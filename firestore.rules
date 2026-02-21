@@ -1,0 +1,37 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // --- Helper Functions ---
+    function isAdmin() {
+      // Check for the existence of the user's UID in the 'admins' collection.
+      // This is secure and efficient.
+      return exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    // --- Collection Rules ---
+
+    // Admin roles are managed from the Firebase Console, not by clients.
+    match /admins/{userId} {
+      allow read: if true; // Allows clients (like the admin panel) to check for admin status.
+      allow write: if false; // DENY all client writes.
+    }
+
+    // Site configuration is publicly readable but only admin-writable.
+    match /site_config/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // Consultation creation is now handled exclusively by a secure server-side API route.
+    // Therefore, all direct client writes are denied.
+    match /consultations/{consultationId} {
+      // DENY ALL client-side creation, update, or deletion.
+      allow write: if false;
+      
+      // Admins can read consultation documents from the admin panel.
+      allow read: if isAdmin();
+    }
+  }
+}

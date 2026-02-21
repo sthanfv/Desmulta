@@ -1,0 +1,292 @@
+{
+  "entities": {
+    "Consultation": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Consultation",
+      "type": "object",
+      "description": "Represents a user inquiry for a viability study. All writes are now handled by a secure server-side API route.",
+      "properties": {
+        "cedula": {
+          "type": "string",
+          "description": "National identification number (Cedula) of the person making the inquiry."
+        },
+        "nombre": {
+          "type": "string",
+          "description": "Full name of the person making the inquiry."
+        },
+        "contacto": {
+          "type": "string",
+          "description": "WhatsApp contact number provided by the user."
+        },
+        "aceptoTerminos": {
+          "type": "boolean",
+          "description": "Indicates whether the user has accepted the terms and conditions."
+        },
+        "status": {
+          "type": "string",
+          "description": "Current status of the consultation (e.g., 'pending')."
+        },
+        "fuente": { "type": "string", "description": "Origin of the consultation (e.g., 'web')." },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the consultation record was created.",
+          "format": "date-time"
+        },
+        "notificationStatus": {
+          "type": "string",
+          "enum": ["pending", "sent"],
+          "description": "Status of the Telegram notification, managed server-side."
+        },
+        "notifiedAt": {
+          "type": "string",
+          "description": "Timestamp when the Telegram notification was successfully sent.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "cedula",
+        "nombre",
+        "contacto",
+        "aceptoTerminos",
+        "status",
+        "fuente",
+        "createdAt",
+        "notificationStatus"
+      ]
+    },
+    "ShowcaseImages": {
+      "title": "Showcase Images",
+      "type": "object",
+      "description": "Stores URLs for the 'before' and 'after' images on the homepage.",
+      "properties": {
+        "beforeImageUrl": {
+          "type": "string",
+          "description": "URL for the 'before' image.",
+          "format": "uri"
+        },
+        "afterImageUrl": {
+          "type": "string",
+          "description": "URL for the 'after' image.",
+          "format": "uri"
+        }
+      },
+      "required": ["beforeImageUrl", "afterImageUrl"]
+    },
+    "Case": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Case",
+      "type": "object",
+      "description": "Represents an administrative debt removal process for a client, typically initiated after a Consultation is deemed viable.",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the Case entity." },
+        "consultationId": {
+          "type": "string",
+          "description": "Reference to the Consultation that initiated this case. (Relationship: Consultation 1:1 Case)"
+        },
+        "caseReferenceNumber": {
+          "type": "string",
+          "description": "Internal or external unique reference number assigned to this administrative case."
+        },
+        "currentStatus": {
+          "type": "string",
+          "description": "Current progress status of the administrative case (e.g., 'pending_documents', 'submitted_to_transit', 'approved', 'rejected', 'closed')."
+        },
+        "initialDebtAmount": {
+          "type": "number",
+          "description": "Total debt amount identified before the administrative process began."
+        },
+        "finalOutcomeDescription": {
+          "type": "string",
+          "description": "A summary description of the final result of the case (e.g., 'Debt fully prescribed', 'Partial debt reduction')."
+        },
+        "caseStartedAt": {
+          "type": "string",
+          "description": "Timestamp when the administrative case officially began.",
+          "format": "date-time"
+        },
+        "caseCompletedAt": {
+          "type": "string",
+          "description": "Timestamp when the administrative case was officially completed or closed.",
+          "format": "date-time"
+        },
+        "beforeSimitImageId": {
+          "type": "string",
+          "description": "Reference to the Asset entity representing the 'before' SIMIT screenshot. (Relationship: Asset 1:N Case)"
+        },
+        "afterSimitImageId": {
+          "type": "string",
+          "description": "Reference to the Asset entity representing the 'after' SIMIT screenshot. (Relationship: Asset 1:N Case)"
+        }
+      },
+      "required": [
+        "id",
+        "consultationId",
+        "caseReferenceNumber",
+        "currentStatus",
+        "initialDebtAmount",
+        "caseStartedAt"
+      ]
+    },
+    "LegalDocumentSummary": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "LegalDocumentSummary",
+      "type": "object",
+      "description": "Stores AI-generated summaries and simplified explanations of legal documents pertinent to a specific case.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the LegalDocumentSummary entity."
+        },
+        "caseId": {
+          "type": "string",
+          "description": "Reference to the Case this summary belongs to. (Relationship: Case 1:N LegalDocumentSummary)"
+        },
+        "documentTitle": {
+          "type": "string",
+          "description": "Title or brief description of the original legal document being summarized."
+        },
+        "summaryContent": {
+          "type": "string",
+          "description": "The AI-generated detailed summary of the legal document."
+        },
+        "keyLegalPoints": {
+          "type": "array",
+          "description": "An array of key legal principles or laws identified and incorporated in the summary.",
+          "items": { "type": "string" }
+        },
+        "simplifiedExplanation": {
+          "type": "string",
+          "description": "A simplified, user-friendly explanation derived from the summary content."
+        },
+        "generatedAt": {
+          "type": "string",
+          "description": "Timestamp when this summary was generated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "caseId",
+        "documentTitle",
+        "summaryContent",
+        "simplifiedExplanation",
+        "generatedAt"
+      ]
+    },
+    "Asset": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Asset",
+      "type": "object",
+      "description": "Manages metadata for digital assets (e.g., images, PDFs) stored in an external CDN like Cloudinary or Vercel Blob, related to cases or consultations.",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the Asset entity." },
+        "url": {
+          "type": "string",
+          "description": "The public URL where the asset is hosted (e.g., Cloudinary, Vercel Blob).",
+          "format": "uri"
+        },
+        "fileName": { "type": "string", "description": "Original filename of the uploaded asset." },
+        "mimeType": {
+          "type": "string",
+          "description": "MIME type of the asset (e.g., 'image/jpeg', 'application/pdf')."
+        },
+        "description": {
+          "type": "string",
+          "description": "Descriptive text for the asset, often used for accessibility (alt text)."
+        },
+        "uploadedAt": {
+          "type": "string",
+          "description": "Timestamp when the asset was uploaded and this record was created.",
+          "format": "date-time"
+        },
+        "caseId": {
+          "type": "string",
+          "description": "Reference to the Case this asset is associated with. (Relationship: Case 1:N Asset)"
+        },
+        "assetType": {
+          "type": "string",
+          "description": "Categorization of the asset (e.g., 'simit_before', 'simit_after', 'official_document', 'proof_of_payment')."
+        }
+      },
+      "required": ["id", "url", "fileName", "mimeType", "description", "uploadedAt"]
+    }
+  },
+  "auth": {
+    "providers": ["google.com", "password"]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/admins/{userId}",
+        "definition": {
+          "description": "Stores UIDs of users with admin privileges. The mere existence of a document for a given UID grants administrative access.",
+          "params": [
+            { "name": "userId", "description": "The Firebase Authentication UID of the user." }
+          ]
+        }
+      },
+      {
+        "path": "/site_config/showcase",
+        "definition": {
+          "entityName": "ShowcaseImages",
+          "schema": { "$ref": "#/backend/entities/ShowcaseImages" },
+          "description": "Singleton document storing homepage showcase images. Publicly readable, admin-writable."
+        }
+      },
+      {
+        "path": "/consultations/{consultationId}",
+        "definition": {
+          "entityName": "Consultation",
+          "schema": { "$ref": "#/backend/entities/Consultation" },
+          "description": "Collection for user inquiries. All client-side writes are now denied. Creation is handled by a secure server-side API route. Management (read/update/delete) is restricted to admins.",
+          "params": [
+            {
+              "name": "consultationId",
+              "description": "Unique identifier for a consultation document."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/cases/{caseId}",
+        "definition": {
+          "entityName": "Case",
+          "schema": { "$ref": "#/backend/entities/Case" },
+          "description": "Collection representing an administrative debt removal process for a client. Each case is managed by an administrator, whose Firebase UID is stored in the 'assignedToId' field. Includes 'createdAt' and 'updatedAt' for auditing purposes.",
+          "params": [{ "name": "caseId", "description": "Unique identifier for a case document." }]
+        }
+      },
+      {
+        "path": "/cases/{caseId}/legalDocumentSummaries/{summaryId}",
+        "definition": {
+          "entityName": "LegalDocumentSummary",
+          "schema": { "$ref": "#/backend/entities/LegalDocumentSummary" },
+          "description": "Subcollection storing AI-generated summaries of legal documents pertinent to a specific case. Includes denormalized 'caseAssignedToId' for authorization independence, ensuring access is tied to the parent case's assigned administrator without requiring cross-document reads.",
+          "params": [
+            { "name": "caseId", "description": "The unique identifier of the parent case." },
+            {
+              "name": "summaryId",
+              "description": "Unique identifier for a legal document summary."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/cases/{caseId}/assets/{assetId}",
+        "definition": {
+          "entityName": "Asset",
+          "schema": { "$ref": "#/backend/entities/Asset" },
+          "description": "Subcollection managing metadata for digital assets (e.g., images, PDFs) associated with a specific case, stored in an external CDN. Includes denormalized 'caseAssignedToId' for authorization independence, ensuring access is tied to the parent case's assigned administrator without requiring cross-document reads.",
+          "params": [
+            { "name": "caseId", "description": "The unique identifier of the parent case." },
+            {
+              "name": "assetId",
+              "description": "Unique identifier for an asset metadata document."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure for VialClear prioritizes security, scalability, and debuggability by strictly adhering to Authorization Independence and Structural Segregation principles. \n\n**Authorization Independence (CRITICAL):**\nThis design ensures authorization independence by: \n1.  **Denormalizing `assignedToId`:** For `LegalDocumentSummary` and `Asset` subcollections, the `caseAssignedToId` (the `uid` of the admin assigned to the parent `Case`) is copied directly into each document. This eliminates the need for expensive and complex `get()` calls in security rules to check the parent `Case` document, thereby enabling atomic operations (transactions/batches) and significantly simplifying rule debugging.\n2.  **Direct `assignedToId` for top-level entities:** `Consultation` and `Case` documents themselves contain an `assignedToId` field, linking them directly to the managing administrator's Firebase UID. This allows for direct authorization checks within the document itself.\n3.  **Dedicated Admin Role Collection:** Administrative privileges are managed via a top-level collection `/admins/{userId}`. The mere existence of a document at `/admins/$(request.auth.uid)` grants global admin access, promoting 'Existence over Content' and avoiding complex permission structures within user documents.\n\n**Querying for Authorization Purposes (QAPs):**\nThis structure directly supports secure `list` operations without relying on rules as filters, which is a key QAP:\n1.  **Admins Listing All:** Global administrators (whose UIDs exist in `/admins`) can securely `list` all documents in `/consultations` and `/cases` because their 'admin' status is checked once at the top level, and the collections are designed for administrative access.\n2.  **Assigned Admin Listing:** An administrator can `list` only the `Consultations` or `Cases` they are `assignedTo` by querying the `assignedToId` field directly (`collection.where('assignedToId', '==', request.auth.uid)`). This is efficient and secure because the `assignedToId` is denormalized within each document.\n3.  **Subcollection Listing:** For `LegalDocumentSummary` and `Asset` documents, `list` operations within a specific `caseId` are secure. Access is granted if the `request.auth.uid` matches the denormalized `caseAssignedToId` present in every document within that subcollection, or if the user is a global admin.\n\n**Structural Segregation:**\nAll documents within a given collection or subcollection path share the same security requirements. For example, all `Consultation` documents are accessible by administrators, and all `LegalDocumentSummary` documents within a `Case` have security tied to that specific case's `assignedToId`. This greatly simplifies Firestore security rules, moving complexity from logic to structure."
+  }
+}
