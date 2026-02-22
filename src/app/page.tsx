@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { ShieldCheck, ArrowRightLeft, CheckCircle2, Info } from 'lucide-react';
+import { ShieldCheck, ArrowRightLeft, CheckCircle2, Info, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ConsultationForm } from '@/components/vial-clear/ConsultationForm';
@@ -12,6 +12,7 @@ import { initiateAnonymousSignIn, useAuth } from '@/firebase';
 
 export default function VialClearPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isWhatsAppWarningOpen, setIsWhatsAppWarningOpen] = useState(false);
   const auth = useAuth();
 
   useEffect(() => {
@@ -19,6 +20,16 @@ export default function VialClearPage() {
       initiateAnonymousSignIn(auth);
     }
   }, [auth]);
+
+  const handleWhatsAppRedirect = () => {
+    const brandName = 'Desmulta';
+    const message = encodeURIComponent(
+      `Hola, vengo de la web de ${brandName}. Deseo una asesoría directa para gestionar mis multas.`
+    );
+    const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '573005648309';
+    window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
+    setIsWhatsAppWarningOpen(false);
+  };
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden selection:bg-primary/30">
@@ -58,13 +69,13 @@ export default function VialClearPage() {
               <ShieldCheck size={16} />
               <span>Servicio 100% Legal y Seguro</span>
             </div>
-            <h1 className="text-6xl md:text-8xl font-black text-foreground tracking-tight leading-[0.95] animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
+            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-foreground tracking-tight leading-[0.95] animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
               Recuperamos tu <br />
               <span className="text-primary italic underline decoration-primary/20 underline-offset-8 transition-all hover:decoration-primary/50">
                 Tranquilidad
               </span>
             </h1>
-            <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed max-w-xl animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
+            <p className="text-lg md:text-xl lg:text-2xl text-muted-foreground leading-relaxed max-w-xl animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
               Expertos en saneamiento legal de fotomultas y comparendos. Sin procesos tediosos, solo
               resultados directos y efectivos.
             </p>
@@ -220,6 +231,24 @@ export default function VialClearPage() {
                 </div>
               </div>
             </div>
+
+            {/* Disclaimer Box - Restored */}
+            <div className="mt-20 glass bg-primary/5 border-primary/20 p-8 md:p-10 rounded-[2.5rem] flex flex-col md:flex-row items-center gap-6 shadow-xl">
+              <div className="w-14 h-14 bg-primary rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-primary/20">
+                <Info className="text-primary-foreground w-8 h-8" />
+              </div>
+              <div className="space-y-2">
+                <h4 className="text-xl font-black text-foreground uppercase tracking-tight">
+                  Nota sobre Honorarios
+                </h4>
+                <p className="text-muted-foreground text-sm md:text-base leading-relaxed font-medium">
+                  &quot;El estudio de viabilidad inicial es una cortesía para identificar sus
+                  oportunidades legales. La ejecución de trámites administrativos y defensa jurídica
+                  genera honorarios profesionales que se ajustan según la complejidad de su
+                  caso.&quot;
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -353,6 +382,66 @@ export default function VialClearPage() {
               </p>
             </DialogHeader>
             <ConsultationForm onSuccess={() => setIsModalOpen(false)} />
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* WhatsApp Floating Action - Restored */}
+      <div className="fixed bottom-8 right-8 z-50 flex flex-col items-end gap-4 group">
+        <div className="glass px-6 py-2 rounded-full text-[11px] text-foreground font-black uppercase tracking-widest shadow-2xl animate-bounce relative hidden group-hover:block border-white/20">
+          ¿Dudas? Chatea con nosotros
+          <div className="absolute -bottom-1 right-8 w-3 h-3 glass rotate-45 border-none"></div>
+        </div>
+        <button
+          onClick={() => setIsWhatsAppWarningOpen(true)}
+          className="bg-[#25D366] hover:bg-[#20ba59] text-white w-20 h-20 rounded-full flex items-center justify-center shadow-2xl shadow-green-500/30 transition-all hover:scale-110 active:scale-90"
+          title="Consultar por WhatsApp"
+        >
+          <MessageCircle size={36} fill="currentColor" className="text-white" />
+        </button>
+      </div>
+
+      {/* WhatsApp Disclaimer Dialog - Restored */}
+      <Dialog open={isWhatsAppWarningOpen} onOpenChange={setIsWhatsAppWarningOpen}>
+        <DialogContent className="max-w-lg p-0 overflow-hidden bg-transparent border-none shadow-none focus-visible:outline-none">
+          <div className="glass p-10 rounded-[3rem] border-white/20 m-4 shadow-3xl bg-white/95 dark:bg-black/80 text-center">
+            <div className="w-20 h-20 bg-green-500/10 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-inner">
+              <MessageCircle size={40} className="text-[#25D366]" />
+            </div>
+            <DialogHeader className="mb-6">
+              <DialogTitle className="text-3xl font-black text-foreground tracking-tight">
+                Asesoría Directa
+              </DialogTitle>
+              <div className="space-y-4 pt-4">
+                <p className="text-muted-foreground text-lg leading-relaxed font-medium">
+                  Recuerde que el estudio de viabilidad base es{' '}
+                  <span className="text-primary font-black">100% gratuito</span>.
+                </p>
+                <div className="bg-primary/5 border border-primary/20 p-6 rounded-2xl flex items-start gap-4 text-left">
+                  <Info className="text-primary shrink-0 mt-1" size={24} />
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    El canal directo está diseñado para iniciar la{' '}
+                    <strong>contratación de trámites</strong>. La gestión administrativa genera
+                    honorarios por resultados.
+                  </p>
+                </div>
+              </div>
+            </DialogHeader>
+            <div className="flex flex-col gap-4 mt-10">
+              <Button
+                onClick={handleWhatsAppRedirect}
+                className="h-16 rounded-2xl bg-[#25D366] hover:bg-[#20ba59] text-white font-black text-lg active:scale-95 transition-all shadow-xl shadow-green-500/20 border-none"
+              >
+                ENTENDIDO, ABRIR CHAT
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => setIsWhatsAppWarningOpen(false)}
+                className="h-14 rounded-2xl text-muted-foreground font-bold hover:bg-muted active:scale-95"
+              >
+                Prefiero el estudio gratuito
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
