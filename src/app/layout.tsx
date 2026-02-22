@@ -7,6 +7,10 @@ export const metadata: Metadata = {
   title: `${process.env.NEXT_PUBLIC_BRAND_NAME || 'Desmulta'} - Saneamiento de Multas de Tránsito`,
   description:
     'Intermediamos ante las Secretarías de Tránsito para gestionar legalmente sus deudas antiguas. Libérese de multas de forma eficiente.',
+  icons: {
+    icon: '/logo.png',
+    apple: '/logo.png',
+  },
 };
 
 export default function RootLayout({
