@@ -1,0 +1,7 @@
+# MANDATO-FILTRO: Robots.txt production version
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api
+
+Sitemap: https://desmulta.com/sitemap.xml

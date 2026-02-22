@@ -4,13 +4,13 @@ import type { NextConfig } from 'next';
 // CSP, anti-clickjacking, HSTS, MIME sniffing prevention, Referrer, Permissions
 const cspHeader = [
   "default-src 'self'",
-  // Next.js requiere 'unsafe-inline' en script-src para funcionar correctamente
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+  // Next.js requiere 'unsafe-inline'. Se agregan Googlegtagmanager y Facebook para tracking.
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://connect.facebook.net",
   "style-src 'self' 'unsafe-inline'",
-  // Imágenes: datos inline + dominios remotos configurados
-  "img-src 'self' data: blob: https://placehold.co https://images.unsplash.com https://picsum.photos https://*.public.blob.vercel-storage.com https://firebasestorage.googleapis.com",
-  // Conexiones: Firebase Client SDK, Firestore, Telegram
-  "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://api.telegram.org",
+  // Imágenes: Se agregan dominios de tracking para beacons/pixeles.
+  "img-src 'self' data: blob: https://placehold.co https://images.unsplash.com https://picsum.photos https://*.public.blob.vercel-storage.com https://firebasestorage.googleapis.com https://www.google-analytics.com https://www.facebook.com",
+  // Conexiones: Firebase, Telegram, Google Analytics.
+  "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://api.telegram.org https://www.google-analytics.com",
   "frame-src 'none'",
   "frame-ancestors 'none'",
   "object-src 'none'",
