@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ConsultationForm } from '@/components/vial-clear/ConsultationForm';
 import { Lightbox } from '@/components/ui/lightbox';
+import { ModeToggle } from '@/components/mode-toggle';
 import {
   useAuth,
   useUser,
@@ -65,19 +66,20 @@ export default function VialClearPage() {
 
   return (
     <div className="min-h-screen font-body">
-      <header className="sticky top-0 z-40 backdrop-blur-md bg-background/80 border-b border-white/5 px-6 py-4">
+      <header className="sticky top-0 z-40 backdrop-blur-md bg-background/80 border-b border-border px-6 py-4">
         <nav className="max-w-6xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-3 group">
               <div className="bg-primary p-2 rounded-lg shadow-[0_0_15px_rgba(234,179,8,0.3)] transition-transform group-hover:scale-110">
                 <ShieldCheck className="text-primary-foreground" size={24} />
               </div>
-              <span className="font-black tracking-tighter text-xl lg:text-2xl uppercase bg-gradient-to-br from-white to-white/60 bg-clip-text text-transparent">
+              <span className="font-black tracking-tighter text-xl lg:text-2xl uppercase text-foreground">
                 {brandName}
               </span>
             </Link>
           </div>
           <div className="flex items-center gap-4">
+            <ModeToggle />
           </div>
         </nav>
       </header>
@@ -111,9 +113,9 @@ export default function VialClearPage() {
           {/* Resultados Reales Card Centered */}
           <div className="relative group">
             <div className="absolute -inset-1 bg-gradient-to-r from-primary to-yellow-600 rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
-            <div className="relative bg-card border border-white/10 rounded-3xl p-8 overflow-hidden">
+            <div className="relative bg-card border border-border rounded-3xl p-8 overflow-hidden">
               <div className="flex justify-between items-center mb-6 lg:mb-10">
-                <h3 className="font-bold text-xl lg:text-2xl flex items-center gap-3">
+                <h3 className="font-bold text-xl lg:text-2xl flex items-center gap-3 text-card-foreground">
                   <CheckCircle2 className="text-primary" size={24} />
                   Resultados Reales
                 </h3>
@@ -185,11 +187,11 @@ export default function VialClearPage() {
           </div>
         </section>
 
-        <section className="bg-card/30 border border-white/5 rounded-3xl p-8 lg:p-12 mb-32 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 blur-[100px] rounded-full mix-blend-screen pointer-events-none"></div>
+        <section className="bg-muted/30 border border-border rounded-3xl p-8 lg:p-12 mb-32 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 blur-[100px] rounded-full mix-blend-multiply dark:mix-blend-screen pointer-events-none"></div>
 
           <div className="text-center max-w-2xl mx-auto mb-16 relative z-10">
-            <h2 className="text-3xl md:text-5xl font-black mb-6 text-white">
+            <h2 className="text-3xl md:text-5xl font-black mb-6 text-foreground">
               No deje que las <span className="text-primary">multas</span> limiten su vida
             </h2>
             <p className="text-muted-foreground text-lg">
@@ -200,11 +202,11 @@ export default function VialClearPage() {
 
           <div className="grid md:grid-cols-3 gap-8 relative z-10">
             {/* Paso 1 */}
-            <div className="bg-white/5 border border-white/10 p-8 rounded-2xl flex flex-col relative group hover:border-red-500/50 transition-colors">
+            <div className="bg-background border border-border p-8 rounded-2xl flex flex-col relative group hover:border-red-500/50 transition-colors shadow-sm">
               <div className="w-14 h-14 bg-red-500/10 text-red-500 rounded-xl flex items-center justify-center mb-6">
                 <AlertTriangle size={28} />
               </div>
-              <h4 className="font-bold text-xl mb-3 text-white">1. El Problema que Crece</h4>
+              <h4 className="font-bold text-xl mb-3 text-foreground">1. El Problema que Crece</h4>
               <p className="text-muted-foreground leading-relaxed text-sm flex-1">
                 Las deudas acumuladas en el SIMIT pueden derivar en cobros coactivos y embargos de
                 cuentas bancarias. Ignorarlo no elimina la deuda.
@@ -212,11 +214,11 @@ export default function VialClearPage() {
             </div>
 
             {/* Paso 2 */}
-            <div className="bg-white/5 border border-white/10 p-8 rounded-2xl flex flex-col relative group hover:border-yellow-500/50 transition-colors">
+            <div className="bg-background border border-border p-8 rounded-2xl flex flex-col relative group hover:border-yellow-500/50 transition-colors shadow-sm">
               <div className="w-14 h-14 bg-yellow-500/10 text-yellow-500 rounded-xl flex items-center justify-center mb-6">
                 <Search size={28} />
               </div>
-              <h4 className="font-bold text-xl mb-3 text-white">2. Estudio Cero Costo</h4>
+              <h4 className="font-bold text-xl mb-3 text-foreground">2. Estudio Cero Costo</h4>
               <p className="text-muted-foreground leading-relaxed text-sm flex-1">
                 Llene nuestro formulario y sus datos serán evaluados <strong>gratuitamente</strong>.
                 Determinaremos la viabilidad jurídica para borrar sus deudas.
@@ -224,11 +226,11 @@ export default function VialClearPage() {
             </div>
 
             {/* Paso 3 */}
-            <div className="bg-white/5 border border-white/10 p-8 rounded-2xl flex flex-col relative group hover:border-green-500/50 transition-colors">
+            <div className="bg-background border border-border p-8 rounded-2xl flex flex-col relative group hover:border-green-500/50 transition-colors shadow-sm">
               <div className="w-14 h-14 bg-green-500/10 text-green-500 rounded-xl flex items-center justify-center mb-6">
                 <ShieldCheck size={28} />
               </div>
-              <h4 className="font-bold text-xl mb-3 text-white">3. Saneamiento Exitoso</h4>
+              <h4 className="font-bold text-xl mb-3 text-foreground">3. Saneamiento Exitoso</h4>
               <p className="text-muted-foreground leading-relaxed text-sm flex-1">
                 Si su caso es aprobable, realizamos la gestión ante Tránsito. Cotizaremos honorarios
                 profesionales ajustados a su favor, cobrando resultados.
@@ -238,17 +240,17 @@ export default function VialClearPage() {
         </section>
       </main>
 
-      <footer className="bg-black/30 border-t border-white/5 py-16 px-6">
+      <footer className="bg-muted border-t border-border py-16 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="space-y-12 mb-12">
             {/* Aviso Legal Prioritario */}
-            <div className="bg-slate-900/50 border-2 border-slate-700/50 p-6 sm:p-8 rounded-xl shadow-inner relative overflow-hidden w-full">
+            <div className="bg-background border-2 border-border p-6 sm:p-8 rounded-xl shadow-inner relative overflow-hidden w-full">
               <div className="absolute top-0 left-0 w-2 h-full bg-yellow-500"></div>
-              <h5 className="text-yellow-500 font-bold text-sm uppercase tracking-widest mb-4 flex items-center gap-3">
-                <AlertTriangle size={18} className="text-yellow-500" />
+              <h5 className="text-yellow-600 dark:text-yellow-500 font-bold text-sm uppercase tracking-widest mb-4 flex items-center gap-3">
+                <AlertTriangle size={18} className="text-yellow-600 dark:text-yellow-500" />
                 Aviso Legal y Declaración Institucional
               </h5>
-              <p className="text-slate-400 text-xs sm:text-sm leading-relaxed text-justify">
+              <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed text-justify">
                 <strong>ACLARATORIA INSTITUCIONAL:</strong> {brandName.toUpperCase()} NO es una
                 unidad gubernamental ni firma litigante judicial. Somos una organización privada
                 dedicada a la <strong>orientación y gestión de procesos administrativos</strong>{' '}
@@ -267,15 +269,15 @@ export default function VialClearPage() {
                 <div className="bg-primary p-2 rounded-lg shadow-[0_0_15px_rgba(234,179,8,0.3)]">
                   <ShieldCheck className="text-primary-foreground" size={24} />
                 </div>
-                <span className="font-black tracking-tighter text-xl uppercase">{brandName}</span>
+                <span className="font-black tracking-tighter text-xl uppercase text-foreground">{brandName}</span>
               </div>
-              <p className="text-slate-500 text-sm leading-relaxed">
+              <p className="text-muted-foreground text-sm leading-relaxed">
                 Expertos en gestión administrativa de tránsito. Recuperamos la movilidad financiera
                 de los conductores colombianos basándonos en el estricto cumplimiento legal.
               </p>
             </div>
           </div>
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6 pt-8 border-t border-white/5 text-slate-600 text-xs">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6 pt-8 border-t border-border text-muted-foreground text-xs">
             <p>
               © {new Date().getFullYear()} {brandName}. Todos los derechos reservados.
             </p>
@@ -306,14 +308,14 @@ export default function VialClearPage() {
       </div>
 
       <Dialog open={isWhatsAppWarningOpen} onOpenChange={setIsWhatsAppWarningOpen}>
-        <DialogContent className="w-[95vw] max-w-lg bg-slate-900 border border-primary/20 rounded-[2rem] shadow-2xl p-6 sm:p-8 overflow-hidden">
+        <DialogContent className="w-[95vw] max-w-lg bg-background border border-border rounded-[2rem] shadow-2xl p-6 sm:p-8 overflow-hidden">
           <div className="mb-4">
-            <DialogTitle className="text-xl sm:text-2xl font-bold text-white flex items-center gap-3">
+            <DialogTitle className="text-xl sm:text-2xl font-bold text-foreground flex items-center gap-3">
               <MessageCircle className="text-green-500" size={28} />
               Chat de Asesoría en Vivo
             </DialogTitle>
           </div>
-          <div className="space-y-4 text-slate-300">
+          <div className="space-y-4 text-muted-foreground">
             <p className="text-sm sm:text-base leading-relaxed">
               Recuerde que el estudio de viabilidad llenando nuestro formulario base es{' '}
               <strong className="text-primary text-base sm:text-lg">completamente gratuito</strong>.
@@ -331,7 +333,7 @@ export default function VialClearPage() {
             <Button
               variant="ghost"
               onClick={() => setIsWhatsAppWarningOpen(false)}
-              className="text-slate-400 hover:text-white w-full sm:w-auto h-auto min-h-12 py-3 whitespace-normal"
+              className="text-muted-foreground hover:text-foreground w-full sm:w-auto h-auto min-h-12 py-3 whitespace-normal"
             >
               No, prefiero el estudio gratuito
             </Button>
@@ -346,9 +348,9 @@ export default function VialClearPage() {
       </Dialog>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-md bg-slate-900 border border-primary/20 rounded-[2rem] shadow-2xl overflow-hidden p-0">
-          <DialogHeader className="px-8 py-6 border-b border-white/5 flex-row justify-between items-center bg-white/5">
-            <DialogTitle className="text-xl font-bold text-white flex items-center gap-2">
+        <DialogContent className="max-w-md bg-background border border-border rounded-[2rem] shadow-2xl overflow-hidden p-0">
+          <DialogHeader className="px-8 py-6 border-b border-border flex-row justify-between items-center bg-muted/50">
+            <DialogTitle className="text-xl font-bold text-foreground flex items-center gap-2">
               <Search className="text-primary" size={20} />
               Revisión Gratuita
             </DialogTitle>
