@@ -1,7 +1,10 @@
-# MANDATO-FILTRO: Robots.txt production version
+# *
 User-agent: *
 Allow: /
-Disallow: /admin
-Disallow: /api
 
-Sitemap: https://desmulta.com/sitemap.xml
+# Host
+Host: https://desmulta-ofi.vercel.app
+
+# Sitemaps
+Sitemap: https://desmulta-ofi.vercel.app/sitemap.xml
+Sitemap: https://desmulta.com/sitemap-0.xml

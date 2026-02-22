@@ -95,10 +95,11 @@ npm run check
 ---
 
 ## 🎨 Identidad Visual y Assets
+
 - **Logo Principal:** `public/logo.png`
 - **Icono del Navegador (Favicon):** `src/app/icon.png` (Alta resolución 512x512)
 - **Estética:** Inspirada en portales institucionales de tránsito con enfoque en seguridad y autoridad legal.
 
 ---
-Hecho con ❤️ para **Desmulta**.
 
+Hecho con ❤️ para **Desmulta**.

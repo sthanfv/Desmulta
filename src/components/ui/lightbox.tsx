@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { ZoomIn } from 'lucide-react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
+import Image from 'next/image';
 
 interface LightboxProps {
   src: string;
@@ -19,10 +20,11 @@ export function Lightbox({ src, alt, className = '' }: LightboxProps) {
       <DialogTrigger asChild>
         <div className={`relative group cursor-zoom-in overflow-hidden rounded-lg ${className}`}>
           {/* Imagen miniatura */}
-          <img
+          <Image
             src={src}
             alt={alt}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
           />
           {/* Overlay interactivo */}
           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
@@ -41,11 +43,9 @@ export function Lightbox({ src, alt, className = '' }: LightboxProps) {
           {alt || 'Vista ampliada de la imagen'}
         </DialogPrimitive.Title>
 
-        <img
-          src={src}
-          alt={alt}
-          className="w-full h-full object-contain drop-shadow-2xl animate-in zoom-in-95 duration-300"
-        />
+        <div className="relative w-full h-full animate-in zoom-in-95 duration-300">
+          <Image src={src} alt={alt} fill className="object-contain drop-shadow-2xl" priority />
+        </div>
       </DialogContent>
     </Dialog>
   );

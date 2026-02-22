@@ -1,18 +1,16 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import {
   ShieldCheck,
   ArrowRightLeft,
   CheckCircle2,
-  Search,
-  Info,
   AlertTriangle,
-  MessageCircle,
   Loader2,
-  ZoomIn,
+  Search,
+  MessageCircle,
+  Info,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -269,7 +267,9 @@ export default function VialClearPage() {
                 <div className="bg-primary p-2 rounded-lg shadow-[0_0_15px_rgba(234,179,8,0.3)]">
                   <ShieldCheck className="text-primary-foreground" size={24} />
                 </div>
-                <span className="font-black tracking-tighter text-xl uppercase text-foreground">{brandName}</span>
+                <span className="font-black tracking-tighter text-xl uppercase text-foreground">
+                  {brandName}
+                </span>
               </div>
               <p className="text-muted-foreground text-sm leading-relaxed">
                 Expertos en gestión administrativa de tránsito. Recuperamos la movilidad financiera

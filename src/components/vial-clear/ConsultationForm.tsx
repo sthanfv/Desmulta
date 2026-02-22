@@ -61,7 +61,7 @@ export function ConsultationForm({ onClose }: { onClose: () => void }) {
 
       try {
         result = JSON.parse(responseText);
-      } catch (_parseError) {
+      } catch {
         throw new Error(
           `El servidor devolvió una respuesta inesperada. Status: ${response.status}. Respuesta: ${responseText.slice(0, 200)}...`
         );
@@ -156,7 +156,9 @@ export function ConsultationForm({ onClose }: { onClose: () => void }) {
           name="nombre"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-sm font-medium text-foreground/80">Nombre Completo</FormLabel>
+              <FormLabel className="text-sm font-medium text-foreground/80">
+                Nombre Completo
+              </FormLabel>
               <FormControl>
                 <Input
                   placeholder="Como aparece en el documento"

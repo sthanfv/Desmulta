@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Loader2, UploadCloud, X, CheckCircle2 } from 'lucide-react';
+import Image from 'next/image';
 
 export function ImageUploader() {
   const [file, setFile] = useState<File | null>(null);
@@ -54,12 +55,12 @@ export function ImageUploader() {
   };
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 text-slate-200">
-      <h3 className="text-lg font-bold text-white mb-4">Cargar Evidencia (Vercel Blob)</h3>
+    <div className="bg-card border border-border rounded-xl p-6 text-card-foreground">
+      <h3 className="text-lg font-bold text-foreground mb-4">Cargar Evidencia (Vercel Blob)</h3>
 
       {!uploadedUrl ? (
-        <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-slate-700 rounded-lg bg-slate-950/50 hover:bg-slate-900/50 transition-colors">
-          <UploadCloud className="w-10 h-10 text-slate-400 mb-4" />
+        <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-border rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+          <UploadCloud className="w-10 h-10 text-muted-foreground mb-4" />
           <input
             type="file"
             ref={fileInputRef}
@@ -70,14 +71,17 @@ export function ImageUploader() {
           />
           <label
             htmlFor="file-upload"
-            className="cursor-pointer bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+            className="cursor-pointer bg-primary/10 hover:bg-primary/20 text-primary px-4 py-2 rounded-md text-sm font-medium transition-colors"
           >
             Seleccionar Imagen
           </label>
           {file && (
-            <div className="mt-4 flex items-center gap-2 bg-slate-800 px-3 py-1.5 rounded-full text-sm">
+            <div className="mt-4 flex items-center gap-2 bg-muted px-3 py-1.5 rounded-full text-sm">
               <span className="truncate max-w-[200px]">{file.name}</span>
-              <button onClick={clearSelection} className="text-slate-400 hover:text-red-400">
+              <button
+                onClick={clearSelection}
+                className="text-muted-foreground hover:text-destructive"
+              >
                 <X size={16} />
               </button>
             </div>
@@ -85,7 +89,7 @@ export function ImageUploader() {
         </div>
       ) : (
         <div className="flex flex-col items-center">
-          <div className="bg-green-500/10 text-green-400 p-4 rounded-lg w-full mb-4 flex items-start gap-3 border border-green-500/20">
+          <div className="bg-green-500/10 text-green-600 dark:text-green-400 p-4 rounded-lg w-full mb-4 flex items-start gap-3 border border-green-500/20">
             <CheckCircle2 className="w-5 h-5 mt-0.5 flex-shrink-0" />
             <div>
               <p className="font-semibold text-sm">¡Subida exitosa!</p>
@@ -93,18 +97,16 @@ export function ImageUploader() {
                 href={uploadedUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="text-xs break-all underline hover:text-green-300 mt-1 block"
+                className="text-xs break-all underline hover:opacity-80 mt-1 block"
               >
                 {uploadedUrl}
               </a>
             </div>
           </div>
 
-          <img
-            src={uploadedUrl}
-            alt="Uploaded preview"
-            className="w-full max-h-64 object-contain rounded-lg border border-slate-700 mb-4"
-          />
+          <div className="relative w-full h-64 rounded-lg border border-border overflow-hidden mb-4">
+            <Image src={uploadedUrl} alt="Uploaded preview" fill className="object-contain" />
+          </div>
 
           <Button onClick={clearSelection} variant="outline" className="w-full">
             Subir otra imagen
