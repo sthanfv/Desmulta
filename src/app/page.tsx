@@ -75,7 +75,7 @@ export default function VialClearPage() {
                 Tranquilidad
               </span>
             </h1>
-            <p className="text-lg md:text-xl lg:text-2xl text-muted-foreground leading-relaxed max-w-xl animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
+            <p className="text-lg md:text-xl lg:text-2xl text-muted-foreground leading-relaxed max-w-lg animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
               Expertos en saneamiento legal de fotomultas y comparendos. Sin procesos tediosos, solo
               resultados directos y efectivos.
             </p>
@@ -142,14 +142,14 @@ export default function VialClearPage() {
               },
               {
                 icon: ArrowRightLeft,
-                title: 'Trámite Directo',
-                desc: 'Sin intermediarios oscuros. Usted trata con abogados reales.',
+                title: 'Gestión Especializada',
+                desc: 'Trato directo y profesional centrado en la resolución administrativa de su caso.',
                 delay: '100',
               },
               {
                 icon: CheckCircle2,
-                title: 'Pago por Resultados',
-                desc: 'Nuestra comisión se genera solo si el proceso es exitoso.',
+                title: 'Eficiencia Comprobada',
+                desc: 'Acompañamiento experto fundamentado en el estricto cumplimiento de las leyes.',
                 delay: '200',
               },
             ].map((item, i) => (
