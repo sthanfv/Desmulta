@@ -78,35 +78,27 @@ BLOB_READ_WRITE_TOKEN="..."
 Recomendado para trabajar en Localhost: puerto **9005**.
 
 ```bash
-# Instalar dependencias puras (Compatibilidad React 19)
-npm install --legacy-peer-deps
+# Instalar dependencias puras (Ignorando conflictos de React 19 v7 Testing Library)
+npm install
 
 # Iniciar servidor local
 npm run dev
 ```
 
-El script de chequeo de Pipeline a la Fija antes de hacer Push de Vercel (Recomendado):
+El script de chequeo de Pipeline a la fija antes de hacer Push de Vercel (Recomendado):
 
 ```bash
 npm run check
 # Esto invoca -> format (Prettier), lint (Next CLI), typecheck (Tsc) y Next Build.
 ```
 
-## 🚀 Despliegue en Local y Checks de Calidad
+---
 
-Recomendado para trabajar en Localhost: puerto **9005**.
+## 🎨 Identidad Visual y Assets
+- **Logo Principal:** `public/logo.png`
+- **Icono del Navegador (Favicon):** `src/app/icon.png` (Alta resolución 512x512)
+- **Estética:** Inspirada en portales institucionales de tránsito con enfoque en seguridad y autoridad legal.
 
-```bash
-# Instalar dependencias puras (Compatibilidad React 19)
-npm install --legacy-peer-deps
+---
+Hecho con ❤️ para **Desmulta**.
 
-# Iniciar servidor local
-npm run dev
-```
-
-El script de chequeo de Pipeline a la Fija antes de hacer Push de Vercel (Recomendado):
-
-```bash
-npm run check
-# Esto invoca -> format (Prettier), lint (Next CLI), typecheck (Tsc), tests y Next Build.
-```
