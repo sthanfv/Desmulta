@@ -1,6 +1,6 @@
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
-    siteUrl: 'https://desmulta.com',
+    siteUrl: 'https://desmulta-ofi.vercel.app',
     generateRobotsTxt: true,
     exclude: ['/admin', '/api'],
     robotsTxtOptions: {
