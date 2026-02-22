@@ -8,6 +8,8 @@ import { getAuth } from 'firebase/auth';
 
 import { ConsultationSchema } from '@/lib/definitions';
 
+import Link from 'next/link';
+
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
@@ -58,7 +60,7 @@ export function ConsultationForm({ onClose }: { onClose: () => void }) {
 
       try {
         result = JSON.parse(responseText);
-      } catch (e) {
+      } catch (_parseError) {
         throw new Error(
           `El servidor devolvió una respuesta inesperada. Status: ${response.status}. Respuesta: ${responseText.slice(0, 200)}...`
         );
@@ -75,12 +77,13 @@ export function ConsultationForm({ onClose }: { onClose: () => void }) {
       });
       setIsSuccess(true);
       setTimeout(onClose, 3000);
-    } catch (e: any) {
-      console.error('Error al enviar la consulta:', e);
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : 'Por favor, intente de nuevo más tarde.';
+      console.warn('Alerta al enviar la consulta:', e);
       toast({
         variant: 'destructive',
         title: 'No se pudo enviar la solicitud',
-        description: e.message || 'Por favor, intente de nuevo más tarde.',
+        description: message,
       });
     }
   };
@@ -191,9 +194,13 @@ export function ConsultationForm({ onClose }: { onClose: () => void }) {
                 </FormLabel>
                 <p className="text-xs text-slate-500">
                   Al enviar, autoriza la consulta de sus datos.{' '}
-                  <a href="#" className="underline text-primary/80 hover:text-primary">
+                  <Link
+                    href="/terminos"
+                    target="_blank"
+                    className="underline text-primary/80 hover:text-primary"
+                  >
                     Leer más
-                  </a>
+                  </Link>
                   .
                 </p>
                 <FormMessage />

@@ -7,7 +7,8 @@ import { ConsultationSchema } from '@/lib/definitions';
 try {
   getAdminApp();
 } catch (error) {
-  console.error('[firebase-admin] Error de inicialización:', error);
+  const message = error instanceof Error ? error.message : 'Error desconocido';
+  console.error('[firebase-admin] Error de inicialización:', message);
 }
 
 export async function POST(request: Request) {
@@ -23,15 +24,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Cuerpo de la petición vacío.' }, { status: 400 });
     }
 
-    let body;
+    let body: unknown;
     try {
       body = JSON.parse(rawBody);
-    } catch (parseError) {
-      console.error('[create-consultation] Error al parsear JSON:', rawBody.substring(0, 100));
+    } catch {
+      console.error('[create-consultation] Error al parsear JSON.');
       return NextResponse.json({ error: 'Formato JSON inválido.' }, { status: 400 });
     }
 
-    // 1. Validate input data against schema
+    // 1. Validar input contra el schema Zod
     const validation = ConsultationSchema.safeParse(body);
     if (!validation.success) {
       return NextResponse.json(
@@ -61,7 +62,7 @@ export async function POST(request: Request) {
       }
     }
 
-    // 3. Prepare data for Firestore
+    // 3. Preparar datos para Firestore
     const dataToSave = {
       authorUid,
       cedula,
@@ -74,30 +75,49 @@ export async function POST(request: Request) {
       notificationStatus: 'pending' as const,
     };
 
-    // 4. Use a transaction to write consultation and update cooldown atomically
-    const consultationRef = db.collection('consultations').doc(); // Create a new doc ref
+    // 4. Transacción atómica: escribir consulta + actualizar cooldown
+    const consultationRef = db.collection('consultations').doc();
 
     await db.runTransaction(async (transaction) => {
       transaction.set(consultationRef, dataToSave);
       transaction.set(cooldownRef, { lastAttemptAt: FieldValue.serverTimestamp() });
     });
 
-    // 5. Trigger notification (fire-and-forget)
-    // We don't await this so the client gets a faster response.
-    // Construimos la URL base dinámicamente para que funcione tanto en localhost como en prod.
-    const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
-    const host = request.headers.get('host') || 'localhost:3000';
-    const notifyUrl = `${protocol}://${host}/api/notify`;
+    // 5. Disparar notificación (fire-and-forget)
+    // ✅ SSRF FIX: URL construida desde variable de entorno, NUNCA del header Host del request.
+    // Un atacante podría manipular el header Host para redirigir el fetch a un servidor malicioso.
+    // Usamos NEXT_PUBLIC_SITE_URL configurada en el entorno de servidor.
+    const baseUrl =
+      process.env.NODE_ENV === 'development'
+        ? 'http://localhost:9005'
+        : process.env.NEXT_PUBLIC_SITE_URL;
 
-    fetch(notifyUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ docId: consultationRef.id }),
-    }).catch((err) => console.error('[create-consultation] Error disparando notify:', err.message));
+    if (baseUrl) {
+      const notifyUrl = `${baseUrl}/api/notify`;
+      const internalSecret = process.env.INTERNAL_API_SECRET || '';
+
+      fetch(notifyUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // Secreto interno: /api/notify rechazará llamados sin este header
+          'x-internal-secret': internalSecret,
+        },
+        body: JSON.stringify({ docId: consultationRef.id }),
+      }).catch((err: unknown) => {
+        const msg = err instanceof Error ? err.message : 'Error desconocido';
+        console.error('[create-consultation] Error disparando notify:', msg);
+      });
+    } else {
+      console.error(
+        '[create-consultation] NEXT_PUBLIC_SITE_URL no está configurado. Notificación omitida.'
+      );
+    }
 
     return NextResponse.json({ success: true, docId: consultationRef.id }, { status: 201 });
-  } catch (error: any) {
-    console.error('Error in /api/create-consultation:', error);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Error desconocido';
+    console.error('[create-consultation] Error interno:', message);
     return NextResponse.json({ error: 'Error interno del servidor.' }, { status: 500 });
   }
 }

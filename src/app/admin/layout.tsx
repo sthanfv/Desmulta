@@ -40,13 +40,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       try {
         setIsSigningIn(true);
         await signInWithEmailAndPassword(auth, email, password);
-      } catch (error: any) {
+      } catch (error) {
+        const err = error as { code?: string; message?: string };
         console.error('Error signing in with email', error);
         let description = 'Por favor, verifique sus credenciales e intente de nuevo.';
         if (
-          error.code === 'auth/invalid-credential' ||
-          error.code === 'auth/user-not-found' ||
-          error.code === 'auth/wrong-password'
+          err.code === 'auth/invalid-credential' ||
+          err.code === 'auth/user-not-found' ||
+          err.code === 'auth/wrong-password'
         ) {
           description = 'Credenciales incorrectas. Por favor, verifique el email y la contraseña.';
         }
@@ -79,7 +80,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         description:
           'Revise su bandeja de entrada. Se ha enviado un enlace para restablecer su contraseña.',
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error sending password reset email', error);
       toast({
         variant: 'destructive',

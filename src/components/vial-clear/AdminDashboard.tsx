@@ -3,25 +3,15 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { useFirestore, useDoc, useMemoFirebase, useAuth } from '@/firebase';
-import {
-  doc,
-  setDoc,
-  collection,
-  query,
-  where,
-  getDocs,
-  writeBatch,
-  Timestamp,
-} from 'firebase/firestore';
-import { uploadImage } from '@/app/admin/actions';
-import { ImageUploader } from '@/components/admin/ImageUploader';
+import { doc, setDoc } from 'firebase/firestore';
+import { deleteExpiredConsultations, uploadImage } from '@/app/admin/actions';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Upload, Trash2 } from 'lucide-react';
+import { Loader2, Trash2, Image as ImageIcon, Upload } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
 import {
   AlertDialog,
@@ -125,11 +115,37 @@ export function AdminDashboard() {
         setAfterPreview(null);
         form.reset();
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : 'Ocurrió un problema al guardar los cambios.';
       toast({
         variant: 'destructive',
         title: 'Error al actualizar',
-        description: error.message || 'Ocurrió un problema al guardar los cambios.',
+        description: message,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleClearShowcase = async () => {
+    setIsSubmitting(true);
+    try {
+      if (showcaseRef) {
+        await setDoc(showcaseRef, { beforeImageUrl: null, afterImageUrl: null }, { merge: true });
+        toast({
+          title: 'Caso eliminado',
+          description: 'El caso de éxito fue retirado de la vista pública.',
+        });
+        setBeforePreview(null);
+        setAfterPreview(null);
+        form.reset();
+      }
+    } catch {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'No se pudo eliminar el caso actual.',
       });
     } finally {
       setIsSubmitting(false);
@@ -137,53 +153,35 @@ export function AdminDashboard() {
   };
 
   const handleDeleteExpired = async () => {
-    if (!firestore) {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'No se pudo conectar a la base de datos.',
-      });
-      return;
-    }
-
     setIsCleaning(true);
-
     try {
-      const consultationsRef = collection(firestore, 'consultations');
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-      const sevenDaysAgoTimestamp = Timestamp.fromDate(sevenDaysAgo);
+      const result = await deleteExpiredConsultations();
 
-      // Query for documents older than 7 days
-      const q = query(consultationsRef, where('createdAt', '<=', sevenDaysAgoTimestamp));
-      const querySnapshot = await getDocs(q);
+      if (result.error) {
+        toast({
+          variant: 'destructive',
+          title: 'Error de limpieza',
+          description: result.error,
+        });
+        return;
+      }
 
-      if (querySnapshot.empty) {
+      if (result.count === 0) {
         toast({
           title: 'Todo limpio',
           description: 'No se encontraron consultas vencidas para eliminar.',
         });
-        setIsCleaning(false);
-        return;
+      } else {
+        toast({
+          title: '¡Limpieza completada!',
+          description: `Se eliminaron ${result.count} consultas vencidas.`,
+        });
       }
-
-      const batch = writeBatch(firestore);
-      querySnapshot.forEach((doc) => {
-        batch.delete(doc.ref);
-      });
-
-      await batch.commit();
-
-      toast({
-        title: '¡Limpieza completada!',
-        description: `Se eliminaron ${querySnapshot.size} consultas vencidas.`,
-      });
-    } catch (error: any) {
-      console.error('Error durante la limpieza de consultas:', error);
+    } catch {
       toast({
         variant: 'destructive',
-        title: 'Error en la limpieza',
-        description: error.message || 'Ocurrió un problema al intentar eliminar las consultas.',
+        title: 'Error interno',
+        description: 'Ocurrió un problema de servidor al intentar eliminar las consultas.',
       });
     } finally {
       setIsCleaning(false);
@@ -203,7 +201,8 @@ export function AdminDashboard() {
           <CardHeader>
             <CardTitle>Gestionar Caso de Éxito</CardTitle>
             <CardDescription>
-              Suba las imágenes de "antes" y "después" que se mostrarán en la página principal.
+              Suba las imágenes de &quot;antes&quot; y &quot;después&quot; que se mostrarán en la
+              página principal.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -215,21 +214,27 @@ export function AdminDashboard() {
                     name="beforeImage"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-lg font-semibold">Imagen "Antes"</FormLabel>
+                        <FormLabel className="text-lg font-semibold">
+                          Imagen &quot;Antes&quot;
+                        </FormLabel>
                         <div className="aspect-video relative bg-muted rounded-md overflow-hidden border-2 border-dashed flex items-center justify-center">
                           {isLoading ? (
-                            <Loader2 className="animate-spin" />
-                          ) : (
+                            <Loader2 className="animate-spin text-muted-foreground" />
+                          ) : beforePreview || showcaseData?.beforeImageUrl ? (
                             <Image
-                              src={
-                                beforePreview ||
-                                showcaseData?.beforeImageUrl ||
-                                'https://picsum.photos/seed/before/600/400'
-                              }
+                              src={beforePreview || showcaseData?.beforeImageUrl || ''}
                               alt="Vista previa de la imagen de Antes"
                               fill
                               className="object-cover"
                             />
+                          ) : (
+                            <div className="flex flex-col items-center justify-center text-muted-foreground p-4 text-center">
+                              <ImageIcon className="h-10 w-10 mb-2 opacity-50" />
+                              <span className="text-sm font-medium">Sin imagen</span>
+                              <span className="text-xs opacity-70">
+                                Sube una para el estado original
+                              </span>
+                            </div>
                           )}
                         </div>
                         <FormControl>
@@ -251,21 +256,25 @@ export function AdminDashboard() {
                     name="afterImage"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-lg font-semibold">Imagen "Después"</FormLabel>
+                        <FormLabel className="text-lg font-semibold">
+                          Imagen &quot;Después&quot;
+                        </FormLabel>
                         <div className="aspect-video relative bg-muted rounded-md overflow-hidden border-2 border-dashed flex items-center justify-center">
                           {isLoading ? (
-                            <Loader2 className="animate-spin" />
-                          ) : (
+                            <Loader2 className="animate-spin text-muted-foreground" />
+                          ) : afterPreview || showcaseData?.afterImageUrl ? (
                             <Image
-                              src={
-                                afterPreview ||
-                                showcaseData?.afterImageUrl ||
-                                'https://picsum.photos/seed/after/600/400'
-                              }
+                              src={afterPreview || showcaseData?.afterImageUrl || ''}
                               alt="Vista previa de la imagen de Después"
                               fill
                               className="object-cover"
                             />
+                          ) : (
+                            <div className="flex flex-col items-center justify-center text-muted-foreground p-4 text-center">
+                              <ImageIcon className="h-10 w-10 mb-2 opacity-50" />
+                              <span className="text-sm font-medium">Sin imagen</span>
+                              <span className="text-xs opacity-70">Sube una para el resultado</span>
+                            </div>
                           )}
                         </div>
                         <FormControl>
@@ -283,37 +292,32 @@ export function AdminDashboard() {
                     )}
                   />
                 </div>
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full sm:w-auto"
-                  size="lg"
-                >
-                  {isSubmitting ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
-                    <Upload className="mr-2 h-4 w-4" />
-                  )}
-                  Guardar Cambios
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                  <Button type="submit" disabled={isSubmitting} className="flex-1" size="lg">
+                    {isSubmitting ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Upload className="mr-2 h-4 w-4" />
+                    )}
+                    Guardar Cambios
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={
+                      isSubmitting ||
+                      (!showcaseData?.beforeImageUrl && !showcaseData?.afterImageUrl)
+                    }
+                    onClick={handleClearShowcase}
+                    className="flex-1 border-destructive/50 text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                    size="lg"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Borrar Caso Actual
+                  </Button>
+                </div>
               </form>
             </Form>
-          </CardContent>
-        </Card>
-
-        {/* Sección de Carga de Vercel Blob */}
-        <Card className="border-primary/20 bg-slate-900/40">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Upload className="w-5 h-5 text-primary" />
-              Subidor Rápido a Vercel Blob
-            </CardTitle>
-            <CardDescription className="text-slate-400">
-              Sube imágenes sueltas (como capturas del SIMIT) para usarlas luego en el Lightbox de la web pública. Reemplazarán las imágenes de muestra con URLs reales.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ImageUploader />
           </CardContent>
         </Card>
 

@@ -19,11 +19,8 @@ export async function POST(request: Request): Promise<NextResponse> {
     });
 
     return NextResponse.json(blob);
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error al subir a Vercel Blob:', error);
-    return NextResponse.json(
-      { error: 'Error interno al procesar el archivo.' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Error interno al procesar el archivo.' }, { status: 500 });
   }
 }

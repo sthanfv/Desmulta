@@ -4,9 +4,9 @@ import { Toaster } from '@/components/ui/toaster';
 import { FirebaseClientProvider } from '@/firebase';
 
 export const metadata: Metadata = {
-  title: `${process.env.NEXT_PUBLIC_BRAND_NAME || 'VialClear'} - Saneamiento de Multas de Tránsito`,
+  title: `${process.env.NEXT_PUBLIC_BRAND_NAME || 'Desmulta'} - Saneamiento de Multas de Tránsito`,
   description:
-    'Intermediamos ante las Secretarías de Tránsito para aplicar la prescripción de deudas antiguas. Libérese de multas legalmente.',
+    'Intermediamos ante las Secretarías de Tránsito para gestionar legalmente sus deudas antiguas. Libérese de multas de forma eficiente.',
 };
 
 export default function RootLayout({

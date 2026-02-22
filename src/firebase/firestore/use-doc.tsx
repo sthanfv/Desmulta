@@ -38,7 +38,7 @@ export interface UseDocResult<T> {
  * The Firestore DocumentReference. Waits if null/undefined.
  * @returns {UseDocResult<T>} Object with data, isLoading, error.
  */
-export function useDoc<T = any>(
+export function useDoc<T = DocumentData>(
   memoizedDocRef: DocumentReference<DocumentData> | null | undefined
 ): UseDocResult<T> {
   type StateDataType = WithId<T> | null;
@@ -57,7 +57,17 @@ export function useDoc<T = any>(
 
     setIsLoading(true);
     setError(null);
-    // Optional: setData(null); // Clear previous data instantly
+
+    // Timeout de seguridad en caso de que Firestore se cuelgue (ej: falta .env)
+    const fallbackTimeout = setTimeout(() => {
+      setIsLoading((prev) => {
+        if (prev) {
+          console.warn('Firestore useDoc timeout: resolviendo loading forzado tras 5s.');
+          return false;
+        }
+        return prev;
+      });
+    }, 5000);
 
     const unsubscribe = onSnapshot(
       memoizedDocRef,
@@ -71,7 +81,7 @@ export function useDoc<T = any>(
         setError(null); // Clear any previous error on successful snapshot (even if doc doesn't exist)
         setIsLoading(false);
       },
-      (error: FirestoreError) => {
+      () => {
         const contextualError = new FirestorePermissionError({
           operation: 'get',
           path: memoizedDocRef.path,
@@ -86,7 +96,10 @@ export function useDoc<T = any>(
       }
     );
 
-    return () => unsubscribe();
+    return () => {
+      clearTimeout(fallbackTimeout);
+      unsubscribe();
+    };
   }, [memoizedDocRef]); // Re-run if the memoizedDocRef changes.
 
   return { data, isLoading, error };

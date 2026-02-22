@@ -2,27 +2,34 @@ import { NextResponse } from 'next/server';
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { getAdminApp } from '@/lib/firebase-admin';
 
-// Helper function to escape HTML characters for Telegram
+// Helper para escapar caracteres HTML en mensajes de Telegram
 function escapeHtml(text: string): string {
   if (!text) return '';
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 // Inicializar Firebase Admin SDK via singleton seguro
 try {
   getAdminApp();
 } catch (error) {
-  console.error('[firebase-admin] Error de inicialización:', error);
+  const message = error instanceof Error ? error.message : 'Error desconocido';
+  console.error('[firebase-admin] Error de inicialización:', message);
 }
 
 export async function POST(request: Request) {
+  // ✅ AUTH INTERNA: Solo el propio servidor puede llamar a este endpoint.
+  // create-consultation/route.ts envía el header x-internal-secret.
+  const internalSecret = process.env.INTERNAL_API_SECRET;
+  const receivedSecret = request.headers.get('x-internal-secret');
+
+  if (!internalSecret || receivedSecret !== internalSecret) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const { TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID } = process.env;
 
   if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
-    console.error('Telegram environment variables are not configured.');
+    console.error('[notify] Variables de Telegram no configuradas.');
     return NextResponse.json(
       { success: false, error: 'Server configuration error.' },
       { status: 500 }
@@ -34,22 +41,29 @@ export async function POST(request: Request) {
 
     if (!rawBody) {
       console.error('[notify] Cuerpo de la petición vacío.');
-      return NextResponse.json({ success: false, error: 'Cuerpo de la petición vacío.' }, { status: 400 });
+      return NextResponse.json(
+        { success: false, error: 'Cuerpo de la petición vacío.' },
+        { status: 400 }
+      );
     }
 
-    let body;
+    let body: unknown;
     try {
       body = JSON.parse(rawBody);
-    } catch (parseError) {
-      console.error('[notify] Error al parsear JSON:', rawBody.substring(0, 100));
-      return NextResponse.json({ success: false, error: 'Formato JSON inválido.' }, { status: 400 });
+    } catch {
+      console.error('[notify] Error al parsear JSON.');
+      return NextResponse.json(
+        { success: false, error: 'Formato JSON inválido.' },
+        { status: 400 }
+      );
     }
 
-    const { docId } = body;
+    const parsed = body as Record<string, unknown>;
+    const docId = typeof parsed.docId === 'string' ? parsed.docId : null;
 
     if (!docId) {
       return NextResponse.json(
-        { success: false, error: 'Document ID is required.' },
+        { success: false, error: 'Document ID es requerido.' },
         { status: 400 }
       );
     }
@@ -97,12 +111,11 @@ export async function POST(request: Request) {
       }),
     });
 
-    const telegramResponseData = await telegramResponse.json();
+    const telegramResponseData = (await telegramResponse.json()) as Record<string, unknown>;
 
     if (!telegramResponse.ok) {
-      console.error('Telegram API Error:', telegramResponseData);
-      // No devolver un error crítico al cliente si solo falla Telegram.
-      // Simplemente registrar el error. El estado de la notificación no cambiará.
+      console.error('[notify] Telegram API Error:', JSON.stringify(telegramResponseData));
+      // No devolver error crítico al proceso: la consulta ya fue guardada.
       return NextResponse.json(
         { error: 'Telegram API call failed but consultation was saved.' },
         { status: 200 }
@@ -116,8 +129,9 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ success: true, message: 'Notificación enviada.' });
-  } catch (error: any) {
-    console.error('Error in /api/notify:', error);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Error desconocido';
+    console.error('[notify] Error interno:', message);
     return NextResponse.json(
       { error: 'Error interno del servidor en /api/notify' },
       { status: 500 }

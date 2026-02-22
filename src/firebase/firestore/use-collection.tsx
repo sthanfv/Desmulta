@@ -51,7 +51,7 @@ export interface InternalQuery extends Query<DocumentData> {
  * The Firestore CollectionReference or Query. Waits if null/undefined.
  * @returns {UseCollectionResult<T>} Object with data, isLoading, error.
  */
-export function useCollection<T = any>(
+export function useCollection<T = DocumentData>(
   memoizedTargetRefOrQuery:
     | ((CollectionReference<DocumentData> | Query<DocumentData>) & { __memo?: boolean })
     | null
@@ -87,7 +87,7 @@ export function useCollection<T = any>(
         setError(null);
         setIsLoading(false);
       },
-      (error: FirestoreError) => {
+      () => {
         // This logic extracts the path from either a ref or a query
         const path: string =
           memoizedTargetRefOrQuery.type === 'collection'
