@@ -3,7 +3,16 @@
 import { useState } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CheckCircle2, ChevronRight, Loader2, Eye, EyeOff } from 'lucide-react';
+import {
+  CheckCircle2,
+  ChevronRight,
+  Loader2,
+  Eye,
+  EyeOff,
+  ShieldCheck,
+  Search,
+  MessageCircle,
+} from 'lucide-react';
 import { getAuth } from 'firebase/auth';
 
 import { ConsultationSchema } from '@/lib/definitions';
@@ -18,7 +27,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 
 type ConsultationFormData = Zod.infer<typeof ConsultationSchema>;
 
-export function ConsultationForm({ onClose }: { onClose: () => void }) {
+interface ConsultationFormProps {
+  onSuccess: () => void;
+}
+
+export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
   const [isSuccess, setIsSuccess] = useState(false);
   const [showCedula, setShowCedula] = useState(false);
   const { toast } = useToast();
@@ -77,7 +90,7 @@ export function ConsultationForm({ onClose }: { onClose: () => void }) {
           'Hemos recibido su solicitud. Uno de nuestros expertos le contactará pronto por WhatsApp.',
       });
       setIsSuccess(true);
-      setTimeout(onClose, 3000);
+      setTimeout(onSuccess, 3000);
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : 'Por favor, intente de nuevo más tarde.';
       console.warn('Alerta al enviar la consulta:', e);
@@ -91,14 +104,22 @@ export function ConsultationForm({ onClose }: { onClose: () => void }) {
 
   if (isSuccess) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 text-center h-[450px] transition-all duration-500">
-        <CheckCircle2 className="w-16 h-16 text-green-500 mb-4" />
-        <h3 className="text-xl font-bold mb-2 text-foreground">Solicitud Enviada</h3>
-        <p className="text-muted-foreground max-w-sm">
-          Uno de nuestros expertos le contactará pronto por WhatsApp.
+      <div className="flex flex-col items-center justify-center p-8 text-center h-[400px] animate-in zoom-in-95 duration-500">
+        <div className="w-20 h-20 rounded-full bg-green-500/10 flex items-center justify-center text-green-500 mb-6 shadow-Inner">
+          <CheckCircle2 className="w-12 h-12" />
+        </div>
+        <h3 className="text-2xl font-black mb-3 text-foreground tracking-tight">
+          Solicitud Enviada
+        </h3>
+        <p className="text-muted-foreground text-lg max-w-sm leading-relaxed">
+          Nuestros expertos jurídicos están revisando tu historial. Te contactaremos pronto.
         </p>
-        <Button onClick={onClose} variant="outline" className="mt-6 border-border">
-          Cerrar
+        <Button
+          onClick={onSuccess}
+          variant="outline"
+          className="mt-8 rounded-2xl px-10 border-border hover:bg-muted font-bold active:scale-95 transition-all"
+        >
+          Entendido
         </Button>
       </div>
     );
@@ -106,7 +127,7 @@ export function ConsultationForm({ onClose }: { onClose: () => void }) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <FormField
           control={form.control}
           name="website"
@@ -121,101 +142,116 @@ export function ConsultationForm({ onClose }: { onClose: () => void }) {
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="cedula"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-sm font-medium text-foreground/80">
-                Cédula del Propietario
-              </FormLabel>
-              <div className="relative">
+        <div className="space-y-6">
+          <FormField
+            control={form.control}
+            name="cedula"
+            render={({ field }) => (
+              <FormItem className="space-y-2">
+                <FormLabel className="text-sm font-black text-foreground/70 uppercase tracking-widest pl-1">
+                  Cédula del Propietario
+                </FormLabel>
+                <div className="relative group">
+                  <FormControl>
+                    <Input
+                      type={showCedula ? 'text' : 'password'}
+                      placeholder="Identificación sin puntos ni comas"
+                      {...field}
+                      className="w-full bg-background border-border/50 rounded-2xl pl-12 pr-12 h-16 text-lg font-medium focus:ring-primary/20 focus:border-primary transition-all shadow-Inner"
+                    />
+                  </FormControl>
+                  <Search
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors"
+                    size={20}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowCedula(!showCedula)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
+                    aria-label={showCedula ? 'Ocultar cédula' : 'Mostrar cédula'}
+                  >
+                    {showCedula ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
+                <FormMessage className="pl-1" />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="nombre"
+            render={({ field }) => (
+              <FormItem className="space-y-2">
+                <FormLabel className="text-sm font-black text-foreground/70 uppercase tracking-widest pl-1">
+                  Nombre Completo
+                </FormLabel>
                 <FormControl>
                   <Input
-                    type={showCedula ? 'text' : 'password'}
-                    placeholder="Solo números, sin puntos ni comas"
+                    placeholder="Como aparece en el documento"
                     {...field}
-                    className="w-full bg-background border-border rounded-lg pl-4 pr-12 py-3 text-foreground focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all shadow-sm"
+                    className="w-full bg-background border-border/50 rounded-2xl px-6 h-16 text-lg font-medium focus:ring-primary/20 focus:border-primary transition-all shadow-Inner"
                   />
                 </FormControl>
-                <button
-                  type="button"
-                  onClick={() => setShowCedula(!showCedula)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                  aria-label={showCedula ? 'Ocultar cédula' : 'Mostrar cédula'}
-                >
-                  {showCedula ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="nombre"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-sm font-medium text-foreground/80">
-                Nombre Completo
-              </FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Como aparece en el documento"
-                  {...field}
-                  className="w-full bg-background border-border rounded-lg px-4 py-3 text-foreground focus:border-primary focus:ring-1 focus:ring-primary outline-none shadow-sm"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="contacto"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-sm font-medium text-foreground/80">
-                WhatsApp de Contacto
-              </FormLabel>
-              <FormControl>
-                <Input
-                  type="tel"
-                  placeholder="3001234567"
-                  {...field}
-                  className="w-full bg-background border-border rounded-lg px-4 py-3 text-foreground focus:border-primary focus:ring-1 focus:ring-primary outline-none shadow-sm"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                <FormMessage className="pl-1" />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="contacto"
+            render={({ field }) => (
+              <FormItem className="space-y-2">
+                <FormLabel className="text-sm font-black text-foreground/70 uppercase tracking-widest pl-1">
+                  WhatsApp de Contacto
+                </FormLabel>
+                <div className="relative group">
+                  <FormControl>
+                    <Input
+                      type="tel"
+                      placeholder="Ej: 300 123 4567"
+                      {...field}
+                      className="w-full bg-background border-border/50 rounded-2xl pl-12 h-16 text-lg font-medium focus:ring-primary/20 focus:border-primary transition-all shadow-Inner"
+                    />
+                  </FormControl>
+                  <MessageCircle
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors"
+                    size={20}
+                  />
+                </div>
+                <FormMessage className="pl-1" />
+              </FormItem>
+            )}
+          />
+        </div>
+
         <FormField
           control={form.control}
           name="aceptoTerminos"
           render={({ field }) => (
-            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md pt-2">
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-3xl p-4 bg-muted/30 border border-border/50">
               <FormControl>
                 <Checkbox
                   checked={field.value}
                   onCheckedChange={field.onChange}
-                  className="mt-0.5 border-input data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
+                  className="mt-1 border-primary/50 w-5 h-5 rounded-md data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
                 />
               </FormControl>
-              <div className="space-y-1 leading-none">
-                <FormLabel className="text-sm font-medium text-foreground/80">
-                  Acepto los términos y la política de privacidad.
+              <div className="space-y-2 leading-tight">
+                <FormLabel className="text-sm font-bold text-foreground">
+                  Acepto el tratamiento de mis datos personales.
                 </FormLabel>
                 <p className="text-xs text-muted-foreground">
-                  Al enviar, autoriza la consulta de sus datos.{' '}
+                  Autorizo a Desmulta a consultar mi estado en el SIMIT para fines de asesoría
+                  técnica.{' '}
                   <Link
                     href="/terminos"
                     target="_blank"
-                    className="underline text-primary/80 hover:text-primary transition-colors"
+                    className="underline text-primary hover:text-primary/80 font-bold transition-all"
                   >
-                    Leer más
+                    Ver Términos
                   </Link>
-                  .
                 </p>
                 <FormMessage />
               </div>
@@ -223,29 +259,32 @@ export function ConsultationForm({ onClose }: { onClose: () => void }) {
           )}
         />
 
-        <div className="pt-2">
+        <div className="pt-4">
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-primary text-primary-foreground font-black py-4 rounded-xl hover:bg-yellow-400 transition-all flex items-center justify-center gap-2 h-12 text-base shadow-md"
+            className="w-full bg-primary text-primary-foreground font-black py-8 rounded-3xl hover:bg-primary/95 transition-all flex items-center justify-center gap-3 h-20 text-xl shadow-xl shadow-primary/20 active:scale-95 border-none"
             aria-disabled={isSubmitting}
           >
             {isSubmitting ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                REVISANDO...
+                <Loader2 className="mr-3 h-6 w-6 animate-spin" />
+                ANALIZANDO...
               </>
             ) : (
               <>
-                REVISAR MI CASO GRATIS
-                <ChevronRight size={18} />
+                ESTUDIO GRATUITO
+                <ChevronRight
+                  size={22}
+                  className="group-hover:translate-x-1 transition-transform"
+                />
               </>
             )}
           </Button>
-          <p className="text-[9px] text-muted-foreground text-center mt-4 uppercase tracking-tighter">
-            Al solicitar el estudio, usted acepta que el análisis inicial es gratuito. Gestiones
-            posteriores conllevan honorarios que se acordarán tras el diagnóstico.
-          </p>
+          <div className="flex items-center justify-center gap-2 mt-6 text-[10px] text-muted-foreground uppercase tracking-widest font-black opacity-60">
+            <ShieldCheck size={12} />
+            <span>Encriptación de Grado Bancario</span>
+          </div>
         </div>
       </form>
     </Form>

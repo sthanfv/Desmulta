@@ -1,362 +1,358 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import {
-  ShieldCheck,
-  ArrowRightLeft,
-  CheckCircle2,
-  AlertTriangle,
-  Loader2,
-  Search,
-  MessageCircle,
-  Info,
-} from 'lucide-react';
+import Image from 'next/image';
+import { ShieldCheck, ArrowRightLeft, CheckCircle2, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ConsultationForm } from '@/components/vial-clear/ConsultationForm';
 import { Lightbox } from '@/components/ui/lightbox';
 import { ModeToggle } from '@/components/mode-toggle';
-import {
-  useAuth,
-  useUser,
-  initiateAnonymousSignIn,
-  useFirestore,
-  useDoc,
-  useMemoFirebase,
-} from '@/firebase';
-import { doc } from 'firebase/firestore';
+import { initiateAnonymousSignIn, useAuth } from '@/firebase';
 
 export default function VialClearPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isWhatsAppWarningOpen, setIsWhatsAppWarningOpen] = useState(false);
   const auth = useAuth();
-  const firestore = useFirestore();
-  const { user, isUserLoading } = useUser();
-  const brandName = process.env.NEXT_PUBLIC_BRAND_NAME || 'Desmulta';
-
-  // Fetch showcase images from Firestore
-  const showcaseRef = useMemoFirebase(
-    () => (firestore ? doc(firestore, 'site_config', 'showcase') : null),
-    [firestore]
-  );
-  const { data: showcaseData, isLoading: isShowcaseLoading } = useDoc<{
-    beforeImageUrl: string;
-    afterImageUrl: string;
-  }>(showcaseRef);
 
   useEffect(() => {
-    // When the state of authentication finishes loading and there is no user (neither anonymous nor explicit),
-    // an anonymous session is initiated. This is crucial to secure Firestore writes.
-    if (!isUserLoading && !user && auth) {
+    if (auth) {
       initiateAnonymousSignIn(auth);
     }
-  }, [isUserLoading, user, auth]);
-
-  const handleWhatsAppRedirect = () => {
-    const message = encodeURIComponent(
-      `Hola, vengo de la web de ${brandName}. Deseo una asesoría directa para gestionar mis multas.`
-    );
-    const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '573005648309';
-    window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
-    setIsWhatsAppWarningOpen(false);
-  };
+  }, [auth]);
 
   return (
-    <div className="min-h-screen font-body">
-      <header className="sticky top-0 z-40 backdrop-blur-md bg-background/80 border-b border-border px-6 py-4">
-        <nav className="max-w-6xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-3 group">
-              <div className="bg-primary p-2 rounded-lg shadow-[0_0_15px_rgba(234,179,8,0.3)] transition-transform group-hover:scale-110">
-                <ShieldCheck className="text-primary-foreground" size={24} />
-              </div>
-              <span className="font-black tracking-tighter text-xl lg:text-2xl uppercase text-foreground">
-                {brandName}
-              </span>
-            </Link>
-          </div>
-          <div className="flex items-center gap-4">
-            <ModeToggle />
-          </div>
-        </nav>
-      </header>
+    <div className="min-h-screen bg-background relative overflow-hidden selection:bg-primary/30">
+      {/* Background radial gradient for "Monet" depth */}
+      <div className="fixed inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,191,0,0.08)_0%,transparent_50%)] pointer-events-none" />
+      <div className="fixed inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(255,191,0,0.05)_0%,transparent_50%)] pointer-events-none" />
 
-      <main className="relative z-10 max-w-6xl mx-auto px-6 pt-16 pb-24">
-        <section className="flex flex-col items-center text-center mb-24 max-w-4xl mx-auto">
-          <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-widest mb-6">
-            Gestión Administrativa Especializada
-          </span>
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-black leading-[1.1] mb-8 text-foreground">
-            Borramos sus <span className="text-primary">multas</span> legalmente.
-          </h1>
-          <p className="text-lg md:text-xl text-muted-foreground mb-10 leading-relaxed max-w-2xl">
-            Intermediamos ante las Secretarías de Tránsito para gestionar y sanear legalmente sus
-            deudas pendientes. Usted recupera su libertad financiera; nosotros nos encargamos del
-            complejo proceso administrativo.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4 w-full sm:w-auto">
+      {/* Header with Glassmorphism */}
+      <header className="fixed top-0 left-0 right-0 z-50 px-4 py-6">
+        <div className="max-w-6xl mx-auto glass rounded-2xl md:rounded-full px-6 py-3 flex justify-between items-center shadow-2xl border-white/10">
+          <div className="flex items-center gap-2">
+            <div className="bg-primary p-2 rounded-xl shadow-lg shadow-primary/20">
+              <ShieldCheck className="w-6 h-6 text-primary-foreground" />
+            </div>
+            <span className="text-xl font-black tracking-tight text-foreground hidden sm:inline-block">
+              DES<span className="text-primary italic">MULTA</span>
+            </span>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <ModeToggle />
             <Button
               onClick={() => setIsModalOpen(true)}
-              size="lg"
-              className="bg-primary text-primary-foreground font-black px-8 h-16 rounded-2xl flex items-center justify-center gap-3 hover:scale-105 transition-transform shadow-[0_0_30px_rgba(234,179,8,0.2)] text-base w-full sm:w-auto"
+              className="bg-primary hover:bg-primary/95 text-primary-foreground font-bold rounded-full px-8 active:scale-95 transition-all shadow-lg shadow-primary/20 border-none"
             >
-              SOLICITAR REVISIÓN GRATUITA
-              <ArrowRightLeft size={20} />
+              Consultar Ahora
             </Button>
           </div>
-        </section>
+        </div>
+      </header>
 
-        <section className="relative z-10 max-w-4xl mx-auto mb-32">
-          {/* Resultados Reales Card Centered */}
-          <div className="relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-primary to-yellow-600 rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
-            <div className="relative bg-card border border-border rounded-3xl p-8 overflow-hidden">
-              <div className="flex justify-between items-center mb-6 lg:mb-10">
-                <h3 className="font-bold text-xl lg:text-2xl flex items-center gap-3 text-card-foreground">
-                  <CheckCircle2 className="text-primary" size={24} />
-                  Resultados Reales
-                </h3>
-                <span className="text-sm text-muted-foreground uppercase font-bold tracking-widest hidden sm:block">
-                  Caso de Éxito
-                </span>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
-                <div className="space-y-4">
-                  <div className="relative h-64 bg-muted rounded-2xl border border-red-500/30 overflow-hidden flex items-center justify-center p-4">
-                    <span className="absolute top-4 left-4 bg-red-600 text-xs font-bold px-3 py-1 rounded z-10">
-                      ANTES
-                    </span>
-                    {isShowcaseLoading ? (
-                      <div className="h-full w-full flex items-center justify-center">
-                        <Loader2 className="animate-spin text-primary" />
-                      </div>
-                    ) : showcaseData?.beforeImageUrl ? (
-                      <Lightbox
-                        src={showcaseData.beforeImageUrl}
-                        alt="Imagen de un caso de éxito antes de la intervención."
-                        className="w-full h-full"
-                      />
-                    ) : (
-                      <div className="h-full w-full flex flex-col items-center justify-center p-4">
-                        <AlertTriangle className="h-10 w-10 text-slate-500/50 mb-3" />
-                        <span className="text-sm text-slate-500 text-center leading-tight">
-                          Estado Base no cargado
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                  <p className="text-sm text-center text-muted-foreground font-medium">
-                    Deuda de multas activa
-                  </p>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="relative h-64 bg-muted rounded-2xl border border-green-500/30 overflow-hidden flex items-center justify-center p-4">
-                    <span className="absolute top-4 left-4 bg-green-600 text-xs font-bold px-3 py-1 rounded z-10">
-                      DESPUÉS
-                    </span>
-                    {isShowcaseLoading ? (
-                      <div className="h-full w-full flex items-center justify-center">
-                        <Loader2 className="animate-spin text-primary" />
-                      </div>
-                    ) : showcaseData?.afterImageUrl ? (
-                      <Lightbox
-                        src={showcaseData.afterImageUrl}
-                        alt="Imagen caso de éxito resuelto"
-                        className="w-full h-full"
-                      />
-                    ) : (
-                      <div className="h-full w-full flex flex-col items-center justify-center p-4">
-                        <ShieldCheck className="h-10 w-10 text-slate-500/50 mb-3" />
-                        <span className="text-sm text-slate-500 text-center leading-tight">
-                          Estado Final no cargado
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                  <p className="text-sm text-center text-muted-foreground font-medium">
-                    Proceso de saneamiento completado exitosamente
-                  </p>
-                </div>
-              </div>
+      {/* Hero Section - Floating Style */}
+      <section className="pt-44 pb-20 px-4">
+        <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+          <div className="space-y-10">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold border border-primary/20 animate-in fade-in slide-in-from-left-4 duration-700">
+              <ShieldCheck size={16} />
+              <span>Servicio 100% Legal y Seguro</span>
             </div>
-          </div>
-        </section>
-
-        <section className="bg-muted/30 border border-border rounded-3xl p-8 lg:p-12 mb-32 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 blur-[100px] rounded-full mix-blend-multiply dark:mix-blend-screen pointer-events-none"></div>
-
-          <div className="text-center max-w-2xl mx-auto mb-16 relative z-10">
-            <h2 className="text-3xl md:text-5xl font-black mb-6 text-foreground">
-              No deje que las <span className="text-primary">multas</span> limiten su vida
-            </h2>
-            <p className="text-muted-foreground text-lg">
-              El tiempo pasa, los intereses de mora crecen y el riesgo de embargos aumenta. Tenemos
-              un proceso administrativo claro para devolverle la tranquilidad.
+            <h1 className="text-6xl md:text-8xl font-black text-foreground tracking-tight leading-[0.95] animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
+              Recuperamos tu <br />
+              <span className="text-primary italic underline decoration-primary/20 underline-offset-8 transition-all hover:decoration-primary/50">
+                Tranquilidad
+              </span>
+            </h1>
+            <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed max-w-xl animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
+              Expertos en saneamiento legal de fotomultas y comparendos. Sin procesos tediosos, solo
+              resultados directos y efectivos.
             </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 relative z-10">
-            {/* Paso 1 */}
-            <div className="bg-background border border-border p-8 rounded-2xl flex flex-col relative group hover:border-red-500/50 transition-colors shadow-sm">
-              <div className="w-14 h-14 bg-red-500/10 text-red-500 rounded-xl flex items-center justify-center mb-6">
-                <AlertTriangle size={28} />
-              </div>
-              <h4 className="font-bold text-xl mb-3 text-foreground">1. El Problema que Crece</h4>
-              <p className="text-muted-foreground leading-relaxed text-sm flex-1">
-                Las deudas acumuladas en el SIMIT pueden derivar en cobros coactivos y embargos de
-                cuentas bancarias. Ignorarlo no elimina la deuda.
-              </p>
-            </div>
-
-            {/* Paso 2 */}
-            <div className="bg-background border border-border p-8 rounded-2xl flex flex-col relative group hover:border-yellow-500/50 transition-colors shadow-sm">
-              <div className="w-14 h-14 bg-yellow-500/10 text-yellow-500 rounded-xl flex items-center justify-center mb-6">
-                <Search size={28} />
-              </div>
-              <h4 className="font-bold text-xl mb-3 text-foreground">2. Estudio Cero Costo</h4>
-              <p className="text-muted-foreground leading-relaxed text-sm flex-1">
-                Llene nuestro formulario y sus datos serán evaluados <strong>gratuitamente</strong>.
-                Determinaremos la viabilidad jurídica para borrar sus deudas.
-              </p>
-            </div>
-
-            {/* Paso 3 */}
-            <div className="bg-background border border-border p-8 rounded-2xl flex flex-col relative group hover:border-green-500/50 transition-colors shadow-sm">
-              <div className="w-14 h-14 bg-green-500/10 text-green-500 rounded-xl flex items-center justify-center mb-6">
-                <ShieldCheck size={28} />
-              </div>
-              <h4 className="font-bold text-xl mb-3 text-foreground">3. Saneamiento Exitoso</h4>
-              <p className="text-muted-foreground leading-relaxed text-sm flex-1">
-                Si su caso es aprobable, realizamos la gestión ante Tránsito. Cotizaremos honorarios
-                profesionales ajustados a su favor, cobrando resultados.
-              </p>
+            <div className="flex flex-col sm:flex-row gap-4 pt-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
+              <Button
+                onClick={() => setIsModalOpen(true)}
+                size="lg"
+                className="h-16 px-10 text-lg font-black rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground shadow-2xl shadow-primary/30 active:scale-95 transition-all border-none"
+              >
+                Iniciar Estudio Sin Costo
+                <ArrowRightLeft className="ml-2 w-5 h-5" />
+              </Button>
             </div>
           </div>
-        </section>
-      </main>
 
-      <footer className="bg-muted border-t border-border py-16 px-6">
+          <div className="relative group animate-in zoom-in-95 duration-1000 delay-200">
+            <div className="absolute -inset-8 bg-primary/20 rounded-[4rem] blur-[80px] opacity-40 group-hover:opacity-60 transition-opacity duration-700" />
+            <div className="relative floating-card bg-card/50 backdrop-blur-sm p-4 border border-white/10 overflow-hidden shadow-2xl">
+              <div className="aspect-[4/3] relative rounded-[2rem] overflow-hidden shadow-Inner">
+                <Image
+                  src="https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&q=80&w=1200"
+                  alt="Gestión de multas profesional"
+                  fill
+                  className="object-cover transition-transform duration-1000 group-hover:scale-110"
+                  priority
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                <div className="absolute bottom-8 left-8 right-8">
+                  <div className="glass p-4 rounded-3xl flex items-center gap-4 border-white/20 shadow-2xl">
+                    <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center text-primary-foreground font-black text-lg shadow-lg">
+                      1k+
+                    </div>
+                    <div>
+                      <p className="font-black text-sm text-foreground">Sanciones Eliminadas</p>
+                      <p className="text-xs text-muted-foreground font-medium">
+                        Este mes en toda Colombia
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Ventajas - Premium Cards */}
+      <section className="py-32 px-4 relative">
         <div className="max-w-6xl mx-auto">
-          <div className="space-y-12 mb-12">
-            {/* Aviso Legal Prioritario */}
-            <div className="bg-background border-2 border-border p-6 sm:p-8 rounded-xl shadow-inner relative overflow-hidden w-full">
-              <div className="absolute top-0 left-0 w-2 h-full bg-yellow-500"></div>
-              <h5 className="text-yellow-600 dark:text-yellow-500 font-bold text-sm uppercase tracking-widest mb-4 flex items-center gap-3">
-                <AlertTriangle size={18} className="text-yellow-600 dark:text-yellow-500" />
-                Aviso Legal y Declaración Institucional
-              </h5>
-              <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed text-justify">
-                <strong>ACLARATORIA INSTITUCIONAL:</strong> {brandName.toUpperCase()} NO es una
-                unidad gubernamental ni firma litigante judicial. Somos una organización privada
-                dedicada a la <strong>orientación y gestión de procesos administrativos</strong>{' '}
-                ante los diferentes organismos de tránsito a nivel nacional, abogando por el debido
-                proceso. Los reportes presentados como casos de éxito corresponden a expedientes
-                tramitados efectivamente; sin embargo, no todas las deudas aplican y los resultados
-                varían obligatoriamente según el tipo de infracción y tiempo de mora. Toda actuación
-                acarrea honorarios profesionales pactados con el cliente tras la revisión de
-                viabilidad.
-              </p>
-            </div>
+          <div className="text-center space-y-6 mb-20">
+            <h2 className="text-4xl md:text-6xl font-black text-foreground tracking-tight">
+              ¿Por qué confiar en nosotros?
+            </h2>
+            <div className="w-24 h-2 bg-primary mx-auto rounded-full shadow-lg shadow-primary/20" />
+          </div>
 
-            {/* Branding y Logo */}
-            <div className="max-w-2xl">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="bg-primary p-2 rounded-lg shadow-[0_0_15px_rgba(234,179,8,0.3)]">
-                  <ShieldCheck className="text-primary-foreground" size={24} />
+          <div className="grid md:grid-cols-3 gap-10">
+            {[
+              {
+                icon: ShieldCheck,
+                title: 'Legalidad Garantizada',
+                desc: 'Operamos estrictamente bajo la Ley 769 de 2002 y el CPACA.',
+                delay: '0',
+              },
+              {
+                icon: ArrowRightLeft,
+                title: 'Trámite Directo',
+                desc: 'Sin intermediarios oscuros. Usted trata con abogados reales.',
+                delay: '100',
+              },
+              {
+                icon: CheckCircle2,
+                title: 'Pago por Resultados',
+                desc: 'Nuestra comisión se genera solo si el proceso es exitoso.',
+                delay: '200',
+              },
+            ].map((item, i) => (
+              <div
+                key={i}
+                style={{ animationDelay: `${item.delay}ms` }}
+                className="group p-10 floating-card bg-card border border-border/50 hover:border-primary/50 hover:shadow-primary/5 transition-all duration-500 animate-in fade-in slide-in-from-bottom-8 fill-mode-both"
+              >
+                <div className="w-20 h-20 rounded-3xl bg-primary/10 flex items-center justify-center text-primary mb-8 group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-500 shadow-inner">
+                  <item.icon className="w-10 h-10" />
                 </div>
-                <span className="font-black tracking-tighter text-xl uppercase text-foreground">
-                  {brandName}
-                </span>
+                <h3 className="text-2xl font-black text-foreground mb-4">{item.title}</h3>
+                <p className="text-muted-foreground leading-relaxed text-lg">{item.desc}</p>
               </div>
-              <p className="text-muted-foreground text-sm leading-relaxed">
-                Expertos en gestión administrativa de tránsito. Recuperamos la movilidad financiera
-                de los conductores colombianos basándonos en el estricto cumplimiento legal.
-              </p>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Proceso - Glass Layout */}
+      <section className="py-32 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="glass p-12 md:p-20 rounded-[3rem] relative overflow-hidden border-white/10 shadow-3xl bg-white/5 dark:bg-white/[0.02]">
+            <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
+
+            <div className="relative grid lg:grid-cols-2 gap-20 items-center">
+              <div className="space-y-12">
+                <div className="space-y-4">
+                  <h2 className="text-4xl md:text-5xl font-black text-foreground leading-tight">
+                    Proceso Ágil <br /> & Transparente
+                  </h2>
+                  <p className="text-muted-foreground text-xl">
+                    Tres pasos para recuperar tu historial crediticio y vial.
+                  </p>
+                </div>
+
+                <div className="space-y-10">
+                  {[
+                    {
+                      num: '01',
+                      title: 'Auditoría Inicial',
+                      desc: 'Crucemos datos con el SIMIT para ver la viabilidad inmediata.',
+                    },
+                    {
+                      num: '02',
+                      title: 'Estrategia Jurídica',
+                      desc: 'Radicamos derechos de petición y recursos de ley específicos.',
+                    },
+                    {
+                      num: '03',
+                      title: 'Saneamiento Total',
+                      desc: 'Verificamos la eliminación efectiva ante el tránsito.',
+                    },
+                  ].map((step, i) => (
+                    <div key={i} className="flex gap-8 group">
+                      <div className="text-5xl font-black text-primary/10 group-hover:text-primary group-hover:scale-110 transition-all duration-500 select-none">
+                        {step.num}
+                      </div>
+                      <div className="space-y-2">
+                        <h4 className="text-2xl font-bold text-foreground group-hover:text-primary transition-colors">
+                          {step.title}
+                        </h4>
+                        <p className="text-muted-foreground text-lg leading-relaxed">{step.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="relative">
+                <div className="absolute inset-0 bg-primary/20 rounded-[3rem] blur-3xl opacity-20 -rotate-6" />
+                <div className="relative aspect-square rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white/10 rotate-2 hover:rotate-0 transition-all duration-700">
+                  <Image
+                    src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&q=80&w=800"
+                    alt="Legal assistance office"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              </div>
             </div>
           </div>
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6 pt-8 border-t border-border text-muted-foreground text-xs">
-            <p>
-              © {new Date().getFullYear()} {brandName}. Todos los derechos reservados.
-            </p>
-            <div className="flex gap-6">
-              <Link href="/terminos" className="hover:text-primary transition-colors">
-                Términos de Servicio
-              </Link>
-              <Link href="/terminos" className="hover:text-primary transition-colors">
-                Política de Privacidad
-              </Link>
+        </div>
+      </section>
+
+      {/* Results - Floating Device Look */}
+      <section className="py-32 px-4">
+        <div className="max-w-4xl mx-auto text-center space-y-16">
+          <div className="space-y-4">
+            <h2 className="text-4xl md:text-6xl font-black text-foreground tracking-tight">
+              Testigos del Éxito
+            </h2>
+            <p className="text-xl text-muted-foreground">Historias de éxito reales verificadas</p>
+          </div>
+
+          <div className="relative group p-4 rounded-[4rem] bg-gradient-to-br from-primary/30 via-primary/5 to-transparent shadow-Inner">
+            <div className="floating-card bg-card/80 backdrop-blur-md overflow-hidden p-3 shadow-2xl border-white/10">
+              <div className="aspect-[16/9] md:aspect-[21/9] relative rounded-[3rem] overflow-hidden group">
+                <Image
+                  src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&q=80&w=1200"
+                  alt="Caso ganado exitosamente"
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                  <Lightbox
+                    src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&q=80&w=1200"
+                    alt="Evidencia proceso ganado"
+                    className="scale-125"
+                  />
+                </div>
+              </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ - Glass Accordion Look */}
+      <section className="py-32 px-4">
+        <div className="max-w-3xl mx-auto space-y-16">
+          <div className="text-center space-y-4">
+            <h2 className="text-4xl font-black text-foreground uppercase tracking-[0.2em]">FAQ</h2>
+            <p className="text-muted-foreground text-lg">Resolviendo tus inquietudes</p>
+          </div>
+
+          <div className="space-y-6">
+            {[
+              {
+                q: '¿Es realmente legal este proceso?',
+                a: 'Totalmente. Utilizamos las herramientas que la misma ley de tránsito y el CPACA otorgan a los ciudadanos para defender sus derechos ante cobros irregulares.',
+              },
+              {
+                q: '¿Cuánto tiempo demora la eliminación?',
+                a: 'El proceso administrativo suele tomar entre 45 y 75 días hábiles, dependiendo de la rapidez de respuesta de la Secretaría de Tránsito correspondiente.',
+              },
+            ].map((faq, i) => (
+              <div
+                key={i}
+                className="floating-card bg-card p-8 border border-white/5 hover:border-primary/30 transition-all duration-300"
+              >
+                <h4 className="flex items-center gap-4 text-xl font-bold text-foreground mb-4">
+                  <Info className="text-primary w-6 h-6" />
+                  {faq.q}
+                </h4>
+                <p className="text-muted-foreground text-lg leading-relaxed pl-10 border-l border-primary/20">
+                  {faq.a}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Pro - Fluid Gradient */}
+      <section className="py-32 px-4 mb-32">
+        <div className="max-w-6xl mx-auto relative group">
+          <div className="absolute inset-0 bg-primary/20 rounded-[4rem] blur-[100px] scale-90 group-hover:scale-100 transition-transform duration-700" />
+          <div className="relative bg-primary text-primary-foreground p-16 md:p-32 rounded-[4rem] overflow-hidden text-center space-y-10 shadow-3xl shadow-primary/20">
+            <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-white/10 rounded-full blur-[120px] pointer-events-none" />
+            <h2 className="text-5xl md:text-8xl font-black tracking-tight leading-[0.9] relative z-10 selection:bg-white/20">
+              Libérate hoy <br /> de las deudas.
+            </h2>
+            <p className="text-2xl opacity-90 max-w-2xl mx-auto font-medium relative z-10">
+              No dejes que tu paz mental dependa de un comparendo injusto. Iniciemos tu defensa
+              ahora.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-6 justify-center relative z-10">
+              <Button
+                onClick={() => setIsModalOpen(true)}
+                size="lg"
+                className="h-20 px-16 bg-foreground text-background hover:bg-foreground/90 font-black rounded-[2rem] active:scale-95 transition-all text-xl shadow-2xl border-none"
+              >
+                CONSULTA GRATIS
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer - Soft & Modern */}
+      <footer className="bg-card/30 backdrop-blur-md border-t border-border/50 py-20 px-4 rounded-t-[4rem]">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-20 items-center">
+          <div className="space-y-8">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-primary/10 rounded-xl">
+                <ShieldCheck className="w-10 h-10 text-primary" />
+              </div>
+              <span className="text-3xl font-black tracking-tighter">DESMULTA</span>
+            </div>
+            <p className="text-lg text-muted-foreground leading-relaxed max-w-sm">
+              Somos una firma privada especializada en consultoría jurídica para conductores.
+              Transformamos problemas en soluciones legales.
+            </p>
+          </div>
+          <div className="text-sm text-muted-foreground font-medium space-y-2 md:text-right uppercase tracking-widest">
+            <p>© 2026 DESMULTA COLOMBIA</p>
+            <p>Justicia Vial & Transparencia</p>
           </div>
         </div>
       </footer>
 
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3 group">
-        <div className="bg-white px-4 py-2 rounded-full text-[11px] text-slate-800 font-bold shadow-xl animate-bounce relative hidden group-hover:block border border-slate-200">
-          ¿Dudas? Chat en vivo
-          <div className="absolute -bottom-1.5 right-6 w-3 h-3 bg-white border-r border-b border-slate-200 rotate-45"></div>
-        </div>
-        <button
-          onClick={() => setIsWhatsAppWarningOpen(true)}
-          className="bg-green-500 hover:bg-green-600 text-white w-16 h-16 rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(34,197,94,0.4)] transition-transform hover:scale-110 active:scale-95"
-          title="Consultar por WhatsApp"
-        >
-          <MessageCircle size={32} />
-        </button>
-      </div>
-
-      <Dialog open={isWhatsAppWarningOpen} onOpenChange={setIsWhatsAppWarningOpen}>
-        <DialogContent className="w-[95vw] max-w-lg bg-background border border-border rounded-[2rem] shadow-2xl p-6 sm:p-8 overflow-hidden">
-          <div className="mb-4">
-            <DialogTitle className="text-xl sm:text-2xl font-bold text-foreground flex items-center gap-3">
-              <MessageCircle className="text-green-500" size={28} />
-              Chat de Asesoría en Vivo
-            </DialogTitle>
-          </div>
-          <div className="space-y-4 text-muted-foreground">
-            <p className="text-sm sm:text-base leading-relaxed">
-              Recuerde que el estudio de viabilidad llenando nuestro formulario base es{' '}
-              <strong className="text-primary text-base sm:text-lg">completamente gratuito</strong>.
-            </p>
-            <div className="bg-primary/10 border border-primary/20 p-5 rounded-2xl flex flex-col sm:flex-row gap-4 items-center sm:items-start mt-4">
-              <Info className="text-primary shrink-0 sm:mt-0.5" size={28} />
-              <p className="text-sm leading-relaxed text-center sm:text-left">
-                El canal de chat directo está diseñado para iniciar la contratación de trámites. La
-                radicación y ejecución administrativa{' '}
-                <strong>generan cobro de honorarios profesionales</strong> por resultados.
-              </p>
-            </div>
-          </div>
-          <div className="flex flex-col-reverse sm:flex-row gap-3 justify-end mt-8">
-            <Button
-              variant="ghost"
-              onClick={() => setIsWhatsAppWarningOpen(false)}
-              className="text-muted-foreground hover:text-foreground w-full sm:w-auto h-auto min-h-12 py-3 whitespace-normal"
-            >
-              No, prefiero el estudio gratuito
-            </Button>
-            <Button
-              onClick={handleWhatsAppRedirect}
-              className="bg-green-600 hover:bg-green-700 text-white font-bold w-full sm:w-auto h-auto min-h-12 py-3 whitespace-normal"
-            >
-              Entendido, abrir Chat
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
+      {/* Modal - Modern Glass Form */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-md bg-background border border-border rounded-[2rem] shadow-2xl overflow-hidden p-0">
-          <DialogHeader className="px-8 py-6 border-b border-border flex-row justify-between items-center bg-muted/50">
-            <DialogTitle className="text-xl font-bold text-foreground flex items-center gap-2">
-              <Search className="text-primary" size={20} />
-              Revisión Gratuita
-            </DialogTitle>
-          </DialogHeader>
-          <div className="p-8">
-            <ConsultationForm onClose={() => setIsModalOpen(false)} />
+        <DialogContent className="max-w-2xl p-0 overflow-hidden bg-transparent border-none shadow-none focus-visible:outline-none">
+          <div className="glass p-12 rounded-[3.5rem] border-white/20 m-4 shadow-3xl bg-white/95 dark:bg-black/80">
+            <DialogHeader className="mb-10">
+              <DialogTitle className="text-4xl font-black text-center text-foreground tracking-tight">
+                Estudio Legal Gratuito
+              </DialogTitle>
+              <p className="text-center text-lg text-muted-foreground mt-3 font-medium">
+                Analizaremos tu caso y te brindaremos viabilidad en minutos.
+              </p>
+            </DialogHeader>
+            <ConsultationForm onSuccess={() => setIsModalOpen(false)} />
           </div>
         </DialogContent>
       </Dialog>
