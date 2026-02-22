@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CheckCircle2, ChevronRight, Loader2 } from 'lucide-react';
+import { CheckCircle2, ChevronRight, Loader2, Eye, EyeOff } from 'lucide-react';
 import { getAuth } from 'firebase/auth';
 
 import { ConsultationSchema } from '@/lib/definitions';
@@ -103,6 +103,8 @@ export function ConsultationForm({ onClose }: { onClose: () => void }) {
     );
   }
 
+  const [showCedula, setShowCedula] = useState(false);
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -128,13 +130,24 @@ export function ConsultationForm({ onClose }: { onClose: () => void }) {
               <FormLabel className="text-sm font-medium text-slate-300">
                 Cédula del Propietario
               </FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Solo números, sin puntos ni comas"
-                  {...field}
-                  className="w-full bg-slate-950 border-white/10 rounded-lg px-4 py-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none"
-                />
-              </FormControl>
+              <div className="relative">
+                <FormControl>
+                  <Input
+                    type={showCedula ? 'text' : 'password'}
+                    placeholder="Solo números, sin puntos ni comas"
+                    {...field}
+                    className="w-full bg-slate-950 border-white/10 rounded-lg pl-4 pr-12 py-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+                  />
+                </FormControl>
+                <button
+                  type="button"
+                  onClick={() => setShowCedula(!showCedula)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                  aria-label={showCedula ? 'Ocultar cédula' : 'Mostrar cédula'}
+                >
+                  {showCedula ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
               <FormMessage />
             </FormItem>
           )}
