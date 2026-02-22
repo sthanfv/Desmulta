@@ -69,7 +69,7 @@ export default function VialClearPage() {
               <ShieldCheck size={16} />
               <span>Servicio 100% Legal y Seguro</span>
             </div>
-            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-foreground tracking-tight leading-[0.95] animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
+            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-7xl xl:text-8xl font-black text-foreground tracking-tight leading-[0.95] animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
               Recuperamos tu <br />
               <span className="text-primary italic underline decoration-primary/20 underline-offset-8 transition-all hover:decoration-primary/50">
                 Tranquilidad

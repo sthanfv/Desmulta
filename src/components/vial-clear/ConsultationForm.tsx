@@ -87,7 +87,7 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
       toast({
         title: '¡Gracias!',
         description:
-          'Hemos recibido su solicitud. Uno de nuestros expertos le contactará pronto por WhatsApp.',
+          'Hemos recibido su solicitud. Uno de nuestros asesores le contactará pronto por WhatsApp.',
       });
       setIsSuccess(true);
       setTimeout(onSuccess, 3000);
@@ -112,7 +112,7 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
           Solicitud Enviada
         </h3>
         <p className="text-muted-foreground text-lg max-w-sm leading-relaxed">
-          Nuestros expertos jurídicos están revisando tu historial. Te contactaremos pronto.
+          Nuestros asesores están revisando tu historial en el SIMIT. Te contactaremos pronto.
         </p>
         <Button
           onClick={onSuccess}

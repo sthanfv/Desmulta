@@ -85,9 +85,9 @@ export default function TerminosPage() {
                   1.3. Honorarios
                 </h4>
                 <p>
-                  La ejecución de trámites conlleva honorarios transparentes informados tras el
-                  diagnóstico inicial. El pago suele estar condicionado al éxito del proceso, según
-                  acuerdo específico.
+                  La ejecución de trámites conlleva honorarios administrativos informados tras el
+                  diagnóstico inicial. Los costos corresponden a la gestión técnica ante las
+                  autoridades competentes.
                 </p>
               </div>
 
