@@ -79,9 +79,9 @@ export default function VialClearPage() {
       </header>
 
       {/* Hero Section - Floating Style */}
-      <section className="pt-44 pb-20 px-4">
-        <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
-          <div className="space-y-10">
+      <section className="pt-44 pb-20 px-4 relative overflow-hidden">
+        <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-20 items-center relative z-10">
+          <div className="space-y-10 z-20">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold border border-primary/20 animate-in fade-in slide-in-from-left-4 duration-700">
               <ShieldCheck size={16} />
               <span>Servicio 100% Legal y Seguro</span>
@@ -108,29 +108,24 @@ export default function VialClearPage() {
             </div>
           </div>
 
-          <div className="relative group animate-in zoom-in-95 duration-1000 delay-200">
+          <div className="relative group animate-in zoom-in-95 duration-1000 delay-200 z-10">
             <div className="absolute -inset-8 bg-primary/20 rounded-[4rem] blur-[80px] opacity-40 group-hover:opacity-60 transition-opacity duration-700" />
-            <div className="relative floating-card bg-card/50 backdrop-blur-sm p-4 border border-white/10 overflow-hidden shadow-2xl">
-              <div className="aspect-[4/3] relative rounded-[2rem] overflow-hidden shadow-Inner">
-                <Image
-                  src="https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&q=80&w=1200"
-                  alt="Gestión de multas profesional"
-                  fill
-                  className="object-cover transition-transform duration-1000 group-hover:scale-110"
-                  priority
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                <div className="absolute bottom-8 left-8 right-8">
-                  <div className="glass p-4 rounded-3xl flex items-center gap-4 border-white/20 shadow-2xl">
-                    <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center text-primary-foreground font-black text-lg shadow-lg">
-                      1k+
-                    </div>
-                    <div>
-                      <p className="font-black text-sm text-foreground">Sanciones Eliminadas</p>
-                      <p className="text-xs text-muted-foreground font-medium">
-                        Este mes en toda Colombia
-                      </p>
-                    </div>
+            <div className="relative floating-card bg-card p-4 border border-white/10 overflow-hidden shadow-2xl">
+              <Lightbox
+                src="https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&q=80&w=1200"
+                alt="Gestión de multas profesional"
+                className="aspect-[4/3] rounded-[2rem]"
+              />
+              <div className="absolute bottom-8 left-8 right-8 z-10 pointer-events-none">
+                <div className="glass p-4 rounded-3xl flex items-center gap-4 border-white/20 shadow-2xl">
+                  <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center text-primary-foreground font-black text-lg shadow-lg">
+                    1k+
+                  </div>
+                  <div>
+                    <p className="font-black text-sm text-foreground">Sanciones Eliminadas</p>
+                    <p className="text-xs text-muted-foreground font-medium">
+                      Este mes en toda Colombia
+                    </p>
                   </div>
                 </div>
               </div>
@@ -289,24 +284,13 @@ export default function VialClearPage() {
                 <span className="text-sm font-black uppercase tracking-widest text-primary/60">
                   Estado Anterior (Antes)
                 </span>
-                <div className="relative group p-3 rounded-[3rem] bg-gradient-to-br from-destructive/20 to-transparent shadow-Inner">
-                  <div className="floating-card bg-card/80 backdrop-blur-md overflow-hidden p-2 shadow-2xl border-white/10">
-                    <div className="aspect-[4/3] relative rounded-[2.5rem] overflow-hidden group">
-                      <Image
-                        src={showcaseData.beforeImageUrl}
-                        alt="Evidencia antes del proceso"
-                        fill
-                        className="object-cover transition-transform duration-700 group-hover:scale-105"
-                      />
-                      <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                        <Lightbox
-                          src={showcaseData.beforeImageUrl}
-                          alt="Ver evidencia real antes"
-                          className="scale-125 mb-4"
-                        />
-                        <p className="text-white font-bold text-sm">Ver Evidencia Anterior</p>
-                      </div>
-                    </div>
+                <div className="relative group p-2 rounded-[2.5rem] bg-gradient-to-br from-destructive/20 to-transparent shadow-Inner">
+                  <div className="floating-card bg-card border border-white/10 overflow-hidden p-0 shadow-2xl">
+                    <Lightbox
+                      src={showcaseData.beforeImageUrl}
+                      alt="Evidencia antes del proceso"
+                      className="aspect-[4/3] rounded-[2.5rem]"
+                    />
                   </div>
                 </div>
               </div>
@@ -316,24 +300,13 @@ export default function VialClearPage() {
                 <span className="text-sm font-black uppercase tracking-widest text-green-500/60">
                   Resultado Final (Después)
                 </span>
-                <div className="relative group p-3 rounded-[3rem] bg-gradient-to-br from-green-500/20 to-transparent shadow-Inner">
-                  <div className="floating-card bg-card/80 backdrop-blur-md overflow-hidden p-2 shadow-2xl border-white/10">
-                    <div className="aspect-[4/3] relative rounded-[2.5rem] overflow-hidden group">
-                      <Image
-                        src={showcaseData.afterImageUrl}
-                        alt="Evidencia después del proceso"
-                        fill
-                        className="object-cover transition-transform duration-700 group-hover:scale-105"
-                      />
-                      <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                        <Lightbox
-                          src={showcaseData.afterImageUrl}
-                          alt="Ver evidencia real después"
-                          className="scale-125 mb-4"
-                        />
-                        <p className="text-white font-bold text-sm">Ver Resultado Final</p>
-                      </div>
-                    </div>
+                <div className="relative group p-2 rounded-[2.5rem] bg-gradient-to-br from-green-500/20 to-transparent shadow-Inner">
+                  <div className="floating-card bg-card border border-white/10 overflow-hidden p-0 shadow-2xl">
+                    <Lightbox
+                      src={showcaseData.afterImageUrl}
+                      alt="Evidencia después del proceso"
+                      className="aspect-[4/3] rounded-[2.5rem]"
+                    />
                   </div>
                 </div>
               </div>

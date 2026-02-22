@@ -18,7 +18,7 @@ export function Lightbox({ src, alt, className = '' }: LightboxProps) {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <div className={`relative group cursor-zoom-in overflow-hidden rounded-lg ${className}`}>
+        <div className={`relative group cursor-zoom-in overflow-hidden ${className}`}>
           {/* Imagen miniatura */}
           <Image
             src={src}
@@ -43,8 +43,20 @@ export function Lightbox({ src, alt, className = '' }: LightboxProps) {
           {alt || 'Vista ampliada de la imagen'}
         </DialogPrimitive.Title>
 
-        <div className="relative w-full h-full animate-in zoom-in-95 duration-300">
+        <div className="relative w-full h-[85vh] animate-in zoom-in-95 duration-300">
           <Image src={src} alt={alt} fill className="object-contain drop-shadow-2xl" priority />
+        </div>
+
+        <div className="flex justify-center mt-6">
+          <a
+            href={src}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-2xl backdrop-blur-md transition-all font-bold border border-white/10"
+          >
+            <ZoomIn size={20} />
+            Ver Resolución Completa
+          </a>
         </div>
       </DialogContent>
     </Dialog>
