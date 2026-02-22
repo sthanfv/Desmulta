@@ -86,7 +86,7 @@ export default function VialClearPage() {
           <div className="space-y-10 z-20">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold border border-primary/20 animate-in fade-in slide-in-from-left-4 duration-700">
               <ShieldCheck size={16} />
-              <span>Servicio 100% Legal y Seguro</span>
+              <span>Trámite Administrativo Seguro</span>
             </div>
             <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-7xl xl:text-8xl font-black text-foreground tracking-tight leading-[0.95] animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
               Recuperamos tu <br />
@@ -95,8 +95,8 @@ export default function VialClearPage() {
               </span>
             </h1>
             <p className="text-lg md:text-xl lg:text-2xl text-muted-foreground leading-relaxed max-w-lg animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
-              Expertos en saneamiento legal de fotomultas y comparendos. Sin procesos tediosos, solo
-              resultados directos y efectivos.
+              Expertos en saneamiento administrativo de fotomultas y comparendos en toda Colombia.
+              Gestión directa, transparente y efectiva.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 pt-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
               <Button
@@ -341,11 +341,31 @@ export default function VialClearPage() {
             {[
               {
                 q: '¿Es realmente legal este proceso?',
-                a: 'Totalmente. Utilizamos las herramientas que la misma ley de tránsito y el CPACA otorgan a los ciudadanos para defender sus derechos ante cobros irregulares.',
+                a: 'Totalmente. Realizamos la gestión de trámites administrativos amparados en el derecho de petición y el debido proceso consagrado en la ley de tránsito y el CPACA para defender sus derechos ante cobros irregulares.',
               },
               {
                 q: '¿Cuánto tiempo demora la eliminación?',
-                a: 'El proceso administrativo suele tomar entre 15 y 30 días calendario, dependiendo de la rapidez de respuesta de la Secretaría de Tránsito correspondiente.',
+                a: 'La gestión suele tomar entre 15 y 30 días calendario, dependiendo de los tiempos de respuesta de cada Secretaría de Tránsito y el estado del proceso administrativo.',
+              },
+              {
+                q: '¿Garantizan que la multa será eliminada?',
+                a: 'Realizamos un estudio de viabilidad previo. Si el caso cumple con los requisitos legales para el saneamiento (como caducidad o prescripción), procedemos con la gestión del trámite administrativo.',
+              },
+              {
+                q: '¿Tengo que pagar por adelantado?',
+                a: 'El estudio inicial es gratuito. Para iniciar el trámite administrativo se establecen honorarios de gestión que se detallan de forma transparente según la complejidad de su caso.',
+              },
+              {
+                q: '¿Qué pasa si mi multa ya está en cobro coactivo?',
+                a: 'Aún en cobro coactivo es posible realizar gestiones administrativas si se han vulnerado sus derechos al debido proceso o si la sanción ya cumplió los tiempos legales de ley.',
+              },
+              {
+                q: '¿Es seguro proporcionar mi número de cédula?',
+                a: 'Totalmente. Su identificación solo se utiliza para realizar la consulta técnica en las bases de datos públicas (SIMIT). No almacenamos su documento en bases de datos permanentes y cumplimos estrictamente con la Ley 1581 de Protección de Datos.',
+              },
+              {
+                q: '¿Qué sucede si la multa ya aparece en mi historial oficial?',
+                a: 'Nuestra gestión se especializa precisamente en sanear ese historial. Si existe una vulneración al debido proceso o los términos de ley ya expiraron, adelantamos el trámite administrativo para que la sanción sea retirada de las plataformas oficiales.',
               },
             ].map((faq, i) => (
               <div
@@ -402,13 +422,13 @@ export default function VialClearPage() {
               <span className="text-3xl font-black tracking-tighter">DESMULTA</span>
             </div>
             <p className="text-lg text-muted-foreground leading-relaxed max-w-sm">
-              Somos una firma privada especializada en consultoría jurídica para conductores.
-              Transformamos problemas en soluciones legales.
+              Especialistas en la gestión y saneamiento de trámites administrativos de tránsito.
+              Ayudamos a los conductores a recuperar su tranquilidad vial de forma legal.
             </p>
           </div>
           <div className="text-sm text-muted-foreground font-medium space-y-2 md:text-right uppercase tracking-widest">
-            <p>© 2026 DESMULTA COLOMBIA</p>
-            <p>Justicia Vial & Transparencia</p>
+            <p>© 2025 DESMULTA COLOMBIA</p>
+            <p>Trámites Administrativos & Saneamiento Vial</p>
           </div>
         </div>
       </footer>

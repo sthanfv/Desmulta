@@ -42,7 +42,8 @@ export default function TerminosPage() {
             </span>
           </h1>
           <p className="text-xl text-muted-foreground font-medium max-w-2xl">
-            Transparencia total en el manejo de sus datos y la gestión de sus trámites legales.
+            Transparencia total en el manejo de sus datos y la gestión de sus trámites
+            administrativos.
           </p>
         </div>
 
@@ -135,7 +136,7 @@ export default function TerminosPage() {
                     Contacto por <span className="text-primary font-bold">WhatsApp</span> para
                     entrega de resultados.
                   </li>
-                  <li>Gestión de procesos de mandato administrativo.</li>
+                  <li>Gestión de procesos de saneamiento administrativo.</li>
                 </ul>
               </div>
 
@@ -161,7 +162,7 @@ export default function TerminosPage() {
                 Compromiso de Confianza
               </h3>
               <p className="text-lg opacity-90 font-medium max-w-xl mx-auto relative z-10">
-                Su tranquilidad legal es nuestra prioridad. Al utilizar nuestros servicios, acepta
+                Saneamiento vial profesional y eficiente. Al utilizar nuestros servicios, acepta
                 estas condiciones diseñadas para su protección.
               </p>
               <div className="relative z-10">
