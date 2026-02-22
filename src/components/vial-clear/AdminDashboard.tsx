@@ -152,10 +152,11 @@ export function AdminDashboard() {
         counterValue: data.counterValue || showcaseData?.counterValue || '',
         counterLabel: data.counterLabel || showcaseData?.counterLabel || '',
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Error al actualizar las imágenes.';
       toast({
         title: 'Error',
-        description: err.message || 'Error al actualizar las imágenes.',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
