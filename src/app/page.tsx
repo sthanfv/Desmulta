@@ -78,12 +78,6 @@ export default function VialClearPage() {
             </Link>
           </div>
           <div className="flex items-center gap-4">
-            <Button
-              onClick={() => setIsModalOpen(true)}
-              className="bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-medium transition-all"
-            >
-              Estudio Gratuito
-            </Button>
           </div>
         </nav>
       </header>
