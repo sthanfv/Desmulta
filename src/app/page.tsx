@@ -8,7 +8,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { ConsultationForm } from '@/components/vial-clear/ConsultationForm';
 import { Lightbox } from '@/components/ui/lightbox';
 import { ModeToggle } from '@/components/mode-toggle';
-import { initiateAnonymousSignIn, useAuth } from '@/firebase';
+import { doc } from 'firebase/firestore';
+import {
+  initiateAnonymousSignIn,
+  useAuth,
+  useFirestore,
+  useDoc,
+  useMemoFirebase,
+} from '@/firebase';
 
 export default function VialClearPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -30,6 +37,16 @@ export default function VialClearPage() {
     window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
     setIsWhatsAppWarningOpen(false);
   };
+
+  const firestore = useFirestore();
+  const showcaseRef = useMemoFirebase(
+    () => (firestore ? doc(firestore, 'site_config', 'showcase') : null),
+    [firestore]
+  );
+  const { data: showcaseData } = useDoc<{
+    beforeImageUrl: string;
+    afterImageUrl: string;
+  }>(showcaseRef);
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden selection:bg-primary/30">
@@ -265,26 +282,73 @@ export default function VialClearPage() {
             </p>
           </div>
 
-          <div className="relative group p-4 rounded-[4rem] bg-gradient-to-br from-primary/30 via-primary/5 to-transparent shadow-Inner">
-            <div className="floating-card bg-card/80 backdrop-blur-md overflow-hidden p-3 shadow-2xl border-white/10">
-              <div className="aspect-[16/9] md:aspect-[21/9] relative rounded-[3rem] overflow-hidden group">
-                <Image
-                  src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&q=80&w=1200"
-                  alt="Caso ganado exitosamente"
-                  fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                  <Lightbox
-                    src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&q=80&w=1200"
-                    alt="Evidencia proceso ganado"
-                    className="scale-125 mb-4"
-                  />
-                  <p className="text-white font-bold text-sm">Ver Evidencia Real</p>
+          {showcaseData?.beforeImageUrl && showcaseData?.afterImageUrl ? (
+            <div className="grid md:grid-cols-2 gap-8 items-center">
+              {/* Image Before */}
+              <div className="space-y-4">
+                <span className="text-sm font-black uppercase tracking-widest text-primary/60">
+                  Estado Anterior (Antes)
+                </span>
+                <div className="relative group p-3 rounded-[3rem] bg-gradient-to-br from-destructive/20 to-transparent shadow-Inner">
+                  <div className="floating-card bg-card/80 backdrop-blur-md overflow-hidden p-2 shadow-2xl border-white/10">
+                    <div className="aspect-[4/3] relative rounded-[2.5rem] overflow-hidden group">
+                      <Image
+                        src={showcaseData.beforeImageUrl}
+                        alt="Evidencia antes del proceso"
+                        fill
+                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                        <Lightbox
+                          src={showcaseData.beforeImageUrl}
+                          alt="Ver evidencia real antes"
+                          className="scale-125 mb-4"
+                        />
+                        <p className="text-white font-bold text-sm">Ver Evidencia Anterior</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Image After */}
+              <div className="space-y-4">
+                <span className="text-sm font-black uppercase tracking-widest text-green-500/60">
+                  Resultado Final (Después)
+                </span>
+                <div className="relative group p-3 rounded-[3rem] bg-gradient-to-br from-green-500/20 to-transparent shadow-Inner">
+                  <div className="floating-card bg-card/80 backdrop-blur-md overflow-hidden p-2 shadow-2xl border-white/10">
+                    <div className="aspect-[4/3] relative rounded-[2.5rem] overflow-hidden group">
+                      <Image
+                        src={showcaseData.afterImageUrl}
+                        alt="Evidencia después del proceso"
+                        fill
+                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                        <Lightbox
+                          src={showcaseData.afterImageUrl}
+                          alt="Ver evidencia real después"
+                          className="scale-125 mb-4"
+                        />
+                        <p className="text-white font-bold text-sm">Ver Resultado Final</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <div className="relative group p-4 rounded-[4rem] bg-gradient-to-br from-primary/30 via-primary/5 to-transparent shadow-Inner opacity-50">
+              <div className="floating-card bg-card/80 backdrop-blur-md overflow-hidden p-3 shadow-2xl border-white/10">
+                <div className="aspect-[16/9] md:aspect-[21/9] relative rounded-[3rem] overflow-hidden flex items-center justify-center bg-muted/20">
+                  <p className="font-bold text-muted-foreground p-12">
+                    Nuevos casos de éxito se están procesando...
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
