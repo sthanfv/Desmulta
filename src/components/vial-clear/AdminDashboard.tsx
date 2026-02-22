@@ -36,6 +36,8 @@ import {
 const showcaseSchema = z.object({
   beforeImage: z.instanceof(FileList).optional(),
   afterImage: z.instanceof(FileList).optional(),
+  counterValue: z.string().optional(),
+  counterLabel: z.string().optional(),
 });
 
 type ShowcaseFormData = z.infer<typeof showcaseSchema>;
@@ -54,6 +56,8 @@ export function AdminDashboard() {
   const { data: showcaseData, isLoading } = useDoc<{
     beforeImageUrl: string;
     afterImageUrl: string;
+    counterValue: string;
+    counterLabel: string;
   }>(showcaseRef);
 
   const [beforePreview, setBeforePreview] = useState<string | null>(null);
@@ -61,6 +65,21 @@ export function AdminDashboard() {
 
   const form = useForm<ShowcaseFormData>({
     resolver: zodResolver(showcaseSchema),
+    defaultValues: {
+      counterValue: showcaseData?.counterValue || '',
+      counterLabel: showcaseData?.counterLabel || '',
+    },
+  });
+
+  // Update form when data loads
+  useState(() => {
+    if (showcaseData) {
+      form.reset({
+        ...form.getValues(),
+        counterValue: showcaseData.counterValue || '',
+        counterLabel: showcaseData.counterLabel || '',
+      });
+    }
   });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'before' | 'after') => {
@@ -113,25 +132,31 @@ export function AdminDashboard() {
         }
       }
 
-      if (beforeImageUrl && afterImageUrl) {
-        setDoc(showcaseRef, { beforeImageUrl, afterImageUrl }, { merge: true }).catch((err) => {
-          console.error('Error writing to Firestore:', err);
-        });
-        toast({
-          title: 'Éxito',
-          description: 'Las imágenes del caso de éxito han sido actualizadas.',
-        });
-        setBeforePreview(null);
-        setAfterPreview(null);
-        form.reset();
-      }
-    } catch (error: unknown) {
-      const message =
-        error instanceof Error ? error.message : 'Ocurrió un problema al guardar los cambios.';
+      await setDoc(
+        showcaseRef,
+        {
+          beforeImageUrl,
+          afterImageUrl,
+          counterValue: data.counterValue || showcaseData?.counterValue || '1k+',
+          counterLabel: data.counterLabel || showcaseData?.counterLabel || 'Sanciones Eliminadas',
+        },
+        { merge: true }
+      );
       toast({
+        title: 'Éxito',
+        description: 'Las imágenes del caso de éxito han sido actualizadas.',
+      });
+      setBeforePreview(null);
+      setAfterPreview(null);
+      form.reset({
+        counterValue: data.counterValue || showcaseData?.counterValue || '',
+        counterLabel: data.counterLabel || showcaseData?.counterLabel || '',
+      });
+    } catch (err: any) {
+      toast({
+        title: 'Error',
+        description: err.message || 'Error al actualizar las imágenes.',
         variant: 'destructive',
-        title: 'Error al actualizar',
-        description: message,
       });
     } finally {
       setIsSubmitting(false);
@@ -248,6 +273,48 @@ export function AdminDashboard() {
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-12">
+              {/* Counter Configuration */}
+              <div className="grid md:grid-cols-2 gap-10 bg-primary/5 p-8 rounded-[2.5rem] border border-primary/10">
+                <FormField
+                  control={form.control}
+                  name="counterValue"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-black text-foreground uppercase tracking-widest opacity-70">
+                        Valor del Contador (Ej: 1k+, 500+)
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="1k+"
+                          className="bg-background border-border/50 rounded-2xl h-14"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="counterLabel"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-black text-foreground uppercase tracking-widest opacity-70">
+                        Etiqueta (Ej: Sanciones Eliminadas)
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Sanciones Eliminadas"
+                          className="bg-background border-border/50 rounded-2xl h-14"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
               <div className="grid md:grid-cols-2 gap-10">
                 <FormField
                   control={form.control}

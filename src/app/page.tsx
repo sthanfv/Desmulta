@@ -46,6 +46,8 @@ export default function VialClearPage() {
   const { data: showcaseData } = useDoc<{
     beforeImageUrl: string;
     afterImageUrl: string;
+    counterValue: string;
+    counterLabel: string;
   }>(showcaseRef);
 
   return (
@@ -119,10 +121,12 @@ export default function VialClearPage() {
               <div className="absolute bottom-8 left-8 right-8 z-10 pointer-events-none">
                 <div className="glass p-4 rounded-3xl flex items-center gap-4 border-white/20 shadow-2xl">
                   <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center text-primary-foreground font-black text-lg shadow-lg">
-                    1k+
+                    {showcaseData?.counterValue || '1k+'}
                   </div>
                   <div>
-                    <p className="font-black text-sm text-foreground">Sanciones Eliminadas</p>
+                    <p className="font-black text-sm text-foreground">
+                      {showcaseData?.counterLabel || 'Sanciones Eliminadas'}
+                    </p>
                     <p className="text-xs text-muted-foreground font-medium">
                       Este mes en toda Colombia
                     </p>
@@ -341,7 +345,7 @@ export default function VialClearPage() {
               },
               {
                 q: '¿Cuánto tiempo demora la eliminación?',
-                a: 'El proceso administrativo suele tomar entre 45 y 75 días hábiles, dependiendo de la rapidez de respuesta de la Secretaría de Tránsito correspondiente.',
+                a: 'El proceso administrativo suele tomar entre 15 y 30 días calendario, dependiendo de la rapidez de respuesta de la Secretaría de Tránsito correspondiente.',
               },
             ].map((faq, i) => (
               <div
