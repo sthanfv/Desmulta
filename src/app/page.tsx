@@ -152,7 +152,7 @@ export default function VialClearPage() {
             {[
               {
                 icon: ShieldCheck,
-                title: 'Legalidad Garantizada',
+                title: 'Respaldo Normativo',
                 desc: 'Operamos estrictamente bajo la Ley 769 de 2002 y el CPACA.',
                 delay: '0',
               },
@@ -259,8 +259,8 @@ export default function VialClearPage() {
                 </h4>
                 <p className="text-muted-foreground text-sm md:text-base leading-relaxed font-medium">
                   &quot;El estudio de viabilidad inicial es una cortesía para identificar sus
-                  oportunidades legales. La ejecución de trámites administrativos y defensa jurídica
-                  genera honorarios profesionales que se ajustan según la complejidad de su
+                  oportunidades de saneamiento. La ejecución de trámites administrativos y gestión técnica
+                  genera honorarios de éxito que se ajustan según la complejidad de su
                   caso.&quot;
                 </p>
               </div>
@@ -276,6 +276,14 @@ export default function VialClearPage() {
             <h2 className="text-4xl md:text-6xl font-black text-foreground tracking-tight">
               Casos de Éxito
             </h2>
+            <div className="flex flex-col items-center gap-2">
+              <span className="text-5xl md:text-7xl font-black text-primary tracking-tighter">
+                {showcaseData?.counterValue || '500+'}
+              </span>
+              <span className="text-sm md:text-base font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">
+                {showcaseData?.counterLabel || 'Sanciones Eliminadas'}
+              </span>
+            </div>
             <p className="text-xl text-muted-foreground">
               Resultados reales verificados ante los organismos de tránsito
             </p>
@@ -349,7 +357,7 @@ export default function VialClearPage() {
               },
               {
                 q: '¿Garantizan que la multa será eliminada?',
-                a: 'Realizamos un estudio de viabilidad previo. Si el caso cumple con los requisitos legales para el saneamiento (como caducidad o prescripción), procedemos con la gestión del trámite administrativo.',
+                a: 'Realizamos un estudio técnico de viabilidad previo. Si el caso cumple con los parámetros de ley para ser saneado, procedemos con la gestión del trámite administrativo.',
               },
               {
                 q: '¿Tengo que pagar por adelantado?',
@@ -357,7 +365,7 @@ export default function VialClearPage() {
               },
               {
                 q: '¿Qué pasa si mi multa ya está en cobro coactivo?',
-                a: 'Aún en cobro coactivo es posible realizar gestiones administrativas si se han vulnerado sus derechos al debido proceso o si la sanción ya cumplió los tiempos legales de ley.',
+                a: 'Aún en cobro coactivo es posible realizar gestiones administrativas si se han vulnerado sus derechos al debido proceso o si la sanción ya cumplió los términos de ley.',
               },
               {
                 q: '¿Es seguro proporcionar mi número de cédula?',
@@ -365,7 +373,7 @@ export default function VialClearPage() {
               },
               {
                 q: '¿Qué sucede si la multa ya aparece en mi historial oficial?',
-                a: 'Nuestra gestión se especializa precisamente en sanear ese historial. Si existe una vulneración al debido proceso o los términos de ley ya expiraron, adelantamos el trámite administrativo para que la sanción sea retirada de las plataformas oficiales.',
+                a: 'Nuestra gestión se especializa precisamente en sanear ese historial. Si existe una vulneración al debido proceso o inconsistencias técnicas, adelantamos el trámite administrativo para que la sanción sea retirada.',
               },
             ].map((faq, i) => (
               <div

@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -72,15 +72,14 @@ export function AdminDashboard() {
   });
 
   // Update form when data loads
-  useState(() => {
+  useEffect(() => {
     if (showcaseData) {
       form.reset({
-        ...form.getValues(),
         counterValue: showcaseData.counterValue || '',
         counterLabel: showcaseData.counterLabel || '',
       });
     }
-  });
+  }, [showcaseData, form]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'before' | 'after') => {
     const file = e.target.files?.[0];
@@ -267,8 +266,8 @@ export function AdminDashboard() {
               Historias de Éxito
             </h2>
             <p className="text-muted-foreground mt-3 text-lg max-w-2xl font-medium leading-relaxed">
-              Actualiza las imágenes que demuestran la efectividad de nuestros procesos legales ante
-              la opinión pública.
+              Actualiza los datos e imágenes que demuestran la efectividad de nuestra gestión
+              administrativa.
             </p>
           </div>
 
