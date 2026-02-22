@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import Image from 'next/image';
 import { ShieldCheck, ArrowRightLeft, CheckCircle2, Info, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -419,23 +420,92 @@ export default function VialClearPage() {
         </div>
       </section>
 
-      {/* Footer - Soft & Modern */}
-      <footer className="bg-card/30 backdrop-blur-md border-t border-border/50 py-20 px-4 rounded-t-[4rem]">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-20 items-center">
-          <div className="space-y-8">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-primary/10 rounded-xl">
-                <ShieldCheck className="w-10 h-10 text-primary" />
-              </div>
-              <span className="text-3xl font-black tracking-tighter">DESMULTA</span>
+      {/* Footer - Professional & Structured */}
+      <footer className="bg-card/30 backdrop-blur-md border-t border-border/50 py-24 px-4 rounded-t-[4rem] relative z-10">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-16 mb-20">
+            {/* Brand Section */}
+            <div className="space-y-6">
+              <Link href="/" className="flex items-center gap-3 group">
+                <div className="p-2 bg-primary/10 rounded-xl group-hover:bg-primary/20 transition-colors">
+                  <ShieldCheck className="w-10 h-10 text-primary" />
+                </div>
+                <span className="text-3xl font-black tracking-tighter">DESMULTA</span>
+              </Link>
+              <p className="text-lg text-muted-foreground leading-relaxed">
+                Expertos en la gestión administrativa y saneamiento de trámites de tránsito a nivel
+                nacional.
+              </p>
             </div>
-            <p className="text-lg text-muted-foreground leading-relaxed max-w-sm">
-              Especialistas en la gestión y saneamiento de trámites administrativos de tránsito.
-              Ayudamos a los conductores a recuperar su tranquilidad vial de forma legal.
-            </p>
+
+            {/* Navigation Section */}
+            <div className="grid grid-cols-2 gap-8">
+              <div className="space-y-6">
+                <h4 className="text-sm font-black uppercase tracking-[0.2em] text-foreground/50">
+                  Navegación
+                </h4>
+                <ul className="space-y-4">
+                  <li>
+                    <button
+                      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                      className="text-muted-foreground hover:text-primary transition-colors font-medium"
+                    >
+                      Inicio
+                    </button>
+                  </li>
+                  <li>
+                    <Link
+                      href="/terminos"
+                      className="text-muted-foreground hover:text-primary transition-colors font-medium"
+                    >
+                      Estudio Técnico
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+              <div className="space-y-6">
+                <h4 className="text-sm font-black uppercase tracking-[0.2em] text-foreground/50">
+                  Legal
+                </h4>
+                <ul className="space-y-4">
+                  <li>
+                    <Link
+                      href="/terminos"
+                      className="text-muted-foreground hover:text-primary transition-colors font-medium"
+                    >
+                      Términos de Uso
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/terminos"
+                      className="text-muted-foreground hover:text-primary transition-colors font-medium"
+                    >
+                      Privacidad
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Contact Section */}
+            <div className="space-y-6 md:text-right">
+              <h4 className="text-sm font-black uppercase tracking-[0.2em] text-foreground/50">
+                Contacto Directo
+              </h4>
+              <p className="text-muted-foreground font-medium">Colombia, Servicio Nacional</p>
+              <Button
+                variant="outline"
+                className="rounded-full px-8 border-primary/20 hover:bg-primary/10 hover:text-primary"
+                onClick={() => setIsWhatsAppWarningOpen(true)}
+              >
+                Hablar con Asesor
+              </Button>
+            </div>
           </div>
-          <div className="text-sm text-muted-foreground font-medium space-y-2 md:text-right uppercase tracking-widest">
-            <p>© 2025 DESMULTA COLOMBIA</p>
+
+          <div className="pt-12 border-t border-border/20 flex flex-col md:flex-row justify-between items-center gap-6 text-[11px] text-muted-foreground font-black uppercase tracking-[0.3em]">
+            <p>© 2025 DESMULTA COLOMBIA — MARCA REGISTRADA</p>
             <p>Trámites Administrativos & Saneamiento Vial</p>
           </div>
         </div>
@@ -470,6 +540,15 @@ export default function VialClearPage() {
           title="Consultar por WhatsApp"
         >
           <MessageCircle size={36} fill="currentColor" className="text-white" />
+        </button>
+
+        {/* Scroll to Top - Added */}
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="bg-card/50 backdrop-blur-md hover:bg-card border border-white/10 text-foreground w-14 h-14 rounded-full flex items-center justify-center shadow-xl transition-all hover:-translate-y-1 active:scale-90"
+          title="Volver Arriba"
+        >
+          <ArrowRightLeft size={20} className="rotate-90" />
         </button>
       </div>
 

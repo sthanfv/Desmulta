@@ -12,10 +12,16 @@ const GSC_ID = process.env.NEXT_PUBLIC_GSC_ID;
 export const metadata: Metadata = {
   title: `${process.env.NEXT_PUBLIC_BRAND_NAME || 'Desmulta'} - Saneamiento de Multas de Tránsito`,
   description:
-    'Intermediamos ante las Secretarías de Tránsito para gestionar legalmente sus deudas antiguas. Libérese de multas de forma eficiente.',
+    'Gestionamos técnicamente sus trámites ante las Secretarías de Tránsito para sanear deudas administrativas de forma eficiente.',
   icons: {
-    icon: '/logo.png',
+    icon: '/favicon.ico',
     apple: '/logo.png',
+  },
+  openGraph: {
+    title: `Desmulta - Recupere su Tranquilidad Vial`,
+    description: 'Gestión técnica de trámites de tránsito a nivel nacional.',
+    type: 'website',
+    images: [{ url: '/logo.png' }],
   },
 };
 
