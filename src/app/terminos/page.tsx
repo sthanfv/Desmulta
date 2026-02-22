@@ -9,137 +9,178 @@ export default function TerminosPage() {
   const brandName = process.env.NEXT_PUBLIC_BRAND_NAME || 'Desmulta';
 
   return (
-    <div className="min-h-screen bg-[#020817] text-slate-300 font-sans selection:bg-primary/30">
-      {/* Header Simple */}
-      <header className="fixed top-0 w-full z-50 bg-[#020817]/80 backdrop-blur-xl border-b border-white/5">
-        <div className="max-w-4xl mx-auto px-6 h-20 flex items-center justify-between">
+    <div className="min-h-screen bg-background relative overflow-hidden text-foreground/80 font-sans selection:bg-primary/30">
+      {/* Background radial gradients for consistency */}
+      <div className="fixed inset-0 bg-[radial-gradient(circle_at_10%_10%,rgba(255,191,0,0.05)_0%,transparent_40%)] pointer-events-none" />
+      <div className="fixed inset-0 bg-[radial-gradient(circle_at_90%_90%,rgba(255,191,0,0.03)_0%,transparent_40%)] pointer-events-none" />
+
+      {/* Header Glassmorphic */}
+      <header className="fixed top-0 w-full z-50 p-6">
+        <div className="max-w-4xl mx-auto glass rounded-3xl px-8 h-16 flex items-center justify-between shadow-2xl border-white/10">
           <Link
             href="/"
-            className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group"
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-all group active:scale-95"
           >
-            <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-            <span className="font-bold">Volver al inicio</span>
+            <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+            <span className="font-bold text-sm">Inicio</span>
           </Link>
           <div className="flex items-center gap-2">
-            <ShieldCheck className="text-primary" size={24} />
-            <span className="font-black tracking-tighter text-xl uppercase text-white">
+            <ShieldCheck className="text-primary" size={20} />
+            <span className="font-black tracking-tighter text-lg uppercase text-foreground">
               {brandName}
             </span>
           </div>
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-6 pt-32 pb-24">
-        <div className="mb-16">
-          <h1 className="text-4xl md:text-5xl font-black mb-6 text-white leading-tight">
-            Términos de Servicio y <br />
-            <span className="text-primary">Política de Privacidad</span>
+      <main className="max-w-4xl mx-auto px-6 pt-36 pb-24">
+        <div className="mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
+          <h1 className="text-5xl md:text-7xl font-black mb-6 text-foreground tracking-tight leading-[0.95]">
+            Legal & <br />
+            <span className="text-primary italic underline decoration-primary/20 underline-offset-8">
+              Privacidad
+            </span>
           </h1>
-          <p className="text-lg text-slate-400">
-            Última actualización: Febrero de 2024. Le rogamos leer detenidamente estos términos
-            antes de utilizar nuestros servicios de gestión administrativa.
+          <p className="text-xl text-muted-foreground font-medium max-w-2xl">
+            Transparencia total en el manejo de sus datos y la gestión de sus trámites legales.
           </p>
         </div>
 
-        <div className="space-y-16">
+        <div className="space-y-12">
           {/* Términos de Servicio */}
-          <section>
-            <div className="flex items-center gap-3 mb-8">
-              <div className="p-3 bg-white/5 rounded-xl border border-white/10">
-                <FileText className="text-primary" size={24} />
+          <section className="floating-card bg-card/40 backdrop-blur-sm border border-white/10 p-10 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100">
+            <div className="flex items-center gap-4 mb-10">
+              <div className="p-3 bg-primary/10 rounded-2xl border border-primary/20 shadow-inner">
+                <FileText className="text-primary" size={28} />
               </div>
-              <h2 className="text-2xl font-bold text-white">1. Términos de Servicio</h2>
+              <h2 className="text-3xl font-black text-foreground tracking-tight">
+                Condiciones del Servicio
+              </h2>
             </div>
 
-            <div className="space-y-6 text-slate-400 leading-relaxed">
-              <p>
-                <strong>1.1. Naturaleza del Servicio:</strong> {brandName} actúa como un facilitador
-                y gestor administrativo para la debida diligencia de procesos y requerimientos ante
-                los organismos de tránsito correspondientes en el territorio nacional. No somos una
-                entidad estatal ni un despacho judicial.
-              </p>
-              <p>
-                <strong>1.2. Estudio de Viabilidad:</strong> El análisis inicial de su caso a través
-                del Sistema Integrado de Información sobre Multas y Sanciones por Infracciones de
-                Tránsito (SIMIT) es un servicio totalmente gratuito y de carácter informativo. No
-                obliga a la contratación de la gestión posterior.
-              </p>
-              <p>
-                <strong>1.3. Honorarios Profesionales:</strong> La ejecución de trámites y gestión
-                documental conlleva el cobro de honorarios. Estos serán informados de manera
-                transparente una vez se determine la viabilidad de su caso y antes de iniciar
-                cualquier actuación. El cobro está sujeto a la obtención de resultados favorables
-                (exoneración o regularización de la cuenta), salvo acuerdo contrario expresado por
-                escrito.
-              </p>
-              <p>
-                <strong>1.4. Garantía de Resultados:</strong> Si bien contamos con una alta
-                efectividad fundamentada en la normativa vigente y fallos administrativos,{' '}
-                {brandName} advierte que las decisiones finales dependen en exclusiva de los
-                organismos de tránsito correspondientes. Por tanto, no se garantiza el éxito en el
-                100% de los expedientes, ya que cada caso tiene sus particularidades.
-              </p>
+            <div className="grid gap-8 text-muted-foreground leading-relaxed text-lg">
+              <div className="space-y-3">
+                <h4 className="font-black text-foreground uppercase tracking-widest text-xs opacity-60">
+                  1.1. Naturaleza
+                </h4>
+                <p>
+                  {brandName} actúa como un facilitador y gestor administrativo para la debida
+                  diligencia de procesos ante organismos de tránsito. No somos una entidad estatal
+                  ni un despacho judicial.
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <h4 className="font-black text-foreground uppercase tracking-widest text-xs opacity-60">
+                  1.2. Gratuidad del Estudio
+                </h4>
+                <p>
+                  El análisis inicial a través del SIMIT es gratuito y de carácter informativo. No
+                  obliga a la contratación de gestión posterior.
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <h4 className="font-black text-foreground uppercase tracking-widest text-xs opacity-60">
+                  1.3. Honorarios
+                </h4>
+                <p>
+                  La ejecución de trámites conlleva honorarios transparentes informados tras el
+                  diagnóstico inicial. El pago suele estar condicionado al éxito del proceso, según
+                  acuerdo específico.
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <h4 className="font-black text-foreground uppercase tracking-widest text-xs opacity-60">
+                  1.4. Garantías
+                </h4>
+                <p>
+                  Contamos con alta efectividad normativa, pero las decisiones finales dependen de
+                  los organismos de tránsito. Cada caso es único y se trata con rigor técnico.
+                </p>
+              </div>
             </div>
           </section>
-
-          <hr className="border-white/10" />
 
           {/* Política de Privacidad */}
-          <section>
-            <div className="flex items-center gap-3 mb-8">
-              <div className="p-3 bg-white/5 rounded-xl border border-white/10">
-                <Lock className="text-primary" size={24} />
+          <section className="floating-card bg-card/40 backdrop-blur-sm border border-white/10 p-10 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-200">
+            <div className="flex items-center gap-4 mb-10">
+              <div className="p-3 bg-primary/10 rounded-2xl border border-primary/20 shadow-inner">
+                <Lock className="text-primary" size={28} />
               </div>
-              <h2 className="text-2xl font-bold text-white">2. Política de Privacidad</h2>
+              <h2 className="text-3xl font-black text-foreground tracking-tight">
+                Privacidad de Datos
+              </h2>
             </div>
 
-            <div className="space-y-6 text-slate-400 leading-relaxed">
-              <p>
-                <strong>2.1. Tratamiento de Datos:</strong> Al enviar el formulario de viabilidad,
-                usted autoriza a{brandName} a consultar su estado de cuenta en el SIMIT y demás
-                bases de datos públicas de tránsito utilizando el número de identificación
-                proporcionado.
-              </p>
-              <p>
-                <strong>2.2. Uso de la Información:</strong> Los datos personales (número de
-                documento, nombre, teléfono) serán utilizados exclusivamente con los siguientes
-                fines:
-              </p>
-              <ul className="list-disc pl-6 space-y-2 mt-2">
-                <li>Realizar la consulta de deudas y comparendos.</li>
-                <li>
-                  Contactarle vía telefónica o por WhatsApp para entregarle los resultados de la
-                  pre-evaluación.
-                </li>
-                <li>
-                  Efectuar cobros o enviar comprobantes asociados a posibles contratos de mandato.
-                </li>
-              </ul>
-              <p>
-                <strong>2.3. Protección y Confidencialidad:</strong> Su información es manejada bajo
-                estándares de confidencialidad. {brandName} no almacena los números de
-                identificación de forma permanente después de que el proceso ha culminado ni
-                comercializa bases de datos con terceros bajo ninguna circunstancia.
-              </p>
+            <div className="grid gap-8 text-muted-foreground leading-relaxed text-lg">
+              <div className="space-y-3">
+                <h4 className="font-black text-foreground uppercase tracking-widest text-xs opacity-60">
+                  2.1. Autorización
+                </h4>
+                <p>
+                  Al enviar su consulta, autoriza a {brandName} a verificar su estado en el SIMIT y
+                  bases de datos públicas de tránsito para fines de asesoría.
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <h4 className="font-black text-foreground uppercase tracking-widest text-xs opacity-60">
+                  2.2. Uso Específico
+                </h4>
+                <ul className="list-disc pl-6 space-y-3">
+                  <li>Consulta de deudas y comparendos vigentes.</li>
+                  <li>
+                    Contacto por <span className="text-primary font-bold">WhatsApp</span> para
+                    entrega de resultados.
+                  </li>
+                  <li>Gestión de procesos de mandato administrativo.</li>
+                </ul>
+              </div>
+
+              <div className="space-y-3">
+                <h4 className="font-black text-foreground uppercase tracking-widest text-xs opacity-60">
+                  2.3. Protección
+                </h4>
+                <p>
+                  No comercializamos sus datos. La información se maneja bajo estrictos estándares
+                  de confidencialidad y se elimina tras el fin de la gestión si el usuario así lo
+                  requiere.
+                </p>
+              </div>
             </div>
           </section>
 
-          {/* Contacto */}
-          <div className="bg-primary/5 border border-primary/20 p-8 rounded-2xl relative overflow-hidden">
-            <h3 className="text-xl font-bold text-white mb-4">Aceptación de Términos</h3>
-            <p className="text-slate-400 text-sm leading-relaxed mb-6 relative z-10">
-              Al utilizar nuestra plataforma y canales de comunicación (WhatsApp, formularios),
-              usted declara haber leído y comprendido los presentes términos de servicio y autoriza
-              el tratamiento de sus datos conforme a nuestra política de privacidad.
-            </p>
-            <Link href="/">
-              <Button className="bg-primary text-primary-foreground font-bold hover:bg-yellow-400">
-                Entendido, volver
-              </Button>
-            </Link>
+          {/* Accept Card */}
+          <div className="relative group animate-in zoom-in-95 duration-700 delay-300">
+            <div className="absolute inset-0 bg-primary/10 rounded-[3rem] blur-2xl opacity-50 group-hover:opacity-100 transition-opacity" />
+            <div className="relative bg-primary text-primary-foreground p-12 rounded-[3rem] text-center space-y-8 overflow-hidden">
+              <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-white/10 rounded-full blur-[80px] pointer-events-none" />
+              <h3 className="text-3xl font-black tracking-tight relative z-10">
+                Compromiso de Confianza
+              </h3>
+              <p className="text-lg opacity-90 font-medium max-w-xl mx-auto relative z-10">
+                Su tranquilidad legal es nuestra prioridad. Al utilizar nuestros servicios, acepta
+                estas condiciones diseñadas para su protección.
+              </p>
+              <div className="relative z-10">
+                <Link href="/">
+                  <Button className="h-16 px-12 bg-foreground text-background hover:bg-foreground/90 font-black rounded-2xl active:scale-95 transition-all text-lg shadow-xl border-none">
+                    ACEPTAR Y VOLVER
+                  </Button>
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </main>
+
+      <footer className="py-20 text-center opacity-40">
+        <p className="text-[10px] font-black uppercase tracking-[0.3em]">
+          Ley 1581 de 2012 • Protección de Datos Personales
+        </p>
+      </footer>
     </div>
   );
 }
