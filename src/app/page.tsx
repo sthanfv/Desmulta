@@ -195,8 +195,8 @@ export default function VialClearPage() {
                     },
                     {
                       num: '02',
-                      title: 'Estrategia Jurídica',
-                      desc: 'Radicamos derechos de petición y recursos de ley específicos.',
+                      title: 'Análisis de Inconsistencias',
+                      desc: 'Identificamos fallas en el procedimiento para fundamentar técnicamente su caso.',
                     },
                     {
                       num: '03',
@@ -258,9 +258,11 @@ export default function VialClearPage() {
         <div className="max-w-4xl mx-auto text-center space-y-16">
           <div className="space-y-4">
             <h2 className="text-4xl md:text-6xl font-black text-foreground tracking-tight">
-              Testigos del Éxito
+              Casos de Éxito
             </h2>
-            <p className="text-xl text-muted-foreground">Historias de éxito reales verificadas</p>
+            <p className="text-xl text-muted-foreground">
+              Resultados reales verificados ante los organismos de tránsito
+            </p>
           </div>
 
           <div className="relative group p-4 rounded-[4rem] bg-gradient-to-br from-primary/30 via-primary/5 to-transparent shadow-Inner">
@@ -272,12 +274,13 @@ export default function VialClearPage() {
                   fill
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                   <Lightbox
                     src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&q=80&w=1200"
                     alt="Evidencia proceso ganado"
-                    className="scale-125"
+                    className="scale-125 mb-4"
                   />
+                  <p className="text-white font-bold text-sm">Ver Evidencia Real</p>
                 </div>
               </div>
             </div>
