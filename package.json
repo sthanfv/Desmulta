@@ -11,7 +11,8 @@
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
-    "check": "npm run format && npm run lint && npm run typecheck && npm run build"
+    "check": "npm run format && npm run lint && npm run typecheck && npm run build",
+    "postbuild": "next-sitemap"
   },
   "dependencies": {
     "@genkit-ai/google-genai": "^1.28.0",
@@ -48,6 +49,7 @@
     "genkit": "^1.28.0",
     "lucide-react": "^0.475.0",
     "next": "^15.5.12",
+    "next-sitemap": "^4.2.3",
     "patch-package": "^8.0.0",
     "react": "^19.2.1",
     "react-day-picker": "^9.11.3",
