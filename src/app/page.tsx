@@ -69,12 +69,8 @@ export default function VialClearPage() {
         <nav className="max-w-6xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-3 group">
-              <div className="relative">
-                <img
-                  src="/logo.png"
-                  alt={brandName}
-                  className="h-10 w-auto object-contain transition-transform duration-300 group-hover:rotate-3"
-                />
+              <div className="bg-primary p-2 rounded-lg shadow-[0_0_15px_rgba(234,179,8,0.3)] transition-transform group-hover:scale-110">
+                <ShieldCheck className="text-primary-foreground" size={24} />
               </div>
               <span className="font-black tracking-tighter text-xl lg:text-2xl uppercase bg-gradient-to-br from-white to-white/60 bg-clip-text text-transparent">
                 {brandName}
@@ -273,18 +269,11 @@ export default function VialClearPage() {
 
             {/* Branding y Logo */}
             <div className="max-w-2xl">
-              <div className="flex items-center gap-4">
-                <div className="relative group">
-                  <img
-                    src="/logo.png"
-                    alt={brandName}
-                    className="h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full -z-10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="bg-primary p-2 rounded-lg shadow-[0_0_15px_rgba(234,179,8,0.3)]">
+                  <ShieldCheck className="text-primary-foreground" size={24} />
                 </div>
-                <span className="font-black tracking-tighter text-2xl uppercase hidden sm:block bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
-                  {brandName}
-                </span>
+                <span className="font-black tracking-tighter text-xl uppercase">{brandName}</span>
               </div>
               <p className="text-slate-500 text-sm leading-relaxed">
                 Expertos en gestión administrativa de tránsito. Recuperamos la movilidad financiera
