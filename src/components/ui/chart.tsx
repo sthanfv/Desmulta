@@ -78,11 +78,11 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
             ([theme, prefix]) => `
 ${prefix} [data-chart=${id}] {
 ${colorConfig
-  .map(([key, itemConfig]) => {
-    const color = itemConfig.theme?.[theme as keyof typeof itemConfig.theme] || itemConfig.color;
-    return color ? `  --color-${key}: ${color};` : null;
-  })
-  .join('\n')}
+                .map(([key, itemConfig]) => {
+                  const color = itemConfig.theme?.[theme as keyof typeof itemConfig.theme] || itemConfig.color;
+                  return color ? `  --color-${key}: ${color};` : null;
+                })
+                .join('\n')}
 }
 `
           )
@@ -97,13 +97,13 @@ const ChartTooltip = RechartsPrimitive.Tooltip;
 const ChartTooltipContent = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<typeof RechartsPrimitive.Tooltip> &
-    React.ComponentProps<'div'> & {
-      hideLabel?: boolean;
-      hideIndicator?: boolean;
-      indicator?: 'line' | 'dot' | 'dashed';
-      nameKey?: string;
-      labelKey?: string;
-    }
+  React.ComponentProps<'div'> & {
+    hideLabel?: boolean;
+    hideIndicator?: boolean;
+    indicator?: 'line' | 'dot' | 'dashed';
+    nameKey?: string;
+    labelKey?: string;
+  }
 >(
   (
     {
@@ -134,7 +134,9 @@ const ChartTooltipContent = React.forwardRef<
       const key = `${labelKey || item.dataKey || item.name || 'value'}`;
       const itemConfig = getPayloadConfigFromPayload(config, item, key);
       const value =
-        !labelKey && typeof label === 'string'
+        !labelKey &&
+          typeof label === 'string' &&
+          !['__proto__', 'constructor', 'prototype'].includes(label)
           ? config[label as keyof typeof config]?.label || label
           : itemConfig?.label;
 
@@ -243,10 +245,10 @@ const ChartLegend = RechartsPrimitive.Legend;
 const ChartLegendContent = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<'div'> &
-    Pick<RechartsPrimitive.LegendProps, 'payload' | 'verticalAlign'> & {
-      hideIcon?: boolean;
-      nameKey?: string;
-    }
+  Pick<RechartsPrimitive.LegendProps, 'payload' | 'verticalAlign'> & {
+    hideIcon?: boolean;
+    nameKey?: string;
+  }
 >(({ className, hideIcon = false, payload, verticalAlign = 'bottom', nameKey }, ref) => {
   const { config } = useChart();
 
@@ -316,7 +318,16 @@ function getPayloadConfigFromPayload(config: ChartConfig, payload: unknown, key:
     configLabelKey = payloadPayload[key as keyof typeof payloadPayload] as string;
   }
 
-  return configLabelKey in config ? config[configLabelKey] : config[key as keyof typeof config];
+  if (
+    ['__proto__', 'constructor', 'prototype'].includes(configLabelKey) ||
+    ['__proto__', 'constructor', 'prototype'].includes(key)
+  ) {
+    return undefined;
+  }
+
+  return configLabelKey in config
+    ? config[configLabelKey as keyof typeof config]
+    : config[key as keyof typeof config];
 }
 
 export {

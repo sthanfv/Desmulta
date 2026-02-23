@@ -79,7 +79,7 @@ export async function POST(request: Request) {
     const data = docSnap.data();
 
     // Idempotencia: Si la notificación ya fue enviada, no hacer nada.
-    if (data?.notificationStatus === 'sent') {
+    if (data?.telegramStatus === 'sent') {
       return NextResponse.json({ message: 'Notificación ya fue enviada.' });
     }
 
@@ -115,16 +115,21 @@ export async function POST(request: Request) {
 
     if (!telegramResponse.ok) {
       console.error('[notify] Telegram API Error:', JSON.stringify(telegramResponseData));
-      // No devolver error crítico al proceso: la consulta ya fue guardada.
+      // ✅ ESCRITURA OPTIMISTA: Marcamos como 'failed' para que el cron recuperador lo reintente.
+      // Esta es la 2da escritura que solo ocurre en el ~1% de casos de fallo.
+      await docRef.update({
+        telegramStatus: 'failed',
+        telegramError: JSON.stringify(telegramResponseData).slice(0, 200),
+      });
       return NextResponse.json(
-        { error: 'Telegram API call failed but consultation was saved.' },
+        { error: 'Telegram API call failed. Consultation saved, will retry.' },
         { status: 200 }
       );
     }
 
-    // Marcar como notificado para asegurar la idempotencia
+    // ✅ Marcar como entregado: idempotencia garantizada
     await docRef.update({
-      notificationStatus: 'sent',
+      telegramStatus: 'sent',
       notifiedAt: Timestamp.now(),
     });
 

@@ -72,7 +72,9 @@ export async function POST(request: Request) {
       status: 'pendiente' as const,
       fuente: 'web' as const,
       createdAt: FieldValue.serverTimestamp(),
-      notificationStatus: 'pending' as const,
+      // Escritura optimista: asumimos entrega exitosa.
+      // Solo se cambia a 'failed' si Telegram falla (2da escritura solo en error)
+      telegramStatus: 'pending' as const,
     };
 
     // 4. Transacción atómica: escribir consulta + actualizar cooldown

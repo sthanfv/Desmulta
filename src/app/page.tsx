@@ -3,7 +3,18 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ShieldCheck, ArrowRightLeft, CheckCircle2, Info, MessageCircle } from 'lucide-react';
+import {
+  ShieldCheck,
+  ArrowRightLeft,
+  CheckCircle2,
+  Info,
+  MessageCircle,
+  Mail,
+  Phone,
+  MapPin,
+  Instagram,
+  Facebook,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -147,12 +158,25 @@ export default function VialClearPage() {
     () => (firestore ? doc(firestore, 'site_config', 'showcase') : null),
     [firestore]
   );
+  const footerRef = useMemoFirebase(
+    () => (firestore ? doc(firestore, 'site_config', 'footer') : null),
+    [firestore]
+  );
+
   const { data: showcaseData } = useDoc<{
     beforeImageUrl: string;
     afterImageUrl: string;
     counterValue: string;
     counterLabel: string;
   }>(showcaseRef);
+
+  const { data: footerData } = useDoc<{
+    whatsapp: string;
+    email: string;
+    address: string;
+    instagramUrl: string;
+    facebookUrl: string;
+  }>(footerRef);
 
   return (
     <div className="min-h-screen bg-background selection:bg-primary/30 selection:text-primary-foreground overflow-x-hidden">
@@ -218,14 +242,14 @@ export default function VialClearPage() {
               <ShieldCheck size={16} />
               <span>Trámite Administrativo Seguro</span>
             </div>
-            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white tracking-tighter leading-[0.9] reveal">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black text-white tracking-tighter leading-[0.9] reveal">
               RECUPERE <br />
               <span className="text-primary italic underline decoration-primary/20 underline-offset-8 transition-all hover:decoration-primary/50">
                 Liderazgo
               </span>{' '}
               VIAL
             </h1>
-            <p className="text-lg md:text-xl lg:text-2xl text-white/70 font-medium leading-[1.6] max-w-lg reveal reveal-delay-1">
+            <p className="text-sm md:text-lg lg:text-xl text-white/70 font-medium leading-[1.6] max-w-lg reveal reveal-delay-1">
               Blindaje legal experto para sus trámites administrativos, fotomultas y comparendos.
               Saneamiento integral con transparencia corporativa.
             </p>
@@ -281,7 +305,7 @@ export default function VialClearPage() {
       <section className="py-32 px-4 relative">
         <div className="max-w-6xl mx-auto">
           <div className="text-center space-y-6 mb-20">
-            <h2 className="text-4xl md:text-6xl font-black text-foreground tracking-tight reveal">
+            <h2 className="text-2xl md:text-5xl font-black text-foreground tracking-tight reveal">
               Pilares de Autoridad Legal
             </h2>
             <div className="w-24 h-2 bg-primary mx-auto rounded-full shadow-lg shadow-primary/20" />
@@ -296,8 +320,8 @@ export default function VialClearPage() {
                   <ShieldCheck className="w-12 h-12" />
                 </div>
                 <div className="space-y-4 text-center md:text-left">
-                  <h3 className="text-3xl font-black text-foreground">Respaldo Normativo</h3>
-                  <p className="text-muted-foreground leading-relaxed text-xl max-w-xl">
+                  <h3 className="text-2xl md:text-3xl font-black text-foreground">Respaldo Normativo</h3>
+                  <p className="text-muted-foreground leading-relaxed text-lg md:text-xl max-w-xl">
                     Operamos estrictamente bajo la Ley 769 de 2002 y el CPACA. Nuestro rigor legal
                     es su mayor garantía de éxito frente a las autoridades de tránsito.
                   </p>
@@ -349,46 +373,59 @@ export default function VialClearPage() {
             <div className="relative grid lg:grid-cols-2 gap-20 items-center">
               <div className="space-y-12">
                 <div className="space-y-4">
-                  <h2 className="text-4xl md:text-5xl font-black text-foreground leading-tight reveal">
+                  <h2 className="text-2xl md:text-4xl font-black text-foreground leading-tight reveal">
                     Proceso Ágil <br /> & Transparente
                   </h2>
-                  <p className="text-muted-foreground text-xl reveal reveal-delay-1">
+                  <p className="text-base md:text-lg text-muted-foreground reveal reveal-delay-1">
                     Tres pasos para recuperar su historial crediticio y vial.
                   </p>
                 </div>
 
-                <div className="space-y-10">
+                <div className="grid gap-6">
                   {[
                     {
                       num: '01',
                       title: 'Auditoría Inicial',
-                      desc: 'Crucemos datos con el SIMIT para ver la viabilidad inmediata.',
+                      desc: 'Crucemos datos con el SIMIT para ver la viabilidad inmediata sin compromiso.',
+                      icon: <ShieldCheck className="w-6 h-6" />,
                     },
                     {
                       num: '02',
                       title: 'Análisis de Inconsistencias',
-                      desc: 'Identificamos fallas en el procedimiento para fundamentar técnicamente su caso.',
+                      desc: 'Identificamos fallas en el procedimiento administrativo para fundamentar técnicamente su caso.',
+                      icon: <ArrowRightLeft className="w-6 h-6" />,
                     },
                     {
                       num: '03',
                       title: 'Saneamiento Total',
-                      desc: 'Verificamos la eliminación efectiva ante el tránsito.',
+                      desc: 'Verificamos la eliminación efectiva ante el tránsito y enviamos su paz y salvo.',
+                      icon: <CheckCircle2 className="w-6 h-6" />,
                     },
                   ].map((step, i) => (
                     <div
                       key={i}
                       className={cn(
-                        'flex gap-6 items-start reveal',
-                        i === 1 ? 'reveal-delay-1' : i === 2 ? 'reveal-delay-2' : ''
+                        'group relative p-8 rounded-[2rem] bg-card/40 backdrop-blur-sm border border-white/5 hover:border-primary/50 transition-all duration-500 reveal diamond-border',
+                        i === 0 ? 'reveal-delay-1' : i === 1 ? 'reveal-delay-2' : 'reveal-delay-3'
                       )}
                     >
-                      <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center text-primary-foreground font-black text-lg shadow-lg shrink-0">
-                        {step.num}
+                      <div className="flex gap-6 items-center">
+                        <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-500 shadow-inner shrink-0">
+                          {step.icon}
+                        </div>
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-3">
+                            <span className="text-xs font-black text-primary/40 tracking-widest uppercase">{step.num}</span>
+                            <h3 className="text-lg md:text-xl font-black text-foreground">{step.title}</h3>
+                          </div>
+                          <p className="text-muted-foreground leading-relaxed text-xs md:text-base">{step.desc}</p>
+                        </div>
                       </div>
-                      <div className="space-y-2">
-                        <h3 className="text-xl font-black text-foreground">{step.title}</h3>
-                        <p className="text-muted-foreground leading-relaxed">{step.desc}</p>
-                      </div>
+
+                      {/* Connection Line (Visual Only) */}
+                      {i < 2 && (
+                        <div className="absolute left-7 -bottom-6 w-px h-6 bg-gradient-to-b from-primary/50 to-transparent hidden lg:block" />
+                      )}
                     </div>
                   ))}
                 </div>
@@ -432,11 +469,11 @@ export default function VialClearPage() {
       <section className="py-32 px-4">
         <div className="max-w-4xl mx-auto text-center space-y-16">
           <div className="space-y-4">
-            <h2 className="text-3xl md:text-5xl font-black text-foreground tracking-tight">
+            <h2 className="text-2xl md:text-4xl font-black text-foreground tracking-tight">
               Casos de Éxito
             </h2>
             <div className="flex flex-col items-center gap-2">
-              <div className="text-4xl md:text-6xl font-black text-primary tracking-tighter">
+              <div className="text-3xl md:text-6xl font-black text-primary tracking-tighter">
                 {showcaseData ? (
                   showcaseData.counterValue || '500+'
                 ) : (
@@ -508,7 +545,7 @@ export default function VialClearPage() {
       <section className="py-24 px-4 bg-muted/10">
         <div className="max-w-4xl mx-auto space-y-12">
           <div className="text-center space-y-4 mb-20 reveal">
-            <h2 className="text-4xl md:text-6xl font-black text-foreground tracking-tight">
+            <h2 className="text-3xl md:text-5xl font-black text-foreground tracking-tight">
               Preguntas Frecuentes
             </h2>
             <p className="text-muted-foreground text-xl max-w-2xl mx-auto">
@@ -566,10 +603,10 @@ export default function VialClearPage() {
           <div className="absolute inset-0 bg-primary/20 rounded-[4rem] blur-[100px] scale-90 group-hover:scale-100 transition-transform duration-700 animate-slow-fade" />
           <div className="relative bg-primary text-primary-foreground p-16 md:p-32 rounded-[4rem] overflow-hidden text-center space-y-10 shadow-3xl shadow-primary/20 glow-box">
             <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-white/10 rounded-full blur-[120px] pointer-events-none" />
-            <h2 className="text-4xl md:text-6xl font-black tracking-tight leading-[0.9] relative z-10 selection:bg-white/20">
+            <h2 className="text-2xl md:text-5xl font-black tracking-tight leading-[0.9] relative z-10 selection:bg-white/20">
               Libérate hoy <br /> de las deudas.
             </h2>
-            <p className="text-2xl opacity-90 max-w-2xl mx-auto font-medium relative z-10">
+            <p className="text-lg md:text-xl opacity-90 max-w-2xl mx-auto font-medium relative z-10">
               No dejes que tu paz mental dependa de un comparendo injusto. Iniciemos tu defensa
               ahora.
             </p>
@@ -577,7 +614,7 @@ export default function VialClearPage() {
               <Button
                 onClick={() => setIsModalOpen(true)}
                 size="lg"
-                className="h-20 px-16 bg-foreground text-background hover:bg-foreground/90 font-black rounded-[2rem] active:scale-95 transition-all text-xl shadow-2xl border-none"
+                className="h-16 md:h-20 px-10 md:px-16 bg-foreground text-background hover:bg-foreground/90 font-black rounded-[2rem] active:scale-95 transition-all text-lg md:text-xl shadow-2xl border-none"
               >
                 CONSULTA GRATIS
               </Button>
@@ -586,93 +623,173 @@ export default function VialClearPage() {
         </div>
       </section>
 
-      {/* Footer - Professional & Structured */}
-      <footer className="bg-card/30 backdrop-blur-md border-t border-border/50 py-24 px-4 rounded-t-[4rem] relative z-10 reveal">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-3 gap-16 mb-20">
-            {/* Brand Section */}
-            <div className="space-y-6">
-              <Link href="/" className="flex items-center gap-3 group">
-                <div className="p-2 bg-primary/10 rounded-xl group-hover:bg-primary/20 transition-colors">
-                  <ShieldCheck className="w-10 h-10 text-primary" />
+      {/* Footer - Professional Bento Grid */}
+      <footer className="py-32 px-4 relative z-10 reveal">
+        <div className="max-w-7xl mx-auto space-y-12">
+          {/* Main Footer Bento */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Brand Card */}
+            <div className="lg:col-span-5 floating-card p-10 lg:p-12 bg-card/30 flex flex-col justify-between group overflow-hidden">
+              <div className="absolute -top-12 -right-12 w-48 h-48 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-all duration-700" />
+              <div className="space-y-8 relative z-10">
+                <Link href="/" className="flex items-center gap-4">
+                  <div className="p-3 bg-primary rounded-2xl shadow-xl shadow-primary/20">
+                    <ShieldCheck className="w-10 h-10 text-primary-foreground" />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-3xl md:text-4xl font-black tracking-tighter leading-none">
+                      DESMULTA
+                    </span>
+                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary mt-1">
+                      COLOMBIA
+                    </span>
+                  </div>
+                </Link>
+                <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-md font-medium">
+                  Líderes en defensa administrativa y saneamiento vial. Transformamos problemas
+                  legales en soluciones definitivas con ética y transparencia.
+                </p>
+              </div>
+
+              <div className="mt-12 flex gap-4">
+                {footerData?.instagramUrl && (
+                  <Link
+                    href={footerData.instagramUrl}
+                    target="_blank"
+                    className="w-12 h-12 rounded-2xl bg-card border border-white/10 flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/30 transition-all active:scale-95"
+                  >
+                    <Instagram size={24} />
+                  </Link>
+                )}
+                {footerData?.facebookUrl && (
+                  <Link
+                    href={footerData.facebookUrl}
+                    target="_blank"
+                    className="w-12 h-12 rounded-2xl bg-card border border-white/10 flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/30 transition-all active:scale-95"
+                  >
+                    <Facebook size={24} />
+                  </Link>
+                )}
+              </div>
+            </div>
+
+            {/* Links & Contact Bento Grid */}
+            <div className="lg:col-span-7 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-6">
+              {/* Navigation Card */}
+              <div className="lg:col-span-3 floating-card p-10 bg-card/20 border-white/5 space-y-8">
+                <h4 className="text-xs font-black uppercase tracking-[0.3em] text-foreground/40">
+                  Navegación Táctica
+                </h4>
+                <nav className="flex flex-col gap-6">
+                  {[
+                    { label: 'Inicio', href: '#', action: () => window.scrollTo(0, 0) },
+                    { label: 'Estudio Técnico', href: '/terminos' },
+                    { label: 'Términos de Uso', href: '/terminos' },
+                    { label: 'Política Privacidad', href: '/terminos' },
+                  ].map((link, i) => (
+                    <Link
+                      key={i}
+                      href={link.href}
+                      onClick={link.action}
+                      className="text-lg font-bold text-muted-foreground hover:text-primary flex items-center gap-3 group/link transition-colors"
+                    >
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary/20 group-hover/link:bg-primary transition-colors" />
+                      {link.label}
+                    </Link>
+                  ))}
+                </nav>
+              </div>
+
+              {/* Direct Info Card */}
+              <div className="lg:col-span-4 floating-card p-10 bg-primary/5 border-primary/10 space-y-8 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-4 opacity-5">
+                  <MessageCircle size={120} className="text-primary rotate-12" />
                 </div>
-                <span className="text-3xl font-black tracking-tighter">DESMULTA</span>
-              </Link>
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                Expertos en la gestión administrativa y saneamiento de trámites de tránsito a nivel
-                nacional.
-              </p>
-            </div>
-
-            {/* Navigation Section */}
-            <div className="grid grid-cols-2 gap-8">
-              <div className="space-y-6">
-                <h4 className="text-sm font-black uppercase tracking-[0.2em] text-foreground/50">
-                  Navegación
+                <h4 className="text-xs font-black uppercase tracking-[0.3em] text-primary/60">
+                  Canales Oficiales
                 </h4>
-                <ul className="space-y-4">
-                  <li>
-                    <button
-                      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                      className="text-muted-foreground hover:text-primary transition-colors font-medium"
-                    >
-                      Inicio
-                    </button>
-                  </li>
-                  <li>
-                    <Link
-                      href="/terminos"
-                      className="text-muted-foreground hover:text-primary transition-colors font-medium"
-                    >
-                      Estudio Técnico
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-              <div className="space-y-6">
-                <h4 className="text-sm font-black uppercase tracking-[0.2em] text-foreground/50">
-                  Legal
-                </h4>
-                <ul className="space-y-4">
-                  <li>
-                    <Link
-                      href="/terminos"
-                      className="text-muted-foreground hover:text-primary transition-colors font-medium"
-                    >
-                      Términos de Uso
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/terminos"
-                      className="text-muted-foreground hover:text-primary transition-colors font-medium"
-                    >
-                      Privacidad
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-            </div>
+                <div className="space-y-8 relative z-10">
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-background rounded-2xl border border-primary/20">
+                      <Phone size={20} className="text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-black text-muted-foreground uppercase tracking-widest leading-none mb-1.5">
+                        WhatsApp 24/7
+                      </p>
+                      <p className="text-xl font-bold text-foreground">
+                        +{footerData?.whatsapp || '573005648309'}
+                      </p>
+                    </div>
+                  </div>
 
-            {/* Contact Section */}
-            <div className="space-y-6 md:text-right">
-              <h4 className="text-sm font-black uppercase tracking-[0.2em] text-foreground/50">
-                Contacto Directo
-              </h4>
-              <p className="text-muted-foreground font-medium">Colombia, Servicio Nacional</p>
-              <Button
-                variant="outline"
-                className="rounded-full px-8 border-primary/20 hover:bg-primary/10 hover:text-primary"
-                onClick={() => setIsWhatsAppWarningOpen(true)}
-              >
-                Hablar con Asesor
-              </Button>
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-background rounded-2xl border border-primary/20">
+                      <Mail size={20} className="text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-black text-muted-foreground uppercase tracking-widest leading-none mb-1.5">
+                        Email Corporativo
+                      </p>
+                      <p className="text-xl font-bold text-foreground">
+                        {footerData?.email || 'contacto@desmulta.com.co'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-background rounded-2xl border border-primary/20">
+                      <MapPin size={20} className="text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-black text-muted-foreground uppercase tracking-widest leading-none mb-1.5">
+                        Base de Operaciones
+                      </p>
+                      <p className="text-xl font-bold text-foreground">
+                        {footerData?.address || 'Bogotá D.C., Colombia'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <Button
+                  onClick={() => setIsWhatsAppWarningOpen(true)}
+                  className="w-full h-16 rounded-3xl bg-primary text-primary-foreground font-black text-lg active:scale-95 transition-all shadow-xl shadow-primary/20 border-none group/btn"
+                >
+                  ABRIR CANAL DIRECTO
+                  <ArrowRightLeft
+                    size={18}
+                    className="ml-3 group-hover:translate-x-1 transition-transform"
+                  />
+                </Button>
+              </div>
             </div>
           </div>
 
-          <div className="pt-12 border-t border-border/20 flex flex-col md:flex-row justify-between items-center gap-6 text-[11px] text-muted-foreground font-black uppercase tracking-[0.3em]">
-            <p>© 2025 DESMULTA COLOMBIA — DERECHOS RESERVADOS</p>
-            <p>Trámites Administrativos & Saneamiento Vial</p>
+          {/* Bottom Bar Institutional */}
+          <div className="pt-10 flex flex-col md:flex-row justify-between items-center gap-8 border-t border-border/20">
+            <div className="flex flex-col items-center md:items-start gap-2">
+              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.4em]">
+                © 2025 DESMULTA COLOMBIA — ENTIDAD PRIVADA DE GESTIÓN VIAL
+              </p>
+              <div className="flex items-center gap-4 opacity-40 hover:opacity-100 transition-opacity">
+                <span className="text-[9px] font-black uppercase tracking-widest bg-muted px-2 py-0.5 rounded">
+                  PROTECCIÓN LEY 1581
+                </span>
+                <span className="text-[9px] font-black uppercase tracking-widest bg-muted px-2 py-0.5 rounded">
+                  CERTIFICACIÓN CPACA
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center">
+                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              </div>
+              <span className="text-[10px] font-black uppercase tracking-widest text-green-600 dark:text-green-400">
+                Sistemas Operativos 100% Online
+              </span>
+            </div>
           </div>
         </div>
       </footer>

@@ -10,16 +10,25 @@ import { deleteExpiredConsultations, uploadImage } from '@/app/admin/actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Image from 'next/image';
+import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import {
+  Sparkle,
+  Mail,
+  Phone,
+  MapPin,
+  Instagram,
+  Facebook,
+  Globe,
   Loader2,
   Trash2,
   Image as ImageIcon,
   Upload,
   ShieldCheck,
   LogOut,
-  Sparkle,
+  Users
 } from 'lucide-react';
+import { ConsultationsList } from './ConsultationsList';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
 import {
   AlertDialog,
@@ -40,7 +49,16 @@ const showcaseSchema = z.object({
   counterLabel: z.string().optional(),
 });
 
+const footerSchema = z.object({
+  whatsapp: z.string().min(10, 'El número debe tener al menos 10 dígitos'),
+  email: z.string().email('Email inválido'),
+  address: z.string().min(5, 'Dirección muy corta'),
+  instagramUrl: z.string().url('URL inválida').or(z.literal('')),
+  facebookUrl: z.string().url('URL inválida').or(z.literal('')),
+});
+
 type ShowcaseFormData = z.infer<typeof showcaseSchema>;
+type FooterFormData = z.infer<typeof footerSchema>;
 
 export function AdminDashboard() {
   const { toast } = useToast();
@@ -53,17 +71,30 @@ export function AdminDashboard() {
     () => (firestore ? doc(firestore, 'site_config', 'showcase') : null),
     [firestore]
   );
-  const { data: showcaseData, isLoading } = useDoc<{
+  const footerRef = useMemoFirebase(
+    () => (firestore ? doc(firestore, 'site_config', 'footer') : null),
+    [firestore]
+  );
+
+  const { data: showcaseData, isLoading: isShowcaseLoading } = useDoc<{
     beforeImageUrl: string;
     afterImageUrl: string;
     counterValue: string;
     counterLabel: string;
   }>(showcaseRef);
 
+  const { data: footerData } = useDoc<{
+    whatsapp: string;
+    email: string;
+    address: string;
+    instagramUrl: string;
+    facebookUrl: string;
+  }>(footerRef);
+
   const [beforePreview, setBeforePreview] = useState<string | null>(null);
   const [afterPreview, setAfterPreview] = useState<string | null>(null);
 
-  const form = useForm<ShowcaseFormData>({
+  const showcaseForm = useForm<ShowcaseFormData>({
     resolver: zodResolver(showcaseSchema),
     defaultValues: {
       counterValue: showcaseData?.counterValue || '754+',
@@ -71,15 +102,38 @@ export function AdminDashboard() {
     },
   });
 
-  // Update form when data loads
+  const footerForm = useForm<FooterFormData>({
+    resolver: zodResolver(footerSchema),
+    defaultValues: {
+      whatsapp: footerData?.whatsapp || '573005648309',
+      email: footerData?.email || 'contacto@desmulta.com.co',
+      address: footerData?.address || 'Colombia, Servicio Nacional',
+      instagramUrl: footerData?.instagramUrl || '',
+      facebookUrl: footerData?.facebookUrl || '',
+    },
+  });
+
+  // Update forms when data loads
   useEffect(() => {
     if (showcaseData) {
-      form.reset({
+      showcaseForm.reset({
         counterValue: showcaseData.counterValue || '754+',
         counterLabel: showcaseData.counterLabel || 'Casos Exitosos',
       });
     }
-  }, [showcaseData, form]);
+  }, [showcaseData, showcaseForm]);
+
+  useEffect(() => {
+    if (footerData) {
+      footerForm.reset({
+        whatsapp: footerData.whatsapp || '573005648309',
+        email: footerData.email || 'contacto@desmulta.com.co',
+        address: footerData.address || 'Colombia, Servicio Nacional',
+        instagramUrl: footerData.instagramUrl || '',
+        facebookUrl: footerData.facebookUrl || '',
+      });
+    }
+  }, [footerData, footerForm]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'before' | 'after') => {
     const file = e.target.files?.[0];
@@ -93,7 +147,7 @@ export function AdminDashboard() {
     }
   };
 
-  const onSubmit = async (data: ShowcaseFormData) => {
+  const onShowcaseSubmit = async (data: ShowcaseFormData) => {
     setIsSubmitting(true);
     if (!firestore || !showcaseRef) {
       toast({
@@ -147,12 +201,42 @@ export function AdminDashboard() {
       });
       setBeforePreview(null);
       setAfterPreview(null);
-      form.reset({
+      showcaseForm.reset({
         counterValue: data.counterValue || showcaseData?.counterValue || '754+',
         counterLabel: data.counterLabel || showcaseData?.counterLabel || 'Casos Exitosos',
       });
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Error al actualizar las imágenes.';
+      toast({
+        title: 'Error',
+        description: errorMessage,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const onFooterSubmit = async (data: FooterFormData) => {
+    setIsSubmitting(true);
+    if (!firestore || !footerRef) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'No se pudo conectar a la base de datos.',
+      });
+      setIsSubmitting(false);
+      return;
+    }
+
+    try {
+      await setDoc(footerRef, data, { merge: true });
+      toast({
+        title: 'Footer Actualizado',
+        description: 'Los datos de contacto han sido guardados correctamente.',
+      });
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Error al actualizar el footer.';
       toast({
         title: 'Error',
         description: errorMessage,
@@ -174,7 +258,7 @@ export function AdminDashboard() {
         });
         setBeforePreview(null);
         setAfterPreview(null);
-        form.reset();
+        showcaseForm.reset();
       }
     } catch {
       toast({
@@ -255,13 +339,38 @@ export function AdminDashboard() {
         </div>
       </header>
 
-      <main className="flex-1 max-w-6xl mx-auto w-full px-6 py-12 space-y-12">
+      <main className="flex-1 max-w-6xl mx-auto w-full px-6 py-12 space-y-24">
+        {/* --- GESTIÓN DE CONSULTAS (LEADS) --- */}
+        <section className="relative scroll-mt-24">
+          <div className="space-y-12">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-3 rounded-2xl bg-primary/10 border border-primary/20">
+                    <Users className="text-primary w-8 h-8" />
+                  </div>
+                  <Badge variant="outline" className="text-primary border-primary/20 bg-primary/5 uppercase tracking-widest font-black text-[10px] px-3 py-1">
+                    Control de Prospectos
+                  </Badge>
+                </div>
+                <h2 className="text-3xl md:text-5xl font-black text-foreground tracking-tight">
+                  Gestión de Leads
+                </h2>
+                <p className="text-muted-foreground mt-4 text-lg max-w-2xl font-medium leading-relaxed">
+                  Visualiza y gestiona las consultas recibidas. Haz clic en el botón de WhatsApp para iniciar el contacto directo.
+                </p>
+              </div>
+            </div>
+            <ConsultationsList />
+          </div>
+        </section>
+
         {/* Showcase Management Card */}
         <section className="floating-card bg-card/40 backdrop-blur-md border border-white/10 p-10 shadow-3xl overflow-hidden relative group">
           <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/5 rounded-full blur-[80px] pointer-events-none" />
 
           <div className="mb-12">
-            <h2 className="text-3xl font-black text-foreground tracking-tight flex items-center gap-3">
+            <h2 className="text-2xl md:text-3xl font-black text-foreground tracking-tight flex items-center gap-3">
               <Sparkle className="text-primary w-8 h-8" />
               Historias de Éxito
             </h2>
@@ -271,12 +380,12 @@ export function AdminDashboard() {
             </p>
           </div>
 
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-12">
+          <Form {...showcaseForm}>
+            <form onSubmit={showcaseForm.handleSubmit(onShowcaseSubmit)} className="space-y-12">
               {/* Counter Configuration */}
               <div className="grid md:grid-cols-2 gap-10 bg-primary/5 p-8 rounded-[2.5rem] border border-primary/10">
                 <FormField
-                  control={form.control}
+                  control={showcaseForm.control}
                   name="counterValue"
                   render={({ field }) => (
                     <FormItem>
@@ -295,7 +404,7 @@ export function AdminDashboard() {
                   )}
                 />
                 <FormField
-                  control={form.control}
+                  control={showcaseForm.control}
                   name="counterLabel"
                   render={({ field }) => (
                     <FormItem>
@@ -317,7 +426,7 @@ export function AdminDashboard() {
 
               <div className="grid md:grid-cols-2 gap-10">
                 <FormField
-                  control={form.control}
+                  control={showcaseForm.control}
                   name="beforeImage"
                   render={({ field }) => (
                     <FormItem className="space-y-4">
@@ -325,7 +434,7 @@ export function AdminDashboard() {
                         Estado Anterior (Antes)
                       </FormLabel>
                       <div className="aspect-video relative bg-black/5 dark:bg-black/20 rounded-[2.5rem] overflow-hidden border-2 border-dashed border-primary/20 flex items-center justify-center transition-all hover:bg-primary/5">
-                        {isLoading ? (
+                        {isShowcaseLoading ? (
                           <Loader2 className="animate-spin text-primary w-10 h-10" />
                         ) : beforePreview || showcaseData?.beforeImageUrl ? (
                           <Image
@@ -358,7 +467,7 @@ export function AdminDashboard() {
                 />
 
                 <FormField
-                  control={form.control}
+                  control={showcaseForm.control}
                   name="afterImage"
                   render={({ field }) => (
                     <FormItem className="space-y-4">
@@ -366,7 +475,7 @@ export function AdminDashboard() {
                         Resultado (Después)
                       </FormLabel>
                       <div className="aspect-video relative bg-black/5 dark:bg-black/20 rounded-[2.5rem] overflow-hidden border-2 border-dashed border-primary/20 flex items-center justify-center transition-all hover:bg-primary/5">
-                        {isLoading ? (
+                        {isShowcaseLoading ? (
                           <Loader2 className="animate-spin text-primary w-10 h-10" />
                         ) : afterPreview || showcaseData?.afterImageUrl ? (
                           <Image
@@ -410,7 +519,7 @@ export function AdminDashboard() {
                   ) : (
                     <Upload className="mr-3 h-6 w-6" />
                   )}
-                  SINCRONIZAR CAMBIOS
+                  SINCRONIZAR CASO
                 </Button>
                 <Button
                   type="button"
@@ -425,6 +534,146 @@ export function AdminDashboard() {
                   VACIAR MÓDULO
                 </Button>
               </div>
+            </form>
+          </Form>
+        </section>
+
+        {/* Footer Configuration Card */}
+        <section className="floating-card bg-card/40 backdrop-blur-md border border-white/10 p-10 shadow-3xl overflow-hidden relative group">
+          <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/5 rounded-full blur-[80px] pointer-events-none" />
+
+          <div className="mb-12">
+            <h2 className="text-3xl font-black text-foreground tracking-tight flex items-center gap-3">
+              <Globe className="text-primary w-8 h-8" />
+              Identidad Institutional
+            </h2>
+            <p className="text-muted-foreground mt-3 text-lg max-w-2xl font-medium leading-relaxed">
+              Gestiona la información de contacto y enlaces sociales que aparecen en el pie de
+              página de la plataforma.
+            </p>
+          </div>
+
+          <Form {...footerForm}>
+            <form onSubmit={footerForm.handleSubmit(onFooterSubmit)} className="space-y-10">
+              <div className="grid md:grid-cols-2 gap-8">
+                <FormField
+                  control={footerForm.control}
+                  name="whatsapp"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-black text-foreground uppercase tracking-widest opacity-70 flex items-center gap-2">
+                        <Phone size={14} className="text-primary" />
+                        WhatsApp (Sin espacios)
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="57300..."
+                          className="bg-background border-border/50 rounded-2xl h-14"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={footerForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-black text-foreground uppercase tracking-widest opacity-70 flex items-center gap-2">
+                        <Mail size={14} className="text-primary" />
+                        Email de Soporte
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="contacto@desmulta.com.co"
+                          className="bg-background border-border/50 rounded-2xl h-14"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={footerForm.control}
+                name="address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-black text-foreground uppercase tracking-widest opacity-70 flex items-center gap-2">
+                      <MapPin size={14} className="text-primary" />
+                      Ubicación / Oficina
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Dirección física o ciudad"
+                        className="bg-background border-border/50 rounded-2xl h-14"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid md:grid-cols-2 gap-8">
+                <FormField
+                  control={footerForm.control}
+                  name="instagramUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-black text-foreground uppercase tracking-widest opacity-70 flex items-center gap-2">
+                        <Instagram size={14} className="text-primary" />
+                        Perfil Instagram (URL)
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="https://instagram.com/..."
+                          className="bg-background border-border/50 rounded-2xl h-14"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={footerForm.control}
+                  name="facebookUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-black text-foreground uppercase tracking-widest opacity-70 flex items-center gap-2">
+                        <Facebook size={14} className="text-primary" />
+                        Perfil Facebook (URL)
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="https://facebook.com/..."
+                          className="bg-background border-border/50 rounded-2xl h-14"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full h-16 rounded-[2rem] bg-foreground text-background hover:bg-foreground/90 font-black text-lg active:scale-95 transition-all shadow-xl shadow-foreground/10 border-none"
+              >
+                {isSubmitting ? (
+                  <Loader2 className="mr-3 h-6 w-6 animate-spin" />
+                ) : (
+                  <Upload className="mr-3 h-6 w-6" />
+                )}
+                ACTUALIZAR DATOS INSTITUCIONALES
+              </Button>
             </form>
           </Form>
         </section>

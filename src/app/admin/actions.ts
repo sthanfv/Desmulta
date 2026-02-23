@@ -73,3 +73,34 @@ export async function deleteExpiredConsultations(): Promise<{
     return { error: errorMsg };
   }
 }
+
+/**
+ * Obtiene la lista de consultas desde Firestore
+ */
+export async function getConsultations() {
+  try {
+    getAdminApp();
+    const db = getFirestore();
+
+    const snapshot = await db
+      .collection('consultations')
+      .orderBy('createdAt', 'desc')
+      .get();
+
+    const consultations = snapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        createdAt: data.createdAt?.toDate()?.toISOString() || null,
+        notifiedAt: data.notifiedAt?.toDate()?.toISOString() || null,
+      };
+    });
+
+    return { success: true, data: consultations };
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : 'Error al obtener consultas';
+    console.error('[getConsultations] Error:', msg);
+    return { success: false, error: msg };
+  }
+}

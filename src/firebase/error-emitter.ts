@@ -19,45 +19,38 @@ type Callback<T> = (data: T) => void;
  * It uses a generic type T that extends a record of event names to payload types.
  */
 function createEventEmitter<T extends Record<string, unknown>>() {
-  // The events object stores arrays of callbacks, keyed by event name.
-  // The types ensure that a callback for a specific event matches its payload type.
-  const events: { [K in keyof T]?: Array<Callback<T[K]>> } = {};
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const events = new Map<keyof T, Array<Callback<any>>>();
 
   return {
     /**
      * Subscribe to an event.
-     * @param eventName The name of the event to subscribe to.
-     * @param callback The function to call when the event is emitted.
      */
     on<K extends keyof T>(eventName: K, callback: Callback<T[K]>) {
-      if (!events[eventName]) {
-        events[eventName] = [];
+      if (!events.has(eventName)) {
+        events.set(eventName, []);
       }
-      events[eventName]?.push(callback);
+      events.get(eventName)?.push(callback);
     },
 
     /**
      * Unsubscribe from an event.
-     * @param eventName The name of the event to unsubscribe from.
-     * @param callback The specific callback to remove.
      */
     off<K extends keyof T>(eventName: K, callback: Callback<T[K]>) {
-      if (!events[eventName]) {
-        return;
-      }
-      events[eventName] = events[eventName]?.filter((cb) => cb !== callback);
+      const callbacks = events.get(eventName);
+      if (!callbacks) return;
+
+      events.set(
+        eventName,
+        callbacks.filter((cb) => cb !== callback)
+      );
     },
 
     /**
      * Publish an event to all subscribers.
-     * @param eventName The name of the event to emit.
-     * @param data The data payload that corresponds to the event's type.
      */
     emit<K extends keyof T>(eventName: K, data: T[K]) {
-      if (!events[eventName]) {
-        return;
-      }
-      events[eventName]?.forEach((callback) => callback(data));
+      events.get(eventName)?.forEach((callback) => callback(data));
     },
   };
 }

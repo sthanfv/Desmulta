@@ -38,3 +38,17 @@ export type ConsultationFormState = {
   };
   success: boolean;
 };
+
+export interface Consultation {
+  id: string;
+  cedula: string;
+  nombre: string;
+  contacto: string;
+  aceptoTerminos: boolean;
+  authorUid: string;
+  status: 'pendiente' | 'contactado' | 'en_proceso' | 'terminado';
+  fuente: 'web' | 'manual';
+  createdAt: any; // Firebase Timestamp
+  telegramStatus: 'pending' | 'sent' | 'failed';
+  notifiedAt?: any;
+}
