@@ -66,8 +66,8 @@ export function AdminDashboard() {
   const form = useForm<ShowcaseFormData>({
     resolver: zodResolver(showcaseSchema),
     defaultValues: {
-      counterValue: showcaseData?.counterValue || '',
-      counterLabel: showcaseData?.counterLabel || '',
+      counterValue: showcaseData?.counterValue || '754+',
+      counterLabel: showcaseData?.counterLabel || 'Casos Exitosos',
     },
   });
 
@@ -75,8 +75,8 @@ export function AdminDashboard() {
   useEffect(() => {
     if (showcaseData) {
       form.reset({
-        counterValue: showcaseData.counterValue || '',
-        counterLabel: showcaseData.counterLabel || '',
+        counterValue: showcaseData.counterValue || '754+',
+        counterLabel: showcaseData.counterLabel || 'Casos Exitosos',
       });
     }
   }, [showcaseData, form]);
@@ -136,8 +136,8 @@ export function AdminDashboard() {
         {
           beforeImageUrl,
           afterImageUrl,
-          counterValue: data.counterValue || showcaseData?.counterValue || '1k+',
-          counterLabel: data.counterLabel || showcaseData?.counterLabel || 'Sanciones Eliminadas',
+          counterValue: data.counterValue || showcaseData?.counterValue || '754+',
+          counterLabel: data.counterLabel || showcaseData?.counterLabel || 'Casos Exitosos',
         },
         { merge: true }
       );
@@ -148,8 +148,8 @@ export function AdminDashboard() {
       setBeforePreview(null);
       setAfterPreview(null);
       form.reset({
-        counterValue: data.counterValue || showcaseData?.counterValue || '',
-        counterLabel: data.counterLabel || showcaseData?.counterLabel || '',
+        counterValue: data.counterValue || showcaseData?.counterValue || '754+',
+        counterLabel: data.counterLabel || showcaseData?.counterLabel || 'Casos Exitosos',
       });
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Error al actualizar las imágenes.';
@@ -438,8 +438,8 @@ export function AdminDashboard() {
                 Mantenimiento de Base de Datos
               </h2>
               <p className="text-muted-foreground text-lg font-medium leading-relaxed">
-                El sistema detectará y eliminará <strong>únicamente</strong> las consultas que tengan
-                más de 7 días de antigüedad para cumplimiento de ley y ahorro de recursos.
+                El sistema detectará y eliminará <strong>únicamente</strong> las consultas que
+                tengan más de 7 días de antigüedad para cumplimiento de ley y ahorro de recursos.
               </p>
             </div>
 

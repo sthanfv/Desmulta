@@ -11,9 +11,14 @@ export const ConsultationSchema = z.object({
     .trim()
     .min(3, { message: 'El nombre es requerido.' })
     .max(60, { message: 'El nombre no puede tener más de 60 caracteres.' }),
-  contacto: z.string().regex(/^3[0-9]{9}$/, {
-    message: 'Debe ser un número de celular colombiano válido (10 dígitos, ej: 3001234567).',
-  }),
+  contacto: z
+    .string()
+    .transform((v) => v.replace(/\s+/g, ''))
+    .pipe(
+      z.string().regex(/^3[0-9]{9}$/, {
+        message: 'Debe ser un número de celular colombiano válido (10 dígitos, ej: 300 123 4567).',
+      })
+    ),
   aceptoTerminos: z.boolean().refine((value) => value === true, {
     message: 'Debe aceptar los términos y condiciones.',
   }),

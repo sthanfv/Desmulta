@@ -14,6 +14,7 @@ import {
   MessageCircle,
 } from 'lucide-react';
 import { getAuth } from 'firebase/auth';
+import { useEffect } from 'react';
 
 import { ConsultationSchema } from '@/lib/definitions';
 
@@ -51,6 +52,40 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
       website: '', // Honeypot field
     },
   });
+
+  // Persistence logic (Modo Supervivencia)
+  useEffect(() => {
+    const savedData = localStorage.getItem('consultation_draft');
+    if (savedData) {
+      try {
+        const parsed = JSON.parse(savedData);
+        form.reset({ ...form.getValues(), ...parsed, aceptoTerminos: false });
+        toast({
+          title: 'Borrador recuperado',
+          description: 'Hemos restaurado los datos que empezaste a completar.',
+        });
+      } catch (e) {
+        console.error('Error al recuperar borrador', e);
+      }
+    }
+
+    const subscription = form.watch((value) => {
+      const { cedula, nombre, contacto } = value;
+      localStorage.setItem('consultation_draft', JSON.stringify({ cedula, nombre, contacto }));
+    });
+    return () => subscription.unsubscribe();
+  }, [form, toast]);
+
+  const formatPhone = (value: string) => {
+    const numbers = value.replace(/\D/g, '');
+    if (numbers.length <= 3) return numbers;
+    if (numbers.length <= 6) return `${numbers.slice(0, 3)} ${numbers.slice(3)}`;
+    return `${numbers.slice(0, 3)} ${numbers.slice(3, 6)} ${numbers.slice(6, 10)}`;
+  };
+
+  const formatCedula = (value: string) => {
+    return value.replace(/\D/g, '').slice(0, 12);
+  };
 
   const { isSubmitting } = form.formState;
 
@@ -94,12 +129,13 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
       }
 
       toast({
-        title: '¡Gracias!',
+        title: '¡Solicitud Recibida!',
         description:
-          'Hemos recibido su solicitud. Uno de nuestros asesores le contactará pronto por WhatsApp.',
+          'Su consulta ha sido registrada. Le contactaremos a la mayor brevedad posible dentro de nuestros horarios habituales.',
       });
       setIsSuccess(true);
-      setTimeout(onSuccess, 3000);
+      localStorage.removeItem('consultation_draft');
+      setTimeout(onSuccess, 4000);
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : 'Por favor, intente de nuevo más tarde.';
       console.warn('Alerta al enviar la consulta:', e);
@@ -118,10 +154,11 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
           <CheckCircle2 className="w-12 h-12" />
         </div>
         <h3 className="text-2xl font-black mb-3 text-foreground tracking-tight">
-          Solicitud Enviada
+          Estudio en Proceso
         </h3>
         <p className="text-muted-foreground text-lg max-w-sm leading-relaxed">
-          Nuestros asesores están revisando tu historial en el SIMIT. Te contactaremos pronto.
+          Hemos recibido su información correctamente. Un asesor jurídico especializado revisará su
+          caso y le contactará a la brevedad posible a través de WhatsApp.
         </p>
         <Button
           onClick={onSuccess}
@@ -172,6 +209,10 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
                       type={showCedula ? 'text' : 'password'}
                       placeholder="Identificación sin puntos ni comas"
                       {...field}
+                      onChange={(e) => {
+                        const formatted = formatCedula(e.target.value);
+                        field.onChange(formatted);
+                      }}
                       className="w-full bg-background border-border/50 rounded-2xl pl-12 pr-12 h-16 text-lg font-medium focus:ring-primary/20 focus:border-primary transition-all shadow-Inner"
                     />
                   </FormControl>
@@ -227,6 +268,10 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
                       type="tel"
                       placeholder="Ej: 300 123 4567"
                       {...field}
+                      onChange={(e) => {
+                        const formatted = formatPhone(e.target.value);
+                        field.onChange(formatted);
+                      }}
                       className="w-full bg-background border-border/50 rounded-2xl pl-12 h-16 text-lg font-medium focus:ring-primary/20 focus:border-primary transition-all shadow-Inner"
                     />
                   </FormControl>
@@ -278,13 +323,14 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-primary text-primary-foreground font-black py-8 rounded-3xl hover:bg-primary/95 transition-all flex items-center justify-center gap-3 h-20 text-xl shadow-xl shadow-primary/20 active:scale-95 border-none"
+            className="w-full bg-primary text-primary-foreground font-black py-8 rounded-3xl hover:bg-primary/95 transition-all flex items-center justify-center gap-3 h-20 text-xl shadow-xl shadow-primary/20 active:scale-95 border-none relative overflow-hidden group"
             aria-disabled={isSubmitting}
           >
+            <div className="absolute inset-0 animate-shimmer pointer-events-none opacity-40" />
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-3 h-6 w-6 animate-spin" />
-                ANALIZANDO...
+                ENVIANDO...
               </>
             ) : (
               <>
@@ -296,9 +342,17 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
               </>
             )}
           </Button>
-          <div className="flex items-center justify-center gap-2 mt-6 text-[10px] text-muted-foreground uppercase tracking-widest font-black opacity-60">
-            <ShieldCheck size={12} />
-            <span>Encriptación de Grado Bancario</span>
+          <div className="flex flex-col items-center gap-4 mt-8">
+            <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-green-500/5 border border-green-500/20">
+              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              <span className="text-[10px] font-black text-green-600 dark:text-green-400 uppercase tracking-widest">
+                Conexión Cifrada de Extremo a Extremo
+              </span>
+            </div>
+            <div className="flex items-center justify-center gap-2 text-[10px] text-muted-foreground uppercase tracking-widest font-black opacity-60">
+              <ShieldCheck size={12} />
+              <span>Protección Legal Certificada</span>
+            </div>
           </div>
         </div>
       </form>

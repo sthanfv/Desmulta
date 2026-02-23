@@ -1,21 +1,35 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
+import { cn } from '@/lib/utils';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { FirebaseClientProvider } from '@/firebase';
 import Script from 'next/script';
 import { ThemeProvider } from '@/components/theme-provider';
+import { Outfit } from 'next/font/google';
+
+const outfit = Outfit({
+  subsets: ['latin'],
+  display: 'swap',
+});
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
 const PIXEL_ID = process.env.NEXT_PUBLIC_PIXEL_ID;
 const GSC_ID = process.env.NEXT_PUBLIC_GSC_ID;
 
+export const viewport: Viewport = {
+  themeColor: '#ffbf00',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
+
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:9005'),
   title: `${process.env.NEXT_PUBLIC_BRAND_NAME || 'Desmulta'} - Saneamiento de Multas de Tránsito`,
   description:
     'Gestionamos técnicamente sus trámites ante las Secretarías de Tránsito para sanear deudas administrativas de forma eficiente.',
   manifest: '/manifest.json',
-  themeColor: '#ffbf00',
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
@@ -42,11 +56,27 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         {GSC_ID && <meta name="google-site-verification" content={GSC_ID} />}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap"
-          rel="stylesheet"
+        <link rel="preconnect" href="https://images.unsplash.com" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'LegalService',
+              name: 'Desmulta Colombia',
+              description:
+                'Expertos en la gestión administrativa y saneamiento de trámites de tránsito a nivel nacional.',
+              url: process.env.NEXT_PUBLIC_SITE_URL || 'https://desmulta.com',
+              telephone: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+573005648309',
+              address: {
+                '@type': 'PostalAddress',
+                addressCountry: 'CO',
+              },
+              serviceType: 'Saneamiento de Trámites de Tránsito',
+              areaServed: 'Colombia',
+              priceRange: 'Gratis/Por Resultados',
+            }),
+          }}
         />
         {/* Google Analytics 4 */}
         {GA_ID && (
@@ -83,7 +113,7 @@ export default function RootLayout({
           </Script>
         )}
       </head>
-      <body className="font-body antialiased">
+      <body className={cn(outfit.className, 'antialiased')}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           <FirebaseClientProvider>
             {children}

@@ -11,7 +11,8 @@
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
-    "check": "npm run format && npm run lint && npm run typecheck && npm run build",
+    "test": "vitest run",
+    "check": "npm run format && npm run lint && npm run typecheck && npm run test && npm run build",
     "postbuild": "next-sitemap"
   },
   "dependencies": {
