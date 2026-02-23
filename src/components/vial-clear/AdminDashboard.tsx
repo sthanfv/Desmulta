@@ -438,8 +438,8 @@ export function AdminDashboard() {
                 Mantenimiento de Base de Datos
               </h2>
               <p className="text-muted-foreground text-lg font-medium leading-relaxed">
-                El sistema detectará y eliminará automáticamente las consultas que tengan más de 7
-                días de antigüedad para preservar el cumplimiento de la Ley de Protección de Datos.
+                El sistema detectará y eliminará <strong>únicamente</strong> las consultas que tengan
+                más de 7 días de antigüedad para cumplimiento de ley y ahorro de recursos.
               </p>
             </div>
 

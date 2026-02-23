@@ -89,7 +89,7 @@ export default function VialClearPage() {
               <ShieldCheck size={16} />
               <span>Trámite Administrativo Seguro</span>
             </div>
-            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-7xl xl:text-8xl font-black text-foreground tracking-tight leading-[0.95] animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-foreground tracking-tight leading-[0.95] animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
               Recuperamos tu <br />
               <span className="text-primary italic underline decoration-primary/20 underline-offset-8 transition-all hover:decoration-primary/50">
                 Tranquilidad
@@ -143,7 +143,7 @@ export default function VialClearPage() {
       <section className="py-32 px-4 relative">
         <div className="max-w-6xl mx-auto">
           <div className="text-center space-y-6 mb-20">
-            <h2 className="text-4xl md:text-6xl font-black text-foreground tracking-tight">
+            <h2 className="text-3xl md:text-5xl font-black text-foreground tracking-tight">
               ¿Por qué confiar en nosotros?
             </h2>
             <div className="w-24 h-2 bg-primary mx-auto rounded-full shadow-lg shadow-primary/20" />
@@ -195,7 +195,7 @@ export default function VialClearPage() {
             <div className="relative grid lg:grid-cols-2 gap-20 items-center">
               <div className="space-y-12">
                 <div className="space-y-4">
-                  <h2 className="text-4xl md:text-5xl font-black text-foreground leading-tight">
+                  <h2 className="text-3xl md:text-4xl font-black text-foreground leading-tight">
                     Proceso Ágil <br /> & Transparente
                   </h2>
                   <p className="text-muted-foreground text-xl">
@@ -274,11 +274,11 @@ export default function VialClearPage() {
       <section className="py-32 px-4">
         <div className="max-w-4xl mx-auto text-center space-y-16">
           <div className="space-y-4">
-            <h2 className="text-4xl md:text-6xl font-black text-foreground tracking-tight">
+            <h2 className="text-3xl md:text-5xl font-black text-foreground tracking-tight">
               Casos de Éxito
             </h2>
             <div className="flex flex-col items-center gap-2">
-              <span className="text-5xl md:text-7xl font-black text-primary tracking-tighter">
+              <span className="text-4xl md:text-6xl font-black text-primary tracking-tighter">
                 {showcaseData?.counterValue || '500+'}
               </span>
               <span className="text-sm md:text-base font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">
@@ -400,7 +400,7 @@ export default function VialClearPage() {
           <div className="absolute inset-0 bg-primary/20 rounded-[4rem] blur-[100px] scale-90 group-hover:scale-100 transition-transform duration-700" />
           <div className="relative bg-primary text-primary-foreground p-16 md:p-32 rounded-[4rem] overflow-hidden text-center space-y-10 shadow-3xl shadow-primary/20">
             <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-white/10 rounded-full blur-[120px] pointer-events-none" />
-            <h2 className="text-5xl md:text-8xl font-black tracking-tight leading-[0.9] relative z-10 selection:bg-white/20">
+            <h2 className="text-4xl md:text-6xl font-black tracking-tight leading-[0.9] relative z-10 selection:bg-white/20">
               Libérate hoy <br /> de las deudas.
             </h2>
             <p className="text-2xl opacity-90 max-w-2xl mx-auto font-medium relative z-10">
@@ -505,7 +505,7 @@ export default function VialClearPage() {
           </div>
 
           <div className="pt-12 border-t border-border/20 flex flex-col md:flex-row justify-between items-center gap-6 text-[11px] text-muted-foreground font-black uppercase tracking-[0.3em]">
-            <p>© 2025 DESMULTA COLOMBIA — MARCA REGISTRADA</p>
+            <p>© 2025 DESMULTA COLOMBIA — DERECHOS RESERVADOS</p>
             <p>Trámites Administrativos & Saneamiento Vial</p>
           </div>
         </div>

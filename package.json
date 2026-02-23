@@ -73,6 +73,7 @@
     "cross-env": "^7.0.3",
     "eslint": "^9.39.3",
     "eslint-config-next": "^15.5.12",
+    "eslint-plugin-security": "^4.0.0",
     "genkit-cli": "^0.0.2",
     "jsdom": "^24.0.0",
     "postcss": "^8",

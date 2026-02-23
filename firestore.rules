@@ -14,7 +14,8 @@ service cloud.firestore {
 
     // Admin roles are managed from the Firebase Console, not by clients.
     match /admins/{userId} {
-      allow read: if true; // Allows clients (like the admin panel) to check for admin status.
+      // Allows only the owner of the UID to check their status, or admins.
+      allow read: if request.auth.uid == userId || isAdmin();
       allow write: if false; // DENY all client writes.
     }
 
