@@ -34,7 +34,12 @@ interface ConsultationFormProps {
 export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
   const [isSuccess, setIsSuccess] = useState(false);
   const [showCedula, setShowCedula] = useState(false);
+  const [isHuman, setIsHuman] = useState(false);
   const { toast } = useToast();
+
+  const handleInteraction = () => {
+    if (!isHuman) setIsHuman(true);
+  };
 
   const form = useForm<ConsultationFormData>({
     resolver: zodResolver(ConsultationSchema),
@@ -51,6 +56,10 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
 
   const onSubmit: SubmitHandler<ConsultationFormData> = async (data) => {
     try {
+      if (!isHuman) {
+        throw new Error('Error de validación anti-bot. Por favor, interactúe con el formulario.');
+      }
+
       const auth = getAuth();
       const currentUser = auth.currentUser;
 
@@ -127,15 +136,21 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        onMouseMove={handleInteraction}
+        onKeyDown={handleInteraction}
+        onTouchStart={handleInteraction}
+        className="space-y-8"
+      >
         <FormField
           control={form.control}
           name="website"
           render={({ field }) => (
-            <FormItem className="hidden">
-              <FormLabel>Website</FormLabel>
+            <FormItem className="hidden" aria-hidden="true">
+              <FormLabel className="sr-only">Website (Honeypot)</FormLabel>
               <FormControl>
-                <Input {...field} autoComplete="off" tabIndex={-1} />
+                <Input {...field} autoComplete="off" tabIndex={-1} aria-hidden="true" />
               </FormControl>
               <FormMessage />
             </FormItem>

@@ -13,9 +13,17 @@ export const metadata: Metadata = {
   title: `${process.env.NEXT_PUBLIC_BRAND_NAME || 'Desmulta'} - Saneamiento de Multas de Tránsito`,
   description:
     'Gestionamos técnicamente sus trámites ante las Secretarías de Tránsito para sanear deudas administrativas de forma eficiente.',
+  manifest: '/manifest.json',
+  themeColor: '#ffbf00',
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Desmulta',
+  },
   icons: {
-    icon: '/favicon.ico',
-    apple: '/logo.png',
+    icon: '/icon.png',
+    apple: '/icon.png',
   },
   openGraph: {
     title: `Desmulta - Recupere su Tranquilidad Vial`,

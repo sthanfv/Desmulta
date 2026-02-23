@@ -64,7 +64,7 @@ export default function VialClearPage() {
             <div className="bg-primary p-2 rounded-xl shadow-lg shadow-primary/20">
               <ShieldCheck className="w-6 h-6 text-primary-foreground" />
             </div>
-            <span className="text-xl font-black tracking-tight text-foreground hidden sm:inline-block">
+            <span className="text-xl font-black tracking-tight text-foreground hidden sm:inline-block" role="text">
               DES<span className="text-primary italic">MULTA</span>
             </span>
           </div>
@@ -74,6 +74,7 @@ export default function VialClearPage() {
             <Button
               onClick={() => setIsModalOpen(true)}
               className="bg-primary hover:bg-primary/95 text-primary-foreground font-bold rounded-full px-8 active:scale-95 transition-all shadow-lg shadow-primary/20 border-none"
+              aria-label="Abrir formulario de consulta de multas"
             >
               Consultar Ahora
             </Button>

@@ -17,16 +17,15 @@ Sistema integral para la gestión y captación de clientes de regularización de
 
 ## 🔒 Auditoría y Seguridad Especializada (MANDATO-FILTRO)
 
-El proyecto cuenta con un blindaje de seguridad de grado industrial:
+El proyecto cuenta con un blindaje de seguridad de grado industrial (Nota A+):
 
-- **Security Headers HTTP (Grado A+):** Implementación de CSP estricto, HSTS, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, y **Aislamiento de Origen** (`COOP`, `CORP`).
-- **Análisis Estático Continuo:** Integración de `eslint-plugin-security` para detectar vulnerabilidades en tiempo de desarrollo.
-- **Tests de Integridad:** Suite de pruebas automatizadas con `Vitest` para verificar la presencia y configuración de encabezados de seguridad.
-- **Mitigación SSRF:** Intercomunicación de API controlada estrictamente vía variables de entorno (`NEXT_PUBLIC_SITE_URL`).
-- **Autenticación Oculta (`x-internal-secret`):** Las rutas de fondo de Vercel API están aisladas y utilizan llaves asimétricas para intercomunicarse.
-- **Validación Robusta y Anti-Bot:** Verificación en cliente (Zod Schema), en backend de Next.js (`create-consultation`), y en base de datos (`firestore.rules`). Incluye un HoneyPot.
-- **Defensa contra DDoS (Firestore):** Implementación de cooldown por usuario de 5 minutos mediante transacciones atómicas de Firebase.
-- **0 Credenciales Expuestas:** Dependencia total de variables de entorno seguras en Vercel.
+- **Security Headers HTTP (Grado A+):** CSP estricto (refinado), HSTS, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, y **Aislamiento de Origen** (`COOP`, `CORP`).
+- **Rate Limiting por IP:** Middleware activo que protege endpoints críticos (`/api/*`) contra ataques de fuerza bruta y spam.
+- **Honeypot Avanzado v2:** Sistema anti-bot de doble capa: campo oculto tradicional + detección proactiva de interacciones humanas (mouse/teclado).
+- **PWA (Survival Mode):** Aplicación Web Progresiva instalable en iOS y Android para acceso directo y resiliencia.
+- **Accesibilidad WCAG:** Cumplimiento de estándares de contraste y etiquetas ARIA para lectores de pantalla.
+- **Análisis Estático Continuo:** Integración de `eslint-plugin-security`.
+- **Tests de Integridad:** Suite de pruebas con `Vitest` para seguridad de encabezados.
 
 ---
 
