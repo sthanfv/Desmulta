@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import {
     getConsultations,
-    analyzeLeadWithAI
+    convertToCase
 } from '@/app/admin/actions';
 import {
     Consultation
@@ -13,29 +13,17 @@ import {
     CreditCard,
     Phone,
     Calendar,
-    ExternalLink,
     AlertCircle,
-    CheckCircle2,
     Clock,
-    Sparkles,
     RefreshCw,
     Search,
     Loader2,
-    BrainCircuit
+    Gavel
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogDescription,
-} from "@/components/ui/dialog";
-import { AICaseAnalysis } from './AICaseAnalysis';
-import { PreliminaryCaseAssessmentOutput } from '@/ai/flows/preliminary-case-assessment-flow';
 
 export function ConsultationsList() {
     const [consultations, setConsultations] = useState<Consultation[]>([]);
@@ -43,10 +31,8 @@ export function ConsultationsList() {
     const [error, setError] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
 
-    // AI State
-    const [analyzingId, setAnalyzingId] = useState<string | null>(null);
-    const [showAIResults, setShowAIResults] = useState(false);
-    const [aiAnalysisResult, setAiAnalysisResult] = useState<PreliminaryCaseAssessmentOutput | null>(null);
+    // Case Conversion State
+    const [convertingId, setConvertingId] = useState<string | null>(null);
 
     const fetchConsultations = async () => {
         setLoading(true);
@@ -60,21 +46,22 @@ export function ConsultationsList() {
         setLoading(false);
     };
 
-    const handleAnalyzeIA = async (id: string, cedula: string) => {
-        try {
-            setAnalyzingId(id);
-            const result = await analyzeLeadWithAI(id, cedula);
+    const handleConvertToCase = async (lead: Consultation) => {
+        if (!confirm(`¿Estás seguro de convertir a ${lead.nombre} en un caso legal activo?`)) return;
 
-            if (result.success && result.data) {
-                setAiAnalysisResult(result.data);
-                setShowAIResults(true);
+        try {
+            setConvertingId(lead.id);
+            const result = await convertToCase(lead);
+            if (result.success) {
+                alert('¡Caso creado exitosamente!');
+                fetchConsultations(); // Recargar para ver el cambio de estado
             } else {
-                setError(result.error || 'Error en el análisis de IA');
+                setError(result.error || 'Error al crear el caso');
             }
         } catch (err) {
-            setError('Error inesperado durante el análisis');
+            setError('Error inesperado al convertir el caso');
         } finally {
-            setAnalyzingId(null);
+            setConvertingId(null);
         }
     };
 
@@ -214,16 +201,16 @@ export function ConsultationsList() {
                                         </Button>
                                         <Button
                                             variant="outline"
-                                            onClick={() => handleAnalyzeIA(consultation.id, consultation.cedula)}
-                                            disabled={analyzingId === consultation.id}
-                                            className="w-full h-12 rounded-xl border-white/10 hover:bg-white/5 font-bold gap-2 overflow-hidden relative group"
+                                            onClick={() => handleConvertToCase(consultation)}
+                                            disabled={convertingId === consultation.id || consultation.status === 'en_proceso'}
+                                            className="w-full h-12 rounded-xl border-white/10 hover:bg-white/5 font-bold gap-2 text-blue-400 border-blue-400/20"
                                         >
-                                            {analyzingId === consultation.id ? (
-                                                <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                                            {convertingId === consultation.id ? (
+                                                <Loader2 className="w-4 h-4 animate-spin" />
                                             ) : (
                                                 <>
-                                                    <Sparkles className="w-4 h-4 text-primary group-hover:scale-125 transition-transform" />
-                                                    <span>Analizar con IA</span>
+                                                    <Gavel className="w-4 h-4" />
+                                                    <span>Convertir en Caso</span>
                                                 </>
                                             )}
                                         </Button>
@@ -234,26 +221,6 @@ export function ConsultationsList() {
                     ))
                 )}
             </div>
-
-            {/* AI Analysis Dialog */}
-            <Dialog open={showAIResults} onOpenChange={setShowAIResults}>
-                <DialogContent className="max-w-2xl bg-[#0F172A] border-white/10 rounded-[3rem] p-0 overflow-hidden backdrop-blur-3xl shadow-3xl">
-                    <DialogHeader className="p-10 pb-0">
-                        <div className="flex items-center gap-4 mb-4">
-                            <div className="p-3 rounded-2xl bg-primary/20">
-                                <BrainCircuit className="w-8 h-8 text-primary animate-pulse" />
-                            </div>
-                            <div>
-                                <DialogTitle className="text-3xl font-black text-white tracking-tight">Análisis Inteligente</DialogTitle>
-                                <DialogDescription className="text-white/60 font-medium">Motor Genkit v1.0 • Procesamiento Legal</DialogDescription>
-                            </div>
-                        </div>
-                    </DialogHeader>
-                    <div className="p-10 pt-6 max-h-[70vh] overflow-y-auto custom-scrollbar border-t border-white/5">
-                        {aiAnalysisResult && <AICaseAnalysis analysis={aiAnalysisResult} />}
-                    </div>
-                </DialogContent>
-            </Dialog>
         </div>
     );
 }

@@ -52,3 +52,28 @@ export interface Consultation {
   telegramStatus: 'pending' | 'sent' | 'failed';
   notifiedAt?: any;
 }
+
+export type CaseStatus = 'apertura' | 'documentacion' | 'tramite' | 'resolucion' | 'finalizado' | 'archivo';
+
+export interface CaseHistoryEvent {
+  date: any; // Firebase Timestamp or ISO string
+  description: string;
+  type: 'status_change' | 'note' | 'document_added' | 'system';
+}
+
+export interface Case {
+  id: string;
+  consultationId: string;
+  cedula: string;
+  nombre: string;
+  contacto: string;
+  status: CaseStatus;
+  history: CaseHistoryEvent[];
+  documents: Array<{
+    name: string;
+    url: string;
+    uploadedAt: any;
+  }>;
+  createdAt: any;
+  updatedAt: any;
+}
