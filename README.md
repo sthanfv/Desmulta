@@ -17,14 +17,16 @@ Sistema integral para la gestión y captación de clientes de regularización de
 
 ## 🔒 Auditoría y Seguridad Especializada (MANDATO-FILTRO)
 
-El proyecto superó una auditoría de seguridad exhaustiva, garantizando grado empresarial:
+El proyecto cuenta con un blindaje de seguridad de grado industrial:
 
-- **Security Headers HTTP (Grado A):** Implementación de CSP estricto, HSTS, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, y `Permissions-Policy`.
+- **Security Headers HTTP (Grado A+):** Implementación de CSP estricto, HSTS, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, y **Aislamiento de Origen** (`COOP`, `CORP`).
+- **Análisis Estático Continuo:** Integración de `eslint-plugin-security` para detectar vulnerabilidades en tiempo de desarrollo.
+- **Tests de Integridad:** Suite de pruebas automatizadas con `Vitest` para verificar la presencia y configuración de encabezados de seguridad.
 - **Mitigación SSRF:** Intercomunicación de API controlada estrictamente vía variables de entorno (`NEXT_PUBLIC_SITE_URL`).
 - **Autenticación Oculta (`x-internal-secret`):** Las rutas de fondo de Vercel API están aisladas y utilizan llaves asimétricas para intercomunicarse.
 - **Validación Robusta y Anti-Bot:** Verificación en cliente (Zod Schema), en backend de Next.js (`create-consultation`), y en base de datos (`firestore.rules`). Incluye un HoneyPot.
 - **Defensa contra DDoS (Firestore):** Implementación de cooldown por usuario de 5 minutos mediante transacciones atómicas de Firebase.
-- **0 Credenciales Expuestas:** El repositorio depende ciegamente de `.env` encriptados localmente y Vercel Variables en el cloud.
+- **0 Credenciales Expuestas:** Dependencia total de variables de entorno seguras en Vercel.
 
 ---
 
