@@ -3,7 +3,8 @@
 import { put } from '@vercel/blob';
 import { revalidatePath } from 'next/cache';
 import { getAdminApp } from '@/lib/firebase-admin';
-import { getFirestore, Timestamp } from 'firebase-admin/firestore';
+import { getFirestore, Timestamp, FieldValue } from 'firebase-admin/firestore';
+import { preliminaryCaseAssessment } from '@/ai/flows/preliminary-case-assessment-flow';
 
 export async function uploadImage(
   formData: FormData,
@@ -101,6 +102,40 @@ export async function getConsultations() {
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Error al obtener consultas';
     console.error('[getConsultations] Error:', msg);
+    return { success: false, error: msg };
+  }
+}
+
+/**
+ * Ejecuta el flujo de IA para analizar un lead
+ */
+export async function analyzeLeadWithAI(leadId: string, cedula: string) {
+  try {
+    getAdminApp();
+    const db = getFirestore();
+
+    // 1. Ejecutar el flujo de Genkit
+    // Nota: El prompt espera 'fineDetails'. Como aún no tenemos documentos subidos,
+    // usaremos un texto base para el análisis preliminar.
+    const analysis = await preliminaryCaseAssessment({
+      cedula,
+      fineDetails: "Análisis preliminar basado en número de identificación."
+    });
+
+    // 2. Guardar el resultado en Firestore
+    await db.collection('consultations').doc(leadId).update({
+      aiAnalysis: {
+        viability: analysis.viability,
+        summary: analysis.summary,
+        legalJustifications: analysis.legalJustifications,
+        analyzedAt: FieldValue.serverTimestamp()
+      }
+    });
+
+    return { success: true, data: analysis };
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : 'Error en el análisis de IA';
+    console.error('[analyzeLeadWithAI] Error:', msg);
     return { success: false, error: msg };
   }
 }

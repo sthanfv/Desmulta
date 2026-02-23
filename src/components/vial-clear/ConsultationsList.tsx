@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import {
-    getConsultations
+    getConsultations,
+    analyzeLeadWithAI
 } from '@/app/admin/actions';
 import {
     Consultation
@@ -18,18 +19,34 @@ import {
     Clock,
     Sparkles,
     RefreshCw,
-    Search
+    Search,
+    Loader2,
+    BrainCircuit
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+} from "@/components/ui/dialog";
+import { AICaseAnalysis } from './AICaseAnalysis';
+import { PreliminaryCaseAssessmentOutput } from '@/ai/flows/preliminary-case-assessment-flow';
 
 export function ConsultationsList() {
     const [consultations, setConsultations] = useState<Consultation[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
+
+    // AI State
+    const [analyzingId, setAnalyzingId] = useState<string | null>(null);
+    const [showAIResults, setShowAIResults] = useState(false);
+    const [aiAnalysisResult, setAiAnalysisResult] = useState<PreliminaryCaseAssessmentOutput | null>(null);
 
     const fetchConsultations = async () => {
         setLoading(true);
@@ -41,6 +58,24 @@ export function ConsultationsList() {
             setError(result.error || 'Error desconocido al cargar consultas');
         }
         setLoading(false);
+    };
+
+    const handleAnalyzeIA = async (id: string, cedula: string) => {
+        try {
+            setAnalyzingId(id);
+            const result = await analyzeLeadWithAI(id, cedula);
+
+            if (result.success && result.data) {
+                setAiAnalysisResult(result.data);
+                setShowAIResults(true);
+            } else {
+                setError(result.error || 'Error en el análisis de IA');
+            }
+        } catch (err) {
+            setError('Error inesperado durante el análisis');
+        } finally {
+            setAnalyzingId(null);
+        }
     };
 
     useEffect(() => {
@@ -179,10 +214,18 @@ export function ConsultationsList() {
                                         </Button>
                                         <Button
                                             variant="outline"
-                                            className="w-full h-12 rounded-xl border-white/10 hover:bg-white/5 font-bold gap-2"
+                                            onClick={() => handleAnalyzeIA(consultation.id, consultation.cedula)}
+                                            disabled={analyzingId === consultation.id}
+                                            className="w-full h-12 rounded-xl border-white/10 hover:bg-white/5 font-bold gap-2 overflow-hidden relative group"
                                         >
-                                            <Sparkles className="w-4 h-4 text-primary" />
-                                            Analizar con IA
+                                            {analyzingId === consultation.id ? (
+                                                <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                                            ) : (
+                                                <>
+                                                    <Sparkles className="w-4 h-4 text-primary group-hover:scale-125 transition-transform" />
+                                                    <span>Analizar con IA</span>
+                                                </>
+                                            )}
                                         </Button>
                                     </div>
                                 </div>
@@ -191,6 +234,26 @@ export function ConsultationsList() {
                     ))
                 )}
             </div>
+
+            {/* AI Analysis Dialog */}
+            <Dialog open={showAIResults} onOpenChange={setShowAIResults}>
+                <DialogContent className="max-w-2xl bg-[#0F172A] border-white/10 rounded-[3rem] p-0 overflow-hidden backdrop-blur-3xl shadow-3xl">
+                    <DialogHeader className="p-10 pb-0">
+                        <div className="flex items-center gap-4 mb-4">
+                            <div className="p-3 rounded-2xl bg-primary/20">
+                                <BrainCircuit className="w-8 h-8 text-primary animate-pulse" />
+                            </div>
+                            <div>
+                                <DialogTitle className="text-3xl font-black text-white tracking-tight">Análisis Inteligente</DialogTitle>
+                                <DialogDescription className="text-white/60 font-medium">Motor Genkit v1.0 • Procesamiento Legal</DialogDescription>
+                            </div>
+                        </div>
+                    </DialogHeader>
+                    <div className="p-10 pt-6 max-h-[70vh] overflow-y-auto custom-scrollbar border-t border-white/5">
+                        {aiAnalysisResult && <AICaseAnalysis analysis={aiAnalysisResult} />}
+                    </div>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
