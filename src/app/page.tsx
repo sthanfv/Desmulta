@@ -219,20 +219,24 @@ export default function VialClearPage() {
 
       {/* Hero Section - Elite Authority Style */}
       <section className="min-h-[90vh] flex items-center pt-32 pb-20 px-4 relative overflow-hidden">
-        {/* Background Video */}
+        {/* Background Video - Hidden on mobile for performance */}
         <div className="absolute inset-0 z-0 overflow-hidden">
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-cover scale-110 blur-[2px] opacity-40"
-          >
-            <source
-              src="https://assets.mixkit.co/videos/preview/mixkit-night-city-traffic-with-car-headlights-27928-large.mp4"
-              type="video/mp4"
-            />
-          </video>
+          <div className="hidden md:block w-full h-full">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover scale-110 blur-[2px] opacity-40"
+            >
+              <source
+                src="https://assets.mixkit.co/videos/preview/mixkit-night-city-traffic-with-car-headlights-27928-large.mp4"
+                type="video/mp4"
+              />
+            </video>
+          </div>
+          {/* Fallback Image for Mobile */}
+          <div className="md:hidden absolute inset-0 bg-[url('https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&q=80&w=800')] bg-cover bg-center opacity-30 blur-[1px]" />
           <div className="absolute inset-0 hero-video-overlay z-10" />
         </div>
 

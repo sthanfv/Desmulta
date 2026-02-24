@@ -108,7 +108,17 @@
   }
 
   .glass {
-    @apply bg-white/5 dark:bg-black/20 backdrop-blur-xl border border-white/10 shadow-xl;
+    @apply bg-white/10 dark:bg-black/40 border border-white/10 shadow-xl;
+    @apply backdrop-blur-xl md:backdrop-blur-2xl;
+  }
+  
+  /* Optimize glass for mobile: reduce blur intensity */
+  @media (max-width: 768px) {
+    .glass, .floating-card {
+      backdrop-blur: none !important;
+      -webkit-backdrop-filter: none !important;
+      @apply bg-white/95 dark:bg-neutral-900/95;
+    }
   }
 
   .shadow-Inner {
@@ -210,11 +220,19 @@
 
   @keyframes shimmer-premium {
     0% {
-      transform: rotate(25deg) translate(-100%, -100%);
+      transform: rotate(25deg) translate(-100%, -100%) translateZ(0);
     }
 
     100% {
-      transform: rotate(25deg) translate(100%, 100%);
+      transform: rotate(25deg) translate(100%, 100%) translateZ(0);
+    }
+  }
+
+  /* Simplify shimmer on mobile to save battery and GPU */
+  @media (max-width: 768px) {
+    .animate-shimmer::after {
+      animation-duration: 12s; /* Slower = less paint */
+      opacity: 0.5;
     }
   }
 
