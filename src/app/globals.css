@@ -111,10 +111,11 @@
     @apply bg-white/10 dark:bg-black/40 border border-white/10 shadow-xl;
     @apply backdrop-blur-xl md:backdrop-blur-2xl;
   }
-  
+
   /* Optimize glass for mobile: reduce blur intensity */
   @media (max-width: 768px) {
-    .glass, .floating-card {
+    .glass,
+    .floating-card {
       backdrop-blur: none !important;
       -webkit-backdrop-filter: none !important;
       @apply bg-white/95 dark:bg-neutral-900/95;

@@ -90,13 +90,12 @@ export async function POST(request: Request) {
     // ✅ SSRF FIX: URL construida desde variable de entorno, NUNCA del header Host del request.
     // Un atacante podría manipular el header Host para redirigir el fetch a un servidor malicioso.
     // Usamos NEXT_PUBLIC_SITE_URL configurada en el entorno de servidor.
-    const baseUrl =
-      process.env.NODE_ENV === 'development'
-        ? 'http://localhost:9005'
-        : process.env.NEXT_PUBLIC_SITE_URL;
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL;
+    const isDev = process.env.NODE_ENV === 'development';
 
-    if (baseUrl) {
-      const notifyUrl = `${baseUrl}/api/notify`;
+    if (baseUrl || isDev) {
+      const finalBase = baseUrl || 'http://localhost:9005';
+      const notifyUrl = `${finalBase}/api/notify`;
       const internalSecret = process.env.INTERNAL_API_SECRET || '';
 
       fetch(notifyUrl, {
