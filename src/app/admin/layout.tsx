@@ -8,7 +8,7 @@ import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/aut
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, LogIn, Eye, EyeOff } from 'lucide-react';
+import { Loader2, LogIn, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -163,6 +163,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               Ingresar
             </Button>
           </form>
+
+          <div className="mt-8 pt-6 border-t border-border/50 text-center">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => router.push('/')}
+              className="text-muted-foreground hover:text-primary transition-colors gap-2 rounded-xl"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Volver al Inicio Publico</span>
+            </Button>
+          </div>
         </div>
       </div>
     );

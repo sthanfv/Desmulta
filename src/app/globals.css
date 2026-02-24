@@ -29,25 +29,25 @@
   }
 
   .dark {
-    /* Monet Dark: Deep Blue-Gray with Gold tint */
-    --background: 222 47% 6%;
-    --foreground: 210 40% 98%;
-    --card: 222 47% 8%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222 47% 8%;
-    --popover-foreground: 210 40% 98%;
+    /* Monet Dark: AMOLED Pure Black */
+    --background: 0 0% 0%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 2%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 2%;
+    --popover-foreground: 0 0% 98%;
     --primary: 45 100% 52%;
-    --primary-foreground: 222.2 84% 4.9%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 12%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 0 0% 10%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 10%;
+    --muted-foreground: 0 0% 65%;
     --accent: 45 100% 52%;
-    --accent-foreground: 210 40% 98%;
+    --accent-foreground: 0 0% 0%;
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 15%;
+    --input: 0 0% 15%;
     --ring: 45 100% 52%;
   }
 }
@@ -71,11 +71,34 @@
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-background;
+    @apply bg-transparent;
   }
 
   ::-webkit-scrollbar-thumb {
     @apply bg-primary/20 rounded-full transition-colors hover:bg-primary/40;
+  }
+
+  /* Specific class for refined scrolling */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    background-clip: content-box;
+    border: 2px solid transparent;
+  }
+
+  .custom-scrollbar:hover::-webkit-scrollbar-thumb {
+    background: rgba(255, 191, 0, 0.3);
+    background-clip: content-box;
+    border: 2px solid transparent;
   }
 }
 
@@ -157,39 +180,41 @@
     }
   }
 
-  /* Shimmer Effect - Premium Shine */
+  /* Shimmer Effect - Premium Shine - Optimized for 60fps */
   .animate-shimmer {
-    position: relative;
-    overflow: hidden;
+    position: relative !important;
+    overflow: hidden !important;
+    isolation: isolate;
   }
 
   .animate-shimmer::after {
     content: '';
     position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
+    inset: -150%;
+    width: 400%;
+    height: 400%;
     background: linear-gradient(
       45deg,
-      transparent 0%,
-      rgba(255, 191, 0, 0.1) 45%,
-      rgba(255, 255, 255, 0.2) 50%,
-      rgba(255, 191, 0, 0.1) 55%,
-      transparent 100%
+      transparent 25%,
+      rgba(255, 191, 0, 0.05) 45%,
+      rgba(255, 255, 255, 0.3) 50%,
+      rgba(255, 191, 0, 0.05) 55%,
+      transparent 75%
     );
-    transform: rotate(25deg);
-    animation: shimmer-premium 4s infinite;
+    transform: rotate(25deg) translate(-100%, -100%);
+    animation: shimmer-premium 8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
     pointer-events: none;
+    will-change: transform;
+    z-index: 10;
   }
 
   @keyframes shimmer-premium {
     0% {
-      transform: translate(-100%, -100%) rotate(25deg);
+      transform: rotate(25deg) translate(-100%, -100%);
     }
 
     100% {
-      transform: translate(100%, 100%) rotate(25deg);
+      transform: rotate(25deg) translate(100%, 100%);
     }
   }
 
@@ -258,4 +283,8 @@
     rgba(0, 0, 0, 0.4) 50%,
     rgba(0, 0, 0, 0.8) 100%
   );
+}
+.virtual-item {
+  content-visibility: auto;
+  contain-intrinsic-size: 150px;
 }

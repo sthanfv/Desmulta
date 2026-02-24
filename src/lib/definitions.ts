@@ -10,9 +10,10 @@ export const ConsultationSchema = z.object({
     .string()
     .trim()
     .toUpperCase()
-    .regex(/^[A-Z]{3}[0-9]{2}[0-9A-Z]$/, {
+    .refine((val) => val === '' || /^[A-Z]{3}[0-9]{2}[0-9A-Z]$/.test(val), {
       message: 'Placa inválida (Formato: AAA123 o AAA12A).',
-    }),
+    })
+    .optional(),
   nombre: z
     .string()
     .trim()

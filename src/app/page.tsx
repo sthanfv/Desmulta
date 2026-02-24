@@ -251,7 +251,7 @@ export default function VialClearPage() {
             </h1>
             <p className="text-sm md:text-lg lg:text-xl text-white/70 font-medium leading-[1.6] max-w-lg reveal reveal-delay-1">
               Blindaje legal experto para sus trámites administrativos, fotomultas y comparendos.
-              Saneamiento integral con transparencia corporativa.
+              Saneamiento integral con absoluta reserva y transparencia corporativa.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 pt-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
               <Button
@@ -324,8 +324,9 @@ export default function VialClearPage() {
                     Respaldo Normativo
                   </h3>
                   <p className="text-muted-foreground leading-relaxed text-lg md:text-xl max-w-xl">
-                    Operamos estrictamente bajo la Ley 769 de 2002 y el CPACA. Nuestro rigor legal
-                    es su mayor garantía de éxito frente a las autoridades de tránsito.
+                    Operamos bajo estrictos protocolos de defensa administrativa. Nuestro
+                    conocimiento especializado es su mayor garantía frente a las autoridades de
+                    tránsito.
                   </p>
                 </div>
               </div>
@@ -358,8 +359,8 @@ export default function VialClearPage() {
               </div>
               <h3 className="text-2xl font-black text-foreground mb-4">Eficiencia Comprobada</h3>
               <p className="text-muted-foreground leading-relaxed text-lg">
-                Acompañamiento experto fundamentado en el estricto cumplimiento de los tiempos
-                legales y términos de ley.
+                Acompañamiento experto fundamentado en el estricto cumplimiento de los términos
+                legales y la normativa vigente.
               </p>
             </div>
           </div>
@@ -388,13 +389,13 @@ export default function VialClearPage() {
                     {
                       num: '01',
                       title: 'Auditoría Inicial',
-                      desc: 'Crucemos datos con el SIMIT para ver la viabilidad inmediata sin compromiso.',
+                      desc: 'Crucemos datos con el SIMIT para evaluar la viabilidad de su caso sin compromiso.',
                       icon: <ShieldCheck className="w-6 h-6" />,
                     },
                     {
                       num: '02',
                       title: 'Análisis de Inconsistencias',
-                      desc: 'Identificamos fallas en el procedimiento administrativo para fundamentar técnicamente su caso.',
+                      desc: 'Identificamos las mejores estrategias técnico-legales para fundamentar la defensa de sus derechos.',
                       icon: <ArrowRightLeft className="w-6 h-6" />,
                     },
                     {
@@ -565,15 +566,15 @@ export default function VialClearPage() {
             {[
               {
                 q: '¿Es realmente legal este proceso?',
-                a: 'Totalmente. Adelantamos gestiones administrativas amparadas en el derecho de petición y el debido proceso consagrado en la ley de tránsito y el CPACA para defender sus derechos ante cobros irregulares.',
+                a: 'Totalmente. Adelantamos gestiones administrativas amparadas en el debido proceso y la normativa vigente para defender sus derechos ante cobros irregulares.',
               },
               {
                 q: '¿Cuánto tiempo demora la eliminación?',
-                a: 'La gestión suele tomar entre 15 y 30 días calendario, dependiendo de los tiempos de respuesta de cada Secretaría de Tránsito y la complejidad del historial administrativo.',
+                a: 'La gestión suele tomar entre 15 y 30 días calendario, dependiendo de los tiempos de respuesta de cada organismo de tránsito y la complejidad del historial administrativo.',
               },
               {
                 q: '¿Garantizan que la multa será eliminada?',
-                a: 'Realizamos un estudio técnico de viabilidad previo. Si determinamos que el caso es viable bajo los parámetros de ley, procedemos con la gestión garantizando un servicio de alta calidad técnica.',
+                a: 'Realizamos un estudio técnico de viabilidad previo. Si determinamos que el caso cumple con los requisitos técnicos necesarios, procedemos con la gestión garantizando un servicio de alta calidad.',
               },
               {
                 q: '¿Debo pagar por adelantado el trámite?',
@@ -581,11 +582,11 @@ export default function VialClearPage() {
               },
               {
                 q: '¿Qué pasa si mi multa ya está en cobro coactivo?',
-                a: 'Incluso en cobro coactivo es posible realizar gestiones si se han vulnerado sus derechos al debido proceso o si la sanción ya cumplió los términos de ley para su prescripción.',
+                a: 'Incluso en cobro coactivo es posible realizar gestiones si se han vulnerado sus derechos fundamentales o si el trámite ya cumplió los tiempos administrativos para su resolución.',
               },
               {
                 q: '¿Es seguro proporcionar mi número de cédula?',
-                a: 'Es indispensable para realizar la consulta técnica en las bases de datos oficiales (SIMIT). No almacenamos su documento de forma permanente y cumplimos con la Ley 1581 de Protección de Datos.',
+                a: 'Es indispensable para realizar la consulta técnica en las bases de datos oficiales. No almacenamos su documento de forma permanente y cumplimos con la normativa de Protección de Datos.',
               },
             ].map((faq, i) => (
               <AccordionItem
@@ -649,7 +650,7 @@ export default function VialClearPage() {
                       DESMULTA
                     </span>
                     <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary mt-1">
-                      COLOMBIA
+                      TECNOLOGÍA VIAL
                     </span>
                   </div>
                 </Link>
@@ -725,9 +726,7 @@ export default function VialClearPage() {
                       <p className="text-xs font-black text-muted-foreground uppercase tracking-widest leading-none mb-1.5">
                         WhatsApp 24/7
                       </p>
-                      <p className="text-xl font-bold text-foreground">
-                        +{footerData?.whatsapp || '573005648309'}
-                      </p>
+                      <p className="text-xl font-bold text-foreground">+57 300 [PROTEGIDO]</p>
                     </div>
                   </div>
 
@@ -754,7 +753,7 @@ export default function VialClearPage() {
                         Base de Operaciones
                       </p>
                       <p className="text-xl font-bold text-foreground">
-                        {footerData?.address || 'Bogotá D.C., Colombia'}
+                        Cobertura Nacional Digital
                       </p>
                     </div>
                   </div>
@@ -778,14 +777,14 @@ export default function VialClearPage() {
           <div className="pt-10 flex flex-col md:flex-row justify-between items-center gap-8 border-t border-border/20">
             <div className="flex flex-col items-center md:items-start gap-2">
               <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.4em]">
-                © 2025 DESMULTA COLOMBIA — ENTIDAD PRIVADA DE GESTIÓN VIAL
+                © 2025 DESMULTA — SERVICIO PRIVADO DE GESTIÓN VIAL
               </p>
               <div className="flex items-center gap-4 opacity-40 hover:opacity-100 transition-opacity">
                 <span className="text-[9px] font-black uppercase tracking-widest bg-muted px-2 py-0.5 rounded">
-                  PROTECCIÓN LEY 1581
+                  PROTECCIÓN DE DATOS
                 </span>
                 <span className="text-[9px] font-black uppercase tracking-widest bg-muted px-2 py-0.5 rounded">
-                  CERTIFICACIÓN CPACA
+                  COMPROMISO LEGAL
                 </span>
               </div>
             </div>
@@ -805,16 +804,19 @@ export default function VialClearPage() {
       {/* Modal - Modern Glass Form */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="max-w-2xl p-0 overflow-hidden bg-transparent border-none shadow-none focus-visible:outline-none">
-          <div className="glass p-12 rounded-[3.5rem] border-white/20 m-4 shadow-3xl bg-white/95 dark:bg-black/80">
-            <DialogHeader className="mb-10">
-              <DialogTitle className="text-4xl font-black text-center text-foreground tracking-tight">
-                Estudio Legal Gratuito
-              </DialogTitle>
-              <p className="text-center text-lg text-muted-foreground mt-3 font-medium">
-                Analizaremos tu caso y te brindaremos viabilidad en minutos.
-              </p>
-            </DialogHeader>
-            <ConsultationForm onSuccess={() => setIsModalOpen(false)} />
+          <div className="glass rounded-[2.5rem] md:rounded-[3.5rem] border-white/20 m-2 md:m-4 shadow-3xl bg-white/95 dark:bg-black/80 overflow-hidden">
+            <div className="max-h-[85vh] overflow-y-auto custom-scrollbar p-8 md:p-12 pr-6 md:pr-10">
+              <DialogHeader className="mb-10">
+                <DialogTitle className="text-4xl font-black text-center text-foreground tracking-tight">
+                  Estudio de Viabilidad Gratuito
+                </DialogTitle>
+                <p className="text-center text-lg text-muted-foreground mt-3 font-medium">
+                  Recibiremos su información para un análisis técnico detallado. La respuesta será
+                  enviada a su WhatsApp dentro de nuestros horarios laborales habituales.
+                </p>
+              </DialogHeader>
+              <ConsultationForm onSuccess={() => setIsModalOpen(false)} />
+            </div>
           </div>
         </DialogContent>
       </Dialog>
@@ -877,7 +879,7 @@ export default function VialClearPage() {
             <div className="flex flex-col gap-4 mt-10">
               <Button
                 onClick={handleWhatsAppRedirect}
-                className="h-16 rounded-2xl bg-[#25D366] hover:bg-[#20ba59] text-white font-black text-lg active:scale-95 transition-all shadow-xl shadow-green-500/20 border-none"
+                className="h-16 rounded-2xl bg-[#25D366] hover:bg-[#20ba59] text-white font-black text-lg active:scale-95 transition-all shadow-xl shadow-green-500/20 border-none relative overflow-hidden animate-shimmer"
               >
                 ENTENDIDO, ABRIR CHAT
               </Button>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { getConsultations, convertToCase } from '@/app/admin/actions';
 import { Consultation } from '@/lib/definitions';
 import {
@@ -23,23 +23,44 @@ import { Input } from '@/components/ui/input';
 export function ConsultationsList() {
   const [consultations, setConsultations] = useState<Consultation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [lastDocId, setLastDocId] = useState<string | null | undefined>(undefined);
+  const [hasMore, setHasMore] = useState(true);
 
   // Case Conversion State
   const [convertingId, setConvertingId] = useState<string | null>(null);
 
-  const fetchConsultations = async () => {
-    setLoading(true);
-    const result = await getConsultations();
-    if (result.success && result.data) {
-      setConsultations(result.data as Consultation[]);
-      setError(null);
-    } else {
-      setError(result.error || 'Error desconocido al cargar consultas');
-    }
-    setLoading(false);
-  };
+  const fetchConsultations = useCallback(
+    async (reset: boolean = false) => {
+      if (reset) {
+        setLoading(true);
+        setLastDocId(undefined);
+      } else {
+        setLoadingMore(true);
+      }
+
+      const result = await getConsultations(20, reset ? undefined : lastDocId);
+
+      if (result.success && result.data) {
+        if (reset) {
+          setConsultations(result.data as Consultation[]);
+        } else {
+          setConsultations((prev) => [...prev, ...(result.data as Consultation[])]);
+        }
+        setLastDocId(result.lastDocId);
+        setHasMore(!!result.hasMore);
+        setError(null);
+      } else {
+        setError(result.error || 'Error desconocido al cargar consultas');
+      }
+
+      setLoading(false);
+      setLoadingMore(false);
+    },
+    [lastDocId]
+  );
 
   const handleConvertToCase = async (lead: Consultation) => {
     if (!confirm(`¿Estás seguro de convertir a ${lead.nombre} en un caso legal activo?`)) return;
@@ -49,7 +70,7 @@ export function ConsultationsList() {
       const result = await convertToCase(lead);
       if (result.success) {
         alert('¡Caso creado exitosamente!');
-        fetchConsultations(); // Recargar para ver el cambio de estado
+        fetchConsultations(true); // Recargar desde el principio para ver el cambio de estado
       } else {
         setError(result.error || 'Error al crear el caso');
       }
@@ -61,8 +82,27 @@ export function ConsultationsList() {
   };
 
   useEffect(() => {
-    fetchConsultations();
-  }, []);
+    fetchConsultations(true);
+  }, [fetchConsultations]);
+
+  // Infinite Scroll Observer
+  useEffect(() => {
+    if (loading || !hasMore || loadingMore) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          fetchConsultations();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const sentinel = document.getElementById('infinite-scroll-sentinel');
+    if (sentinel) observer.observe(sentinel);
+
+    return () => observer.disconnect();
+  }, [loading, hasMore, loadingMore, lastDocId, fetchConsultations]);
 
   const filteredConsultations = consultations.filter(
     (c) =>
@@ -102,7 +142,7 @@ export function ConsultationsList() {
     }
   };
 
-  if (loading) {
+  if (loading && consultations.length === 0) {
     return (
       <div className="space-y-4">
         {[1, 2, 3].map((i) => (
@@ -115,7 +155,7 @@ export function ConsultationsList() {
     );
   }
 
-  if (error) {
+  if (error && consultations.length === 0) {
     return (
       <Card className="bg-red-500/5 border-red-500/20 rounded-[2.5rem]">
         <CardContent className="pt-6 text-center space-y-4">
@@ -123,7 +163,7 @@ export function ConsultationsList() {
           <p className="text-red-400 font-medium">{error}</p>
           <Button
             variant="outline"
-            onClick={fetchConsultations}
+            onClick={() => fetchConsultations(true)}
             className="rounded-2xl border-red-500/20 text-red-400 hover:bg-red-500/10"
           >
             Reintentar
@@ -146,16 +186,16 @@ export function ConsultationsList() {
           />
         </div>
         <Button
-          onClick={fetchConsultations}
+          onClick={() => fetchConsultations(true)}
           className="h-14 px-8 rounded-2xl bg-primary text-primary-foreground font-bold flex gap-2 hover:scale-[1.02] active:scale-95 transition-all"
         >
-          <RefreshCw className="w-5 h-5" />
+          <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
           Actualizar
         </Button>
       </div>
 
       <div className="grid gap-4">
-        {filteredConsultations.length === 0 ? (
+        {filteredConsultations.length === 0 && !loading ? (
           <div className="text-center py-20 bg-white/5 rounded-[3rem] border border-dashed border-white/10">
             <Clock className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
             <p className="text-muted-foreground text-lg">
@@ -163,94 +203,105 @@ export function ConsultationsList() {
             </p>
           </div>
         ) : (
-          filteredConsultations.map((consultation) => (
-            <Card
-              key={consultation.id}
-              className="group overflow-hidden bg-white/5 border-white/10 rounded-[2.5rem] transition-all hover:border-primary/30 hover:bg-white/[0.07] backdrop-blur-md"
-            >
-              <CardContent className="p-6 md:p-8">
-                <div className="flex flex-col md:flex-row justify-between gap-6">
-                  <div className="space-y-4">
-                    <div className="flex flex-wrap items-center gap-3">
-                      <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-                        <User className="w-6 h-6" />
+          <>
+            {filteredConsultations.map((consultation) => (
+              <Card
+                key={consultation.id}
+                className="group overflow-hidden bg-white/5 border-white/10 rounded-[2.5rem] transition-all hover:border-primary/30 hover:bg-white/[0.07] backdrop-blur-md virtual-item"
+              >
+                <CardContent className="p-6 md:p-8">
+                  <div className="flex flex-col md:flex-row justify-between gap-6">
+                    <div className="space-y-4">
+                      <div className="flex flex-wrap items-center gap-3">
+                        <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                          <User className="w-6 h-6" />
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-bold text-foreground">
+                            {consultation.nombre}
+                          </h3>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            {getStatusBadge(consultation.status)}
+                            <span>•</span>
+                            <span className="flex items-center gap-1">
+                              <Calendar className="w-3 h-3" />
+                              {new Date(consultation.createdAt).toLocaleDateString('es-CO', {
+                                day: '2-digit',
+                                month: 'short',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="text-xl font-bold text-foreground">{consultation.nombre}</h3>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          {getStatusBadge(consultation.status)}
-                          <span>•</span>
-                          <span className="flex items-center gap-1">
-                            <Calendar className="w-3 h-3" />
-                            {new Date(consultation.createdAt).toLocaleDateString('es-CO', {
-                              day: '2-digit',
-                              month: 'short',
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })}
-                          </span>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="flex items-center gap-3 bg-black/20 p-3 rounded-2xl border border-white/5">
+                          <CreditCard className="w-5 h-5 text-primary/60" />
+                          <div>
+                            <p className="text-[10px] uppercase font-bold text-muted-foreground/50 tracking-widest">
+                              Cédula
+                            </p>
+                            <p className="font-mono text-foreground">{consultation.cedula}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3 bg-black/20 p-3 rounded-2xl border border-white/5">
+                          <Phone className="w-5 h-5 text-primary/60" />
+                          <div>
+                            <p className="text-[10px] uppercase font-bold text-muted-foreground/50 tracking-widest">
+                              Contacto
+                            </p>
+                            <p className="text-foreground">{consultation.contacto}</p>
+                          </div>
                         </div>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="flex items-center gap-3 bg-black/20 p-3 rounded-2xl border border-white/5">
-                        <CreditCard className="w-5 h-5 text-primary/60" />
-                        <div>
-                          <p className="text-[10px] uppercase font-bold text-muted-foreground/50 tracking-widest">
-                            Cédula
-                          </p>
-                          <p className="font-mono text-foreground">{consultation.cedula}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3 bg-black/20 p-3 rounded-2xl border border-white/5">
-                        <Phone className="w-5 h-5 text-primary/60" />
-                        <div>
-                          <p className="text-[10px] uppercase font-bold text-muted-foreground/50 tracking-widest">
-                            Contacto
-                          </p>
-                          <p className="text-foreground">{consultation.contacto}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-2 justify-center lg:min-w-[200px]">
-                    <Button
-                      asChild
-                      className="w-full h-12 rounded-xl bg-green-500 text-white hover:bg-green-600 font-bold gap-2"
-                    >
-                      <a
-                        href={`https://wa.me/57${consultation.contacto.replace(/\s+/g, '')}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                    <div className="flex flex-col gap-2 justify-center lg:min-w-[200px]">
+                      <Button
+                        asChild
+                        className="w-full h-12 rounded-xl bg-green-500 text-white hover:bg-green-600 font-bold gap-2"
                       >
-                        <Phone className="w-4 h-4" />
-                        WhatsApp
-                      </a>
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => handleConvertToCase(consultation)}
-                      disabled={
-                        convertingId === consultation.id || consultation.status === 'en_proceso'
-                      }
-                      className="w-full h-12 rounded-xl border-white/10 hover:bg-white/5 font-bold gap-2 text-blue-400 border-blue-400/20"
-                    >
-                      {convertingId === consultation.id ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <>
-                          <Gavel className="w-4 h-4" />
-                          <span>Convertir en Caso</span>
-                        </>
-                      )}
-                    </Button>
+                        <a
+                          href={`https://wa.me/57${consultation.contacto.replace(/\s+/g, '')}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Phone className="w-4 h-4" />
+                          WhatsApp
+                        </a>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => handleConvertToCase(consultation)}
+                        disabled={
+                          convertingId === consultation.id || consultation.status === 'en_proceso'
+                        }
+                        className="w-full h-12 rounded-xl border-white/10 hover:bg-white/5 font-bold gap-2 text-blue-400 border-blue-400/20"
+                      >
+                        {convertingId === consultation.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <>
+                            <Gavel className="w-4 h-4" />
+                            <span>Convertir en Caso</span>
+                          </>
+                        )}
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))
+                </CardContent>
+              </Card>
+            ))}
+
+            {/* Sentinel for Infinite Scroll */}
+            {hasMore && (
+              <div id="infinite-scroll-sentinel" className="h-10 flex items-center justify-center">
+                {loadingMore && <Loader2 className="w-6 h-6 animate-spin text-primary" />}
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

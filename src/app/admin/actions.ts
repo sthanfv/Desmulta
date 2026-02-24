@@ -75,14 +75,23 @@ export async function deleteExpiredConsultations(): Promise<{
 }
 
 /**
- * Obtiene la lista de consultas desde Firestore
+ * Obtiene la lista de consultas desde Firestore con paginación
  */
-export async function getConsultations() {
+export async function getConsultations(pageSize: number = 20, lastDocId?: string | null) {
   try {
     getAdminApp();
     const db = getFirestore();
 
-    const snapshot = await db.collection('consultations').orderBy('createdAt', 'desc').get();
+    let query = db.collection('consultations').orderBy('createdAt', 'desc').limit(pageSize);
+
+    if (lastDocId) {
+      const lastDoc = await db.collection('consultations').doc(lastDocId).get();
+      if (lastDoc.exists) {
+        query = query.startAfter(lastDoc);
+      }
+    }
+
+    const snapshot = await query.get();
 
     const consultations = snapshot.docs.map((doc) => {
       const data = doc.data();
@@ -94,7 +103,14 @@ export async function getConsultations() {
       };
     });
 
-    return { success: true, data: consultations };
+    const lastVisible = snapshot.docs[snapshot.docs.length - 1];
+
+    return {
+      success: true,
+      data: consultations,
+      lastDocId: lastVisible ? lastVisible.id : null,
+      hasMore: snapshot.docs.length === pageSize,
+    };
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Error al obtener consultas';
     console.error('[getConsultations] Error:', msg);
@@ -148,13 +164,23 @@ export async function convertToCase(lead: Consultation) {
 }
 
 /**
- * Obtiene la lista de casos activos
+ * Obtiene la lista de casos activos con paginación
  */
-export async function getCases() {
+export async function getCases(pageSize: number = 20, lastDocId?: string | null) {
   try {
     getAdminApp();
     const db = getFirestore();
-    const snapshot = await db.collection('cases').orderBy('createdAt', 'desc').get();
+
+    let query = db.collection('cases').orderBy('createdAt', 'desc').limit(pageSize);
+
+    if (lastDocId) {
+      const lastDoc = await db.collection('cases').doc(lastDocId).get();
+      if (lastDoc.exists) {
+        query = query.startAfter(lastDoc);
+      }
+    }
+
+    const snapshot = await query.get();
 
     const cases = snapshot.docs.map((doc) => ({
       ...doc.data(),
@@ -163,7 +189,14 @@ export async function getCases() {
       updatedAt: doc.data().updatedAt?.toDate().toISOString(),
     }));
 
-    return { success: true, data: cases };
+    const lastVisible = snapshot.docs[snapshot.docs.length - 1];
+
+    return {
+      success: true,
+      data: cases,
+      lastDocId: lastVisible ? lastVisible.id : null,
+      hasMore: snapshot.docs.length === pageSize,
+    };
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Error al obtener casos';
     console.error('[getCases] Error:', msg);

@@ -75,7 +75,7 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
       const { cedula, placa, nombre, contacto } = value;
       localStorage.setItem(
         'consultation_draft',
-        JSON.stringify({ cedula, placa, nombre, contacto })
+        JSON.stringify({ cedula, placa: placa || '', nombre, contacto })
       );
     });
     return () => subscription.unsubscribe();
@@ -143,7 +143,7 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
       toast({
         title: '¡Solicitud Recibida!',
         description:
-          'Su consulta ha sido registrada. Le contactaremos a la mayor brevedad posible dentro de nuestros horarios habituales.',
+          'Su consulta ha sido registrada. Un asesor jurídico revisará su caso y le contactará vía WhatsApp dentro de nuestros horarios laborales habituales.',
       });
       setIsSuccess(true);
       localStorage.removeItem('consultation_draft');
@@ -169,13 +169,14 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
           Estudio en Proceso
         </h3>
         <p className="text-muted-foreground text-lg max-w-sm leading-relaxed">
-          Hemos recibido su información correctamente. Un asesor jurídico especializado revisará su
-          caso y le contactará a la brevedad posible a través de WhatsApp.
+          Hemos recibido su información correctamente. Un asesor jurídico especializado revisará el
+          estado de su historial y le contactará a través de WhatsApp dentro de nuestros horarios
+          laborales.
         </p>
         <Button
           onClick={onSuccess}
           variant="outline"
-          className="mt-8 rounded-2xl px-10 border-border hover:bg-muted font-bold active:scale-95 transition-all"
+          className="mt-8 rounded-2xl px-10 border-border hover:bg-muted font-bold active:scale-95 transition-all relative overflow-hidden animate-shimmer"
         >
           Entendido
         </Button>
@@ -267,7 +268,8 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
             render={({ field }) => (
               <FormItem className="space-y-2">
                 <FormLabel className="text-sm font-black text-foreground/70 uppercase tracking-widest pl-1">
-                  Placa del Vehículo
+                  Placa del Vehículo{' '}
+                  <span className="text-xs font-medium lowercase opacity-50">(Opcional)</span>
                 </FormLabel>
                 <FormControl>
                   <div className="relative group">
@@ -280,10 +282,12 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
                       }}
                       className={cn(
                         'w-full bg-background border-border/50 rounded-2xl px-6 h-16 text-lg font-black tracking-[0.2em] focus:ring-primary/20 focus:border-primary transition-all shadow-Inner uppercase',
-                        field.value.length === 6 && 'border-green-500/30 bg-green-500/[0.02]'
+                        field.value &&
+                          field.value.length === 6 &&
+                          'border-green-500/30 bg-green-500/[0.02]'
                       )}
                     />
-                    {field.value.length === 6 && (
+                    {field.value && field.value.length === 6 && (
                       <CheckCircle2
                         size={18}
                         className="absolute right-4 top-1/2 -translate-y-1/2 text-green-500 animate-in zoom-in duration-300"
@@ -410,10 +414,10 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-primary text-primary-foreground font-black py-6 md:py-8 rounded-3xl hover:bg-primary/95 transition-all flex items-center justify-center gap-3 h-16 md:h-20 text-lg md:text-xl shadow-xl shadow-primary/20 active:scale-95 border-none relative overflow-hidden group"
+            className="w-full bg-primary text-primary-foreground font-black py-6 md:py-8 rounded-3xl hover:bg-primary/95 transition-all flex items-center justify-center gap-3 h-16 md:h-20 text-lg md:text-xl shadow-xl shadow-primary/20 active:scale-95 border-none relative overflow-hidden group animate-shimmer"
             aria-disabled={isSubmitting}
           >
-            <div className="absolute inset-0 animate-shimmer pointer-events-none opacity-40" />
+            {/* Optimized for 60fps via CSS animate-shimmer class */}
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-3 h-6 w-6 animate-spin" />
@@ -438,7 +442,7 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
             </div>
             <div className="flex items-center justify-center gap-2 text-[10px] text-muted-foreground uppercase tracking-[0.25em] font-black opacity-40 hover:opacity-100 transition-opacity">
               <ShieldCheck size={12} className="text-primary" />
-              <span>Protección Legal Certificada por CPACA</span>
+              <span>Protección Técnica con Alta Calidad Jurídica</span>
             </div>
           </div>
         </div>
