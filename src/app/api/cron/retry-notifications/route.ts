@@ -62,6 +62,7 @@ export async function GET(request: Request) {
 ━━━━━━━━━━━━━━━━━━━━
 
 👤 <b>Cliente:</b> ${escapeHtml(data?.nombre)}
+🚗 <b>Placa:</b> <code>${escapeHtml(data?.placa || 'N/A')}</code>
 📱 <b>WhatsApp:</b> <a href="https://wa.me/57${escapeHtml(data?.contacto)}">${escapeHtml(data?.contacto)}</a>
 
 📌 <b>Detalles</b>
