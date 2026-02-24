@@ -26,10 +26,13 @@ import {
   Upload,
   ShieldCheck,
   LogOut,
-  Users
+  Users,
+  Gavel,
 } from 'lucide-react';
 import { ConsultationsList } from './ConsultationsList';
+import { CasesList } from './CasesList';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -340,30 +343,86 @@ export function AdminDashboard() {
       </header>
 
       <main className="flex-1 max-w-6xl mx-auto w-full px-6 py-12 space-y-24">
-        {/* --- GESTIÓN DE CONSULTAS (LEADS) --- */}
-        <section className="relative scroll-mt-24">
-          <div className="space-y-12">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-              <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-3 rounded-2xl bg-primary/10 border border-primary/20">
-                    <Users className="text-primary w-8 h-8" />
+        <Tabs defaultValue="leads" className="w-full space-y-12">
+          <TabsList className="bg-white/5 border border-white/10 p-1 rounded-2xl h-16 w-full md:w-auto overflow-x-auto flex">
+            <TabsTrigger
+              value="leads"
+              className="px-8 flex-1 md:flex-none rounded-xl font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
+            >
+              <Users className="w-4 h-4 mr-2" />
+              Gestión de Leads
+            </TabsTrigger>
+            <TabsTrigger
+              value="cases"
+              className="px-8 flex-1 md:flex-none rounded-xl font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
+            >
+              <Gavel className="w-4 h-4 mr-2" />
+              Casos Activos
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="leads" className="space-y-24 outline-none">
+            {/* --- GESTIÓN DE CONSULTAS (LEADS) --- */}
+            <section className="relative scroll-mt-24">
+              <div className="space-y-12">
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                  <div>
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="p-3 rounded-2xl bg-primary/10 border border-primary/20">
+                        <Users className="text-primary w-8 h-8" />
+                      </div>
+                      <Badge
+                        variant="outline"
+                        className="text-primary border-primary/20 bg-primary/5 uppercase tracking-widest font-black text-[10px] px-3 py-1"
+                      >
+                        Control de Prospectos
+                      </Badge>
+                    </div>
+                    <h2 className="text-3xl md:text-5xl font-black text-foreground tracking-tight">
+                      Gestión de Leads
+                    </h2>
+                    <p className="text-muted-foreground mt-4 text-lg max-w-2xl font-medium leading-relaxed">
+                      Visualiza y gestiona las consultas recibidas. Haz clic en el botón de WhatsApp
+                      para iniciar el contacto directo.
+                    </p>
                   </div>
-                  <Badge variant="outline" className="text-primary border-primary/20 bg-primary/5 uppercase tracking-widest font-black text-[10px] px-3 py-1">
-                    Control de Prospectos
-                  </Badge>
                 </div>
-                <h2 className="text-3xl md:text-5xl font-black text-foreground tracking-tight">
-                  Gestión de Leads
-                </h2>
-                <p className="text-muted-foreground mt-4 text-lg max-w-2xl font-medium leading-relaxed">
-                  Visualiza y gestiona las consultas recibidas. Haz clic en el botón de WhatsApp para iniciar el contacto directo.
-                </p>
+                <ConsultationsList />
               </div>
-            </div>
-            <ConsultationsList />
-          </div>
-        </section>
+            </section>
+          </TabsContent>
+
+          <TabsContent value="cases" className="space-y-24 outline-none">
+            {/* --- GESTIÓN DE CASOS --- */}
+            <section className="relative scroll-mt-24">
+              <div className="space-y-12">
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                  <div>
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="p-3 rounded-2xl bg-primary/10 border border-primary/20">
+                        <Gavel className="text-primary w-8 h-8" />
+                      </div>
+                      <Badge
+                        variant="outline"
+                        className="text-primary border-primary/20 bg-primary/5 uppercase tracking-widest font-black text-[10px] px-3 py-1"
+                      >
+                        Casos Legales
+                      </Badge>
+                    </div>
+                    <h2 className="text-3xl md:text-5xl font-black text-foreground tracking-tight">
+                      Procesos en Trámite
+                    </h2>
+                    <p className="text-muted-foreground mt-4 text-lg max-w-2xl font-medium leading-relaxed">
+                      Administra los documentos y el progreso de los procesos jurídicos que han sido
+                      formalizados.
+                    </p>
+                  </div>
+                </div>
+                <CasesList />
+              </div>
+            </section>
+          </TabsContent>
+        </Tabs>
 
         {/* Showcase Management Card */}
         <section className="floating-card bg-card/40 backdrop-blur-md border border-white/10 p-10 shadow-3xl overflow-hidden relative group">

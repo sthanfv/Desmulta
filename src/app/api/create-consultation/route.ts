@@ -41,7 +41,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { cedula, nombre, contacto, aceptoTerminos, authorUid } = validation.data;
+    const { cedula, placa, nombre, contacto, aceptoTerminos, authorUid } = validation.data;
 
     if (!authorUid) {
       return NextResponse.json({ error: 'Falta el UID del autor.' }, { status: 400 });
@@ -66,6 +66,7 @@ export async function POST(request: Request) {
     const dataToSave = {
       authorUid,
       cedula,
+      placa,
       nombre,
       contacto,
       aceptoTerminos,

@@ -47,6 +47,7 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
     resolver: zodResolver(ConsultationSchema),
     defaultValues: {
       cedula: '',
+      placa: '',
       nombre: '',
       contacto: '',
       aceptoTerminos: false,
@@ -71,8 +72,11 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
     }
 
     const subscription = form.watch((value) => {
-      const { cedula, nombre, contacto } = value;
-      localStorage.setItem('consultation_draft', JSON.stringify({ cedula, nombre, contacto }));
+      const { cedula, placa, nombre, contacto } = value;
+      localStorage.setItem(
+        'consultation_draft',
+        JSON.stringify({ cedula, placa, nombre, contacto })
+      );
     });
     return () => subscription.unsubscribe();
   }, [form, toast]);
@@ -86,6 +90,13 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
 
   const formatCedula = (value: string) => {
     return value.replace(/\D/g, '').slice(0, 12);
+  };
+
+  const formatPlaca = (value: string) => {
+    return value
+      .replace(/[^a-zA-Z0-9]/g, '')
+      .toUpperCase()
+      .slice(0, 6);
   };
 
   const { isSubmitting } = form.formState;
@@ -215,22 +226,25 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
                         field.onChange(formatted);
                       }}
                       className={cn(
-                        "w-full bg-background border-border/50 rounded-2xl pl-12 pr-12 h-16 text-lg font-medium focus:ring-primary/20 focus:border-primary transition-all shadow-Inner",
-                        field.value.length >= 6 && "border-green-500/30 bg-green-500/[0.02]"
+                        'w-full bg-background border-border/50 rounded-2xl pl-12 pr-12 h-16 text-lg font-medium focus:ring-primary/20 focus:border-primary transition-all shadow-Inner',
+                        field.value.length >= 6 && 'border-green-500/30 bg-green-500/[0.02]'
                       )}
                     />
                   </FormControl>
                   <Search
                     className={cn(
-                      "absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground transition-all duration-300",
-                      "group-focus-within:text-primary group-focus-within:scale-110",
-                      field.value.length >= 6 && "text-green-500"
+                      'absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground transition-all duration-300',
+                      'group-focus-within:text-primary group-focus-within:scale-110',
+                      field.value.length >= 6 && 'text-green-500'
                     )}
                     size={20}
                   />
                   <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
                     {field.value.length >= 6 && (
-                      <CheckCircle2 size={18} className="text-green-500 animate-in zoom-in duration-300" />
+                      <CheckCircle2
+                        size={18}
+                        className="text-green-500 animate-in zoom-in duration-300"
+                      />
                     )}
                     <button
                       type="button"
@@ -242,6 +256,41 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
                     </button>
                   </div>
                 </div>
+                <FormMessage className="pl-1" />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="placa"
+            render={({ field }) => (
+              <FormItem className="space-y-2">
+                <FormLabel className="text-sm font-black text-foreground/70 uppercase tracking-widest pl-1">
+                  Placa del Vehículo
+                </FormLabel>
+                <FormControl>
+                  <div className="relative group">
+                    <Input
+                      placeholder="Ej: AAA123 o AAA12A"
+                      {...field}
+                      onChange={(e) => {
+                        const formatted = formatPlaca(e.target.value);
+                        field.onChange(formatted);
+                      }}
+                      className={cn(
+                        'w-full bg-background border-border/50 rounded-2xl px-6 h-16 text-lg font-black tracking-[0.2em] focus:ring-primary/20 focus:border-primary transition-all shadow-Inner uppercase',
+                        field.value.length === 6 && 'border-green-500/30 bg-green-500/[0.02]'
+                      )}
+                    />
+                    {field.value.length === 6 && (
+                      <CheckCircle2
+                        size={18}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-green-500 animate-in zoom-in duration-300"
+                      />
+                    )}
+                  </div>
+                </FormControl>
                 <FormMessage className="pl-1" />
               </FormItem>
             )}
@@ -261,12 +310,15 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
                       placeholder="Como aparece en el documento"
                       {...field}
                       className={cn(
-                        "w-full bg-background border-border/50 rounded-2xl px-6 h-16 text-lg font-medium focus:ring-primary/20 focus:border-primary transition-all shadow-Inner",
-                        field.value.length >= 3 && "border-green-500/30 bg-green-500/[0.02]"
+                        'w-full bg-background border-border/50 rounded-2xl px-6 h-16 text-lg font-medium focus:ring-primary/20 focus:border-primary transition-all shadow-Inner',
+                        field.value.length >= 3 && 'border-green-500/30 bg-green-500/[0.02]'
                       )}
                     />
                     {field.value.length >= 3 && (
-                      <CheckCircle2 size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-green-500 animate-in zoom-in duration-300" />
+                      <CheckCircle2
+                        size={18}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-green-500 animate-in zoom-in duration-300"
+                      />
                     )}
                   </div>
                 </FormControl>
@@ -294,21 +346,25 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
                         field.onChange(formatted);
                       }}
                       className={cn(
-                        "w-full bg-background border-border/50 rounded-2xl pl-12 h-16 text-lg font-medium focus:ring-primary/20 focus:border-primary transition-all shadow-Inner",
-                        field.value.replace(/\s/g, '').length >= 10 && "border-green-500/30 bg-green-500/[0.02]"
+                        'w-full bg-background border-border/50 rounded-2xl pl-12 h-16 text-lg font-medium focus:ring-primary/20 focus:border-primary transition-all shadow-Inner',
+                        field.value.replace(/\s/g, '').length >= 10 &&
+                          'border-green-500/30 bg-green-500/[0.02]'
                       )}
                     />
                   </FormControl>
                   <MessageCircle
                     className={cn(
-                      "absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground transition-all duration-300",
-                      "group-focus-within:text-primary group-focus-within:scale-110",
-                      field.value.replace(/\s/g, '').length >= 10 && "text-green-500"
+                      'absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground transition-all duration-300',
+                      'group-focus-within:text-primary group-focus-within:scale-110',
+                      field.value.replace(/\s/g, '').length >= 10 && 'text-green-500'
                     )}
                     size={20}
                   />
                   {field.value.replace(/\s/g, '').length >= 10 && (
-                    <CheckCircle2 size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-green-500 animate-in zoom-in duration-300" />
+                    <CheckCircle2
+                      size={18}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-green-500 animate-in zoom-in duration-300"
+                    />
                   )}
                 </div>
                 <FormMessage className="pl-1" />

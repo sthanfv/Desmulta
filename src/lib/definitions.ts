@@ -6,6 +6,13 @@ export const ConsultationSchema = z.object({
     .min(5, { message: 'La cédula debe tener al menos 5 caracteres.' })
     .max(20, { message: 'La cédula no puede tener más de 20 caracteres.' })
     .regex(/^[0-9]+$/, { message: 'La cédula solo debe contener números.' }),
+  placa: z
+    .string()
+    .trim()
+    .toUpperCase()
+    .regex(/^[A-Z]{3}[0-9]{2}[0-9A-Z]$/, {
+      message: 'Placa inválida (Formato: AAA123 o AAA12A).',
+    }),
   nombre: z
     .string()
     .trim()
@@ -33,6 +40,7 @@ export type ConsultationFormState = {
     cedula?: string[];
     nombre?: string[];
     contacto?: string[];
+    placa?: string[];
     aceptoTerminos?: string[];
     website?: string[];
   };
@@ -42,21 +50,28 @@ export type ConsultationFormState = {
 export interface Consultation {
   id: string;
   cedula: string;
+  placa: string;
   nombre: string;
   contacto: string;
   aceptoTerminos: boolean;
   authorUid: string;
   status: 'pendiente' | 'contactado' | 'en_proceso' | 'terminado';
   fuente: 'web' | 'manual';
-  createdAt: any; // Firebase Timestamp
+  createdAt: string;
   telegramStatus: 'pending' | 'sent' | 'failed';
-  notifiedAt?: any;
+  notifiedAt?: string;
 }
 
-export type CaseStatus = 'apertura' | 'documentacion' | 'tramite' | 'resolucion' | 'finalizado' | 'archivo';
+export type CaseStatus =
+  | 'apertura'
+  | 'documentacion'
+  | 'tramite'
+  | 'resolucion'
+  | 'finalizado'
+  | 'archivo';
 
 export interface CaseHistoryEvent {
-  date: any; // Firebase Timestamp or ISO string
+  date: string;
   description: string;
   type: 'status_change' | 'note' | 'document_added' | 'system';
 }
@@ -65,6 +80,7 @@ export interface Case {
   id: string;
   consultationId: string;
   cedula: string;
+  placa: string;
   nombre: string;
   contacto: string;
   status: CaseStatus;
@@ -72,8 +88,8 @@ export interface Case {
   documents: Array<{
     name: string;
     url: string;
-    uploadedAt: any;
+    uploadedAt: string;
   }>;
-  createdAt: any;
-  updatedAt: any;
+  createdAt: string;
+  updatedAt: string;
 }

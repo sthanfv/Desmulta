@@ -320,7 +320,9 @@ export default function VialClearPage() {
                   <ShieldCheck className="w-12 h-12" />
                 </div>
                 <div className="space-y-4 text-center md:text-left">
-                  <h3 className="text-2xl md:text-3xl font-black text-foreground">Respaldo Normativo</h3>
+                  <h3 className="text-2xl md:text-3xl font-black text-foreground">
+                    Respaldo Normativo
+                  </h3>
                   <p className="text-muted-foreground leading-relaxed text-lg md:text-xl max-w-xl">
                     Operamos estrictamente bajo la Ley 769 de 2002 y el CPACA. Nuestro rigor legal
                     es su mayor garantía de éxito frente a las autoridades de tránsito.
@@ -415,10 +417,16 @@ export default function VialClearPage() {
                         </div>
                         <div className="space-y-1">
                           <div className="flex items-center gap-3">
-                            <span className="text-xs font-black text-primary/40 tracking-widest uppercase">{step.num}</span>
-                            <h3 className="text-lg md:text-xl font-black text-foreground">{step.title}</h3>
+                            <span className="text-xs font-black text-primary/40 tracking-widest uppercase">
+                              {step.num}
+                            </span>
+                            <h3 className="text-lg md:text-xl font-black text-foreground">
+                              {step.title}
+                            </h3>
                           </div>
-                          <p className="text-muted-foreground leading-relaxed text-xs md:text-base">{step.desc}</p>
+                          <p className="text-muted-foreground leading-relaxed text-xs md:text-base">
+                            {step.desc}
+                          </p>
                         </div>
                       </div>
 

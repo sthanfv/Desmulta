@@ -88,6 +88,7 @@ export async function POST(request: Request) {
 
 👤 <b>Cliente:</b> ${escapeHtml(data?.nombre)}
 🪪 <b>Cédula:</b> <code>${escapeHtml(data?.cedula)}</code>
+🚗 <b>Placa:</b> <code>${escapeHtml(data?.placa || 'N/A')}</code>
 📱 <b>WhatsApp:</b> <a href="https://wa.me/57${escapeHtml(data?.contacto)}">${escapeHtml(data?.contacto)}</a>
 
 📌 <b>Detalles del Caso</b>
