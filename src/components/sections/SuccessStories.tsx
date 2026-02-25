@@ -68,6 +68,7 @@ export function SuccessStories() {
     const newStories = STORIES.map((story, index) => {
       // Usamos el número de semana para rotar el índice de la ciudad
       const cityIndex = (weekNumber + index) % CITIES.length;
+      // eslint-disable-next-line security/detect-object-injection -- cityIndex is calculated from internal constants and week number, not user input
       return { ...story, location: CITIES[cityIndex] };
     });
     setRotatedStories(newStories);

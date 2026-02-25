@@ -14,7 +14,7 @@ interface LogContext {
 class SecurityLogger {
   private static instance: SecurityLogger;
 
-  private constructor() {}
+  private constructor() { }
 
   public static getInstance(): SecurityLogger {
     if (!SecurityLogger.instance) {
@@ -44,8 +44,13 @@ class SecurityLogger {
     }
 
     if (data !== null && typeof data === 'object') {
-      const sanitized: Record<string, unknown> = {};
+      const sanitized = Object.create(null);
       for (const [key, value] of Object.entries(data as Record<string, unknown>)) {
+        // Guard against Prototype Pollution
+        if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+          continue;
+        }
+
         // Blacklist de llaves sensibles
         const sensitiveKeys = [
           'cedula',
@@ -56,9 +61,12 @@ class SecurityLogger {
           'password',
           'token',
         ];
+
         if (sensitiveKeys.includes(key.toLowerCase())) {
+          // eslint-disable-next-line security/detect-object-injection -- Key is validated against prototype pollution and sanitized object has no prototype
           sanitized[key] = this.obfuscate(value);
         } else {
+          // eslint-disable-next-line security/detect-object-injection -- Key is validated against prototype pollution and sanitized object has no prototype
           sanitized[key] = this.obfuscate(value);
         }
       }
