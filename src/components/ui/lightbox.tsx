@@ -24,6 +24,7 @@ export function Lightbox({ src, alt, className = '' }: LightboxProps) {
             src={src}
             alt={alt}
             fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover transition-transform duration-500 group-hover:scale-105"
           />
           {/* Overlay interactivo */}
@@ -44,7 +45,14 @@ export function Lightbox({ src, alt, className = '' }: LightboxProps) {
         </DialogPrimitive.Title>
 
         <div className="relative w-full h-[85vh] animate-in zoom-in-95 duration-300">
-          <Image src={src} alt={alt} fill className="object-contain drop-shadow-2xl" priority />
+          <Image
+            src={src}
+            alt={alt}
+            fill
+            sizes="95vw"
+            className="object-contain drop-shadow-2xl"
+            priority
+          />
         </div>
 
         <div className="flex justify-center mt-6">

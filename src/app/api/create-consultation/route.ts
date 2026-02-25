@@ -2,25 +2,24 @@ import { NextResponse } from 'next/server';
 import { getFirestore, Timestamp, FieldValue } from 'firebase-admin/firestore';
 import { getAdminApp } from '@/lib/firebase-admin';
 import { ConsultationSchema } from '@/lib/definitions';
+import { logger } from '@/lib/logger/security-logger';
+import { analyzeViabilityFlow } from '@/lib/genkit';
 
 // Inicializar Firebase Admin SDK via singleton seguro
 try {
   getAdminApp();
 } catch (error) {
   const message = error instanceof Error ? error.message : 'Error desconocido';
-  console.error('[firebase-admin] Error de inicialización:', message);
+  logger.error('[firebase-admin] Error de inicialización:', { error: message });
 }
 
 export async function POST(request: Request) {
-  // getAdminApp() garantiza que la app esté inicializada antes de usar servicios
   getAdminApp();
   const db = getFirestore();
 
   try {
     const rawBody = await request.text();
-
     if (!rawBody) {
-      console.error('[create-consultation] Cuerpo de la petición vacío.');
       return NextResponse.json({ error: 'Cuerpo de la petición vacío.' }, { status: 400 });
     }
 
@@ -28,11 +27,9 @@ export async function POST(request: Request) {
     try {
       body = JSON.parse(rawBody);
     } catch {
-      console.error('[create-consultation] Error al parsear JSON.');
       return NextResponse.json({ error: 'Formato JSON inválido.' }, { status: 400 });
     }
 
-    // 1. Validar input contra el schema Zod
     const validation = ConsultationSchema.safeParse(body);
     if (!validation.success) {
       return NextResponse.json(
@@ -41,7 +38,17 @@ export async function POST(request: Request) {
       );
     }
 
-    const { cedula, placa, nombre, contacto, aceptoTerminos, authorUid } = validation.data;
+    const {
+      cedula,
+      placa,
+      nombre,
+      contacto,
+      aceptoTerminos,
+      authorUid,
+      antiguedad,
+      tipoInfraccion,
+      estadoCoactivo,
+    } = validation.data;
 
     if (!authorUid) {
       return NextResponse.json({ error: 'Falta el UID del autor.' }, { status: 400 });
@@ -70,56 +77,63 @@ export async function POST(request: Request) {
       nombre,
       contacto,
       aceptoTerminos,
+      antiguedad,
+      tipoInfraccion,
+      estadoCoactivo,
       status: 'pendiente' as const,
       fuente: 'web' as const,
       createdAt: FieldValue.serverTimestamp(),
-      // Escritura optimista: asumimos entrega exitosa.
-      // Solo se cambia a 'failed' si Telegram falla (2da escritura solo en error)
       telegramStatus: 'pending' as const,
     };
 
     // 4. Transacción atómica: escribir consulta + actualizar cooldown
     const consultationRef = db.collection('consultations').doc();
-
     await db.runTransaction(async (transaction) => {
       transaction.set(consultationRef, dataToSave);
       transaction.set(cooldownRef, { lastAttemptAt: FieldValue.serverTimestamp() });
     });
 
-    // 5. Disparar notificación (fire-and-forget)
-    // ✅ SSRF FIX: URL construida desde variable de entorno, NUNCA del header Host del request.
-    // Un atacante podría manipular el header Host para redirigir el fetch a un servidor malicioso.
-    // Usamos NEXT_PUBLIC_SITE_URL configurada en el entorno de servidor.
+    // 5. Notificación Telegram (Async)
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL;
     const isDev = process.env.NODE_ENV === 'development';
 
     if (baseUrl || isDev) {
-      const finalBase = baseUrl || 'http://localhost:9005';
-      const notifyUrl = `${finalBase}/api/notify`;
-      const internalSecret = process.env.INTERNAL_API_SECRET || '';
+      const requestUrl = new URL(request.url);
+      const host = isDev ? requestUrl.host : baseUrl ? new URL(baseUrl).host : requestUrl.host;
+      const protocol = isDev ? requestUrl.protocol : baseUrl ? new URL(baseUrl).protocol : 'https:';
+      const notifyUrl = `${protocol}//${host}/api/notify`;
 
       fetch(notifyUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // Secreto interno: /api/notify rechazará llamados sin este header
-          'x-internal-secret': internalSecret,
+          'x-internal-secret': process.env.INTERNAL_API_SECRET || '',
         },
         body: JSON.stringify({ docId: consultationRef.id }),
-      }).catch((err: unknown) => {
-        const msg = err instanceof Error ? err.message : 'Error desconocido';
-        console.error('[create-consultation] Error disparando notify:', msg);
+      }).catch((err) => {
+        logger.error('[create-consultation] Error en notificación:', { error: String(err) });
       });
-    } else {
-      console.error(
-        '[create-consultation] NEXT_PUBLIC_SITE_URL no está configurado. Notificación omitida.'
-      );
     }
+
+    // 6. Análisis IA Predictiva (Async / Non-blocking) - MANDATO-FILTRO v5.0
+    (async () => {
+      try {
+        const aiAnalysis = await analyzeViabilityFlow({
+          antiquity: antiguedad,
+          type: tipoInfraccion,
+          coactive: estadoCoactivo,
+        });
+        await consultationRef.update({ aiAnalysis });
+        logger.info('[create-consultation] Análisis IA guardado.', { docId: consultationRef.id });
+      } catch (aiError) {
+        logger.error('[create-consultation] Fallo en IA:', { error: String(aiError) });
+      }
+    })();
 
     return NextResponse.json({ success: true, docId: consultationRef.id }, { status: 201 });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Error desconocido';
-    console.error('[create-consultation] Error interno:', message);
+    logger.error('[create-consultation] Error crítico:', { error: message });
     return NextResponse.json({ error: 'Error interno del servidor.' }, { status: 500 });
   }
 }

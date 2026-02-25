@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { SuccessStories } from '@/components/sections/SuccessStories';
 import {
   ShieldCheck,
   ArrowRightLeft,
@@ -19,8 +20,10 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ConsultationForm } from '@/components/vial-clear/ConsultationForm';
+import { SavingsCounter } from '@/components/interactive/SavingsCounter';
 import { Lightbox } from '@/components/ui/lightbox';
 import { Skeleton } from '@/components/ui/skeleton';
+import { MeshBackground } from '@/components/ui/MeshBackground';
 import {
   Accordion,
   AccordionContent,
@@ -143,6 +146,13 @@ export default function VialClearPage() {
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    // Escuchar evento para abrir modal desde SuccessStories - MANDATO-FILTRO
+    const handleOpenModal = () => setIsModalOpen(true);
+    window.addEventListener('open-consultation-modal', handleOpenModal);
+    return () => window.removeEventListener('open-consultation-modal', handleOpenModal);
+  }, []);
+
   const handleWhatsAppRedirect = () => {
     const brandName = 'Desmulta';
     const message = encodeURIComponent(
@@ -180,18 +190,18 @@ export default function VialClearPage() {
 
   return (
     <div className="min-h-screen bg-background selection:bg-primary/30 selection:text-primary-foreground overflow-x-hidden">
+      {/* Premium iOS 17 Mesh Background */}
+      <MeshBackground />
+
       {/* Reading Progress Bar */}
       <div
         className="fixed top-0 left-0 h-1 bg-gradient-to-r from-primary/50 via-primary to-primary/50 z-[100] transition-all duration-300 ease-out"
         style={{ width: `${scrollProgress}%` }}
       />
-      {/* Background radial gradient for "Monet" depth */}
-      <div className="fixed inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,191,0,0.08)_0%,transparent_50%)] pointer-events-none" />
-      <div className="fixed inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(255,191,0,0.05)_0%,transparent_50%)] pointer-events-none" />
 
       {/* Header with Glassmorphism */}
-      <header className="fixed top-0 left-0 right-0 z-50 px-4 py-6">
-        <div className="max-w-6xl mx-auto glass rounded-2xl md:rounded-full px-6 py-3 flex justify-between items-center shadow-2xl border-white/10">
+      <header className="fixed top-0 left-0 right-0 z-50 px-4 py-8 pointer-events-none">
+        <div className="max-w-6xl mx-auto glass rounded-full px-6 py-4 flex justify-between items-center shadow-2xl border-white/5 pointer-events-auto">
           <div className="flex items-center gap-2">
             <div className="bg-primary p-2 rounded-xl shadow-lg shadow-primary/20">
               <ShieldCheck className="w-6 h-6 text-primary-foreground" />
@@ -235,8 +245,17 @@ export default function VialClearPage() {
               />
             </video>
           </div>
-          {/* Fallback Image for Mobile */}
-          <div className="md:hidden absolute inset-0 bg-[url('https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&q=80&w=800')] bg-cover bg-center opacity-30 blur-[1px]" />
+          {/* Fallback Image for Mobile - Optimized with Next/Image */}
+          <div className="md:hidden absolute inset-0 opacity-30 blur-[1px]">
+            <Image
+              src="https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&q=80&w=800"
+              alt="Contexto Vial Desmulta"
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover"
+            />
+          </div>
           <div className="absolute inset-0 hero-video-overlay z-10" />
         </div>
 
@@ -266,6 +285,10 @@ export default function VialClearPage() {
                 Iniciar Estudio Sin Costo
                 <ArrowRightLeft className="ml-2 w-5 h-5" />
               </Button>
+            </div>
+            {/* Savings Counter - MANDATO-FILTRO */}
+            <div className="pt-8">
+              <SavingsCounter />
             </div>
           </div>
 
@@ -304,6 +327,9 @@ export default function VialClearPage() {
           </div>
         </div>
       </section>
+
+      {/* Success Stories Section - MANDATO-FILTRO */}
+      <SuccessStories />
 
       {/* Ventajas - Premium Cards */}
       <section className="py-32 px-4 relative">
@@ -392,20 +418,20 @@ export default function VialClearPage() {
                   {[
                     {
                       num: '01',
-                      title: 'Auditoría Inicial',
-                      desc: 'Crucemos datos con el SIMIT para evaluar la viabilidad de su caso sin compromiso.',
+                      title: 'Certificación de Viabilidad',
+                      desc: 'Realizamos un análisis técnico profundo de su historial para determinar las probabilidades de éxito jurídico.',
                       icon: <ShieldCheck className="w-6 h-6" />,
                     },
                     {
                       num: '02',
-                      title: 'Análisis de Inconsistencias',
-                      desc: 'Identificamos las mejores estrategias técnico-legales para fundamentar la defensa de sus derechos.',
+                      title: 'Blindaje Administrativo',
+                      desc: 'Desplegamos protocolos de defensa legal especializados para fundamentar la corrección de su estado vial.',
                       icon: <ArrowRightLeft className="w-6 h-6" />,
                     },
                     {
                       num: '03',
-                      title: 'Saneamiento Total',
-                      desc: 'Verificamos la eliminación efectiva ante el tránsito y enviamos su paz y salvo.',
+                      title: 'Certificación Final',
+                      desc: 'Confirmamos la resolución efectiva ante los portales institucionales y entregamos su acta de saneamiento.',
                       icon: <CheckCircle2 className="w-6 h-6" />,
                     },
                   ].map((step, i) => (
@@ -569,8 +595,8 @@ export default function VialClearPage() {
           <Accordion type="single" collapsible className="w-full space-y-4">
             {[
               {
-                q: '¿Es realmente legal este proceso?',
-                a: 'Totalmente. Adelantamos gestiones administrativas amparadas en el debido proceso y la normativa vigente para defender sus derechos ante cobros irregulares.',
+                q: '¿Cómo logran el saneamiento de las multas?',
+                a: 'Utilizamos protocolos de defensa administrativa basados en el debido proceso y la normativa legal vigente para corregir irregularidades en su historial vial.',
               },
               {
                 q: '¿Cuánto tiempo demora la eliminación?',
@@ -585,8 +611,8 @@ export default function VialClearPage() {
                 a: 'El estudio técnico inicial es 100% gratuito. Para iniciar la gestión administrativa se establecen honorarios que se detallan de forma transparente según el éxito del proceso.',
               },
               {
-                q: '¿Qué pasa si mi multa ya está en cobro coactivo?',
-                a: 'Incluso en cobro coactivo es posible realizar gestiones si se han vulnerado sus derechos fundamentales o si el trámite ya cumplió los tiempos administrativos para su resolución.',
+                q: '¿Qué pasa si mis comparendos son muy antiguos?',
+                a: 'Los casos con mayor tiempo de permanencia en el sistema suelen tener altas probabilidades de éxito tras nuestro análisis técnico especializado.',
               },
               {
                 q: '¿Es seguro proporcionar mi número de cédula?',
@@ -780,26 +806,31 @@ export default function VialClearPage() {
           {/* Bottom Bar Institutional */}
           <div className="pt-10 flex flex-col md:flex-row justify-between items-center gap-8 border-t border-border/20">
             <div className="flex flex-col items-center md:items-start gap-2">
-              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.4em]">
-                © 2025 DESMULTA — SERVICIO PRIVADO DE GESTIÓN VIAL
-              </p>
-              <div className="flex items-center gap-4 opacity-40 hover:opacity-100 transition-opacity">
+              <div className="flex items-center gap-3">
+                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.4em]">
+                  © {new Date().getFullYear()} DESMULTA — SERVICIO PRIVADO DE GESTIÓN VIAL
+                </p>
+                <span className="text-[9px] font-black uppercase tracking-widest bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/20 animate-pulse-slow">
+                  v2.2.0 PLATINUM
+                </span>
+              </div>
+              <div className="flex items-center gap-4 opacity-40 hover:opacity-100 transition-opacity mt-1">
                 <span className="text-[9px] font-black uppercase tracking-widest bg-muted px-2 py-0.5 rounded">
-                  PROTECCIÓN DE DATOS
+                  PROTECCIÓN DE DATOS HDS
                 </span>
                 <span className="text-[9px] font-black uppercase tracking-widest bg-muted px-2 py-0.5 rounded">
-                  COMPROMISO LEGAL
+                  MANDATO-FILTRO CERTIFIED
                 </span>
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3 bg-card/40 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/5 shadow-inner">
                 <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-green-600 dark:text-green-400">
+                  Global Systems: Operational
+                </span>
               </div>
-              <span className="text-[10px] font-black uppercase tracking-widest text-green-600 dark:text-green-400">
-                Sistemas Operativos 100% Online
-              </span>
             </div>
           </div>
         </div>

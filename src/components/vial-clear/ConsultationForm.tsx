@@ -26,6 +26,8 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
 import { cn } from '@/lib/utils';
+import { Progress } from '../ui/progress';
+import { haptics } from '@/lib/utils/haptics';
 
 type ConsultationFormData = Zod.infer<typeof ConsultationSchema>;
 
@@ -34,6 +36,7 @@ interface ConsultationFormProps {
 }
 
 export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
+  const [step, setStep] = useState(1);
   const [isSuccess, setIsSuccess] = useState(false);
   const [showCedula, setShowCedula] = useState(false);
   const [isHuman, setIsHuman] = useState(false);
@@ -52,6 +55,9 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
       contacto: '',
       aceptoTerminos: false,
       website: '', // Honeypot field
+      antiguedad: '',
+      tipoInfraccion: '',
+      estadoCoactivo: '',
     },
   });
 
@@ -62,24 +68,31 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
       try {
         const parsed = JSON.parse(savedData);
         form.reset({ ...form.getValues(), ...parsed, aceptoTerminos: false });
-        toast({
-          title: 'Borrador recuperado',
-          description: 'Hemos restaurado los datos que empezaste a completar.',
-        });
       } catch (e) {
-        console.error('Error al recuperar borrador', e);
+        // En producción no queremos ruido, pero fallamos silenciosamente
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Error al recuperar borrador', e);
+        }
       }
     }
 
     const subscription = form.watch((value) => {
-      const { cedula, placa, nombre, contacto } = value;
+      const { cedula, placa, nombre, contacto, antiguedad, tipoInfraccion, estadoCoactivo } = value;
       localStorage.setItem(
         'consultation_draft',
-        JSON.stringify({ cedula, placa: placa || '', nombre, contacto })
+        JSON.stringify({
+          cedula,
+          placa: placa || '',
+          nombre,
+          contacto,
+          antiguedad,
+          tipoInfraccion,
+          estadoCoactivo,
+        })
       );
     });
     return () => subscription.unsubscribe();
-  }, [form, toast]);
+  }, [form]);
 
   const formatPhone = (value: string) => {
     const numbers = value.replace(/\D/g, '');
@@ -100,6 +113,22 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
   };
 
   const { isSubmitting } = form.formState;
+
+  const handleNextStep = async () => {
+    const fieldsToValidate = ['antiguedad', 'tipoInfraccion', 'estadoCoactivo'] as const;
+    const isValid = await form.trigger(fieldsToValidate);
+
+    if (isValid) {
+      haptics.vibrate('medium');
+      setStep(2);
+    } else {
+      toast({
+        variant: 'destructive',
+        title: 'Complete el análisis',
+        description: 'Por favor, responda las 3 preguntas de viabilidad inicial.',
+      });
+    }
+  };
 
   const onSubmit: SubmitHandler<ConsultationFormData> = async (data) => {
     try {
@@ -131,9 +160,7 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
       try {
         result = JSON.parse(responseText);
       } catch {
-        throw new Error(
-          `El servidor devolvió una respuesta inesperada. Status: ${response.status}. Respuesta: ${responseText.slice(0, 200)}...`
-        );
+        throw new Error(`Status: ${response.status}. Error interno de red.`);
       }
 
       if (!response.ok) {
@@ -141,19 +168,19 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
       }
 
       toast({
-        title: '¡Solicitud Recibida!',
+        title: '¡Análisis Iniciado!',
         description:
-          'Su consulta ha sido registrada. Un asesor jurídico revisará su caso y le contactará vía WhatsApp dentro de nuestros horarios laborales habituales.',
+          'Tu caso ha pasado el filtro inicial. Un asesor jurídico revisará tu historial completo y te contactará vía WhatsApp.',
       });
+      haptics.vibrate('success');
       setIsSuccess(true);
       localStorage.removeItem('consultation_draft');
       setTimeout(onSuccess, 4000);
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : 'Por favor, intente de nuevo más tarde.';
-      console.warn('Alerta al enviar la consulta:', e);
       toast({
         variant: 'destructive',
-        title: 'No se pudo enviar la solicitud',
+        title: 'Error de envío',
         description: message,
       });
     }
@@ -161,24 +188,25 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
 
   if (isSuccess) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 text-center h-[400px] animate-in zoom-in-95 duration-500">
-        <div className="w-20 h-20 rounded-full bg-green-500/10 flex items-center justify-center text-green-500 mb-6 shadow-Inner">
-          <CheckCircle2 className="w-12 h-12" />
+      <div className="flex flex-col items-center justify-center p-8 text-center h-[500px] animate-in zoom-in-95 duration-500">
+        <div className="w-24 h-24 rounded-full bg-green-500/10 flex items-center justify-center text-green-500 mb-8 shadow-Inner border border-green-500/20">
+          <CheckCircle2 className="w-14 h-14" />
         </div>
-        <h3 className="text-xl md:text-2xl font-black mb-3 text-foreground tracking-tight">
-          Estudio en Proceso
+        <h3 className="text-2xl md:text-3xl font-black mb-4 text-foreground tracking-tight uppercase">
+          Certificación en Trámite
         </h3>
-        <p className="text-muted-foreground text-lg max-w-sm leading-relaxed">
-          Hemos recibido su información correctamente. Un asesor jurídico especializado revisará el
-          estado de su historial y le contactará a través de WhatsApp dentro de nuestros horarios
-          laborales.
+        <p className="text-muted-foreground text-lg max-w-sm leading-relaxed font-medium">
+          Hemos recibido su información y el análisis preliminar de viabilidad. Un asesor se
+          comunicará al WhatsApp{' '}
+          <span className="text-primary font-bold">{form.getValues('contacto')}</span> para
+          finalizar el proceso.
         </p>
         <Button
           onClick={onSuccess}
           variant="outline"
-          className="mt-8 rounded-2xl px-10 border-border hover:bg-muted font-bold active:scale-95 transition-all relative overflow-hidden animate-shimmer"
+          className="mt-10 rounded-2xl px-12 border-primary/20 hover:bg-primary/5 text-primary font-black active:scale-95 transition-all relative overflow-hidden h-14 uppercase tracking-widest"
         >
-          Entendido
+          Cerrar Notificación
         </Button>
       </div>
     );
@@ -193,259 +221,354 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
         onTouchStart={handleInteraction}
         className="space-y-8"
       >
+        <div className="px-1">
+          <Progress value={step === 1 ? 50 : 100} className="h-2 bg-muted/40" />
+        </div>
+
+        {/* Honeypot */}
         <FormField
           control={form.control}
           name="website"
           render={({ field }) => (
             <FormItem className="hidden" aria-hidden="true">
-              <FormLabel className="sr-only">Website (Honeypot)</FormLabel>
               <FormControl>
                 <Input {...field} autoComplete="off" tabIndex={-1} aria-hidden="true" />
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
 
-        <div className="space-y-6">
-          <FormField
-            control={form.control}
-            name="cedula"
-            render={({ field }) => (
-              <FormItem className="space-y-2">
-                <FormLabel className="text-sm font-black text-foreground/70 uppercase tracking-widest pl-1">
-                  Cédula del Propietario
-                </FormLabel>
-                <div className="relative group">
-                  <FormControl>
-                    <Input
-                      type={showCedula ? 'text' : 'password'}
-                      placeholder="Identificación sin puntos ni comas"
-                      {...field}
-                      onChange={(e) => {
-                        const formatted = formatCedula(e.target.value);
-                        field.onChange(formatted);
-                      }}
-                      className={cn(
-                        'w-full bg-background border-border/50 rounded-2xl pl-12 pr-12 h-16 text-lg font-medium focus:ring-primary/20 focus:border-primary transition-all shadow-Inner',
-                        field.value.length >= 6 && 'border-green-500/30 bg-green-500/[0.02]'
-                      )}
-                    />
-                  </FormControl>
-                  <Search
-                    className={cn(
-                      'absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground transition-all duration-300',
-                      'group-focus-within:text-primary group-focus-within:scale-110',
-                      field.value.length >= 6 && 'text-green-500'
-                    )}
-                    size={20}
-                  />
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                    {field.value.length >= 6 && (
-                      <CheckCircle2
-                        size={18}
-                        className="text-green-500 animate-in zoom-in duration-300"
-                      />
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => setShowCedula(!showCedula)}
-                      className="text-muted-foreground hover:text-foreground transition-colors p-1"
-                      aria-label={showCedula ? 'Ocultar cédula' : 'Mostrar cédula'}
-                    >
-                      {showCedula ? <EyeOff size={20} /> : <Eye size={20} />}
-                    </button>
-                  </div>
-                </div>
-                <FormMessage className="pl-1" />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="placa"
-            render={({ field }) => (
-              <FormItem className="space-y-2">
-                <FormLabel className="text-sm font-black text-foreground/70 uppercase tracking-widest pl-1">
-                  Placa del Vehículo{' '}
-                  <span className="text-xs font-medium lowercase opacity-50">(Opcional)</span>
-                </FormLabel>
-                <FormControl>
-                  <div className="relative group">
-                    <Input
-                      placeholder="Ej: AAA123 o AAA12A"
-                      {...field}
-                      onChange={(e) => {
-                        const formatted = formatPlaca(e.target.value);
-                        field.onChange(formatted);
-                      }}
-                      className={cn(
-                        'w-full bg-background border-border/50 rounded-2xl px-6 h-16 text-lg font-black tracking-[0.2em] focus:ring-primary/20 focus:border-primary transition-all shadow-Inner uppercase',
-                        field.value &&
-                          field.value.length === 6 &&
-                          'border-green-500/30 bg-green-500/[0.02]'
-                      )}
-                    />
-                    {field.value && field.value.length === 6 && (
-                      <CheckCircle2
-                        size={18}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-green-500 animate-in zoom-in duration-300"
-                      />
-                    )}
-                  </div>
-                </FormControl>
-                <FormMessage className="pl-1" />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="nombre"
-            render={({ field }) => (
-              <FormItem className="space-y-2">
-                <FormLabel className="text-sm font-black text-foreground/70 uppercase tracking-widest pl-1">
-                  Nombre Completo
-                </FormLabel>
-                <FormControl>
-                  <div className="relative group">
-                    <Input
-                      placeholder="Como aparece en el documento"
-                      {...field}
-                      className={cn(
-                        'w-full bg-background border-border/50 rounded-2xl px-6 h-16 text-lg font-medium focus:ring-primary/20 focus:border-primary transition-all shadow-Inner',
-                        field.value.length >= 3 && 'border-green-500/30 bg-green-500/[0.02]'
-                      )}
-                    />
-                    {field.value.length >= 3 && (
-                      <CheckCircle2
-                        size={18}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-green-500 animate-in zoom-in duration-300"
-                      />
-                    )}
-                  </div>
-                </FormControl>
-                <FormMessage className="pl-1" />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="contacto"
-            render={({ field }) => (
-              <FormItem className="space-y-2">
-                <FormLabel className="text-sm font-black text-foreground/70 uppercase tracking-widest pl-1">
-                  WhatsApp de Contacto
-                </FormLabel>
-                <div className="relative group">
-                  <FormControl>
-                    <Input
-                      type="tel"
-                      placeholder="Ej: 300 123 4567"
-                      {...field}
-                      onChange={(e) => {
-                        const formatted = formatPhone(e.target.value);
-                        field.onChange(formatted);
-                      }}
-                      className={cn(
-                        'w-full bg-background border-border/50 rounded-2xl pl-12 h-16 text-lg font-medium focus:ring-primary/20 focus:border-primary transition-all shadow-Inner',
-                        field.value.replace(/\s/g, '').length >= 10 &&
-                          'border-green-500/30 bg-green-500/[0.02]'
-                      )}
-                    />
-                  </FormControl>
-                  <MessageCircle
-                    className={cn(
-                      'absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground transition-all duration-300',
-                      'group-focus-within:text-primary group-focus-within:scale-110',
-                      field.value.replace(/\s/g, '').length >= 10 && 'text-green-500'
-                    )}
-                    size={20}
-                  />
-                  {field.value.replace(/\s/g, '').length >= 10 && (
-                    <CheckCircle2
-                      size={18}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-green-500 animate-in zoom-in duration-300"
-                    />
-                  )}
-                </div>
-                <FormMessage className="pl-1" />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <FormField
-          control={form.control}
-          name="aceptoTerminos"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-3xl p-4 bg-muted/30 border border-border/50">
-              <FormControl>
-                <Checkbox
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                  className="mt-1 border-primary/50 w-5 h-5 rounded-md data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
-                />
-              </FormControl>
-              <div className="space-y-2 leading-tight">
-                <FormLabel className="text-sm font-bold text-foreground">
-                  Acepto el tratamiento de mis datos personales.
-                </FormLabel>
-                <p className="text-xs text-muted-foreground">
-                  Autorizo a Desmulta a consultar mi estado en el SIMIT para fines de asesoría
-                  técnica.{' '}
-                  <Link
-                    href="/terminos"
-                    target="_blank"
-                    className="underline text-primary hover:text-primary/80 font-bold transition-all"
-                  >
-                    Ver Términos
-                  </Link>
-                </p>
-                <FormMessage />
+        {step === 1 && (
+          <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-500">
+            <div className="space-y-4">
+              <div className="inline-flex px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-[10px] font-black uppercase tracking-widest text-primary">
+                Paso 1: Análisis de Viabilidad
               </div>
-            </FormItem>
-          )}
-        />
+              <h3 className="text-2xl font-black text-foreground tracking-tighter uppercase leading-none">
+                Califica tu caso <br />
+                <span className="text-primary">en 30 segundos</span>
+              </h3>
+            </div>
 
-        <div className="pt-4">
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full bg-primary text-primary-foreground font-black py-6 md:py-8 rounded-3xl hover:bg-primary/95 transition-all flex items-center justify-center gap-3 h-16 md:h-20 text-lg md:text-xl shadow-xl shadow-primary/20 active:scale-95 border-none relative overflow-hidden group animate-shimmer"
-            aria-disabled={isSubmitting}
-          >
-            {/* Optimized for 60fps via CSS animate-shimmer class */}
-            {isSubmitting ? (
-              <>
-                <Loader2 className="mr-3 h-6 w-6 animate-spin" />
-                ENVIANDO...
-              </>
-            ) : (
-              <>
-                ESTUDIO GRATUITO
-                <ChevronRight
-                  size={22}
-                  className="group-hover:translate-x-1 transition-transform"
+            <div className="space-y-8">
+              {/* Pregunta 1: Antigüedad */}
+              <FormField
+                control={form.control}
+                name="antiguedad"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel className="text-xs font-black uppercase tracking-widest text-muted-foreground pl-1">
+                      1. ¿Hace cuánto tiempo fue la infracción?
+                    </FormLabel>
+                    <FormControl>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {[
+                          'Menos de 1 año',
+                          'Entre 1 y 3 años',
+                          'Más de 3 años',
+                          'No estoy seguro',
+                        ].map((option) => (
+                          <button
+                            key={option}
+                            type="button"
+                            onClick={() => {
+                              field.onChange(option);
+                              haptics.vibrate('light');
+                            }}
+                            className={cn(
+                              'flex items-center justify-center h-14 rounded-2xl border-2 transition-all font-bold text-sm',
+                              field.value === option
+                                ? 'border-primary bg-primary/5 text-primary shadow-lg shadow-primary/10'
+                                : 'border-border/40 hover:border-border text-muted-foreground'
+                            )}
+                          >
+                            {option}
+                          </button>
+                        ))}
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Pregunta 2: Tipo de Infracción */}
+              <FormField
+                control={form.control}
+                name="tipoInfraccion"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel className="text-xs font-black uppercase tracking-widest text-muted-foreground pl-1">
+                      2. Tipo de Captura
+                    </FormLabel>
+                    <FormControl>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {['Foto-Multa (Cámara)', 'Comparendo Físico (Agente)', 'Ambas', 'Otro'].map(
+                          (option) => (
+                            <button
+                              key={option}
+                              type="button"
+                              onClick={() => {
+                                field.onChange(option);
+                                haptics.vibrate('light');
+                              }}
+                              className={cn(
+                                'flex items-center justify-center h-14 rounded-2xl border-2 transition-all font-bold text-sm',
+                                field.value === option
+                                  ? 'border-primary bg-primary/5 text-primary shadow-lg shadow-primary/10'
+                                  : 'border-border/40 hover:border-border text-muted-foreground'
+                              )}
+                            >
+                              {option}
+                            </button>
+                          )
+                        )}
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Pregunta 3: Coactivo */}
+              <FormField
+                control={form.control}
+                name="estadoCoactivo"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel className="text-xs font-black uppercase tracking-widest text-muted-foreground pl-1">
+                      3. ¿Tiene mandamiento de pago o embargo? (Cobro Coactivo)
+                    </FormLabel>
+                    <FormControl>
+                      <div className="grid grid-cols-3 gap-3">
+                        {['SÍ', 'NO', 'NO SÉ'].map((option) => (
+                          <button
+                            key={option}
+                            type="button"
+                            onClick={() => {
+                              field.onChange(option);
+                              haptics.vibrate('light');
+                            }}
+                            className={cn(
+                              'flex items-center justify-center h-14 rounded-2xl border-2 transition-all font-black text-sm',
+                              field.value === option
+                                ? 'border-primary bg-primary/5 text-primary shadow-lg shadow-primary/10'
+                                : 'border-border/40 hover:border-border text-muted-foreground'
+                            )}
+                          >
+                            {option}
+                          </button>
+                        ))}
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <Button
+              type="button"
+              onClick={handleNextStep}
+              className="w-full bg-primary text-primary-foreground font-black py-8 rounded-3xl hover:bg-primary/95 transition-all flex items-center justify-center gap-3 h-20 text-xl shadow-xl shadow-primary/20 active:scale-95 border-none relative overflow-hidden group animate-shimmer"
+            >
+              CONTINUAR ANÁLISIS
+              <ChevronRight size={24} className="group-hover:translate-x-1 transition-transform" />
+            </Button>
+          </div>
+        )}
+
+        {step === 2 && (
+          <div className="space-y-10 animate-in fade-in slide-in-from-left-4 duration-500">
+            <div className="space-y-4">
+              <button
+                type="button"
+                onClick={() => setStep(1)}
+                className="text-xs font-bold text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 uppercase tracking-tighter"
+              >
+                ← Regresar al Paso 1
+              </button>
+              <div className="inline-flex px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-[10px] font-black uppercase tracking-widest text-green-500">
+                Paso 2: Datos de Validación Jurídica
+              </div>
+              <h3 className="text-2xl font-black text-foreground tracking-tighter uppercase leading-none">
+                Donde enviamos <br />
+                <span className="text-primary">tu certificación?</span>
+              </h3>
+            </div>
+
+            <div className="space-y-6">
+              <FormField
+                control={form.control}
+                name="cedula"
+                render={({ field }) => (
+                  <FormItem className="space-y-2">
+                    <FormLabel className="text-[10px] font-black text-foreground/70 uppercase tracking-widest pl-1">
+                      Cédula del Propietario
+                    </FormLabel>
+                    <div className="relative group">
+                      <FormControl>
+                        <Input
+                          type={showCedula ? 'text' : 'password'}
+                          placeholder="Identificación sin puntos ni comas"
+                          {...field}
+                          onChange={(e) => field.onChange(formatCedula(e.target.value))}
+                          className={cn(
+                            'w-full bg-background border-border/50 rounded-2xl pl-12 pr-12 h-16 text-lg font-medium focus:ring-primary/20 focus:border-primary transition-all shadow-Inner',
+                            field.value.length >= 6 && 'border-green-500/30 bg-green-500/[0.02]'
+                          )}
+                        />
+                      </FormControl>
+                      <Search
+                        className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"
+                        size={20}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowCedula(!showCedula)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground"
+                      >
+                        {showCedula ? <EyeOff size={20} /> : <Eye size={20} />}
+                      </button>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="placa"
+                  render={({ field }) => (
+                    <FormItem className="space-y-2">
+                      <FormLabel className="text-[10px] font-black text-foreground/70 uppercase tracking-widest pl-1">
+                        Placa <span className="opacity-40">(Opcional)</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Ej: AAA123"
+                          {...field}
+                          onChange={(e) => field.onChange(formatPlaca(e.target.value))}
+                          className="w-full bg-background border-border/50 rounded-2xl px-6 h-16 text-lg font-black tracking-widest uppercase shadow-Inner"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </>
-            )}
-          </Button>
-          <div className="flex flex-col items-center gap-4 mt-8">
-            <div className="flex items-center gap-2 px-5 py-2 rounded-full bg-green-500/5 border border-green-500/20 shadow-sm animate-pulse-slow">
-              <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]" />
+
+                <FormField
+                  control={form.control}
+                  name="contacto"
+                  render={({ field }) => (
+                    <FormItem className="space-y-2">
+                      <FormLabel className="text-[10px] font-black text-foreground/70 uppercase tracking-widest pl-1">
+                        WhatsApp Celular
+                      </FormLabel>
+                      <div className="relative">
+                        <FormControl>
+                          <Input
+                            type="tel"
+                            placeholder="300 123 4567"
+                            {...field}
+                            onChange={(e) => field.onChange(formatPhone(e.target.value))}
+                            className="w-full bg-background border-border/50 rounded-2xl pl-12 h-16 text-lg font-medium shadow-Inner"
+                          />
+                        </FormControl>
+                        <MessageCircle
+                          className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"
+                          size={20}
+                        />
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="nombre"
+                render={({ field }) => (
+                  <FormItem className="space-y-2">
+                    <FormLabel className="text-[10px] font-black text-foreground/70 uppercase tracking-widest pl-1">
+                      Nombre Completo
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Como aparece en el documento"
+                        {...field}
+                        className="w-full bg-background border-border/50 rounded-2xl px-6 h-16 text-lg font-medium shadow-Inner"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <FormField
+              control={form.control}
+              name="aceptoTerminos"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-3xl p-5 bg-muted/30 border border-border/50">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      className="mt-1 border-primary/50 w-6 h-6 rounded-lg data-[state=checked]:bg-primary"
+                    />
+                  </FormControl>
+                  <div className="space-y-1">
+                    <FormLabel className="text-xs font-bold text-foreground">
+                      Acepto el tratamiento de mis datos personales.
+                    </FormLabel>
+                    <p className="text-[10px] text-muted-foreground leading-tight">
+                      Autorizo a Desmulta a consultar mi estado en el SIMIT para fines de asesoría
+                      técnica.{' '}
+                      <Link href="/terminos" target="_blank" className="underline text-primary">
+                        Ver Términos
+                      </Link>
+                    </p>
+                    <FormMessage />
+                  </div>
+                </FormItem>
+              )}
+            />
+
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full bg-primary text-primary-foreground font-black py-8 rounded-3xl hover:bg-primary/95 transition-all flex items-center justify-center gap-3 h-20 text-xl shadow-xl shadow-primary/20 active:scale-95 border-none animate-shimmer"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-3 h-6 w-6 animate-spin" />
+                  PROCESANDO...
+                </>
+              ) : (
+                'INICIAR ESTUDIO GRATUITO'
+              )}
+            </Button>
+          </div>
+        )}
+
+        {/* Footer info (only on Step 2) */}
+        {step === 2 && (
+          <div className="flex flex-col items-center gap-4 pt-4 border-t border-border/20">
+            <div className="flex items-center gap-2 px-5 py-2 rounded-full bg-green-500/5 border border-green-500/20 shadow-sm">
+              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
               <span className="text-[10px] font-black text-green-600 dark:text-green-400 uppercase tracking-widest">
                 Conexión Cifrada SSL Finalizada
               </span>
             </div>
-            <div className="flex items-center justify-center gap-2 text-[10px] text-muted-foreground uppercase tracking-[0.25em] font-black opacity-40 hover:opacity-100 transition-opacity">
+            <div className="flex items-center justify-center gap-2 text-[10px] text-muted-foreground uppercase tracking-[0.25em] font-black opacity-40">
               <ShieldCheck size={12} className="text-primary" />
               <span>Protección Técnica con Alta Calidad Jurídica</span>
             </div>
           </div>
-        </div>
+        )}
       </form>
     </Form>
   );

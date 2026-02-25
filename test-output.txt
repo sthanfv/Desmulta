@@ -1,0 +1,20 @@
+
+Running 1 test using 1 worker
+
+  Ô£ÿ  1 [chromium] ÔÇ║ src\tests\e2e\funnel-smoke.spec.ts:10:9 ÔÇ║ Embudo de Leads Desmulta ÔÇ║ debe permitir completar el flujo de consulta exitosamente (8ms)
+
+
+  1) [chromium] ÔÇ║ src\tests\e2e\funnel-smoke.spec.ts:10:9 ÔÇ║ Embudo de Leads Desmulta ÔÇ║ debe permitir completar el flujo de consulta exitosamente 
+
+    Error: browserType.launch: Executable doesn't exist at C:\Users\STHAN\AppData\Local\ms-playwright\chromium_headless_shell-1208\chrome-headless-shell-win64\chrome-headless-shell.exe
+    ÔòöÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòù
+    Ôòæ Looks like Playwright Test or Playwright was just installed or updated. Ôòæ
+    Ôòæ Please run the following command to download new browsers:              Ôòæ
+    Ôòæ                                                                         Ôòæ
+    Ôòæ     npx playwright install                                              Ôòæ
+    Ôòæ                                                                         Ôòæ
+    Ôòæ <3 Playwright Team                                                      Ôòæ
+    ÔòÜÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòØ
+
+  1 failed
+    [chromium] ÔÇ║ src\tests\e2e\funnel-smoke.spec.ts:10:9 ÔÇ║ Embudo de Leads Desmulta ÔÇ║ debe permitir completar el flujo de consulta exitosamente 

@@ -32,6 +32,10 @@ export const ConsultationSchema = z.object({
   }),
   website: z.string().max(0, { message: 'Bot detected' }).optional(), // Honeypot field
   authorUid: z.string().optional(),
+  // Campos de Pre-Viabilidad MANDATO-FILTRO
+  antiguedad: z.string().min(1, { message: 'Seleccione la antigüedad de la multa.' }),
+  tipoInfraccion: z.string().min(1, { message: 'Seleccione el tipo de infracción.' }),
+  estadoCoactivo: z.string().min(1, { message: 'Seleccione si el caso está en cobro coactivo.' }),
 });
 
 // This type is no longer used for the client-side form, but can be kept for reference
@@ -56,6 +60,9 @@ export interface Consultation {
   contacto: string;
   aceptoTerminos: boolean;
   authorUid: string;
+  antiguedad: string;
+  tipoInfraccion: string;
+  estadoCoactivo: string;
   status: 'pendiente' | 'contactado' | 'en_proceso' | 'terminado';
   fuente: 'web' | 'manual';
   createdAt: string;

@@ -27,36 +27,33 @@ export function CasesList() {
   const [lastDocId, setLastDocId] = useState<string | null | undefined>(undefined);
   const [hasMore, setHasMore] = useState(true);
 
-  const fetchCases = useCallback(
-    async (reset: boolean = false) => {
-      if (reset) {
-        setLoading(true);
-        setLastDocId(undefined);
-      } else {
-        setLoadingMore(true);
-      }
+  const fetchCases = useCallback(async (cursor?: string | null) => {
+    const isReset = cursor === undefined;
+    if (isReset) {
+      setLoading(true);
+    } else {
+      setLoadingMore(true);
+    }
 
-      const result = await getCases(20, reset ? undefined : lastDocId);
-      if (result.success && result.data) {
-        if (reset) {
-          setCases(result.data as Case[]);
-        } else {
-          setCases((prev) => [...prev, ...(result.data as Case[])]);
-        }
-        setLastDocId(result.lastDocId);
-        setHasMore(!!result.hasMore);
-        setError(null);
+    const result = await getCases(20, cursor);
+    if (result.success && result.data) {
+      if (isReset) {
+        setCases(result.data as Case[]);
       } else {
-        setError(result.error || 'Error al cargar casos');
+        setCases((prev) => [...prev, ...(result.data as Case[])]);
       }
-      setLoading(false);
-      setLoadingMore(false);
-    },
-    [lastDocId]
-  );
+      setLastDocId(result.lastDocId);
+      setHasMore(!!result.hasMore);
+      setError(null);
+    } else {
+      setError(result.error || 'Error al cargar casos');
+    }
+    setLoading(false);
+    setLoadingMore(false);
+  }, []);
 
   useEffect(() => {
-    fetchCases(true);
+    fetchCases();
   }, [fetchCases]);
 
   // Infinite Scroll Observer
@@ -66,7 +63,7 @@ export function CasesList() {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          fetchCases();
+          fetchCases(lastDocId);
         }
       },
       { threshold: 0.1 }
@@ -128,7 +125,7 @@ export function CasesList() {
         </div>
         <Button
           variant="outline"
-          onClick={() => fetchCases(true)}
+          onClick={() => fetchCases()}
           className="h-14 px-8 rounded-2xl border-white/10 hover:bg-white/5 font-bold gap-2"
         >
           <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
@@ -139,83 +136,85 @@ export function CasesList() {
       {error && cases.length === 0 && (
         <div className="text-center p-6 bg-destructive/5 rounded-xl border border-destructive/20">
           <p className="text-destructive font-bold">{error}</p>
-          <Button onClick={() => fetchCases(true)} variant="link" className="text-foreground">
+          <Button onClick={() => fetchCases()} variant="link" className="text-foreground">
             Reintentar
           </Button>
         </div>
       )}
 
-      <div className="grid gap-4">
-        {filteredCases.length === 0 && !loading ? (
-          <div className="text-center py-20 bg-white/5 rounded-[3rem] border border-dashed border-white/10">
-            <Gavel className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
-            <p className="text-muted-foreground text-lg">
-              No hay casos activos que coincidan con la búsqueda.
-            </p>
-          </div>
-        ) : (
-          <>
-            {filteredCases.map((c) => (
-              <Card
-                key={c.id}
-                className="group overflow-hidden bg-white/5 border-white/10 rounded-[2.5rem] transition-all hover:border-primary/30 hover:bg-white/[0.07] backdrop-blur-md virtual-item"
-              >
-                <CardContent className="p-6">
-                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                    <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-                        <FileText className="w-7 h-7" />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <h3 className="text-lg font-bold text-foreground">{c.nombre}</h3>
-                          <Badge
-                            variant="outline"
-                            className={`uppercase text-[10px] font-black ${getStatusColor(c.status)}`}
-                          >
-                            {c.status}
-                          </Badge>
+      <div className="bg-white/5 border border-white/10 rounded-[3rem] overflow-hidden backdrop-blur-xl shadow-2xl">
+        <div className="max-h-[800px] overflow-y-auto custom-scrollbar p-6 space-y-4">
+          {filteredCases.length === 0 && !loading ? (
+            <div className="text-center py-20 bg-white/5 rounded-[3rem] border border-dashed border-white/10">
+              <Gavel className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
+              <p className="text-muted-foreground text-lg">
+                No hay casos activos que coincidan con la búsqueda.
+              </p>
+            </div>
+          ) : (
+            <>
+              {filteredCases.map((c) => (
+                <Card
+                  key={c.id}
+                  className="group overflow-hidden bg-white/5 border-white/10 rounded-[2.5rem] transition-all hover:border-primary/30 hover:bg-white/[0.07] backdrop-blur-md virtual-item"
+                >
+                  <CardContent className="p-6">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                      <div className="flex items-center gap-4">
+                        <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                          <FileText className="w-7 h-7" />
                         </div>
-                        <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1 font-mono text-[12px] opacity-70">
-                            {c.id}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
-                            Actualizado recientemente
-                          </span>
+                        <div>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className="text-lg font-bold text-foreground">{c.nombre}</h3>
+                            <Badge
+                              variant="outline"
+                              className={`uppercase text-[10px] font-black ${getStatusColor(c.status)}`}
+                            >
+                              {c.status}
+                            </Badge>
+                          </div>
+                          <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
+                            <span className="flex items-center gap-1 font-mono text-[12px] opacity-70">
+                              {c.id}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Clock className="w-3 h-3" />
+                              Actualizado recientemente
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    <div className="flex items-center gap-3 w-full md:w-auto">
-                      <Button
-                        variant="outline"
-                        className="flex-1 md:flex-none h-12 rounded-xl border-white/10 hover:bg-white/5 font-bold gap-2"
-                      >
-                        <ChevronRight className="w-4 h-4" />
-                        Gestionar
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="rounded-xl h-12 w-12 hover:bg-white/10"
-                      >
-                        <MoreHorizontal size={20} />
-                      </Button>
+                      <div className="flex items-center gap-3 w-full md:w-auto">
+                        <Button
+                          variant="outline"
+                          className="flex-1 md:flex-none h-12 rounded-xl border-white/10 hover:bg-white/5 font-bold gap-2"
+                        >
+                          <ChevronRight className="w-4 h-4" />
+                          Gestionar
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="rounded-xl h-12 w-12 hover:bg-white/10"
+                        >
+                          <MoreHorizontal size={20} />
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-            {/* Sentinel for Infinite Scroll */}
-            {hasMore && (
-              <div id="cases-scroll-sentinel" className="h-10 flex items-center justify-center">
-                {loadingMore && <Loader2 className="w-6 h-6 animate-spin text-primary" />}
-              </div>
-            )}
-          </>
-        )}
+                  </CardContent>
+                </Card>
+              ))}
+              {/* Sentinel for Infinite Scroll */}
+              {hasMore && (
+                <div id="cases-scroll-sentinel" className="h-10 flex items-center justify-center">
+                  {loadingMore && <Loader2 className="w-6 h-6 animate-spin text-primary" />}
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

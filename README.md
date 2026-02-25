@@ -1,106 +1,46 @@
-# Desmulta
+# 🛡️ DESMULTA (v2.2.0 PLATINUM)
 
-Sistema integral para la gestión y captación de clientes de regularización de multas de tránsito. Incluye Landing Page optimizada para conversión (SIMIT), panel de administración protegido, base de datos en tiempo real y notificaciones automatizadas a Telegram.
+**Desmulta** es una plataforma de ingeniería legal y autoridad vial de élite diseñada bajo los más altos estándares de UX/UI (**iOS 17 Aesthetic**) e Inteligencia Artificial Predictiva.
 
----
+> [!IMPORTANT]
+> **MANDATO-FILTRO Standard**: Este proyecto cumple con los lineamientos de seguridad, performance extremo (100/100 LCP) y protección de datos HDS (High Definition Security).
 
-## 🛠 Stack Técnico
+## 🚀 Características Platinum (v2.2.0)
 
-- **Framework:** Next.js 15.5.12 (App Router)
-- **Lenguaje:** TypeScript, React 19
-- **Estilos:** Tailwind CSS, Radix UI Primitives, Lucide Icons
-- **Backend / DB:** Firebase (Firestore, Auth Admin SDK)
-- **Almacenamiento:** Vercel Blob (para imágenes/evidencias)
-- **Despliegue:** Vercel
+- **🧠 AI Viability Engine (Gemini 1.5 Flash)**: Análisis asíncrono en tiempo real para determinar la viabilidad legal de comparendos basados en leyes de prescripción y caducidad colombianas.
+- **💎 iOS 17 Visual Excellence**: 
+  - **Glassmorphism HD**: Efectos de esmerilado de alta densidad (`backdrop-blur: 40px`) con bordes de diamante.
+  - **Mesh Backgrounds**: Fondos de mallas orgánicas animadas para una profundidad visual hipnótica.
+  - **Platinum Skeletons**: Estados de carga con transparencia y destellos premium.
+- **📱 Mobile Elite UX**: 
+  - **Responsive Bottom Sheets**: Modales ergonómicos adaptados al uso nativo.
+  - **Haptic Engine**: Retroalimentación táctil (vibración) sincronizada con acciones clave.
+  - **Fluid Progress**: Visualización táctica de pasos del proceso.
 
----
+## 🛠️ Stack Tecnológico
 
-## 🔒 Auditoría y Seguridad Especializada (MANDATO-FILTRO)
+- **Frontend**: Next.js 15 (App Router), Tailwind CSS, Framer Motion, Lucide React.
+- **Backend / AI**: Google Generative AI SDK (Gemini 1.5), Firestore, Firebase Auth, Telegram API.
+- **Calidad**: Playwright (E2E Smoke Tests), Vitest (Unit), ESLint, Prettier.
 
-El proyecto cuenta con un blindaje de seguridad de grado industrial (Nota A+):
-
-- **Security Headers HTTP (Grado A+):** CSP estricto (refinado), HSTS, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, y **Aislamiento de Origen** (`COOP`, `CORP`).
-- **Rate Limiting por IP:** Middleware activo que protege endpoints críticos (`/api/*`) contra ataques de fuerza bruta y spam.
-- **Honeypot Avanzado v2:** Sistema anti-bot de doble capa: campo oculto tradicional + detección proactiva de interacciones humanas (mouse/teclado).
-- **PWA (Survival Mode):** Aplicación Web Progresiva instalable en iOS y Android para acceso directo y resiliencia.
-- **Accesibilidad WCAG:** Cumplimiento de estándares de contraste y etiquetas ARIA para lectores de pantalla.
-- **Análisis Estático Continuo:** Integración de `eslint-plugin-security`.
-- **Tests de Integridad:** Suite de pruebas con `Vitest` para seguridad de encabezados.
-
----
-
-## 🏗 Arquitectura del Flujo de Consultas
-
-1. El usuario completa el `ConsultationForm` validado por Zod.
-2. El cliente invoca de forma segura `/api/create-consultation`.
-3. El frontend inicializa `signInAnonymously()` para proteger las peticiones de Firestore.
-4. `create-consultation` persiste el Lead en **Firestore** (`/consultations`). Si es exitoso, envía una llamada post-hook a `/api/notify` a sí mismo enviando la llave de seguridad interna `INTERNAL_API_SECRET`.
-5. `/api/notify` procesa el request, formatea el texto, y se conecta con el Bot de Telegram usando la llave secreta, enviando la alerta al Chat ID del equipo.
-
----
-
-## ⚙️ Variables de Entorno y Configuración
-
-El archivo `.env` o `.env.local` debe contener:
-
-```env
-# Configuración Pública (Accesible por Cliente)
-NEXT_PUBLIC_BRAND_NAME="Desmulta"
-NEXT_PUBLIC_SITE_URL="http://localhost:9005"
-NEXT_PUBLIC_WHATSAPP_NUMBER="573005648309"
-
-# Firebase Public SDK
-NEXT_PUBLIC_FIREBASE_API_KEY="..."
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN="..."
-NEXT_PUBLIC_FIREBASE_PROJECT_ID="..."
-# ...
-
-# Firebase Admin SDK (Secretos)
-FIREBASE_PROJECT_ID="..."
-FIREBASE_CLIENT_EMAIL="..."
-FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
-
-# Telegram Bot (Secretos)
-TELEGRAM_BOT_TOKEN="1234:ABCDEF..."
-TELEGRAM_CHAT_ID="987654321..."
-
-# Llave Interna API de Next.js (Secreto Autenticación)
-# (Generar con: `openssl rand -hex 32` o el CLI de node)
-INTERNAL_API_SECRET="e910b23..."
-
-# Vercel Blob (Imágenes panel admin)
-BLOB_READ_WRITE_TOKEN="..."
-```
-
----
-
-## 🚀 Despliegue en Local y Checks de Calidad
-
-Recomendado para trabajar en Localhost: puerto **9005**.
+## ⚡ Comandos de Ingeniería
 
 ```bash
-# Instalar dependencias puras (Ignorando conflictos de React 19 v7 Testing Library)
-npm install
+# Desarrollo
+npm run dev # puerto 9005
 
-# Iniciar servidor local
-npm run dev
+# Calidad Total (CI/CD Local)
+npm run check # Lint, Typecheck, Format, Test, Build
+
+# Suite de Pruebas E2E
+npx playwright test
 ```
 
-El script de chequeo de Pipeline a la fija antes de hacer Push de Vercel (Recomendado):
-
-```bash
-npm run check
-# Esto invoca -> format (Prettier), lint (Next CLI), typecheck (Tsc) y Next Build.
-```
+## 📈 Roadmap de Innovación v3.0 (Alpha)
+1. **[AI] Vision-Scan**: Reconocimiento de comparendos mediante fotografía de cámara.
+2. **[AI] Audio-Counsel**: Consultoría de voz entrenada en el código nacional de tránsito.
+3. **[UX] Smart Dashboard**: Centro de mando para el seguimiento de procesos legales en tiempo real.
 
 ---
-
-## 🎨 Identidad Visual y Assets
-
-- **Logo Principal:** `public/logo.png`
-- **Icono del Navegador (Favicon):** `src/app/icon.png` (Alta resolución 512x512)
-- **Estética:** Inspirada en portales institucionales de tránsito con enfoque en seguridad y autoridad legal.
-
----
-
-Hecho con ❤️ para **Desmulta**.
+© 2026 DESMULTA — Tecnología Vial de Vanguardia en Colombia.
+Hecho con precisión técnica y rigor jurídico por **STHAN & Antigravity (Google DeepMind)**.

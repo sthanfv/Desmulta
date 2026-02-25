@@ -132,8 +132,9 @@ Comandos disponibles:
       );
     }
   } catch (err: unknown) {
-    const errMsg = err instanceof Error ? err.message : 'Error desconocido';
-    console.error('[telegram-webhook] Error:', errMsg);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[telegram-webhook] Error:', err instanceof Error ? err.message : err);
+    }
     // ✅ Respondemos 200 de todas formas para no causar reintentos de Telegram
   }
 

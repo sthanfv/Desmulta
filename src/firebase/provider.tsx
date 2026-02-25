@@ -98,7 +98,6 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
       },
       (error) => {
         // Auth listener error
-        console.error('FirebaseProvider: onAuthStateChanged error:', error);
         setUserAuthState({ user: null, isUserLoading: false, userError: error });
       }
     );
