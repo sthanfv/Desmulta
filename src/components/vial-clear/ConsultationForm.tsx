@@ -54,7 +54,7 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
       nombre: '',
       contacto: '',
       aceptoTerminos: false,
-      website: '', // Honeypot field
+      _tramp_field: '', // Honeypot field evadiendo autofill
       antiguedad: '',
       tipoInfraccion: '',
       estadoCoactivo: '',
@@ -138,10 +138,16 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
       }
 
       const auth = getAuth();
-      const currentUser = auth.currentUser;
+      let currentUser = auth.currentUser;
 
       if (!currentUser) {
-        throw new Error('No se pudo identificar la sesión de usuario (UID faltante).');
+        // En vez de fallar y requerir que el usuario reabra el formulario,
+        // esperamos 1 segundo a que Firebase asigne el anonymous o enviamos flag fallback.
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+        currentUser = auth.currentUser;
+        if (!currentUser) {
+          throw new Error('Conexión inicializada. Por favor, intente dar clic nuevamente.');
+        }
       }
 
       const payload = {
@@ -227,14 +233,14 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
           <Progress value={step === 1 ? 50 : 100} className="h-2 bg-muted/40" />
         </div>
 
-        {/* Honeypot */}
+        {/* Honeypot anti-scrapping */}
         <FormField
           control={form.control}
-          name="website"
+          name="_tramp_field"
           render={({ field }) => (
             <FormItem className="hidden" aria-hidden="true">
               <FormControl>
-                <Input {...field} autoComplete="off" tabIndex={-1} aria-hidden="true" />
+                <Input {...field} autoComplete="new-password" tabIndex={-1} aria-hidden="true" />
               </FormControl>
             </FormItem>
           )}

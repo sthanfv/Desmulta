@@ -25,6 +25,12 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
     
+    // Casos de éxito (Success Stories) públicos y UI Dinámica
+    match /success_stories/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
     // Consultation creation is now handled exclusively by a secure server-side API route.
     // Therefore, all direct client writes are denied.
     match /consultations/{consultationId} {

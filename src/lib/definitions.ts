@@ -30,7 +30,7 @@ export const ConsultationSchema = z.object({
   aceptoTerminos: z.boolean().refine((value) => value === true, {
     message: 'Debe aceptar los términos y condiciones.',
   }),
-  website: z.string().max(0, { message: 'Bot detected' }).optional(), // Honeypot field
+  _tramp_field: z.string().max(0, { message: 'Bot detected' }).optional(), // Honeypot field
   authorUid: z.string().optional(),
   // Campos de Pre-Viabilidad MANDATO-FILTRO
   antiguedad: z.string().min(1, { message: 'Seleccione la antigüedad de la multa.' }),
