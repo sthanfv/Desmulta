@@ -108,9 +108,9 @@ export function SuccessStories() {
               transition={{
                 duration: 0.4,
                 delay: index * 0.05,
-                ease: "easeOut"
+                ease: 'easeOut',
               }}
-              viewport={{ once: true, margin: "-50px" }}
+              viewport={{ once: true, margin: '-50px' }}
               className="glass p-8 rounded-[2rem] group hover:border-primary/50 transition-all duration-300 relative overflow-hidden cursor-pointer active:scale-[0.98] will-change-[opacity,transform]"
               onClick={() => {
                 window.dispatchEvent(new CustomEvent('open-consultation-modal'));

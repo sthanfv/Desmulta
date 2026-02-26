@@ -28,7 +28,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL ||
-    (process.env.NODE_ENV === 'development' ? 'http://localhost:9005' : 'https://desmulta.com')
+      (process.env.NODE_ENV === 'development' ? 'http://localhost:9005' : 'https://desmulta.com')
   ),
   title: `${process.env.NEXT_PUBLIC_BRAND_NAME || 'Desmulta'} - Saneamiento de Multas de Tránsito`,
   description:

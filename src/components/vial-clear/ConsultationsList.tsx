@@ -71,7 +71,10 @@ export function ConsultationsList() {
       const result = await convertToCase(lead);
       if (result.success) {
         alert('¡Caso creado exitosamente!');
-        fetchConsultations(); // Recargar desde el principio para ver el cambio de estado
+        // Optimización Spark: Actualizar localmente en lugar de recargar toda la lista
+        setConsultations((prev) =>
+          prev.map((c) => (c.id === lead.id ? { ...c, status: 'en_proceso' as const } : c))
+        );
       } else {
         setError(result.error || 'Error al crear el caso');
       }
