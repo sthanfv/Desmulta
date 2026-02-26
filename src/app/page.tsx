@@ -186,12 +186,6 @@ export default function VialClearPage() {
       {/* Premium iOS 17 Mesh Background */}
       <MeshBackground />
 
-      {/* Reading Progress Bar */}
-      <div
-        className="fixed top-0 left-0 h-1 bg-gradient-to-r from-primary/50 via-primary to-primary/50 z-[100] transition-all duration-300 ease-out"
-        style={{ width: `${scrollProgress}%` }}
-      />
-
       {/* Header with Glassmorphism */}
       <header className="fixed top-0 left-0 right-0 z-50 px-4 py-8 pointer-events-none">
         <div className="max-w-6xl mx-auto glass rounded-full px-6 py-4 flex justify-between items-center shadow-2xl border-white/5 pointer-events-auto">
