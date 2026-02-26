@@ -113,6 +113,9 @@ export async function POST(request: Request) {
 
     const telegramApiUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s timeout
+
     const telegramResponse = await fetch(telegramApiUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -121,7 +124,9 @@ export async function POST(request: Request) {
         text: message,
         parse_mode: 'HTML',
       }),
+      signal: controller.signal,
     });
+    clearTimeout(timeoutId);
 
     const telegramResponseData = (await telegramResponse.json()) as Record<string, unknown>;
 

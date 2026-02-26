@@ -91,22 +91,15 @@ const AnimatedCounter = ({
 
 export default function VialClearPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isWhatsAppWarningOpen, setIsWhatsAppWarningOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
   const auth = useAuth();
   const { toast } = useToast();
-
+  const [isWhatsAppWarningOpen, setIsWhatsAppWarningOpen] = useState(false);
   useEffect(() => {
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 400);
-
-      // Calculate scroll progress percentage
-      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = (window.scrollY / totalHeight) * 100;
-      setScrollProgress(progress);
     };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 

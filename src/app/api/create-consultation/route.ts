@@ -94,25 +94,20 @@ export async function POST(request: Request) {
     });
 
     // 5. Notificación Telegram (Async)
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL;
-    const isDev = process.env.NODE_ENV === 'development';
+    // 5. Notificación Telegram (Consistente) - MANDATO-FILTRO
+    const notifyUrl = `${request.nextUrl.origin}/api/notify`;
 
-    if (baseUrl || isDev) {
-      const requestUrl = new URL(request.url);
-      const host = isDev ? requestUrl.host : baseUrl ? new URL(baseUrl).host : requestUrl.host;
-      const protocol = isDev ? requestUrl.protocol : baseUrl ? new URL(baseUrl).protocol : 'https:';
-      const notifyUrl = `${protocol}//${host}/api/notify`;
-
-      fetch(notifyUrl, {
+    try {
+      await fetch(notifyUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'x-internal-secret': process.env.INTERNAL_API_SECRET || '',
         },
         body: JSON.stringify({ docId: consultationRef.id }),
-      }).catch((err) => {
-        logger.error('[create-consultation] Error en notificación:', { error: String(err) });
       });
+    } catch (err) {
+      logger.error('[create-consultation] Error en notificación:', { error: String(err) });
     }
 
     // 6. Análisis IA Predictiva (Async / Non-blocking) - MANDATO-FILTRO v5.0

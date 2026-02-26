@@ -6,6 +6,7 @@ import { FirebaseClientProvider } from '@/firebase';
 import Script from 'next/script';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Outfit } from 'next/font/google';
+import { ScrollProgressBar } from '@/components/ui/ScrollProgressBar';
 
 const outfit = Outfit({
   subsets: ['latin'],
@@ -119,6 +120,7 @@ export default function RootLayout({
       <body className={cn(outfit.className, 'antialiased')} suppressHydrationWarning={true}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           <FirebaseClientProvider>
+            <ScrollProgressBar />
             {children}
             <Toaster />
           </FirebaseClientProvider>

@@ -14,7 +14,7 @@ interface LogContext {
 class SecurityLogger {
   private static instance: SecurityLogger;
 
-  private constructor() { }
+  private constructor() {}
 
   public static getInstance(): SecurityLogger {
     if (!SecurityLogger.instance) {

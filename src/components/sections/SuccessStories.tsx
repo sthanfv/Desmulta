@@ -103,11 +103,15 @@ export function SuccessStories() {
           {rotatedStories.map((story, index) => (
             <motion.div
               key={story.id}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 15 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              viewport={{ once: true }}
-              className="glass p-8 rounded-[2rem] group hover:border-primary/50 transition-all duration-500 relative overflow-hidden cursor-pointer active:scale-[0.98]"
+              transition={{
+                duration: 0.4,
+                delay: index * 0.05,
+                ease: "easeOut"
+              }}
+              viewport={{ once: true, margin: "-50px" }}
+              className="glass p-8 rounded-[2rem] group hover:border-primary/50 transition-all duration-300 relative overflow-hidden cursor-pointer active:scale-[0.98] will-change-[opacity,transform]"
               onClick={() => {
                 window.dispatchEvent(new CustomEvent('open-consultation-modal'));
               }}
