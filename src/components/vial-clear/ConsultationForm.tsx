@@ -131,6 +131,7 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
   };
 
   const onSubmit: SubmitHandler<ConsultationFormData> = async (data) => {
+    haptics.vibrate('medium'); // Immediate feedback on submit
     try {
       if (!isHuman) {
         throw new Error('Error de validación anti-bot. Por favor, interactúe con el formulario.');
@@ -177,6 +178,7 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
       localStorage.removeItem('consultation_draft');
       setTimeout(onSuccess, 4000);
     } catch (e: unknown) {
+      haptics.vibrate('error');
       const message = e instanceof Error ? e.message : 'Por favor, intente de nuevo más tarde.';
       toast({
         variant: 'destructive',

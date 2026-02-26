@@ -1,13 +1,13 @@
-# 🛡️ DESMULTA (v2.5.0 PLATINUM)
+# 🛡️ DESMULTA (v2.7.0 PLATINUM)
 
 **Desmulta** es una plataforma de ingeniería legal y autoridad vial de élite diseñada bajo los más altos estándares de UX/UI (**iOS 17 Aesthetic**) e Inteligencia Artificial Predictiva.
 
 > [!IMPORTANT]
 > **MANDATO-FILTRO Standard**: Este proyecto cumple con los lineamientos de seguridad, performance extremo (100/100 LCP) y fluidez de scroll nativa profesional.
 
-## 🚀 Características Platinum (v2.5.0)
+## 🚀 Características Platinum (v2.7.0)
 
-- **🧠 AI Viability Engine (Gemini 1.5 Flash)**: Análisis asíncrono en tiempo real para determinar la viabilidad legal de comparendos basados en leyes de prescripción y caducidad colombianas.
+- **⚡ Async Engine (Next.js 15 After)**: Notificaciones a Telegram e integraciones de IA procesadas sin bloquear el thread del cliente para una UX con zero-latency.
 - **💎 iOS 17 Visual Excellence**:
   - **Glassmorphism HD**: Efectos de esmerilado de alta densidad (`backdrop-blur: 40px`) con bordes de diamante.
   - **Mesh Backgrounds**: Fondos de mallas orgánicas animadas para una profundidad visual hipnótica.

@@ -59,6 +59,14 @@
 
   body {
     @apply bg-background text-foreground;
+    overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+
+  input,
+  textarea {
+    user-select: auto;
   }
 
   ::selection {

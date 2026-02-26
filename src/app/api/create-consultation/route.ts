@@ -1,4 +1,4 @@
-import { NextResponse, NextRequest } from 'next/server';
+import { NextResponse, NextRequest, after } from 'next/server';
 import { getFirestore, Timestamp, FieldValue } from 'firebase-admin/firestore';
 import { getAdminApp } from '@/lib/firebase-admin';
 import { ConsultationSchema } from '@/lib/definitions';
@@ -93,25 +93,25 @@ export async function POST(request: NextRequest) {
       transaction.set(cooldownRef, { lastAttemptAt: FieldValue.serverTimestamp() });
     });
 
-    // 5. Notificación Telegram (Async)
-    // 5. Notificación Telegram (Consistente) - MANDATO-FILTRO
+    // 5. & 6. Tareas en Background (Next.js 15 after API) - MANDATO-FILTRO
     const notifyUrl = `${request.nextUrl.origin}/api/notify`;
 
-    try {
-      await fetch(notifyUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-internal-secret': process.env.INTERNAL_API_SECRET || '',
-        },
-        body: JSON.stringify({ docId: consultationRef.id }),
-      });
-    } catch (err) {
-      logger.error('[create-consultation] Error en notificación:', { error: String(err) });
-    }
+    after(async () => {
+      // 5. Notificación Telegram (Consistente y asíncrona)
+      try {
+        await fetch(notifyUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-internal-secret': process.env.INTERNAL_API_SECRET || '',
+          },
+          body: JSON.stringify({ docId: consultationRef.id }),
+        });
+      } catch (err) {
+        logger.error('[create-consultation] Error en notificación:', { error: String(err) });
+      }
 
-    // 6. Análisis IA Predictiva (Async / Non-blocking) - MANDATO-FILTRO v5.0
-    (async () => {
+      // 6. Análisis IA Predictiva (Non-blocking) 
       try {
         const aiAnalysis = await analyzeViabilityFlow({
           antiquity: antiguedad,
@@ -123,7 +123,7 @@ export async function POST(request: NextRequest) {
       } catch (aiError) {
         logger.error('[create-consultation] Fallo en IA:', { error: String(aiError) });
       }
-    })();
+    });
 
     return NextResponse.json({ success: true, docId: consultationRef.id }, { status: 201 });
   } catch (error: unknown) {

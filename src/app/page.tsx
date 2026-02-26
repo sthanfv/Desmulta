@@ -24,6 +24,7 @@ import { SavingsCounter } from '@/components/interactive/SavingsCounter';
 import { Lightbox } from '@/components/ui/lightbox';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MeshBackground } from '@/components/ui/MeshBackground';
+import { InstallPWA } from '@/components/pwa/InstallPWA';
 import {
   Accordion,
   AccordionContent,
@@ -140,7 +141,7 @@ export default function VialClearPage() {
   }, []);
 
   useEffect(() => {
-    // Soporte para Shortcuts de PWA Premium - v2.5.0
+    // Soporte para Shortcuts de PWA Premium - v2.7.0
     const params = new URLSearchParams(window.location.search);
     if (params.get('action') === 'consultar') {
       setIsModalOpen(true);
@@ -193,6 +194,9 @@ export default function VialClearPage() {
     <div className="min-h-screen bg-background selection:bg-primary/30 selection:text-primary-foreground overflow-x-hidden">
       {/* Premium iOS 17 Mesh Background */}
       <MeshBackground />
+
+      {/* PWA Elite Installation Trigger */}
+      <InstallPWA />
 
       {/* Header with Glassmorphism */}
       <header className="fixed top-0 left-0 right-0 z-50 px-4 py-8 pointer-events-none">
@@ -806,7 +810,7 @@ export default function VialClearPage() {
                   © {new Date().getFullYear()} DESMULTA — SERVICIO PRIVADO DE GESTIÓN VIAL
                 </p>
                 <span className="text-[9px] font-black uppercase tracking-widest bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/20">
-                  v2.5.0
+                  v2.6.0
                 </span>
               </div>
               <div className="flex items-center gap-4 opacity-40 hover:opacity-100 transition-opacity mt-1">
