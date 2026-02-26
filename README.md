@@ -1,11 +1,11 @@
-# 🛡️ DESMULTA (v2.3.0 PLATINUM)
+# 🛡️ DESMULTA (v2.5.0 PLATINUM)
 
 **Desmulta** es una plataforma de ingeniería legal y autoridad vial de élite diseñada bajo los más altos estándares de UX/UI (**iOS 17 Aesthetic**) e Inteligencia Artificial Predictiva.
 
 > [!IMPORTANT]
 > **MANDATO-FILTRO Standard**: Este proyecto cumple con los lineamientos de seguridad, performance extremo (100/100 LCP) y fluidez de scroll nativa profesional.
 
-## 🚀 Características Platinum (v2.3.0)
+## 🚀 Características Platinum (v2.5.0)
 
 - **🧠 AI Viability Engine (Gemini 1.5 Flash)**: Análisis asíncrono en tiempo real para determinar la viabilidad legal de comparendos basados en leyes de prescripción y caducidad colombianas.
 - **💎 iOS 17 Visual Excellence**:
@@ -13,10 +13,18 @@
   - **Mesh Backgrounds**: Fondos de mallas orgánicas animadas para una profundidad visual hipnótica.
   - **Platinum Skeletons**: Estados de carga con transparencia y destellos premium.
 - **📱 Mobile Elite UX**:
+  - **PWA Premium**: Soporte para atajos de acceso rápido y experiencia de "App Nativa".
   - **Ultra-Fluid Scroll**: Optimización de respuesta inmediata para mouse y gestos táctiles.
-  - **Responsive Bottom Sheets**: Modales ergonómicos adaptados al uso nativo.
   - **Haptic Engine**: Retroalimentación táctil (vibración) sincronizada con acciones clave.
-  - **Fluid Progress**: Visualización táctica de pasos del proceso.
+
+- **💼 CRM Administrativo Platinum**:
+  - **Lead Management**: Pipeline de gestión de clientes con estados dinámicos (Pendiente, Contactado, En Proceso).
+  - **Conversión de Casos**: Sistema de un solo clic para transformar leads en expedientes legales activos.
+  - **Privacidad HDS**: Enmascaramiento de datos sensibles con revelación bajo demanda.
+
+- **⚡ Arquitectura de Eficiencia (Plan Spark)**:
+  - **Zero-Waste Reads**: Optimizado para minimizar lecturas de Firebase mediante actualización de estado local.
+  - **Auto-Legacy Cleanup**: Sistema automático de purga de datos antiguos para optimizar el almacenamiento.
 
 ## 🛠️ Stack Tecnológico
 
