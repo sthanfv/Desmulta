@@ -1,0 +1,425 @@
+# Page snapshot
+
+```yaml
+- generic:
+  - generic:
+    - banner:
+      - generic [ref=e1]:
+        - generic [ref=e2]:
+          - img [ref=e4]
+          - generic [ref=e7]: DESMULTA
+        - generic [ref=e8]:
+          - button [ref=e9] [cursor=pointer]:
+            - img
+            - generic [ref=e10]: Cambiar tema
+          - button [ref=e11] [cursor=pointer]: Consultar Ahora
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - img
+            - generic: Trámite Administrativo Seguro
+          - heading [level=1]: RECUPERE Liderazgo VIAL
+          - paragraph: Blindaje legal experto para sus trámites administrativos, fotomultas y comparendos. Saneamiento integral con absoluta reserva y transparencia corporativa.
+          - generic:
+            - button:
+              - text: Iniciar Estudio Sin Costo
+              - img
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - img
+                - generic: Impacto Económico Recuperado
+              - generic:
+                - generic: $0
+                - generic: M+
+                - generic: pesos aprox
+              - generic:
+                - img
+                - generic: Saneamiento Jurídico Verificado
+        - generic:
+          - generic:
+            - generic:
+              - img
+              - generic:
+                - img
+            - generic:
+              - generic:
+                - generic: "2015"
+                - generic:
+                  - generic: Sanciones Eliminadas
+                  - paragraph: Este mes en toda Colombia
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - heading [level=2]: Resultados que Hablan por Sí Solos
+            - paragraph: Hemos transformado el historial vial de miles de colombianos a través de nuestro análisis jurídico de alta precisión. La transparencia en los resultados es nuestra mayor garantía.
+          - generic:
+            - generic:
+              - img
+              - text: CASOS VERIFICADOS
+            - paragraph: "Última actualización: Esta semana"
+        - generic:
+          - generic:
+            - generic:
+              - generic:
+                - generic: "Expediente #8842"
+                - generic: "Estado: PROTEGIDO (Habeas Data)"
+              - generic:
+                - img
+            - generic:
+              - generic:
+                - heading [level=4]: Monto Recuperado
+                - paragraph: $840,000
+              - generic:
+                - generic:
+                  - img
+                  - generic: Villavicencio
+                - generic:
+                  - img
+                  - generic: 12 días
+              - generic:
+                - generic: Saneamiento Integral
+                - generic: VALIDAR →
+          - generic:
+            - generic:
+              - generic:
+                - generic: "Expediente #9103"
+                - generic: "Estado: PROTEGIDO (Habeas Data)"
+              - generic:
+                - img
+            - generic:
+              - generic:
+                - heading [level=4]: Monto Recuperado
+                - paragraph: $1,250,000
+              - generic:
+                - generic:
+                  - img
+                  - generic: Santa Marta
+                - generic:
+                  - img
+                  - generic: 18 días
+              - generic:
+                - generic: Optimización de Historial
+                - generic: VALIDAR →
+          - generic:
+            - generic:
+              - generic:
+                - generic: "Expediente #7721"
+                - generic: "Estado: PROTEGIDO (Habeas Data)"
+              - generic:
+                - img
+            - generic:
+              - generic:
+                - heading [level=4]: Monto Recuperado
+                - paragraph: $460,000
+              - generic:
+                - generic:
+                  - img
+                  - generic: Manizales
+                - generic:
+                  - img
+                  - generic: 9 días
+              - generic:
+                - generic: Resolución Técnica
+                - generic: VALIDAR →
+          - generic:
+            - generic:
+              - generic:
+                - generic: "Expediente #8550"
+                - generic: "Estado: PROTEGIDO (Habeas Data)"
+              - generic:
+                - img
+            - generic:
+              - generic:
+                - heading [level=4]: Monto Recuperado
+                - paragraph: $2,100,000
+              - generic:
+                - generic:
+                  - img
+                  - generic: Bogotá D.C.
+                - generic:
+                  - img
+                  - generic: 22 días
+              - generic:
+                - generic: Gestión Especializada
+                - generic: VALIDAR →
+        - generic:
+          - paragraph: "* Por protocolos de Seguridad Jurídica y cumplimiento de la Ley 1581 de 2012 (Protección de Datos Personales), los números de expediente y nombres de clientes han sido anonimizados. Los resultados financieros son verificables ante los portales institucionales una vez formalizada la gestión administrativa."
+    - generic:
+      - generic:
+        - generic:
+          - heading [level=2]: Pilares de Autoridad Legal
+        - generic:
+          - generic:
+            - generic:
+              - generic:
+                - img
+              - generic:
+                - heading [level=3]: Respaldo Normativo
+                - paragraph: Operamos bajo estrictos protocolos de defensa administrativa. Nuestro conocimiento especializado es su mayor garantía frente a las autoridades de tránsito.
+          - generic:
+            - generic:
+              - generic: 2,015
+              - generic: Sanciones Eliminadas
+          - generic:
+            - generic:
+              - img
+            - heading [level=3]: Gestión Especializada
+            - paragraph: Trato directo y profesional centrado en la resolución administrativa personalizada de su historial vial.
+          - generic:
+            - generic:
+              - img
+            - heading [level=3]: Eficiencia Comprobada
+            - paragraph: Acompañamiento experto fundamentado en el estricto cumplimiento de los términos legales y la normativa vigente.
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - generic:
+                - heading [level=2]: Proceso Ágil & Transparente
+                - paragraph: Tres pasos para recuperar su historial crediticio y vial.
+              - generic:
+                - generic:
+                  - generic:
+                    - generic:
+                      - img
+                    - generic:
+                      - generic:
+                        - generic: "01"
+                        - heading [level=3]: Certificación de Viabilidad
+                      - paragraph: Realizamos un análisis técnico profundo de su historial para determinar las probabilidades de éxito jurídico.
+                - generic:
+                  - generic:
+                    - generic:
+                      - img
+                    - generic:
+                      - generic:
+                        - generic: "02"
+                        - heading [level=3]: Blindaje Administrativo
+                      - paragraph: Desplegamos protocolos de defensa legal especializados para fundamentar la corrección de su estado vial.
+                - generic:
+                  - generic:
+                    - generic:
+                      - img
+                    - generic:
+                      - generic:
+                        - generic: "03"
+                        - heading [level=3]: Certificación Final
+                      - paragraph: Confirmamos la resolución efectiva ante los portales institucionales y entregamos su acta de saneamiento.
+            - generic:
+              - generic:
+                - img
+          - generic:
+            - generic:
+              - img
+            - generic:
+              - heading [level=4]: Nota sobre Honorarios
+              - paragraph: "\"El estudio de viabilidad inicial es una cortesía para identificar sus oportunidades de saneamiento. La ejecución de trámites administrativos y gestión técnica genera honorarios de éxito que se ajustan según la complejidad de su caso.\""
+    - generic:
+      - generic:
+        - generic:
+          - heading [level=2]: Casos de Éxito
+          - generic:
+            - generic: "2015"
+            - generic: Sanciones Eliminadas
+          - paragraph: Resultados reales verificados ante los organismos de tránsito
+        - generic:
+          - generic:
+            - text: Estado Anterior (Antes)
+            - generic:
+              - generic:
+                - generic:
+                  - img
+                  - generic:
+                    - img
+          - generic:
+            - text: Resultado Final (Después)
+            - generic:
+              - generic:
+                - generic:
+                  - img
+                  - generic:
+                    - img
+    - generic:
+      - generic:
+        - generic:
+          - heading [level=2]: Preguntas Frecuentes
+          - paragraph: Claridad legal para su total confianza.
+        - generic:
+          - generic:
+            - heading [level=3]:
+              - button:
+                - text: ¿Cómo logran el saneamiento de las multas?
+                - img
+          - generic:
+            - heading [level=3]:
+              - button:
+                - text: ¿Cuánto tiempo demora la eliminación?
+                - img
+          - generic:
+            - heading [level=3]:
+              - button:
+                - text: ¿Garantizan que la multa será eliminada?
+                - img
+          - generic:
+            - heading [level=3]:
+              - button:
+                - text: ¿Debo pagar por adelantado el trámite?
+                - img
+          - generic:
+            - heading [level=3]:
+              - button:
+                - text: ¿Qué pasa si mis comparendos son muy antiguos?
+                - img
+          - generic:
+            - heading [level=3]:
+              - button:
+                - text: ¿Es seguro proporcionar mi número de cédula?
+                - img
+    - generic:
+      - generic:
+        - generic:
+          - heading [level=2]: Libérate hoy de las deudas.
+          - paragraph: No dejes que tu paz mental dependa de un comparendo injusto. Iniciemos tu defensa ahora.
+          - generic:
+            - button: CONSULTA GRATIS
+    - contentinfo:
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - link:
+                - /url: /
+                - generic:
+                  - img
+                - generic:
+                  - generic: DESMULTA
+                  - generic: TECNOLOGÍA VIAL
+              - paragraph: Líderes en defensa administrativa y saneamiento vial. Transformamos problemas legales en soluciones definitivas con ética y transparencia.
+          - generic:
+            - generic:
+              - heading [level=4]: Navegación Táctica
+              - navigation:
+                - link:
+                  - /url: "#"
+                  - text: Inicio
+                - link:
+                  - /url: /terminos
+                  - text: Estudio Técnico
+                - link:
+                  - /url: /terminos
+                  - text: Términos de Uso
+                - link:
+                  - /url: /terminos
+                  - text: Política Privacidad
+            - generic:
+              - generic:
+                - img
+              - heading [level=4]: Canales Oficiales
+              - generic:
+                - generic:
+                  - generic:
+                    - img
+                  - generic:
+                    - paragraph: WhatsApp 24/7
+                    - paragraph: +57 300 [PROTEGIDO]
+                - generic:
+                  - generic:
+                    - img
+                  - generic:
+                    - paragraph: Email Corporativo
+                    - paragraph: contacto@desmulta.com.co
+                - generic:
+                  - generic:
+                    - img
+                  - generic:
+                    - paragraph: Base de Operaciones
+                    - paragraph: Cobertura Nacional Digital
+              - button:
+                - text: ABRIR CANAL DIRECTO
+                - img
+        - generic:
+          - generic:
+            - generic:
+              - paragraph: © 2026 DESMULTA — SERVICIO PRIVADO DE GESTIÓN VIAL
+              - generic: v2.3.0
+            - generic:
+              - generic: Protección de Datos HDS
+          - generic:
+            - generic:
+              - generic: "Sistemas Globales: Operativos"
+    - generic:
+      - button:
+        - img
+      - button:
+        - img
+  - list
+  - button [ref=e17] [cursor=pointer]:
+    - img [ref=e18]
+  - alert
+  - dialog "Estudio de Viabilidad Gratuito" [active] [ref=e22]:
+    - generic [ref=e24]:
+      - generic [ref=e25]:
+        - heading "Estudio de Viabilidad Gratuito" [level=2] [ref=e26]
+        - paragraph [ref=e27]: Recibiremos su información para un análisis técnico detallado. La respuesta será enviada a su WhatsApp dentro de nuestros horarios laborales habituales.
+      - generic [ref=e28]:
+        - progressbar [ref=e30]
+        - generic [ref=e32]:
+          - generic [ref=e33]:
+            - button "← Regresar al Paso 1" [ref=e34] [cursor=pointer]
+            - generic [ref=e35]: "Paso 2: Datos de Validación Jurídica"
+            - heading "Donde enviamos tu certificación?" [level=3] [ref=e36]:
+              - text: Donde enviamos
+              - text: tu certificación?
+          - generic [ref=e37]:
+            - generic [ref=e38]:
+              - text: Cédula del Propietario
+              - generic [ref=e39]:
+                - textbox "Cédula del Propietario" [ref=e40]:
+                  - /placeholder: Identificación sin puntos ni comas
+                  - text: "12345678"
+                - img [ref=e41]
+                - button [ref=e44] [cursor=pointer]:
+                  - img [ref=e45]
+            - generic [ref=e48]:
+              - generic [ref=e49]:
+                - generic [ref=e50]: Placa (Opcional)
+                - textbox "Placa (Opcional)" [ref=e51]:
+                  - /placeholder: "Ej: AAA123"
+              - generic [ref=e52]:
+                - text: WhatsApp Celular
+                - generic [ref=e53]:
+                  - textbox "WhatsApp Celular" [ref=e54]:
+                    - /placeholder: 300 123 4567
+                    - text: 300 111 2233
+                  - img [ref=e55]
+            - generic [ref=e57]:
+              - text: Nombre Completo
+              - textbox "Nombre Completo" [ref=e58]:
+                - /placeholder: Como aparece en el documento
+                - text: TEST_USER_SMOKE
+          - generic [ref=e59]:
+            - checkbox "Acepto el tratamiento de mis datos personales." [checked] [ref=e60] [cursor=pointer]:
+              - generic:
+                - img
+            - checkbox [checked]
+            - generic [ref=e61]:
+              - text: Acepto el tratamiento de mis datos personales.
+              - paragraph [ref=e62]:
+                - text: Autorizo a Desmulta a consultar mi estado en el SIMIT para fines de asesoría técnica.
+                - link "Ver Términos" [ref=e63] [cursor=pointer]:
+                  - /url: /terminos
+          - button "INICIAR ESTUDIO GRATUITO" [ref=e64] [cursor=pointer]
+        - generic [ref=e65]:
+          - generic [ref=e68]: Conexión Cifrada SSL Finalizada
+          - generic [ref=e69]:
+            - img [ref=e70]
+            - generic [ref=e73]: Protección Técnica con Alta Calidad Jurídica
+    - button "Close" [ref=e74] [cursor=pointer]:
+      - img [ref=e75]
+      - generic [ref=e78]: Close
+```

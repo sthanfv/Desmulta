@@ -312,7 +312,4 @@
     rgba(0, 0, 0, 0.8) 100%
   );
 }
-.virtual-item {
-  content-visibility: auto;
-  contain-intrinsic-size: 150px;
-}
+

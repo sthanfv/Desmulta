@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { SuccessStories } from '@/components/sections/SuccessStories';
 import {
   ShieldCheck,
-  ArrowRightLeft,
+  ArrowUp,
   CheckCircle2,
   Info,
   MessageCircle,
@@ -270,7 +270,7 @@ export default function VialClearPage() {
                 className="h-16 px-10 text-lg font-black rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground shadow-2xl shadow-primary/30 active:scale-95 transition-all border-none"
               >
                 Iniciar Estudio Sin Costo
-                <ArrowRightLeft className="ml-2 w-5 h-5" />
+                <ArrowUp className="ml-2 w-5 h-5" />
               </Button>
             </div>
             {/* Savings Counter - MANDATO-FILTRO */}
@@ -360,7 +360,7 @@ export default function VialClearPage() {
             {/* Bento Card 3 - Especializada (Tall) */}
             <div className="md:col-span-3 reveal reveal-delay-2 diamond-border p-10 rounded-[2.5rem] bg-card/40 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all duration-700 group">
               <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-6 group-hover:bg-primary group-hover:text-primary-foreground transition-all">
-                <ArrowRightLeft className="w-8 h-8" />
+                <ShieldCheck className="w-8 h-8" />
               </div>
               <h3 className="text-2xl font-black text-foreground mb-4">Gestión Especializada</h3>
               <p className="text-muted-foreground leading-relaxed text-lg">
@@ -413,7 +413,7 @@ export default function VialClearPage() {
                       num: '02',
                       title: 'Blindaje Administrativo',
                       desc: 'Desplegamos protocolos de defensa legal especializados para fundamentar la corrección de su estado vial.',
-                      icon: <ArrowRightLeft className="w-6 h-6" />,
+                      icon: <ShieldCheck className="w-6 h-6" />,
                     },
                     {
                       num: '03',
@@ -781,7 +781,7 @@ export default function VialClearPage() {
                   className="w-full h-16 rounded-3xl bg-primary text-primary-foreground font-black text-lg active:scale-95 transition-all shadow-xl shadow-primary/20 border-none group/btn"
                 >
                   ABRIR CANAL DIRECTO
-                  <ArrowRightLeft
+                  <ShieldCheck
                     size={18}
                     className="ml-3 group-hover:translate-x-1 transition-transform"
                   />
@@ -797,25 +797,22 @@ export default function VialClearPage() {
                 <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.4em]">
                   © {new Date().getFullYear()} DESMULTA — SERVICIO PRIVADO DE GESTIÓN VIAL
                 </p>
-                <span className="text-[9px] font-black uppercase tracking-widest bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/20 animate-pulse-slow">
-                  v2.2.0 PLATINUM
+                <span className="text-[9px] font-black uppercase tracking-widest bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/20">
+                  v2.3.0
                 </span>
               </div>
               <div className="flex items-center gap-4 opacity-40 hover:opacity-100 transition-opacity mt-1">
-                <span className="text-[9px] font-black uppercase tracking-widest bg-muted px-2 py-0.5 rounded">
-                  PROTECCIÓN DE DATOS HDS
-                </span>
-                <span className="text-[9px] font-black uppercase tracking-widest bg-muted px-2 py-0.5 rounded">
-                  MANDATO-FILTRO CERTIFIED
+                <span className="text-[9px] font-black uppercase tracking-widest bg-muted/30 px-2 py-0.5 rounded border border-white/5">
+                  Protección de Datos HDS
                 </span>
               </div>
             </div>
 
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-3 bg-card/40 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/5 shadow-inner">
-                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_#22c55e]" />
                 <span className="text-[10px] font-black uppercase tracking-widest text-green-600 dark:text-green-400">
-                  Global Systems: Operational
+                  Sistemas Globales: Operativos
                 </span>
               </div>
             </div>
@@ -857,18 +854,18 @@ export default function VialClearPage() {
           <MessageCircle size={36} fill="currentColor" className="text-white" />
         </button>
 
-        {/* Scroll to Top - Enhanced visibility */}
+        {/* Scroll to Top - Ultra Minimalist Arrow */}
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           className={cn(
-            'bg-card/80 backdrop-blur-md hover:bg-card border border-white/10 text-foreground w-14 h-14 rounded-full flex items-center justify-center shadow-xl transition-all duration-500',
+            'text-primary/70 hover:text-primary w-14 h-14 flex items-center justify-center transition-all duration-500',
             showScrollTop
               ? 'opacity-100 translate-y-0 scale-100'
               : 'opacity-0 translate-y-10 scale-50 pointer-events-none'
           )}
           title="Volver Arriba"
         >
-          <ArrowRightLeft size={20} className="rotate-90" />
+          <ArrowUp size={36} className="animate-bounce" />
         </button>
       </div>
 
