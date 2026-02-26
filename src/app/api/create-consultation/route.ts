@@ -94,24 +94,16 @@ export async function POST(request: NextRequest) {
     });
 
     // 5. & 6. Tareas en Background (Next.js 15 after API) - MANDATO-FILTRO
-    const notifyUrl = `${request.nextUrl.origin}/api/notify`;
-
     after(async () => {
-      // 5. Notificación Telegram (Consistente y asíncrona)
+      // 5. Notificación Telegram (Consistente y asíncrona, zero-latency directo al módulo)
       try {
-        await fetch(notifyUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-internal-secret': process.env.INTERNAL_API_SECRET || '',
-          },
-          body: JSON.stringify({ docId: consultationRef.id }),
-        });
+        const { sendTelegramNotification } = await import('@/lib/telegram');
+        await sendTelegramNotification(consultationRef.id);
       } catch (err) {
         logger.error('[create-consultation] Error en notificación:', { error: String(err) });
       }
 
-      // 6. Análisis IA Predictiva (Non-blocking) 
+      // 6. Análisis IA Predictiva (Non-blocking)
       try {
         const aiAnalysis = await analyzeViabilityFlow({
           antiquity: antiguedad,

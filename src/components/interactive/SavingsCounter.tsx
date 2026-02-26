@@ -3,28 +3,40 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, useSpring, useTransform, useInView } from 'framer-motion';
 import { TrendingUp, ShieldCheck } from 'lucide-react';
+import { doc } from 'firebase/firestore';
+import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 
-interface SavingsCounterProps {
-  finalAmount?: number; // En millones de pesos o valor total
-  duration?: number;
-}
-
-export function SavingsCounter({ finalAmount = 582 }: SavingsCounterProps) {
-  const [currentGoal, setCurrentGoal] = useState(finalAmount);
+export function SavingsCounter() {
+  const [currentGoal, setCurrentGoal] = useState(582);
   const [hasStarted, setHasStarted] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(containerRef, { once: true, amount: 0.5 });
+  const firestore = useFirestore();
 
-  // Lógica de crecimiento MANDATO-FILTRO:
-  // Aumentamos 1.5M cada mes desde una fecha base (Enero 2024)
+  // Conexión a DB para unificar el contador de Dinero.
+  const showcaseRef = useMemoFirebase(
+    () => (firestore ? doc(firestore, 'site_config', 'showcase') : null),
+    [firestore]
+  );
+
+  const { data: showcaseData } = useDoc<{ totalSavingsBase: number; monthlyGrowth: number }>(
+    showcaseRef
+  );
+
+  // Lógica de crecimiento Dinámica:
   useEffect(() => {
+    // Tomamos base de Firestore o default
+    const baseValue = showcaseData?.totalSavingsBase || 582;
+    const monthlyGrowth = showcaseData?.monthlyGrowth || 12.5;
+
     const baseDate = new Date(2024, 0, 1); // Enero 1, 2024
     const now = new Date();
     const monthsPassed =
       (now.getFullYear() - baseDate.getFullYear()) * 12 + (now.getMonth() - baseDate.getMonth());
-    const monthlyGrowth = 12.5; // Aumento promedio mensual para que se vea real
-    setCurrentGoal(finalAmount + Math.floor(monthsPassed * monthlyGrowth));
-  }, [finalAmount]);
+
+    // Calculamos el valor simulado actual sumando el tiempo
+    setCurrentGoal(baseValue + Math.floor(monthsPassed * monthlyGrowth));
+  }, [showcaseData]);
 
   // Spring animation for smooth numbers
   const count = useSpring(0, {
@@ -36,7 +48,7 @@ export function SavingsCounter({ finalAmount = 582 }: SavingsCounterProps) {
   const value = useTransform(count, (latest) => Math.floor(latest));
 
   useEffect(() => {
-    if (isInView && !hasStarted) {
+    if (isInView && !hasStarted && currentGoal > 0) {
       setHasStarted(true);
       count.set(currentGoal);
     }

@@ -1,12 +1,14 @@
 'use client';
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import { CheckCircle2, MapPin, Calendar, ArrowUpRight } from 'lucide-react';
+import React, { useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { CheckCircle2, MapPin, Calendar, ArrowUpRight, Activity } from 'lucide-react';
+import { collection, query, orderBy, limit } from 'firebase/firestore';
+import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 
-const STORIES = [
+const FALLBACK_STORIES = [
   {
-    id: 1,
+    id: 'fb-1',
     caseId: '#8842',
     location: 'Bogotá D.C.',
     amount: '$840,000',
@@ -14,7 +16,7 @@ const STORIES = [
     type: 'Saneamiento Integral',
   },
   {
-    id: 2,
+    id: 'fb-2',
     caseId: '#9103',
     location: 'Medellín',
     amount: '$1,250,000',
@@ -22,7 +24,7 @@ const STORIES = [
     type: 'Optimización de Historial',
   },
   {
-    id: 3,
+    id: 'fb-3',
     caseId: '#7721',
     location: 'Cali',
     amount: '$460,000',
@@ -30,7 +32,7 @@ const STORIES = [
     type: 'Resolución Técnica',
   },
   {
-    id: 4,
+    id: 'fb-4',
     caseId: '#8550',
     location: 'Barranquilla',
     amount: '$2,100,000',
@@ -54,32 +56,54 @@ const CITIES = [
   'Manizales',
 ];
 
+interface StoryData {
+  caseId: string;
+  location: string;
+  amount: string;
+  time: string;
+  type: string;
+}
+
 export function SuccessStories() {
-  const [rotatedStories, setRotatedStories] = React.useState(STORIES);
+  const [rotatedStories, setRotatedStories] = React.useState(FALLBACK_STORIES);
+  const firestore = useFirestore();
+
+  // 1. Data Layer - MANDATO-FILTRO v3.0 Live-Feed Query
+  const storiesQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, 'success_stories'), orderBy('createdAt', 'desc'), limit(4));
+  }, [firestore]);
+
+  const { data: liveStories, isLoading } = useCollection<StoryData>(storiesQuery);
 
   React.useEffect(() => {
-    // Lógica de rotación semanal MANDATO-FILTRO
-    const now = new Date();
-    const startOfYear = new Date(now.getFullYear(), 0, 1);
-    const weekNumber = Math.ceil(
-      ((now.getTime() - startOfYear.getTime()) / 86400000 + startOfYear.getDay() + 1) / 7
-    );
+    // Si no hay live stories, rotamos las estáticas para no dejar vacío
+    if (!liveStories || liveStories.length === 0) {
+      const now = new Date();
+      const startOfYear = new Date(now.getFullYear(), 0, 1);
+      const weekNumber = Math.ceil(
+        ((now.getTime() - startOfYear.getTime()) / 86400000 + startOfYear.getDay() + 1) / 7
+      );
 
-    const newStories = STORIES.map((story, index) => {
-      // Usamos el número de semana para rotar el índice de la ciudad
-      const cityIndex = (weekNumber + index) % CITIES.length;
-      // eslint-disable-next-line security/detect-object-injection -- cityIndex is calculated from internal constants and week number, not user input
-      return { ...story, location: CITIES[cityIndex] };
-    });
-    setRotatedStories(newStories);
-  }, []);
+      const newStories = FALLBACK_STORIES.map((story, index) => {
+        const cityIndex = (weekNumber + index) % CITIES.length;
+        // eslint-disable-next-line security/detect-object-injection
+        return { ...story, location: CITIES[cityIndex] };
+      });
+      setRotatedStories(newStories);
+    }
+  }, [liveStories]);
+
+  // Selección inteligente: Si hay DB, usar DB. Si no, fallback rotativo.
+  const displayStories = liveStories && liveStories.length > 0 ? liveStories : rotatedStories;
+  const isLive = liveStories && liveStories.length > 0;
 
   return (
     <section className="py-24 px-4 bg-background relative overflow-hidden">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
           <div className="max-w-2xl">
-            <h2 className="text-3xl md:text-5xl font-black text-foreground mb-6 tracking-tight leading-none uppercase">
+            <h2 className="text-3xl md:text-5xl font-black text-foreground mb-6 tracking-tight leading-none uppercase flex items-center gap-4">
               Resultados que <span className="text-primary">Hablan por Sí Solos</span>
             </h2>
             <p className="text-muted-foreground text-lg font-medium leading-relaxed">
@@ -89,84 +113,103 @@ export function SuccessStories() {
             </p>
           </div>
           <div className="hidden md:flex flex-col items-end gap-2">
-            <div className="flex items-center gap-2 px-6 py-4 rounded-2xl bg-primary/10 border-2 border-primary/30 text-primary font-black uppercase text-sm tracking-widest shadow-[0_0_20px_rgba(255,191,0,0.1)]">
-              <CheckCircle2 size={20} className="animate-pulse" />
-              CASOS VERIFICADOS
+            <div className="flex items-center gap-2 px-6 py-4 rounded-2xl bg-primary/10 border-2 border-primary/30 text-primary font-black uppercase text-sm tracking-widest shadow-[0_0_20px_rgba(255,191,0,0.1)] transition-all">
+              {isLive ? (
+                <>
+                  <Activity size={20} className="animate-pulse text-green-500" />
+                  <span className="text-green-500">LIVE FEED ACTIVO</span>
+                </>
+              ) : (
+                <>
+                  <CheckCircle2 size={20} className="animate-pulse" />
+                  CASOS VERIFICADOS
+                </>
+              )}
             </div>
             <p className="text-[10px] text-muted-foreground italic font-medium">
-              Última actualización: Esta semana
+              {isLive ? 'Sincronizado con base de datos real' : 'Última actualización: Esta semana'}
             </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {rotatedStories.map((story, index) => (
-            <motion.div
-              key={story.id}
-              initial={{ opacity: 0, y: 15 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.4,
-                delay: index * 0.05,
-                ease: 'easeOut',
-              }}
-              viewport={{ once: true, margin: '-50px' }}
-              className="glass p-8 rounded-[2rem] group hover:border-primary/50 transition-all duration-300 relative overflow-hidden cursor-pointer active:scale-[0.98] will-change-[opacity,transform]"
-              onClick={() => {
-                window.dispatchEvent(new CustomEvent('open-consultation-modal'));
-              }}
-            >
-              <div className="flex justify-between items-start mb-8">
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60">
-                    Expediente {story.caseId}
-                  </span>
-                  <span className="text-[8px] font-bold text-muted-foreground/40 uppercase tracking-tighter">
-                    Estado: PROTEGIDO (Habeas Data)
-                  </span>
-                </div>
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                  <ArrowUpRight size={20} />
-                </div>
-              </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 min-h-[300px]">
+          <AnimatePresence mode="popLayout">
+            {displayStories.map((story, index) => (
+              <motion.div
+                key={story.id}
+                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+                transition={{
+                  duration: 0.5,
+                  delay: index * 0.1,
+                  type: 'spring',
+                  bounce: 0.4,
+                }}
+                className={`glass p-8 rounded-[2rem] group transition-all duration-300 relative overflow-hidden cursor-pointer active:scale-[0.98] will-change-[transform] ${isLive ? 'border-primary/20 hover:border-primary border-2 shadow-[0_0_15px_rgba(255,191,0,0.05)] hover:shadow-[0_0_30px_rgba(255,191,0,0.15)] bg-gradient-to-b from-card/80 to-primary/5' : 'hover:border-primary/50'}`}
+                onClick={() => window.dispatchEvent(new CustomEvent('open-consultation-modal'))}
+              >
+                {/* Live Indicator Dot */}
+                {isLive && (
+                  <div className="absolute top-4 left-4 w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.8)] animate-pulse z-20" />
+                )}
 
-              <div className="space-y-6">
-                <div>
-                  <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">
-                    Monto Recuperado
-                  </h4>
-                  <p className="text-3xl font-black text-foreground italic">{story.amount}</p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
-                  <div className="flex items-center gap-2">
-                    <MapPin size={14} className="text-primary" />
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase">
-                      {story.location}
+                <div className="flex justify-between items-start mb-8 relative z-10">
+                  <div className="flex flex-col ml-3">
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60">
+                      Expediente {story.caseId}
+                    </span>
+                    <span className="text-[8px] font-bold text-muted-foreground/40 uppercase tracking-tighter">
+                      Estado: PROTEGIDO (Habeas Data)
                     </span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Calendar size={14} className="text-primary" />
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase text-right">
-                      {story.time}
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300 hover:rotate-45">
+                    <ArrowUpRight size={20} />
+                  </div>
+                </div>
+
+                <div className="space-y-6 relative z-10">
+                  <div>
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">
+                      Monto Recuperado
+                    </h4>
+                    <p
+                      className={`text-3xl font-black italic transition-colors duration-300 ${isLive ? 'text-white group-hover:text-primary drop-shadow-md' : 'text-foreground'}`}
+                    >
+                      {story.amount}
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
+                    <div className="flex items-center gap-2">
+                      <MapPin size={14} className="text-primary" />
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase">
+                        {story.location}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Calendar size={14} className="text-primary" />
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase text-right">
+                        {story.time}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between items-center">
+                    <div className="inline-flex px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-[9px] font-black uppercase tracking-widest text-foreground/50 truncate max-w-[120px]">
+                      {story.type}
+                    </div>
+                    <span className="text-[9px] font-black text-primary opacity-0 group-hover:opacity-100 transition-opacity translate-x-4 group-hover:translate-x-0 duration-300">
+                      VER DETALLES →
                     </span>
                   </div>
                 </div>
 
-                <div className="flex justify-between items-center">
-                  <div className="inline-flex px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-[9px] font-black uppercase tracking-widest text-foreground/50">
-                    {story.type}
-                  </div>
-                  <span className="text-[9px] font-black text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                    VALIDAR →
-                  </span>
-                </div>
-              </div>
-
-              {/* Decorative accent */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl rounded-full -mr-16 -mt-16 group-hover:bg-primary/10 transition-colors" />
-            </motion.div>
-          ))}
+                {/* Decorative accent */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl rounded-full -mr-16 -mt-16 group-hover:bg-primary/20 transition-colors duration-500" />
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
 
         {/* Footnote for Rigor & Confidence */}

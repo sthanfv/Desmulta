@@ -141,7 +141,7 @@ export default function VialClearPage() {
   }, []);
 
   useEffect(() => {
-    // Soporte para Shortcuts de PWA Premium - v2.7.0
+    // Soporte para Shortcuts de PWA Premium - v3.0.0
     const params = new URLSearchParams(window.location.search);
     if (params.get('action') === 'consultar') {
       setIsModalOpen(true);
@@ -810,7 +810,7 @@ export default function VialClearPage() {
                   © {new Date().getFullYear()} DESMULTA — SERVICIO PRIVADO DE GESTIÓN VIAL
                 </p>
                 <span className="text-[9px] font-black uppercase tracking-widest bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/20">
-                  v2.6.0
+                  v3.0 PLATINUM
                 </span>
               </div>
               <div className="flex items-center gap-4 opacity-40 hover:opacity-100 transition-opacity mt-1">
