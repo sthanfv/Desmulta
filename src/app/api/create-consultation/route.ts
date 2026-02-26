@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { getFirestore, Timestamp, FieldValue } from 'firebase-admin/firestore';
 import { getAdminApp } from '@/lib/firebase-admin';
 import { ConsultationSchema } from '@/lib/definitions';
@@ -13,7 +13,7 @@ try {
   logger.error('[firebase-admin] Error de inicialización:', { error: message });
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   getAdminApp();
   const db = getFirestore();
 
