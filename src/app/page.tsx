@@ -617,6 +617,14 @@ export default function VialClearPage() {
                 q: '¿Es seguro proporcionar mi número de cédula?',
                 a: 'Es indispensable para realizar la consulta técnica en las bases de datos oficiales. No almacenamos su documento de forma permanente y cumplimos con la normativa de Protección de Datos.',
               },
+              {
+                q: '¿Es segura esta página? (SSL y el candado verde)',
+                a: 'Totalmente. Operamos bajo tecnología SSL (HTTPS) de grado industrial a través de Vercel. Puedes verificarlo viendo el candado verde o gris cerrado en la barra de direcciones de tu navegador, lo que garantiza que toda tu información viaja de forma encriptada y segura.',
+              },
+              {
+                q: '¿Por qué es riesgoso gestionar mis deudas de tránsito por mi cuenta?',
+                a: 'Analizamos la viabilidad técnica de tu historial bajo protocolos de alta precisión para diseñar una estrategia jurídica que busca maximizar tus probabilidades de éxito. Intentar procesos administrativos sin el respaldo técnico experto podría comprometer seriamente la efectividad de tus trámites, exponiéndote a errores de argumentación que podrían cerrar tu oportunidad de saneamiento vial definitivamente.',
+              },
             ].map((faq, i) => (
               <AccordionItem
                 key={i}
@@ -687,6 +695,12 @@ export default function VialClearPage() {
                   Líderes en defensa administrativa y saneamiento vial. Transformamos problemas
                   legales en soluciones definitivas con ética y transparencia.
                 </p>
+                <div className="pt-4 p-4 rounded-2xl bg-primary/5 border border-primary/10">
+                  <p className="text-xs text-muted-foreground leading-relaxed italic">
+                    <span className="font-bold text-primary">¿Por qué usamos Vercel? </span>
+                    Somos un proyecto independiente de tecnología legal (LegalTech) que busca democratizar el acceso a la defensa ciudadana sin costos excesivos.
+                  </p>
+                </div>
               </div>
 
               <div className="mt-12 flex gap-4">
@@ -810,7 +824,7 @@ export default function VialClearPage() {
                   © {new Date().getFullYear()} DESMULTA — SERVICIO PRIVADO DE GESTIÓN VIAL
                 </p>
                 <span className="text-[9px] font-black uppercase tracking-widest bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/20">
-                  v3.0 PLATINUM
+                  v3.1.0
                 </span>
               </div>
               <div className="flex items-center gap-4 opacity-40 hover:opacity-100 transition-opacity mt-1">
