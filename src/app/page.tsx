@@ -207,7 +207,6 @@ export default function VialClearPage() {
             </div>
             <span
               className="text-xl font-black tracking-tight text-foreground hidden sm:inline-block"
-              role="text"
             >
               DES<span className="text-primary italic">MULTA</span>
             </span>
@@ -271,7 +270,7 @@ export default function VialClearPage() {
               </span>{' '}
               VIAL
             </h1>
-            <p className="text-sm md:text-lg lg:text-xl text-white/70 font-medium leading-[1.6] max-w-lg reveal reveal-delay-1">
+            <p className="text-sm md:text-lg lg:text-xl text-white/95 font-medium leading-[1.6] max-w-lg reveal reveal-delay-1">
               Blindaje legal experto para sus trámites administrativos, fotomultas y comparendos.
               Saneamiento integral con absoluta reserva y transparencia corporativa.
             </p>
@@ -824,7 +823,7 @@ export default function VialClearPage() {
                   © {new Date().getFullYear()} DESMULTA — SERVICIO PRIVADO DE GESTIÓN VIAL
                 </p>
                 <span className="text-[9px] font-black uppercase tracking-widest bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/20">
-                  v3.1.0
+                  v3.2.0
                 </span>
               </div>
               <div className="flex items-center gap-4 opacity-40 hover:opacity-100 transition-opacity mt-1">

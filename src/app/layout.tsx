@@ -21,14 +21,12 @@ export const viewport: Viewport = {
   themeColor: '#ffbf00',
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
 };
 
 export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL ||
-      (process.env.NODE_ENV === 'development' ? 'http://localhost:9005' : 'https://desmulta.com')
+    (process.env.NODE_ENV === 'development' ? 'http://localhost:9005' : 'https://desmulta.com')
   ),
   title: `${process.env.NEXT_PUBLIC_BRAND_NAME || 'Desmulta'} - Saneamiento de Multas de Tránsito`,
   description:
@@ -64,7 +62,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="es" suppressHydrationWarning>
       <head>
         {GSC_ID && <meta name="google-site-verification" content={GSC_ID} />}
         <link rel="preconnect" href="https://images.unsplash.com" />
