@@ -28,9 +28,33 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_SITE_URL ||
     (process.env.NODE_ENV === 'development' ? 'http://localhost:9005' : 'https://desmulta.com')
   ),
-  title: `${process.env.NEXT_PUBLIC_BRAND_NAME || 'Desmulta'} - Saneamiento de Multas de Tránsito`,
+  title: `${process.env.NEXT_PUBLIC_BRAND_NAME || 'Desmulta'} - Saneamiento de Multas de Tránsito en Colombia`,
   description:
-    'Gestionamos técnicamente sus trámites ante las Secretarías de Tránsito para sanear deudas administrativas de forma eficiente.',
+    'Expertos en gestión administrativa y saneamiento de deudas viales. Consulte su viabilidad gratis y recupere su paz mental ante el SIMIT y Secretarías de Tránsito.',
+  keywords: [
+    'multas de tránsito',
+    'comparendos',
+    'fotomultas',
+    'SIMIT',
+    'saneamiento vial',
+    'defensa administrativa',
+    'prescripción de multas',
+    'caducidad comparendos',
+    'tránsito Colombia',
+    'Desmulta',
+  ],
+  authors: [{ name: 'Desmulta LegalTech' }],
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
@@ -49,10 +73,27 @@ export const metadata: Metadata = {
     apple: '/icon.png',
   },
   openGraph: {
-    title: `Desmulta - Recupere su Tranquilidad Vial`,
-    description: 'Gestión técnica de trámites de tránsito a nivel nacional.',
+    title: 'Desmulta - Saneamiento Profesional de Multas en Colombia',
+    description: 'Análisis de viabilidad gratuito para sus comparendos y fotomultas. Gestión técnica 100% legal.',
+    url: './',
+    siteName: 'Desmulta',
+    locale: 'es_CO',
     type: 'website',
-    images: [{ url: '/logo.png' }],
+    images: [
+      {
+        url: '/logo.png',
+        width: 1200,
+        height: 630,
+        alt: 'Desmulta - Tecnología Vial y Saneamiento Administrativo',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Desmulta - Recupere su Liderazgo Vial',
+    description: 'Gestión experta de trámites administrativos de tránsito. Sin cobros ocultos.',
+    images: ['/logo.png'],
+    creator: '@desmulta_co',
   },
 };
 

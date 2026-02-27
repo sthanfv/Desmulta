@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { ConsultationForm } from '@/components/vial-clear/ConsultationForm';
 import { SavingsCounter } from '@/components/interactive/SavingsCounter';
 import { Lightbox } from '@/components/ui/lightbox';
@@ -247,7 +247,7 @@ export default function VialClearPage() {
           <div className="md:hidden absolute inset-0 opacity-30 blur-[1px]">
             <Image
               src="https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&q=80&w=800"
-              alt="Contexto Vial Desmulta"
+              alt="Contexto de seguridad vial y gestión de multas en Colombia"
               fill
               priority
               sizes="100vw"
@@ -473,7 +473,7 @@ export default function VialClearPage() {
                 <div className="relative aspect-square rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white/10 rotate-2 hover:rotate-0 transition-all duration-700">
                   <Image
                     src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&q=80&w=800"
-                    alt="Legal assistance office"
+                    alt="Oficina de asesoría jurídica especializada en derecho de tránsito"
                     fill
                     className="object-cover"
                   />
@@ -823,7 +823,7 @@ export default function VialClearPage() {
                   © {new Date().getFullYear()} DESMULTA — SERVICIO PRIVADO DE GESTIÓN VIAL
                 </p>
                 <span className="text-[9px] font-black uppercase tracking-widest bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/20">
-                  v3.2.1
+                  v3.3.8
                 </span>
               </div>
               <div className="flex items-center gap-4 opacity-40 hover:opacity-100 transition-opacity mt-1">
@@ -854,10 +854,10 @@ export default function VialClearPage() {
                 <DialogTitle className="text-4xl font-black text-center text-foreground tracking-tight">
                   Estudio de Viabilidad Gratuito
                 </DialogTitle>
-                <p className="text-center text-lg text-muted-foreground mt-3 font-medium">
+                <DialogDescription className="text-center text-lg text-muted-foreground mt-3 font-medium">
                   Recibiremos su información para un análisis técnico detallado. La respuesta será
                   enviada a su WhatsApp dentro de nuestros horarios laborales habituales.
-                </p>
+                </DialogDescription>
               </DialogHeader>
               <ConsultationForm onSuccess={() => setIsModalOpen(false)} />
             </div>
@@ -905,7 +905,7 @@ export default function VialClearPage() {
               <DialogTitle className="text-3xl font-black text-foreground tracking-tight">
                 Asesoría Directa
               </DialogTitle>
-              <div className="space-y-4 pt-4">
+              <DialogDescription className="space-y-4 pt-4">
                 <p className="text-muted-foreground text-lg leading-relaxed font-medium">
                   Recuerde que el estudio de viabilidad base es{' '}
                   <span className="text-primary font-black">100% gratuito</span>.
@@ -918,7 +918,7 @@ export default function VialClearPage() {
                     honorarios por resultados.
                   </p>
                 </div>
-              </div>
+              </DialogDescription>
             </DialogHeader>
             <div className="flex flex-col gap-4 mt-10">
               <Button

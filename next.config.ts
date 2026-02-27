@@ -8,6 +8,11 @@ const withPWA = withPWAInit({
   fallbacks: {
     document: '/offline.html',
   },
+  // Forzamos a no usar helpers de transpilación externos que fallan en sw.js
+  workboxOptions: {
+    skipWaiting: true,
+    clientsClaim: true,
+  }
 });
 
 import { securityHeadersLabels } from './src/lib/security-headers';

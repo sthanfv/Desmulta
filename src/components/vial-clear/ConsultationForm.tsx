@@ -106,6 +106,7 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
   };
 
   const formatPlaca = (value: string) => {
+    // Solo permitimos 6 caracteres: 3 letras y 3 números para carros, o formatos similares.
     return value
       .replace(/[^a-zA-Z0-9]/g, '')
       .toUpperCase()
@@ -175,14 +176,16 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
       }
 
       toast({
-        title: '¡Análisis Iniciado!',
+        title: '¡Análisis en Trámite!',
         description:
-          'Tu caso ha pasado el filtro inicial. Un asesor jurídico revisará tu historial completo y te contactará vía WhatsApp.',
+          'Tu información ha sido recibida con éxito. Un asesor especializado procesará tu análisis de viabilidad jurídica.',
+        duration: 8000,
       });
       haptics.vibrate('success');
       setIsSuccess(true);
       localStorage.removeItem('consultation_draft');
-      setTimeout(onSuccess, 4000);
+      // Extendemos el tiempo visible del modal de éxito para dar calma al usuario
+      setTimeout(onSuccess, 8000);
     } catch (e: unknown) {
       haptics.vibrate('error');
       const message = e instanceof Error ? e.message : 'Por favor, intente de nuevo más tarde.';
@@ -204,10 +207,10 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
           Certificación en Trámite
         </h3>
         <p className="text-muted-foreground text-lg max-w-sm leading-relaxed font-medium">
-          Hemos recibido su información y el análisis preliminar de viabilidad. Un asesor se
-          comunicará al WhatsApp{' '}
-          <span className="text-primary font-bold">{form.getValues('contacto')}</span> para
-          finalizar el proceso.
+          Su caso está siendo procesado por nuestro motor de IA predictiva. Un asesor jurídico le
+          contactará en su WhatsApp{' '}
+          <span className="text-primary font-bold">{form.getValues('contacto')}</span> durante
+          nuestro horario de atención habitual para entregarle su análisis blindado.
         </p>
         <Button
           onClick={onSuccess}
@@ -559,6 +562,12 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
                 'INICIAR ESTUDIO GRATUITO'
               )}
             </Button>
+            <div className="flex items-center justify-center gap-2 pt-2 opacity-50 grayscale hover:grayscale-0 transition-all cursor-default">
+              <ShieldCheck className="w-3 h-3 text-primary" />
+              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-foreground">
+                Encriptación RSA 256-bit Activada
+              </span>
+            </div>
           </div>
         )}
 

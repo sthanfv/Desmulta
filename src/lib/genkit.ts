@@ -1,7 +1,9 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Configuración directa de Google Generative AI (v5.1 - No Genkit dependency)
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENAI_API_KEY || '');
+const apiKey = process.env.GEMINI_API_KEY || '';
+const genAI = new GoogleGenerativeAI(apiKey);
+// Usamos el nombre del modelo sin parámetros de versión para dejar que el SDK v0.24 decida el mejor endpoint (v1)
 const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
 export interface ViabilityInput {
@@ -36,6 +38,14 @@ export async function analyzeViabilityFlow(input: ViabilityInput): Promise<Viabi
 
     RESPUESTA: JSON PURO con score (0-100), rationale (máx 15 palabras), y recommendation (PROCEDER/ESTUDIO_PROFUNDO/DESCARTAR).
   `;
+
+  if (!apiKey) {
+    return {
+      score: 50,
+      rationale: 'API Key no configurada. Requiere revisión manual.',
+      recommendation: 'ESTUDIO_PROFUNDO',
+    };
+  }
 
   try {
     const result = await model.generateContent(prompt);

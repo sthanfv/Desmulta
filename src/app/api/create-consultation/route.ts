@@ -103,7 +103,8 @@ export async function POST(request: NextRequest) {
         logger.error('[create-consultation] Error en notificación:', { error: String(err) });
       }
 
-      // 6. Análisis IA Predictiva (Non-blocking)
+      /* 
+      // 6. Análisis IA Predictiva (Desactivado temporalmente por solicitud del usuario - v3.3.6)
       try {
         const aiAnalysis = await analyzeViabilityFlow({
           antiquity: antiguedad,
@@ -115,6 +116,7 @@ export async function POST(request: NextRequest) {
       } catch (aiError) {
         logger.error('[create-consultation] Fallo en IA:', { error: String(aiError) });
       }
+      */
     });
 
     return NextResponse.json({ success: true, docId: consultationRef.id }, { status: 201 });
