@@ -1,11 +1,11 @@
-# 🛡️ DESMULTA (v3.2.0)
+# 🛡️ DESMULTA (v3.2.1)
 
 **Desmulta** es una plataforma de ingeniería legal y autoridad vial de élite diseñada bajo los más altos estándares de UX/UI (**iOS 17 Aesthetic**) e Inteligencia Artificial Predictiva.
 
 > [!IMPORTANT]
 > **MANDATO-FILTRO Standard**: Este proyecto cumple con los lineamientos de seguridad, performance extremo (100/100 LCP) y fluidez de scroll nativa profesional.
 
-## 🚀 Características (v3.2.0)
+## 🚀 Características (v3.2.1)
 
 - **⚡ Async Engine (Next.js 15 After)**: Notificaciones a Telegram e integraciones de IA procesadas sin bloquear el thread del cliente para una UX con zero-latency.
 - **💎 iOS 17 Visual Excellence**:
