@@ -17,7 +17,7 @@ async function sleep(ms: number) {
 
 export async function sendMessage(message: string) {
   const maxRetries = 2;
-  let lastError: any = null;
+  let lastError: unknown = null;
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
@@ -30,9 +30,12 @@ export async function sendMessage(message: string) {
       const response = await chatFlow({ message });
       return { success: true, text: response };
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       lastError = error;
-      const statusCode = (error as any)?.code || (error as any)?.status;
+
+      // Inspección segura de errores de Genkit/API
+      const err = error as { code?: number | string; status?: string | number };
+      const statusCode = err?.code || err?.status;
 
       // Si no es un error de cuota (429), no reintentamos
       if (statusCode !== 429 && statusCode !== 'RESOURCE_EXHAUSTED') {
