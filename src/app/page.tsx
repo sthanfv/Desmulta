@@ -947,7 +947,7 @@ export default function VialClearPage() {
         </DialogContent>
       </Dialog>
       {/* Nuevo ChatBot Profesional con Genkit & Server Actions v4.0.0 */}
-      <ChatBubble />
+      {/* <ChatBubble /> */}
     </div>
   );
 }
