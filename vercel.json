@@ -1,8 +1,8 @@
 {
-    "crons": [
-        {
-            "path": "/api/cron/retry-notifications",
-            "schedule": "0 0 * * *"
-        }
-    ]
+  "crons": [
+    {
+      "path": "/api/cron/retry-notifications",
+      "schedule": "0 0 * * *"
+    }
+  ]
 }

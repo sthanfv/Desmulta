@@ -1,6 +1,6 @@
 {
   "name": "desmulta-web",
-  "version": "3.3.8",
+  "version": "4.0.7",
   "private": true,
   "scripts": {
     "dev": "next dev -p 9005",
@@ -62,7 +62,7 @@
     "recharts": "^2.15.1",
     "tailwind-merge": "^3.0.1",
     "tailwindcss-animate": "^1.0.7",
-    "zod": "^3.24.2"
+    "zod": "3.25.1"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",

@@ -18,13 +18,21 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import { ConsultationForm } from '@/components/vial-clear/ConsultationForm';
 import { SavingsCounter } from '@/components/interactive/SavingsCounter';
 import { Lightbox } from '@/components/ui/lightbox';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MeshBackground } from '@/components/ui/MeshBackground';
 import { InstallPWA } from '@/components/pwa/InstallPWA';
+import { ChatBubble } from '@/components/chat/chat-bubble';
+
 import {
   Accordion,
   AccordionContent,
@@ -205,9 +213,7 @@ export default function VialClearPage() {
             <div className="bg-primary p-2 rounded-xl shadow-lg shadow-primary/20">
               <ShieldCheck className="w-6 h-6 text-primary-foreground" />
             </div>
-            <span
-              className="text-xl font-black tracking-tight text-foreground hidden sm:inline-block"
-            >
+            <span className="text-xl font-black tracking-tight text-foreground hidden sm:inline-block">
               DES<span className="text-primary italic">MULTA</span>
             </span>
           </div>
@@ -579,7 +585,7 @@ export default function VialClearPage() {
       </section>
 
       {/* FAQ - Premium Accordion Section */}
-      <section className="py-24 px-4 bg-muted/10">
+      <section id="faq-section" className="py-24 px-4 bg-muted/10">
         <div className="max-w-4xl mx-auto space-y-12">
           <div className="text-center space-y-4 mb-20 reveal">
             <h2 className="text-3xl md:text-5xl font-black text-foreground tracking-tight">
@@ -697,7 +703,8 @@ export default function VialClearPage() {
                 <div className="pt-4 p-4 rounded-2xl bg-primary/5 border border-primary/10">
                   <p className="text-xs text-muted-foreground leading-relaxed italic">
                     <span className="font-bold text-primary">¿Por qué usamos Vercel? </span>
-                    Somos un proyecto independiente de tecnología legal (LegalTech) que busca democratizar el acceso a la defensa ciudadana sin costos excesivos.
+                    Somos un proyecto independiente de tecnología legal (LegalTech) que busca
+                    democratizar el acceso a la defensa ciudadana sin costos excesivos.
                   </p>
                 </div>
               </div>
@@ -734,9 +741,10 @@ export default function VialClearPage() {
                 <nav className="flex flex-col gap-6">
                   {[
                     { label: 'Inicio', href: '#', action: () => window.scrollTo(0, 0) },
-                    { label: 'Estudio Técnico', href: '/terminos' },
+                    { label: 'Nuestros Servicios', href: '/servicios' },
+                    { label: 'Metodología', href: '/metodologia' },
+                    { label: 'Preguntas Frecuentes', href: '/faq' },
                     { label: 'Términos de Uso', href: '/terminos' },
-                    { label: 'Política Privacidad', href: '/terminos' },
                   ].map((link, i) => (
                     <Link
                       key={i}
@@ -938,6 +946,8 @@ export default function VialClearPage() {
           </div>
         </DialogContent>
       </Dialog>
+      {/* Nuevo ChatBot Profesional con Genkit & Server Actions v4.0.0 */}
+      <ChatBubble />
     </div>
   );
 }

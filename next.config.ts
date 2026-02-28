@@ -12,7 +12,7 @@ const withPWA = withPWAInit({
   workboxOptions: {
     skipWaiting: true,
     clientsClaim: true,
-  }
+  },
 });
 
 import { securityHeadersLabels } from './src/lib/security-headers';

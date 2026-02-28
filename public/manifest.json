@@ -1,56 +1,53 @@
 {
-    "name": "Desmulta - Gestión de Multas",
-    "short_name": "Desmulta",
-    "description": "Expertos en saneamiento administrativo de fotomultas y comparendos en toda Colombia.",
-    "lang": "es-CO",
-    "start_url": "/",
-    "display": "standalone",
-    "background_color": "#ffffff",
-    "theme_color": "#ffbf00",
-    "orientation": "portrait",
-    "scope": "/",
-    "categories": [
-        "utilities",
-        "legal"
-    ],
-    "icons": [
+  "name": "Desmulta - Gestión de Multas",
+  "short_name": "Desmulta",
+  "description": "Expertos en saneamiento administrativo de fotomultas y comparendos en toda Colombia.",
+  "lang": "es-CO",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffbf00",
+  "orientation": "portrait",
+  "scope": "/",
+  "categories": ["utilities", "legal"],
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Consultar Multas",
+      "short_name": "Consultar",
+      "description": "Revisa el estado de tus fotomultas",
+      "url": "/?action=consultar",
+      "icons": [
         {
-            "src": "/logo.png",
-            "sizes": "192x192",
-            "type": "image/png",
-            "purpose": "any"
-        },
-        {
-            "src": "/logo.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "any"
-        },
-        {
-            "src": "/logo.png",
-            "sizes": "192x192",
-            "type": "image/png",
-            "purpose": "maskable"
-        },
-        {
-            "src": "/logo.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "maskable"
+          "src": "/android-chrome-512x512.png",
+          "sizes": "192x192"
         }
-    ],
-    "shortcuts": [
-        {
-            "name": "Consultar Multas",
-            "short_name": "Consultar",
-            "description": "Revisa el estado de tus fotomultas",
-            "url": "/?action=consultar",
-            "icons": [
-                {
-                    "src": "/android-chrome-512x512.png",
-                    "sizes": "192x192"
-                }
-            ]
-        }
-    ]
+      ]
+    }
+  ]
 }

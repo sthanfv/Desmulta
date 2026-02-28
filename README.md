@@ -1,79 +1,44 @@
-# 🛡️ DESMULTA (v3.3.0)
+# Desmulta - Saneamiento Vial Inteligente v4.0.7
 
-**Desmulta** es una plataforma de ingeniería legal y autoridad vial de élite diseñada bajo los más altos estándares de UX/UI (**iOS 17 Aesthetic**) e Inteligencia Artificial Predictiva.
+![Desmulta Logo](https://desmulta-ofi.vercel.app/icon.png)
 
-> [!IMPORTANT]
-> **MANDATO-FILTRO Standard**: Este proyecto cumple con los lineamientos de seguridad, performance extremo (100/100 LCP) y fluidez de scroll nativa profesional.
+## 🚀 Descripción del Proyecto
+Líderes en defensa administrativa y saneamiento vial en Colombia. Transforma problemas legales en soluciones definitivas con ética, transparencia y tecnología de vanguardia.
 
-## 🚀 Características (v3.3.0)
+## 🧠 Arquitectura de Inteligencia Desmulta
+Nuestro sistema ha evolucionado a un motor de **Inteligencia de Gestión Administrativa** basado en:
+- **Google Genkit**: Framework de orquestación para flujos de IA robustos.
+- **Gemini 2.0 Flash**: Motor de procesamiento avanzado con tiempos de respuesta ultra-rápidos.
+- **Protocolos de Éxito**: Algoritmos de persuasión diseñados para maximizar la conversión y proteger la metodología interna (MANDATO-FILTRO).
+- **Eficiencia de Tokens**: Knowledge Base compactada para optimizar el uso de recursos y garantizar estabilidad.
 
-- **⚡ Async Engine (Next.js 15 After)**: Notificaciones a Telegram e integraciones de IA procesadas sin bloquear el thread del cliente para una UX con zero-latency.
-- **💎 iOS 17 Visual Excellence**:
-  - **Glassmorphism HD**: Efectos de esmerilado de alta densidad (`backdrop-blur: 40px`) con bordes de diamante.
-  - **Mesh Backgrounds**: Fondos de mallas orgánicas animadas para una profundidad visual hipnótica.
-  - **Premium Skeletons**: Estados de carga con transparencia y destellos premium.
-- **📱 Mobile Elite UX**:
-  - **PWA Premium**: Soporte para atajos de acceso rápido y experiencia de "App Nativa".
-  - **Ultra-Fluid Scroll**: Optimización de respuesta inmediata para mouse y gestos táctiles.
-  - **Haptic Engine**: Retroalimentación táctil (vibración) sincronizada con acciones clave.
+## 💎 Características Principales
+- **Estética iOS Glassmorphism**: Interfaz premium con transparencias avanzadas y micro-animaciones.
+- **Contextual Appearance**: El asistente aparece de forma inteligente solo en secciones estratégicas (FAQ).
+- **Blindaje de Negocio**: Prompt engineering avanzado para prevenir la revelación de secretos comerciales.
+- **Manejo de Alta Demanda**: Gestión elegante de cuotas de API bajo fachadas de prestigio.
 
-- **💼 CRM Administrativo**:
-  - **Lead Management**: Pipeline de gestión de clientes con estados dinámicos (Pendiente, Contactado, En Proceso).
-  - **Conversión de Casos**: Sistema de un solo clic para transformar leads en expedientes legales activos.
-  - **Privacidad HDS**: Enmascaramiento de datos sensibles con revelación bajo demanda.
+## 🛠 Tech Stack
+- **Frontend**: Next.js 15 (App Router), React 19, Tailwind CSS.
+- **Componentes**: Radix UI, Lucide React, Shadcn/UI.
+- **Backend**: Next.js Server Actions, Firebase.
+- **Validación**: Zod, React Hook Form.
+- **Pipeline**: ESLint, Prettier, TypeScript, Vitest, Playwright.
 
-- **⚡ Arquitectura de Eficiencia (Plan Spark)**:
-  - **Zero-Waste Reads**: Optimizado para minimizar lecturas de Firebase mediante actualización de estado local.
-  - **Auto-Legacy Cleanup**: Sistema automático de purga de datos antiguos para optimizar el almacenamiento.
-
-## 🛠️ Stack Tecnológico
-
-- **Frontend**: Next.js 15 (App Router), Tailwind CSS, Framer Motion, Lucide React.
-- **Backend / AI**: Google Generative AI SDK (Gemini 1.5), Firestore, Firebase Auth, Telegram API.
-- **Calidad**: Playwright (E2E Smoke Tests), Vitest (Unit), ESLint, Prettier.
-
-## 📖 Glosario de Contenidos (Copia Maestra)
-
-Este glosario contiene todos los textos actuales de la plataforma para referencia rápida y consistencia editorial.
-
-### General & Autoridad
-- **Marca**: DESMULTA — TECNOLOGÍA VIAL
-- **Slogan Hero**: "RECUPERE LIDERAZGO VIAL"
-- **Descripción Hero**: "Blindaje legal experto para sus trámites administrativos, fotomultas y comparendos. Saneamiento integral con absoluta reserva y transparencia corporativa."
-- **CTAs**: "Consultar Ahora", "Iniciar Estudio Sin Costo", "CONSULTA GRATIS", "ABRIR CANAL DIRECTO"
-
-### Pilares de Autoridad (Ventajas)
-- **Respaldo Normativo**: Operamos bajo estrictos protocolos de defensa administrativa. Nuestro conocimiento especializado es su mayor garantía frente a las autoridades de tránsito.
-- **Gestión Especializada**: Trato directo y profesional centrado en la resolución administrativa personalizada de su historial vial.
-- **Eficiencia Comprobada**: Acompañamiento experto fundamentado en el estricto cumplimiento de los términos legales y la normativa vigente.
-
-### El Proceso (Pasos)
-1. **Certificación de Viabilidad**: Realizamos un análisis técnico profundo de su historial para determinar las probabilidades de éxito jurídico.
-2. **Blindaje Administrativo**: Desplegamos protocolos de defensa legal especializados para fundamentar la corrección de su estado vial.
-3. **Certificación Final**: Confirmamos la resolución efectiva ante los portales institucionales y entregamos su acta de saneamiento.
-
-### FAQs (Psicología y Seguridad)
-- **Riesgo de Gestión Propia**: Analizamos la viabilidad técnica de tu historial bajo protocolos de alta precisión para diseñar una estrategia jurídica que busca maximizar tus probabilidades de éxito. Intentar procesos administrativos sin el respaldo técnico experto podría comprometer seriamente la efectividad de tus trámites, exponiéndote a errores de argumentación que podrían cerrar tu oportunidad de saneamiento vial definitivamente.
-- **Seguridad SSL**: Operamos bajo tecnología SSL (HTTPS) de grado industrial a través de Vercel. Puedes verificarlo viendo el candado verde o gris cerrado en la barra de direcciones de tu navegador, lo que garantiza que toda tu información viaja de forma encriptada y segura.
-
-### Notas Legales y Transparencia
-- **Honorarios**: "El estudio de viabilidad inicial es una cortesía para identificar sus oportunidades de saneamiento. La ejecución de trámites administrativos y gestión técnica genera honorarios de éxito que se ajustan según la complejidad de su caso."
-- **Infraestructura**: "¿Por qué usamos Vercel? Somos un proyecto independiente de tecnología legal (LegalTech) que busca democratizar el acceso a la defensa ciudadana sin costos excesivos."
-
-## ⚡ Comandos de Ingeniería
-
+## 🧑‍💻 Instalación y Desarrollo
 ```bash
+# Instalación
+npm install
+
 # Desarrollo
-npm run dev # puerto 9005
+npm run dev
 
-# Calidad Total (CI/CD Local)
-npm run check # Lint, Typecheck, Format, Test, Build
-
-# Suite de Pruebas E2E
-npx playwright test
+# Verificación Completa (MANDATO-FILTRO)
+npm run check
 ```
 
----
+## 📜 Licencia & Ética
+Proyecto enfocado en la democratización del acceso a la defensa ciudadana sin costos excesivos.
 
-© 2026 DESMULTA — Tecnología Vial de Vanguardia en Colombia.
-Hecho con precisión técnica y rigor jurídico por **STHAN & Antigravity (Google DeepMind)**.
+---
+**Desmulta © 2026 - Tecnología Legal para su Tranquilidad Vial**

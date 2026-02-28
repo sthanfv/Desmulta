@@ -3,8 +3,9 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 // Configuración directa de Google Generative AI (v5.1 - No Genkit dependency)
 const apiKey = process.env.GEMINI_API_KEY || '';
 const genAI = new GoogleGenerativeAI(apiKey);
-// Usamos el nombre del modelo sin parámetros de versión para dejar que el SDK v0.24 decida el mejor endpoint (v1)
-const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
+// Modelo para análisis técnico (Directo)
+const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
 export interface ViabilityInput {
   antiquity: string;

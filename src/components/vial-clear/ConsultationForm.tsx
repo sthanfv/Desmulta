@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import {
   CheckCircle2,
   ChevronRight,
@@ -29,7 +30,7 @@ import { cn } from '@/lib/utils';
 import { Progress } from '../ui/progress';
 import { haptics } from '@/lib/utils/haptics';
 
-type ConsultationFormData = Zod.infer<typeof ConsultationSchema>;
+type ConsultationFormData = z.infer<typeof ConsultationSchema>;
 
 interface ConsultationFormProps {
   onSuccess: () => void;
@@ -76,7 +77,7 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
       }
     }
 
-    const subscription = form.watch((value) => {
+    const subscription = form.watch((value: Partial<ConsultationFormData>) => {
       const { cedula, placa, nombre, contacto, antiguedad, tipoInfraccion, estadoCoactivo } = value;
       localStorage.setItem(
         'consultation_draft',
