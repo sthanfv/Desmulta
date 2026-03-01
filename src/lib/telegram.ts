@@ -36,14 +36,24 @@ export async function sendTelegramNotification(docId: string): Promise<boolean> 
       return true;
     }
 
-    const message = `<b>💼 NUEVO PROSPECTO</b>
+    const isSimit = data?.fuente === 'simit_capture';
+    const headerTitle = isSimit ? '🚨 NUEVA CAPTURA SIMIT' : '💼 NUEVO PROSPECTO';
+
+    // Si NO es flow Simit pero tiene imagen, mandamos el link en text
+    // Si es flujo SIMIT, la imagen irá como adjunto principal.
+    const evidenceSection =
+      data?.evidenceUrl && !isSimit
+        ? `\n🖼️ <b>Evidencia SIMIT:</b> <a href="${escapeHtml(data.evidenceUrl)}">Ver Captura</a>`
+        : '';
+
+    const message = `<b>${headerTitle}</b>
 ━━━━━━━━━━━━━━━━━━━━
 
 👤 <b>Cliente:</b> ${escapeHtml(data?.nombre)}
 🪪 <b>Cédula:</b> <code>${escapeHtml(data?.cedula)}</code>
 🚗 <b>Placa:</b> <code>${escapeHtml(data?.placa || 'N/A')}</code>
 📱 <b>WhatsApp:</b> <a href="https://wa.me/57${escapeHtml(data?.contacto)}">${escapeHtml(data?.contacto)}</a>
-
+${evidenceSection}
 📌 <b>Análisis de Viabilidad</b>
 • <b>Antigüedad:</b> ${escapeHtml(data?.antiguedad)}
 • <b>Tipo Multa:</b> ${escapeHtml(data?.tipoInfraccion)}
@@ -58,7 +68,22 @@ export async function sendTelegramNotification(docId: string): Promise<boolean> 
 ━━━━━━━━━━━━━━━━━━━━
 💡 <i>Abre el enlace de WhatsApp para contactar.</i>`;
 
-    const telegramApiUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+    let telegramApiUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+    let payloadData: Record<string, unknown> = {
+      chat_id: TELEGRAM_CHAT_ID,
+      text: message,
+      parse_mode: 'HTML',
+    };
+
+    if (data?.evidenceUrl) {
+      telegramApiUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`;
+      payloadData = {
+        chat_id: TELEGRAM_CHAT_ID,
+        photo: data.evidenceUrl,
+        caption: message,
+        parse_mode: 'HTML',
+      };
+    }
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s timeout
@@ -66,11 +91,7 @@ export async function sendTelegramNotification(docId: string): Promise<boolean> 
     const telegramResponse = await fetch(telegramApiUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: TELEGRAM_CHAT_ID,
-        text: message,
-        parse_mode: 'HTML',
-      }),
+      body: JSON.stringify(payloadData),
       signal: controller.signal,
     });
     clearTimeout(timeoutId);

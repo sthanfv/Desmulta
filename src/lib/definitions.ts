@@ -36,6 +36,25 @@ export const ConsultationSchema = z.object({
   antiguedad: z.string().min(1, { message: 'Seleccione la antigüedad de la multa.' }),
   tipoInfraccion: z.string().min(1, { message: 'Seleccione el tipo de infracción.' }),
   estadoCoactivo: z.string().min(1, { message: 'Seleccione si el caso está en cobro coactivo.' }),
+  evidenceUrl: z.string().url().optional(), // Nueva URL de evidencia opcional
+});
+
+// Schema simplificado para flujo SIMIT Tutorial (captura de pantalla ya contiene cédula)
+export const SimitCaptureSchema = z.object({
+  contacto: z
+    .string()
+    .transform((v) => v.replace(/\s+/g, ''))
+    .pipe(
+      z.string().regex(/^3[0-9]{9}$/, {
+        message: 'Debe ser un número de celular colombiano válido (10 dígitos, ej: 300 123 4567).',
+      })
+    ),
+  evidenceUrl: z.string().url({ message: 'Debe subir una captura de pantalla del SIMIT.' }),
+  aceptoTerminos: z.boolean().refine((value) => value === true, {
+    message: 'Debe aceptar los términos y condiciones.',
+  }),
+  _tramp_field: z.string().max(0, { message: 'Bot detected' }).optional(),
+  authorUid: z.string().optional(),
 });
 
 // This type is no longer used for the client-side form, but can be kept for reference

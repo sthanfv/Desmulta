@@ -1,6 +1,5 @@
 'use server';
 
-import { put } from '@vercel/blob';
 import { revalidatePath } from 'next/cache';
 import { getAdminApp } from '@/lib/firebase-admin';
 import { getFirestore, Timestamp, FieldValue } from 'firebase-admin/firestore';
@@ -20,6 +19,7 @@ export async function uploadImage(
   }
 
   try {
+    const { put } = await import('@vercel/blob');
     const blob = await put(file.name, file, {
       access: 'public',
       addRandomSuffix: true, // Renombra la imagen para que sea única
@@ -269,5 +269,37 @@ export async function uploadCaseDocument(caseId: string, formData: FormData, doc
     const msg = error instanceof Error ? error.message : 'Error al subir el documento';
     console.error('[uploadCaseDocument] Error:', msg);
     return { success: false, error: msg };
+  }
+}
+
+/**
+ * Elimina todas las capturas de SIMIT identificadas por el prefijo 'simit_cap_'
+ */
+export async function deleteSimitCaptures(): Promise<{
+  success?: boolean;
+  count?: number;
+  error?: string;
+}> {
+  try {
+    const { list, del } = await import('@vercel/blob');
+    // Listar blobs con el prefijo específico
+    const { blobs } = await list({ prefix: 'simit_cap_' });
+
+    if (blobs.length === 0) {
+      return { success: true, count: 0 };
+    }
+
+    // Extraer URLs para eliminar
+    const urls = blobs.map((blob) => blob.url);
+
+    // Eliminar en lote
+    await del(urls);
+
+    return { success: true, count: blobs.length };
+  } catch (error: unknown) {
+    const errorMsg =
+      error instanceof Error ? error.message : 'Error interno al limpiar capturas SIMIT';
+    console.error('[deleteSimitCaptures] Error:', errorMsg);
+    return { error: errorMsg };
   }
 }

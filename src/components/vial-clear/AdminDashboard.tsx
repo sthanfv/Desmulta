@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useFirestore, useDoc, useMemoFirebase, useAuth } from '@/firebase';
 import { doc, setDoc } from 'firebase/firestore';
-import { deleteExpiredConsultations, uploadImage } from '@/app/admin/actions';
+import { deleteExpiredConsultations, uploadImage, deleteSimitCaptures } from '@/app/admin/actions';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -69,6 +69,7 @@ export function AdminDashboard() {
   const firestore = useFirestore();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCleaning, setIsCleaning] = useState(false);
+  const [isCleaningSimit, setIsCleaningSimit] = useState(false);
 
   const showcaseRef = useMemoFirebase(
     () => (firestore ? doc(firestore, 'site_config', 'showcase') : null),
@@ -307,6 +308,42 @@ export function AdminDashboard() {
       });
     } finally {
       setIsCleaning(false);
+    }
+  };
+
+  const handleDeleteSimitCaptures = async () => {
+    setIsCleaningSimit(true);
+    try {
+      const result = await deleteSimitCaptures();
+
+      if (result.error) {
+        toast({
+          variant: 'destructive',
+          title: 'Error de limpieza SIMIT',
+          description: result.error,
+        });
+        return;
+      }
+
+      if (result.count === 0) {
+        toast({
+          title: 'Storage Limpio',
+          description: 'No se encontraron capturas de SIMIT para eliminar.',
+        });
+      } else {
+        toast({
+          title: '¡SIMIT Limpio!',
+          description: `Se eliminaron ${result.count} capturas del servidor Vercel Blob.`,
+        });
+      }
+    } catch {
+      toast({
+        variant: 'destructive',
+        title: 'Error interno',
+        description: 'Ocurrió un problema al intentar conectar con Vercel Blob.',
+      });
+    } finally {
+      setIsCleaningSimit(false);
     }
   };
 
@@ -738,7 +775,7 @@ export function AdminDashboard() {
         </section>
 
         {/* Maintenance Card */}
-        <section className="floating-card bg-destructive/5 dark:bg-destructive/[0.02] border border-destructive/10 p-10 shadow-3xl">
+        <section className="floating-card bg-destructive/5 dark:bg-destructive/[0.02] border border-destructive/10 p-10 shadow-3xl space-y-10">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
             <div className="flex-1 space-y-3">
               <h2 className="text-2xl font-black text-destructive flex items-center gap-3">
@@ -790,6 +827,68 @@ export function AdminDashboard() {
                       className="h-14 rounded-2xl px-8 font-black bg-destructive hover:bg-destructive/90 active:scale-95 transition-all shadow-xl shadow-destructive/20"
                     >
                       SÍ, DEPURAR PERMANENTEMENTE
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </div>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+
+          <div className="h-px bg-destructive/10 w-full" />
+
+          {/* SIMIT BLOB CLEANING */}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+            <div className="flex-1 space-y-3">
+              <h2 className="text-2xl font-black text-primary flex items-center gap-3">
+                <ImageIcon className="w-8 h-8" />
+                Limpieza de Archivos SIMIT
+              </h2>
+              <p className="text-muted-foreground text-lg font-medium leading-relaxed">
+                Libera espacio en el servidor de almacenamiento eliminando{' '}
+                <strong>únicamente</strong> las capturas de pantalla enviadas por usuarios en el
+                flujo SIMIT.
+              </p>
+            </div>
+
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  disabled={isCleaningSimit}
+                  className="h-16 px-10 rounded-3xl font-black text-lg active:scale-95 transition-all border-primary/20 text-primary hover:bg-primary hover:text-white shadow-xl shadow-primary/5"
+                >
+                  {isCleaningSimit ? (
+                    <Loader2 className="mr-3 h-6 w-6 animate-spin" />
+                  ) : (
+                    <ImageIcon className="mr-3 h-6 w-6" />
+                  )}
+                  LIMPIAR CAPTURAS
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="glass border-white/10 p-0 overflow-hidden m-4 rounded-[3rem]">
+                <div className="p-10 text-center">
+                  <div className="w-20 h-20 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-6">
+                    <ImageIcon size={40} />
+                  </div>
+                  <AlertDialogHeader className="space-y-4">
+                    <AlertDialogTitle className="text-3xl font-black text-foreground text-center">
+                      Vaciar Storage SIMIT
+                    </AlertDialogTitle>
+                    <AlertDialogDescription className="text-lg text-muted-foreground text-center leading-relaxed">
+                      Se eliminarán todas las imágenes de capturas de SIMIT del servidor. Esto NO
+                      afecta las fotos de testimonios ni de casos legales avanzados.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+                    <AlertDialogCancel className="h-14 rounded-2xl px-8 font-bold text-foreground border-border hover:bg-muted active:scale-95 transition-all">
+                      Cancelar
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleDeleteSimitCaptures}
+                      disabled={isCleaningSimit}
+                      className="h-14 rounded-2xl px-8 font-black bg-primary text-primary-foreground hover:bg-primary/90 active:scale-95 transition-all shadow-xl shadow-primary/20"
+                    >
+                      SÍ, LIMPIAR ARCHIVOS
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </div>

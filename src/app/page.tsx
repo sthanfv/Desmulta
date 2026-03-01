@@ -31,7 +31,7 @@ import { Lightbox } from '@/components/ui/lightbox';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MeshBackground } from '@/components/ui/MeshBackground';
 import { InstallPWA } from '@/components/pwa/InstallPWA';
-import { ChatBubble } from '@/components/chat/chat-bubble';
+import TextType from '@/components/ui/TextType';
 
 import {
   Accordion,
@@ -49,6 +49,7 @@ import {
   useMemoFirebase,
 } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
+import { haptics } from '@/lib/utils/haptics';
 
 const AnimatedCounter = ({
   value,
@@ -100,10 +101,12 @@ const AnimatedCounter = ({
 
 export default function VialClearPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formMode, setFormMode] = useState<'full' | 'simit'>('full');
   const [showScrollTop, setShowScrollTop] = useState(false);
   const auth = useAuth();
   const { toast } = useToast();
   const [isWhatsAppWarningOpen, setIsWhatsAppWarningOpen] = useState(false);
+  const [isSimitTutorialOpen, setIsSimitTutorialOpen] = useState(false);
   useEffect(() => {
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 400);
@@ -282,7 +285,10 @@ export default function VialClearPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 pt-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
               <Button
-                onClick={() => setIsModalOpen(true)}
+                onClick={() => {
+                  setFormMode('full');
+                  setIsModalOpen(true);
+                }}
                 size="lg"
                 className="h-16 px-10 text-lg font-black rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground shadow-2xl shadow-primary/30 active:scale-95 transition-all border-none"
               >
@@ -663,11 +669,39 @@ export default function VialClearPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center relative z-10">
               <Button
-                onClick={() => setIsModalOpen(true)}
+                onClick={() => {
+                  setFormMode('full');
+                  setIsModalOpen(true);
+                }}
                 size="lg"
                 className="h-16 md:h-20 px-10 md:px-16 bg-foreground text-background hover:bg-foreground/90 font-black rounded-[2rem] active:scale-95 transition-all text-lg md:text-xl shadow-2xl border-none"
               >
                 CONSULTA GRATIS
+              </Button>
+              <Button
+                onClick={() => setIsSimitTutorialOpen(true)}
+                size="lg"
+                className="h-auto md:h-20 min-h-[4rem] px-8 md:px-12 bg-foreground text-background hover:bg-foreground/90 font-black rounded-[2rem] active:scale-95 transition-all text-base md:text-xl shadow-2xl border-none relative overflow-hidden group flex flex-col items-center justify-center py-3"
+              >
+                <span className="relative z-10 block mb-1">SIMIT</span>
+                {/* Instrucciones + Animación TextType dentro del botón */}
+                <span className="relative z-10 text-[10px] md:text-xs font-semibold opacity-90 block leading-tight text-center">
+                  Entra a SIMIT oficial copiando en tu navegador:
+                  <br className="md:hidden" />
+                  <span className="inline-block font-mono text-background px-2 py-0.5 rounded ml-0 md:ml-1 mt-1 md:mt-0 tracking-wider">
+                    <TextType
+                      text={['simit.org.co', 'www.simit.org.co']}
+                      typingSpeed={110}
+                      pauseDuration={4000}
+                      deletingSpeed={70}
+                      showCursor={true}
+                      cursorCharacter="_"
+                      cursorClassName="opacity-70"
+                    />
+                  </span>
+                </span>
+
+                <div className="absolute inset-0 bg-black/5 dark:bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
               </Button>
             </div>
           </div>
@@ -854,20 +888,29 @@ export default function VialClearPage() {
       </footer>
 
       {/* Modal - Modern Glass Form */}
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+      <Dialog
+        open={isModalOpen}
+        onOpenChange={(open) => {
+          setIsModalOpen(open);
+          if (!open) setFormMode('full');
+        }}
+      >
         <DialogContent className="max-w-2xl p-0 overflow-hidden bg-transparent border-none shadow-none focus-visible:outline-none">
           <div className="glass rounded-[2.5rem] md:rounded-[3.5rem] border-white/20 m-2 md:m-4 shadow-3xl bg-white/95 dark:bg-black/80 overflow-hidden">
             <div className="max-h-[85vh] overflow-y-auto custom-scrollbar p-8 md:p-12 pr-6 md:pr-10">
               <DialogHeader className="mb-10">
                 <DialogTitle className="text-4xl font-black text-center text-foreground tracking-tight">
-                  Estudio de Viabilidad Gratuito
+                  {formMode === 'simit'
+                    ? 'Envío Rápido con Captura'
+                    : 'Estudio de Viabilidad Gratuito'}
                 </DialogTitle>
                 <DialogDescription className="text-center text-lg text-muted-foreground mt-3 font-medium">
-                  Recibiremos su información para un análisis técnico detallado. La respuesta será
-                  enviada a su WhatsApp dentro de nuestros horarios laborales habituales.
+                  {formMode === 'simit'
+                    ? 'Sube tu captura del SIMIT y déjanos tu WhatsApp. Un asesor analizará tu caso y te contactará.'
+                    : 'Recibiremos su información para un análisis técnico detallado. La respuesta será enviada a su WhatsApp dentro de nuestros horarios laborales habituales.'}
                 </DialogDescription>
               </DialogHeader>
-              <ConsultationForm onSuccess={() => setIsModalOpen(false)} />
+              <ConsultationForm onSuccess={() => setIsModalOpen(false)} mode={formMode} />
             </div>
           </div>
         </DialogContent>
@@ -946,6 +989,105 @@ export default function VialClearPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* SIMIT Tutorial Dialog - New Credibility Flow v5.1.0 */}
+      <Dialog open={isSimitTutorialOpen} onOpenChange={setIsSimitTutorialOpen}>
+        <DialogContent className="max-w-xl p-0 overflow-hidden bg-transparent border-none shadow-none focus-visible:outline-none">
+          <div className="glass p-8 md:p-12 rounded-[3.5rem] border-white/20 m-4 shadow-3xl bg-white/95 dark:bg-black/90 text-center relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl rounded-full -mr-16 -mt-16" />
+
+            <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <ShieldCheck size={32} className="text-primary" />
+            </div>
+
+            <DialogHeader className="mb-0">
+              <DialogTitle className="text-2xl md:text-3xl font-black text-foreground tracking-tight uppercase leading-none">
+                Consulta tu estado <br /> <span className="text-primary italic">en 3 pasos</span>
+              </DialogTitle>
+              <DialogDescription className="pt-6 space-y-6">
+                <div className="space-y-6 text-left">
+                  {/* Step 1 */}
+                  <div className="flex gap-4 group">
+                    <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex-shrink-0 flex items-center justify-center font-black text-sm shadow-lg group-hover:scale-110 transition-transform">
+                      1
+                    </div>
+                    <div className="space-y-1">
+                      <p className="font-bold text-foreground uppercase tracking-wider text-xs">
+                        Accede al Portal Oficial
+                      </p>
+                      <p className="text-sm text-muted-foreground leading-snug">
+                        Entra a{' '}
+                        <a
+                          href="https://fcm.org.co/simit/#/home-public"
+                          target="_blank"
+                          className="text-primary font-bold underline"
+                        >
+                          SIMIT
+                        </a>{' '}
+                        desde tu navegador. Es el único portal válido.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Step 2 */}
+                  <div className="flex gap-4 group">
+                    <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex-shrink-0 flex items-center justify-center font-black text-sm shadow-lg group-hover:scale-110 transition-transform">
+                      2
+                    </div>
+                    <div className="space-y-1">
+                      <p className="font-bold text-foreground uppercase tracking-wider text-xs">
+                        Ingresa tu Cédula
+                      </p>
+                      <p className="text-sm text-muted-foreground leading-snug">
+                        Digita tu número de identidad. No necesitas estar registrado para ver tus
+                        comparendos.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Step 3 */}
+                  <div className="flex gap-4 group">
+                    <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex-shrink-0 flex items-center justify-center font-black text-sm shadow-lg group-hover:scale-110 transition-transform">
+                      3
+                    </div>
+                    <div className="space-y-1">
+                      <p className="font-bold text-foreground uppercase tracking-wider text-xs">
+                        Captura y Analiza
+                      </p>
+                      <p className="text-sm text-muted-foreground leading-snug font-medium italic text-primary">
+                        Toma una captura de pantalla de tus multas y regresa aquí para subirla.
+                        ¡Nosotros evaluamos la viabilidad por ti!
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="flex flex-col gap-4 mt-8">
+              <Button
+                onClick={() => {
+                  setIsSimitTutorialOpen(false);
+                  setFormMode('simit');
+                  setIsModalOpen(true);
+                  haptics.vibrate('medium');
+                }}
+                className="h-16 rounded-2xl bg-primary text-primary-foreground font-black text-lg active:scale-95 transition-all shadow-xl shadow-primary/20 border-none relative overflow-hidden animate-shimmer"
+              >
+                YA TENGO MI CAPTURA, SUBIR
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => setIsSimitTutorialOpen(false)}
+                className="h-12 rounded-2xl text-muted-foreground font-bold hover:bg-muted active:scale-95 text-xs uppercase"
+              >
+                Cerrar Tutorial
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Nuevo ChatBot Profesional con Genkit & Server Actions v4.0.0 */}
       {/* <ChatBubble /> */}
     </div>

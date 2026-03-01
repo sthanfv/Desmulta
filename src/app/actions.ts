@@ -1,7 +1,7 @@
 /**
  * TODAS LAS DECISIONES, ARCHIVOS Y CÓDIGO GENERADO DEBEN PASAR EL FILTRO
  * DE SEGURIDAD Y CALIDAD ‘MANDATO-FILTRO’
- * 
+ *
  * Server Actions para Desmulta Chat (v4.0.8)
  * Resiliencia ante Cuota (Reintentos) + Seguridad
  */
@@ -12,7 +12,7 @@ import { chatFlow } from '@/ai/flows/chat-with-ai';
 import { logger } from '@/lib/logger/security-logger';
 
 async function sleep(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export async function sendMessage(message: string) {
@@ -29,7 +29,6 @@ export async function sendMessage(message: string) {
       logger.info('Iniciando Server Action: sendMessage', { messageLength: message.length });
       const response = await chatFlow({ message });
       return { success: true, text: response };
-
     } catch (error: unknown) {
       lastError = error;
 
@@ -52,6 +51,7 @@ export async function sendMessage(message: string) {
 
   return {
     success: false,
-    error: 'La Inteligencia Desmulta está procesando un alto volumen de solicitudes de éxito. Por favor, intente de nuevo en un momento para garantizar su análisis técnico.',
+    error:
+      'La Inteligencia Desmulta está procesando un alto volumen de solicitudes de éxito. Por favor, intente de nuevo en un momento para garantizar su análisis técnico.',
   };
 }

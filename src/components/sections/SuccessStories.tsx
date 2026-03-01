@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, MapPin, Calendar, ArrowUpRight, Activity } from 'lucide-react';
 import { collection, query, orderBy, limit } from 'firebase/firestore';
@@ -74,7 +74,7 @@ export function SuccessStories() {
     return query(collection(firestore, 'success_stories'), orderBy('createdAt', 'desc'), limit(4));
   }, [firestore]);
 
-  const { data: liveStories, isLoading } = useCollection<StoryData>(storiesQuery);
+  const { data: liveStories } = useCollection<StoryData>(storiesQuery);
 
   React.useEffect(() => {
     // Si no hay live stories, rotamos las estáticas para no dejar vacío

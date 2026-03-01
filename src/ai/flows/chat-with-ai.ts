@@ -1,7 +1,7 @@
 /**
  * TODAS LAS DECISIONES, ARCHIVOS Y CÓDIGO GENERADO DEBEN PASAR EL FILTRO
  * DE SEGURIDAD Y CALIDAD ‘MANDATO-FILTRO’
- * 
+ *
  * Configuración de Flujo Genkit para Desmulta (v4.0.8)
  * Optimización Extrema de Tokens para resiliencia de cuota.
  */
@@ -41,7 +41,7 @@ export const chatFlow = ai.defineFlow(
       config: {
         maxOutputTokens: 300,
         temperature: 0.7,
-      }
+      },
     });
     return result.text;
   }

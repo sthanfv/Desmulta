@@ -17,7 +17,7 @@ import {
 import { getAuth } from 'firebase/auth';
 import { useEffect } from 'react';
 
-import { ConsultationSchema } from '@/lib/definitions';
+import { ConsultationSchema, SimitCaptureSchema } from '@/lib/definitions';
 
 import Link from 'next/link';
 
@@ -29,15 +29,18 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { cn } from '@/lib/utils';
 import { Progress } from '../ui/progress';
 import { haptics } from '@/lib/utils/haptics';
+import { ImageUpload } from './ImageUpload';
 
 type ConsultationFormData = z.infer<typeof ConsultationSchema>;
 
 interface ConsultationFormProps {
   onSuccess: () => void;
+  mode?: 'full' | 'simit';
 }
 
-export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
-  const [step, setStep] = useState(1);
+export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormProps) {
+  const isSimitMode = mode === 'simit';
+  const [step, setStep] = useState(isSimitMode ? 2 : 1);
   const [isSuccess, setIsSuccess] = useState(false);
   const [showCedula, setShowCedula] = useState(false);
   const [isHuman, setIsHuman] = useState(false);
@@ -48,18 +51,36 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
   };
 
   const form = useForm<ConsultationFormData>({
-    resolver: zodResolver(ConsultationSchema),
-    defaultValues: {
-      cedula: '',
-      placa: '',
-      nombre: '',
-      contacto: '',
-      aceptoTerminos: false,
-      _tramp_field: '', // Honeypot field evadiendo autofill
-      antiguedad: '',
-      tipoInfraccion: '',
-      estadoCoactivo: '',
-    },
+    resolver: zodResolver(
+      isSimitMode
+        ? (SimitCaptureSchema as unknown as typeof ConsultationSchema)
+        : ConsultationSchema
+    ),
+    defaultValues: isSimitMode
+      ? {
+          contacto: '',
+          aceptoTerminos: false,
+          _tramp_field: '',
+          evidenceUrl: '',
+          cedula: 'SIMIT-CAPTURA',
+          placa: '',
+          nombre: 'VÍA CAPTURA SIMIT',
+          antiguedad: 'N/A',
+          tipoInfraccion: 'N/A',
+          estadoCoactivo: 'N/A',
+        }
+      : {
+          cedula: '',
+          placa: '',
+          nombre: '',
+          contacto: '',
+          aceptoTerminos: false,
+          _tramp_field: '',
+          antiguedad: '',
+          tipoInfraccion: '',
+          estadoCoactivo: '',
+          evidenceUrl: '',
+        },
   });
 
   // Persistence logic (Modo Supervivencia)
@@ -155,6 +176,7 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
       const payload = {
         ...data,
         authorUid: currentUser.uid,
+        ...(isSimitMode && { fuente: 'simit_capture' }),
       };
 
       const response = await fetch('/api/create-consultation', {
@@ -208,10 +230,10 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
           Certificación en Trámite
         </h3>
         <p className="text-muted-foreground text-lg max-w-sm leading-relaxed font-medium">
-          Su caso está siendo procesado por nuestro motor de IA predictiva. Un asesor jurídico le
-          contactará en su WhatsApp{' '}
-          <span className="text-primary font-bold">{form.getValues('contacto')}</span> durante
-          nuestro horario de atención habitual para entregarle su análisis blindado.
+          Su caso está siendo procesado por nuestro{' '}
+          <strong>equipo de analistas especializados</strong>. Un asesor jurídico le contactará en
+          su WhatsApp <span className="text-primary font-bold">{form.getValues('contacto')}</span>{' '}
+          durante nuestro horario de atención habitual para entregarle su estudio de viabilidad.
         </p>
         <Button
           onClick={onSuccess}
@@ -234,7 +256,7 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
         className="space-y-8"
       >
         <div className="px-1">
-          <Progress value={step === 1 ? 50 : 100} className="h-2 bg-muted/40" />
+          <Progress value={isSimitMode ? 100 : step === 1 ? 50 : 100} className="h-2 bg-muted/40" />
         </div>
 
         {/* Honeypot anti-scrapping */}
@@ -250,7 +272,7 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
           )}
         />
 
-        {step === 1 && (
+        {step === 1 && !isSimitMode && (
           <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-500">
             <div className="space-y-4">
               <div className="inline-flex px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-[10px] font-black uppercase tracking-widest text-primary">
@@ -393,83 +415,152 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
         {step === 2 && (
           <div className="space-y-10 animate-in fade-in slide-in-from-left-4 duration-500">
             <div className="space-y-4">
-              <button
-                type="button"
-                onClick={() => setStep(1)}
-                className="text-xs font-bold text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 uppercase tracking-tighter"
-              >
-                ← Regresar al Paso 1
-              </button>
+              {!isSimitMode && (
+                <button
+                  type="button"
+                  onClick={() => setStep(1)}
+                  className="text-xs font-bold text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 uppercase tracking-tighter"
+                >
+                  ← Regresar al Paso 1
+                </button>
+              )}
               <div className="inline-flex px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-[10px] font-black uppercase tracking-widest text-green-500">
-                Paso 2: Datos de Validación Jurídica
+                {isSimitMode
+                  ? 'Envío Rápido con Captura SIMIT'
+                  : 'Paso 2: Datos de Validación Jurídica'}
               </div>
               <h3 className="text-2xl font-black text-foreground tracking-tighter uppercase leading-none">
-                Donde enviamos <br />
-                <span className="text-primary">tu certificación?</span>
+                {isSimitMode ? (
+                  <>
+                    Sube tu captura <br />
+                    <span className="text-primary">y te contactamos</span>
+                  </>
+                ) : (
+                  <>
+                    Donde enviamos <br />
+                    <span className="text-primary">tu certificación?</span>
+                  </>
+                )}
               </h3>
             </div>
 
             <div className="space-y-6">
-              <FormField
-                control={form.control}
-                name="cedula"
-                render={({ field }) => (
-                  <FormItem className="space-y-2">
-                    <FormLabel className="text-[10px] font-black text-foreground/70 uppercase tracking-widest pl-1">
-                      Cédula del Propietario
-                    </FormLabel>
-                    <div className="relative group">
-                      <FormControl>
-                        <Input
-                          type={showCedula ? 'text' : 'password'}
-                          placeholder="Identificación sin puntos ni comas"
-                          {...field}
-                          onChange={(e) => field.onChange(formatCedula(e.target.value))}
-                          className={cn(
-                            'w-full bg-background border-border/50 rounded-2xl pl-12 pr-12 h-16 text-lg font-medium focus:ring-primary/20 focus:border-primary transition-all shadow-Inner',
-                            field.value.length >= 6 && 'border-green-500/30 bg-green-500/[0.02]'
-                          )}
-                        />
-                      </FormControl>
-                      <Search
-                        className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"
-                        size={20}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowCedula(!showCedula)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground"
-                      >
-                        {showCedula ? <EyeOff size={20} /> : <Eye size={20} />}
-                      </button>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Campos completos: solo en modo full */}
+              {!isSimitMode && (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="cedula"
+                    render={({ field }) => (
+                      <FormItem className="space-y-2">
+                        <FormLabel className="text-[10px] font-black text-foreground/70 uppercase tracking-widest pl-1">
+                          Cédula del Propietario
+                        </FormLabel>
+                        <div className="relative group">
+                          <FormControl>
+                            <Input
+                              type={showCedula ? 'text' : 'password'}
+                              placeholder="Identificación sin puntos ni comas"
+                              {...field}
+                              onChange={(e) => field.onChange(formatCedula(e.target.value))}
+                              className={cn(
+                                'w-full bg-background border-border/50 rounded-2xl pl-12 pr-12 h-16 text-lg font-medium focus:ring-primary/20 focus:border-primary transition-all shadow-Inner',
+                                field.value.length >= 6 && 'border-green-500/30 bg-green-500/[0.02]'
+                              )}
+                            />
+                          </FormControl>
+                          <Search
+                            className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"
+                            size={20}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowCedula(!showCedula)}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground"
+                          >
+                            {showCedula ? <EyeOff size={20} /> : <Eye size={20} />}
+                          </button>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
-                  control={form.control}
-                  name="placa"
-                  render={({ field }) => (
-                    <FormItem className="space-y-2">
-                      <FormLabel className="text-[10px] font-black text-foreground/70 uppercase tracking-widest pl-1">
-                        Placa <span className="opacity-40">(Opcional)</span>
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Ej: AAA123"
-                          {...field}
-                          onChange={(e) => field.onChange(formatPlaca(e.target.value))}
-                          className="w-full bg-background border-border/50 rounded-2xl px-6 h-16 text-lg font-black tracking-widest uppercase shadow-Inner"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                      control={form.control}
+                      name="placa"
+                      render={({ field }) => (
+                        <FormItem className="space-y-2">
+                          <FormLabel className="text-[10px] font-black text-foreground/70 uppercase tracking-widest pl-1">
+                            Placa <span className="opacity-40">(Opcional)</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Ej: AAA123"
+                              {...field}
+                              onChange={(e) => field.onChange(formatPlaca(e.target.value))}
+                              className="w-full bg-background border-border/50 rounded-2xl px-6 h-16 text-lg font-black tracking-widest uppercase shadow-Inner"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
+                    <FormField
+                      control={form.control}
+                      name="contacto"
+                      render={({ field }) => (
+                        <FormItem className="space-y-2">
+                          <FormLabel className="text-[10px] font-black text-foreground/70 uppercase tracking-widest pl-1">
+                            WhatsApp Celular
+                          </FormLabel>
+                          <div className="relative">
+                            <FormControl>
+                              <Input
+                                type="tel"
+                                placeholder="300 123 4567"
+                                {...field}
+                                onChange={(e) => field.onChange(formatPhone(e.target.value))}
+                                className="w-full bg-background border-border/50 rounded-2xl pl-12 h-16 text-lg font-medium shadow-Inner"
+                              />
+                            </FormControl>
+                            <MessageCircle
+                              className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"
+                              size={20}
+                            />
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="nombre"
+                    render={({ field }) => (
+                      <FormItem className="space-y-2">
+                        <FormLabel className="text-[10px] font-black text-foreground/70 uppercase tracking-widest pl-1">
+                          Nombre Completo
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Como aparece en el documento"
+                            {...field}
+                            className="w-full bg-background border-border/50 rounded-2xl px-6 h-16 text-lg font-medium shadow-Inner"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </>
+              )}
+
+              {/* WhatsApp: siempre visible, pero en modo SIMIT es campo principal */}
+              {isSimitMode && (
                 <FormField
                   control={form.control}
                   name="contacto"
@@ -497,26 +588,16 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
                     </FormItem>
                   )}
                 />
-              </div>
+              )}
+            </div>
 
-              <FormField
-                control={form.control}
-                name="nombre"
-                render={({ field }) => (
-                  <FormItem className="space-y-2">
-                    <FormLabel className="text-[10px] font-black text-foreground/70 uppercase tracking-widest pl-1">
-                      Nombre Completo
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Como aparece en el documento"
-                        {...field}
-                        className="w-full bg-background border-border/50 rounded-2xl px-6 h-16 text-lg font-medium shadow-Inner"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+            <div className="pt-2 animate-in fade-in slide-in-from-bottom-2 duration-700 delay-300">
+              <ImageUpload
+                onUploadSuccess={(url) =>
+                  form.setValue('evidenceUrl', url, { shouldValidate: isSimitMode })
+                }
+                onClear={() => form.setValue('evidenceUrl', '', { shouldValidate: isSimitMode })}
+                required={isSimitMode}
               />
             </div>
 
@@ -559,6 +640,8 @@ export function ConsultationForm({ onSuccess }: ConsultationFormProps) {
                   <Loader2 className="mr-3 h-6 w-6 animate-spin" />
                   PROCESANDO...
                 </>
+              ) : isSimitMode ? (
+                'ENVIAR CAPTURA SIMIT'
               ) : (
                 'INICIAR ESTUDIO GRATUITO'
               )}

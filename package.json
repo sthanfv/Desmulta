@@ -50,6 +50,7 @@
     "firebase-admin": "^12.1.0",
     "framer-motion": "^12.34.3",
     "genkit": "^1.29.0",
+    "gsap": "^3.14.2",
     "lucide-react": "^0.475.0",
     "next": "^15.5.12",
     "next-sitemap": "^4.2.3",
