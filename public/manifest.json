@@ -1,11 +1,11 @@
 {
-  "name": "Desmulta - Gestión de Multas",
+  "name": "Desmulta",
   "short_name": "Desmulta",
   "description": "Expertos en saneamiento administrativo de fotomultas y comparendos en toda Colombia.",
   "lang": "es-CO",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
+  "background_color": "#000000",
   "theme_color": "#ffbf00",
   "orientation": "portrait",
   "scope": "/",

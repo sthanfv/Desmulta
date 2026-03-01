@@ -236,33 +236,8 @@ export default function VialClearPage() {
 
       {/* Hero Section - Elite Authority Style */}
       <section className="min-h-[90vh] flex items-center pt-32 pb-20 px-4 relative overflow-hidden">
-        {/* Background Video - Hidden on mobile for performance */}
-        <div className="absolute inset-0 z-0 overflow-hidden">
-          <div className="hidden md:block w-full h-full">
-            <video
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="w-full h-full object-cover scale-110 blur-[2px] opacity-40"
-            >
-              <source
-                src="https://assets.mixkit.co/videos/preview/mixkit-night-city-traffic-with-car-headlights-27928-large.mp4"
-                type="video/mp4"
-              />
-            </video>
-          </div>
-          {/* Fallback Image for Mobile - Optimized with Next/Image */}
-          <div className="md:hidden absolute inset-0 opacity-30 blur-[1px]">
-            <Image
-              src="https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&q=80&w=800"
-              alt="Contexto de seguridad vial y gestión de multas en Colombia"
-              fill
-              priority
-              sizes="100vw"
-              className="object-cover"
-            />
-          </div>
+        {/* Purged Background Video for Maximum Performance - MANDATO-FILTRO */}
+        <div className="absolute inset-0 z-0 overflow-hidden bg-background/50">
           <div className="absolute inset-0 hero-video-overlay z-10" />
         </div>
 
@@ -482,13 +457,8 @@ export default function VialClearPage() {
 
               <div className="relative">
                 <div className="absolute inset-0 bg-primary/20 rounded-[3rem] blur-3xl opacity-20 -rotate-6" />
-                <div className="relative aspect-square rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white/10 rotate-2 hover:rotate-0 transition-all duration-700">
-                  <Image
-                    src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&q=80&w=800"
-                    alt="Oficina de asesoría jurídica especializada en derecho de tránsito"
-                    fill
-                    className="object-cover"
-                  />
+                <div className="relative aspect-square rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white/10 rotate-2 hover:rotate-0 transition-all duration-700 bg-primary/5 flex items-center justify-center">
+                  <ShieldCheck className="w-32 h-32 text-primary/20" />
                 </div>
               </div>
             </div>
