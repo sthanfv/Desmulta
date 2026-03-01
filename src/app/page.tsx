@@ -823,7 +823,7 @@ export default function VialClearPage() {
                         Email Corporativo
                       </p>
                       <p className="text-xl font-bold text-foreground">
-                        {footerData?.email || 'contacto@desmulta.com.co'}
+                        {footerData?.email || 'contacto@desmulta-ofi.vercel.app'}
                       </p>
                     </div>
                   </div>

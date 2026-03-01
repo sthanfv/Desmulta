@@ -26,7 +26,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL ||
-      (process.env.NODE_ENV === 'development' ? 'http://localhost:9005' : 'https://desmulta.com')
+    (process.env.NODE_ENV === 'development' ? 'http://localhost:9005' : 'https://desmulta-ofi.vercel.app')
   ),
   title: `${process.env.NEXT_PUBLIC_BRAND_NAME || 'Desmulta'} - Saneamiento de Multas de Tránsito en Colombia`,
   description:
@@ -117,7 +117,7 @@ export default function RootLayout({
               name: 'Desmulta Colombia',
               description:
                 'Expertos en la gestión administrativa y saneamiento de trámites de tránsito a nivel nacional.',
-              url: process.env.NEXT_PUBLIC_SITE_URL || 'https://desmulta.com',
+              url: process.env.NEXT_PUBLIC_SITE_URL || 'https://desmulta-ofi.vercel.app',
               telephone: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+573005648309',
               address: {
                 '@type': 'PostalAddress',

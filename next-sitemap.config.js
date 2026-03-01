@@ -4,6 +4,6 @@ module.exports = {
   generateRobotsTxt: false,
   exclude: ['/admin', '/api'],
   robotsTxtOptions: {
-    additionalSitemaps: ['https://desmulta.com/sitemap-0.xml'],
+    additionalSitemaps: [],
   },
 };
