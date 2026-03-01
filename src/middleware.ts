@@ -9,6 +9,7 @@ import type { NextRequest } from 'next/server';
  * 2. Protección contra Clickjacking y Sniffing.
  * 3. Preparación para filtrado geográfico (Vercel Edge).
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- Next.js requiere este parámetro en la firma del middleware
 export function middleware(_request: NextRequest) {
   const response = NextResponse.next();
 
