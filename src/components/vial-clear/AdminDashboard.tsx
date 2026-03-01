@@ -110,7 +110,7 @@ export function AdminDashboard() {
     resolver: zodResolver(footerSchema),
     defaultValues: {
       whatsapp: footerData?.whatsapp || '573005648309',
-      email: footerData?.email || 'contacto@desmulta-ofi.vercel.app',
+      email: footerData?.email || 'contacto@desmulta.vercel.app',
       address: footerData?.address || 'Colombia, Servicio Nacional',
       instagramUrl: footerData?.instagramUrl || '',
       facebookUrl: footerData?.facebookUrl || '',
@@ -131,7 +131,7 @@ export function AdminDashboard() {
     if (footerData) {
       footerForm.reset({
         whatsapp: footerData.whatsapp || '573005648309',
-        email: footerData.email || 'contacto@desmulta-ofi.vercel.app',
+        email: footerData.email || 'contacto@desmulta.vercel.app',
         address: footerData.address || 'Colombia, Servicio Nacional',
         instagramUrl: footerData.instagramUrl || '',
         facebookUrl: footerData.facebookUrl || '',
@@ -683,7 +683,7 @@ export function AdminDashboard() {
                       </FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="contacto@desmulta-ofi.vercel.app"
+                          placeholder="contacto@desmulta.vercel.app"
                           className="bg-background border-border/50 rounded-2xl h-14"
                           {...field}
                         />

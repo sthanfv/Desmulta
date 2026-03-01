@@ -134,6 +134,6 @@ export const DESMULTA_KB: KnowledgeBase = {
   ],
   contacto: {
     whatsapp: '573005648309',
-    email: 'contacto@desmulta-ofi.vercel.app',
+    email: 'contacto@desmulta.vercel.app',
   },
 };
