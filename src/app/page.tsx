@@ -779,18 +779,6 @@ export default function VialClearPage() {
                 <div className="space-y-8 relative z-10">
                   <div className="flex items-start gap-4">
                     <div className="p-3 bg-background rounded-2xl border border-primary/20">
-                      <Phone size={20} className="text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-xs font-black text-muted-foreground uppercase tracking-widest leading-none mb-1.5">
-                        WhatsApp 24/7
-                      </p>
-                      <p className="text-xl font-bold text-foreground">+57 300 [PROTEGIDO]</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-4">
-                    <div className="p-3 bg-background rounded-2xl border border-primary/20">
                       <Mail size={20} className="text-primary" />
                     </div>
                     <div>
