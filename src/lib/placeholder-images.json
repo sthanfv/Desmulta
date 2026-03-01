@@ -3,13 +3,13 @@
     {
       "id": "desmulta-antes",
       "description": "A representation of a traffic fine system showing a large debt amount.",
-      "imageUrl": "https://images.unsplash.com/photo-1698281207523-5d61a859e73a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxkZWJ0JTIwc2NyZWVufGVufDB8fHx8MTc3MTY4OTM5NHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "/hero-bg.avif",
       "imageHint": "debt screen"
     },
     {
       "id": "desmulta-despues",
       "description": "A representation of a traffic fine system showing a zero balance or 'paid in full' status.",
-      "imageUrl": "https://images.unsplash.com/photo-1702390778918-d1d657694899?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxjbGVhciUyMHNjcmVlbnxlbnwwfHx8fDE3NzE2ODkzOTR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "/oficina.avif",
       "imageHint": "clear screen"
     }
   ]

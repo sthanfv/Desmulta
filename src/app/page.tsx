@@ -281,8 +281,8 @@ export default function VialClearPage() {
             <div className="absolute -inset-8 bg-primary/20 rounded-[4rem] blur-[80px] opacity-40 group-hover:opacity-60 transition-opacity duration-700 animate-slow-fade" />
             <div className="relative floating-card bg-card p-4 border border-white/10 overflow-hidden shadow-2xl glow-box">
               <Lightbox
-                src="https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&q=80&w=1200"
-                alt="Gestión de multas profesional"
+                src="/hero-bg.avif"
+                alt="Gestión de multas profesional - Desmulta"
                 className="rounded-[3rem] object-cover aspect-[4/5] shadow-2xl"
               />
               <div className="absolute bottom-8 left-8 right-8 z-10 pointer-events-none animate-float">
@@ -457,8 +457,13 @@ export default function VialClearPage() {
 
               <div className="relative">
                 <div className="absolute inset-0 bg-primary/20 rounded-[3rem] blur-3xl opacity-20 -rotate-6" />
-                <div className="relative aspect-square rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white/10 rotate-2 hover:rotate-0 transition-all duration-700 bg-primary/5 flex items-center justify-center">
-                  <ShieldCheck className="w-32 h-32 text-primary/20" />
+                <div className="relative aspect-square rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white/10 rotate-2 hover:rotate-0 transition-all duration-700">
+                  <Image
+                    src="/oficina.avif"
+                    alt="Oficina de asesoría jurídica especializada en derecho de tránsito"
+                    fill
+                    className="object-cover"
+                  />
                 </div>
               </div>
             </div>

@@ -82,7 +82,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/logo.png',
+        url: '/D.png',
         width: 1200,
         height: 630,
         alt: 'Desmulta - Tecnología Vial y Saneamiento Administrativo',
@@ -93,7 +93,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Desmulta - Recupere su Liderazgo Vial',
     description: 'Gestión experta de trámites administrativos de tránsito. Sin cobros ocultos.',
-    images: ['/logo.png'],
+    images: ['/D.png'],
     creator: '@desmulta_co',
   },
 };
@@ -107,7 +107,6 @@ export default function RootLayout({
     <html lang="es" suppressHydrationWarning>
       <head>
         {GSC_ID && <meta name="google-site-verification" content={GSC_ID} />}
-        <link rel="preconnect" href="https://images.unsplash.com" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
