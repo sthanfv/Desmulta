@@ -1,4 +1,4 @@
-# Desmulta — Plataforma de Saneamiento Vial Inteligente v5.0.0
+# Desmulta — Plataforma de Saneamiento Vial Inteligente v5.1.0
 
 ![Desmulta Banner](https://desmulta-ofi.vercel.app/icon.png)
 
@@ -48,7 +48,7 @@ Hemos seleccionado un stack de vanguardia para garantizar seguridad, velocidad y
 ---
 
 ## 5. El Estado Actual y Objetivo
-*   **Estado:** El proyecto se encuentra en **Fase de Producción v5.0.0**, con el flujo SIMIT 100% operativo, seguridad de almacenamiento blindada y arquitectura de IA integrada.
+*   **Estado:** El proyecto se encuentra en **Fase de Producción v5.1.0**, con el flujo SIMIT 100% operativo, seguridad de almacenamiento blindada y arquitectura de IA integrada.
 *   **Tu Ayuda:** Mi labor como **Desarrollador Senior Specialist** es mantener el **MANDATO-FILTRO**: asegurar que cada línea de código sea segura, que la UI sea de clase mundial (Premium) y que la lógica de negocio esté blindada contra errores o abusos.
 
 ---

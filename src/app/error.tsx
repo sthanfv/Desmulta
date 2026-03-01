@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { ShieldX, RefreshCcw } from 'lucide-react';
+import { AlertTriangle, RefreshCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function Error({
@@ -12,37 +12,34 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error(error);
+    // Aquí podrías enviar el error a un servicio de monitoreo si lo tuvieras
+    console.error('Error reportado:', error);
   }, [error]);
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4 relative overflow-hidden">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-destructive/5 rounded-full blur-[120px] pointer-events-none" />
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4 relative overflow-hidden">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-destructive/20 rounded-full blur-[100px] pointer-events-none" />
 
-      <div className="max-w-md w-full text-center space-y-8 relative z-10 animate-in fade-in zoom-in-95 duration-700">
-        <div className="w-24 h-24 bg-destructive/10 rounded-[2rem] flex items-center justify-center mx-auto shadow-inner border border-destructive/20">
-          <ShieldX size={48} className="text-destructive" />
+      <div className="glass p-10 md:p-16 rounded-[3rem] border-white/10 shadow-3xl bg-white/5 dark:bg-white/[0.02] text-center relative z-10 max-w-2xl w-full">
+        <div className="w-24 h-24 bg-destructive/10 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-inner">
+          <AlertTriangle className="w-12 h-12 text-destructive" />
         </div>
 
-        <div className="space-y-4">
-          <h1 className="text-4xl font-black tracking-tighter text-foreground">Ups, algo falló</h1>
-          <p className="text-muted-foreground font-medium leading-relaxed">
-            Hemos detectado una anomalía técnica temporal. No se preocupe, su información está
-            segura.
-          </p>
-        </div>
+        <h2 className="text-3xl font-black text-foreground mb-4 uppercase tracking-tight">
+          Falla en el Sistema
+        </h2>
+
+        <p className="text-lg text-muted-foreground mb-10 max-w-md mx-auto font-medium">
+          Hemos detectado una interrupción técnica inesperada. Nuestro equipo ya ha sido notificado.
+        </p>
 
         <Button
           onClick={() => reset()}
-          className="w-full h-14 rounded-2xl bg-foreground text-background font-black shadow-xl active:scale-95 transition-all border-none flex items-center justify-center gap-2"
+          className="h-16 px-10 text-lg font-black rounded-2xl bg-foreground text-background hover:bg-foreground/90 shadow-2xl active:scale-95 transition-all border-none"
         >
-          <RefreshCcw size={20} />
-          REINTENTAR CARGA
+          <RefreshCcw className="mr-2 w-5 h-5" />
+          Intentar Recuperar
         </Button>
-
-        <p className="text-[10px] text-muted-foreground font-mono opacity-50">
-          ID Error: {error.digest || 'Internal System Warp'}
-        </p>
       </div>
     </div>
   );
