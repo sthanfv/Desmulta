@@ -87,20 +87,32 @@ export default function TerminosPage() {
                 </h4>
                 <div className="space-y-4">
                   <p>
-                    La ejecución de trámites conlleva honorarios administrativos informados de manera transparente tras el diagnóstico gratuito inicial. Para la seguridad de ambas partes, los costos de la gestión técnica ante las autoridades competentes se dividen en tres fases:
+                    La ejecución de trámites conlleva honorarios administrativos informados de
+                    manera transparente tras el diagnóstico gratuito inicial. Para la seguridad de
+                    ambas partes, los costos de la gestión técnica ante las autoridades competentes
+                    se dividen en tres fases:
                   </p>
                   <ul className="list-none space-y-3 pl-0">
                     <li className="flex gap-2">
                       <span className="text-primary font-black shrink-0">Fase 1 - Apertura:</span>
-                      <span>Anticipo inicial que cubre los costos operativos y la estructuración del expediente del caso.</span>
+                      <span>
+                        Anticipo inicial que cubre los costos operativos y la estructuración del
+                        expediente del caso.
+                      </span>
                     </li>
                     <li className="flex gap-2">
                       <span className="text-primary font-black shrink-0">Fase 2 - Gestión:</span>
-                      <span>Interposición formal y seguimiento riguroso del proceso ante los organismos de tránsito.</span>
+                      <span>
+                        Interposición formal y seguimiento riguroso del proceso ante los organismos
+                        de tránsito.
+                      </span>
                     </li>
                     <li className="flex gap-2">
                       <span className="text-primary font-black shrink-0">Fase 3 - Éxito:</span>
-                      <span>Honorarios finales aplicables únicamente tras la confirmación oficial del saneamiento vial.</span>
+                      <span>
+                        Honorarios finales aplicables únicamente tras la confirmación oficial del
+                        saneamiento vial.
+                      </span>
                     </li>
                   </ul>
                 </div>
@@ -111,7 +123,12 @@ export default function TerminosPage() {
                   1.4. POLÍTICA DE DESISTIMIENTO Y DEVOLUCIONES
                 </h4>
                 <p>
-                  Si el usuario decide desistir del servicio durante la ejecución de la Fase 1, se realizará el reintegro de su dinero, descontando únicamente un (30%) por concepto de gastos administrativos, uso de plataforma y tiempo de análisis preliminar. Una vez iniciada la Fase 2 (Gestión Documental), los valores abonados no son reembolsables, dado que el trabajo técnico y jurídico ya se encuentra en ejecución.
+                  Si el usuario decide desistir del servicio durante la ejecución de la Fase 1, se
+                  realizará el reintegro de su dinero, descontando únicamente un (30%) por concepto
+                  de gastos administrativos, uso de plataforma y tiempo de análisis preliminar. Una
+                  vez iniciada la Fase 2 (Gestión Documental), los valores abonados no son
+                  reembolsables, dado que el trabajo técnico y jurídico ya se encuentra en
+                  ejecución.
                 </p>
               </div>
 
@@ -168,7 +185,13 @@ export default function TerminosPage() {
                   2.3. PROTECCIÓN Y ALMACENAMIENTO SEGURO
                 </h4>
                 <p>
-                  No comercializamos ni compartimos sus datos con terceros. Toda la información sensible suministrada se procesa bajo estrictas políticas de privacidad y se almacena en servidores seguros en la nube respaldados por infraestructura tecnológica de primer nivel, utilizando encriptación de grado industrial. Su información se maneja bajo estrictos estándares de confidencialidad y se elimina permanentemente de nuestros sistemas tras el fin de la gestión, si el usuario así lo requiere.
+                  No comercializamos ni compartimos sus datos con terceros. Toda la información
+                  sensible suministrada se procesa bajo estrictas políticas de privacidad y se
+                  almacena en servidores seguros en la nube respaldados por infraestructura
+                  tecnológica de primer nivel, utilizando encriptación de grado industrial. Su
+                  información se maneja bajo estrictos estándares de confidencialidad y se elimina
+                  permanentemente de nuestros sistemas tras el fin de la gestión, si el usuario así
+                  lo requiere.
                 </p>
               </div>
             </div>

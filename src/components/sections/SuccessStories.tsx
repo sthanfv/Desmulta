@@ -74,7 +74,7 @@ export function SuccessStories() {
     return query(collection(firestore, 'success_stories'), orderBy('createdAt', 'desc'), limit(4));
   }, [firestore]);
 
-  const { data: liveStories } = useCollection<StoryData>(storiesQuery);
+  const { data: liveStories, isLoading } = useCollection<StoryData>(storiesQuery);
 
   React.useEffect(() => {
     // Si no hay live stories, rotamos las estáticas para no dejar vacío
@@ -97,6 +97,44 @@ export function SuccessStories() {
   // Selección inteligente: Si hay DB, usar DB. Si no, fallback rotativo.
   const displayStories = liveStories && liveStories.length > 0 ? liveStories : rotatedStories;
   const isLive = liveStories && liveStories.length > 0;
+
+  if (isLoading) {
+    return (
+      <section className="py-24 px-4 bg-background relative overflow-hidden">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
+            <div className="max-w-2xl">
+              <div className="h-12 w-64 bg-primary/10 rounded-xl mb-6 animate-pulse" />
+              <div className="h-20 w-full bg-muted/20 rounded-xl animate-pulse" />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="glass p-8 rounded-[2rem] border-white/5 space-y-6">
+                <div className="flex justify-between items-start">
+                  <div className="space-y-2">
+                    <div className="h-3 w-20 bg-primary/20 rounded-full animate-pulse" />
+                    <div className="h-2 w-24 bg-muted/20 rounded-full animate-pulse" />
+                  </div>
+                  <div className="w-10 h-10 rounded-full bg-muted/20 animate-pulse" />
+                </div>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <div className="h-2 w-16 bg-muted/20 rounded-full animate-pulse" />
+                    <div className="h-10 w-32 bg-primary/10 rounded-xl animate-pulse" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
+                    <div className="h-3 w-full bg-muted/20 rounded-full animate-pulse" />
+                    <div className="h-3 w-full bg-muted/20 rounded-full animate-pulse" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-24 px-4 bg-background relative overflow-hidden">

@@ -26,7 +26,9 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL ||
-    (process.env.NODE_ENV === 'development' ? 'http://localhost:9005' : 'https://desmulta.vercel.app')
+      (process.env.NODE_ENV === 'development'
+        ? 'http://localhost:9005'
+        : 'https://desmulta.vercel.app')
   ),
   title: `${process.env.NEXT_PUBLIC_BRAND_NAME || 'Desmulta'} - Saneamiento de Multas de Tránsito en Colombia`,
   description:
@@ -69,8 +71,11 @@ export const metadata: Metadata = {
     ],
   },
   icons: {
-    icon: '/D.png',
-    apple: '/D.png',
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/D.png', type: 'image/png' },
+    ],
+    apple: [{ url: '/D.png', sizes: '180x180', type: 'image/png' }],
   },
   openGraph: {
     title: 'Desmulta - Saneamiento Profesional de Multas en Colombia',

@@ -1,55 +1,51 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-// Mapa en memoria para el rate limiting simple (Nota: En Vercel Serverless esto es por instancia)
-// Para una solución definitiva en producción Vercel, se recomienda Upstash o Redis.
-const rateLimitMap = new Map<string, { count: number; lastReset: number }>();
-
-const RATE_LIMIT_THRESHOLD = 10; // Máximo 10 peticiones
-const RATE_LIMIT_WINDOW = 60 * 1000; // Por minuto (60,000 ms)
-
-export function middleware(request: NextRequest) {
-  const ip =
-    (request as Request & { ip?: string }).ip ??
-    request.headers.get('x-forwarded-for') ??
-    '127.0.0.1';
-
-  // Solo aplicar rate limiting a rutas críticas (API de contacto y formularios)
-  if (
-    request.nextUrl.pathname.startsWith('/api/create-consultation') ||
-    request.nextUrl.pathname.startsWith('/api/notify')
-  ) {
-    const now = Date.now();
-    const rateLimitInfo = rateLimitMap.get(ip) ?? { count: 0, lastReset: now };
-
-    if (now - rateLimitInfo.lastReset > RATE_LIMIT_WINDOW) {
-      rateLimitInfo.count = 1;
-      rateLimitInfo.lastReset = now;
-    } else {
-      rateLimitInfo.count++;
-    }
-
-    rateLimitMap.set(ip, rateLimitInfo);
-
-    if (rateLimitInfo.count > RATE_LIMIT_THRESHOLD) {
-      return new NextResponse('Demasiadas peticiones. Por favor, intente más tarde.', {
-        status: 429,
-        headers: {
-          'Content-Type': 'text/plain; charset=utf-8',
-          'Retry-After': '60',
-        },
-      });
-    }
-  }
-
-  // Continuar con el resto de la petición
+/**
+ * Middleware de Seguridad Global - MANDATO-FILTRO v5.2.0
+ *
+ * Responsabilidades:
+ * 1. Hardening de Headers de Seguridad.
+ * 2. Protección contra Clickjacking y Sniffing.
+ * 3. Preparación para filtrado geográfico (Vercel Edge).
+ */
+export function middleware(_request: NextRequest) {
   const response = NextResponse.next();
 
-  // Asegurar que los headers de seguridad se mantienen (aunque Next.js ya los inyecta vía config)
+  // Inyección de Headers de Seguridad Estrictos
+  const headers = response.headers;
+
+  // Prevenir que el sitio sea embebido en frames (Anti-Clickjacking)
+  headers.set('X-Frame-Options', 'DENY');
+
+  // Forzar detección de tipo de contenido (Anti-MIME Sniffing)
+  headers.set('X-Content-Type-Options', 'nosniff');
+
+  // Control de Referer para privacidad
+  headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+
+  // Permissions Policy: Restringir acceso a hardware sensible si no se requiere
+  headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+
+  // HSTS (HTTP Strict Transport Security) - Solo en producción
+  if (process.env.NODE_ENV === 'production') {
+    headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+  }
+
   return response;
 }
 
-// Configuración de rutas donde se ejecuta el middleware
+// Matcher para interceptar todas las rutas excepto assets estáticos y APIs internas
 export const config = {
-  matcher: ['/api/create-consultation', '/api/notify'],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public (público)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico|hero-bg.avif|oficina.avif|D.png).*)',
+  ],
 };

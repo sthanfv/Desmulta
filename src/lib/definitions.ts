@@ -5,7 +5,8 @@ export const ConsultationSchema = z.object({
     .string()
     .min(5, { message: 'La cédula debe tener al menos 5 caracteres.' })
     .max(20, { message: 'La cédula no puede tener más de 20 caracteres.' })
-    .regex(/^[0-9]+$/, { message: 'La cédula solo debe contener números.' }),
+    .regex(/^[0-9]+$/, { message: 'La cédula solo debe contener números.' })
+    .trim(),
   placa: z
     .string()
     .trim()
@@ -18,10 +19,11 @@ export const ConsultationSchema = z.object({
     .string()
     .trim()
     .min(3, { message: 'El nombre es requerido.' })
-    .max(60, { message: 'El nombre no puede tener más de 60 caracteres.' }),
+    .max(60, { message: 'El nombre no puede tener más de 60 caracteres.' })
+    .transform((val) => val.replace(/[<>]/g, '')), // Sanitización básica XSS
   contacto: z
     .string()
-    .transform((v) => v.replace(/\s+/g, ''))
+    .transform((v) => v.replace(/\D/g, '')) // Solo números
     .pipe(
       z.string().regex(/^3[0-9]{9}$/, {
         message: 'Debe ser un número de celular colombiano válido (10 dígitos, ej: 300 123 4567).',
@@ -30,13 +32,12 @@ export const ConsultationSchema = z.object({
   aceptoTerminos: z.boolean().refine((value) => value === true, {
     message: 'Debe aceptar los términos y condiciones.',
   }),
-  _tramp_field: z.string().max(0, { message: 'Bot detected' }).optional(), // Honeypot field
+  _tramp_field: z.string().max(0, { message: 'Bot detected' }).optional(),
   authorUid: z.string().optional(),
-  // Campos de Pre-Viabilidad MANDATO-FILTRO
   antiguedad: z.string().min(1, { message: 'Seleccione la antigüedad de la multa.' }),
   tipoInfraccion: z.string().min(1, { message: 'Seleccione el tipo de infracción.' }),
   estadoCoactivo: z.string().min(1, { message: 'Seleccione si el caso está en cobro coactivo.' }),
-  evidenceUrl: z.string().url().optional(), // Nueva URL de evidencia opcional
+  evidenceUrl: z.string().url().optional().or(z.literal('')),
 });
 
 // Schema simplificado para flujo SIMIT Tutorial (captura de pantalla ya contiene cédula)

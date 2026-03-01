@@ -11,7 +11,6 @@ import {
   Info,
   MessageCircle,
   Mail,
-  Phone,
   MapPin,
   Instagram,
   Facebook,
@@ -107,6 +106,13 @@ export default function VialClearPage() {
   const { toast } = useToast();
   const [isWhatsAppWarningOpen, setIsWhatsAppWarningOpen] = useState(false);
   const [isSimitTutorialOpen, setIsSimitTutorialOpen] = useState(false);
+
+  useEffect(() => {
+    if (auth) {
+      initiateAnonymousSignIn(auth);
+    }
+  }, [auth]);
+
   useEffect(() => {
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 400);
@@ -116,10 +122,6 @@ export default function VialClearPage() {
   }, []);
 
   useEffect(() => {
-    if (auth) {
-      initiateAnonymousSignIn(auth);
-    }
-
     const handleCopy = () => {
       const selection = window.getSelection();
       if (selection && selection.toString().length > 10) {
@@ -828,7 +830,7 @@ export default function VialClearPage() {
                   © {new Date().getFullYear()} DESMULTA — SERVICIO PRIVADO DE GESTIÓN VIAL
                 </p>
                 <span className="text-[9px] font-black uppercase tracking-widest bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/20">
-                  v5.1.0
+                  v5.2.0
                 </span>
               </div>
               <div className="flex items-center gap-4 opacity-40 hover:opacity-100 transition-opacity mt-1">

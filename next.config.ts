@@ -6,7 +6,7 @@ const withPWA = withPWAInit({
   disable: process.env.NODE_ENV === 'development',
   register: true,
   fallbacks: {
-    document: '/offline.html',
+    document: '/offline',
   },
   // Forzamos a no usar helpers de transpilación externos que fallan en sw.js
   workboxOptions: {

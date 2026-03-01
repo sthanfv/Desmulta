@@ -9,10 +9,7 @@
   "theme_color": "#ffbf00",
   "orientation": "portrait",
   "scope": "/",
-  "categories": [
-    "utilities",
-    "legal"
-  ],
+  "categories": ["utilities", "legal"],
   "icons": [
     {
       "src": "/D.png",
@@ -47,8 +44,9 @@
       "url": "/?action=consultar",
       "icons": [
         {
-          "src": "/android-chrome-512x512.png",
-          "sizes": "192x192"
+          "src": "/D.png",
+          "sizes": "192x192",
+          "type": "image/png"
         }
       ]
     }
