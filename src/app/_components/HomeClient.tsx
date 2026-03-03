@@ -131,8 +131,10 @@ export default function HomeClient({ showcaseData, footerData }: HomeClientProps
       const threshold = 400;
 
       // Solo actualizar si cruzamos el umbral para evitar re-renders constantes
-      if ((currentScroll > threshold && lastScrollValue <= threshold) ||
-        (currentScroll <= threshold && lastScrollValue > threshold)) {
+      if (
+        (currentScroll > threshold && lastScrollValue <= threshold) ||
+        (currentScroll <= threshold && lastScrollValue > threshold)
+      ) {
         setShowScrollTop(currentScroll > threshold);
       }
       lastScrollValue = currentScroll;

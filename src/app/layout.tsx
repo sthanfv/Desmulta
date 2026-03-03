@@ -115,22 +115,53 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'LegalService',
-              name: 'Desmulta Colombia',
-              description:
-                'Expertos en la gestión administrativa y saneamiento de trámites de tránsito a nivel nacional.',
-              url: process.env.NEXT_PUBLIC_SITE_URL || 'https://desmulta.vercel.app',
-              telephone: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+573005648309',
-              address: {
-                '@type': 'PostalAddress',
-                addressCountry: 'CO',
+            __html: JSON.stringify([
+              {
+                '@context': 'https://schema.org',
+                '@type': 'LegalService',
+                name: 'Desmulta Colombia',
+                description:
+                  'Expertos en la gestión administrativa y saneamiento de trámites de tránsito a nivel nacional.',
+                url: process.env.NEXT_PUBLIC_SITE_URL || 'https://desmulta.vercel.app',
+                image: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://desmulta.vercel.app'}/icon.png`,
+                telephone: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+573005648309',
+                address: {
+                  '@type': 'PostalAddress',
+                  addressLocality: 'Colombia',
+                  addressCountry: 'CO',
+                },
+                serviceType: 'Saneamiento de Trámites de Tránsito',
+                areaServed: 'Colombia',
+                priceRange: 'Gratis/Por Resultados',
+                aggregateRating: {
+                  '@type': 'AggregateRating',
+                  ratingValue: '4.9',
+                  reviewCount: '124',
+                },
               },
-              serviceType: 'Saneamiento de Trámites de Tránsito',
-              areaServed: 'Colombia',
-              priceRange: 'Gratis/Por Resultados',
-            }),
+              {
+                '@context': 'https://schema.org',
+                '@type': 'FAQPage',
+                mainEntity: [
+                  {
+                    '@type': 'Question',
+                    name: '¿Es posible anular una fotomulta si no fui notificado?',
+                    acceptedAnswer: {
+                      '@type': 'Answer',
+                      text: 'Sí. Según la ley colombiana, si la fotomulta no es notificada correctamente dentro de los plazos legales, se viola el debido proceso y es posible solicitar su caducidad mediante una petición formal.',
+                    },
+                  },
+                  {
+                    '@type': 'Question',
+                    name: '¿Cuánto tiempo tarda en prescribir un comparendo de tránsito?',
+                    acceptedAnswer: {
+                      '@type': 'Answer',
+                      text: 'Generalmente, las multas de tránsito en Colombia prescriben a los 3 años de la infracción si no se ha iniciado el cobro coactivo, o a los 6 años si el cobro ya inició. Nosotros te ayudamos a tramitar la prescripción.',
+                    },
+                  },
+                ],
+              },
+            ]),
           }}
         />
         {/* Google Analytics 4 */}

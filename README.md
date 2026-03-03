@@ -1,6 +1,6 @@
-# Desmulta — Plataforma de Saneamiento Vial Inteligente v5.2.0
+# Desmulta — Plataforma de Saneamiento Vial Inteligente v5.3.0
 
-![Desmulta Banner](https://desmulta-ofi.vercel.app/icon.png)
+![Desmulta Banner](https://desmulta.vercel.app/icon.png)
 
 ---
 
@@ -13,48 +13,44 @@
 
 ---
 
-## 2. Stack Tecnológico
+## 2. Stack Tecnológico & Optimizaciones (60 FPS)
 
 Hemos seleccionado un stack de vanguardia para garantizar seguridad, velocidad y escalabilidad (MANDATO-FILTRO):
 
-- **Frontend & Backend:** [Next.js 15 (App Router)](https://nextjs.org/) con [React 19](https://react.dev/), aprovechando **Server Actions** para un procesamiento seguro y rápido.
-- **Estilos:** [Tailwind CSS](https://tailwindcss.com/) con una estética premium basada en **iOS Glassmorphism** y micro-animaciones con **GSAP**.
-- **Base de Datos & Seguridad:** [Firebase (Firestore)](https://firebase.google.com/) para persistencia en tiempo real y [Firebase Admin SDK](https://firebase.google.com/docs/admin/setup) para operaciones privilegiadas.
-- **Almacenamiento de Evidencias:** [Vercel Blob](https://vercel.com/docs/storage/vercel-blob) para capturas de pantalla de alta disponibilidad.
-- **Despliegue:** Alojado en la infraestructura de **Vercel** con integración continua de GitHub.
+- **Core:** [Next.js 15 (App Router)](https://nextjs.org/) con [React 19](https://react.dev/).
+- **UX Fluida:** Animaciones de grado industrial con [Framer Motion](https://www.framer.com/motion/) y optimización de renderizado por GPU para asegurar un **Scroll de 60 FPS**.
+- **Estilos:** [Tailwind CSS](https://tailwindcss.com/) con estética **iOS Glassmorphism** y diseño adaptativo.
+- **Backend & Seguridad:** [Firebase Admin](https://firebase.google.com/) para gestión de datos sensible y [Zod](https://zod.dev/) para validación de esquemas.
+- **SEO Dinámico:** Generación nativa de sitemaps y metadatos dinámicos para una indexación premium.
 
 ---
 
 ## 3. Arquitectura y Funcionalidades Clave
 
-- **Tipo de Aplicación:** Se comporta como una **PWA (Progressive Web App)** con capacidades de SSR (Server-Side Rendering) y CSR para una experiencia fluida.
-- **Integraciones Externas:**
-  - **Telegram API:** Sistema de alertas críticas para analistas con envío de evidencias en tiempo real.
-  - **Google Genkit:** Orquestación de IA para análisis predictivo y gestión de Knowledge Base.
-- **Seguridad y Validación:**
-  - **Zod:** Validación estricta de esquemas en todos los puntos de entrada.
-  - **Rate Limiting:** Protección por IP en endpoints sensibles (Upload/Consultas).
-  - **Encriptación:** Canales cifrados SSL y protocolos de seguridad RSA.
+- **Tipo de Aplicación:** PWA (Progressive Web App) optimizada con estrategias de precaché inteligentes.
+- **Integraciones:**
+  - **Telegram Cloud:** Notificaciones críticas de trámites en tiempo real.
+  - **Google Genkit:** Inteligencia artificial aplicada al análisis legal.
+- **Branding Unificado:** Identidad visual coherente mediante `icon.png` inyectado en metadatos de OpenGraph, Twitter y PWA.
 
 ---
 
 ## 4. Lógica de Negocio y Flujos
 
 1.  **El Viaje del Usuario:**
-    - **Consulta Express:** El usuario sube su captura de SIMIT o completa un formulario de 30 segundos.
-    - **Validación de Analista:** El sistema (y un equipo experto) evalúan la prescripción basándose en datos técnicos.
-    - **Certificación:** El usuario recibe un dictamen de viabilidad gratuito.
-2.  **Manejo de Estados y Gestión:**
-    - El estudio de viabilidad es **100% gratuito**, lo que genera confianza y captura leads de alta calidad.
-    - **Contratación:** Solo si el caso es viable, se inicia la gestión administrativa mediante honorarios por resultados.
-    - _Nota:_ No se realizan cobros automáticos; cada fase de contratación es manual y transparente para evitar devoluciones complejas.
+    - **Consulta Express:** Carga de evidencia (Captura SIMIT) o formulario rápido.
+    - **Validación de Analista:** Evaluación técnica automatizada y experta.
+    - **Certificado de Viabilidad:** Entrega de dictamen gratuito.
+2.  **Sostenibilidad y Ética:**
+    - El estudio inicial es **gratuito**, fomentando la transparencia.
+    - Los honorarios se activan únicamente ante el éxito del trámite administrativo, blindando al usuario contra riesgos económicos.
 
 ---
 
-## 5. El Estado Actual y Objetivo
+## 5. El Estado Actual y Roadmap
 
-- **Estado:** El proyecto se encuentra en **Fase de Producción v5.2.0**, con el flujo SIMIT 100% operativo, seguridad de almacenamiento blindada y arquitectura de IA integrada.
-- **Tu Ayuda:** Mi labor como **Desarrollador Senior Specialist** es mantener el **MANDATO-FILTRO**: asegurar que cada línea de código sea segura, que la UI sea de clase mundial (Premium) y que la lógica de negocio esté blindada contra errores o abusos.
+- **Estado:** Producción v5.3.0 con motor de SEO quirúrgico y performance optimizada.
+- **MANDATO-FILTRO:** Como equipo senior, mantenemos una vigilancia técnica constante sobre la seguridad de los datos (HSTS, CSP, XSS protection) y la pulcritud del código (Proceso de Lavado).
 
 ---
 
