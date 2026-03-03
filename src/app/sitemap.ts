@@ -1,19 +1,20 @@
 import { MetadataRoute } from 'next';
+import ciudades from '@/lib/data/ciudades.json';
 
 /**
- * Sitemap Profesional Dinámico - Desmulta v5.2.0
+ * Sitemap Profesional Dinámico - Desmulta v5.4.0
  *
  * MANDATO-FILTRO: SEO "Estado del Arte"
  * 1. URLs Canónicas y Absolutas.
  * 2. Lastmod dinámico para eficiencia de rastreo.
- * 3. Prioridades estratégicas según valor de negocio.
+ * 3. Expansión Nacional: Inyecta rutas dinámicas por ciudad.
  */
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://desmulta.vercel.app';
   const now = new Date();
 
   // Definición de rutas principales con prioridades SEO
-  return [
+  const staticRoutes = [
     {
       url: baseUrl,
       lastModified: now,
@@ -45,4 +46,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.3,
     },
   ];
+
+  // Generación dinámica de rutas por ciudad para SEO Local
+  const cityRoutes = ciudades.map((ciudad) => ({
+    url: `${baseUrl}/servicios/${ciudad.slug}`,
+    lastModified: now,
+    changeFrequency: 'monthly' as const,
+    priority: 0.8,
+  }));
+
+  return [...staticRoutes, ...cityRoutes];
 }

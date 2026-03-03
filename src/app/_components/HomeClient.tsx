@@ -55,6 +55,7 @@ import type { ShowcaseConfig, FooterConfig } from '@/lib/site-config';
 interface HomeClientProps {
   showcaseData: ShowcaseConfig;
   footerData: FooterConfig;
+  cityContext?: string;
 }
 
 // ─── Componente Auxiliar: Contador Animado ─────────────────────────────────────
@@ -109,7 +110,7 @@ const AnimatedCounter = ({
 
 // ─── Componente Principal ─────────────────────────────────────────────────────
 
-export default function HomeClient({ showcaseData, footerData }: HomeClientProps) {
+export default function HomeClient({ showcaseData, footerData, cityContext }: HomeClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formMode, setFormMode] = useState<'full' | 'simit'>('full');
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -234,16 +235,28 @@ export default function HomeClient({ showcaseData, footerData }: HomeClientProps
               <ShieldCheck size={16} />
               <span>Trámite Administrativo Seguro</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black text-white tracking-tighter leading-[0.9] reveal">
-              RECUPERE <br />
-              <span className="text-primary italic underline decoration-primary/20 underline-offset-8 transition-all hover:decoration-primary/50">
-                Liderazgo
-              </span>{' '}
-              VIAL
+            <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black text-white tracking-tighter leading-[0.9] reveal uppercase">
+              {cityContext ? (
+                <>
+                  MULTAS EN <br />
+                  <span className="text-primary italic underline decoration-primary/20 underline-offset-8 transition-all hover:decoration-primary/50">
+                    {cityContext}
+                  </span>
+                </>
+              ) : (
+                <>
+                  RECUPERE <br />
+                  <span className="text-primary italic underline decoration-primary/20 underline-offset-8 transition-all hover:decoration-primary/50">
+                    Liderazgo
+                  </span>{' '}
+                  VIAL
+                </>
+              )}
             </h1>
             <p className="text-sm md:text-lg lg:text-xl text-white/95 font-medium leading-[1.6] max-w-lg reveal reveal-delay-1">
-              Blindaje legal experto para sus trámites administrativos, fotomultas y comparendos.
-              Saneamiento integral con absoluta reserva y transparencia corporativa.
+              {cityContext
+                ? `¿Tienes comparendos pendientes en ${cityContext}? Blindaje legal experto para sus fotomultas y trámites administrativos con el tránsito local.`
+                : 'Blindaje legal experto para sus trámites administrativos, fotomultas y comparendos. Saneamiento integral con absoluta reserva y transparencia corporativa.'}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 pt-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
               <Button

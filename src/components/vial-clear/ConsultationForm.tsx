@@ -58,29 +58,29 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
     ),
     defaultValues: isSimitMode
       ? {
-          contacto: '',
-          aceptoTerminos: false,
-          _tramp_field: '',
-          evidenceUrl: '',
-          cedula: 'SIMIT-CAPTURA',
-          placa: '',
-          nombre: 'VÍA CAPTURA SIMIT',
-          antiguedad: 'N/A',
-          tipoInfraccion: 'N/A',
-          estadoCoactivo: 'N/A',
-        }
+        contacto: '',
+        aceptoTerminos: false,
+        _tramp_field: '',
+        evidenceUrl: '',
+        cedula: 'SIMIT-CAPTURA',
+        placa: '',
+        nombre: 'VÍA CAPTURA SIMIT',
+        antiguedad: 'N/A',
+        tipoInfraccion: 'N/A',
+        estadoCoactivo: 'N/A',
+      }
       : {
-          cedula: '',
-          placa: '',
-          nombre: '',
-          contacto: '',
-          aceptoTerminos: false,
-          _tramp_field: '',
-          antiguedad: '',
-          tipoInfraccion: '',
-          estadoCoactivo: '',
-          evidenceUrl: '',
-        },
+        cedula: '',
+        placa: '',
+        nombre: '',
+        contacto: '',
+        aceptoTerminos: false,
+        _tramp_field: '',
+        antiguedad: '',
+        tipoInfraccion: '',
+        estadoCoactivo: '',
+        evidenceUrl: '',
+      },
   });
 
   // Persistence logic (Modo Supervivencia)
@@ -128,7 +128,7 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
   };
 
   const formatPlaca = (value: string) => {
-    // Solo permitimos 6 caracteres: 3 letras y 3 números para carros, o formatos similares.
+    // Permitimos hasta 6 caracteres para carros (AAA123) y motos (AAA12A)
     return value
       .replace(/[^a-zA-Z0-9]/g, '')
       .toUpperCase()
@@ -178,6 +178,20 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
         authorUid: currentUser.uid,
         ...(isSimitMode && { fuente: 'simit_capture' }),
       };
+
+      // --- VALIDACIÓN EN EL EDGE (Velocidad Extrema v5.4.1) ---
+      // Realizamos una validación ultra-rápida antes del procesamiento pesado
+      const edgeValidation = await fetch('/api/validar-consulta', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ placa: data.placa, cedula: data.cedula }),
+      });
+
+      if (!edgeValidation.ok) {
+        const edgeError = await edgeValidation.json();
+        throw new Error(edgeError.error || 'Fallo en la validación preliminar.');
+      }
+      // -------------------------------------------------------
 
       const response = await fetch('/api/create-consultation', {
         method: 'POST',
