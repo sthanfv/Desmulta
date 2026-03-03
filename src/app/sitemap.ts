@@ -14,7 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
 
   // Definición de rutas principales con prioridades SEO
-  const staticRoutes = [
+  const staticRoutes: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
       lastModified: now,
@@ -48,10 +48,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
   ];
 
   // Generación dinámica de rutas por ciudad para SEO Local
-  const cityRoutes = ciudades.map((ciudad) => ({
+  const cityRoutes: MetadataRoute.Sitemap = ciudades.map((ciudad) => ({
     url: `${baseUrl}/servicios/${ciudad.slug}`,
     lastModified: now,
-    changeFrequency: 'monthly' as const,
+    changeFrequency: 'monthly',
     priority: 0.8,
   }));
 

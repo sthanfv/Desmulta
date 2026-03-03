@@ -19,9 +19,9 @@ Hemos seleccionado un stack de vanguardia para garantizar seguridad, velocidad y
 
 - **Core:** [Next.js 15 (App Router)](https://nextjs.org/) con [React 19](https://react.dev/).
 - **Edge Computing:** Validación ultra-rápida de datos en el borde con **Edge Functions** (latencia < 50ms).
-- **SEO de Autoridad:** 
-    - **Dominación Local:** Generación dinámica de rutas para +1,100 municipios de Colombia.
-    - **Rich Snippets:** Implementación avanzada de Schema.org (`LegalService` con estrellas y `FAQPage`).
+- **SEO de Autoridad:**
+  - **Dominación Local:** Generación dinámica de rutas para +1,100 municipios de Colombia.
+  - **Rich Snippets:** Implementación avanzada de Schema.org (`LegalService` con estrellas y `FAQPage`).
 - **Analíticas:** Integración nativa con **Vercel Analytics** para monitoreo de rendimiento real.
 - **UX Fluida:** Animaciones de grado industrial con [Framer Motion](https://www.framer.com/motion/) para un **Scroll estable de 60 FPS**.
 - **Estilos:** [Tailwind CSS](https://tailwindcss.com/) con estética **iOS Glassmorphism Premium**.

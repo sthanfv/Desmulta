@@ -1,102 +1,102 @@
 [
-    {
-        "slug": "bogota",
-        "nombre": "Bogotá",
-        "departamento": "Cundinamarca"
-    },
-    {
-        "slug": "medellin",
-        "nombre": "Medellín",
-        "departamento": "Antioquia"
-    },
-    {
-        "slug": "cali",
-        "nombre": "Cali",
-        "departamento": "Valle del Cauca"
-    },
-    {
-        "slug": "barranquilla",
-        "nombre": "Barranquilla",
-        "departamento": "Atlántico"
-    },
-    {
-        "slug": "cartagena",
-        "nombre": "Cartagena",
-        "departamento": "Bolívar"
-    },
-    {
-        "slug": "bucaramanga",
-        "nombre": "Bucaramanga",
-        "departamento": "Santander"
-    },
-    {
-        "slug": "pereira",
-        "nombre": "Pereira",
-        "departamento": "Risaralda"
-    },
-    {
-        "slug": "manizales",
-        "nombre": "Manizales",
-        "departamento": "Caldas"
-    },
-    {
-        "slug": "armenia",
-        "nombre": "Armenia",
-        "departamento": "Quindío"
-    },
-    {
-        "slug": "cucuta",
-        "nombre": "Cúcuta",
-        "departamento": "Norte de Santander"
-    },
-    {
-        "slug": "ibague",
-        "nombre": "Ibagué",
-        "departamento": "Tolima"
-    },
-    {
-        "slug": "santa-marta",
-        "nombre": "Santa Marta",
-        "departamento": "Magdalena"
-    },
-    {
-        "slug": "villavicencio",
-        "nombre": "Villavicencio",
-        "departamento": "Meta"
-    },
-    {
-        "slug": "valledupar",
-        "nombre": "Valledupar",
-        "departamento": "Cesar"
-    },
-    {
-        "slug": "monteria",
-        "nombre": "Montería",
-        "departamento": "Córdoba"
-    },
-    {
-        "slug": "pasto",
-        "nombre": "Pasto",
-        "departamento": "Nariño"
-    },
-    {
-        "slug": "popayan",
-        "nombre": "Popayán",
-        "departamento": "Cauca"
-    },
-    {
-        "slug": "floridablanca",
-        "nombre": "Floridablanca",
-        "departamento": "Santander"
-    },
-    {
-        "slug": "palmira",
-        "nombre": "Palmira",
-        "departamento": "Valle del Cauca"
-    },
-    {
-        "slug": "envigado",
-        "nombre": "Envigado",
-        "departamento": "Antioquia"
-    }
+  {
+    "slug": "bogota",
+    "nombre": "Bogotá",
+    "departamento": "Cundinamarca"
+  },
+  {
+    "slug": "medellin",
+    "nombre": "Medellín",
+    "departamento": "Antioquia"
+  },
+  {
+    "slug": "cali",
+    "nombre": "Cali",
+    "departamento": "Valle del Cauca"
+  },
+  {
+    "slug": "barranquilla",
+    "nombre": "Barranquilla",
+    "departamento": "Atlántico"
+  },
+  {
+    "slug": "cartagena",
+    "nombre": "Cartagena",
+    "departamento": "Bolívar"
+  },
+  {
+    "slug": "bucaramanga",
+    "nombre": "Bucaramanga",
+    "departamento": "Santander"
+  },
+  {
+    "slug": "pereira",
+    "nombre": "Pereira",
+    "departamento": "Risaralda"
+  },
+  {
+    "slug": "manizales",
+    "nombre": "Manizales",
+    "departamento": "Caldas"
+  },
+  {
+    "slug": "armenia",
+    "nombre": "Armenia",
+    "departamento": "Quindío"
+  },
+  {
+    "slug": "cucuta",
+    "nombre": "Cúcuta",
+    "departamento": "Norte de Santander"
+  },
+  {
+    "slug": "ibague",
+    "nombre": "Ibagué",
+    "departamento": "Tolima"
+  },
+  {
+    "slug": "santa-marta",
+    "nombre": "Santa Marta",
+    "departamento": "Magdalena"
+  },
+  {
+    "slug": "villavicencio",
+    "nombre": "Villavicencio",
+    "departamento": "Meta"
+  },
+  {
+    "slug": "valledupar",
+    "nombre": "Valledupar",
+    "departamento": "Cesar"
+  },
+  {
+    "slug": "monteria",
+    "nombre": "Montería",
+    "departamento": "Córdoba"
+  },
+  {
+    "slug": "pasto",
+    "nombre": "Pasto",
+    "departamento": "Nariño"
+  },
+  {
+    "slug": "popayan",
+    "nombre": "Popayán",
+    "departamento": "Cauca"
+  },
+  {
+    "slug": "floridablanca",
+    "nombre": "Floridablanca",
+    "departamento": "Santander"
+  },
+  {
+    "slug": "palmira",
+    "nombre": "Palmira",
+    "departamento": "Valle del Cauca"
+  },
+  {
+    "slug": "envigado",
+    "nombre": "Envigado",
+    "departamento": "Antioquia"
+  }
 ]
