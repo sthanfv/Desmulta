@@ -7,6 +7,7 @@ import Script from 'next/script';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Outfit } from 'next/font/google';
 import { ScrollProgressBar } from '@/components/ui/ScrollProgressBar';
+import { Analytics } from '@vercel/analytics/next';
 
 const outfit = Outfit({
   subsets: ['latin'],
@@ -26,9 +27,9 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL ||
-      (process.env.NODE_ENV === 'development'
-        ? 'http://localhost:9005'
-        : 'https://desmulta.vercel.app')
+    (process.env.NODE_ENV === 'development'
+      ? 'http://localhost:9005'
+      : 'https://desmulta.vercel.app')
   ),
   title: `${process.env.NEXT_PUBLIC_BRAND_NAME || 'Desmulta'} - Saneamiento de Multas de Tránsito en Colombia`,
   description:
@@ -204,6 +205,7 @@ export default function RootLayout({
           <FirebaseClientProvider>
             <ScrollProgressBar />
             {children}
+            <Analytics />
             <Toaster />
           </FirebaseClientProvider>
         </ThemeProvider>
