@@ -125,8 +125,17 @@ export default function HomeClient({ showcaseData, footerData }: HomeClientProps
   }, [auth]);
 
   useEffect(() => {
+    let lastScrollValue = window.scrollY;
     const handleScroll = () => {
-      setShowScrollTop(window.scrollY > 400);
+      const currentScroll = window.scrollY;
+      const threshold = 400;
+
+      // Solo actualizar si cruzamos el umbral para evitar re-renders constantes
+      if ((currentScroll > threshold && lastScrollValue <= threshold) ||
+        (currentScroll <= threshold && lastScrollValue > threshold)) {
+        setShowScrollTop(currentScroll > threshold);
+      }
+      lastScrollValue = currentScroll;
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);

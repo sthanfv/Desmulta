@@ -6,50 +6,54 @@
   :root {
     /* Monet Light: Subtle Gold/Yellow Tints */
     --background: 45 30% 98%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 45 100% 52%;
-    --primary-foreground: 222.2 84% 4.9%;
-    --secondary: 45 20% 90%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 45 20% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 45 100% 52%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 45 20% 90%;
-    --input: 45 20% 90%;
-    --ring: 45 100% 52%;
-    --radius: 1.25rem;
-    /* More rounded like Android */
+    /* ... rest of root ... */
+    scroll-behavior: smooth;
   }
 
-  .dark {
-    /* Monet Dark: AMOLED Pure Black */
-    --background: 0 0% 0%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 2%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 2%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 45 100% 52%;
-    --primary-foreground: 0 0% 0%;
-    --secondary: 0 0% 10%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 10%;
-    --muted-foreground: 0 0% 65%;
-    --accent: 45 100% 52%;
-    --accent-foreground: 0 0% 0%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 15%;
-    --input: 0 0% 15%;
-    --ring: 45 100% 52%;
-  }
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 45 100% 52%;
+  --primary-foreground: 222.2 84% 4.9%;
+  --secondary: 45 20% 90%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --muted: 45 20% 96%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 45 100% 52%;
+  --accent-foreground: 222.2 47.4% 11.2%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 45 20% 90%;
+  --input: 45 20% 90%;
+  --ring: 45 100% 52%;
+  --radius: 1.25rem;
+  /* More rounded like Android */
+}
+
+.dark {
+  /* Monet Dark: AMOLED Pure Black */
+  --background: 0 0% 0%;
+  --foreground: 0 0% 98%;
+  --card: 0 0% 2%;
+  --card-foreground: 0 0% 98%;
+  --popover: 0 0% 2%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 45 100% 52%;
+  --primary-foreground: 0 0% 0%;
+  --secondary: 0 0% 10%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 0 0% 10%;
+  --muted-foreground: 0 0% 65%;
+  --accent: 45 100% 52%;
+  --accent-foreground: 0 0% 0%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 0 0% 15%;
+  --input: 0 0% 15%;
+  --ring: 45 100% 52%;
+}
 }
 
 @layer base {
@@ -62,6 +66,7 @@
     overscroll-behavior: none;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
+    scroll-behavior: smooth;
   }
 
   input,
@@ -132,6 +137,7 @@
 
   /* Optimize glass for mobile: re-enabled but with optimized quality */
   @media (max-width: 768px) {
+
     .glass,
     .floating-card {
       @apply backdrop-blur-[20px] bg-white/70 dark:bg-neutral-900/60;
@@ -182,6 +188,7 @@
   }
 
   @keyframes pulse-slow {
+
     0%,
     100% {
       opacity: 0.8;
@@ -221,14 +228,12 @@
     inset: -150%;
     width: 400%;
     height: 400%;
-    background: linear-gradient(
-      45deg,
-      transparent 25%,
-      rgba(255, 191, 0, 0.05) 45%,
-      rgba(255, 255, 255, 0.3) 50%,
-      rgba(255, 191, 0, 0.05) 55%,
-      transparent 75%
-    );
+    background: linear-gradient(45deg,
+        transparent 25%,
+        rgba(255, 191, 0, 0.05) 45%,
+        rgba(255, 255, 255, 0.3) 50%,
+        rgba(255, 191, 0, 0.05) 55%,
+        transparent 75%);
     transform: rotate(25deg) translate(-100%, -100%);
     animation: shimmer-premium 8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
     pointer-events: none;
@@ -249,8 +254,15 @@
   /* Simplify shimmer on mobile to save battery and GPU */
   @media (max-width: 768px) {
     .animate-shimmer::after {
-      animation-duration: 12s; /* Slower = less paint */
+      animation-duration: 12s;
+      /* Slower = less paint */
       opacity: 0.5;
+    }
+
+    .glass {
+      backdrop-filter: blur(12px);
+      /* Lighter on mobile */
+      -webkit-backdrop-filter: blur(12px);
     }
   }
 
@@ -267,13 +279,11 @@
     inset: -1px;
     border-radius: inherit;
     padding: 1px;
-    background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.2) 0%,
-      rgba(255, 255, 255, 0) 40%,
-      rgba(255, 255, 255, 0) 60%,
-      rgba(255, 255, 255, 0.2) 100%
-    );
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.2) 0%,
+        rgba(255, 255, 255, 0) 40%,
+        rgba(255, 255, 255, 0) 60%,
+        rgba(255, 255, 255, 0.2) 100%);
     -webkit-mask:
       linear-gradient(#fff 0 0) content-box,
       linear-gradient(#fff 0 0);
@@ -290,8 +300,9 @@
 .reveal {
   opacity: 0;
   transform: translateY(40px);
-  transition: all 1s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 1s cubic-bezier(0.22, 1, 0.36, 1), transform 1s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform, opacity;
+  contain: content;
 }
 
 .reveal.visible {
@@ -313,10 +324,8 @@
 
 /* Hero Video Overlay */
 .hero-video-overlay {
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.7) 0%,
-    rgba(0, 0, 0, 0.4) 50%,
-    rgba(0, 0, 0, 0.8) 100%
-  );
+  background: linear-gradient(to bottom,
+      rgba(0, 0, 0, 0.7) 0%,
+      rgba(0, 0, 0, 0.4) 50%,
+      rgba(0, 0, 0, 0.8) 100%);
 }

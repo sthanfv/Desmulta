@@ -54,3 +54,14 @@ firestore-debug.log
 # specific project junk
 /docs/old
 *.bak
+branding-colors.md
+*.png
+!public/*.png
+!src/**/*.png
+next-sitemap.config.js
+build_error.log
+build_log.txt
+lint_results.txt
+test-error-details.txt
+test-output.txt
+test-results.json
