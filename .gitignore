@@ -10,40 +10,47 @@
 !.yarn/releases
 !.yarn/versions
 
-# testing
-/coverage
-
 # next.js
 /.next/
 /out/
-
-# production
 /build
+
+# testing
+/coverage
+/playwright-report
+/test-results
 
 # misc
 .DS_Store
 *.pem
+*.tsbuildinfo
+next-env.d.ts
 
 # debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+*.log
 
 # vercel
 .vercel
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-
+# genkit
 .genkit/*
-.env*
+
+# local env files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 # firebase
 firebase-debug.log
 firestore-debug.log
 *-adminsdk-*.json
 
-.vercel
-.env*.local
+# specific project junk
+/docs/old
+*.bak

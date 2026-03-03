@@ -12,25 +12,25 @@
   "categories": ["utilities", "legal"],
   "icons": [
     {
-      "src": "/D.png",
+      "src": "/icon.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/D.png",
+      "src": "/icon.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/D.png",
+      "src": "/icon.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/D.png",
+      "src": "/icon.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -44,7 +44,7 @@
       "url": "/?action=consultar",
       "icons": [
         {
-          "src": "/D.png",
+          "src": "/icon.png",
           "sizes": "192x192",
           "type": "image/png"
         }

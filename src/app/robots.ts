@@ -1,5 +1,13 @@
 import { MetadataRoute } from 'next';
 
+/**
+ * Robots.txt Profesional - Desmulta v5.2.0
+ *
+ * MANDATO-FILTRO: SEO y Seguridad
+ * 1. Acceso universal para buscadores.
+ * 2. Restricción estricta de rutas administrativas y privadas.
+ * 3. Declaración explícita del Sitemap XML.
+ */
 export default function robots(): MetadataRoute.Robots {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://desmulta.vercel.app';
 
@@ -7,7 +15,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/api/', '/admin/', '/private/'],
+      disallow: ['/api/', '/admin/', '/private/', '/*_next/', '/static/'],
     },
     sitemap: `${baseUrl}/sitemap.xml`,
   };

@@ -73,9 +73,9 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: 'any' },
-      { url: '/D.png', type: 'image/png' },
+      { url: '/icon.png', type: 'image/png' },
     ],
-    apple: [{ url: '/D.png', sizes: '180x180', type: 'image/png' }],
+    apple: [{ url: '/icon.png', sizes: '180x180', type: 'image/png' }],
   },
   openGraph: {
     title: 'Desmulta - Saneamiento Profesional de Multas en Colombia',
@@ -87,7 +87,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/D.png',
+        url: '/icon.png',
         width: 1200,
         height: 630,
         alt: 'Desmulta - Tecnología Vial y Saneamiento Administrativo',
@@ -98,7 +98,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Desmulta - Recupere su Liderazgo Vial',
     description: 'Gestión experta de trámites administrativos de tránsito. Sin cobros ocultos.',
-    images: ['/D.png'],
+    images: ['/icon.png'],
     creator: '@desmulta_co',
   },
 };

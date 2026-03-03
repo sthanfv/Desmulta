@@ -44,7 +44,7 @@ export function InstallPWA() {
     const { outcome } = await deferredPrompt.userChoice;
 
     if (outcome === 'accepted') {
-      console.log('Usuario aceptó la instalación Premium');
+      // Instalación aceptada - Silencio en producción según MANDATO-FILTRO
     }
 
     // Limpiamos el prompt guardado

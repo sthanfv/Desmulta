@@ -16,6 +16,26 @@ export function middleware(_request: NextRequest) {
   // Inyección de Headers de Seguridad Estrictos
   const headers = response.headers;
 
+  // Content Security Policy (CSP) - MANDATO-FILTRO Estricto
+  // Nota: En un entorno real, 'script-src' debería incluir hashes o nonces para Google Analytics/Gemini si se usan inline.
+  const cspHeader = `
+    default-src 'self';
+    script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.googletagmanager.com https://*.google-analytics.com https://va.vercel-scripts.com;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+    img-src 'self' blob: data: https://*.googleusercontent.com https://*.googleapis.com https://i.ytimg.com https://*.vercel.app;
+    font-src 'self' https://fonts.gstatic.com;
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+    frame-ancestors 'none';
+    connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.google-analytics.com https://*.googletagmanager.com;
+    upgrade-insecure-requests;
+  `
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+
+  headers.set('Content-Security-Policy', cspHeader);
+
   // Prevenir que el sitio sea embebido en frames (Anti-Clickjacking)
   headers.set('X-Frame-Options', 'DENY');
 
@@ -47,6 +67,6 @@ export const config = {
      * - favicon.ico (favicon file)
      * - public (público)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|hero-bg.avif|oficina.avif|D.png).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|hero-bg.avif|oficina.avif|icon.png).*)',
   ],
 };
