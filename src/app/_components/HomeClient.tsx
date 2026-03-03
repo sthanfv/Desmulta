@@ -6,7 +6,7 @@
  * Recibe los datos de configuración (showcase y footer) ya pre-renderizados
  * por el Server Component en page.tsx usando Firebase Admin SDK + cache() de React 19.
  *
- * MANDATO-FILTRO v5.2.0: toda la lógica de estado, efectos y formularios vive aquí.
+ * MANDATO-FILTRO v5.4.1: toda la lógica de estado, efectos y formularios vive aquí.
  */
 
 import React, { useState, useEffect } from 'react';
@@ -780,7 +780,7 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
                   © {new Date().getFullYear()} DESMULTA — SERVICIO PRIVADO DE GESTIÓN VIAL
                 </p>
                 <span className="text-[9px] font-black uppercase tracking-widest bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/20">
-                  v5.2.0
+                  v5.4.1
                 </span>
               </div>
               <div className="flex items-center gap-4 opacity-40 hover:opacity-100 transition-opacity mt-1">

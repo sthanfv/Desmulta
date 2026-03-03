@@ -51,7 +51,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const cityRoutes: MetadataRoute.Sitemap = ciudades.map((ciudad) => ({
     url: `${baseUrl}/servicios/${ciudad.slug}`,
     lastModified: now,
-    changeFrequency: 'monthly',
+    changeFrequency: 'monthly' as const,
     priority: 0.8,
   }));
 
