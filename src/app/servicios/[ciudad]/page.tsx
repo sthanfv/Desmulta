@@ -62,9 +62,24 @@ export default async function PaginaCiudad({ params }: PageProps) {
   // Obtenemos la configuración global (Server-Side)
   const [showcaseData, footerData] = await Promise.all([getShowcaseConfig(), getFooterConfig()]);
 
-  // Personalizamos ligeramente el contenido para la ciudad si es necesario
-  // Por ahora, reutilizamos HomeClient pasando la ciudad como contexto extra si fuera necesario
-  // (HomeClient podría ser actualizado para mostrar el nombre de la ciudad en el Hero)
+  // --- MANDATO-FILTRO v5.9.0 (SEO ESTRUCTURADO) ---
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'LegalService',
+    name: `Desmulta ${ciudadActual.nombre}`,
+    description: `Expertos en saneamiento de multas de tránsito en ${ciudadActual.nombre}. Resolvemos procesos legales con el Tránsito de ${ciudadActual.departamento}.`,
+    areaServed: {
+      '@type': 'City',
+      name: ciudadActual.nombre,
+    },
+    address: {
+      '@type': 'PostalAddress',
+      addressRegion: ciudadActual.departamento,
+      addressCountry: 'CO',
+    },
+    priceRange: '$$',
+    image: 'https://desmulta.vercel.app/icon.png',
+  };
 
   return (
     <div
@@ -72,6 +87,10 @@ export default async function PaginaCiudad({ params }: PageProps) {
       data-city={ciudadActual.nombre}
       data-dept={ciudadActual.departamento}
     >
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <HomeClient
         showcaseData={showcaseData}
         footerData={footerData}

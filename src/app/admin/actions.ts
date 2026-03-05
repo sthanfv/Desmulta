@@ -96,10 +96,12 @@ export async function getConsultations(pageSize: number = 20, lastDocId?: string
     const consultations = snapshot.docs.map((doc) => {
       const data = doc.data();
       return {
-        id: doc.id,
         ...data,
-        createdAt: data.createdAt?.toDate()?.toISOString() || null,
-        notifiedAt: data.notifiedAt?.toDate()?.toISOString() || null,
+        id: doc.id,
+        // Serialización segura para Next.js Plain Objects - v5.13.0
+        createdAt: data.createdAt?.toDate?.().toISOString() || null,
+        updatedAt: data.updatedAt?.toDate?.().toISOString() || null,
+        notifiedAt: data.notifiedAt?.toDate?.().toISOString() || null,
       };
     });
 
@@ -295,11 +297,36 @@ export async function deleteSimitCaptures(): Promise<{
     // Eliminar en lote
     await del(urls);
 
-    return { success: true, count: blobs.length };
+    // Refrescar panel admin
+    revalidatePath('/admin');
+
+    return { success: true, count: urls.length };
   } catch (error: unknown) {
-    const errorMsg =
-      error instanceof Error ? error.message : 'Error interno al limpiar capturas SIMIT';
-    console.error('[deleteSimitCaptures] Error:', errorMsg);
-    return { error: errorMsg };
+    const msg = error instanceof Error ? error.message : 'Error al limpiar';
+    console.error('[deleteSimitCaptures] Error:', msg);
+    return { error: msg };
+  }
+}
+
+/**
+ * Actualiza el estado de una consulta (Lead)
+ */
+export async function updateConsultationStatus(id: string, newStatus: string) {
+  try {
+    getAdminApp();
+    const db = getFirestore();
+    const docRef = db.collection('consultations').doc(id);
+
+    await docRef.update({
+      status: newStatus,
+      updatedAt: FieldValue.serverTimestamp(),
+    });
+
+    // Esto hace que la tabla se refresque sola sin F5
+    revalidatePath('/admin');
+    return { success: true };
+  } catch (error) {
+    console.error('Error al actualizar estado:', error);
+    return { error: 'No se pudo actualizar el estado' };
   }
 }

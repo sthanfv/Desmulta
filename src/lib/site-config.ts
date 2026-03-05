@@ -6,13 +6,14 @@
  * - Deduplicar peticiones dentro del mismo request
  * - Pre-renderizar los datos estáticos junto al HTML inicial
  *
- * MANDATO-FILTRO v5.4.1: Sin credenciales hardcodeadas, sin console.log en prod,
+ * MANDATO-FILTRO v5.8.0: Sin credenciales hardcodeadas, sin console.log en prod,
  * fallback seguro a datos por defecto si Firestore no responde.
  */
 
 import { cache } from 'react';
 import { getAdminApp } from '@/lib/firebase-admin';
 import { getFirestore } from 'firebase-admin/firestore';
+import { logger } from '@/lib/logger/security-logger';
 
 // ─── Tipos de Datos ───────────────────────────────────────────────────────────
 
@@ -42,7 +43,7 @@ const SHOWCASE_DEFAULTS: ShowcaseConfig = {
 
 const FOOTER_DEFAULTS: FooterConfig = {
   whatsapp: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '573005648309',
-  email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'contacto@desmulta.co',
+  email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'contactodesmulta@protonmail.com',
   address: 'Colombia — Servicio Nacional',
   instagramUrl: 'https://instagram.com/desmulta_co',
   facebookUrl: 'https://facebook.com/desmulta',
@@ -71,8 +72,9 @@ export const getShowcaseConfig = cache(async (): Promise<ShowcaseConfig> => {
       counterValue: data.counterValue || SHOWCASE_DEFAULTS.counterValue,
       counterLabel: data.counterLabel || SHOWCASE_DEFAULTS.counterLabel,
     };
-  } catch {
-    // Fallo silencioso: devolvemos los valores por defecto para no bloquear el renderizado
+  } catch (err) {
+    // Fallo silencioso con registro auditoría: devolvemos los valores por defecto para no bloquear el renderizado
+    logger.error('[site-config] Error al obtener showcase config:', { error: String(err) });
     return SHOWCASE_DEFAULTS;
   }
 });
@@ -99,7 +101,8 @@ export const getFooterConfig = cache(async (): Promise<FooterConfig> => {
       instagramUrl: data.instagramUrl || FOOTER_DEFAULTS.instagramUrl,
       facebookUrl: data.facebookUrl || FOOTER_DEFAULTS.facebookUrl,
     };
-  } catch {
+  } catch (err) {
+    logger.error('[site-config] Error al obtener footer config:', { error: String(err) });
     return FOOTER_DEFAULTS;
   }
 });

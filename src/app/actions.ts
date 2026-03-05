@@ -55,3 +55,55 @@ export async function sendMessage(message: string) {
       'La Inteligencia Desmulta está procesando un alto volumen de solicitudes de éxito. Por favor, intente de nuevo en un momento para garantizar su análisis técnico.',
   };
 }
+
+/* =========================================================================
+   🚀 MÓDULO PENDIENTE: CORREOS INSTITUCIONALES (RESEND)
+   =========================================================================
+   INSTRUCCIONES PARA ACTIVAR CUANDO SE COMPRE EL DOMINIO (ej. desmulta.com):
+
+   1. En la consola ejecutar: npm install resend
+   2. Conseguir la API Key en resend.com y ponerla en .env.local y en Vercel:
+      RESEND_API_KEY=re_tu_codigo_secreto
+   3. En resend.com > Domains, agregar el dominio comprado y configurar los DNS.
+   4. Quitar los marcadores de comentario de la función de abajo.
+   5. Cambiar 'soporte@tudominio.com' por el correo real.
+   6. Llamar a esta función justo después de guardar el lead en Firebase.
+   ========================================================================= */
+
+/*
+import { Resend } from 'resend';
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+export async function enviarCorreoBienvenida(emailCliente: string, nombre: string, radicado: string, placa: string) {
+  try {
+    await resend.emails.send({
+      from: 'Desmulta <soporte@tudominio.com>', // <-- ACTUALIZAR ESTO
+      to: emailCliente,
+      subject: `🚨 Radicado ${radicado}: Análisis de Viabilidad Iniciado`,
+      html: `
+        <div style="font-family: sans-serif; max-width: 600px; margin: auto; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;">
+          <div style="background-color: #000; padding: 20px; text-align: center;">
+            <h1 style="color: #D4AF37; margin: 0;">DESMULTA</h1>
+          </div>
+          <div style="padding: 30px; color: #374151;">
+            <p>Hola <strong>${nombre}</strong>,</p>
+            <p>Hemos recibido tu solicitud de análisis para la placa <strong>${placa}</strong>.</p>
+            <p>Tu caso ha sido registrado bajo el radicado: <strong style="color: #D4AF37;">${radicado}</strong></p>
+            <p>Nuestro equipo jurídico está evaluando la viabilidad de prescripción o caducidad. Te contactaremos pronto por WhatsApp para darte respuesta.</p>
+            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;" />
+            <p style="font-size: 12px; color: #9ca3af; text-align: center;">
+              Este es un mensaje automático. Por favor no respondas a este correo.
+            </p>
+          </div>
+        </div>
+      `,
+    });
+    logger.info('Correo institucional enviado con éxito a:', { email: emailCliente });
+    return { success: true };
+  } catch (error) {
+    logger.error('Error enviando correo institucional:', { error: String(error) });
+    return { success: false };
+  }
+}
+*/
+// ==================== FIN MÓDULO PENDIENTE ==============================

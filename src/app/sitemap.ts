@@ -1,59 +1,42 @@
 import { MetadataRoute } from 'next';
 import ciudades from '@/lib/data/ciudades.json';
+import { getBlogPosts } from '@/lib/mdx';
 
 /**
- * Sitemap Profesional Dinámico - Desmulta v5.4.0
- *
+ * Sitemap Profesional Dinámico - Desmulta v5.16.1
+ * 
  * MANDATO-FILTRO: SEO "Estado del Arte"
  * 1. URLs Canónicas y Absolutas.
  * 2. Lastmod dinámico para eficiencia de rastreo.
- * 3. Expansión Nacional: Inyecta rutas dinámicas por ciudad.
+ * 3. Expansión: Inyecta rutas de ciudades y posts del blog dinámicamente.
  */
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://desmulta.vercel.app';
-  const now = new Date();
 
-  // Definición de rutas principales con prioridades SEO
-  const staticRoutes: MetadataRoute.Sitemap = [
-    {
-      url: baseUrl,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 1.0,
-    },
-    {
-      url: `${baseUrl}/servicios`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/metodologia`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/faq`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/terminos`,
-      lastModified: now,
-      changeFrequency: 'yearly',
-      priority: 0.3,
-    },
-  ];
-
-  // Generación dinámica de rutas por ciudad para SEO Local
-  const cityRoutes: MetadataRoute.Sitemap = ciudades.map((ciudad) => ({
-    url: `${baseUrl}/servicios/${ciudad.slug}`,
-    lastModified: now,
+  // Páginas estáticas principales
+  const staticPages: MetadataRoute.Sitemap = ['', '/servicios', '/faq', '/metodologia', '/blog'].map((route) => ({
+    url: `${baseUrl}${route}`,
+    lastModified: new Date(),
     changeFrequency: 'monthly' as const,
+    priority: 1,
+  }));
+
+  // Páginas dinámicas de ciudades
+  const cityPages: MetadataRoute.Sitemap = ciudades.map((c) => ({
+    url: `${baseUrl}/servicios/${c.slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
     priority: 0.8,
   }));
 
-  return [...staticRoutes, ...cityRoutes];
+  // Páginas dinámicas de Blog (Inyección automática MANDATO-FILTRO)
+  const blogPosts = await getBlogPosts();
+  const blogPages: MetadataRoute.Sitemap = blogPosts.map((post) => ({
+    url: `${baseUrl}/blog/${post.slug}`,
+    lastModified: new Date(post.date),
+    changeFrequency: 'monthly' as const,
+    priority: 0.7,
+  }));
+
+  return [...staticPages, ...cityPages, ...blogPages];
 }

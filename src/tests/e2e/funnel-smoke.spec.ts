@@ -41,8 +41,8 @@ test.describe('Embudo de Leads Desmulta', () => {
     // Aceptar términos (usando el rol de checkbox de Radix UI)
     await page.getByRole('checkbox').click();
 
-    // 5. Envío Final
-    await page.getByRole('button', { name: 'INICIAR ESTUDIO GRATUITO' }).click();
+    // 5. Envío Final (Actualizado para v5.8.0+)
+    await page.getByRole('button', { name: '¡FINALIZAR ESTUDIO GRATUITO!' }).click();
 
     // 6. Verificación de Éxito mejorada (v5.1)
     // Buscamos cualquier indicador de éxito o el cierre del modal

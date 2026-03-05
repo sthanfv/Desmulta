@@ -30,29 +30,38 @@ export async function sendTelegramNotification(docId: string): Promise<boolean> 
     }
 
     const data = docSnap.data();
+    const isSimit = data?.fuente === 'simit_capture';
 
     // Idempotencia: Si la notificación ya fue enviada, no hacer nada.
     if (data?.telegramStatus === 'sent') {
       return true;
     }
 
-    const isSimit = data?.fuente === 'simit_capture';
-    const headerTitle = isSimit ? '🚨 NUEVA CAPTURA SIMIT' : '💼 NUEVO PROSPECTO';
+    const shortId = data?.shortId || 'SIN-REF';
+    const headerTitle = isSimit
+      ? `🚨 NUEVA CAPTURA SIMIT (${shortId})`
+      : `💼 NUEVO PROSPECTO (${shortId})`;
 
-    // Si NO es flow Simit pero tiene imagen, mandamos el link en text
-    // Si es flujo SIMIT, la imagen irá como adjunto principal.
+    // Sección de Evidencia (Si existe imagen y no es flujo SIMIT)
     const evidenceSection =
       data?.evidenceUrl && !isSimit
         ? `\n🖼️ <b>Evidencia SIMIT:</b> <a href="${escapeHtml(data.evidenceUrl)}">Ver Captura</a>`
         : '';
 
+    // Preparación de WhatsApp (MANDATO-FILTRO: Automatización)
+    const numeroLimpio = (data?.contacto || '').replace(/\D/g, '');
+    const telefonoWa = numeroLimpio.startsWith('57') ? numeroLimpio : `57${numeroLimpio}`;
+    const mensajeWa = `Hola ${data?.nombre}, soy analista de Desmulta. Recibimos tu solicitud (Ref: ${shortId}) para la placa ${data?.placa || 'en trámite'}. Te cuento que...`;
+    const urlWhatsApp = `https://wa.me/${telefonoWa}?text=${encodeURIComponent(mensajeWa)}`;
+
     const message = `<b>${headerTitle}</b>
 ━━━━━━━━━━━━━━━━━━━━
 
 👤 <b>Cliente:</b> ${escapeHtml(data?.nombre)}
+🆔 <b>Ref:</b> <code>${escapeHtml(shortId)}</code>
 🪪 <b>Cédula:</b> <code>${escapeHtml(data?.cedula)}</code>
 🚗 <b>Placa:</b> <code>${escapeHtml(data?.placa || 'N/A')}</code>
-📱 <b>WhatsApp:</b> <a href="https://wa.me/57${escapeHtml(data?.contacto)}">${escapeHtml(data?.contacto)}</a>
+📱 <b>WhatsApp:</b> <a href="${urlWhatsApp}">${escapeHtml(data?.contacto)}</a>
 ${evidenceSection}
 📌 <b>Análisis de Viabilidad</b>
 • <b>Antigüedad:</b> ${escapeHtml(data?.antiguedad)}
@@ -66,13 +75,25 @@ ${evidenceSection}
 
 📅 <b>Recibido:</b> ${escapeHtml(new Date().toLocaleString('es-CO', { timeZone: 'America/Bogota' }))}
 ━━━━━━━━━━━━━━━━━━━━
-💡 <i>Abre el enlace de WhatsApp para contactar.</i>`;
+💡 <i>Usa el botón de abajo para responder instantáneamente.</i>`;
+
+    const replyMarkup = {
+      inline_keyboard: [
+        [
+          {
+            text: '🟢 Responder por WhatsApp',
+            url: urlWhatsApp,
+          },
+        ],
+      ],
+    };
 
     let telegramApiUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
     let payloadData: Record<string, unknown> = {
       chat_id: TELEGRAM_CHAT_ID,
       text: message,
       parse_mode: 'HTML',
+      reply_markup: replyMarkup,
     };
 
     if (data?.evidenceUrl) {
@@ -82,6 +103,7 @@ ${evidenceSection}
         photo: data.evidenceUrl,
         caption: message,
         parse_mode: 'HTML',
+        reply_markup: replyMarkup,
       };
     }
 

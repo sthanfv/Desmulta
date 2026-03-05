@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 /**
- * Middleware de Seguridad Global - MANDATO-FILTRO v5.4.1
+ * Middleware de Seguridad Global - MANDATO-FILTRO v5.8.0
  *
  * Responsabilidades:
  * 1. Hardening de Headers de Seguridad.

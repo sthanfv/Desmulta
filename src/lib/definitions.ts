@@ -29,6 +29,7 @@ export const ConsultationSchema = z.object({
         message: 'Debe ser un número de celular colombiano válido (10 dígitos, ej: 300 123 4567).',
       })
     ),
+  email: z.string().email({ message: 'Correo electrónico inválido.' }).optional().or(z.literal('')),
   aceptoTerminos: z.boolean().refine((value) => value === true, {
     message: 'Debe aceptar los términos y condiciones.',
   }),
@@ -78,13 +79,16 @@ export interface Consultation {
   placa: string;
   nombre: string;
   contacto: string;
+  email?: string;
   aceptoTerminos: boolean;
   authorUid: string;
   antiguedad: string;
   tipoInfraccion: string;
   estadoCoactivo: string;
+  fechaMulta?: string;
   status: 'pendiente' | 'contactado' | 'en_proceso' | 'terminado';
-  fuente: 'web' | 'manual';
+  fuente: 'web' | 'manual' | 'simit_capture';
+  shortId?: string;
   createdAt: string;
   telegramStatus: 'pending' | 'sent' | 'failed';
   notifiedAt?: string;

@@ -7,7 +7,7 @@ import Script from 'next/script';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Outfit } from 'next/font/google';
 import { ScrollProgressBar } from '@/components/ui/ScrollProgressBar';
-import { Analytics } from '@vercel/analytics/next';
+import { Analytics } from '@vercel/analytics/react';
 
 const outfit = Outfit({
   subsets: ['latin'],
@@ -27,9 +27,9 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL ||
-      (process.env.NODE_ENV === 'development'
-        ? 'http://localhost:9005'
-        : 'https://desmulta.vercel.app')
+    (process.env.NODE_ENV === 'development'
+      ? 'http://localhost:9005'
+      : 'https://desmulta.vercel.app')
   ),
   title: `${process.env.NEXT_PUBLIC_BRAND_NAME || 'Desmulta'} - Saneamiento de Multas de Tránsito en Colombia`,
   description:
@@ -182,33 +182,31 @@ export default function RootLayout({
             </Script>
           </>
         )}
-        {/* Meta Pixel */}
-        {PIXEL_ID && (
-          <Script id="meta-pixel" strategy="afterInteractive">
-            {`
-              !function(f,b,e,v,n,t,s)
-              {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-              n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-              if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-              n.queue=[];t=b.createElement(e);t.async=!0;
-              t.src=v;s=b.getElementsByTagName(e)[0];
-              s.parentNode.insertBefore(t,s)}(window, document,'script',
-              'https://connect.facebook.net/en_US/fbevents.js');
-              fbq('init', '${PIXEL_ID}');
-              fbq('track', 'PageView');
-            `}
-          </Script>
-        )}
       </head>
       <body className={cn(outfit.className, 'antialiased')} suppressHydrationWarning={true}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           <FirebaseClientProvider>
             <ScrollProgressBar />
             {children}
-            <Analytics />
             <Toaster />
           </FirebaseClientProvider>
         </ThemeProvider>
+        <Analytics />
+        {/* INYECTA EL PIXEL DE META DE FORMA SEGURA */}
+        <Script id="meta-pixel" strategy="afterInteractive" dangerouslySetInnerHTML={{
+          __html: `
+            !function(f,b,e,v,n,t,s)
+            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+            n.queue=[];t=b.createElement(e);t.async=!0;
+            t.src=v;s=b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t,s)}(window, document,'script',
+            'https://connect.facebook.net/en_US/fbevents.js');
+            fbq('init', '${PIXEL_ID || 'TU_PIXEL_ID_AQUI'}');
+            fbq('track', 'PageView');
+          `
+        }} />
       </body>
     </html>
   );

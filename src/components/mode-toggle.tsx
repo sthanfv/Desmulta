@@ -8,6 +8,19 @@ import { Button } from '@/components/ui/button';
 
 export function ModeToggle() {
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <Button variant="outline" size="icon" className="rounded-full w-9 h-9 border-foreground/10 opacity-0">
+        <span className="sr-only">Cargando...</span>
+      </Button>
+    );
+  }
 
   return (
     <Button

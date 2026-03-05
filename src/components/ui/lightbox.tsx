@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { ZoomIn } from 'lucide-react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
@@ -14,24 +14,37 @@ interface LightboxProps {
 
 export function Lightbox({ src, alt, className = '' }: LightboxProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const triggerContent = (
+    <div className={`relative group cursor-zoom-in overflow-hidden ${className}`}>
+      {/* Imagen miniatura */}
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        className="object-cover transition-transform duration-500 group-hover:scale-105"
+      />
+      {/* Overlay interactivo */}
+      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+        <ZoomIn className="w-8 h-8 text-white drop-shadow-md" />
+      </div>
+    </div>
+  );
+
+  if (!mounted) {
+    return triggerContent;
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <div className={`relative group cursor-zoom-in overflow-hidden ${className}`}>
-          {/* Imagen miniatura */}
-          <Image
-            src={src}
-            alt={alt}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-          {/* Overlay interactivo */}
-          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-            <ZoomIn className="w-8 h-8 text-white drop-shadow-md" />
-          </div>
-        </div>
+        {triggerContent}
       </DialogTrigger>
 
       {/* 

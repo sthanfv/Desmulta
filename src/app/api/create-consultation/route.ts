@@ -13,6 +13,11 @@ try {
   logger.error('[firebase-admin] Error de inicialización:', { error: message });
 }
 
+/**
+ * La función generarIdCorto ha sido deprecada en v5.8.0
+ * en favor de la transacción atómica con contador secuencial.
+ */
+
 export async function POST(request: NextRequest) {
   getAdminApp();
   const db = getFirestore();
@@ -65,46 +70,75 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 3. Preparar datos para Firestore
+    // 2.1 Actualizar Cooldown (MANDATO-FILTRO: Persistencia de Seguridad)
+    await cooldownRef.set({
+      lastAttemptAt: FieldValue.serverTimestamp(),
+    });
+
+    // 3. Preparar base de datos para Firestore
+
     const dataToSave = isSimitCapture
       ? {
-          authorUid,
-          cedula: 'SIMIT-CAPTURA',
-          placa: '',
-          nombre: 'VÍA CAPTURA SIMIT',
-          contacto: validatedData.contacto,
-          aceptoTerminos: validatedData.aceptoTerminos,
-          antiguedad: 'N/A',
-          tipoInfraccion: 'N/A',
-          estadoCoactivo: 'N/A',
-          evidenceUrl: validatedData.evidenceUrl || null,
-          status: 'pendiente' as const,
-          fuente: 'simit_capture' as const,
-          createdAt: FieldValue.serverTimestamp(),
-          telegramStatus: 'pending' as const,
-        }
+        authorUid,
+        cedula: 'SIMIT-CAPTURA',
+        placa: '',
+        nombre: 'VÍA CAPTURA SIMIT',
+        contacto: validatedData.contacto,
+        aceptoTerminos: validatedData.aceptoTerminos,
+        antiguedad: 'N/A',
+        tipoInfraccion: 'N/A',
+        estadoCoactivo: 'N/A',
+        evidenceUrl: validatedData.evidenceUrl || null,
+        status: 'pendiente' as const,
+        fuente: 'simit_capture' as const,
+        createdAt: FieldValue.serverTimestamp(),
+        telegramStatus: 'pending' as const,
+      }
       : {
-          authorUid,
-          cedula: (validatedData as Record<string, unknown>).cedula as string,
-          placa: (validatedData as Record<string, unknown>).placa as string,
-          nombre: (validatedData as Record<string, unknown>).nombre as string,
-          contacto: validatedData.contacto,
-          aceptoTerminos: validatedData.aceptoTerminos,
-          antiguedad: (validatedData as Record<string, unknown>).antiguedad as string,
-          tipoInfraccion: (validatedData as Record<string, unknown>).tipoInfraccion as string,
-          estadoCoactivo: (validatedData as Record<string, unknown>).estadoCoactivo as string,
-          evidenceUrl: (validatedData as Record<string, unknown>).evidenceUrl || null,
-          status: 'pendiente' as const,
-          fuente: 'web' as const,
-          createdAt: FieldValue.serverTimestamp(),
-          telegramStatus: 'pending' as const,
-        };
+        authorUid,
+        cedula: (validatedData as Record<string, unknown>).cedula as string,
+        placa: (validatedData as Record<string, unknown>).placa as string,
+        nombre: (validatedData as Record<string, unknown>).nombre as string,
+        contacto: validatedData.contacto,
+        aceptoTerminos: validatedData.aceptoTerminos,
+        antiguedad: (validatedData as any).antiguedad as string,
+        tipoInfraccion: (validatedData as any).tipoInfraccion as string,
+        estadoCoactivo: (validatedData as any).estadoCoactivo as string,
+        evidenceUrl: (validatedData as any).evidenceUrl || null,
+        status: 'pendiente' as const,
+        fuente: 'web' as const,
+        createdAt: FieldValue.serverTimestamp(),
+        telegramStatus: 'pending' as const,
+      };
 
-    // 4. Transacción atómica: escribir consulta + actualizar cooldown
+    // 4. Transacción atómica: Incrementar contador + escribir consulta + actualizar cooldown
+    const counterRef = db.collection('metadata').doc('counters');
     const consultationRef = db.collection('consultations').doc();
-    await db.runTransaction(async (transaction) => {
-      transaction.set(consultationRef, dataToSave);
+
+    const { idSecuencial } = await db.runTransaction(async (transaction) => {
+      const counterDoc = await transaction.get(counterRef);
+      let newCount = 1;
+
+      if (counterDoc.exists) {
+        newCount = (counterDoc.data()?.totalConsultas || 0) + 1;
+      }
+
+      // Actualizar contador maestro
+      transaction.set(counterRef, { totalConsultas: newCount }, { merge: true });
+
+      // Generar ID Secuencial (ej: CASO-042)
+      const idSecuencial = `CASO-${newCount.toString().padStart(3, '0')}`;
+
+      // Inyectar ID secuencial en el objeto final
+      const finalDataToSave = {
+        ...dataToSave,
+        shortId: idSecuencial,
+      };
+
+      transaction.set(consultationRef, finalDataToSave);
       transaction.set(cooldownRef, { lastAttemptAt: FieldValue.serverTimestamp() });
+
+      return { idSecuencial };
     });
 
     // 5. & 6. Tareas en Background (Next.js 15 after API) - MANDATO-FILTRO
@@ -114,7 +148,26 @@ export async function POST(request: NextRequest) {
         const { sendTelegramNotification } = await import('@/lib/telegram');
         await sendTelegramNotification(consultationRef.id);
       } catch (err) {
-        logger.error('[create-consultation] Error en notificación:', { error: String(err) });
+        logger.error('[create-consultation] Error en notificación Telegram:', { error: String(err) });
+      }
+
+      // 6. Notificación Email via Resend (v5.15.0)
+      if ('email' in validatedData && validatedData.email) {
+        try {
+          const { enviarCorreoBienvenida } = await import('@/lib/email');
+          const placaFinal = (validatedData as any).placa || 'N/A';
+          const nombreFinal = (validatedData as any).nombre || 'Usuario Desmulta';
+
+          await enviarCorreoBienvenida(
+            validatedData.email as string,
+            nombreFinal,
+            idSecuencial,
+            placaFinal
+          );
+          logger.info('[create-consultation] Correo de bienvenida enviado.', { email: (validatedData as any).email });
+        } catch (emailErr) {
+          logger.error('[create-consultation] Error en notificación Email:', { error: String(emailErr) });
+        }
       }
 
       /* 

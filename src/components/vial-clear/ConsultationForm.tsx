@@ -40,7 +40,7 @@ interface ConsultationFormProps {
 
 export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormProps) {
   const isSimitMode = mode === 'simit';
-  const [step, setStep] = useState(isSimitMode ? 2 : 1);
+  const [step, setStep] = useState(isSimitMode ? 2 : 0);
   const [isSuccess, setIsSuccess] = useState(false);
   const [showCedula, setShowCedula] = useState(false);
   const [isHuman, setIsHuman] = useState(false);
@@ -58,29 +58,29 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
     ),
     defaultValues: isSimitMode
       ? {
-          contacto: '',
-          aceptoTerminos: false,
-          _tramp_field: '',
-          evidenceUrl: '',
-          cedula: 'SIMIT-CAPTURA',
-          placa: '',
-          nombre: 'VÍA CAPTURA SIMIT',
-          antiguedad: 'N/A',
-          tipoInfraccion: 'N/A',
-          estadoCoactivo: 'N/A',
-        }
+        contacto: '',
+        aceptoTerminos: false,
+        _tramp_field: '',
+        evidenceUrl: '',
+        cedula: 'SIMIT-CAPTURA',
+        placa: '',
+        nombre: 'VÍA CAPTURA SIMIT',
+        antiguedad: 'N/A',
+        tipoInfraccion: 'N/A',
+        estadoCoactivo: 'N/A',
+      }
       : {
-          cedula: '',
-          placa: '',
-          nombre: '',
-          contacto: '',
-          aceptoTerminos: false,
-          _tramp_field: '',
-          antiguedad: '',
-          tipoInfraccion: '',
-          estadoCoactivo: '',
-          evidenceUrl: '',
-        },
+        cedula: '',
+        placa: '',
+        nombre: '',
+        contacto: '',
+        aceptoTerminos: false,
+        _tramp_field: '',
+        antiguedad: '',
+        tipoInfraccion: '',
+        estadoCoactivo: '',
+        evidenceUrl: '',
+      },
   });
 
   // Persistence logic (Modo Supervivencia)
@@ -164,12 +164,11 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
       let currentUser = auth.currentUser;
 
       if (!currentUser) {
-        // En vez de fallar y requerir que el usuario reabra el formulario,
-        // esperamos 1 segundo a que Firebase asigne el anonymous o enviamos flag fallback.
-        await new Promise((resolve) => setTimeout(resolve, 1500));
+        // Reducimos la espera al mínimo para asegurar la sesión anónima
+        await new Promise((resolve) => setTimeout(resolve, 300));
         currentUser = auth.currentUser;
         if (!currentUser) {
-          throw new Error('Conexión inicializada. Por favor, intente dar clic nuevamente.');
+          throw new Error('Conexión en curso. Por favor, intente dar clic nuevamente.');
         }
       }
 
@@ -221,8 +220,8 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
       haptics.vibrate('success');
       setIsSuccess(true);
       localStorage.removeItem('consultation_draft');
-      // Extendemos el tiempo visible del modal de éxito para dar calma al usuario
-      setTimeout(onSuccess, 8000);
+      // Cerramos automáticamente tras un breve periodo de éxito
+      setTimeout(onSuccess, 3000);
     } catch (e: unknown) {
       haptics.vibrate('error');
       const message = e instanceof Error ? e.message : 'Por favor, intente de nuevo más tarde.';
@@ -270,21 +269,89 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
         className="space-y-8"
       >
         <div className="px-1">
-          <Progress value={isSimitMode ? 100 : step === 1 ? 50 : 100} className="h-2 bg-muted/40" />
+          <Progress
+            value={isSimitMode ? 100 : step === 0 ? 33 : step === 1 ? 66 : 100}
+            className="h-2 bg-muted/40"
+          />
         </div>
 
-        {/* Honeypot anti-scrapping */}
-        <FormField
-          control={form.control}
-          name="_tramp_field"
-          render={({ field }) => (
-            <FormItem className="hidden" aria-hidden="true">
+        {/* Honeypot anti-spam (MANDATO-FILTRO v5.9.0) */}
+        <div
+          style={{ position: 'absolute', opacity: 0, top: -9999, left: -9999 }}
+          aria-hidden="true"
+        >
+          <FormField
+            control={form.control}
+            name="_tramp_field"
+            render={({ field }) => (
               <FormControl>
                 <Input {...field} autoComplete="new-password" tabIndex={-1} aria-hidden="true" />
               </FormControl>
-            </FormItem>
-          )}
-        />
+            )}
+          />
+        </div>
+
+        {step === 0 && !isSimitMode && (
+          <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="space-y-4 text-center">
+              <div className="inline-flex px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-[10px] font-black uppercase tracking-widest text-primary">
+                Pre-Análisis Gratuito
+              </div>
+              <h3 className="text-3xl font-black text-foreground tracking-tighter uppercase leading-tight">
+                ¿Qué tanta <span className="text-primary">probabilidad</span> <br />
+                tienes de ganar?
+              </h3>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4">
+              {[
+                {
+                  id: 'Más de 3 años',
+                  label: 'MÁS DE 3 AÑOS (Prescripción)',
+                  desc: 'Probabilidad de Éxito: 95%',
+                  color: 'text-green-500',
+                  bg: 'hover:border-green-500/50',
+                },
+                {
+                  id: 'Entre 1 y 3 años',
+                  label: 'ENTRE 1 Y 3 AÑOS (Caducidad)',
+                  desc: 'Probabilidad de Éxito: 75%',
+                  color: 'text-yellow-500',
+                  bg: 'hover:border-yellow-500/50',
+                },
+                {
+                  id: 'Menos de 1 año',
+                  label: 'MENOS DE 1 AÑO (Reciente)',
+                  desc: 'Probabilidad de Éxito: 45%',
+                  color: 'text-red-500',
+                  bg: 'hover:border-red-500/50',
+                },
+              ].map((opt) => (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => {
+                    form.setValue('antiguedad', opt.id);
+                    haptics.vibrate('medium');
+                    setStep(1);
+                  }}
+                  className={cn(
+                    'p-6 rounded-[2rem] border-2 border-border/40 transition-all text-left flex flex-col gap-1 active:scale-95',
+                    opt.bg
+                  )}
+                >
+                  <span className="font-black text-sm uppercase tracking-tight">{opt.label}</span>
+                  <span className={cn('text-[10px] font-bold uppercase tracking-widest', opt.color)}>
+                    {opt.desc}
+                  </span>
+                </button>
+              ))}
+            </div>
+            <p className="text-[10px] text-center text-muted-foreground font-medium px-8 leading-relaxed">
+              Basado en la Ley 769 de 2002 y Sentencias de la Corte Constitucional de Colombia.
+            </p>
+          </div>
+        )}
 
         {step === 1 && !isSimitMode && (
           <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-500">
@@ -299,46 +366,7 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
             </div>
 
             <div className="space-y-8">
-              {/* Pregunta 1: Antigüedad */}
-              <FormField
-                control={form.control}
-                name="antiguedad"
-                render={({ field }) => (
-                  <FormItem className="space-y-3">
-                    <FormLabel className="text-xs font-black uppercase tracking-widest text-muted-foreground pl-1">
-                      1. ¿Hace cuánto tiempo fue la infracción?
-                    </FormLabel>
-                    <FormControl>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {[
-                          'Menos de 1 año',
-                          'Entre 1 y 3 años',
-                          'Más de 3 años',
-                          'No estoy seguro',
-                        ].map((option) => (
-                          <button
-                            key={option}
-                            type="button"
-                            onClick={() => {
-                              field.onChange(option);
-                              haptics.vibrate('light');
-                            }}
-                            className={cn(
-                              'flex items-center justify-center h-14 rounded-2xl border-2 transition-all font-bold text-sm',
-                              field.value === option
-                                ? 'border-primary bg-primary/5 text-primary shadow-lg shadow-primary/10'
-                                : 'border-border/40 hover:border-border text-muted-foreground'
-                            )}
-                          >
-                            {option}
-                          </button>
-                        ))}
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Pregunta 2: Tipo de Infracción (Ahora es la 1 después del Termómetro) */}
 
               {/* Pregunta 2: Tipo de Infracción */}
               <FormField
@@ -347,7 +375,7 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
                 render={({ field }) => (
                   <FormItem className="space-y-3">
                     <FormLabel className="text-xs font-black uppercase tracking-widest text-muted-foreground pl-1">
-                      2. Tipo de Captura
+                      1. Tipo de Captura
                     </FormLabel>
                     <FormControl>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -385,7 +413,7 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
                 render={({ field }) => (
                   <FormItem className="space-y-3">
                     <FormLabel className="text-xs font-black uppercase tracking-widest text-muted-foreground pl-1">
-                      3. ¿Tiene mandamiento de pago o embargo? (Cobro Coactivo)
+                      2. ¿Tiene mandamiento de pago o embargo? (Cobro Coactivo)
                     </FormLabel>
                     <FormControl>
                       <div className="grid grid-cols-3 gap-3">
@@ -432,10 +460,10 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
               {!isSimitMode && (
                 <button
                   type="button"
-                  onClick={() => setStep(1)}
+                  onClick={() => setStep(0)}
                   className="text-xs font-bold text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 uppercase tracking-tighter"
                 >
-                  ← Regresar al Paso 1
+                  ← Regresar al Inicio
                 </button>
               )}
               <div className="inline-flex px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-[10px] font-black uppercase tracking-widest text-green-500">
@@ -570,6 +598,27 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
                       </FormItem>
                     )}
                   />
+
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem className="space-y-2">
+                        <FormLabel className="text-[10px] font-black text-foreground/70 uppercase tracking-widest pl-1">
+                          Correo Electrónico <span className="opacity-40">(Opcional)</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="email"
+                            placeholder="tu@correo.com"
+                            {...field}
+                            className="w-full bg-background border-border/50 rounded-2xl px-6 h-16 text-lg font-medium shadow-Inner"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </>
               )}
 
@@ -657,13 +706,13 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
               ) : isSimitMode ? (
                 'ENVIAR CAPTURA SIMIT'
               ) : (
-                'INICIAR ESTUDIO GRATUITO'
+                '¡FINALIZAR ESTUDIO GRATUITO!'
               )}
             </Button>
             <div className="flex items-center justify-center gap-2 pt-2 opacity-50 grayscale hover:grayscale-0 transition-all cursor-default">
               <ShieldCheck className="w-3 h-3 text-primary" />
               <span className="text-[9px] font-black uppercase tracking-[0.2em] text-foreground">
-                Encriptación RSA 256-bit Activada
+                SERVICIO PROTEGIDO Y VERIFICADO
               </span>
             </div>
           </div>

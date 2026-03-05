@@ -22,6 +22,20 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
+
+// Función de utilidad para calcular el ahorro estimado
+const getEstimatedSavings = (antiguedad?: string) => {
+  if (!antiguedad) return { label: 'A consultar', value: 'Pendiente', color: 'text-muted-foreground' };
+
+  if (antiguedad.includes('Más de 3 años')) {
+    return { label: 'Ahorro Alto', value: '$800.000 - $1.500.000', color: 'text-green-500 font-black' };
+  }
+  if (antiguedad.includes('Entre 1 y 3 años')) {
+    return { label: 'Ahorro Medio', value: '$400.000 - $800.000', color: 'text-yellow-500 font-bold' };
+  }
+  return { label: 'A consultar', value: 'Pendiente', color: 'text-muted-foreground' };
+};
 
 export function ConsultationsList() {
   const [consultations, setConsultations] = useState<Consultation[]>([]);
@@ -48,9 +62,9 @@ export function ConsultationsList() {
 
     if (result.success && result.data) {
       if (isReset) {
-        setConsultations(result.data as Consultation[]);
+        setConsultations(result.data as unknown as Consultation[]);
       } else {
-        setConsultations((prev) => [...prev, ...(result.data as Consultation[])]);
+        setConsultations((prev) => [...prev, ...(result.data as unknown as Consultation[])]);
       }
       setLastDocId(result.lastDocId);
       setHasMore(!!result.hasMore);
@@ -123,7 +137,6 @@ export function ConsultationsList() {
       return next;
     });
   };
-
   const formatMaskedPhone = (phone: string, isRevealed: boolean) => {
     if (isRevealed) return phone;
     const clean = phone.replace(/\s+/g, '');
@@ -131,43 +144,59 @@ export function ConsultationsList() {
     return `${clean.slice(0, 3)} *** ${clean.slice(-4)}`;
   };
 
-  const getEstimatedSavings = (type?: string) => {
-    if (!type) return null;
-    if (type.includes('Foto-Multa')) return 650000;
-    if (type.includes('Físico')) return 325000;
-    if (type.includes('Ambas')) return 975000;
-    return 200000;
+  const getViabilityColor = (antiguedad?: string) => {
+    if (!antiguedad) return 'bg-slate-500';
+    if (antiguedad.includes('Más de 3 años'))
+      return 'bg-green-500 shadow-[0_0_12px_rgba(34,197,94,0.6)] animate-pulse';
+    if (antiguedad.includes('Entre 1 y 3 años')) return 'bg-yellow-500';
+    if (antiguedad.includes('Menos de 1 año')) return 'bg-red-500';
+    return 'bg-slate-500';
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'pendiente':
-        return (
-          <Badge className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20 hover:bg-yellow-500/20">
-            Pendiente
-          </Badge>
-        );
-      case 'contactado':
-        return (
-          <Badge className="bg-blue-500/10 text-blue-500 border-blue-500/20 hover:bg-blue-500/20">
-            Contactado
-          </Badge>
-        );
-      case 'en_proceso':
-        return (
-          <Badge className="bg-primary/10 text-primary border-primary/20 hover:bg-primary/20">
-            En Proceso
-          </Badge>
-        );
-      case 'terminado':
-        return (
-          <Badge className="bg-green-500/10 text-green-500 border-green-500/20 hover:bg-green-500/20">
-            Terminado
-          </Badge>
-        );
-      default:
-        return <Badge variant="outline">{status}</Badge>;
+  const handleUpdateStatus = async (id: string, status: string) => {
+    try {
+      setConvertingId(id);
+      const { updateConsultationStatus } = await import('@/app/admin/actions');
+      const result = await updateConsultationStatus(id, status);
+      if (result.success) {
+        setConsultations((prev) => prev.map((c) => (c.id === id ? { ...c, status: status as any } : c)));
+      }
+    } catch (err) {
+      console.error('Error al actualizar estado:', err);
+    } finally {
+      setConvertingId(null);
     }
+  };
+
+  const getStatusBadge = (consultation: Consultation) => {
+    const status = consultation.status;
+    const statuses = [
+      { id: 'pendiente', label: 'Pendiente', color: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' },
+      { id: 'contactado', label: 'Contactado', color: 'bg-blue-500/10 text-blue-500 border-blue-500/20' },
+      { id: 'en_proceso', label: 'En Proceso', color: 'bg-primary/10 text-primary border-primary/20' },
+      { id: 'terminado', label: 'Terminado', color: 'bg-green-500/10 text-green-500 border-green-500/20' },
+    ];
+
+    return (
+      <div className="flex flex-wrap gap-1">
+        {statuses.map((s) => (
+          <button
+            key={s.id}
+            type="button"
+            disabled={status === s.id || convertingId === consultation.id}
+            onClick={() => handleUpdateStatus(consultation.id, s.id)}
+            className={cn(
+              'px-2 py-0.5 rounded-md text-[9px] font-black uppercase transition-all border outline-none',
+              status === s.id
+                ? s.color
+                : 'bg-white/5 text-muted-foreground border-white/5 opacity-40 hover:opacity-100 hover:border-white/20'
+            )}
+          >
+            {s.label}
+          </button>
+        ))}
+      </div>
+    );
   };
 
   if (loading && consultations.length === 0) {
@@ -249,8 +278,16 @@ export function ConsultationsList() {
                             <h3 className="text-xl font-bold text-foreground">
                               {consultation.nombre}
                             </h3>
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                              {getStatusBadge(consultation.status)}
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                              {getStatusBadge(consultation)}
+                              <div className="flex items-center gap-2 px-2 py-0.5 rounded-full bg-white/5 border border-white/10">
+                                <div
+                                  className={`h-2 w-2 rounded-full ${getViabilityColor(consultation.antiguedad)}`}
+                                />
+                                <span className="text-[9px] font-black uppercase tracking-tighter">
+                                  {consultation.antiguedad || 'Sin Analizar'}
+                                </span>
+                              </div>
                               <span>•</span>
                               <span className="flex items-center gap-1">
                                 <Calendar className="w-3 h-3" />
@@ -329,19 +366,18 @@ export function ConsultationsList() {
                           </div>
                         </div>
 
-                        {/* Badge de Ahorro Estimado */}
-                        {getEstimatedSavings(consultation.tipoInfraccion) && (
-                          <div className="mt-4 flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-2xl w-fit">
-                            <DollarSign className="w-3 h-3 text-green-500" />
-                            <span className="text-[10px] font-black text-green-500 uppercase tracking-widest">
-                              Ahorro Estimado: $
-                              {getEstimatedSavings(consultation.tipoInfraccion)?.toLocaleString(
-                                'es-CO'
-                              )}{' '}
-                              COP
+                        {/* Badge de Ahorro Estimado (v5.12.3) */}
+                        <div className="mt-4 flex flex-col gap-1 p-4 bg-white/5 border border-white/10 rounded-2xl w-fit">
+                          <div className="flex items-center gap-2">
+                            <DollarSign className="w-3 h-3 text-primary/60" />
+                            <span className="text-[10px] font-black text-primary/60 uppercase tracking-widest">
+                              {getEstimatedSavings(consultation.antiguedad).label}
                             </span>
                           </div>
-                        )}
+                          <p className={cn("text-xs font-black uppercase tracking-tight", getEstimatedSavings(consultation.antiguedad).color)}>
+                            {getEstimatedSavings(consultation.antiguedad).value}
+                          </p>
+                        </div>
                       </div>
 
                       <div className="flex flex-col gap-2 justify-center lg:min-w-[200px]">

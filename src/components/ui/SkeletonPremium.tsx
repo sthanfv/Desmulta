@@ -7,7 +7,7 @@ interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 /**
- * SkeletonPremium - MANDATO-FILTRO v5.4.1
+ * SkeletonPremium - MANDATO-FILTRO v5.8.0
  * Diseño High-Fidelity con estética Glassmorphism y degradados de la marca.
  */
 export function SkeletonPremium({ className, variant = 'glass', ...props }: SkeletonProps) {
