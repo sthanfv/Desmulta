@@ -9,6 +9,7 @@ import { Outfit } from 'next/font/google';
 import { ScrollProgressBar } from '@/components/ui/ScrollProgressBar';
 import { MotorFomo } from '@/components/MotorFomo';
 import { Analytics } from '@vercel/analytics/react';
+import { PwaRegistry } from '@/components/PwaRegistry';
 
 const outfit = Outfit({
   subsets: ['latin'],
@@ -16,7 +17,6 @@ const outfit = Outfit({
 });
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
-const PIXEL_ID = process.env.NEXT_PUBLIC_PIXEL_ID;
 const GSC_ID = process.env.NEXT_PUBLIC_GSC_ID;
 
 export const viewport: Viewport = {
@@ -28,9 +28,9 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL ||
-    (process.env.NODE_ENV === 'development'
-      ? 'http://localhost:9005'
-      : 'https://desmulta.vercel.app')
+      (process.env.NODE_ENV === 'development'
+        ? 'http://localhost:9005'
+        : 'https://desmulta.vercel.app')
   ),
   title: `${process.env.NEXT_PUBLIC_BRAND_NAME || 'Desmulta'} - Saneamiento de Multas de Tránsito en Colombia`,
   description:

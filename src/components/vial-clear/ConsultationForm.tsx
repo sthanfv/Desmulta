@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useForm, type SubmitHandler } from 'react-hook-form';
+import { useForm, type SubmitHandler, type UseFormReturn } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
@@ -15,7 +15,8 @@ import {
   MessageCircle,
 } from 'lucide-react';
 import { getAuth } from 'firebase/auth';
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 import { ConsultationSchema, SimitCaptureSchema } from '@/lib/definitions';
 
@@ -32,6 +33,28 @@ import { haptics } from '@/lib/utils/haptics';
 import { ImageUpload } from './ImageUpload';
 
 type ConsultationFormData = z.infer<typeof ConsultationSchema>;
+type SimitFormData = z.infer<typeof SimitCaptureSchema>;
+
+// --- ARMA DE CONVERSIÓN TÁCTICA: ENRUTADOR MÁGICO ---
+// Lee parámetros de WhatsApp/Ads en la URL y auto-rellena el estado sin interactuar
+function EnrutadorMagico({
+  form,
+}: {
+  form: UseFormReturn<ConsultationFormData | SimitFormData | Record<string, unknown>>;
+}) {
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const placaURL = searchParams.get('placa');
+
+    if (placaURL) {
+      // @ts-expect-error Bypass dinamico controlado en RHF V7
+      form.setValue('placa', placaURL.toUpperCase(), { shouldValidate: true });
+    }
+  }, [searchParams, form]);
+
+  return null; // Componente fantasma
+}
 
 interface ConsultationFormProps {
   onSuccess: () => void;
@@ -275,6 +298,11 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
             className="h-2 bg-muted/40"
           />
         </div>
+
+        {/* El enrutador mágico lee la URL de WhatsApp y rellena la placa */}
+        <Suspense fallback={null}>
+          <EnrutadorMagico form={form} />
+        </Suspense>
 
         {/* Honeypot anti-spam (MANDATO-FILTRO v5.9.0) */}
         <div

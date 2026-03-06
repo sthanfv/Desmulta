@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import { ConsultationsList } from './ConsultationsList';
 import { CasesList } from './CasesList';
+import { TableroKanban, Lead } from '@/app/admin/TableroKanban';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -97,6 +98,33 @@ export function AdminDashboard() {
 
   const [beforePreview, setBeforePreview] = useState<string | null>(null);
   const [afterPreview, setAfterPreview] = useState<string | null>(null);
+
+  // MOCK LEADS PARA EL KANBAN DE RENDIMIENTO (Reemplazar con Hook de Firestore luego)
+  const mockLeadsParaCentroComando: Lead[] = [
+    { id: 'LD-001', placa: 'HKS890', ciudad: 'Cali', estado: 'NUEVO', montoAprox: '$740,000' },
+    { id: 'LD-002', placa: 'UWY918', ciudad: 'Bogotá', estado: 'NUEVO', montoAprox: '$412,000' },
+    {
+      id: 'LD-003',
+      placa: 'MQL441',
+      ciudad: 'Medellín',
+      estado: 'ESTUDIO',
+      montoAprox: '$800,000',
+    },
+    {
+      id: 'LD-004',
+      placa: 'JJP223',
+      ciudad: 'Bucaramanga',
+      estado: 'RADICADO',
+      montoAprox: '$1,200,000',
+    },
+    {
+      id: 'LD-005',
+      placa: 'AAA000',
+      ciudad: 'Barranquilla',
+      estado: 'FINALIZADO',
+      montoAprox: '$500,000',
+    },
+  ];
 
   const showcaseForm = useForm<ShowcaseFormData>({
     resolver: zodResolver(showcaseSchema),
@@ -364,7 +392,7 @@ export function AdminDashboard() {
                 PANEL CONTROL
               </h1>
               <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mt-1 opacity-70">
-                Desmulta Admin v6.10.0
+                Desmulta Admin v7.0.0
               </p>
             </div>
           </div>
@@ -380,8 +408,15 @@ export function AdminDashboard() {
       </header>
 
       <main className="flex-1 max-w-6xl mx-auto w-full px-6 py-12 space-y-24">
-        <Tabs defaultValue="leads" className="w-full space-y-12">
-          <TabsList className="bg-white/5 border border-white/10 p-1 rounded-2xl h-16 w-full md:w-auto overflow-x-auto flex">
+        <Tabs defaultValue="comando" className="w-full space-y-12">
+          <TabsList className="bg-white/5 border border-white/10 p-1 rounded-2xl h-16 w-full md:w-auto overflow-x-auto flex flex-nowrap">
+            <TabsTrigger
+              value="comando"
+              className="px-8 flex-1 md:flex-none rounded-xl font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all uppercase tracking-widest text-xs min-w-[180px]"
+            >
+              <ShieldCheck className="w-4 h-4 mr-2" />
+              Centro de Comando
+            </TabsTrigger>
             <TabsTrigger
               value="leads"
               className="px-8 flex-1 md:flex-none rounded-xl font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
@@ -397,6 +432,13 @@ export function AdminDashboard() {
               Casos Activos
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent
+            value="comando"
+            className="space-y-24 outline-none animate-in fade-in zoom-in-95 duration-500"
+          >
+            <TableroKanban leadsIniciales={mockLeadsParaCentroComando} />
+          </TabsContent>
 
           <TabsContent value="leads" className="space-y-24 outline-none">
             {/* --- GESTIÓN DE CONSULTAS (LEADS) --- */}
