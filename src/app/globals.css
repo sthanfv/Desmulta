@@ -215,6 +215,11 @@
     position: relative !important;
     overflow: hidden !important;
     isolation: isolate;
+    /* Android fix: contain prevents the ::after from escaping the stacking context */
+    contain: layout paint;
+    /* Clip any overflow that Android Chrome may not respect from overflow:hidden alone */
+    -webkit-clip-path: inset(0 round var(--radius, 0.5rem));
+    clip-path: inset(0 round var(--radius, 0.5rem));
   }
 
   .animate-shimmer::after {
@@ -235,7 +240,8 @@
     animation: shimmer-premium 8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
     pointer-events: none;
     will-change: transform;
-    z-index: 10;
+    /* z-index 1 (not 10): stays inside the stacking context, never escapes to push layout */
+    z-index: 1;
   }
 
   @keyframes shimmer-premium {
@@ -262,6 +268,7 @@
       -webkit-backdrop-filter: blur(12px);
     }
   }
+
 
   /* Diamond Cut - Ultra Thin Border */
   .diamond-border {
