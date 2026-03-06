@@ -6,7 +6,7 @@
  * Recibe los datos de configuración (showcase y footer) ya pre-renderizados
  * por el Server Component en page.tsx usando Firebase Admin SDK + cache() de React 19.
  *
- * MANDATO-FILTRO v5.8.0: toda la lógica de estado, efectos y formularios vive aquí.
+ * MANDATO-FILTRO v5.17.0: toda la lógica de estado, efectos y formularios vive aquí.
  */
 
 import React, { useState, useEffect } from 'react';
@@ -555,7 +555,9 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
           </div>
           {!mounted ? (
             <div className="w-full h-96 bg-card/20 animate-pulse rounded-[3rem] border border-white/10 flex items-center justify-center">
-              <p className="text-muted-foreground font-medium">Sincronizando información legal...</p>
+              <p className="text-muted-foreground font-medium">
+                Sincronizando información legal...
+              </p>
             </div>
           ) : (
             <Accordion type="single" collapsible className="w-full space-y-4">
@@ -760,7 +762,10 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
                       <p className="text-xs font-black text-muted-foreground uppercase tracking-widest leading-none mb-1.5">
                         Email Corporativo
                       </p>
-                      <p className="text-lg sm:text-xl font-bold text-foreground truncate max-w-[280px] sm:max-w-full" title={footerData.email}>
+                      <p
+                        className="text-lg sm:text-xl font-bold text-foreground truncate max-w-[280px] sm:max-w-full"
+                        title={footerData.email}
+                      >
                         {footerData.email || 'contacto@desmulta.vercel.app'}
                       </p>
                     </div>
@@ -800,7 +805,7 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
                   © {new Date().getFullYear()} DESMULTA — SERVICIO PRIVADO DE GESTIÓN VIAL
                 </p>
                 <span className="text-[9px] font-black uppercase tracking-widest bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/20">
-                  v5.16.2
+                  v5.17.0
                 </span>
               </div>
               <div className="flex items-center gap-4 opacity-40 hover:opacity-100 transition-opacity mt-1">

@@ -1,4 +1,4 @@
-# Desmulta — Plataforma de Saneamiento Vial Inteligente v5.8.0
+# Desmulta — Plataforma de Saneamiento Vial Inteligente v5.17.0
 
 ![Desmulta Banner](https://desmulta.vercel.app/icon.png)
 
@@ -54,7 +54,7 @@ Hemos seleccionado un stack de vanguardia para garantizar seguridad, velocidad y
 
 ## 5. El Estado Actual y Evolución
 
-- **Estado:** Producción v5.8.0 con Aceleración Frontend y Radicado Secuencial.
+- **Estado:** Producción v5.17.0 con Aceleración Frontend y Radicado Secuencial.
 - **MANDATO-FILTRO:** Como equipo senior, mantenemos una vigilancia técnica constante sobre la seguridad de los datos y la pulcritud del código.
 
 ---

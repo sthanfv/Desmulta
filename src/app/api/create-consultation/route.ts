@@ -3,7 +3,11 @@ import { getFirestore, Timestamp, FieldValue } from 'firebase-admin/firestore';
 import { getAdminApp } from '@/lib/firebase-admin';
 import { ConsultationSchema, SimitCaptureSchema } from '@/lib/definitions';
 import { logger } from '@/lib/logger/security-logger';
+import { z } from 'zod';
 // import { analyzeViabilityFlow } from '@/lib/genkit';
+
+type ConsultationData = z.infer<typeof ConsultationSchema>;
+type SimitCaptureData = z.infer<typeof SimitCaptureSchema>;
 
 // Inicializar Firebase Admin SDK via singleton seguro
 try {
@@ -78,38 +82,38 @@ export async function POST(request: NextRequest) {
     // 3. Preparar base de datos para Firestore
 
     const dataToSave = isSimitCapture
-      ? {
+      ? ({
         authorUid,
         cedula: 'SIMIT-CAPTURA',
         placa: '',
         nombre: 'VÍA CAPTURA SIMIT',
-        contacto: validatedData.contacto,
+        contacto: (validatedData as SimitCaptureData).contacto,
         aceptoTerminos: validatedData.aceptoTerminos,
         antiguedad: 'N/A',
         tipoInfraccion: 'N/A',
         estadoCoactivo: 'N/A',
-        evidenceUrl: validatedData.evidenceUrl || null,
+        evidenceUrl: (validatedData as SimitCaptureData).evidenceUrl || null,
         status: 'pendiente' as const,
         fuente: 'simit_capture' as const,
         createdAt: FieldValue.serverTimestamp(),
         telegramStatus: 'pending' as const,
-      }
-      : {
+      } as const)
+      : ({
         authorUid,
-        cedula: (validatedData as Record<string, unknown>).cedula as string,
-        placa: (validatedData as Record<string, unknown>).placa as string,
-        nombre: (validatedData as Record<string, unknown>).nombre as string,
+        cedula: (validatedData as ConsultationData).cedula,
+        placa: (validatedData as ConsultationData).placa || '',
+        nombre: (validatedData as ConsultationData).nombre,
         contacto: validatedData.contacto,
         aceptoTerminos: validatedData.aceptoTerminos,
-        antiguedad: (validatedData as any).antiguedad as string,
-        tipoInfraccion: (validatedData as any).tipoInfraccion as string,
-        estadoCoactivo: (validatedData as any).estadoCoactivo as string,
-        evidenceUrl: (validatedData as any).evidenceUrl || null,
+        antiguedad: (validatedData as ConsultationData).antiguedad,
+        tipoInfraccion: (validatedData as ConsultationData).tipoInfraccion,
+        estadoCoactivo: (validatedData as ConsultationData).estadoCoactivo,
+        evidenceUrl: (validatedData as ConsultationData).evidenceUrl || null,
         status: 'pendiente' as const,
         fuente: 'web' as const,
         createdAt: FieldValue.serverTimestamp(),
         telegramStatus: 'pending' as const,
-      };
+      } as const);
 
     // 4. Transacción atómica: Incrementar contador + escribir consulta + actualizar cooldown
     const counterRef = db.collection('metadata').doc('counters');
@@ -148,25 +152,27 @@ export async function POST(request: NextRequest) {
         const { sendTelegramNotification } = await import('@/lib/telegram');
         await sendTelegramNotification(consultationRef.id);
       } catch (err) {
-        logger.error('[create-consultation] Error en notificación Telegram:', { error: String(err) });
+        logger.error('[create-consultation] Error en notificación Telegram:', {
+          error: String(err),
+        });
       }
 
       // 6. Notificación Email via Resend (v5.15.0)
-      if ('email' in validatedData && validatedData.email) {
+      if (!isSimitCapture && 'email' in validatedData && validatedData.email) {
         try {
           const { enviarCorreoBienvenida } = await import('@/lib/email');
-          const placaFinal = (validatedData as any).placa || 'N/A';
-          const nombreFinal = (validatedData as any).nombre || 'Usuario Desmulta';
+          const data = validatedData as ConsultationData;
+          const placaFinal = data.placa || 'N/A';
+          const nombreFinal = data.nombre || 'Usuario Desmulta';
 
-          await enviarCorreoBienvenida(
-            validatedData.email as string,
-            nombreFinal,
-            idSecuencial,
-            placaFinal
-          );
-          logger.info('[create-consultation] Correo de bienvenida enviado.', { email: (validatedData as any).email });
+          await enviarCorreoBienvenida(data.email as string, nombreFinal, idSecuencial, placaFinal);
+          logger.info('[create-consultation] Correo de bienvenida enviado.', {
+            email: data.email,
+          });
         } catch (emailErr) {
-          logger.error('[create-consultation] Error en notificación Email:', { error: String(emailErr) });
+          logger.error('[create-consultation] Error en notificación Email:', {
+            error: String(emailErr),
+          });
         }
       }
 

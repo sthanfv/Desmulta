@@ -58,29 +58,29 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
     ),
     defaultValues: isSimitMode
       ? {
-        contacto: '',
-        aceptoTerminos: false,
-        _tramp_field: '',
-        evidenceUrl: '',
-        cedula: 'SIMIT-CAPTURA',
-        placa: '',
-        nombre: 'VÍA CAPTURA SIMIT',
-        antiguedad: 'N/A',
-        tipoInfraccion: 'N/A',
-        estadoCoactivo: 'N/A',
-      }
+          contacto: '',
+          aceptoTerminos: false,
+          _tramp_field: '',
+          evidenceUrl: '',
+          cedula: 'SIMIT-CAPTURA',
+          placa: '',
+          nombre: 'VÍA CAPTURA SIMIT',
+          antiguedad: 'N/A',
+          tipoInfraccion: 'N/A',
+          estadoCoactivo: 'N/A',
+        }
       : {
-        cedula: '',
-        placa: '',
-        nombre: '',
-        contacto: '',
-        aceptoTerminos: false,
-        _tramp_field: '',
-        antiguedad: '',
-        tipoInfraccion: '',
-        estadoCoactivo: '',
-        evidenceUrl: '',
-      },
+          cedula: '',
+          placa: '',
+          nombre: '',
+          contacto: '',
+          aceptoTerminos: false,
+          _tramp_field: '',
+          antiguedad: '',
+          tipoInfraccion: '',
+          estadoCoactivo: '',
+          evidenceUrl: '',
+        },
   });
 
   // Persistence logic (Modo Supervivencia)
@@ -341,7 +341,9 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
                   )}
                 >
                   <span className="font-black text-sm uppercase tracking-tight">{opt.label}</span>
-                  <span className={cn('text-[10px] font-bold uppercase tracking-widest', opt.color)}>
+                  <span
+                    className={cn('text-[10px] font-bold uppercase tracking-widest', opt.color)}
+                  >
                     {opt.desc}
                   </span>
                 </button>

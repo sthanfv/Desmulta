@@ -4,7 +4,7 @@ import { getBlogPosts } from '@/lib/mdx';
 
 /**
  * Sitemap Profesional Dinámico - Desmulta v5.16.1
- * 
+ *
  * MANDATO-FILTRO: SEO "Estado del Arte"
  * 1. URLs Canónicas y Absolutas.
  * 2. Lastmod dinámico para eficiencia de rastreo.
@@ -14,7 +14,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://desmulta.vercel.app';
 
   // Páginas estáticas principales
-  const staticPages: MetadataRoute.Sitemap = ['', '/servicios', '/faq', '/metodologia', '/blog'].map((route) => ({
+  const staticPages: MetadataRoute.Sitemap = [
+    '',
+    '/servicios',
+    '/faq',
+    '/metodologia',
+    '/blog',
+  ].map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date(),
     changeFrequency: 'monthly' as const,

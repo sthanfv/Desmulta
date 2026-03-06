@@ -1,61 +1,83 @@
 import { NextResponse } from 'next/server';
+import { getFirestore, Timestamp, FieldValue } from 'firebase-admin/firestore';
+import { getAdminApp } from '@/lib/firebase-admin';
+import { ConsultationSchema } from '@/lib/definitions';
+import { logger } from '@/lib/logger/security-logger';
 
 /**
- * Motor de ValidaciÃ³n en el Edge â€” Desmulta v5.15.0
+ * Motor de Validación — Desmulta v5.17.0
  *
- * Ventajas:
- * 1. Latencia < 50ms (Ejecución en el nodo más cercano).
- * 2. Protección anti-DDoS (Filtra basura antes de la DB).
- * 3. Ahorro de recursos en Supabase/Firebase.
- *
- * MANDATO-FILTRO: Seguridad y Velocidad Extrema.
+ * MANDATO-FILTRO:
+ * 1. Validación estricta con Zod.
+ * 2. Rate Limiting persistente.
+ * 3. Logging ofuscado.
  */
 
-export const runtime = 'edge';
+// Definir esquema parcial para validación rápida (solo cédula y placa)
+const ValidationSchema = ConsultationSchema.pick({
+  cedula: true,
+  placa: true,
+});
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { placa, cedula } = body;
 
-    // 1. Validación de presencia (Cédula obligatoria, Placa opcional)
-    if (!cedula) {
-      return NextResponse.json({ error: 'El número de cédula es obligatorio' }, { status: 400 });
-    }
-
-    // 2. Validación de formato de placa (Solo si se proporciona)
-    if (placa && placa.trim() !== '') {
-      const regexPlaca = /^[A-Z]{3}[0-9]{3}$|^[A-Z]{3}[0-9]{2}[A-Z]$/i;
-      if (!regexPlaca.test(placa)) {
-        return NextResponse.json(
-          { error: 'Formato de placa inválido. Use AAA123 para carros o AAA12A para motos.' },
-          { status: 400 }
-        );
-      }
-    }
-
-    // 3. Validación de cédula (Solo números, 5 a 20 dígitos para cubrir NITs y cédulas extranjeras)
-    if (!/^\d{5,20}$/.test(cedula)) {
+    // 1. Validación con Zod (Sanitización y Tipado)
+    const result = ValidationSchema.safeParse(body);
+    if (!result.success) {
       return NextResponse.json(
-        { error: 'Número de cédula inválido. Verifique e intente nuevamente.' },
+        { error: 'Datos inválidos', details: result.error.flatten() },
         { status: 400 }
       );
     }
 
-    // En este punto, los datos están saneados y listos para la DB principal
+    const { cedula, placa } = result.data;
+
+    // 2. Inicializar Firebase y DB (Edge Compatible via Admin SDK if configured)
+    // Nota: El runtime 'edge' puede tener limitaciones con firebase-admin
+    // dependiendo de la versión y entorno de despliegue.
+    // En Vercel Edge, preferimos usar fetch para Firestore o el SDK ligero.
+    // Para simplificar y mantener consistencia con create-consultation:
+    getAdminApp();
+    const db = getFirestore();
+
+    // 3. Rate Limiting (MANDATO-FILTRO: Prevención de Enumeración)
+    // Usamos un identificador basado en la cédula para limitar consultas sobre la misma persona
+    const cooldownRef = db.collection('validationCooldowns').doc(cedula);
+    const cooldownSnap = await cooldownRef.get();
+    const cooldownPeriod = 2 * 60 * 1000; // 2 minutos para validación previa
+
+    if (cooldownSnap.exists) {
+      const lastAttempt = (cooldownSnap.data()?.lastAttemptAt as Timestamp).toMillis();
+      if (Date.now() - lastAttempt < cooldownPeriod) {
+        logger.warn('[validar-consulta] Rate limit activado', { cedula });
+        return NextResponse.json(
+          { error: 'Demasiados intentos. Espere 2 minutos.' },
+          { status: 429 }
+        );
+      }
+    }
+
+    // Actualizar cooldown
+    await cooldownRef.set({
+      lastAttemptAt: FieldValue.serverTimestamp(),
+      ipHash: request.headers.get('x-forwarded-for') || 'unknown', // Opcional: hash de IP
+    });
+
+    logger.info('[validar-consulta] Validación exitosa', { placa, cedula });
+
     return NextResponse.json({
       success: true,
-      mensaje: 'Validación preliminar exitosa. Analizando viabilidad de prescripción...',
+      mensaje: 'Validación preliminar exitosa. Analizando viabilidad...',
       datos: {
-        placa: placa.toUpperCase(),
+        placa: placa?.toUpperCase() || 'N/A',
         cedula,
       },
     });
   } catch (err) {
-    console.error('[validar-consulta] Error en el Edge:', err); // En el Edge no usamos el logger singleton de Node
-    return NextResponse.json(
-      { error: 'Error procesando la solicitud en el Edge' },
-      { status: 500 }
-    );
+    const message = err instanceof Error ? err.message : 'Error desconocido';
+    logger.error('[validar-consulta] Error crítico:', { error: message });
+    return NextResponse.json({ error: 'Error interno en el motor de validación' }, { status: 500 });
   }
 }

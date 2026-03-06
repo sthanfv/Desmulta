@@ -43,9 +43,7 @@ export function Lightbox({ src, alt, className = '' }: LightboxProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        {triggerContent}
-      </DialogTrigger>
+      <DialogTrigger asChild>{triggerContent}</DialogTrigger>
 
       {/* 
         Utilizamos la variante max-w-7xl para permitir que la imagen sea inmensa y

@@ -27,9 +27,9 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL ||
-    (process.env.NODE_ENV === 'development'
-      ? 'http://localhost:9005'
-      : 'https://desmulta.vercel.app')
+      (process.env.NODE_ENV === 'development'
+        ? 'http://localhost:9005'
+        : 'https://desmulta.vercel.app')
   ),
   title: `${process.env.NEXT_PUBLIC_BRAND_NAME || 'Desmulta'} - Saneamiento de Multas de Tránsito en Colombia`,
   description:
@@ -193,8 +193,11 @@ export default function RootLayout({
         </ThemeProvider>
         <Analytics />
         {/* INYECTA EL PIXEL DE META DE FORMA SEGURA */}
-        <Script id="meta-pixel" strategy="afterInteractive" dangerouslySetInnerHTML={{
-          __html: `
+        <Script
+          id="meta-pixel"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
             !function(f,b,e,v,n,t,s)
             {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
             n.callMethod.apply(n,arguments):n.queue.push(arguments)};
@@ -205,8 +208,9 @@ export default function RootLayout({
             'https://connect.facebook.net/en_US/fbevents.js');
             fbq('init', '${PIXEL_ID || 'TU_PIXEL_ID_AQUI'}');
             fbq('track', 'PageView');
-          `
-        }} />
+          `,
+          }}
+        />
       </body>
     </html>
   );

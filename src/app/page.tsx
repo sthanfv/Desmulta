@@ -1,7 +1,7 @@
 /**
  * Página Principal — Server Component
  *
- * Estrategia React 19 — MANDATO-FILTRO v5.8.0:
+ * Estrategia React 19 — MANDATO-FILTRO v5.17.0:
  * - Los datos de Firestore (showcaseData, footerData) se obtienen AQUÍ, en el servidor,
  *   usando Firebase Admin SDK + cache() de React 19.
  * - Los datos pre-renderizados se pasan como props a <HomeClient />.

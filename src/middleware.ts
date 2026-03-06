@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 /**
- * Middleware de Seguridad Global - MANDATO-FILTRO v5.8.0
+ * Middleware de Seguridad Global - MANDATO-FILTRO v5.17.0
  *
  * Responsabilidades:
  * 1. Hardening de Headers de Seguridad.
@@ -61,12 +61,11 @@ export const config = {
   matcher: [
     /*
      * Match all request paths except for the ones starting with:
-     * - api (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * - public (público)
+     * - assets estáticos específicos (hero-bg, oficina, icon)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|hero-bg.avif|oficina.avif|icon.png).*)',
+    '/((?!_next/static|_next/image|favicon.ico|hero-bg.avif|oficina.avif|icon.png).*)',
   ],
 };

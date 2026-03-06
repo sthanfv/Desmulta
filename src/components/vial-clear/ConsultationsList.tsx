@@ -20,19 +20,27 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 
 // Función de utilidad para calcular el ahorro estimado
 const getEstimatedSavings = (antiguedad?: string) => {
-  if (!antiguedad) return { label: 'A consultar', value: 'Pendiente', color: 'text-muted-foreground' };
+  if (!antiguedad)
+    return { label: 'A consultar', value: 'Pendiente', color: 'text-muted-foreground' };
 
   if (antiguedad.includes('Más de 3 años')) {
-    return { label: 'Ahorro Alto', value: '$800.000 - $1.500.000', color: 'text-green-500 font-black' };
+    return {
+      label: 'Ahorro Alto',
+      value: '$800.000 - $1.500.000',
+      color: 'text-green-500 font-black',
+    };
   }
   if (antiguedad.includes('Entre 1 y 3 años')) {
-    return { label: 'Ahorro Medio', value: '$400.000 - $800.000', color: 'text-yellow-500 font-bold' };
+    return {
+      label: 'Ahorro Medio',
+      value: '$400.000 - $800.000',
+      color: 'text-yellow-500 font-bold',
+    };
   }
   return { label: 'A consultar', value: 'Pendiente', color: 'text-muted-foreground' };
 };
@@ -159,7 +167,11 @@ export function ConsultationsList() {
       const { updateConsultationStatus } = await import('@/app/admin/actions');
       const result = await updateConsultationStatus(id, status);
       if (result.success) {
-        setConsultations((prev) => prev.map((c) => (c.id === id ? { ...c, status: status as any } : c)));
+        setConsultations((prev) =>
+          prev.map((c) =>
+            c.id === id ? { ...c, status: status as Consultation['status'] } : c
+          )
+        );
       }
     } catch (err) {
       console.error('Error al actualizar estado:', err);
@@ -171,10 +183,26 @@ export function ConsultationsList() {
   const getStatusBadge = (consultation: Consultation) => {
     const status = consultation.status;
     const statuses = [
-      { id: 'pendiente', label: 'Pendiente', color: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' },
-      { id: 'contactado', label: 'Contactado', color: 'bg-blue-500/10 text-blue-500 border-blue-500/20' },
-      { id: 'en_proceso', label: 'En Proceso', color: 'bg-primary/10 text-primary border-primary/20' },
-      { id: 'terminado', label: 'Terminado', color: 'bg-green-500/10 text-green-500 border-green-500/20' },
+      {
+        id: 'pendiente',
+        label: 'Pendiente',
+        color: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
+      },
+      {
+        id: 'contactado',
+        label: 'Contactado',
+        color: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
+      },
+      {
+        id: 'en_proceso',
+        label: 'En Proceso',
+        color: 'bg-primary/10 text-primary border-primary/20',
+      },
+      {
+        id: 'terminado',
+        label: 'Terminado',
+        color: 'bg-green-500/10 text-green-500 border-green-500/20',
+      },
     ];
 
     return (
@@ -374,7 +402,12 @@ export function ConsultationsList() {
                               {getEstimatedSavings(consultation.antiguedad).label}
                             </span>
                           </div>
-                          <p className={cn("text-xs font-black uppercase tracking-tight", getEstimatedSavings(consultation.antiguedad).color)}>
+                          <p
+                            className={cn(
+                              'text-xs font-black uppercase tracking-tight',
+                              getEstimatedSavings(consultation.antiguedad).color
+                            )}
+                          >
                             {getEstimatedSavings(consultation.antiguedad).value}
                           </p>
                         </div>

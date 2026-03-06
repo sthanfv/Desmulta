@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 
 /**
  * Robots.ts Profesional - Desmulta v5.11.0
- * 
+ *
  * MANDATO-FILTRO: SEO y Seguridad
  * 1. Acceso universal para buscadores.
  * 2. Restricción estricta de rutas administrativas y privadas.
