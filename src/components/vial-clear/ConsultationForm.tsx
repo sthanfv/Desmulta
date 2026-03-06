@@ -37,22 +37,24 @@ type SimitFormData = z.infer<typeof SimitCaptureSchema>;
 
 // --- ARMA DE CONVERSIÓN TÁCTICA: ENRUTADOR MÁGICO ---
 // Lee parámetros de WhatsApp/Ads en la URL y auto-rellena el estado sin interactuar
-function EnrutadorMagico({
-  form,
-}: {
-  form: { setValue: (name: string, value: string, options?: { shouldValidate?: boolean }) => void };
-}) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function EnrutadorMagico({ form }: { form: UseFormReturn<any> }) {
   const searchParams = useSearchParams();
 
   useEffect(() => {
     const placaURL = searchParams.get('placa');
+    const ciudadURL = searchParams.get('ciudad');
 
     if (placaURL) {
       form.setValue('placa', placaURL.toUpperCase(), { shouldValidate: true });
     }
+
+    if (ciudadURL) {
+      form.setValue('ciudad', ciudadURL, { shouldValidate: true });
+    }
   }, [searchParams, form]);
 
-  return null; // Componente fantasma
+  return null;
 }
 
 interface ConsultationFormProps {
