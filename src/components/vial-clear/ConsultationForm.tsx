@@ -40,7 +40,7 @@ type SimitFormData = z.infer<typeof SimitCaptureSchema>;
 function EnrutadorMagico({
   form,
 }: {
-  form: UseFormReturn<ConsultationFormData | SimitFormData | Record<string, unknown>>;
+  form: { setValue: (name: string, value: string, options?: { shouldValidate?: boolean }) => void };
 }) {
   const searchParams = useSearchParams();
 
