@@ -37,6 +37,7 @@ import {
 import { ConsultationForm } from '@/components/vial-clear/ConsultationForm';
 import { SavingsCounter } from '@/components/interactive/SavingsCounter';
 import { CalculadoraPrescripcion } from '@/components/CalculadoraPrescripcion';
+import { TarjetaPremium } from '@/components/ui/TarjetaPremium';
 import { Lightbox } from '@/components/ui/lightbox';
 import { MeshBackground } from '@/components/ui/MeshBackground';
 import { InstallPWA } from '@/components/pwa/InstallPWA';
@@ -349,31 +350,37 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
                 </div>
               </div>
             </div>
-            <div className="md:col-span-2 reveal reveal-delay-1 diamond-border p-10 rounded-[2.5rem] bg-primary/5 border border-primary/20 flex flex-col justify-center items-center text-center group">
-              <AnimatedCounter
-                value={showcaseData.counterValue || '754+'}
-                label={showcaseData.counterLabel || 'Casos Exitosos'}
-              />
+            <div className="md:col-span-2 reveal reveal-delay-1 flex flex-col justify-center items-center text-center group">
+              <TarjetaPremium className="p-10 w-full h-full flex flex-col justify-center items-center bg-primary/5 border-primary/20">
+                <AnimatedCounter
+                  value={showcaseData.counterValue || '754+'}
+                  label={showcaseData.counterLabel || 'Casos Exitosos'}
+                />
+              </TarjetaPremium>
             </div>
-            <div className="md:col-span-3 reveal reveal-delay-2 diamond-border p-10 rounded-[2.5rem] bg-card/40 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all duration-700 group">
-              <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-6 group-hover:bg-primary group-hover:text-primary-foreground transition-all">
-                <ShieldCheck className="w-8 h-8" />
-              </div>
-              <h3 className="text-2xl font-black text-foreground mb-4">Gestión Especializada</h3>
-              <p className="text-muted-foreground leading-relaxed text-lg">
-                Trato directo y profesional centrado en la resolución administrativa personalizada
-                de su historial vial.
-              </p>
+            <div className="md:col-span-3 reveal reveal-delay-2 group">
+              <TarjetaPremium className="p-10 h-full backdrop-blur-sm border-border/50 hover:border-primary/50 transition-all duration-700">
+                <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-6 group-hover:bg-primary group-hover:text-primary-foreground transition-all">
+                  <ShieldCheck className="w-8 h-8" />
+                </div>
+                <h3 className="text-2xl font-black text-foreground mb-4">Gestión Especializada</h3>
+                <p className="text-muted-foreground leading-relaxed text-lg">
+                  Trato directo y profesional centrado en la resolución administrativa personalizada
+                  de su historial vial.
+                </p>
+              </TarjetaPremium>
             </div>
-            <div className="md:col-span-3 reveal reveal-delay-3 diamond-border p-10 rounded-[2.5rem] bg-card/40 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all duration-700 group">
-              <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-6 group-hover:bg-primary group-hover:text-primary-foreground transition-all">
-                <CheckCircle2 className="w-8 h-8" />
-              </div>
-              <h3 className="text-2xl font-black text-foreground mb-4">Eficiencia Comprobada</h3>
-              <p className="text-muted-foreground leading-relaxed text-lg">
-                Acompañamiento experto fundamentado en el estricto cumplimiento de los términos
-                legales y la normativa vigente.
-              </p>
+            <div className="md:col-span-3 reveal reveal-delay-3 group">
+              <TarjetaPremium className="p-10 h-full backdrop-blur-sm border-border/50 hover:border-primary/50 transition-all duration-700">
+                <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-6 group-hover:bg-primary group-hover:text-primary-foreground transition-all">
+                  <CheckCircle2 className="w-8 h-8" />
+                </div>
+                <h3 className="text-2xl font-black text-foreground mb-4">Eficiencia Comprobada</h3>
+                <p className="text-muted-foreground leading-relaxed text-lg">
+                  Acompañamiento experto fundamentado en el estricto cumplimiento de los términos
+                  legales y la normativa vigente.
+                </p>
+              </TarjetaPremium>
             </div>
           </div>
         </div>
@@ -395,6 +402,7 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
                   </p>
                 </div>
                 <div className="grid gap-6">
+                  {/* Tarjetas de Proceso con TarjetaPremium */}
                   {[
                     {
                       num: '01',
@@ -418,30 +426,32 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
                     <div
                       key={i}
                       className={cn(
-                        'group relative p-8 rounded-[2rem] bg-card/40 backdrop-blur-sm border border-white/5 hover:border-primary/50 transition-all duration-500 reveal diamond-border',
+                        'reveal group relative',
                         i === 0 ? 'reveal-delay-1' : i === 1 ? 'reveal-delay-2' : 'reveal-delay-3'
                       )}
                     >
-                      <div className="flex gap-6 items-center">
-                        <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-500 shadow-inner shrink-0">
-                          {step.icon}
-                        </div>
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-3">
-                            <span className="text-xs font-black text-primary/40 tracking-widest uppercase">
-                              {step.num}
-                            </span>
-                            <h3 className="text-lg md:text-xl font-black text-foreground">
-                              {step.title}
-                            </h3>
+                      <TarjetaPremium className="p-8 backdrop-blur-sm border-border/50 hover:border-primary/50 transition-all duration-500">
+                        <div className="flex gap-6 items-center">
+                          <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-500 shadow-inner shrink-0">
+                            {step.icon}
                           </div>
-                          <p className="text-muted-foreground leading-relaxed text-xs md:text-base">
-                            {step.desc}
-                          </p>
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-3">
+                              <span className="text-xs font-black text-primary/40 tracking-widest uppercase">
+                                {step.num}
+                              </span>
+                              <h3 className="text-lg md:text-xl font-black text-foreground">
+                                {step.title}
+                              </h3>
+                            </div>
+                            <p className="text-muted-foreground leading-relaxed text-xs md:text-base">
+                              {step.desc}
+                            </p>
+                          </div>
                         </div>
-                      </div>
+                      </TarjetaPremium>
                       {i < 2 && (
-                        <div className="absolute left-7 -bottom-6 w-px h-6 bg-gradient-to-b from-primary/50 to-transparent hidden lg:block" />
+                        <div className="absolute left-7 -bottom-6 w-px h-6 bg-gradient-to-b from-primary/50 to-transparent hidden lg:block z-20" />
                       )}
                     </div>
                   ))}
@@ -822,7 +832,7 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
                   © {new Date().getFullYear()} DESMULTA — SERVICIO PRIVADO DE GESTIÓN VIAL
                 </p>
                 <span className="text-[9px] font-black uppercase tracking-widest bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/20">
-                  v5.19.0
+                  v5.50.0
                 </span>
               </div>
               <div className="flex items-center gap-4 opacity-40 hover:opacity-100 transition-opacity mt-1">

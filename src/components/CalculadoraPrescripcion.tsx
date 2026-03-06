@@ -108,7 +108,11 @@ export function CalculadoraPrescripcion() {
               <span>Analizando jurisprudencia...</span>
             </motion.div>
           ) : (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex items-center gap-2"
+            >
               <Database className="w-5 h-5" />
               <span>Calcular Viabilidad Legal</span>
             </motion.div>

@@ -1,4 +1,4 @@
-# Desmulta — Plataforma de Saneamiento Vial Inteligente v5.19.0 🛡️🚀
+# Desmulta — Plataforma de Saneamiento Vial Inteligente v5.50.0 🛡️🚀
 
 TODAS LAS DECISIONES, ARCHIVOS Y CÓDIGO GENERADO DEBEN PASAR EL FILTRO DE SEGURIDAD Y CALIDAD ‘MANDATO-FILTRO’.
 
@@ -7,6 +7,13 @@ TODAS LAS DECISIONES, ARCHIVOS Y CÓDIGO GENERADO DEBEN PASAR EL FILTRO DE SEGUR
 ## 📖 Descripción General
 
 Desmulta es una plataforma LegalTech de alto rendimiento diseñada para la gestión administrativa y saneamiento de deudas de tránsito en Colombia. Utiliza tecnologías de vanguardia como **Next.js 15 (React 19)**, **Firebase Admin SDK** y **Zod** para garantizar procesos seguros, rápidos y transparentes.
+
+### 🌟 Características "Nivel Dios" (Nuevas en v5.50.0)
+- **Interfaz de Alta Fidelidad (`TarjetaPremium`)**: Efectos de iluminación dinámica (linterna) procesados por GPU a 120 FPS sin re-renders en React.
+- **Motor FOMO Dinámico**: Notificaciones de "Consulta en Vivo" que combinan miles de permutaciones (nombres, ciudades y montos aleatorios) creando prueba social con apagado inteligente.
+- **Calculadora Legal UX Premium**: Retraso psicológico de 2.5s y transiciones suaves con Framer Motion para validar la viabilidad de caducidad.
+- **Persistencia de Hierro**: Autoguardado silente en `localStorage` ante cada pulsación para no perder a los leads por fallas técnicas (Modo Supervivencia).
+- **Adaptativo (Multi-Tema)**: Transiciones semánticas impecables entre Claro y Oscuro.
 
 ---
 
@@ -87,7 +94,7 @@ npm run test     # Ejecuta la suite de Vitest
 - **Paleta Premium:** Oxford Blue (#0F172A) y Regulation Yellow (#FFC107).
 - **Tipografía:** Inter (Moderna, Profesional).
 - **Iconografía:** Lucide React (ShieldCheck, Clock, FileX2).
-- **Tecnología Visual:** Tailwind CSS + Framer Motion para micro-interacciones.
+- **Tecnología Visual:** Tailwind CSS + Framer Motion para micro-interacciones, Efectos de Luz v5.4.
 
 ---
 

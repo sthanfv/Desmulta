@@ -7,6 +7,7 @@ import Script from 'next/script';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Outfit } from 'next/font/google';
 import { ScrollProgressBar } from '@/components/ui/ScrollProgressBar';
+import { MotorFomo } from '@/components/MotorFomo';
 import { Analytics } from '@vercel/analytics/react';
 
 const outfit = Outfit({
@@ -187,6 +188,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           <FirebaseClientProvider>
             <ScrollProgressBar />
+            <MotorFomo />
             {children}
             <Toaster />
           </FirebaseClientProvider>
