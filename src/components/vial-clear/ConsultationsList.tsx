@@ -168,9 +168,7 @@ export function ConsultationsList() {
       const result = await updateConsultationStatus(id, status);
       if (result.success) {
         setConsultations((prev) =>
-          prev.map((c) =>
-            c.id === id ? { ...c, status: status as Consultation['status'] } : c
-          )
+          prev.map((c) => (c.id === id ? { ...c, status: status as Consultation['status'] } : c))
         );
       }
     } catch (err) {
