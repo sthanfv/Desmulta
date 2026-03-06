@@ -150,7 +150,7 @@ export default function RootLayout({
                     name: '¿Es posible anular una fotomulta si no fui notificado?',
                     acceptedAnswer: {
                       '@type': 'Answer',
-                      text: 'Sí. Según la ley colombiana, si la fotomulta no es notificada correctamente dentro de los plazos legales, se viola el debido proceso y es posible solicitar su caducidad mediante una petición formal.',
+                      text: 'Sí. Según la ley colombiana, si la fotomulta no es notificada correctamente dentro de los plazos legales, se viola el debido proceso y es posible solicitar su caducidad mediante una solicitud administrativa.',
                     },
                   },
                   {

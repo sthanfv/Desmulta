@@ -27,7 +27,7 @@ export async function enviarCorreoBienvenida(
             <p><strong>Placa del Vehículo:</strong> ${placa}</p>
           </div>
           
-          <p>Un analista de nuestro equipo jurídico revisará tu caso en las próximas horas y se pondrá en contacto contigo a través de WhatsApp.</p>
+          Su solicitud ha sido asignada a uno de nuestros especialistas técnicos. Estamos revisando los detalles de sus comparendos para determinar la estrategia administrativa más efectiva para su caso.
           
           <p style="font-size: 14px; color: #666;">No es necesario que respondas a este correo.</p>
           

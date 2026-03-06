@@ -127,7 +127,7 @@ export default function TerminosPage() {
                   realizará el reintegro de su dinero, descontando únicamente un (30%) por concepto
                   de gastos administrativos, uso de plataforma y tiempo de análisis preliminar. Una
                   vez iniciada la Fase 2 (Gestión Documental), los valores abonados no son
-                  reembolsables, dado que el trabajo técnico y jurídico ya se encuentra en
+                  reembolsables, dado que el trabajo técnico-administrativo ya se encuentra en
                   ejecución.
                 </p>
               </div>

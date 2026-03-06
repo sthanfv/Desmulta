@@ -9,6 +9,7 @@ TODAS LAS DECISIONES, ARCHIVOS Y CÓDIGO GENERADO DEBEN PASAR EL FILTRO DE SEGUR
 Desmulta es una plataforma LegalTech de alto rendimiento diseñada para la gestión administrativa y saneamiento de deudas de tránsito en Colombia. Utiliza tecnologías de vanguardia como **Next.js 15 (React 19)**, **Firebase Admin SDK** y **Zod** para garantizar procesos seguros, rápidos y transparentes.
 
 ### 🌟 Características "Nivel Dios" (Nuevas en v5.50.0)
+
 - **Interfaz de Alta Fidelidad (`TarjetaPremium`)**: Efectos de iluminación dinámica (linterna) procesados por GPU a 120 FPS sin re-renders en React.
 - **Motor FOMO Dinámico**: Notificaciones de "Consulta en Vivo" que combinan miles de permutaciones (nombres, ciudades y montos aleatorios) creando prueba social con apagado inteligente.
 - **Calculadora Legal UX Premium**: Retraso psicológico de 2.5s y transiciones suaves con Framer Motion para validar la viabilidad de caducidad.

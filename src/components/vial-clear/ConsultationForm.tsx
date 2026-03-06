@@ -214,7 +214,7 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
       toast({
         title: '¡Análisis en Trámite!',
         description:
-          'Tu información ha sido recibida con éxito. Un asesor especializado procesará tu análisis de viabilidad jurídica.',
+          'Tu información ha sido recibida con éxito. Un asesor especializado procesará tu análisis de viabilidad técnica.',
         duration: 8000,
       });
       haptics.vibrate('success');
@@ -244,9 +244,10 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
         </h3>
         <p className="text-muted-foreground text-lg max-w-sm leading-relaxed font-medium">
           Su caso está siendo procesado por nuestro{' '}
-          <strong>equipo de analistas especializados</strong>. Un asesor jurídico le contactará en
-          su WhatsApp <span className="text-primary font-bold">{form.getValues('contacto')}</span>{' '}
-          durante nuestro horario de atención habitual para entregarle su estudio de viabilidad.
+          <strong>equipo de analistas especializados</strong>. Un asesor especializado le contactará
+          en su WhatsApp{' '}
+          <span className="text-primary font-bold">{form.getValues('contacto')}</span> durante
+          nuestro horario de atención habitual para entregarle su estudio de viabilidad técnica.
         </p>
         <Button
           onClick={onSuccess}
@@ -471,7 +472,7 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
               <div className="inline-flex px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-[10px] font-black uppercase tracking-widest text-green-500">
                 {isSimitMode
                   ? 'Envío Rápido con Captura SIMIT'
-                  : 'Paso 2: Datos de Validación Jurídica'}
+                  : 'Paso 2: Datos de Validación Técnica'}
               </div>
               <h3 className="text-2xl font-black text-foreground tracking-tighter uppercase leading-none">
                 {isSimitMode ? (
@@ -731,7 +732,7 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
             </div>
             <div className="flex items-center justify-center gap-2 text-[10px] text-muted-foreground uppercase tracking-[0.25em] font-black opacity-40">
               <ShieldCheck size={12} className="text-primary" />
-              <span>Protección Técnica con Alta Calidad Jurídica</span>
+              <span>Protección Técnica con Alta Calidad Administrativa</span>
             </div>
           </div>
         )}

@@ -106,7 +106,7 @@ export default function FAQPage() {
 
       <footer className="py-20 text-center opacity-40">
         <p className="text-[10px] font-black uppercase tracking-[0.3em]">
-          Derecho de Petición y Debido Proceso • Desmulta 2026
+          Debido Proceso Administrativo • Desmulta 2026
         </p>
       </footer>
     </div>

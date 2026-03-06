@@ -38,6 +38,7 @@ import { ConsultationForm } from '@/components/vial-clear/ConsultationForm';
 import { SavingsCounter } from '@/components/interactive/SavingsCounter';
 import { CalculadoraPrescripcion } from '@/components/CalculadoraPrescripcion';
 import { TarjetaPremium } from '@/components/ui/TarjetaPremium';
+import { CentroConfianza } from '@/components/CentroConfianza';
 import { Lightbox } from '@/components/ui/lightbox';
 import { MeshBackground } from '@/components/ui/MeshBackground';
 import { InstallPWA } from '@/components/pwa/InstallPWA';
@@ -203,8 +204,27 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
     setIsWhatsAppWarningOpen(false);
   };
 
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const target = e.currentTarget;
+    const rect = target.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    target.style.setProperty('--mouse-x', `${x}px`);
+    target.style.setProperty('--mouse-y', `${y}px`);
+  };
+
   return (
-    <div className="min-h-screen bg-background selection:bg-primary/30 selection:text-primary-foreground overflow-x-hidden">
+    <div
+      className="min-h-screen bg-background selection:bg-primary/30 selection:text-primary-foreground overflow-x-hidden relative group/layout"
+      onMouseMove={handleMouseMove}
+    >
+      <div
+        className="pointer-events-none fixed inset-0 z-0 opacity-0 transition duration-300 group-hover/layout:opacity-100 hidden md:block"
+        style={{
+          background:
+            'radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,193,7,0.03), transparent 40%)',
+        }}
+      />
       <MeshBackground />
       <InstallPWA />
 
@@ -407,13 +427,13 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
                     {
                       num: '01',
                       title: 'Certificación de Viabilidad',
-                      desc: 'Realizamos un análisis técnico profundo de su historial para determinar las probabilidades de éxito jurídico.',
+                      desc: 'Realizamos un análisis técnico profundo de su historial para determinar las probabilidades reales de exoneración.',
                       icon: <ShieldCheck className="w-6 h-6" />,
                     },
                     {
                       num: '02',
                       title: 'Blindaje Administrativo',
-                      desc: 'Desplegamos protocolos de defensa legal especializados para fundamentar la corrección de su estado vial.',
+                      desc: 'Desplegamos protocolos de gestión administrativa especializados para fundamentar la corrección de su estado vial.',
                       icon: <ShieldCheck className="w-6 h-6" />,
                     },
                     {
@@ -462,7 +482,7 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
                 <div className="relative aspect-square rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white/10 rotate-2 hover:rotate-0 transition-all duration-700">
                   <Image
                     src="/oficina.avif"
-                    alt="Oficina de asesoría jurídica especializada en derecho de tránsito"
+                    alt="Oficina de gestión técnica especializada en trámites de tránsito"
                     fill
                     className="object-cover"
                   />
@@ -692,6 +712,9 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
         </div>
       </section>
 
+      {/* Centro de Confianza (Banda de Seguridad) */}
+      <CentroConfianza />
+
       {/* Footer */}
       <footer className="py-32 px-4 relative z-10 reveal">
         <div className="max-w-7xl mx-auto space-y-12">
@@ -832,7 +855,7 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
                   © {new Date().getFullYear()} DESMULTA — SERVICIO PRIVADO DE GESTIÓN VIAL
                 </p>
                 <span className="text-[9px] font-black uppercase tracking-widest bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/20">
-                  v5.50.0
+                  v5.70.0
                 </span>
               </div>
               <div className="flex items-center gap-4 opacity-40 hover:opacity-100 transition-opacity mt-1">
