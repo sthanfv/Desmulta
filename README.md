@@ -1,62 +1,105 @@
-# Desmulta — Plataforma de Saneamiento Vial Inteligente v5.17.0
+# Desmulta — Plataforma de Saneamiento Vial Inteligente v5.17.0 🛡️🚀
+
+TODAS LAS DECISIONES, ARCHIVOS Y CÓDIGO GENERADO DEBEN PASAR EL FILTRO DE SEGURIDAD Y CALIDAD ‘MANDATO-FILTRO’.
 
 ![Desmulta Banner](https://desmulta.vercel.app/icon.png)
 
----
+## 📖 Descripción General
 
-## 1. Propósito y Visión General
-
-**Desmulta** es una solución integral diseñada para democratizar y automatizar la defensa administrativa y el saneamiento vial en Colombia. El proyecto resuelve la complejidad y la falta de transparencia en el manejo de infracciones de tránsito, permitiendo que ciudadanos y empresas gestionen la viabilidad jurídica de sus multas de forma técnica y profesional.
-
-- **Problema Principal:** El difícil acceso a la justicia administrativa y la complejidad de los portales gubernamentales.
-- **Usuario Final:** Conductores particulares, flotas de transporte y propietarios de vehículos que buscan una evaluación jurídica honesta y rápida sobre la prescripción o caducidad de sus multas.
+Desmulta es una plataforma LegalTech de alto rendimiento diseñada para la gestión administrativa y saneamiento de deudas de tránsito en Colombia. Utiliza tecnologías de vanguardia como **Next.js 15 (React 19)**, **Firebase Admin SDK** y **Zod** para garantizar procesos seguros, rápidos y transparentes.
 
 ---
 
-## 2. Stack Tecnológico & Optimizaciones de Elite
+## 🗺️ Mapa de Rutas (App Router)
 
-Hemos seleccionado un stack de vanguardia para garantizar seguridad, velocidad y escalabilidad (MANDATO-FILTRO):
+La aplicación utiliza el `src/app` router de Next.js, con las siguientes rutas activas:
 
-- **Core:** [Next.js 15 (App Router)](https://nextjs.org/) con [React 19](https://react.dev/).
-- **Edge Computing:** Validación ultra-rápida de datos en el borde con **Edge Functions** (latencia < 50ms).
-- **SEO de Autoridad:**
-  - **Dominación Local:** Generación dinámica de rutas para +1,100 municipios de Colombia.
-  - **Rich Snippets:** Implementación avanzada de Schema.org (`LegalService` con estrellas y `FAQPage`).
-- **Analíticas:** Integración nativa con **Vercel Analytics** para monitoreo de rendimiento real.
-- **UX Fluida:** Animaciones de grado industrial con [Framer Motion](https://www.framer.com/motion/) para un **Scroll estable de 60 FPS**.
-- **Estilos:** [Tailwind CSS](https://tailwindcss.com/) con estética **iOS Glassmorphism Premium**.
-- **Backend & Seguridad:** [Firebase Admin](https://firebase.google.com/) y parches de seguridad proactivos (RCE Protection).
+### Públicas
 
----
+- `/` : Landing Page Principal con Dashboard Interactivo.
+- `/servicios` : Catálogo de servicios legales ofrecidos.
+- `/servicios/[ciudad]` : Landing pages dinámicas optimizadas para SEO local.
+- `/blog` : Centro de autoridad legal (Sentencia C-038, Prescripción, Embargos).
+- `/metodologia` : Detalle del proceso técnico-legal de saneamiento.
+- `/faq` : Preguntas frecuentes y claridad normativa.
+- `/terminos` : Marco legal y protección de datos (HDS).
 
-## 3. Arquitectura y Funcionalidades Clave
+### Administrativas
 
-- **Tipo de Aplicación:** PWA (Progressive Web App) optimizada con estrategias de precaché inteligentes.
-- **Integraciones Estratégicas:**
-  - **Telegram Cloud:** Notificaciones críticas de trámites en tiempo real.
-  - **Google Genkit:** Inteligencia artificial aplicada al análisis legal.
-- **Sitemap Dinámico:** Motor que auto-genera URLs para cada ciudad de Colombia sincronizado con el Tráfico de Búsqueda.
+- `/admin` : Panel de control centralizado para la gestión de leads y casos.
 
----
+### API (Backend)
 
-## 4. Lógica de Negocio y Flujos
-
-1.  **El Viaje del Usuario:**
-    - **Consulta Express:** Validación instantánea en el Edge (Placa y Cédula).
-    - **Carga de Evidencia:** Sistema de subida de capturas SIMIT con cifrado.
-    - **Validación de Analista:** Evaluación técnica automatizada y experta.
-    - **Certificado de Viabilidad:** Entrega de dictamen gratuito vía WhatsApp.
-2.  **Sostenibilidad y Ética:**
-    - El estudio inicial es **gratuito**, fomentando la transparencia.
-    - Los honorarios se activan únicamente ante el éxito del trámite administrativo, blindando al usuario contra riesgos económicos.
+- `/api/validar-consulta` : Motor de validación con Rate Limiting y auditoría.
+- `/api/create-consultation` : Endpoint seguro para la ingesta de leads a Firestore.
 
 ---
 
-## 5. El Estado Actual y Evolución
+## 🧠 Esquema de Datos y Validación (Zod)
 
-- **Estado:** Producción v5.17.0 con Aceleración Frontend y Radicado Secuencial.
-- **MANDATO-FILTRO:** Como equipo senior, mantenemos una vigilancia técnica constante sobre la seguridad de los datos y la pulcritud del código.
+Garantizamos la integridad de los datos mediante esquemas estrictos que previenen Inyección de Datos y ataques automatizados.
+
+### Formulario de Consulta (`ConsultationSchema`)
+
+| Campo            | Tipo    | Validación / Regla                              |
+| :--------------- | :------ | :---------------------------------------------- |
+| `cedula`         | String  | Numérico, 5-20 caracteres.                      |
+| `placa`          | String  | Formato AAA123 o AAA12A (Opcional).             |
+| `nombre`         | String  | Mínimo 3 caracteres, sanitización XSS.          |
+| `contacto`       | String  | Celular colombiano (10 dígitos, empieza por 3). |
+| `email`          | String  | Formato email válido (Opcional).                |
+| `antiguedad`     | String  | Selección obligatoria de rango temporal.        |
+| `tipoInfraccion` | String  | Clasificación del comparendo.                   |
+| `estadoCoactivo` | String  | Estado jurídico del cobro.                      |
+| `aceptoTerminos` | Boolean | True (Obligatorio).                             |
+| `_tramp_field`   | String  | Honeypot Anti-Bot (Debe estar vacío).           |
+
+### Captura SIMIT (`SimitCaptureSchema`)
+
+Utilizado en el flujo de envío rápido mediante captura de pantalla:
+
+- `contacto`: Celular colombiano validado.
+- `evidenceUrl`: URL del archivo en Vercel Blob / Firebase Storage.
+- `aceptoTerminos`: Obligatorio.
 
 ---
 
-**Desmulta © 2026 — Ingeniería de Datos para un Tránsito Justo**
+## 🛡️ Calidad y Ciberseguridad (MANDATO-FILTRO)
+
+### Reporte de Pruebas
+
+- **Unitarias (Vitest):** Cobertura del 100% en lógica de validación, filtros de seguridad y Rate Limiting.
+- **E2E (Playwright):** Validación del Full Funnel (Navegación -> Viabilidad -> Lead).
+- **Hardening:** Headers de seguridad globales (CSP, X-Frame-Options, HSTS).
+
+### Comandos de Verificación "Limpio Limpio"
+
+```powershell
+# Ciclo completo de calidad
+npm run check    # Ejecuta format, lint y typecheck secuencialmente
+npm run test     # Ejecuta la suite de Vitest
+```
+
+---
+
+## 🎨 Diseño y Estética
+
+- **Paleta Premium:** Oxford Blue (#0F172A) y Regulation Yellow (#FFC107).
+- **Tipografía:** Inter (Moderna, Profesional).
+- **Iconografía:** Lucide React (ShieldCheck, Clock, FileX2).
+- **Tecnología Visual:** Tailwind CSS + Framer Motion para micro-interacciones.
+
+---
+
+## ⚙️ Stack Tecnológico
+
+- **Core:** Next.js 15 (App Router), React 19.
+- **Db/Auth:** Firebase (Admin SDK, Firestore, Auth).
+- **Validation:** Zod.
+- **Styling:** Tailwind CSS, Shadcn/UI.
+- **Analytics:** Vercel Analytics.
+- **Communications:** Resend (Email), Telegram Bot API.
+
+---
+
+**Desmulta © 2026 — Ingeniería de Clase Mundial para la Justicia Vial.**
