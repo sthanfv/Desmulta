@@ -5,7 +5,7 @@ import { ConsultationSchema } from '@/lib/definitions';
 import { logger } from '@/lib/logger/security-logger';
 
 /**
- * Motor de Validación — Desmulta v5.17.0
+ * Motor de Validation — Desmulta v5.19.0
  *
  * MANDATO-FILTRO:
  * 1. Validación estricta con Zod.

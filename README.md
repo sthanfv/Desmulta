@@ -1,4 +1,4 @@
-# Desmulta — Plataforma de Saneamiento Vial Inteligente v5.17.0 🛡️🚀
+# Desmulta — Plataforma de Saneamiento Vial Inteligente v5.19.0 🛡️🚀
 
 TODAS LAS DECISIONES, ARCHIVOS Y CÓDIGO GENERADO DEBEN PASAR EL FILTRO DE SEGURIDAD Y CALIDAD ‘MANDATO-FILTRO’.
 
@@ -96,6 +96,7 @@ npm run test     # Ejecuta la suite de Vitest
 - **Core:** Next.js 15 (App Router), React 19.
 - **Db/Auth:** Firebase (Admin SDK, Firestore, Auth).
 - **Validation:** Zod.
+- **Utils:** Calculadora Legal v1.0 (Nivel Bancario - UTC Strict).
 - **Styling:** Tailwind CSS, Shadcn/UI.
 - **Analytics:** Vercel Analytics.
 - **Communications:** Resend (Email), Telegram Bot API.

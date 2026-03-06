@@ -6,7 +6,7 @@
  * Recibe los datos de configuración (showcase y footer) ya pre-renderizados
  * por el Server Component en page.tsx usando Firebase Admin SDK + cache() de React 19.
  *
- * MANDATO-FILTRO v5.17.0: toda la lógica de estado, efectos y formularios vive aquí.
+ * MANDATO-FILTRO v5.19.0: toda la lógica de estado, efectos y formularios vive aquí.
  */
 
 import React, { useState, useEffect } from 'react';
@@ -36,6 +36,7 @@ import {
 } from '@/components/ui/dialog';
 import { ConsultationForm } from '@/components/vial-clear/ConsultationForm';
 import { SavingsCounter } from '@/components/interactive/SavingsCounter';
+import { CalculadoraPrescripcion } from '@/components/CalculadoraPrescripcion';
 import { Lightbox } from '@/components/ui/lightbox';
 import { MeshBackground } from '@/components/ui/MeshBackground';
 import { InstallPWA } from '@/components/pwa/InstallPWA';
@@ -542,6 +543,22 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
         </div>
       </section>
 
+      {/* Motor de Prescripción (Calculadora) */}
+      <section className="py-24 px-4 relative overflow-hidden bg-muted/10">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16 space-y-4">
+            <h2 className="text-3xl md:text-5xl font-black text-foreground tracking-tight reveal">
+              ¿Tu Multa es <span className="text-primary italic">Prescribible?</span>
+            </h2>
+            <p className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto reveal reveal-delay-1">
+              No todas las multas se deben pagar. Usa nuestro motor matemático para saber si por ley
+              puedes solicitar la exoneración total de tu deuda.
+            </p>
+          </div>
+          <CalculadoraPrescripcion />
+        </div>
+      </section>
+
       {/* FAQ */}
       <section id="faq-section" className="py-24 px-4 bg-muted/10">
         <div className="max-w-4xl mx-auto space-y-12">
@@ -805,7 +822,7 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
                   © {new Date().getFullYear()} DESMULTA — SERVICIO PRIVADO DE GESTIÓN VIAL
                 </p>
                 <span className="text-[9px] font-black uppercase tracking-widest bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/20">
-                  v5.17.0
+                  v5.19.0
                 </span>
               </div>
               <div className="flex items-center gap-4 opacity-40 hover:opacity-100 transition-opacity mt-1">

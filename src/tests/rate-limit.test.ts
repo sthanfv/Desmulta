@@ -23,11 +23,16 @@ describe('🛡️ Escudo Anti-DDoS y Rate Limiting', () => {
     // El sistema debería bloquear tras la 2da/3ra petición según la configuración de Firestore
     for (let i = 0; i < 4; i++) {
       try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 1000); // 1s timeout
+
         const res = await fetch(API_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payloadAtacante),
+          signal: controller.signal,
         });
+        clearTimeout(timeoutId);
         codigosRespuesta.push(res.status);
       } catch (err) {
         console.error('Fallo de conexión al servidor local:', err);

@@ -1,6 +1,6 @@
 {
   "name": "desmulta-web",
-  "version": "5.17.0",
+  "version": "5.22.0",
   "private": true,
   "scripts": {
     "dev": "next dev -p 9005",

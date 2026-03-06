@@ -364,7 +364,7 @@ export function AdminDashboard() {
                 PANEL CONTROL
               </h1>
               <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mt-1 opacity-70">
-                Desmulta Admin v5.17.0
+                Desmulta Admin v5.22.0
               </p>
             </div>
           </div>
