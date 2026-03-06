@@ -235,8 +235,8 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
 
   if (isSuccess) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 text-center h-[500px] animate-in zoom-in-95 duration-500">
-        <div className="w-24 h-24 rounded-full bg-green-500/10 flex items-center justify-center text-green-500 mb-8 shadow-Inner border border-green-500/20">
+      <div className="flex flex-col items-center justify-center p-6 md:p-8 text-center min-h-[450px] md:h-[500px] animate-in zoom-in-95 duration-500">
+        <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-green-500/10 flex items-center justify-center text-green-500 mb-8 shadow-Inner border border-green-500/20">
           <CheckCircle2 className="w-14 h-14" />
         </div>
         <h3 className="text-2xl md:text-3xl font-black mb-4 text-foreground tracking-tight uppercase">
@@ -252,7 +252,7 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
         <Button
           onClick={onSuccess}
           variant="outline"
-          className="mt-10 rounded-2xl px-12 border-primary/20 hover:bg-primary/5 text-primary font-black active:scale-95 transition-all relative overflow-hidden h-14 uppercase tracking-widest"
+          className="mt-10 rounded-2xl w-full sm:w-auto px-6 md:px-12 border-primary/20 hover:bg-primary/5 text-primary font-black active:scale-95 transition-all relative overflow-hidden h-14 uppercase tracking-widest text-xs md:text-sm"
         >
           Cerrar Notificación
         </Button>

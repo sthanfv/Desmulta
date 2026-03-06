@@ -24,6 +24,8 @@ import {
   Instagram,
   Facebook,
   BookOpen,
+  Lock,
+  FileText,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -38,7 +40,6 @@ import { ConsultationForm } from '@/components/vial-clear/ConsultationForm';
 import { SavingsCounter } from '@/components/interactive/SavingsCounter';
 import { CalculadoraPrescripcion } from '@/components/CalculadoraPrescripcion';
 import { TarjetaPremium } from '@/components/ui/TarjetaPremium';
-import { CentroConfianza } from '@/components/CentroConfianza';
 import { Lightbox } from '@/components/ui/lightbox';
 import { MeshBackground } from '@/components/ui/MeshBackground';
 import { InstallPWA } from '@/components/pwa/InstallPWA';
@@ -409,9 +410,9 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
       {/* Proceso */}
       <section className="py-32 px-4">
         <div className="max-w-6xl mx-auto">
-          <div className="glass p-12 md:p-20 rounded-[3rem] relative overflow-hidden border-white/10 shadow-3xl bg-white/5 dark:bg-white/[0.02]">
+          <div className="glass p-6 sm:p-12 md:p-20 rounded-[2rem] md:rounded-[3rem] relative overflow-hidden border-white/10 shadow-3xl bg-white/5 dark:bg-white/[0.02]">
             <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
-            <div className="relative grid lg:grid-cols-2 gap-20 items-center">
+            <div className="relative grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
               <div className="space-y-12">
                 <div className="space-y-4">
                   <h2 className="text-2xl md:text-4xl font-black text-foreground leading-tight reveal">
@@ -477,20 +478,75 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
                   ))}
                 </div>
               </div>
-              <div className="relative">
-                <div className="absolute inset-0 bg-primary/20 rounded-[3rem] blur-3xl opacity-20 -rotate-6" />
-                <div className="relative aspect-square rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white/10 rotate-2 hover:rotate-0 transition-all duration-700">
-                  <Image
-                    src="/oficina.avif"
-                    alt="Oficina de gestión técnica especializada en trámites de tránsito"
-                    fill
-                    className="object-cover"
-                  />
+              {/* Lado Derecho: Centro de Confianza */}
+              <div className="space-y-8 pt-4 lg:pt-0 reveal">
+                <div className="space-y-4">
+                  <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-card/60 backdrop-blur-md border border-white/5 shadow-sm">
+                    <CheckCircle2 className="w-4 h-4 text-green-500" />
+                    <span className="text-xs font-black text-muted-foreground tracking-widest uppercase">
+                      Plataforma Verificada
+                    </span>
+                  </div>
+                  <h2 className="text-3xl md:text-5xl font-black text-foreground leading-tight tracking-tight">
+                    Tu <span className="text-primary italic">tranquilidad</span> <br /> es nuestra
+                    prioridad
+                  </h2>
+                  <p className="text-base md:text-xl text-muted-foreground font-medium">
+                    Hacemos el trabajo difícil por ti con total transparencia. Protegemos tus datos
+                    como si fueran nuestros y te hablamos con la verdad.
+                  </p>
+                </div>
+
+                <div className="grid gap-6 pt-4">
+                  {[
+                    {
+                      titulo: 'Privacidad y Habeas Data',
+                      descripcion:
+                        'Ley 1581 de 2012. Tus datos están encriptados y jamás serán compartidos con terceros.',
+                      icon: <Lock className="w-6 h-6" />,
+                    },
+                    {
+                      titulo: 'Transparencia Central',
+                      descripcion:
+                        'Somos un equipo validado de gestores, no un bufete tradicional. Honorarios fijos por mediación.',
+                      icon: <FileText className="w-6 h-6" />,
+                    },
+                    {
+                      titulo: 'Infraestructura Segura',
+                      descripcion:
+                        'Plataforma con protocolos de grado empresarial (SSL/TLS), bloqueando accesos no autorizados.',
+                      icon: <ShieldCheck className="w-6 h-6" />,
+                    },
+                  ].map((pilar, i) => (
+                    <div
+                      key={i}
+                      className={cn(
+                        'reveal group relative',
+                        i === 0 ? 'reveal-delay-1' : i === 1 ? 'reveal-delay-2' : 'reveal-delay-3'
+                      )}
+                    >
+                      <TarjetaPremium className="p-6 md:p-8 backdrop-blur-sm border-border/50 hover:border-primary/50 transition-all duration-500 h-full">
+                        <div className="flex gap-6 items-center">
+                          <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-500 shadow-inner shrink-0">
+                            {pilar.icon}
+                          </div>
+                          <div className="space-y-1">
+                            <h3 className="text-lg md:text-xl font-black text-foreground">
+                              {pilar.titulo}
+                            </h3>
+                            <p className="text-muted-foreground leading-relaxed text-xs md:text-base font-medium">
+                              {pilar.descripcion}
+                            </p>
+                          </div>
+                        </div>
+                      </TarjetaPremium>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
-            <div className="mt-20 glass bg-primary/5 border-primary/20 p-8 md:p-10 rounded-[2.5rem] flex flex-col md:flex-row items-center gap-6 shadow-xl">
-              <div className="w-14 h-14 bg-primary rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-primary/20">
+            <div className="mt-12 md:mt-20 glass bg-primary/5 border-primary/20 p-6 md:p-10 rounded-[2rem] md:rounded-[2.5rem] flex flex-col md:flex-row items-center gap-6 shadow-xl text-center md:text-left">
+              <div className="w-14 h-14 bg-primary rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-primary/20 mx-auto md:mx-0">
                 <Info className="text-primary-foreground w-8 h-8" />
               </div>
               <div className="space-y-2">
@@ -712,9 +768,6 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
         </div>
       </section>
 
-      {/* Centro de Confianza (Banda de Seguridad) */}
-      <CentroConfianza />
-
       {/* Footer */}
       <footer className="py-32 px-4 relative z-10 reveal">
         <div className="max-w-7xl mx-auto space-y-12">
@@ -855,7 +908,7 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
                   © {new Date().getFullYear()} DESMULTA — SERVICIO PRIVADO DE GESTIÓN VIAL
                 </p>
                 <span className="text-[9px] font-black uppercase tracking-widest bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/20">
-                  v5.70.0
+                  v6.10.0
                 </span>
               </div>
               <div className="flex items-center gap-4 opacity-40 hover:opacity-100 transition-opacity mt-1">

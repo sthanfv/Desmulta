@@ -5,6 +5,7 @@ import { Upload, Image as ImageIcon, CheckCircle2, AlertCircle } from 'lucide-re
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
+import { comprimirCaptura } from '@/lib/optimizador-imagenes';
 
 interface ImageUploadProps {
   onUploadSuccess: (url: string) => void;
@@ -46,11 +47,14 @@ export function ImageUpload({ onUploadSuccess, onClear, className, required }: I
     // Subir a Vercel Blob via API para obtener URL pública real (MANDATO-FILTRO)
     setIsUploading(true);
     try {
+      // 1. Aplicamos nuestra compresión Nivel Dios en el cliente
+      const optimizedFile = await comprimirCaptura(selectedFile);
+
       const response = await fetch(
-        `/api/upload?filename=${encodeURIComponent(selectedFile.name)}`,
+        `/api/upload?filename=${encodeURIComponent(optimizedFile.name)}`,
         {
           method: 'POST',
-          body: selectedFile,
+          body: optimizedFile,
         }
       );
 
