@@ -779,7 +779,7 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
               </div>
               <div className="space-y-6 text-sm text-muted-foreground leading-relaxed">
                 <p>
-                  <strong>Naturaleza:</strong> {showcaseData.brandName || 'Desmulta'} actúa como gestor administrativo ante organismos de tránsito. No somos una entidad estatal.
+                  <strong>Naturaleza:</strong> {'Desmulta'} actúa como gestor administrativo ante organismos de tránsito. No somos una entidad estatal.
                 </p>
                 <p>
                   <strong>Gratuidad:</strong> El estudio inicial mediante SIMIT es informativo y gratuito. No obliga a contratación posterior.
