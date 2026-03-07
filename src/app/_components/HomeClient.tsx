@@ -25,6 +25,7 @@ import {
   BookOpen,
   Lock,
   FileText,
+  ArrowUpRight,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
