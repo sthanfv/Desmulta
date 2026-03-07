@@ -34,6 +34,7 @@ import {
   LogOut,
 } from 'lucide-react';
 import { TableroKanbanReal, KanbanItem } from '@/components/vial-clear/TableroKanbanReal';
+import { ThemeToggle } from '@/components/vial-clear/ThemeToggle';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
 import {
   AlertDialog,
@@ -158,6 +159,7 @@ export function AdminDashboard() {
               nombre: l.nombre,
               cedula: l.cedula,
               contacto: l.contacto,
+              tipo: 'lead',
             });
           });
         }
@@ -185,6 +187,7 @@ export function AdminDashboard() {
               nombre: c.nombre,
               cedula: c.cedula,
               contacto: c.contacto,
+              tipo: 'caso',
             });
           });
         }
@@ -466,18 +469,21 @@ export function AdminDashboard() {
                 PANEL CONTROL
               </h1>
               <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mt-1 opacity-70">
-                Desmulta Admin v1.7.0
+                Desmulta Admin v1.8.0
               </p>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            onClick={() => auth?.signOut()}
-            className="rounded-full hover:bg-destructive/10 hover:text-destructive active:scale-95 transition-all gap-2 font-bold"
-          >
-            <LogOut size={18} />
-            Cerrar Sesión
-          </Button>
+          <div className="flex items-center gap-4">
+            <ThemeToggle />
+            <Button
+              variant="ghost"
+              onClick={() => auth?.signOut()}
+              className="rounded-full hover:bg-destructive/10 hover:text-destructive active:scale-95 transition-all gap-2 font-bold px-4"
+            >
+              <LogOut size={18} />
+              <span className="hidden sm:inline">Cerrar Sesión</span>
+            </Button>
+          </div>
         </div>
       </header>
 

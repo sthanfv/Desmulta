@@ -143,7 +143,7 @@ export async function convertToCase(lead: Consultation) {
       status: 'apertura',
       history: [
         {
-          date: FieldValue.serverTimestamp(),
+          date: new Date(), // ✅ new Date() dentro de arrays — serverTimestamp() prohibido en arrays por Firebase
           description: 'Caso aperturado desde gestión de leads.',
           type: 'system',
         },
@@ -225,7 +225,7 @@ export async function updateCaseStatus(caseId: string, newStatus: string, descri
     const caseRef = db.collection('cases').doc(caseId);
 
     const event = {
-      date: FieldValue.serverTimestamp(),
+      date: new Date(), // ✅ new Date() dentro de arrayUnion — serverTimestamp() prohibido en arrays por Firebase
       description,
       type: 'status_change',
     };
@@ -260,11 +260,11 @@ export async function uploadCaseDocument(caseId: string, formData: FormData, doc
     const documentData = {
       name: documentName,
       url: url,
-      uploadedAt: FieldValue.serverTimestamp(),
+      uploadedAt: new Date(), // ✅ new Date() dentro de arrayUnion
     };
 
     const historyEvent = {
-      date: FieldValue.serverTimestamp(),
+      date: new Date(), // ✅ new Date() dentro de arrayUnion — serverTimestamp() prohibido en arrays por Firebase
       description: `Documento añadido: ${documentName}`,
       type: 'document_added',
     };
