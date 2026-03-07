@@ -13,6 +13,8 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+import { TarjetaPremium } from './ui/TarjetaPremium';
+
 export function CalculadoraPrescripcion() {
   const [fecha, setFecha] = useState('');
   const [coactivo, setCoactivo] = useState(false);
@@ -49,7 +51,7 @@ export function CalculadoraPrescripcion() {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto bg-card border border-border rounded-3xl p-6 md:p-8 shadow-2xl transition-colors duration-300">
+    <TarjetaPremium className="w-full max-w-2xl mx-auto p-6 md:p-8 shadow-2xl transition-all rounded-3xl">
       <div className="flex items-center gap-3 mb-6">
         <div className="p-3 bg-primary/10 rounded-xl">
           <Clock className="w-6 h-6 text-primary" />
@@ -208,6 +210,6 @@ export function CalculadoraPrescripcion() {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </TarjetaPremium>
   );
 }

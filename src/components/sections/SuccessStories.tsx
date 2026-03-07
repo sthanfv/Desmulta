@@ -56,7 +56,32 @@ const CITIES = [
   'Manizales',
 ];
 
+const AMOUNTS = [
+  '$840,000',
+  '$1,250,000',
+  '$460,000',
+  '$2,100,000',
+  '$1,120,000',
+  '$680,000',
+  '$3,400,000',
+  '$950,000',
+  '$2,800,000',
+  '$520,000',
+];
+
+const TIMES = [
+  '9 días',
+  '12 días',
+  '18 días',
+  '22 días',
+  '15 días',
+  '7 días',
+  '25 días',
+  '11 días',
+];
+
 interface StoryData {
+  id: string;
   caseId: string;
   location: string;
   amount: string;
@@ -81,14 +106,26 @@ export function SuccessStories() {
     if (!liveStories || liveStories.length === 0) {
       const now = new Date();
       const startOfYear = new Date(now.getFullYear(), 0, 1);
-      const weekNumber = Math.ceil(
-        ((now.getTime() - startOfYear.getTime()) / 86400000 + startOfYear.getDay() + 1) / 7
-      );
-
+      const dayOfYear = Math.floor((now.getTime() - startOfYear.getTime()) / 86400000);
+      
       const newStories = FALLBACK_STORIES.map((story, index) => {
-        const cityIndex = (weekNumber + index) % CITIES.length;
-        // eslint-disable-next-line security/detect-object-injection
-        return { ...story, location: CITIES[cityIndex] };
+        // Usamos dayOfYear para que cambie cada día, o weekNumber si prefieres cada semana
+        const offset = dayOfYear + index;
+        
+        const cityIndex = (offset) % CITIES.length;
+        const amountIndex = (offset) % AMOUNTS.length;
+        const timeIndex = (offset) % TIMES.length;
+        
+        // Generamos un ID de expediente dinámico basado en una base + el offset
+        const dynamicCaseId = `#${7000 + (offset % 3000)}`;
+
+        return { 
+          ...story, 
+          caseId: dynamicCaseId,
+          location: CITIES[cityIndex],
+          amount: AMOUNTS[amountIndex],
+          time: TIMES[timeIndex],
+        };
       });
       setRotatedStories(newStories);
     }
@@ -184,67 +221,71 @@ export function SuccessStories() {
                   type: 'spring',
                   bounce: 0.4,
                 }}
-                className={`glass p-8 rounded-[2rem] group transition-all duration-300 relative overflow-hidden cursor-pointer active:scale-[0.98] will-change-[transform] ${isLive ? 'border-primary/20 hover:border-primary border-2 shadow-[0_0_15px_rgba(255,191,0,0.05)] hover:shadow-[0_0_30px_rgba(255,191,0,0.15)] bg-gradient-to-b from-card/80 to-primary/5' : 'hover:border-primary/50'}`}
-                onClick={() => window.dispatchEvent(new CustomEvent('open-consultation-modal'))}
+                className="relative"
               >
-                {/* Live Indicator Dot */}
-                {isLive && (
-                  <div className="absolute top-4 left-4 w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.8)] animate-pulse z-20" />
-                )}
+                <TarjetaPremium
+                  className={`p-8 rounded-[2rem] group transition-all duration-300 cursor-pointer active:scale-[0.98] will-change-[transform] h-full ${isLive ? 'border-primary/20 hover:border-primary border-2 shadow-[0_0_15px_rgba(255,191,0,0.05)] hover:shadow-[0_0_30px_rgba(255,191,0,0.15)] bg-gradient-to-b from-card/80 to-primary/5' : 'hover:border-primary/50'}`}
+                  onClick={() => window.dispatchEvent(new CustomEvent('open-consultation-modal'))}
+                >
+                  {/* Live Indicator Dot */}
+                  {isLive && (
+                    <div className="absolute top-4 left-4 w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.8)] animate-pulse z-20" />
+                  )}
 
-                <div className="flex justify-between items-start mb-8 relative z-10">
-                  <div className="flex flex-col ml-3">
-                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60">
-                      Expediente {story.caseId}
-                    </span>
-                    <span className="text-[8px] font-bold text-muted-foreground/40 uppercase tracking-tighter">
-                      Estado: PROTEGIDO (Habeas Data)
-                    </span>
-                  </div>
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300 hover:rotate-45">
-                    <ArrowUpRight size={20} />
-                  </div>
-                </div>
-
-                <div className="space-y-6 relative z-10">
-                  <div>
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">
-                      Monto Recuperado
-                    </h4>
-                    <p
-                      className={`text-3xl font-black italic transition-colors duration-300 ${isLive ? 'text-white group-hover:text-primary drop-shadow-md' : 'text-foreground'}`}
-                    >
-                      {story.amount}
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
-                    <div className="flex items-center gap-2">
-                      <MapPin size={14} className="text-primary" />
-                      <span className="text-[10px] font-bold text-muted-foreground uppercase">
-                        {story.location}
+                  <div className="flex justify-between items-start mb-8 relative z-10">
+                    <div className="flex flex-col ml-3">
+                      <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60">
+                        Expediente {story.caseId}
+                      </span>
+                      <span className="text-[8px] font-bold text-muted-foreground/40 uppercase tracking-tighter">
+                        Estado: PROTEGIDO (Habeas Data)
                       </span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Calendar size={14} className="text-primary" />
-                      <span className="text-[10px] font-bold text-muted-foreground uppercase text-right">
-                        {story.time}
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300 hover:rotate-45">
+                      <ArrowUpRight size={20} />
+                    </div>
+                  </div>
+
+                  <div className="space-y-6 relative z-10">
+                    <div>
+                      <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">
+                        Monto Recuperado
+                      </h4>
+                      <p
+                        className={`text-3xl font-black italic transition-colors duration-300 ${isLive ? 'text-white group-hover:text-primary drop-shadow-md' : 'text-foreground'}`}
+                      >
+                        {story.amount}
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
+                      <div className="flex items-center gap-2">
+                        <MapPin size={14} className="text-primary" />
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase">
+                          {story.location}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Calendar size={14} className="text-primary" />
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase text-right">
+                          {story.time}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-center">
+                      <div className="inline-flex px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-[9px] font-black uppercase tracking-widest text-foreground/50 truncate max-w-[120px]">
+                        {story.type}
+                      </div>
+                      <span className="text-[9px] font-black text-primary opacity-0 group-hover:opacity-100 transition-opacity translate-x-4 group-hover:translate-x-0 duration-300">
+                        VER DETALLES →
                       </span>
                     </div>
                   </div>
 
-                  <div className="flex justify-between items-center">
-                    <div className="inline-flex px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-[9px] font-black uppercase tracking-widest text-foreground/50 truncate max-w-[120px]">
-                      {story.type}
-                    </div>
-                    <span className="text-[9px] font-black text-primary opacity-0 group-hover:opacity-100 transition-opacity translate-x-4 group-hover:translate-x-0 duration-300">
-                      VER DETALLES →
-                    </span>
-                  </div>
-                </div>
-
-                {/* Decorative accent */}
-                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl rounded-full -mr-16 -mt-16 group-hover:bg-primary/20 transition-colors duration-500" />
+                  {/* Decorative accent */}
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl rounded-full -mr-16 -mt-16 group-hover:bg-primary/20 transition-colors duration-500" />
+                </TarjetaPremium>
               </motion.div>
             ))}
           </AnimatePresence>

@@ -1,6 +1,7 @@
 import { GripVertical, Image as ImageIcon, Phone, MapPin } from "lucide-react";
 import Image from "next/image";
 import { KanbanItem } from "./TableroKanbanReal"; 
+import { TarjetaPremium } from "../ui/TarjetaPremium";
 
 export function TarjetaKanban({ 
   data, 
@@ -13,11 +14,14 @@ export function TarjetaKanban({
   const esCaso = data.tipo === 'caso';
 
   return (
-    <div
-      draggable
-      onDragStart={(e) => onDragStart(e, data.id, data.estado)}
-      className="p-4 rounded-xl border transition-all cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md bg-slate-900 border-slate-700 group relative overflow-hidden"
+    <TarjetaPremium
+      className="p-4 cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md transition-all rounded-xl"
     >
+      <div 
+        draggable
+        onDragStart={(e) => onDragStart(e, data.id, data.estado)}
+        className="w-full h-full"
+      >
       {/* Indicador lateral */}
       <div className={`absolute left-0 top-0 bottom-0 w-1 ${esCaso ? 'bg-blue-500' : 'bg-primary'}`} />
 
@@ -34,12 +38,12 @@ export function TarjetaKanban({
       </div>
 
       <div className="flex items-start gap-2">
-        <GripVertical className="w-4 h-4 text-slate-600 group-hover:text-slate-400 mt-1 shrink-0" />
+        <GripVertical className="w-4 h-4 text-muted-foreground group-hover:text-primary mt-1 shrink-0" />
         <div className="flex-1 min-w-0">
-          <h4 className="text-white font-black text-base uppercase tracking-tight truncate">
+          <h4 className="text-foreground font-black text-base uppercase tracking-tight truncate">
             {data.placa && data.placa !== 'N/A' ? data.placa : (data.cedula ? `C.C. ${data.cedula}` : 'Sin Id')}
           </h4>
-          <p className="text-slate-400 text-xs truncate">{data.nombre || 'Usuario Desmulta'}</p>
+          <p className="text-muted-foreground text-xs truncate">{data.nombre || 'Usuario Desmulta'}</p>
         </div>
       </div>
 
@@ -66,6 +70,7 @@ export function TarjetaKanban({
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </TarjetaPremium>
   );
 }

@@ -317,7 +317,7 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
 
           <div className="relative group animate-in zoom-in-95 duration-1000 delay-200 z-10">
             <div className="absolute -inset-8 bg-primary/20 rounded-[4rem] blur-[80px] opacity-40 group-hover:opacity-60 transition-opacity duration-700 animate-slow-fade" />
-            <div className="relative floating-card bg-card p-4 border border-white/10 overflow-hidden shadow-2xl glow-box">
+            <TarjetaPremium className="relative floating-card p-4 overflow-hidden shadow-2xl rounded-[3rem]">
               <Lightbox
                 src="/hero-bg.avif"
                 alt="Gestión de multas profesional - Desmulta"
@@ -338,7 +338,7 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
                   </div>
                 </div>
               </div>
-            </div>
+            </TarjetaPremium>
           </div>
         </div>
       </section>
@@ -356,9 +356,8 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
             <div className="w-24 h-2 bg-primary mx-auto rounded-full shadow-lg shadow-primary/20" />
           </div>
           <div className="grid md:grid-cols-6 gap-6">
-            <div className="md:col-span-4 reveal diamond-border p-10 rounded-[2.5rem] bg-card/40 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all duration-700 group overflow-hidden relative">
-              <div className="absolute -right-20 -top-20 w-64 h-64 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-colors duration-1000" />
-              <div className="relative z-10 flex flex-col md:flex-row gap-10 items-center">
+            <TarjetaPremium className="md:col-span-4 reveal p-10 rounded-[2.5rem] backdrop-blur-sm border-border/50 hover:border-primary/50 transition-all duration-700 group flex items-center">
+              <div className="relative z-10 flex flex-col md:flex-row gap-10 items-center w-full">
                 <div className="w-24 h-24 rounded-3xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-500 shadow-inner">
                   <ShieldCheck className="w-12 h-12" />
                 </div>
@@ -373,7 +372,7 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
                   </p>
                 </div>
               </div>
-            </div>
+            </TarjetaPremium>
             <div className="md:col-span-2 reveal reveal-delay-1 flex flex-col justify-center items-center text-center group">
               <TarjetaPremium className="p-10 w-full h-full flex flex-col justify-center items-center bg-primary/5 border-primary/20">
                 <AnimatedCounter
