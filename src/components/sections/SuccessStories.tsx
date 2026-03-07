@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, MapPin, Calendar, ArrowUpRight, Activity } from 'lucide-react';
 import { collection, query, orderBy, limit } from 'firebase/firestore';
 import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { TarjetaPremium } from '../ui/TarjetaPremium';
 
 const FALLBACK_STORIES = [
   {
