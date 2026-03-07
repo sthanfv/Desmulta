@@ -19,6 +19,7 @@ import {
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { ModalDetalleLead } from './ModalDetalleLead';
+import { Consultation } from '@/lib/definitions';
 
 // 1. Definimos las columnas exactas para cada modo (Con UX Psicología de interfaz)
 const COLUMNAS_LEADS = [
@@ -251,7 +252,7 @@ export function TableroKanbanReal({
         contacto: item.contacto || '',
         status: 'en_proceso',
         // Otros campos opcionales si son necesarios según la interfaz Consultation
-      } as any);
+      } as unknown as Consultation);
 
       if (!result.success) throw new Error(result.error || 'Error desconocido');
 

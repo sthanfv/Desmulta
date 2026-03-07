@@ -1,4 +1,4 @@
-# Desmulta — Plataforma de Saneamiento Vial Inteligente v1.7.0 🛡️🚀
+# Desmulta — Plataforma de Saneamiento Vial Inteligente v1.8.0 🛡️🚀
 
 TODAS LAS DECISIONES, ARCHIVOS Y CÓDIGO GENERADO DEBEN PASAR EL FILTRO DE SEGURIDAD Y CALIDAD ‘MANDATO-FILTRO’.
 
@@ -11,6 +11,8 @@ Desmulta es una plataforma LegalTech de alto rendimiento diseñada para la gesti
 ### 🌟 Características "Nivel Dios" (Nuevas en v1.7.0)
 
 - **Interfaz de Alta Fidelidad (`TarjetaPremium`)**: Efectos de iluminación dinámica (linterna) procesados por GPU a 120 FPS sin re-renders en React.
+- **Kanban Pro (Novedad v1.8.0)**: Tablero dual (Ventas/Legal) con **Smart Cards** que detectan automáticamente si el lead es por Imagen o por Datos, aplicando un sistema de Fallback inteligente (Placa -> Cédula) para identificación inmediata.
+- **Acciones Tácticas Móviles (`Tap-to-Move`)**: Modal de acción rápida diseñado para celulares que permite contactar por WhatsApp y mover estados con un solo toque, eliminando la dependencia del Drag & Drop en pantallas táctiles.
 - **Motor FOMO Dinámico**: Notificaciones de "Consulta en Vivo" que combinan miles de permutaciones (nombres, ciudades y montos aleatorios) creando prueba social con apagado inteligente.
 - **Calculadora Legal UX Premium**: Retraso psicológico de 2.5s y transiciones suaves con Framer Motion para validar la viabilidad de caducidad.
 - **Persistencia de Hierro**: Autoguardado silente en `localStorage` ante cada pulsación para no perder a los leads por fallas técnicas (Modo Supervivencia).

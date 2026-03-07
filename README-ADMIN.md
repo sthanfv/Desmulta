@@ -29,10 +29,12 @@ El panel de administración está construido utilizando el _App Router_ de Next.
 
 Es el cerebro interactivo del panel. Utiliza un sistema de pestañas (`Tabs` de Shadcn UI) para fragmentar la información en tres grandes módulos:
 
-1. **Centro de Comando (`TableroKanban`)**:
-   - Una vista de tablero Kanban interactivo procesado con HTML5 Drag & Drop nativo.
-   - **Columnas/Estados**: `NUEVO`, `ESTUDIO`, `RADICADO`, `FINALIZADO`.
+1. **Centro de Comando (`TableroKanbanReal`)**:
+   - Una vista de tablero Kanban interactivo con soporte para **Drag & Drop** nativo y **Tap-to-Move** para móviles.
+   - **Smart Cards**: Detectan el tipo de lead (Imagen SIMIT vs Datos) y ajustan su visualización aplicando Fallback automático: prioriza Placa, si no existe usa la Cédula como título.
+   - **Columnas/Estados**: `NUEVO`, `CONTACTADO`, `ESTUDIO`, `DESCARTADO` (Ventas) / `APERTURA`, `RADICADO`, `TRAMITE`, `FINALIZADO` (Casos).
    - Utiliza UI Optimista (Optimistic UI) para actualizar el DOM instantáneamente al arrastrar y soltar sin esperar la respuesta del servidor, garantizando 0 lag.
+   - **Modal de Acción Rápida (`ModalDetalleLead`)**: Ventana flotante de alto rendimiento para visualización profunda, previsualización de capturas SIMIT y contacto directo vía WhatsApp con mensajes pre-llenados inteligentes.
 
 2. **Gestión de Leads (`ConsultationsList` - Módulo de Prospectos)**:
    - Visualización de todas las consultas (Leads) entrantes.
@@ -81,4 +83,4 @@ El archivo de Server Actions es el puente entre el frontend admin y la base de d
 
 ---
 
-_Informe generado automáticamente tras escaneo profundo del repositorio local (v1.7.0)._
+_Informe generado automáticamente tras escaneo profundo del repositorio local (v1.8.0)._
