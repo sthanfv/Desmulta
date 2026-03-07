@@ -655,7 +655,7 @@ export default function HomeClient({
         </div>
       </section>
 
-      {/* Guía Legal (Blog) [ESTRENO v1.8.0] */}
+      {/* Guía Legal (Blog) [ESTRENO v1.8.5] */}
       <section id="guia-legal" className="py-32 px-4 bg-muted/5 relative overflow-hidden">
         <div className="max-w-6xl mx-auto">
           <div className="text-center space-y-6 mb-20">
@@ -1007,7 +1007,7 @@ export default function HomeClient({
                   © {new Date().getFullYear()} DESMULTA — SERVICIO PRIVADO DE GESTIÓN VIAL
                 </p>
                 <span className="text-[9px] font-black uppercase tracking-widest bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/20">
-                  v1.7.0
+                  v1.8.5
                 </span>
               </div>
               <div className="flex items-center gap-4 opacity-40 hover:opacity-100 transition-opacity mt-1">
