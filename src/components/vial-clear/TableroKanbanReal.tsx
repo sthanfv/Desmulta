@@ -329,7 +329,7 @@ export function TableroKanbanReal({
               </p>
             </div>
 
-            <div className="flex-1 flex flex-col gap-3 min-h-[200px] max-h-[65vh] overflow-y-auto pr-2 rounded-xl custom-scrollbar">
+            <div className="flex-1 flex flex-col gap-3 min-h-[200px] max-h-[65vh] overflow-y-auto overscroll-contain pr-2 rounded-xl custom-scrollbar">
               {itemsActivos
                 .filter((item) => item.estado === columna.id)
                 .map((item) => (
