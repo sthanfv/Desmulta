@@ -5,6 +5,7 @@ import { MouseEvent, useRef } from 'react';
 interface TarjetaPremiumProps {
   children: React.ReactNode;
   className?: string;
+  onClick?: () => void;
 }
 
 /**
@@ -15,7 +16,7 @@ interface TarjetaPremiumProps {
  *
  * MANDATO-FILTRO v5.40.0: Rendimiento extremo y estética de alta tecnología.
  */
-export function TarjetaPremium({ children, className = '' }: TarjetaPremiumProps) {
+export function TarjetaPremium({ children, className = '', onClick }: TarjetaPremiumProps) {
   const divRef = useRef<HTMLDivElement>(null);
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
@@ -35,6 +36,7 @@ export function TarjetaPremium({ children, className = '' }: TarjetaPremiumProps
     <div
       ref={divRef}
       onMouseMove={handleMouseMove}
+      onClick={onClick}
       className={`relative overflow-hidden bg-card border border-border rounded-3xl group transition-colors duration-300 ${className}`}
     >
       {/* Efecto Linterna (Solo en PC con puntero real para optimizar móvil) */}
