@@ -222,7 +222,7 @@ export function AdminDashboard() {
     },
   });
 
-  // Update forms when data loads
+  // Actualizar formularios cuando los datos carguen
   useEffect(() => {
     if (showcaseData) {
       showcaseForm.reset({
@@ -469,7 +469,7 @@ export function AdminDashboard() {
                 PANEL CONTROL
               </h1>
               <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mt-1 opacity-70">
-                Desmulta Admin v1.8.0
+                Desmulta Administrador v1.8.5
               </p>
             </div>
           </div>
@@ -501,7 +501,7 @@ export function AdminDashboard() {
           )}
         </section>
 
-        {/* Showcase Management Card */}
+        {/* Tarjeta de Gestión de Casos de Éxito */}
         <section className="floating-card bg-card/40 backdrop-blur-md border border-white/10 p-10 shadow-3xl overflow-hidden relative group">
           <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/5 rounded-full blur-[80px] pointer-events-none" />
 
@@ -518,7 +518,7 @@ export function AdminDashboard() {
 
           <Form {...showcaseForm}>
             <form onSubmit={showcaseForm.handleSubmit(onShowcaseSubmit)} className="space-y-12">
-              {/* Counter Configuration */}
+              {/* Configuración del Contador */}
               <div className="grid md:grid-cols-2 gap-10 bg-primary/5 p-8 rounded-[2.5rem] border border-primary/10">
                 <FormField
                   control={showcaseForm.control}
@@ -674,14 +674,14 @@ export function AdminDashboard() {
           </Form>
         </section>
 
-        {/* Footer Configuration Card */}
+        {/* Tarjeta de Configuración del Pie de Página */}
         <section className="floating-card bg-card/40 backdrop-blur-md border border-white/10 p-10 shadow-3xl overflow-hidden relative group">
           <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/5 rounded-full blur-[80px] pointer-events-none" />
 
           <div className="mb-12">
             <h2 className="text-3xl font-black text-foreground tracking-tight flex items-center gap-3">
               <Globe className="text-primary w-8 h-8" />
-              Identidad Institutional
+              Identidad Institucional
             </h2>
             <p className="text-muted-foreground mt-3 text-lg max-w-2xl font-medium leading-relaxed">
               Gestiona la información de contacto y enlaces sociales que aparecen en el pie de

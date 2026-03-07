@@ -21,7 +21,7 @@ import { Consultation } from '@/lib/definitions';
 const COLUMNAS_LEADS = [
   {
     id: 'NUEVO',
-    titulo: 'Nuevos Leads',
+    titulo: 'Nuevas Solicitudes',
     accion: 'Llamar hoy mismo',
     icono: AlertCircle,
     color: 'border-red-500/40 text-red-500',
@@ -170,7 +170,7 @@ export function TableroKanbanReal({
       if (modoVista === 'leads') {
         const result = await updateConsultationStatus(itemId, nuevoEstado.toLowerCase());
         if (result.error) throw new Error(result.error);
-        toast({ title: `Lead actualizado a ${nuevoEstado}` });
+        toast({ title: `Solicitud actualizada a ${nuevoEstado}` });
       } else {
         const desc = `Movimiento manual en Kanban a ${nuevoEstado}`;
         const result = await updateCaseStatus(itemId, nuevoEstado.toLowerCase(), desc);
@@ -251,7 +251,7 @@ export function TableroKanbanReal({
 
       if (!result.success) throw new Error(result.error || 'Error desconocido');
 
-      toast({ title: 'Lead promovido a Caso Legal exitosamente' });
+      toast({ title: 'Solicitud promovida a Caso Legal exitosamente' });
       // El dashboard padre debería refrescarse eventualmente, o podemos añadirlo a localCasos si queremos verlo ya.
     } catch (error) {
       console.error('Fallo al promover', error);
@@ -276,7 +276,7 @@ export function TableroKanbanReal({
         <h2 className="text-2xl font-black text-foreground uppercase tracking-tight flex items-center gap-3 mb-4">
           Centro de Comando
           <span className="bg-primary/20 text-primary text-xs px-3 py-1 rounded-full border border-primary/30">
-            Live
+            En Vivo
           </span>
         </h2>
 
@@ -288,7 +288,7 @@ export function TableroKanbanReal({
               : 'text-muted-foreground hover:text-white hover:bg-white/5'
               }`}
           >
-            <Users className="w-4 h-4" /> Flujo de Ventas
+            <Users className="w-4 h-4" /> Gestión de Solicitudes
           </button>
           <button
             onClick={() => cambiarVista('casos')}

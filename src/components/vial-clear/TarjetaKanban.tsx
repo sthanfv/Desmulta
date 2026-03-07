@@ -28,7 +28,7 @@ export function TarjetaKanban({
       {/* Tipo de Lead Badge */}
       <div className="flex justify-between items-start mb-2">
         <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border bg-black/40 text-muted-foreground/80 border-white/10">
-          {esCaso ? '📂 CASO' : '👤 LEAD'}
+          {esCaso ? '📂 CASO' : '👤 SOLICITUD'}
         </span>
         {esCaptura && (
           <span className="bg-blue-500/20 text-blue-400 p-1 rounded-md" title="Captura SIMIT">

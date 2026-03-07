@@ -48,9 +48,9 @@ export function ModalDetalleLead({ data, onClose, onCambiarEstado, onPromoverACa
 
                 {/* CABECERA */}
                 <div className="flex justify-between items-center p-5 border-b border-white/5 bg-slate-900/50">
-                    <h3 className="text-xl font-black text-white uppercase tracking-wide flex items-center gap-2">
-                        Detalle del {esCaso ? 'Caso' : 'Prospecto'}
-                    </h3>
+                    <h2 className="text-xl font-black text-white uppercase tracking-wide flex items-center gap-2">
+                        {esCaso ? 'Detalle del Caso' : 'Detalle de la Solicitud'}
+                    </h2>
                     <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-2 rounded-full">
                         <X className="w-5 h-5" />
                     </button>
@@ -133,7 +133,7 @@ export function ModalDetalleLead({ data, onClose, onCambiarEstado, onPromoverACa
                                 disabled={isProcessing !== null}
                                 className="flex-1 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-colors hover:bg-yellow-500/20 disabled:opacity-50 flex justify-center items-center"
                             >
-                                {isProcessing === 'contactado' ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Marcar Contactado'}
+                                {isProcessing === 'contactado' ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Marcar como Contactado'}
                             </button>
                         )}
 
