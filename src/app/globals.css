@@ -210,65 +210,68 @@
     }
   }
 
-  /* Shimmer Effect - Premium Shine - Optimized for 60fps */
+  /* Shimmer Effect - Premium Shine - Desktop Only */
   .animate-shimmer {
     position: relative !important;
     overflow: hidden !important;
     isolation: isolate;
-    /* Android fix: contain prevents the ::after from escaping the stacking context */
-    contain: layout paint;
-    /* Clip any overflow that Android Chrome may not respect from overflow:hidden alone */
-    -webkit-clip-path: inset(0 round var(--radius, 0.5rem));
-    clip-path: inset(0 round var(--radius, 0.5rem));
+    /* NOTA: NO usar transform aquí — en Android crea un nuevo compositing
+       layer que mueve físicamente el botón en el contenedor flex */
   }
 
   .animate-shimmer::after {
     content: '';
     position: absolute;
-    inset: -150%;
-    width: 400%;
-    height: 400%;
+    /* Contiene el brillo dentro del botón sin desbordarse */
+    inset: 0;
     background: linear-gradient(
-      45deg,
-      transparent 25%,
-      rgba(255, 191, 0, 0.05) 45%,
-      rgba(255, 255, 255, 0.3) 50%,
-      rgba(255, 191, 0, 0.05) 55%,
-      transparent 75%
+      105deg,
+      transparent 20%,
+      rgba(255, 255, 255, 0) 30%,
+      rgba(255, 255, 255, 0.18) 50%,
+      rgba(255, 191, 0, 0.08) 60%,
+      transparent 70%
     );
-    transform: rotate(25deg) translate(-100%, -100%);
+    transform: translateX(-100%);
     animation: shimmer-premium 8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
     pointer-events: none;
     will-change: transform;
-    /* z-index 1 (not 10): stays inside the stacking context, never escapes to push layout */
     z-index: 1;
   }
 
   @keyframes shimmer-premium {
     0% {
-      transform: rotate(25deg) translate(-100%, -100%) translateZ(0);
+      transform: translateX(-100%);
     }
 
+    60%,
     100% {
-      transform: rotate(25deg) translate(100%, 100%) translateZ(0);
+      transform: translateX(200%);
     }
   }
 
-  /* Simplify shimmer on mobile to save battery and GPU */
+  /* shimmer-child: span hijo explícito dentro del botón.
+     Nunca altera el layout del padre — a diferencia del ::after hack. */
+  .shimmer-child {
+    animation: shimmer-premium 8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    will-change: transform;
+  }
+
   @media (max-width: 768px) {
+    /* En móvil el shimmer es más rápido para que se note en toques breves */
+    .shimmer-child {
+      animation-duration: 5s;
+    }
+
     .animate-shimmer::after {
-      animation-duration: 12s;
-      /* Slower = less paint */
-      opacity: 0.5;
+      animation-duration: 5s;
     }
 
     .glass {
       backdrop-filter: blur(12px);
-      /* Lighter on mobile */
       -webkit-backdrop-filter: blur(12px);
     }
   }
-
 
   /* Diamond Cut - Ultra Thin Border */
   .diamond-border {

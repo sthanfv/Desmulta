@@ -5,12 +5,18 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useFirestore, useDoc, useMemoFirebase, useAuth } from '@/firebase';
 import { doc, setDoc } from 'firebase/firestore';
-import { deleteExpiredConsultations, uploadImage, deleteSimitCaptures } from '@/app/admin/actions';
+import {
+  deleteExpiredConsultations,
+  uploadImage,
+  deleteSimitCaptures,
+  getConsultations,
+  getCases,
+} from '@/app/admin/actions';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Image from 'next/image';
-import { Badge } from '@/components/ui/badge';
+
 import { useToast } from '@/hooks/use-toast';
 import {
   Sparkle,
@@ -26,14 +32,9 @@ import {
   Upload,
   ShieldCheck,
   LogOut,
-  Users,
-  Gavel,
 } from 'lucide-react';
-import { ConsultationsList } from './ConsultationsList';
-import { CasesList } from './CasesList';
-import { TableroKanban, Lead } from '@/app/admin/TableroKanban';
+import { TableroKanbanReal, KanbanItem } from '@/components/vial-clear/TableroKanbanReal';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -99,32 +100,105 @@ export function AdminDashboard() {
   const [beforePreview, setBeforePreview] = useState<string | null>(null);
   const [afterPreview, setAfterPreview] = useState<string | null>(null);
 
-  // MOCK LEADS PARA EL KANBAN DE RENDIMIENTO (Reemplazar con Hook de Firestore luego)
-  const mockLeadsParaCentroComando: Lead[] = [
-    { id: 'LD-001', placa: 'HKS890', ciudad: 'Cali', estado: 'NUEVO', montoAprox: '$740,000' },
-    { id: 'LD-002', placa: 'UWY918', ciudad: 'Bogotá', estado: 'NUEVO', montoAprox: '$412,000' },
-    {
-      id: 'LD-003',
-      placa: 'MQL441',
-      ciudad: 'Medellín',
-      estado: 'ESTUDIO',
-      montoAprox: '$800,000',
-    },
-    {
-      id: 'LD-004',
-      placa: 'JJP223',
-      ciudad: 'Bucaramanga',
-      estado: 'RADICADO',
-      montoAprox: '$1,200,000',
-    },
-    {
-      id: 'LD-005',
-      placa: 'AAA000',
-      ciudad: 'Barranquilla',
-      estado: 'FINALIZADO',
-      montoAprox: '$500,000',
-    },
-  ];
+  // Mapeo seguro de estados
+  const mapStatusToKanban = (status: string, tipo: 'lead' | 'caso') => {
+    const s = status?.toLowerCase() || '';
+    if (tipo === 'lead') {
+      if (s === 'contactado' || s === 'en_proceso' || s === 'estudio') return 'ESTUDIO';
+      if (s === 'radicado') return 'RADICADO';
+      if (s === 'terminado' || s === 'finalizado') return 'FINALIZADO';
+      return 'NUEVO';
+    } else {
+      if (s === 'documentacion' || s === 'estudio') return 'ESTUDIO';
+      if (s === 'tramite' || s === 'resolucion' || s === 'radicado') return 'RADICADO';
+      if (s === 'finalizado' || s === 'archivo') return 'FINALIZADO';
+      return 'NUEVO';
+    }
+  };
+
+  const [leadsParaKanban, setLeadsParaKanban] = useState<KanbanItem[]>([]);
+  const [casosParaKanban, setCasosParaKanban] = useState<KanbanItem[]>([]);
+  const [isLoadingKanban, setIsLoadingKanban] = useState(true);
+
+  useEffect(() => {
+    const fetchKanbanData = async () => {
+      setIsLoadingKanban(true);
+      try {
+        const [leadsRes, casesRes] = await Promise.all([getConsultations(50), getCases(50)]);
+
+        const leadsBuffer: KanbanItem[] = [];
+        const casosBuffer: KanbanItem[] = [];
+
+        if (leadsRes.success && leadsRes.data) {
+          const rawLeads = leadsRes.data as unknown as Array<{
+            id: string;
+            placa?: string;
+            ciudad?: string;
+            status: string;
+            antiguedad?: string;
+            createdAt?: string;
+            evidenceUrl?: string;
+            nombre?: string;
+            cedula?: string;
+            contacto?: string;
+          }>;
+          rawLeads.forEach((l) => {
+            let ahorro = undefined;
+            if (l.antiguedad?.includes('Más de 3 años')) ahorro = '$800k - $1.5M';
+            else if (l.antiguedad?.includes('Entre 1 y 3 años')) ahorro = '$400k - $800k';
+
+            leadsBuffer.push({
+              id: l.id,
+              placa: l.placa || 'N/A',
+              ciudad: l.ciudad || 'Por definir',
+              estado: mapStatusToKanban(l.status, 'lead'),
+              ahorro,
+              createdAt: l.createdAt,
+              evidenceUrl: l.evidenceUrl,
+              nombre: l.nombre,
+              cedula: l.cedula,
+              contacto: l.contacto,
+            });
+          });
+        }
+
+        if (casesRes.success && casesRes.data) {
+          const rawCases = casesRes.data as unknown as Array<{
+            id: string;
+            placa?: string;
+            cedula?: string;
+            ciudad?: string;
+            status: string;
+            createdAt?: string;
+            evidenceUrl?: string;
+            nombre?: string;
+            contacto?: string;
+          }>;
+          rawCases.forEach((c) => {
+            casosBuffer.push({
+              id: c.id,
+              placa: c.placa || c.cedula || 'N/A',
+              ciudad: c.ciudad || 'Por definir',
+              estado: mapStatusToKanban(c.status, 'caso'),
+              createdAt: c.createdAt,
+              evidenceUrl: c.evidenceUrl,
+              nombre: c.nombre,
+              cedula: c.cedula,
+              contacto: c.contacto,
+            });
+          });
+        }
+        setLeadsParaKanban(leadsBuffer);
+        setCasosParaKanban(casosBuffer);
+      } catch (err) {
+        console.error('Error fetching kanban data', err);
+      } finally {
+        setIsLoadingKanban(false);
+      }
+    };
+
+    fetchKanbanData();
+  }, []);
 
   const showcaseForm = useForm<ShowcaseFormData>({
     resolver: zodResolver(showcaseSchema),
@@ -392,7 +466,7 @@ export function AdminDashboard() {
                 PANEL CONTROL
               </h1>
               <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mt-1 opacity-70">
-                Desmulta Admin v7.0.0
+                Desmulta Admin v1.7.0
               </p>
             </div>
           </div>
@@ -408,100 +482,18 @@ export function AdminDashboard() {
       </header>
 
       <main className="flex-1 max-w-6xl mx-auto w-full px-6 py-12 space-y-24">
-        <Tabs defaultValue="comando" className="w-full space-y-12">
-          <TabsList className="bg-white/5 border border-white/10 p-1 rounded-2xl h-16 w-full md:w-auto overflow-x-auto flex flex-nowrap">
-            <TabsTrigger
-              value="comando"
-              className="px-8 flex-1 md:flex-none rounded-xl font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all uppercase tracking-widest text-xs min-w-[180px]"
-            >
-              <ShieldCheck className="w-4 h-4 mr-2" />
-              Centro de Comando
-            </TabsTrigger>
-            <TabsTrigger
-              value="leads"
-              className="px-8 flex-1 md:flex-none rounded-xl font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
-            >
-              <Users className="w-4 h-4 mr-2" />
-              Gestión de Leads
-            </TabsTrigger>
-            <TabsTrigger
-              value="cases"
-              className="px-8 flex-1 md:flex-none rounded-xl font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
-            >
-              <Gavel className="w-4 h-4 mr-2" />
-              Casos Activos
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent
-            value="comando"
-            className="space-y-24 outline-none animate-in fade-in zoom-in-95 duration-500"
-          >
-            <TableroKanban leadsIniciales={mockLeadsParaCentroComando} />
-          </TabsContent>
-
-          <TabsContent value="leads" className="space-y-24 outline-none">
-            {/* --- GESTIÓN DE CONSULTAS (LEADS) --- */}
-            <section className="relative scroll-mt-24">
-              <div className="space-y-12">
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                  <div>
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="p-3 rounded-2xl bg-primary/10 border border-primary/20">
-                        <Users className="text-primary w-8 h-8" />
-                      </div>
-                      <Badge
-                        variant="outline"
-                        className="text-primary border-primary/20 bg-primary/5 uppercase tracking-widest font-black text-[10px] px-3 py-1"
-                      >
-                        Control de Prospectos
-                      </Badge>
-                    </div>
-                    <h2 className="text-3xl md:text-5xl font-black text-foreground tracking-tight">
-                      Gestión de Leads
-                    </h2>
-                    <p className="text-muted-foreground mt-4 text-lg max-w-2xl font-medium leading-relaxed">
-                      Visualiza y gestiona las consultas recibidas. Haz clic en el botón de WhatsApp
-                      para iniciar el contacto directo.
-                    </p>
-                  </div>
-                </div>
-                <ConsultationsList />
-              </div>
-            </section>
-          </TabsContent>
-
-          <TabsContent value="cases" className="space-y-24 outline-none">
-            {/* --- GESTIÓN DE CASOS --- */}
-            <section className="relative scroll-mt-24">
-              <div className="space-y-12">
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                  <div>
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="p-3 rounded-2xl bg-primary/10 border border-primary/20">
-                        <Gavel className="text-primary w-8 h-8" />
-                      </div>
-                      <Badge
-                        variant="outline"
-                        className="text-primary border-primary/20 bg-primary/5 uppercase tracking-widest font-black text-[10px] px-3 py-1"
-                      >
-                        Casos Legales
-                      </Badge>
-                    </div>
-                    <h2 className="text-3xl md:text-5xl font-black text-foreground tracking-tight">
-                      Procesos en Trámite
-                    </h2>
-                    <p className="text-muted-foreground mt-4 text-lg max-w-2xl font-medium leading-relaxed">
-                      Administra los documentos y el progreso de los procesos jurídicos que han sido
-                      formalizados.
-                    </p>
-                  </div>
-                </div>
-                <CasesList />
-              </div>
-            </section>
-          </TabsContent>
-        </Tabs>
+        <section className="space-y-12 shrink-0 pt-0 animate-in fade-in zoom-in-95 duration-500">
+          {isLoadingKanban ? (
+            <div className="flex flex-col items-center justify-center p-20 opacity-60">
+              <Loader2 className="w-12 h-12 animate-spin text-primary mb-6" />
+              <p className="text-muted-foreground font-black uppercase tracking-widest text-xs">
+                Cargando Centro de Comando...
+              </p>
+            </div>
+          ) : (
+            <TableroKanbanReal leadsReales={leadsParaKanban} casosReales={casosParaKanban} />
+          )}
+        </section>
 
         {/* Showcase Management Card */}
         <section className="floating-card bg-card/40 backdrop-blur-md border border-white/10 p-10 shadow-3xl overflow-hidden relative group">

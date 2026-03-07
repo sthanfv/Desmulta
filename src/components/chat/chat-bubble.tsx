@@ -137,7 +137,7 @@ export function ChatBubble() {
             {isLoading && (
               <div className="flex justify-start">
                 <div className="bg-white/50 dark:bg-white/10 backdrop-blur-sm p-4 rounded-[2rem] rounded-tl-none text-[10px] font-black uppercase tracking-widest text-primary animate-pulse">
-                  Consultando jurisprudencia...
+                  Analizando su caso...
                 </div>
               </div>
             )}

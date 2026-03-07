@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import { GripVertical, AlertCircle, Clock, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { updateConsultationStatus, updateCaseStatus } from './actions';
+import { useToast } from '@/hooks/use-toast';
 
 // 1. Tipos de datos (Alineados temporalmente con Firebase)
 export type EstadoCaso = 'NUEVO' | 'ESTUDIO' | 'RADICADO' | 'FINALIZADO';
@@ -10,8 +12,55 @@ export interface Lead {
   id: string;
   placa: string;
   ciudad: string;
-  estado: EstadoCaso;
+  estado: EstadoCaso | string;
   montoAprox?: string;
+  ahorro?: string;
+  tipo?: 'lead' | 'caso';
+  createdAt?: string;
+}
+
+export function TarjetaKanban({
+  data,
+  onDragStart,
+}: {
+  data: Lead;
+  onDragStart: (e: React.DragEvent, lead: Lead) => void;
+}) {
+  const esCaso = data.tipo === 'caso';
+
+  return (
+    <div
+      draggable
+      onDragStart={(e) => onDragStart(e, data)}
+      className={`p-4 rounded-xl border transition-all cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md
+        ${esCaso ? 'bg-slate-800 border-yellow-500/30' : 'bg-slate-900 border-slate-700'} relative group overflow-hidden`}
+    >
+      <div className="absolute top-0 left-0 w-1 h-full bg-primary/50 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="flex justify-between items-start mb-2">
+        <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border bg-black/40 text-muted-foreground/80 border-white/10">
+          {esCaso ? '📂 Caso Activo' : '👤 Lead Nuevo'}
+        </span>
+        {data.ahorro && (
+          <span className="text-[10px] bg-green-500/10 text-green-400 px-2 py-0.5 rounded-full border border-green-500/20 font-black">
+            {data.ahorro}
+          </span>
+        )}
+      </div>
+
+      <div className="flex items-center gap-2 mb-1">
+        <GripVertical className="w-4 h-4 text-muted-foreground/50 group-hover:text-primary transition-colors cursor-grab" />
+        <h4 className="text-white font-black text-lg tracking-tighter uppercase">
+          {data.placa || 'S/N'}
+        </h4>
+      </div>
+      <p className="text-slate-400 text-xs mt-1 ml-6 font-bold">{data.ciudad || 'N/A'}</p>
+
+      <div className="mt-3 pt-3 border-t border-slate-800 flex justify-between items-center text-[10px] text-slate-500 italic font-medium">
+        <span>ID: {data.id.slice(0, 8)}</span>
+        <span>{data.createdAt ? new Date(data.createdAt).toLocaleDateString() : 'Reciente'}</span>
+      </div>
+    </div>
+  );
 }
 
 // 2. Configuración de las Columnas Oxford/Regulation
@@ -24,16 +73,19 @@ const COLUMNAS: { id: EstadoCaso; titulo: string; icono: React.ElementType; colo
 
 export function TableroKanban({ leadsIniciales }: { leadsIniciales: Lead[] }) {
   const [leads, setLeads] = useState<Lead[]>(leadsIniciales);
+  const { toast } = useToast();
+
+  React.useEffect(() => {
+    setLeads(leadsIniciales);
+  }, [leadsIniciales]);
 
   // 3. Motores de arrastre nativo de HTML5
-  const handleDragStart = (e: React.DragEvent, leadId: string) => {
-    e.dataTransfer.setData('leadId', leadId);
+  const handleDragStart = (e: React.DragEvent, lead: Lead) => {
+    e.dataTransfer.setData('leadId', lead.id);
+    e.dataTransfer.setData('tipo', lead.tipo || 'lead'); // 'lead' por defecto si no viene
+    e.dataTransfer.setData('estadoAnterior', lead.estado);
     // Efecto visual al agarrar la tarjeta (GPU Acceleration)
     e.currentTarget.classList.add('opacity-50', 'scale-95');
-  };
-
-  const handleDragEnd = (e: React.DragEvent) => {
-    e.currentTarget.classList.remove('opacity-50', 'scale-95');
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -43,14 +95,40 @@ export function TableroKanban({ leadsIniciales }: { leadsIniciales: Lead[] }) {
   const handleDrop = async (e: React.DragEvent, nuevoEstado: EstadoCaso) => {
     e.preventDefault();
     const leadId = e.dataTransfer.getData('leadId');
+    const tipo = e.dataTransfer.getData('tipo');
+    const estadoAnterior = e.dataTransfer.getData('estadoAnterior') as EstadoCaso;
 
-    // Actualizamos la UI inmediatamente (Optimistic UI Cero Lag)
+    // Si cae en la misma columna, no hacemos nada
+    if (estadoAnterior === nuevoEstado) return;
+
+    // 1. Actualizamos la UI inmediatamente (Optimistic UI Cero Lag)
     setLeads((prev) =>
       prev.map((lead) => (lead.id === leadId ? { ...lead, estado: nuevoEstado } : lead))
     );
 
-    // TODO: Conectar actualización de estado con Firebase Firestore vía actions en una iteración posterior
-    // await actualizarEstadoFirebase(leadId, nuevoEstado);
+    try {
+      if (tipo === 'lead') {
+        const result = await updateConsultationStatus(leadId, nuevoEstado);
+        if (result.error) throw new Error(result.error);
+        toast({ title: `Lead actualizado a ${nuevoEstado}` });
+      } else {
+        const descripcionAuditoria = `Movimiento manual en Kanban a ${nuevoEstado}`;
+        const result = await updateCaseStatus(leadId, nuevoEstado, descripcionAuditoria);
+        if (result.error) throw new Error(result.error);
+        toast({ title: `Caso actualizado a ${nuevoEstado}` });
+      }
+    } catch (error) {
+      // 2. REVERSIÓN: Si falla la base de datos, devolvemos la tarjeta a su lugar
+      setLeads((prev) =>
+        prev.map((lead) => (lead.id === leadId ? { ...lead, estado: estadoAnterior } : lead))
+      );
+      toast({
+        variant: 'destructive',
+        title: 'Error de sincronización',
+        description: 'Fallo al comunicarse con Firebase. Se deshizo el movimiento.',
+      });
+      console.error('Error en la persistencia Kanban:', error);
+    }
   };
 
   return (
@@ -95,27 +173,7 @@ export function TableroKanban({ leadsIniciales }: { leadsIniciales: Lead[] }) {
               {leads
                 .filter((lead) => lead.estado === columna.id)
                 .map((lead) => (
-                  <div
-                    key={lead.id}
-                    draggable
-                    onDragStart={(e) => handleDragStart(e, lead.id)}
-                    onDragEnd={handleDragEnd}
-                    className="glass p-4 rounded-xl cursor-grab active:cursor-grabbing border-white/10 hover:border-primary/50 transition-all duration-200 shadow-lg hover:shadow-primary/10 group relative overflow-hidden"
-                  >
-                    <div className="absolute top-0 left-0 w-1 h-full bg-primary/50 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <div className="flex justify-between items-start mb-3">
-                      <div className="flex items-center gap-2">
-                        <GripVertical className="w-4 h-4 text-muted-foreground/50 group-hover:text-primary transition-colors" />
-                        <span className="font-black text-foreground text-lg tracking-widest">
-                          {lead.placa}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex justify-between items-end mt-4 text-xs font-bold uppercase tracking-wider">
-                      <span className="text-muted-foreground">{lead.ciudad}</span>
-                      {lead.montoAprox && <span className="text-primary">{lead.montoAprox}</span>}
-                    </div>
-                  </div>
+                  <TarjetaKanban key={lead.id} data={lead} onDragStart={handleDragStart} />
                 ))}
               {leads.filter((l) => l.estado === columna.id).length === 0 && (
                 <div className="h-full w-full flex items-center justify-center text-muted-foreground/30 text-xs font-bold uppercase tracking-widest border-2 border-dashed border-white/5 rounded-xl">

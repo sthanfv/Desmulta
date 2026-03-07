@@ -82,7 +82,11 @@ export async function getConsultations(pageSize: number = 20, lastDocId?: string
     getAdminApp();
     const db = getFirestore();
 
-    let query = db.collection('consultations').orderBy('createdAt', 'desc').limit(pageSize);
+    // 🛡️ LEY DEL LÍMITE ESTRICTO: Solo descargamos leads activos, bloqueando lecturas de DESCARTADOS
+    let query = db.collection('consultations')
+      .where('status', 'in', ['nuevo', 'contactado', 'estudio', 'en_proceso', 'radicado'])
+      .orderBy('createdAt', 'desc')
+      .limit(pageSize);
 
     if (lastDocId) {
       const lastDoc = await db.collection('consultations').doc(lastDocId).get();
@@ -173,7 +177,11 @@ export async function getCases(pageSize: number = 20, lastDocId?: string | null)
     getAdminApp();
     const db = getFirestore();
 
-    let query = db.collection('cases').orderBy('createdAt', 'desc').limit(pageSize);
+    // 🛡️ LEY DEL LÍMITE ESTRICTO: Solo casos legales en estado activo
+    let query = db.collection('cases')
+      .where('status', 'in', ['apertura', 'documentacion', 'estudio', 'tramite', 'resolucion', 'radicado', 'en_espera'])
+      .orderBy('createdAt', 'desc')
+      .limit(pageSize);
 
     if (lastDocId) {
       const lastDoc = await db.collection('cases').doc(lastDocId).get();

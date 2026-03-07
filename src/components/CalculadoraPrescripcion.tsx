@@ -20,6 +20,7 @@ export function CalculadoraPrescripcion() {
   const [resultado, setResultado] = useState<ReturnType<typeof calcularViabilidadLegal> | null>(
     null
   );
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const handleCalcular = () => {
     if (!fecha) return;
@@ -27,6 +28,7 @@ export function CalculadoraPrescripcion() {
     // 1. Iniciamos el estado de tensión (Loading)
     setIsCalculating(true);
     setResultado(null); // Ocultamos resultados anteriores si los hay
+    setErrorMsg(null);
 
     // 2. Retraso psicológico de 2.5 segundos para aumentar percepción de valor/precisión
     setTimeout(() => {
@@ -34,7 +36,8 @@ export function CalculadoraPrescripcion() {
         const res = calcularViabilidadLegal(fecha, coactivo);
         setResultado(res);
       } catch (error) {
-        console.error(error);
+        const msg = error instanceof Error ? error.message : 'Error inesperado en el motor.';
+        setErrorMsg(msg);
       } finally {
         setIsCalculating(false); // Apagamos el motor
       }
@@ -70,6 +73,8 @@ export function CalculadoraPrescripcion() {
               value={fecha}
               onChange={(e) => setFecha(e.target.value)}
               disabled={isCalculating}
+              min="2000-01-01"
+              max={new Date().toISOString().split('T')[0]}
               className="w-full bg-muted border border-input text-foreground rounded-xl py-3 pl-11 pr-4 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all disabled:opacity-50"
             />
           </div>
@@ -105,7 +110,7 @@ export function CalculadoraPrescripcion() {
               className="flex items-center gap-2"
             >
               <Loader2 className="w-5 h-5 animate-spin" />
-              <span>Analizando jurisprudencia...</span>
+              <span>Calculando viabilidad...</span>
             </motion.div>
           ) : (
             <motion.div
@@ -119,6 +124,21 @@ export function CalculadoraPrescripcion() {
           )}
         </button>
       </div>
+
+      {/* Notificación de Error (fecha fuera de rango, etc.) */}
+      <AnimatePresence>
+        {errorMsg && !isCalculating && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="flex items-center gap-3 p-4 bg-red-500/10 border border-red-500/20 text-red-500 dark:text-red-400 rounded-2xl text-sm font-bold mb-4"
+          >
+            <AlertTriangle className="w-5 h-5 flex-shrink-0" />
+            {errorMsg}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Resultados Dinámicos con Framer Motion */}
       <AnimatePresence>

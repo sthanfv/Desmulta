@@ -8,10 +8,16 @@ export function PwaRegistry() {
       // Usamos sw-custom.js para evitar conflicto con el PWA Workbox preexistente
       navigator.serviceWorker
         .register('/sw-custom.js')
-        .then((registration) =>
-          console.log('Escudo Offline Activado (Custom Nivel Dios):', registration.scope)
-        )
-        .catch((err) => console.error('Fallo al registrar SW:', err));
+        .then((reg) => {
+          if (process.env.NODE_ENV === 'development') {
+            console.log('SW activado:', reg.scope);
+          }
+        })
+        .catch((err) => {
+          if (process.env.NODE_ENV === 'development') {
+            console.error('SW fallo:', err);
+          }
+        });
     }
   }, []);
 

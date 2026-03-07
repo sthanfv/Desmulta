@@ -250,9 +250,13 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
             <ModeToggle />
             <Button
               onClick={() => setIsModalOpen(true)}
-              className="bg-primary hover:bg-primary/95 text-primary-foreground font-bold rounded-full px-8 active:scale-95 transition-all shadow-lg shadow-primary/20 border-none animate-shimmer"
+              className="bg-primary hover:bg-primary/95 text-primary-foreground font-bold rounded-full px-8 active:scale-95 transition-all shadow-lg shadow-primary/20 border-none relative overflow-hidden"
               aria-label="Abrir formulario de consulta de multas"
             >
+              <span
+                aria-hidden="true"
+                className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none shimmer-child"
+              />
               Consultar Ahora
             </Button>
           </div>
@@ -507,7 +511,7 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
                     {
                       titulo: 'Transparencia Central',
                       descripcion:
-                        'Somos un equipo validado de gestores, no un bufete tradicional. Honorarios fijos por mediación.',
+                        'Somos un equipo certificado de gestores administrativos independientes. Sin costos ocultos — honorarios fijos por resultado.',
                       icon: <FileText className="w-6 h-6" />,
                     },
                     {
@@ -804,6 +808,7 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
                   <Link
                     href={footerData.instagramUrl}
                     target="_blank"
+                    rel="noopener noreferrer"
                     className="w-12 h-12 rounded-2xl bg-card border border-white/10 flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/30 transition-all active:scale-95"
                   >
                     <Instagram size={24} />
@@ -813,6 +818,7 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
                   <Link
                     href={footerData.facebookUrl}
                     target="_blank"
+                    rel="noopener noreferrer"
                     className="w-12 h-12 rounded-2xl bg-card border border-white/10 flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/30 transition-all active:scale-95"
                   >
                     <Facebook size={24} />
@@ -907,7 +913,7 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
                   © {new Date().getFullYear()} DESMULTA — SERVICIO PRIVADO DE GESTIÓN VIAL
                 </p>
                 <span className="text-[9px] font-black uppercase tracking-widest bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/20">
-                  v7.0.0
+                  v1.7.0
                 </span>
               </div>
               <div className="flex items-center gap-4 opacity-40 hover:opacity-100 transition-opacity mt-1">
@@ -1013,8 +1019,12 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
             <div className="flex flex-col gap-4 mt-10">
               <Button
                 onClick={handleWhatsAppRedirect}
-                className="h-16 rounded-2xl bg-[#25D366] hover:bg-[#20ba59] text-white font-black text-lg active:scale-95 transition-all shadow-xl shadow-green-500/20 border-none relative overflow-hidden animate-shimmer"
+                className="h-16 rounded-2xl bg-[#25D366] hover:bg-[#20ba59] text-white font-black text-lg active:scale-95 transition-all shadow-xl shadow-green-500/20 border-none relative overflow-hidden"
               >
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none shimmer-child"
+                />
                 ENTENDIDO, ABRIR CHAT
               </Button>
               <Button
@@ -1053,6 +1063,7 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
                           <a
                             href="https://fcm.org.co/simit/#/home-public"
                             target="_blank"
+                            rel="noopener noreferrer"
                             className="text-primary font-bold underline"
                           >
                             SIMIT

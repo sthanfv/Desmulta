@@ -94,6 +94,7 @@ export default function FAQPage() {
               <a
                 href={`https://wa.me/${DESMULTA_KB.contacto.whatsapp.replace(/\D/g, '')}`}
                 target="_blank"
+                rel="noopener noreferrer"
                 className="flex items-center gap-2"
               >
                 <MessageCircle size={20} />

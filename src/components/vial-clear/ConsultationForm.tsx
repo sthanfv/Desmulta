@@ -33,7 +33,6 @@ import { haptics } from '@/lib/utils/haptics';
 import { ImageUpload } from './ImageUpload';
 
 type ConsultationFormData = z.infer<typeof ConsultationSchema>;
-type SimitFormData = z.infer<typeof SimitCaptureSchema>;
 
 // --- ARMA DE CONVERSIÓN TÁCTICA: ENRUTADOR MÁGICO ---
 // Lee parámetros de WhatsApp/Ads en la URL y auto-rellena el estado sin interactuar
@@ -478,8 +477,12 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
             <Button
               type="button"
               onClick={handleNextStep}
-              className="w-full bg-primary text-primary-foreground font-black py-8 rounded-3xl hover:bg-primary/95 transition-all flex items-center justify-center gap-3 h-20 text-xl shadow-xl shadow-primary/20 active:scale-95 border-none relative overflow-hidden group animate-shimmer"
+              className="w-full bg-primary text-primary-foreground font-black py-8 rounded-3xl hover:bg-primary/95 transition-all flex items-center justify-center gap-3 h-20 text-xl shadow-xl shadow-primary/20 active:scale-95 border-none relative overflow-hidden group"
             >
+              <span
+                aria-hidden="true"
+                className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none shimmer-child"
+              />
               CONTINUAR ANÁLISIS
               <ChevronRight size={24} className="group-hover:translate-x-1 transition-transform" />
             </Button>
@@ -728,8 +731,12 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-primary text-primary-foreground font-black py-8 rounded-3xl hover:bg-primary/95 transition-all flex items-center justify-center gap-3 h-20 text-xl shadow-xl shadow-primary/20 active:scale-95 border-none animate-shimmer"
+              className="w-full bg-primary text-primary-foreground font-black py-8 rounded-3xl hover:bg-primary/95 transition-all flex items-center justify-center gap-3 h-20 text-xl shadow-xl shadow-primary/20 active:scale-95 border-none relative overflow-hidden"
             >
+              <span
+                aria-hidden="true"
+                className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none shimmer-child"
+              />
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-3 h-6 w-6 animate-spin" />

@@ -32,6 +32,15 @@ export function calcularViabilidadLegal(
     throw new Error('Falla Crítica: Formato de fecha inválido inyectado al motor.');
   }
 
+  // Muro de contención: Solo aceptamos fechas entre el año 2000 (Código Nacional de Tránsito)
+  // y la fecha actual. Esto bloquea trolleos con años tipo 1500 o 2099.
+  const anioInfraccion = fechaInfraccion.getUTCFullYear();
+  if (anioInfraccion < 2000 || anioInfraccion > hoyUTC.getUTCFullYear()) {
+    throw new Error(
+      'Fecha fuera de rango legal: solo se aceptan infracciones entre el año 2000 y hoy.'
+    );
+  }
+
   // 2. Cálculo de la fecha límite teórica (El umbral de la ley)
   // Ley 1843 y CNT: 3 años normales. Si hay coactivo, son 3 años adicionales desde la resolución.
   // Para el motor, si hay coactivo, el "horizonte" de prescripción se aleja a 6 años totales como peor escenario.
