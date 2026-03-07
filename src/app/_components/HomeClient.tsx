@@ -53,12 +53,14 @@ import { ModeToggle } from '@/components/mode-toggle';
 import { initiateAnonymousSignIn, useAuth } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
 import type { ShowcaseConfig, FooterConfig } from '@/lib/site-config';
+import type { BlogPostMeta } from '@/lib/mdx';
 
 // ─── Tipos de Props ────────────────────────────────────────────────────────────
 
 interface HomeClientProps {
   showcaseData: ShowcaseConfig;
   footerData: FooterConfig;
+  blogPosts: BlogPostMeta[];
   cityContext?: string;
 }
 
@@ -241,7 +243,7 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
           </div>
           <div className="flex items-center gap-3">
             <Link
-              href="/blog"
+              href="#guia-legal"
               className="hidden md:flex items-center gap-2 px-4 py-2 text-sm font-bold text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-xl transition-all"
             >
               <BookOpen className="w-4 h-4" />
@@ -346,8 +348,8 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
       {/* Sección Historias de Éxito */}
       <SuccessStories />
 
-      {/* Pilares de Autoridad Legal */}
-      <section className="py-32 px-4 relative">
+      {/* Pilares de Autoridad Legal / Servicios */}
+      <section id="servicios" className="py-32 px-4 relative">
         <div className="max-w-6xl mx-auto">
           <div className="text-center space-y-6 mb-20">
             <h2 className="text-2xl md:text-5xl font-black text-foreground tracking-tight reveal">
@@ -409,8 +411,8 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
         </div>
       </section>
 
-      {/* Proceso */}
-      <section className="py-32 px-4">
+      {/* Proceso / Metodología */}
+      <section id="metodologia" className="py-32 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="glass p-6 sm:p-12 md:p-20 rounded-[2rem] md:rounded-[3rem] relative overflow-hidden border-white/10 shadow-3xl bg-white/5 dark:bg-white/[0.02]">
             <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
@@ -647,8 +649,48 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
         </div>
       </section>
 
+      {/* Guía Legal (Blog) [ESTRENO v1.8.0] */}
+      <section id="guia-legal" className="py-32 px-4 bg-muted/5 relative overflow-hidden">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center space-y-6 mb-20">
+            <h2 className="text-2xl md:text-5xl font-black text-foreground tracking-tight reveal">
+              Guía Legal <span className="text-primary">Desmulta</span>
+            </h2>
+            <div className="w-24 h-2 bg-primary mx-auto rounded-full shadow-lg shadow-primary/20" />
+            <p className="text-xl text-muted-foreground font-medium max-w-2xl mx-auto reveal reveal-delay-1">
+              Información técnica y jurídica para que conozca sus derechos ante las autoridades de tránsito.
+            </p>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-3">
+            {blogPosts.slice(0, 3).map((post, i) => (
+              <TarjetaPremium key={post.slug} className={`p-8 hover:border-primary/50 transition-all reveal reveal-delay-${i+1}`}>
+                <div className="space-y-4">
+                  <span className="text-[10px] font-black text-primary/60 uppercase tracking-widest">
+                    {post.date}
+                  </span>
+                  <h3 className="text-xl font-black text-foreground line-clamp-2 leading-tight">
+                    {post.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
+                    {post.excerpt}
+                  </p>
+                  <Link
+                    href={`/blog/${post.slug}`}
+                    className="inline-flex items-center text-xs font-black text-primary pt-4 hover:translate-x-1 transition-transform"
+                  >
+                    LEER ARTÍCULO COMPLETO
+                    <ArrowUpRight size={14} className="ml-1" />
+                  </Link>
+                </div>
+              </TarjetaPremium>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* FAQ */}
-      <section id="faq-section" className="py-24 px-4 bg-muted/10">
+      <section id="faq" className="py-24 px-4 bg-muted/10">
         <div className="max-w-4xl mx-auto space-y-12">
           <div className="text-center space-y-4 mb-20 reveal">
             <h2 className="text-3xl md:text-5xl font-black text-foreground tracking-tight">
@@ -715,6 +757,53 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
               ))}
             </Accordion>
           )}
+        </div>
+      </section>
+
+      {/* Términos y Privacidad [Habeas Data Compliance] */}
+      <section id="legal" className="py-32 px-4 bg-background">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center space-y-6 mb-20">
+            <h2 className="text-2xl md:text-5xl font-black text-foreground tracking-tight reveal">
+              Legal & <span className="text-primary">Privacidad</span>
+            </h2>
+            <div className="w-24 h-2 bg-primary mx-auto rounded-full shadow-lg shadow-primary/20" />
+          </div>
+
+          <div className="grid gap-8">
+            <TarjetaPremium className="p-10 reveal">
+              <div className="flex items-center gap-4 mb-8">
+                <FileText className="text-primary" size={24} />
+                <h3 className="text-xl font-black text-foreground uppercase tracking-tight">Condiciones del Servicio</h3>
+              </div>
+              <div className="space-y-6 text-sm text-muted-foreground leading-relaxed">
+                <p>
+                  <strong>Naturaleza:</strong> {showcaseData.brandName || 'Desmulta'} actúa como gestor administrativo ante organismos de tránsito. No somos una entidad estatal.
+                </p>
+                <p>
+                  <strong>Gratuidad:</strong> El estudio inicial mediante SIMIT es informativo y gratuito. No obliga a contratación posterior.
+                </p>
+                <p>
+                  <strong>Honorarios:</strong> Se dividen en Apertura (costos operativos), Gestión (trámite formal) y Éxito (sólo tras saneamiento confirmado).
+                </p>
+              </div>
+            </TarjetaPremium>
+
+            <TarjetaPremium className="p-10 reveal reveal-delay-1">
+              <div className="flex items-center gap-4 mb-8">
+                <Lock className="text-primary" size={24} />
+                <h3 className="text-xl font-black text-foreground uppercase tracking-tight">Protección de Datos</h3>
+              </div>
+              <div className="space-y-6 text-sm text-muted-foreground leading-relaxed">
+                <p>
+                  <strong>Autorización:</strong> Al consultar, autoriza la verificación de su estado en SIMIT y bases públicas para fines de asesoría legal.
+                </p>
+                <p>
+                  <strong>Seguridad:</strong> Sus datos se procesan con encriptación industrial y no se comparten con terceros. Cumplimos con la Ley 1581 de 2012 (Habeas Data).
+                </p>
+              </div>
+            </TarjetaPremium>
+          </div>
         </div>
       </section>
 
@@ -833,12 +922,12 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
                 </h4>
                 <nav className="flex flex-col gap-6">
                   {[
-                    { label: 'Inicio', href: '#', action: () => window.scrollTo(0, 0) },
-                    { label: 'Nuestros Servicios', href: '/servicios' },
-                    { label: 'Metodología', href: '/metodologia' },
-                    { label: 'Guía Legal', href: '/blog' },
-                    { label: 'Preguntas Frecuentes', href: '/faq' },
-                    { label: 'Términos de Uso', href: '/terminos' },
+                    { label: 'Inicio', href: '#', action: () => window.scrollTo({ top: 0, behavior: 'smooth' }) },
+                    { label: 'Servicios', href: '#servicios' },
+                    { label: 'Metodología', href: '#metodologia' },
+                    { label: 'Guía Legal', href: '#guia-legal' },
+                    { label: 'Preguntas Frecuentes', href: '#faq' },
+                    { label: 'Términos de Uso', href: '#legal' },
                   ].map((link, i) => (
                     <Link
                       key={i}

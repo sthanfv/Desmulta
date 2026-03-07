@@ -13,10 +13,21 @@
 
 import HomeClient from '@/app/_components/HomeClient';
 import { getShowcaseConfig, getFooterConfig } from '@/lib/site-config';
+import { getBlogPosts } from '@/lib/mdx';
 
 export default async function VialClearPage() {
   // Fetching en paralelo en el servidor — no bloquean entre sí
-  const [showcaseData, footerData] = await Promise.all([getShowcaseConfig(), getFooterConfig()]);
+  const [showcaseData, footerData, blogPosts] = await Promise.all([
+    getShowcaseConfig(),
+    getFooterConfig(),
+    getBlogPosts(),
+  ]);
 
-  return <HomeClient showcaseData={showcaseData} footerData={footerData} />;
+  return (
+    <HomeClient 
+      showcaseData={showcaseData} 
+      footerData={footerData} 
+      blogPosts={blogPosts} 
+    />
+  );
 }
