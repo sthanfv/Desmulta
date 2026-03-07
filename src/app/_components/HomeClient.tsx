@@ -117,7 +117,12 @@ const AnimatedCounter = ({
 
 // ─── Componente Principal ─────────────────────────────────────────────────────
 
-export default function HomeClient({ showcaseData, footerData, cityContext }: HomeClientProps) {
+export default function HomeClient({
+  showcaseData,
+  footerData,
+  blogPosts,
+  cityContext,
+}: HomeClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formMode, setFormMode] = useState<'full' | 'simit'>('full');
   const [showScrollTop, setShowScrollTop] = useState(false);
