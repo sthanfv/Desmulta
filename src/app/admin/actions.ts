@@ -83,8 +83,9 @@ export async function getConsultations(pageSize: number = 20, lastDocId?: string
     const db = getFirestore();
 
     // 🛡️ LEY DEL LÍMITE ESTRICTO: Solo descargamos leads activos, bloqueando lecturas de DESCARTADOS
+    // BUGFIX: Incluimos 'pendiente' y 'nuevo' porque el API guarda en diferentes variantes
     let query = db.collection('consultations')
-      .where('status', 'in', ['nuevo', 'contactado', 'estudio', 'en_proceso', 'radicado'])
+      .where('status', 'in', ['pendiente', 'nuevo', 'contactado', 'estudio', 'en_proceso', 'radicado'])
       .orderBy('createdAt', 'desc')
       .limit(pageSize);
 

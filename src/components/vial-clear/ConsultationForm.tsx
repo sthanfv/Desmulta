@@ -201,17 +201,19 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
         ...(isSimitMode && { fuente: 'simit_capture' }),
       };
 
-      // --- VALIDACIÓN EN EL EDGE (Velocidad Extrema v5.4.1) ---
-      // Realizamos una validación ultra-rápida antes del procesamiento pesado
-      const edgeValidation = await fetch('/api/validar-consulta', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ placa: data.placa, cedula: data.cedula }),
-      });
+      // --- VALIDACIÓN EN EL EDGE (solo flujo completo, no para capturas SIMIT) ---
+      // El modo SIMIT usa cedula='SIMIT-CAPTURA' (no numérica), que fallaría el validador.
+      if (!isSimitMode) {
+        const edgeValidation = await fetch('/api/validar-consulta', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ placa: data.placa, cedula: data.cedula }),
+        });
 
-      if (!edgeValidation.ok) {
-        const edgeError = await edgeValidation.json();
-        throw new Error(edgeError.error || 'Fallo en la validación preliminar.');
+        if (!edgeValidation.ok) {
+          const edgeError = await edgeValidation.json();
+          throw new Error(edgeError.error || 'Fallo en la validación preliminar.');
+        }
       }
       // -------------------------------------------------------
 
