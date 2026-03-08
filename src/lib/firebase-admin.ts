@@ -1,7 +1,7 @@
 /**
  * Firebase Admin SDK — Singleton de inicialización segura.
  * 
- * Versión: 2.1.7 (Limpieza Atómica de Llave RSA)
+ * Versión: 2.1.8 (Corrección de Linter 's' y Limpieza Atómica)
  */
 
 import { getApps, initializeApp, cert, type App } from 'firebase-admin/app';
@@ -19,8 +19,8 @@ function normalizarLlavePrivada(valorCrudo: string | undefined): string {
   const MARCADOR_INICIO = '-----BEGIN PRIVATE KEY-----';
   const MARCADOR_FIN = '-----END PRIVATE KEY-----';
 
-  // 1. Convertir escapes \n en saltos reales por si vienen de .env
-  let s = valorCrudo.replace(/\\n/g, '\n');
+  // 1. Convertir escapes \n en saltos reales (Usamos const para linter v2.1.8)
+  const s = valorCrudo.replace(/\\n/g, '\n');
 
   // 2. Localizar marcadores
   const inicio = s.indexOf(MARCADOR_INICIO);
@@ -33,7 +33,6 @@ function normalizarLlavePrivada(valorCrudo: string | undefined): string {
       .replace(/[\s\r\n\t]/g, ''); // ELIMINAR CUALQUIER ESPACIO O SALTO INVISIBLE
 
     // 4. RECONSTRUIR EL BLOQUE PEM PERFECTO
-    // Sin saltos de línea internos para evitar errores de red en el Handshake
     return `${MARCADOR_INICIO}\n${base64Interno}\n${MARCADOR_FIN}\n`;
   }
 
@@ -69,7 +68,7 @@ export function getAdminApp(): App {
     });
   } catch (error) {
     const detalleError = error instanceof Error ? error.message : 'Error desconocido';
-    logger.error('[firebase-admin] Fallo crítico en inicialización v2.1.7:', { detalle: detalleError });
+    logger.error('[firebase-admin] Fallo crítico en inicialización v2.1.8:', { detalle: detalleError });
     throw error;
   }
 }
