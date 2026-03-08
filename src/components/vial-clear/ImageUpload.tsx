@@ -17,6 +17,7 @@ interface ImageUploadProps {
 export function ImageUpload({ onUploadSuccess, onClear, className, required }: ImageUploadProps) {
   const [preview, setPreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isUploaded, setIsUploaded] = useState(false); // MANDATO-FILTRO: Estado de confirmación real
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -64,8 +65,12 @@ export function ImageUpload({ onUploadSuccess, onClear, className, required }: I
 
       const blob = (await response.json()) as { url: string };
       onUploadSuccess(blob.url);
-    } catch {
-      setError('Fallo al subir la imagen. Intente de nuevo.');
+      setIsUploaded(true);
+    } catch (err) {
+      console.error('[ImageUpload] Error:', err);
+      setPreview(null); // Limpiamos para evitar confusión visual
+      setError('Fallo al subir la imagen (Error 429/Red). Intente de nuevo en unos segundos.');
+      setIsUploaded(false);
     } finally {
       setIsUploading(false);
     }
@@ -74,6 +79,7 @@ export function ImageUpload({ onUploadSuccess, onClear, className, required }: I
   const handleClear = () => {
     setPreview(null);
     setError(null);
+    setIsUploaded(false);
     onClear();
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
@@ -167,7 +173,7 @@ export function ImageUpload({ onUploadSuccess, onClear, className, required }: I
       </div>
 
       <AnimatePresence>
-        {preview && !isUploading && (
+        {preview && isUploaded && !isUploading && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}

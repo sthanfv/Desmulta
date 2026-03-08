@@ -698,15 +698,29 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
               )}
             </div>
 
-            <div className="pt-2 animate-in fade-in slide-in-from-bottom-2 duration-700 delay-300">
-              <ImageUpload
-                onUploadSuccess={(url) =>
-                  form.setValue('evidenceUrl', url, { shouldValidate: isSimitMode })
-                }
-                onClear={() => form.setValue('evidenceUrl', '', { shouldValidate: isSimitMode })}
-                required={isSimitMode}
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name="evidenceUrl"
+              render={({ field }) => (
+                <FormItem className="pt-2 animate-in fade-in slide-in-from-bottom-2 duration-700 delay-300">
+                  <FormControl>
+                    <ImageUpload
+                      onUploadSuccess={(url) => {
+                        field.onChange(url);
+                        form.trigger('evidenceUrl');
+                      }}
+                      onClear={() => {
+                        field.onChange('');
+                        form.trigger('evidenceUrl');
+                      }}
+                      required={isSimitMode}
+                      currentUrl={field.value}
+                    />
+                  </FormControl>
+                  <FormMessage className="text-center font-bold text-xs mt-2" />
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}

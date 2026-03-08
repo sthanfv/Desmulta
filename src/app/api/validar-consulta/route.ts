@@ -65,8 +65,15 @@ export async function POST(request: Request) {
     const turnstileData = await turnstileRes.json();
 
     if (!turnstileData.success) {
-      logger.security('[EDGE/TURNSTILE] Intento de bot bloqueado.', { origin: request.headers.get('x-forwarded-for') });
-      return NextResponse.json({ error: 'Verificación de seguridad anti-bots fallida.' }, { status: 403 });
+      logger.security('[EDGE/TURNSTILE] Intento de bot bloqueado o fallo de configuración.', { 
+        origin: request.headers.get('x-forwarded-for'),
+        errors: turnstileData['error-codes'] 
+      });
+
+      return NextResponse.json(
+        { error: 'Verificación de seguridad anti-bots fallida.', details: turnstileData['error-codes'] }, 
+        { status: 403 }
+      );
     }
     // ✅ FIN VERIFICACIÓN CLOUDFLARE
 

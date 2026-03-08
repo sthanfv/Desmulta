@@ -44,9 +44,9 @@ export function middleware(_request: NextRequest) {
   headers.set('X-Content-Type-Options', 'nosniff');
 
   // Control de Referer para privacidad
-  headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  headers.set('Referrer-Policy', 'no-referrer-when-downgrade');
 
-  // Permissions Policy: Restringir acceso a hardware sensible si no se requiere
+  // Permissions Policy: Limpieza absoluta (MANDATO-FILTRO)
   headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
 
   // HSTS (HTTP Strict Transport Security) - Solo en producción
