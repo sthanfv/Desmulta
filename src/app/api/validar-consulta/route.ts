@@ -17,6 +17,7 @@ export const runtime = 'edge';
 const EsquemaValidacion = ConsultationSchema.pick({
   cedula: true,
   placa: true,
+  turnstileToken: true,
 });
 
 /**
@@ -41,10 +42,33 @@ export async function POST(request: Request) {
       );
     }
 
-    const { cedula, placa } = resultado.data;
+    const { cedula, placa, turnstileToken } = resultado.data;
     const cedulaOfuscada = ofuscarPII(cedula);
 
     logger.info(`[EDGE] Validando viabilidad para cédula: ${cedulaOfuscada}`);
+
+    // 🛑 1. VERIFICACIÓN CLOUDFLARE TURNSTILE (Guardián Anti-Bot)
+    if (!turnstileToken) {
+      return NextResponse.json({ error: 'Falta validación de seguridad.' }, { status: 403 });
+    }
+
+    const formData = new URLSearchParams();
+    const cfSecret = process.env.TURNSTILE_SECRET_KEY || '';
+    formData.append('secret', cfSecret);
+    formData.append('response', turnstileToken);
+
+    const turnstileRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const turnstileData = await turnstileRes.json();
+
+    if (!turnstileData.success) {
+      logger.security('[EDGE/TURNSTILE] Intento de bot bloqueado.', { origin: request.headers.get('x-forwarded-for') });
+      return NextResponse.json({ error: 'Verificación de seguridad anti-bots fallida.' }, { status: 403 });
+    }
+    // ✅ FIN VERIFICACIÓN CLOUDFLARE
 
     // ⚡ 2. Hash O(1) vía Web Crypto API (Edge Nativo)
     const encoder = new TextEncoder();

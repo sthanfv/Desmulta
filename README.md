@@ -1,4 +1,4 @@
-# Desmulta — Plataforma de Saneamiento Vial Inteligente v1.9.1 🛡️🚀
+# Desmulta — Plataforma de Saneamiento Vial Inteligente v1.9.2 🛡️🚀
 
 TODAS LAS DECISIONES, ARCHIVOS Y CÓDIGO GENERADO DEBEN PASAR EL FILTRO DE SEGURIDAD Y CALIDAD 'MANDATO-FILTRO'.
 
@@ -31,6 +31,17 @@ Auditoría completa de seguridad ejecutada bajo **MANDATO-FILTRO**. Se corrigier
 - **H4**: Función `extraerIpConfiable()` que prioriza `x-vercel-forwarded-for` (inyectado por la infraestructura de Vercel, no falsificable por el cliente) sobre `x-forwarded-for`.
 - **H5**: Función `ofuscarPII()` que muestra solo los últimos 4 dígitos en logs. Ej: `1090123456` → `****3456`.
 - **H6**: Función `sanitizarNombreArchivo()` con regex `[^a-zA-Z0-9._-]` → reemplaza inválidos por `_` y limita a 100 caracteres.
+
+---
+
+## ⚡ Edge Runtime y Arquitectura Serverless O(1) — v1.9.2 (2026-03-07)
+
+Optimización profunda del motor de validación para latencia cercana a cero eliminando las dependencias nativas de Node.js en favor del **Vercel Edge Network**:
+
+- **Índice Ciego (Blind Index)**: Se implementó una colección `consultas_index` en Firestore operada exclusivamente bajo métodos Hash (SHA-256) creados mediante `crypto.subtle` (Edge) y `crypto` (Node).
+- **Cero Exposición PII**: En la validación primaria, la cédula nunca se envía en texto plano como parámetro de consulta a la base de datos, garantizando protección técnica extrema de PII frente a atacantes (MANDATO-FILTRO).
+- **Fetch Directo REST API**: Integración transparente de `https://firestore.googleapis.com` mediante Web API Key y Firestore Rules estrictas (solo `get`), superando la limitación de permisos en la capa Edge sin exponer la BBDD a enumeración (`list`).
+- Limpieza de props residuales y mitigación final del linter (Object Injection en Landing).
 
 ---
 

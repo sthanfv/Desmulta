@@ -19,6 +19,7 @@ import { useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 import { ConsultationSchema, SimitCaptureSchema } from '@/lib/definitions';
+import { Turnstile } from '@marsidev/react-turnstile';
 
 import Link from 'next/link';
 
@@ -67,6 +68,7 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
   const [isSuccess, setIsSuccess] = useState(false);
   const [showCedula, setShowCedula] = useState(false);
   const [isHuman, setIsHuman] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleInteraction = () => {
@@ -179,8 +181,8 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
   const onSubmit: SubmitHandler<ConsultationFormData> = async (data) => {
     haptics.vibrate('medium'); // Immediate feedback on submit
     try {
-      if (!isHuman) {
-        throw new Error('Error de validación anti-bot. Por favor, interactúe con el formulario.');
+      if (!isHuman || !turnstileToken) {
+        throw new Error('El escudo de seguridad aún está validando o detectó anomalías. Espera un segundo.');
       }
 
       const auth = getAuth();
@@ -197,6 +199,7 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
 
       const payload = {
         ...data,
+        turnstileToken,
         authorUid: currentUser.uid,
         ...(isSimitMode && { fuente: 'simit_capture' }),
       };
@@ -207,7 +210,7 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
         const edgeValidation = await fetch('/api/validar-consulta', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ placa: data.placa, cedula: data.cedula }),
+          body: JSON.stringify({ placa: data.placa, cedula: data.cedula, turnstileToken }),
         });
 
         if (!edgeValidation.ok) {
@@ -729,6 +732,16 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
                 </FormItem>
               )}
             />
+
+            <div className="my-6 flex justify-center">
+              <Turnstile 
+                siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ''} 
+                onSuccess={(token) => setTurnstileToken(token)}
+                options={{
+                  theme: 'auto',
+                }}
+              />
+            </div>
 
             <Button
               type="submit"

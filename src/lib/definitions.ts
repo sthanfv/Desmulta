@@ -39,6 +39,7 @@ export const ConsultationSchema = z.object({
   tipoInfraccion: z.string().min(1, { message: 'Seleccione el tipo de infracción.' }),
   estadoCoactivo: z.string().min(1, { message: 'Seleccione si el caso está en cobro coactivo.' }),
   evidenceUrl: z.string().url().optional().or(z.literal('')),
+  turnstileToken: z.string().min(1, "Falta la validación de seguridad (Captcha)."),
 });
 
 // Schema simplificado para flujo SIMIT Tutorial (captura de pantalla ya contiene cédula)
@@ -57,6 +58,7 @@ export const SimitCaptureSchema = z.object({
   }),
   _tramp_field: z.string().max(0, { message: 'Bot detected' }).optional(),
   authorUid: z.string().optional(),
+  turnstileToken: z.string().min(1, "Falta la validación de seguridad (Captcha)."),
 });
 
 // This type is no longer used for the client-side form, but can be kept for reference
