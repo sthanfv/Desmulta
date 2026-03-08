@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { cspHeader } from '@/lib/security-headers';
 
 /**
  * Middleware de Seguridad Global - MANDATO-FILTRO v5.17.0
@@ -16,25 +17,9 @@ export function middleware(_request: NextRequest) {
   // Inyección de Headers de Seguridad Estrictos
   const headers = response.headers;
 
-  // Content Security Policy (CSP) - MANDATO-FILTRO Estricto
-  // Nota: En un entorno real, 'script-src' debería incluir hashes o nonces para Google Analytics/Gemini si se usan inline.
-  const cspHeader = `
-    default-src 'self';
-    script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.googletagmanager.com https://*.google-analytics.com https://va.vercel-scripts.com https://challenges.cloudflare.com https://connect.facebook.net;
-    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-    img-src 'self' blob: data: https://*.googleusercontent.com https://*.googleapis.com https://i.ytimg.com https://*.vercel.app;
-    font-src 'self' https://fonts.gstatic.com;
-    object-src 'none';
-    base-uri 'self';
-    form-action 'self';
-    frame-src 'self' https://challenges.cloudflare.com;
-    frame-ancestors 'none';
-    connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.google-analytics.com https://*.googletagmanager.com https://challenges.cloudflare.com https://connect.facebook.net https://grainy-gradients.vercel.app https://va.vercel-scripts.com;
-    upgrade-insecure-requests;
-  `
-    .replace(/\s{2,}/g, ' ')
-    .trim();
-
+  // Content Security Policy (CSP) — MANDATO-FILTRO: Fuente única de verdad en security-headers.ts
+  // Importado desde @/lib/security-headers para eliminar duplicación y divergencia entre
+  // next.config.ts (build-time) y middleware (runtime). Ambos usan exactamente la misma definición.
   headers.set('Content-Security-Policy', cspHeader);
 
   // Prevenir que el sitio sea embebido en frames (Anti-Clickjacking)
@@ -49,9 +34,14 @@ export function middleware(_request: NextRequest) {
   // Permissions Policy: Limpieza absoluta (MANDATO-FILTRO)
   headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
 
+  // COOP + CORP — Cross-Origin Isolation
+  headers.set('Cross-Origin-Opener-Policy', 'same-origin');
+  headers.set('Cross-Origin-Resource-Policy', 'same-origin');
+
   // HSTS (HTTP Strict Transport Security) - Solo en producción
+  // next.config.ts lo aplica en build-time; el middleware lo refuerza en runtime.
   if (process.env.NODE_ENV === 'production') {
-    headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+    headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
   }
 
   return response;

@@ -41,11 +41,27 @@ service cloud.firestore {
       allow read: if isAdmin();
     }
 
-    // Índice ciego (Validación O(1) Edge Serverless) - Opción 1
+    // Índice ciego (Validación O(1) Edge Serverless) - SHA-256 hash de cédula
     match /consultas_index/{hashId} {
       // allow list: if false; // Por defecto no se puede listar
       allow get: if true; // API público solo puede consultar un hash específico
-      allow write: if false; // Solo administradores o Cloud Functions (Admin SDK)
+      allow write: if false; // Solo Admin SDK
+    }
+
+    // MANDATO-FILTRO: Declaración explícita de colecciones de infraestructura.
+    // Estas colecciones son escritas exclusivamente por el Admin SDK (server-side API routes).
+    // La restricción "deny-all" debe declararse explícitamente, no implícitamente.
+
+    // Rate limiting cooldowns (escritura exclusiva via Admin SDK en create-consultation)
+    match /consultationCooldowns/{uid} {
+      allow read: if false;
+      allow write: if false; // Solo Admin SDK vía API route
+    }
+
+    // Contadores de metadata (ej: totalConsultas — transacción atómica)
+    match /metadata/{docId} {
+      allow read: if isAdmin();
+      allow write: if false; // Solo Admin SDK vía API route
     }
   }
 }

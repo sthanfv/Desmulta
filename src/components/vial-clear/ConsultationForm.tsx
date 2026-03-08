@@ -751,15 +751,23 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
               )}
             />
 
-            <div className="my-6 flex justify-center min-h-[65px]">
-              <Turnstile 
-                siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!} 
-                onSuccess={(token) => setTurnstileToken(token)}
-                options={{
-                  theme: 'dark',
-                  size: 'normal'
-                }}
-              />
+            <div className="my-6 flex flex-col items-center justify-center min-h-[65px]">
+              {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ? (
+                <Turnstile 
+                  siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} 
+                  onSuccess={(token) => setTurnstileToken(token)}
+                  options={{
+                    theme: 'dark',
+                    size: 'normal'
+                  }}
+                />
+              ) : (
+                <div className="text-[10px] font-bold text-destructive animate-pulse uppercase tracking-widest text-center">
+                  ⚠️ Error de Configuración:<br/>
+                  Falta NEXT_PUBLIC_TURNSTILE_SITE_KEY.<br/>
+                  Reinicia el servidor (npm run dev).
+                </div>
+              )}
             </div>
 
             <Button

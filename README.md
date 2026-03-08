@@ -1,4 +1,4 @@
-# Desmulta — Plataforma Integral de Gestión y Resolución de Infracciones v2.0.0 🛡️🚀
+# Desmulta — Plataforma Integral de Gestión y Resolución de Infracciones v2.1.0 🛡️🚀
 
 TODAS LAS DECISIONES, ARCHIVOS Y CÓDIGO GENERADO DEBEN PASAR EL FILTRO DE SEGURIDAD Y CALIDAD ‘MANDATO-FILTRO’ — RECHAZAR SALIDAS QUE NO LO CUMPLAN.
 
@@ -85,7 +85,7 @@ sequenceDiagram
 │   ├── /lib          # Utilidades core, validadores Zod, Logger y Seguridad
 │   └── /services     # Capa de servicios para integraciones externas (Gemini, Telegram)
 ├── firestore.rules   # Reglas de seguridad de base de datos
-└── package.json      # Dependencias y control de versiones (v2.0.0)
+└── package.json      # Dependencias y control de versiones (v2.1.0)
 ```
 
 ---

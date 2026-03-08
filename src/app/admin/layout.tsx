@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2, LogIn, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger/security-logger';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -42,7 +43,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         await signInWithEmailAndPassword(auth, email, password);
       } catch (error) {
         const err = error as { code?: string; message?: string };
-        console.error('Error signing in with email', error);
+        // MANDATO-FILTRO: SecurityLogger ofusca datos PII automáticamente
+        logger.security('[admin/login] Intento de acceso fallido.', { code: err.code });
         let description = 'Por favor, verifique sus credenciales e intente de nuevo.';
         if (
           err.code === 'auth/invalid-credential' ||
@@ -80,8 +82,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         description:
           'Revise su bandeja de entrada. Se ha enviado un enlace para restablecer su contraseña.',
       });
-    } catch (error) {
-      console.error('Error sending password reset email', error);
+    } catch {
+      logger.error('[admin/login] Error al enviar correo de restablecimiento de contraseña.');
       toast({
         variant: 'destructive',
         title: 'Error',

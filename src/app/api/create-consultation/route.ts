@@ -7,6 +7,54 @@ import { z } from 'zod';
 import crypto from 'crypto';
 // import { analyzeViabilityFlow } from '@/lib/genkit';
 
+/**
+ * MANDATO-FILTRO: Verificación server-side del token Cloudflare Turnstile.
+ * Un token vacío, inválido o de un dominio diferente será rechazado aquí.
+ * Docs: https://developers.cloudflare.com/turnstile/get-started/server-side-validation/
+ */
+async function verifyTurnstileToken(token: string | undefined): Promise<boolean> {
+  // Sin token → rechazar siempre (no fail-open en producción)
+  if (!token) return false;
+
+  const secret = process.env.TURNSTILE_SECRET_KEY;
+  if (!secret) {
+    // En desarrollo sin la key configurada, emitir advertencia y pasar
+    if (process.env.NODE_ENV !== 'production') {
+      logger.warn('[turnstile] TURNSTILE_SECRET_KEY no definida. Saltando verificación en desarrollo.');
+      return true;
+    }
+    // En producción sin la key: bloquear y alertar
+    logger.error('[turnstile] TURNSTILE_SECRET_KEY ausente en producción. Bloqueando petición.');
+    return false;
+  }
+
+  try {
+    const formData = new URLSearchParams();
+    formData.append('secret', secret);
+    formData.append('response', token);
+
+    const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: formData.toString(),
+    });
+
+    const data = (await res.json()) as { success: boolean; 'error-codes'?: string[] };
+
+    if (!data.success) {
+      logger.security('[turnstile] Token inválido rechazado por Cloudflare.', {
+        errorCodes: data['error-codes'],
+      });
+    }
+
+    return data.success;
+  } catch (err) {
+    logger.error('[turnstile] Error al contactar API de Cloudflare:', { error: String(err) });
+    // Fail-closed: ante un error de red, bloqueamos la petición
+    return false;
+  }
+}
+
 type ConsultationData = z.infer<typeof ConsultationSchema>;
 type SimitCaptureData = z.infer<typeof SimitCaptureSchema>;
 
@@ -60,6 +108,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Falta el UID del autor.' }, { status: 400 });
     }
 
+    // 1.5. MANDATO-FILTRO: Verificación Turnstile (Anti-Bot Server-Side)
+    const turnstileValid = await verifyTurnstileToken(validatedData.turnstileToken);
+    if (!turnstileValid) {
+      logger.security('[create-consultation] Token Turnstile inválido o ausente.', { authorUid });
+      return NextResponse.json(
+        { error: 'Verificación de seguridad fallida. Por favor, recargue la página e intente de nuevo.' },
+        { status: 403 }
+      );
+    }
+
     // 2. Rate Limiting Check
     const cooldownRef = db.collection('consultationCooldowns').doc(authorUid);
     const cooldownSnap = await cooldownRef.get();
@@ -67,10 +125,16 @@ export async function POST(request: NextRequest) {
 
     if (cooldownSnap.exists) {
       const lastAttempt = (cooldownSnap.data()?.lastAttemptAt as Timestamp).toMillis();
-      if (Date.now() - lastAttempt < fiveMinutes) {
+      const elapsedMs = Date.now() - lastAttempt;
+      if (elapsedMs < fiveMinutes) {
+        // MANDATO-FILTRO: RFC 6585 — Retry-After header obligatorio en respuestas 429
+        const remainingSeconds = Math.ceil((fiveMinutes - elapsedMs) / 1000);
         return NextResponse.json(
           { error: 'Límite de envíos alcanzado. Por favor, espere 5 minutos.' },
-          { status: 429 }
+          {
+            status: 429,
+            headers: { 'Retry-After': String(remainingSeconds) },
+          }
         );
       }
     }
