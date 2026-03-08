@@ -34,9 +34,9 @@ export function middleware(_request: NextRequest) {
   // Permissions Policy: Limpieza absoluta (MANDATO-FILTRO)
   headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
 
-  // COOP + CORP — Cross-Origin Isolation
+  // COOP + CORP — Cross-Origin Isolation (relajado a cross-origin para CDNs externos y Turnstile)
   headers.set('Cross-Origin-Opener-Policy', 'same-origin');
-  headers.set('Cross-Origin-Resource-Policy', 'same-origin');
+  headers.set('Cross-Origin-Resource-Policy', 'cross-origin');
 
   // HSTS (HTTP Strict Transport Security) - Solo en producción
   // next.config.ts lo aplica en build-time; el middleware lo refuerza en runtime.
