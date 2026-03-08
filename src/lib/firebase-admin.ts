@@ -1,52 +1,50 @@
 /**
  * Firebase Admin SDK — Singleton de inicialización segura.
  *
- * Este módulo garantiza que initializeApp() se llame UNA SOLA VEZ
- * en todo el servidor, independientemente de cuántas rutas API lo importen.
- *
- * MANDATO-FILTRO: sin credenciales hardcodeadas, sin console.log en producción,
- * validación estricta de env vars, parseo robusto de PEM en Windows.
+ * MANDATO-FILTRO: Sin credenciales hardcodeadas, validación estricta, 
+ * parseo robusto de PEM para evitar errores de ASN.1 en producción.
  */
 
 import { getApps, initializeApp, cert, type App } from 'firebase-admin/app';
+import { logger } from './logger/security-logger';
 
 /**
- * Normaliza la FIREBASE_PRIVATE_KEY proveniente de .env.
- *
- * Problemas documentados en Windows / dotenv:
- * 1. dotenv NO elimina las comillas envolventes cuando el valor contiene `\n` literales.
- *    El valor llega como: `"-----BEGIN PRIVATE KEY-----\nMII..."` (con comillas).
- * 2. Los saltos de línea llegan como la secuencia `\n` (barra + n), no como newlines reales.
- * 3. Posibles CRLF en el archivo .env de Windows.
- * 4. Posibles caracteres corruptos o espacios al final del valor.
+ * Normaliza la FIREBASE_PRIVATE_KEY. 
+ * El error 'Unparsed DER bytes remain after ASN.1 parsing' ocurre cuando
+ * la llave tiene basura al final o saltos de línea mal formados.
  */
-function parsePrivateKey(raw: string | undefined): string {
-  if (!raw) {
-    throw new Error(
-      '[firebase-admin] FIREBASE_PRIVATE_KEY no está definida en las variables de entorno.'
-    );
+function parsePrivateKey(rawValue: string | undefined): string {
+  if (!rawValue) {
+    throw new Error('[firebase-admin] FIREBASE_PRIVATE_KEY no definida.');
   }
 
-  const normalized = raw
-    .trim() // eliminar espacios / newlines reales al inicio y fin
-    .replace(/^["']+|["']+$/g, '') // eliminar comillas envolventes (simples o dobles)
-    .replace(/\\n/g, '\n') // convertir `\n` literal → newline real
-    .replace(/\r\n/g, '\n') // normalizar CRLF → LF
-    .trim(); // segundo trim por si quedan residuos post-reemplazo
+  // 1. Limpiar comillas accidentales y espacios extremos
+  let key = rawValue.trim().replace(/^["']+|["']+$/g, '');
 
-  if (!normalized.startsWith('-----BEGIN PRIVATE KEY-----')) {
-    throw new Error(
-      '[firebase-admin] FIREBASE_PRIVATE_KEY no tiene el formato PEM esperado. ' +
-        `El valor actual comienza con: "${normalized.substring(0, 40)}"`
-    );
+  // 2. Convertir secuencias literales \n en saltos de línea reales
+  key = key.replace(/\\n/g, '\n');
+
+  // 3. Normalizar saltos de línea Windows CRLF a Unix LF
+  key = key.replace(/\r\n/g, '\n');
+
+  // 4. LIMPIEZA CRÍTICA: Eliminar espacios en blanco al final de cada línea
+  // Esto es lo que suele causar el error "Unparsed DER bytes"
+  const lines = key.split('\n')
+    .map(line => line.trim())
+    .filter(line => line.length > 0);
+
+  const cleanKey = lines.join('\n');
+
+  // 5. Validación de seguridad básica
+  if (!cleanKey.includes('BEGIN PRIVATE KEY') || !cleanKey.includes('END PRIVATE KEY')) {
+    logger.error('[firebase-admin] La llave privada parece estar mal formada (faltan marcadores BEGIN/END).');
   }
 
-  return normalized;
+  return cleanKey;
 }
 
 /**
- * Retorna la instancia de Firebase Admin App (inicializando si es necesario).
- * Usar esta función en lugar de llamar initializeApp() directamente en cada ruta.
+ * Retorna la instancia de Firebase Admin App.
  */
 export function getAdminApp(): App {
   const existingApps = getApps();
@@ -58,14 +56,22 @@ export function getAdminApp(): App {
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
 
   if (!projectId || !clientEmail) {
-    throw new Error(
-      '[firebase-admin] Faltan variables de entorno: FIREBASE_PROJECT_ID y/o FIREBASE_CLIENT_EMAIL.'
-    );
+    throw new Error('[firebase-admin] Credenciales de Admin incompletas.');
   }
 
-  const privateKey = parsePrivateKey(process.env.FIREBASE_PRIVATE_KEY);
-
-  return initializeApp({
-    credential: cert({ projectId, clientEmail, privateKey }),
-  });
+  try {
+    const privateKey = parsePrivateKey(process.env.FIREBASE_PRIVATE_KEY);
+    
+    return initializeApp({
+      credential: cert({ 
+        projectId, 
+        clientEmail, 
+        privateKey 
+      }),
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Error desconocido';
+    logger.error('[firebase-admin] Fallo crítico al inicializar Firebase Admin:', { error: msg });
+    throw err;
+  }
 }
