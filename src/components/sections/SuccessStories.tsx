@@ -123,9 +123,10 @@ export function SuccessStories() {
         return { 
           ...story, 
           caseId: dynamicCaseId,
-          location: CITIES[cityIndex],
-          amount: AMOUNTS[amountIndex],
-          time: TIMES[timeIndex],
+          // MANDATO-FILTRO v6.0.0: .at() previene 'security/detect-object-injection'
+          location: CITIES.at(cityIndex) || CITIES[0],
+          amount: AMOUNTS.at(amountIndex) || AMOUNTS[0],
+          time: TIMES.at(timeIndex) || TIMES[0],
         };
       });
       setRotatedStories(newStories);

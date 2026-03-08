@@ -469,7 +469,7 @@ export function AdminDashboard() {
                 PANEL CONTROL
               </h1>
               <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mt-1 opacity-70">
-                Desmulta Administrador v1.8.5
+                Desmulta Administrador v1.8.6
               </p>
             </div>
           </div>

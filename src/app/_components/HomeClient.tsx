@@ -25,7 +25,6 @@ import {
   BookOpen,
   Lock,
   FileText,
-  ArrowUpRight,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -54,14 +53,12 @@ import { ModeToggle } from '@/components/mode-toggle';
 import { initiateAnonymousSignIn, useAuth } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
 import type { ShowcaseConfig, FooterConfig } from '@/lib/site-config';
-import type { BlogPostMeta } from '@/lib/mdx';
 
 // ─── Tipos de Props ────────────────────────────────────────────────────────────
 
 interface HomeClientProps {
   showcaseData: ShowcaseConfig;
   footerData: FooterConfig;
-  blogPosts: BlogPostMeta[];
   cityContext?: string;
 }
 
@@ -120,7 +117,6 @@ const AnimatedCounter = ({
 export default function HomeClient({
   showcaseData,
   footerData,
-  blogPosts,
   cityContext,
 }: HomeClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -249,7 +245,7 @@ export default function HomeClient({
           </div>
           <div className="flex items-center gap-3">
             <Link
-              href="#guia-legal"
+              href="/blog"
               className="hidden md:flex items-center gap-2 px-4 py-2 text-sm font-bold text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-xl transition-all"
             >
               <BookOpen className="w-4 h-4" />
@@ -272,53 +268,58 @@ export default function HomeClient({
       </header>
 
       {/* Sección Hero */}
-      <section className="min-h-[90vh] flex items-center pt-32 pb-20 px-4 relative overflow-hidden">
-        <div className="absolute inset-0 z-0 overflow-hidden bg-background/50">
+      <section className="min-h-[95vh] flex items-center pt-36 pb-24 px-4 relative overflow-hidden">
+        <div className="absolute inset-0 z-0 overflow-hidden bg-background">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/20 via-background to-background opacity-60 animate-pulse-slow mix-blend-screen" />
+          <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-background to-transparent z-10" />
           <div className="absolute inset-0 hero-video-overlay z-10" />
         </div>
-        <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-20 items-center relative z-20 w-full">
-          <div className="space-y-10 z-20">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold border border-primary/20 animate-in fade-in slide-in-from-left-4 duration-700">
-              <ShieldCheck size={16} />
-              <span>Trámite Administrativo Seguro</span>
+        <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-16 lg:gap-24 items-center relative z-20 w-full">
+          <div className="space-y-10 lg:space-y-12 z-20">
+            <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary/10 text-primary text-sm font-bold border border-primary/20 animate-in fade-in slide-in-from-left-4 duration-700 backdrop-blur-md shadow-[0_0_30px_rgba(255,191,0,0.15)]">
+              <ShieldCheck size={18} className="animate-pulse" />
+              <span className="tracking-wide">Trámite Administrativo Seguro</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black text-white tracking-tighter leading-[0.9] reveal uppercase">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-[5.5rem] font-black text-white tracking-tighter leading-[0.85] reveal uppercase drop-shadow-2xl">
               {cityContext ? (
                 <>
                   MULTAS EN <br />
-                  <span className="text-primary italic underline decoration-primary/20 underline-offset-8 transition-all hover:decoration-primary/50">
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary/90 to-amber-200 italic drop-shadow-[0_0_30px_rgba(255,191,0,0.4)]">
                     {cityContext}
                   </span>
                 </>
               ) : (
                 <>
                   RECUPERE <br />
-                  <span className="text-primary italic underline decoration-primary/20 underline-offset-8 transition-all hover:decoration-primary/50">
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary/90 to-amber-200 italic drop-shadow-[0_0_30px_rgba(255,191,0,0.4)]">
                     Liderazgo
                   </span>{' '}
                   VIAL
                 </>
               )}
             </h1>
-            <p className="text-sm md:text-lg lg:text-xl text-white/95 font-medium leading-[1.6] max-w-lg reveal reveal-delay-1">
+            <p className="text-base sm:text-lg md:text-xl text-white/90 font-medium leading-[1.7] max-w-lg reveal reveal-delay-1 drop-shadow-md">
               {cityContext
                 ? `¿Tienes comparendos pendientes en ${cityContext}? Blindaje legal experto para sus fotomultas y trámites administrativos con el tránsito local.`
                 : 'Blindaje legal experto para sus trámites administrativos, fotomultas y comparendos. Saneamiento integral con absoluta reserva y transparencia corporativa.'}
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 pt-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
+            <div className="flex flex-col sm:flex-row gap-4 pt-6 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
               <Button
                 onClick={() => {
                   setFormMode('full');
                   setIsModalOpen(true);
                 }}
                 size="lg"
-                className="h-16 px-10 text-lg font-black rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground shadow-2xl shadow-primary/30 active:scale-95 transition-all border-none"
+                className="h-16 sm:h-20 px-10 sm:px-12 text-lg sm:text-xl font-black rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_20px_40px_-15px_rgba(255,191,0,0.4)] active:scale-95 transition-all border-none relative overflow-hidden group/cta"
               >
-                Iniciar Estudio Sin Costo
-                <ArrowUp className="ml-2 w-5 h-5" />
+                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/cta:translate-y-0 transition-transform duration-300 ease-in-out" />
+                <span className="relative flex items-center gap-3">
+                  INICIAR ESTUDIO SIN COSTO
+                  <ArrowUp className="w-6 h-6 rotate-45 group-hover/cta:translate-x-1 group-hover/cta:-translate-y-1 transition-transform" />
+                </span>
               </Button>
             </div>
-            <div className="pt-8">
+            <div className="pt-10">
               <SavingsCounter />
             </div>
           </div>
@@ -655,46 +656,6 @@ export default function HomeClient({
         </div>
       </section>
 
-      {/* Guía Legal (Blog) [ESTRENO v1.8.5] */}
-      <section id="guia-legal" className="py-32 px-4 bg-muted/5 relative overflow-hidden">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center space-y-6 mb-20">
-            <h2 className="text-2xl md:text-5xl font-black text-foreground tracking-tight reveal">
-              Guía Legal <span className="text-primary">Desmulta</span>
-            </h2>
-            <div className="w-24 h-2 bg-primary mx-auto rounded-full shadow-lg shadow-primary/20" />
-            <p className="text-xl text-muted-foreground font-medium max-w-2xl mx-auto reveal reveal-delay-1">
-              Información técnica y jurídica para que conozca sus derechos ante las autoridades de tránsito.
-            </p>
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-3">
-            {blogPosts.slice(0, 3).map((post, i) => (
-              <TarjetaPremium key={post.slug} className={`p-8 hover:border-primary/50 transition-all reveal reveal-delay-${i+1}`}>
-                <div className="space-y-4">
-                  <span className="text-[10px] font-black text-primary/60 uppercase tracking-widest">
-                    {post.date}
-                  </span>
-                  <h3 className="text-xl font-black text-foreground line-clamp-2 leading-tight">
-                    {post.title}
-                  </h3>
-                  <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
-                    {post.excerpt}
-                  </p>
-                  <Link
-                    href={`/blog/${post.slug}`}
-                    className="inline-flex items-center text-xs font-black text-primary pt-4 hover:translate-x-1 transition-transform"
-                  >
-                    LEER ARTÍCULO COMPLETO
-                    <ArrowUpRight size={14} className="ml-1" />
-                  </Link>
-                </div>
-              </TarjetaPremium>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* FAQ */}
       <section id="faq" className="py-24 px-4 bg-muted/10">
         <div className="max-w-4xl mx-auto space-y-12">
@@ -763,53 +724,6 @@ export default function HomeClient({
               ))}
             </Accordion>
           )}
-        </div>
-      </section>
-
-      {/* Términos y Privacidad [Habeas Data Compliance] */}
-      <section id="legal" className="py-32 px-4 bg-background">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center space-y-6 mb-20">
-            <h2 className="text-2xl md:text-5xl font-black text-foreground tracking-tight reveal">
-              Legal & <span className="text-primary">Privacidad</span>
-            </h2>
-            <div className="w-24 h-2 bg-primary mx-auto rounded-full shadow-lg shadow-primary/20" />
-          </div>
-
-          <div className="grid gap-8">
-            <TarjetaPremium className="p-10 reveal">
-              <div className="flex items-center gap-4 mb-8">
-                <FileText className="text-primary" size={24} />
-                <h3 className="text-xl font-black text-foreground uppercase tracking-tight">Condiciones del Servicio</h3>
-              </div>
-              <div className="space-y-6 text-sm text-muted-foreground leading-relaxed">
-                <p>
-                  <strong>Naturaleza:</strong> {'Desmulta'} actúa como gestor administrativo ante organismos de tránsito. No somos una entidad estatal.
-                </p>
-                <p>
-                  <strong>Gratuidad:</strong> El estudio inicial mediante SIMIT es informativo y gratuito. No obliga a contratación posterior.
-                </p>
-                <p>
-                  <strong>Honorarios:</strong> Se dividen en Apertura (costos operativos), Gestión (trámite formal) y Éxito (sólo tras saneamiento confirmado).
-                </p>
-              </div>
-            </TarjetaPremium>
-
-            <TarjetaPremium className="p-10 reveal reveal-delay-1">
-              <div className="flex items-center gap-4 mb-8">
-                <Lock className="text-primary" size={24} />
-                <h3 className="text-xl font-black text-foreground uppercase tracking-tight">Protección de Datos</h3>
-              </div>
-              <div className="space-y-6 text-sm text-muted-foreground leading-relaxed">
-                <p>
-                  <strong>Autorización:</strong> Al consultar, autoriza la verificación de su estado en SIMIT y bases públicas para fines de asesoría legal.
-                </p>
-                <p>
-                  <strong>Seguridad:</strong> Sus datos se procesan con encriptación industrial y no se comparten con terceros. Cumplimos con la Ley 1581 de 2012 (Habeas Data).
-                </p>
-              </div>
-            </TarjetaPremium>
-          </div>
         </div>
       </section>
 
@@ -931,9 +845,9 @@ export default function HomeClient({
                     { label: 'Inicio', href: '#', action: () => window.scrollTo({ top: 0, behavior: 'smooth' }) },
                     { label: 'Servicios', href: '#servicios' },
                     { label: 'Metodología', href: '#metodologia' },
-                    { label: 'Guía Legal', href: '#guia-legal' },
+                    { label: 'Guía Legal', href: '/blog' },
                     { label: 'Preguntas Frecuentes', href: '#faq' },
-                    { label: 'Términos de Uso', href: '#legal' },
+                    { label: 'Términos y Condiciones', href: '/terminos' },
                   ].map((link, i) => (
                     <Link
                       key={i}
@@ -1007,7 +921,7 @@ export default function HomeClient({
                   © {new Date().getFullYear()} DESMULTA — SERVICIO PRIVADO DE GESTIÓN VIAL
                 </p>
                 <span className="text-[9px] font-black uppercase tracking-widest bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/20">
-                  v1.8.5
+                  v1.9.0
                 </span>
               </div>
               <div className="flex items-center gap-4 opacity-40 hover:opacity-100 transition-opacity mt-1">

@@ -36,9 +36,9 @@ export default function TerminosPage() {
       <main className="max-w-4xl mx-auto px-6 pt-36 pb-24">
         <div className="mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
           <h1 className="text-5xl md:text-7xl font-black mb-6 text-foreground tracking-tight leading-[0.95]">
-            Legal & <br />
+            Términos & <br />
             <span className="text-primary italic underline decoration-primary/20 underline-offset-8">
-              Privacidad
+              Condiciones
             </span>
           </h1>
           <p className="text-xl text-muted-foreground font-medium max-w-2xl">

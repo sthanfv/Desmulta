@@ -6,6 +6,8 @@ interface TarjetaPremiumProps {
   children: React.ReactNode;
   className?: string;
   onClick?: () => void;
+  /** Estilos en línea opcionales (ej: animationDelay para escalonar animaciones de entrada) */
+  style?: React.CSSProperties;
 }
 
 /**
@@ -16,7 +18,7 @@ interface TarjetaPremiumProps {
  *
  * MANDATO-FILTRO v5.40.0: Rendimiento extremo y estética de alta tecnología.
  */
-export function TarjetaPremium({ children, className = '', onClick }: TarjetaPremiumProps) {
+export function TarjetaPremium({ children, className = '', onClick, style }: TarjetaPremiumProps) {
   const divRef = useRef<HTMLDivElement>(null);
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
@@ -37,6 +39,7 @@ export function TarjetaPremium({ children, className = '', onClick }: TarjetaPre
       ref={divRef}
       onMouseMove={handleMouseMove}
       onClick={onClick}
+      style={style}
       className={`relative overflow-hidden bg-card border border-border rounded-3xl group transition-colors duration-300 ${className}`}
     >
       {/* Efecto Linterna (Solo en PC con puntero real para optimizar móvil) */}
