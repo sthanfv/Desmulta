@@ -39,8 +39,6 @@ export const ConsultationSchema = z.object({
   tipoInfraccion: z.string().min(1, { message: 'Seleccione el tipo de infracción.' }),
   estadoCoactivo: z.string().min(1, { message: 'Seleccione si el caso está en cobro coactivo.' }),
   evidenceUrl: z.string().url().optional().or(z.literal('')),
-  estadoCoactivo: z.string().min(1, { message: 'Seleccione si el caso está en cobro coactivo.' }),
-  evidenceUrl: z.string().url().optional().or(z.literal('')),
   turnstileToken: z.string().optional(),
 });
 
@@ -59,7 +57,6 @@ export const SimitCaptureSchema = z.object({
     message: 'Debe aceptar los términos y condiciones.',
   }),
   _tramp_field: z.string().max(0, { message: 'Bot detected' }).optional(),
-  authorUid: z.string().optional(),
   authorUid: z.string().optional(),
   turnstileToken: z.string().optional(),
 });
