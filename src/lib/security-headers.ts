@@ -6,7 +6,7 @@ export const cspHeader = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://placehold.co https://picsum.photos https://*.public.blob.vercel-storage.com https://firebasestorage.googleapis.com https://www.google-analytics.com https://www.facebook.com https://grainy-gradients.vercel.app",
   "media-src 'self'",
-  "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://api.telegram.org https://www.google-analytics.com https://grainy-gradients.vercel.app https://challenges.cloudflare.com",
+  "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://api.telegram.org https://www.google-analytics.com https://grainy-gradients.vercel.app https://challenges.cloudflare.com https://va.vercel-scripts.com",
   "frame-src 'self' https://challenges.cloudflare.com",
   "frame-ancestors 'none'",
   "object-src 'none'",

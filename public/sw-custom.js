@@ -30,8 +30,9 @@ self.addEventListener('fetch', (event) => {
         .then((networkResponse) => {
           // 2. Silenciosamente actualizamos la caché por debajo si la red funciona
           if (networkResponse.ok && event.request.url.startsWith('http')) {
+            const responseToCache = networkResponse.clone();
             caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, networkResponse.clone());
+              cache.put(event.request, responseToCache);
             });
           }
           return networkResponse;

@@ -20,7 +20,7 @@ export function middleware(_request: NextRequest) {
   // Nota: En un entorno real, 'script-src' debería incluir hashes o nonces para Google Analytics/Gemini si se usan inline.
   const cspHeader = `
     default-src 'self';
-    script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.googletagmanager.com https://*.google-analytics.com https://va.vercel-scripts.com https://challenges.cloudflare.com;
+    script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.googletagmanager.com https://*.google-analytics.com https://va.vercel-scripts.com https://challenges.cloudflare.com https://connect.facebook.net;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     img-src 'self' blob: data: https://*.googleusercontent.com https://*.googleapis.com https://i.ytimg.com https://*.vercel.app;
     font-src 'self' https://fonts.gstatic.com;
@@ -29,7 +29,7 @@ export function middleware(_request: NextRequest) {
     form-action 'self';
     frame-src 'self' https://challenges.cloudflare.com;
     frame-ancestors 'none';
-    connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.google-analytics.com https://*.googletagmanager.com https://challenges.cloudflare.com;
+    connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.google-analytics.com https://*.googletagmanager.com https://challenges.cloudflare.com https://grainy-gradients.vercel.app https://va.vercel-scripts.com;
     upgrade-insecure-requests;
   `
     .replace(/\s{2,}/g, ' ')
