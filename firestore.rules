@@ -40,5 +40,12 @@ service cloud.firestore {
       // Admins can read consultation documents from the admin panel.
       allow read: if isAdmin();
     }
+
+    // Índice ciego (Validación O(1) Edge Serverless) - Opción 1
+    match /consultas_index/{hashId} {
+      // allow list: if false; // Por defecto no se puede listar
+      allow get: if true; // API público solo puede consultar un hash específico
+      allow write: if false; // Solo administradores o Cloud Functions (Admin SDK)
+    }
   }
 }

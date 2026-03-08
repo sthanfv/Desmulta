@@ -4,6 +4,7 @@ import { getAdminApp } from '@/lib/firebase-admin';
 import { ConsultationSchema, SimitCaptureSchema } from '@/lib/definitions';
 import { logger } from '@/lib/logger/security-logger';
 import { z } from 'zod';
+import crypto from 'crypto';
 // import { analyzeViabilityFlow } from '@/lib/genkit';
 
 type ConsultationData = z.infer<typeof ConsultationSchema>;
@@ -141,6 +142,15 @@ export async function POST(request: NextRequest) {
 
       transaction.set(consultationRef, finalDataToSave);
       transaction.set(cooldownRef, { lastAttemptAt: FieldValue.serverTimestamp() });
+
+      // MANDATO-FILTRO: Guardar en el índice público ciego (O(1) Validation Edge)
+      if (finalDataToSave.cedula !== 'SIMIT-CAPTURA') {
+        const hashValue = crypto.createHash('sha256').update(finalDataToSave.cedula).digest('hex');
+        const indexRef = db.collection('consultas_index').doc(hashValue);
+        transaction.set(indexRef, { 
+          createdAt: FieldValue.serverTimestamp() 
+        });
+      }
 
       return { idSecuencial };
     });

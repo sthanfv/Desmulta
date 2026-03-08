@@ -46,52 +46,35 @@ export async function POST(request: Request) {
 
     logger.info(`[EDGE] Validando viabilidad para cédula: ${cedulaOfuscada}`);
 
-    // ⚡ 2. Fetch directo a la REST API de Firestore
+    // ⚡ 2. Hash O(1) vía Web Crypto API (Edge Nativo)
+    const encoder = new TextEncoder();
+    const dataBuf = encoder.encode(cedula);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuf);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
     const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID; 
-    const firestoreUrl = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents`;
+    const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
+    
+    // Petición directa GET O(1) al documento índice protegido (Cero exposición de PII)
+    const firestoreUrl = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/consultas_index/${hashHex}?key=${apiKey}`;
 
-    const queryPayload = {
-      structuredQuery: {
-        from: [{ collectionId: "consultations" }],
-        where: {
-          fieldFilter: {
-            field: { fieldPath: "cedula" },
-            op: "EQUAL",
-            value: { stringValue: cedula }
-          }
-        },
-        limit: 1
-      }
-    };
-
-    const response = await fetch(`${firestoreUrl}:runQuery`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        // Token opcional si las reglas lo exigen en un entorno administrado
-        ...(process.env.FIREBASE_EDGE_ACCESS_TOKEN 
-          ? { 'Authorization': `Bearer ${process.env.FIREBASE_EDGE_ACCESS_TOKEN}` } 
-          : {})
-      },
-      body: JSON.stringify(queryPayload)
+    const response = await fetch(firestoreUrl, {
+      method: 'GET',
     });
 
-    if (!response.ok) {
-      throw new Error(`Error en Firestore REST API: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-
     // 3. Evaluar lógica de negocio
-    const documentoExiste = data[0]?.document !== undefined;
-
-    if (documentoExiste) {
+    if (response.ok) { // 200 OK significa que el documento existe
        logger.warn('[EDGE] Consulta activa preexistente bloqueada', { cedulaOfuscada });
        return NextResponse.json({ 
          success: true, 
          valido: false, 
          mensaje: 'Ya existe una consulta activa para este documento.' 
        });
+    }
+
+    if (response.status !== 404) {
+      throw new Error(`Error en Firestore REST API GET: ${response.status} ${response.statusText}`);
     }
 
     logger.info('[EDGE] Validación preliminar exitosa', { placa, cedulaOfuscada });
