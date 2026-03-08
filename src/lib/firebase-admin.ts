@@ -1,7 +1,7 @@
 /**
  * Firebase Admin SDK — Singleton de inicialización segura.
  * 
- * Versión: 2.1.4 (Saneamiento de Llave ASN.1)
+ * Versión: 2.1.5 (Saneamiento de Llave ASN.1 y Corrección de Lint)
  */
 
 import { getApps, initializeApp, cert, type App } from 'firebase-admin/app';
@@ -16,8 +16,8 @@ function normalizarLlavePrivada(llaveCruda: string | undefined): string {
     throw new Error('VARIABLE_FIREBASE_PRIVATE_KEY_AUSENTE');
   }
 
-  // 1. Limpiar rastro de escapes y comillas de Vercel/Node
-  let limpio = llaveCruda.replace(/\\n/g, '\n').replace(/^["']+|["']+$/g, '').trim();
+  // 1. Limpiar rastro de escapes y comillas de Vercel/Node (Usamos const para pasar el linter)
+  const limpio = llaveCruda.replace(/\\n/g, '\n').replace(/^["']+|["']+$/g, '').trim();
 
   // 2. Extraer solo el contenido entre los marcadores para ignorar basura DER externa
   const match = limpio.match(/-----BEGIN PRIVATE KEY-----([\s\S]*)-----END PRIVATE KEY-----/);
