@@ -1,77 +1,77 @@
 /**
  * Firebase Admin SDK — Singleton de inicialización segura.
- *
- * MANDATO-FILTRO: Sin credenciales hardcodeadas, validación estricta, 
- * parseo robusto de PEM para evitar errores de ASN.1 en producción.
+ * 
+ * Versión: 2.1.4 (Saneamiento de Llave ASN.1)
  */
 
 import { getApps, initializeApp, cert, type App } from 'firebase-admin/app';
 import { logger } from './logger/security-logger';
 
 /**
- * Normaliza la FIREBASE_PRIVATE_KEY. 
- * El error 'Unparsed DER bytes remain after ASN.1 parsing' ocurre cuando
- * la llave tiene basura al final o saltos de línea mal formados.
+ * Normalización agresiva de la llave privada.
+ * Extrae solo los datos base64 para evitar el error "Unparsed DER bytes".
  */
-function parsePrivateKey(rawValue: string | undefined): string {
-  if (!rawValue) {
-    throw new Error('[firebase-admin] FIREBASE_PRIVATE_KEY no definida.');
+function normalizarLlavePrivada(llaveCruda: string | undefined): string {
+  if (!llaveCruda) {
+    throw new Error('VARIABLE_FIREBASE_PRIVATE_KEY_AUSENTE');
   }
 
-  // 1. Limpiar comillas accidentales y espacios extremos
-  let key = rawValue.trim().replace(/^["']+|["']+$/g, '');
+  // 1. Limpiar rastro de escapes y comillas de Vercel/Node
+  let limpio = llaveCruda.replace(/\\n/g, '\n').replace(/^["']+|["']+$/g, '').trim();
 
-  // 2. Convertir secuencias literales \n en saltos de línea reales
-  key = key.replace(/\\n/g, '\n');
-
-  // 3. Normalizar saltos de línea Windows CRLF a Unix LF
-  key = key.replace(/\r\n/g, '\n');
-
-  // 4. LIMPIEZA CRÍTICA: Eliminar espacios en blanco al final de cada línea
-  // Esto es lo que suele causar el error "Unparsed DER bytes"
-  const lines = key.split('\n')
-    .map(line => line.trim())
-    .filter(line => line.length > 0);
-
-  const cleanKey = lines.join('\n');
-
-  // 5. Validación de seguridad básica
-  if (!cleanKey.includes('BEGIN PRIVATE KEY') || !cleanKey.includes('END PRIVATE KEY')) {
-    logger.error('[firebase-admin] La llave privada parece estar mal formada (faltan marcadores BEGIN/END).');
+  // 2. Extraer solo el contenido entre los marcadores para ignorar basura DER externa
+  const match = limpio.match(/-----BEGIN PRIVATE KEY-----([\s\S]*)-----END PRIVATE KEY-----/);
+  
+  if (!match) {
+    // Si no tiene marcadores, intentamos limpiar la basura de todas formas línea por línea
+    logger.warn('[firebase-admin] La llave no tiene marcadores estándar. Intentando limpieza agresiva.');
+    const base64Pure = limpio
+      .split('\n')
+      .map(linea => linea.trim())
+      .filter(linea => linea.length > 0 && !linea.includes('-----'))
+      .join('');
+    return `-----BEGIN PRIVATE KEY-----\n${base64Pure}\n-----END PRIVATE KEY-----\n`;
   }
 
-  return cleanKey;
+  // 3. Reconstruir la llave desde el contenido base64 interno (el bloque del medio)
+  const contenidoBase64 = match[1]
+    .split('\n')
+    .map(linea => linea.trim())
+    .filter(linea => linea.length > 0)
+    .join('\n');
+
+  return `-----BEGIN PRIVATE KEY-----\n${contenidoBase64}\n-----END PRIVATE KEY-----\n`;
 }
 
 /**
- * Retorna la instancia de Firebase Admin App.
+ * Retorna la instancia de Firebase Admin.
  */
 export function getAdminApp(): App {
-  const existingApps = getApps();
-  if (existingApps.length > 0) {
-    return existingApps[0];
+  const appsActivas = getApps();
+  if (appsActivas.length > 0) {
+    return appsActivas[0];
   }
 
-  const projectId = process.env.FIREBASE_PROJECT_ID;
-  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+  const idProyecto = process.env.FIREBASE_PROJECT_ID;
+  const emailCliente = process.env.FIREBASE_CLIENT_EMAIL;
 
-  if (!projectId || !clientEmail) {
-    throw new Error('[firebase-admin] Credenciales de Admin incompletas.');
+  if (!idProyecto || !emailCliente) {
+    throw new Error('[firebase-admin] Faltan credenciales esenciales en el entorno.');
   }
 
   try {
-    const privateKey = parsePrivateKey(process.env.FIREBASE_PRIVATE_KEY);
+    const privateKey = normalizarLlavePrivada(process.env.FIREBASE_PRIVATE_KEY);
     
     return initializeApp({
       credential: cert({ 
-        projectId, 
-        clientEmail, 
-        privateKey 
+        projectId: idProyecto, 
+        clientEmail: emailCliente, 
+        privateKey: privateKey 
       }),
     });
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : 'Error desconocido';
-    logger.error('[firebase-admin] Fallo crítico al inicializar Firebase Admin:', { error: msg });
-    throw err;
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : 'Error desconocido';
+    logger.error('[firebase-admin] Fallo crítico de inicialización:', { detalle: errorMsg });
+    throw error;
   }
 }
