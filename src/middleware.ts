@@ -29,7 +29,7 @@ export function middleware(_request: NextRequest) {
     form-action 'self';
     frame-src 'self' https://challenges.cloudflare.com;
     frame-ancestors 'none';
-    connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.google-analytics.com https://*.googletagmanager.com https://challenges.cloudflare.com https://grainy-gradients.vercel.app https://va.vercel-scripts.com;
+    connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.google-analytics.com https://*.googletagmanager.com https://challenges.cloudflare.com https://connect.facebook.net https://grainy-gradients.vercel.app https://va.vercel-scripts.com;
     upgrade-insecure-requests;
   `
     .replace(/\s{2,}/g, ' ')
