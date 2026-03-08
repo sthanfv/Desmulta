@@ -116,8 +116,8 @@
   @media (max-width: 768px) {
     .glass,
     .floating-card {
-      @apply backdrop-blur-[20px] bg-white/70 dark:bg-neutral-900/60;
-      -webkit-backdrop-filter: blur(20px);
+      @apply backdrop-blur-[12px] bg-white/80 dark:bg-neutral-900/80;
+      -webkit-backdrop-filter: blur(12px);
     }
   }
 

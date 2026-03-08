@@ -22,7 +22,7 @@ export function TarjetaPremium({ children, className = '', onClick, style }: Tar
   const divRef = useRef<HTMLDivElement>(null);
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
-    if (!divRef.current) return;
+    if (!divRef.current || window.innerWidth < 768) return;
     const rect = divRef.current.getBoundingClientRect();
 
     // Calculamos las coordenadas x, y relativas al contenedor

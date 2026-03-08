@@ -209,6 +209,7 @@ export default function HomeClient({
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (window.innerWidth < 768) return; // MANDATO-FILTRO: Optimización CPU Mobile
     const target = e.currentTarget;
     const rect = target.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -280,18 +281,18 @@ export default function HomeClient({
               <ShieldCheck size={18} className="animate-pulse" />
               <span className="tracking-wide">Trámite Administrativo Seguro</span>
             </div>
-            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-[5.5rem] font-black text-white tracking-tighter leading-[0.85] reveal uppercase drop-shadow-2xl">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-[5.5rem] font-black text-white tracking-tighter leading-tight reveal uppercase drop-shadow-2xl">
               {cityContext ? (
                 <>
                   MULTAS EN <br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary/90 to-amber-200 italic drop-shadow-[0_0_30px_rgba(255,191,0,0.4)]">
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary/90 to-amber-200 italic drop-shadow-[0_0_30px_rgba(255,191,0,0.4)] px-2">
                     {cityContext}
                   </span>
                 </>
               ) : (
                 <>
                   RECUPERE <br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary/90 to-amber-200 italic drop-shadow-[0_0_30px_rgba(255,191,0,0.4)]">
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary/90 to-amber-200 italic drop-shadow-[0_0_30px_rgba(255,191,0,0.4)] px-2">
                     Liderazgo
                   </span>{' '}
                   VIAL
@@ -921,7 +922,7 @@ export default function HomeClient({
                   © {new Date().getFullYear()} DESMULTA — SERVICIO PRIVADO DE GESTIÓN VIAL
                 </p>
                 <span className="text-[9px] font-black uppercase tracking-widest bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/20">
-                  v1.9.0
+                  v1.9.3
                 </span>
               </div>
               <div className="flex items-center gap-4 opacity-40 hover:opacity-100 transition-opacity mt-1">

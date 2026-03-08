@@ -1,4 +1,4 @@
-# Desmulta — Plataforma de Saneamiento Vial Inteligente v1.9.2 🛡️🚀
+# Desmulta — Plataforma de Saneamiento Vial Inteligente v1.9.3 🛡️🚀
 
 TODAS LAS DECISIONES, ARCHIVOS Y CÓDIGO GENERADO DEBEN PASAR EL FILTRO DE SEGURIDAD Y CALIDAD 'MANDATO-FILTRO'.
 
@@ -42,6 +42,17 @@ Optimización profunda del motor de validación para latencia cercana a cero eli
 - **Cero Exposición PII**: En la validación primaria, la cédula nunca se envía en texto plano como parámetro de consulta a la base de datos, garantizando protección técnica extrema de PII frente a atacantes (MANDATO-FILTRO).
 - **Fetch Directo REST API**: Integración transparente de `https://firestore.googleapis.com` mediante Web API Key y Firestore Rules estrictas (solo `get`), superando la limitación de permisos en la capa Edge sin exponer la BBDD a enumeración (`list`).
 - Limpieza de props residuales y mitigación final del linter (Object Injection en Landing).
+
+---
+
+## 💎 Perfección Estética y Performance Mobile — v1.9.3 (2026-03-08)
+
+Refinamiento final de la interfaz y optimización de recursos para dispositivos móviles:
+
+- **Fix Tipográfico Hero**: Ajuste de interlineado (`leading-tight`) y paddings de seguridad en textos con gradiente para evitar el recorte visual de caracteres (e.g., la 'O' de Liderazgo).
+- **CPU Bypass (Mobile)**: Desactivación inteligente de listeners de `mousemove` en dispositivos táctiles (< 768px) para reducir el consumo de ciclos de CPU y batería.
+- **Optimización de Renderizado**: Reducción de la carga de `backdrop-blur` y simplificación de las capas de `MeshBackground` en móviles, garantizando una fluidez de scroll constante.
+- **Turnstile Hardening**: Validación estricta de Cloudflare Turnstile reintroducida en esquemas Zod tras la limpieza de duplicados.
 
 ---
 
