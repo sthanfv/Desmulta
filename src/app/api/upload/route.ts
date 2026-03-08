@@ -89,11 +89,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     if (docSnap.exists) {
       contador = docSnap.data()?.count || 0;
-      if (contador >= 3) {
+      const limite = process.env.NODE_ENV === 'production' ? 3 : 10;
+      if (contador >= limite) {
         return NextResponse.json(
           {
-            error:
-              'Ha superado el límite de 3 cargas seguras por día. Por favor, intente mañana o contacte a soporte.',
+            error: `Ha superado el límite de ${limite} cargas seguras por día. Por favor, intente mañana o contacte a soporte.`,
           },
           { status: 429 }
         );
