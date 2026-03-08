@@ -15,7 +15,14 @@ export function InstallPWA() {
   const [showInstallBtn, setShowInstallBtn] = useState(false);
 
   useEffect(() => {
+    // MANDATO-FILTRO: Evitar molestias recurrentes. 
+    // Revisar si el usuario ya cerró el banner hoy.
+    const lastDismissed = localStorage.getItem('pwa-prompt-dismissed');
+    const isDismissedRecently = lastDismissed && (Date.now() - parseInt(lastDismissed)) < 1000 * 60 * 60 * 24; // 24 horas
+
     const handler = (e: Event) => {
+      if (isDismissedRecently) return; // No asustar al usuario si ya lo cerró
+      
       // Previene que el navegador muestre el prompt automático
       e.preventDefault();
       // Guarda el evento para dispararlo más tarde
@@ -33,6 +40,11 @@ export function InstallPWA() {
 
     return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
+
+  const handleDismiss = () => {
+    localStorage.setItem('pwa-prompt-dismissed', Date.now().toString());
+    setShowInstallBtn(false);
+  };
 
   const handleInstallClick = async () => {
     if (!deferredPrompt) return;
@@ -63,7 +75,7 @@ export function InstallPWA() {
         >
           <div className="glass p-5 rounded-[2.5rem] border-primary/20 shadow-2xl flex flex-col gap-4 relative overflow-hidden group">
             <button
-              onClick={() => setShowInstallBtn(false)}
+              onClick={handleDismiss}
               className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
             >
               <X size={18} />
