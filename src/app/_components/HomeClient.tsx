@@ -285,16 +285,16 @@ export default function HomeClient({
               {cityContext ? (
                 <>
                   MULTAS EN <br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary/90 to-amber-200 italic drop-shadow-[0_0_30px_rgba(255,191,0,0.4)] px-2">
-                    {cityContext}
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary/90 to-amber-200 italic drop-shadow-[0_0_30px_rgba(255,191,0,0.4)] pl-2 pr-5">
+                    {cityContext}&nbsp;
                   </span>
                 </>
               ) : (
                 <>
                   RECUPERE <br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary/90 to-amber-200 italic drop-shadow-[0_0_30px_rgba(255,191,0,0.4)] px-2">
-                    Liderazgo
-                  </span>{' '}
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary/90 to-amber-200 italic drop-shadow-[0_0_30px_rgba(255,191,0,0.4)] pl-2 pr-5">
+                    Liderazgo&nbsp;
+                  </span>
                   VIAL
                 </>
               )}
@@ -922,7 +922,7 @@ export default function HomeClient({
                   © {new Date().getFullYear()} DESMULTA — SERVICIO PRIVADO DE GESTIÓN VIAL
                 </p>
                 <span className="text-[9px] font-black uppercase tracking-widest bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/20">
-                  v1.9.3
+                  v1.9.4
                 </span>
               </div>
               <div className="flex items-center gap-4 opacity-40 hover:opacity-100 transition-opacity mt-1">

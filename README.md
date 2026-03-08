@@ -1,4 +1,4 @@
-# Desmulta — Plataforma de Saneamiento Vial Inteligente v1.9.3 🛡️🚀
+# Desmulta — Plataforma de Saneamiento Vial Inteligente v1.9.4 🛡️🚀
 
 TODAS LAS DECISIONES, ARCHIVOS Y CÓDIGO GENERADO DEBEN PASAR EL FILTRO DE SEGURIDAD Y CALIDAD 'MANDATO-FILTRO'.
 
