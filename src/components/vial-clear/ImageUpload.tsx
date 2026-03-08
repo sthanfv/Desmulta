@@ -12,12 +12,13 @@ interface ImageUploadProps {
   onClear: () => void;
   className?: string;
   required?: boolean;
+  currentUrl?: string; // 👈 Agregado para persistencia de previsualización
 }
 
-export function ImageUpload({ onUploadSuccess, onClear, className, required }: ImageUploadProps) {
-  const [preview, setPreview] = useState<string | null>(null);
+export function ImageUpload({ onUploadSuccess, onClear, className, required, currentUrl }: ImageUploadProps) {
+  const [preview, setPreview] = useState<string | null>(currentUrl || null);
   const [isUploading, setIsUploading] = useState(false);
-  const [isUploaded, setIsUploaded] = useState(false); // MANDATO-FILTRO: Estado de confirmación real
+  const [isUploaded, setIsUploaded] = useState(!!currentUrl); // Si ya hay URL, está subido
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
