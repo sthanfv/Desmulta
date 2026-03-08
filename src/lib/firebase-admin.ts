@@ -1,43 +1,43 @@
 /**
  * Firebase Admin SDK — Singleton de inicialización segura.
  * 
- * Versión: 2.1.8 (Corrección de Linter 's' y Limpieza Atómica)
+ * Versión: 2.1.9 (Formateo PEM Estándar 64-chars y Saneamiento)
  */
 
 import { getApps, initializeApp, cert, type App } from 'firebase-admin/app';
 import { logger } from './logger/security-logger';
 
 /**
- * Realiza una limpieza atómica de la llave privada.
- * Extrae solo los caracteres Base64 y reconstruye el bloque PEM desde cero.
+ * Normaliza la llave para que sea un bloque PEM válido de 64 caracteres por línea.
+ * Esto evita el error "Unparsed DER bytes" causado por bytes residuales o falta de saltos.
  */
 function normalizarLlavePrivada(valorCrudo: string | undefined): string {
-  if (!valorCrudo) {
-    throw new Error('LLAVE_PRIVADA_NO_ENCONTRADA_EN_ENTORNO');
+  if (!valorCrudo) return '';
+
+  // 1. Limpieza de escapes de Vercel y comillas
+  const s = valorCrudo.replace(/\\n/g, '\n').replace(/^["']+|["']+$/g, '').trim();
+
+  const INICIO = '-----BEGIN PRIVATE KEY-----';
+  const FIN = '-----END PRIVATE KEY-----';
+
+  const indiceInicio = s.indexOf(INICIO);
+  const indiceFin = s.indexOf(FIN);
+
+  if (indiceInicio !== -1 && indiceFin !== -1) {
+    // 2. Extraer solo el contenido base64 puro (sin espacios ni saltos previos)
+    const base64Puro = s
+      .substring(indiceInicio + INICIO.length, indiceFin)
+      .replace(/[^A-Za-z0-9+/=]/g, '');
+
+    // 3. Re-formatear en bloques de 64 caracteres (estándar RFC 7468)
+    const lineas = base64Puro.match(/.{1,64}/g);
+    if (lineas) {
+      return `${INICIO}\n${lineas.join('\n')}\n${FIN}`;
+    }
   }
 
-  const MARCADOR_INICIO = '-----BEGIN PRIVATE KEY-----';
-  const MARCADOR_FIN = '-----END PRIVATE KEY-----';
-
-  // 1. Convertir escapes \n en saltos reales (Usamos const para linter v2.1.8)
-  const s = valorCrudo.replace(/\\n/g, '\n');
-
-  // 2. Localizar marcadores
-  const inicio = s.indexOf(MARCADOR_INICIO);
-  const fin = s.indexOf(MARCADOR_FIN);
-
-  if (inicio !== -1 && fin !== -1) {
-    // 3. EXTRAER SOLO EL CONTENIDO BASE64 INTERNO
-    const base64Interno = s
-      .substring(inicio + MARCADOR_INICIO.length, fin)
-      .replace(/[\s\r\n\t]/g, ''); // ELIMINAR CUALQUIER ESPACIO O SALTO INVISIBLE
-
-    // 4. RECONSTRUIR EL BLOQUE PEM PERFECTO
-    return `${MARCADOR_INICIO}\n${base64Interno}\n${MARCADOR_FIN}\n`;
-  }
-
-  // Fallback por si la llave ya viene limpia o procesada por Vercel
-  return s.trim();
+  // Fallback si no hay marcadores (peligroso, pero intentamos que funcione)
+  return s;
 }
 
 /**
@@ -49,11 +49,11 @@ export function getAdminApp(): App {
     return appsActivas[0];
   }
 
-  const idProyecto = process.env.FIREBASE_PROJECT_ID;
-  const emailCliente = process.env.FIREBASE_CLIENT_EMAIL;
+  const projectId = process.env.FIREBASE_PROJECT_ID;
+  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
 
-  if (!idProyecto || !emailCliente) {
-    throw new Error('[firebase-admin] Credenciales de servidor insuficientes.');
+  if (!projectId || !clientEmail) {
+    throw new Error('[firebase-admin] Faltan credenciales de servidor: PROJECT_ID / CLIENT_EMAIL.');
   }
 
   try {
@@ -61,14 +61,14 @@ export function getAdminApp(): App {
     
     return initializeApp({
       credential: cert({ 
-        projectId: idProyecto, 
-        clientEmail: emailCliente, 
+        projectId, 
+        clientEmail, 
         privateKey 
       }),
     });
   } catch (error) {
-    const detalleError = error instanceof Error ? error.message : 'Error desconocido';
-    logger.error('[firebase-admin] Fallo crítico en inicialización v2.1.8:', { detalle: detalleError });
+    const errorMsg = error instanceof Error ? error.message : 'Fallo desconocido';
+    logger.error('[firebase-admin] Error fatal de inicialización v2.1.9:', { detalle: errorMsg });
     throw error;
   }
 }
