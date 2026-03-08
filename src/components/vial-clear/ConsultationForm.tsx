@@ -19,7 +19,11 @@ import { useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 import { ConsultationSchema, SimitCaptureSchema } from '@/lib/definitions';
-import { Turnstile } from '@marsidev/react-turnstile';
+import dynamic from 'next/dynamic';
+
+const Turnstile = dynamic(() => import('@marsidev/react-turnstile').then((mod) => mod.Turnstile), {
+  ssr: false,
+});
 
 import Link from 'next/link';
 
@@ -733,12 +737,13 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
               )}
             />
 
-            <div className="my-6 flex justify-center">
+            <div className="my-6 flex justify-center min-h-[65px]">
               <Turnstile 
-                siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ''} 
+                siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!} 
                 onSuccess={(token) => setTurnstileToken(token)}
                 options={{
-                  theme: 'auto',
+                  theme: 'dark',
+                  size: 'normal'
                 }}
               />
             </div>
