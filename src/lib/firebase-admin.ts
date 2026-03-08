@@ -1,7 +1,7 @@
 /**
  * Firebase Admin SDK — Singleton de inicialización segura.
  * 
- * Versión: 2.1.9 (Formateo PEM Estándar 64-chars y Saneamiento)
+ * Versión: 2.2.0 (Estabilización Local y Producción)
  */
 
 import { getApps, initializeApp, cert, type App } from 'firebase-admin/app';
@@ -14,8 +14,12 @@ import { logger } from './logger/security-logger';
 function normalizarLlavePrivada(valorCrudo: string | undefined): string {
   if (!valorCrudo) return '';
 
-  // 1. Limpieza de escapes de Vercel y comillas
-  const s = valorCrudo.replace(/\\n/g, '\n').replace(/^["']+|["']+$/g, '').trim();
+  // 1. Limpieza de escapes y comillas.
+  // En Vercel, a veces las variables vienen con comillas dobles literales.
+  const s = valorCrudo
+    .replace(/\\n/g, '\n')
+    .replace(/^["']+|["']+$/g, '')
+    .trim();
 
   const INICIO = '-----BEGIN PRIVATE KEY-----';
   const FIN = '-----END PRIVATE KEY-----';
@@ -32,12 +36,14 @@ function normalizarLlavePrivada(valorCrudo: string | undefined): string {
     // 3. Re-formatear en bloques de 64 caracteres (estándar RFC 7468)
     const lineas = base64Puro.match(/.{1,64}/g);
     if (lineas) {
-      return `${INICIO}\n${lineas.join('\n')}\n${FIN}`;
+      // Devolvemos con el salto de línea final que algunos motores ASN.1 exigen
+      return `${INICIO}\n${lineas.join('\n')}\n${FIN}\n`;
     }
   }
 
-  // Fallback si no hay marcadores (peligroso, pero intentamos que funcione)
-  return s;
+  // Fallback: si no hay marcadores o algo falló, devolvemos el original limpio
+  // de escapes (esto es lo que funcionaba en versiones anteriores)
+  return s.includes('\n') ? s : s.replace(/\\n/g, '\n');
 }
 
 /**
@@ -59,16 +65,19 @@ export function getAdminApp(): App {
   try {
     const privateKey = normalizarLlavePrivada(process.env.FIREBASE_PRIVATE_KEY);
     
-    return initializeApp({
+    const app = initializeApp({
       credential: cert({ 
         projectId, 
         clientEmail, 
         privateKey 
       }),
     });
+    
+    logger.info('[firebase-admin] Inicialización exitosa v2.2.0');
+    return app;
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Fallo desconocido';
-    logger.error('[firebase-admin] Error fatal de inicialización v2.1.9:', { detalle: errorMsg });
+    logger.error('[firebase-admin] Error fatal de inicialización v2.2.0:', { detalle: errorMsg });
     throw error;
   }
 }

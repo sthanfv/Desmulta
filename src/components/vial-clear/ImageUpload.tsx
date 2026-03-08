@@ -68,9 +68,10 @@ export function ImageUpload({ onUploadSuccess, onClear, className, required, cur
       onUploadSuccess(blob.url);
       setIsUploaded(true);
     } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Error desconocido';
       console.error('[ImageUpload] Error:', err);
-      setPreview(null); // Limpiamos para evitar confusión visual
-      setError('Fallo al subir la imagen (Error 429/Red). Intente de nuevo en unos segundos.');
+      setPreview(null); 
+      setError(errorMsg);
       setIsUploaded(false);
     } finally {
       setIsUploading(false);

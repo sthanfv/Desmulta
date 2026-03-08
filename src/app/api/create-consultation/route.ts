@@ -42,12 +42,8 @@ async function verifyTurnstileToken(token: string | undefined): Promise<boolean>
     const data = (await res.json()) as { success: boolean; 'error-codes'?: string[] };
 
     if (!data.success) {
-      // Si estamos en localhost (dev) y falla por dominio o por token duplicado/expirado (común con React Strict Mode o HMR), lo perdonamos.
-      if (
-        process.env.NODE_ENV !== 'production' &&
-        data['error-codes']?.some((code) => ['domain-mismatch', 'timeout-or-duplicate'].includes(code))
-      ) {
-        logger.warn(`[turnstile] Error ${data['error-codes'].join(', ')} tolerado en entorno local de desarrollo.`);
+      if (process.env.NODE_ENV !== 'production') {
+        logger.warn(`[turnstile] Fallo en desarrollo (${data['error-codes']?.join(', ') || 'sin códigos'}). Tolerado.`);
         return true;
       }
       logger.security('[turnstile] Token inválido rechazado por Cloudflare.', {
