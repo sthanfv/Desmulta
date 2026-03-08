@@ -52,28 +52,46 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Falta validación de seguridad.' }, { status: 403 });
     }
 
-    const formData = new URLSearchParams();
-    const cfSecret = process.env.TURNSTILE_SECRET_KEY || '';
-    formData.append('secret', cfSecret);
-    formData.append('response', turnstileToken);
+    const cfSecret = process.env.TURNSTILE_SECRET_KEY;
+    if (!cfSecret) {
+      if (process.env.NODE_ENV !== 'production') {
+        logger.warn('[EDGE/TURNSTILE] Sin SECRET_KEY. Saltando validación en desarrollo.');
+      } else {
+        return NextResponse.json({ error: 'Configuración de seguridad faltante en producción.' }, { status: 403 });
+      }
+    } else {
+      const formData = new URLSearchParams();
+      formData.append('secret', cfSecret);
+      formData.append('response', turnstileToken);
 
-    const turnstileRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-      method: 'POST',
-      body: formData,
-    });
-
-    const turnstileData = await turnstileRes.json();
-
-    if (!turnstileData.success) {
-      logger.security('[EDGE/TURNSTILE] Intento de bot bloqueado o fallo de configuración.', { 
-        origin: request.headers.get('x-forwarded-for'),
-        errors: turnstileData['error-codes'] 
+      const turnstileRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: formData.toString(),
       });
 
-      return NextResponse.json(
-        { error: 'Verificación de seguridad anti-bots fallida.', details: turnstileData['error-codes'] }, 
-        { status: 403 }
-      );
+      const turnstileData = await turnstileRes.json();
+
+      if (!turnstileData.success) {
+        // En entorno local, los tokens a menudo fallan por "domain-mismatch" o "timeout-or-duplicate".
+        // Si no estamos en producción, vamos a tolerarlo para que se pueda desarrollar en el localhost sin bloqueos del Anti-Bot.
+        if (
+          process.env.NODE_ENV !== 'production' &&
+          turnstileData['error-codes']?.some((code: string) => ['domain-mismatch', 'timeout-or-duplicate'].includes(code))
+        ) {
+           logger.warn(`[EDGE/TURNSTILE] Error ${turnstileData['error-codes'].join(', ')} tolerado en entorno de Desarrollo.`);
+        } else {
+           logger.security('[EDGE/TURNSTILE] Intento de bot bloqueado o fallo de configuración.', { 
+             origin: request.headers.get('x-forwarded-for') || 'desconocido',
+             errors: turnstileData['error-codes'] 
+           });
+
+           return NextResponse.json(
+             { error: 'Verificación de seguridad anti-bots fallida.', details: turnstileData['error-codes'] }, 
+             { status: 403 }
+           );
+        }
+      }
     }
     // ✅ FIN VERIFICACIÓN CLOUDFLARE
 
