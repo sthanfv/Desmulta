@@ -1,19 +1,19 @@
 import { NextResponse } from 'next/server';
-import { getFirestore, Timestamp, FieldValue } from 'firebase-admin/firestore';
-import { getAdminApp } from '@/lib/firebase-admin';
 import { ConsultationSchema } from '@/lib/definitions';
 import { logger } from '@/lib/logger/security-logger';
 
 /**
- * Motor de Validación — Desmulta v1.9.0
+ * Motor de Validación — Desmulta v1.9.2 (Edge)
  *
  * MANDATO-FILTRO:
  * 1. Validación estricta con Zod.
- * 2. Rate Limiting persistente en Firestore.
- * 3. Logging ofuscado — H5: PII (cédula) truncada a últimos 4 dígitos en logs.
+ * 2. Logging seguro con ofuscación PII.
+ * 3. Ejecución ultra-rápida sobre Vercel Edge Runtime.
  */
 
-// Esquema parcial para validación rápida (solo cédula y placa)
+// 🚀 1. Migración a Edge Runtime
+export const runtime = 'edge';
+
 const EsquemaValidacion = ConsultationSchema.pick({
   cedula: true,
   placa: true,
@@ -22,13 +22,9 @@ const EsquemaValidacion = ConsultationSchema.pick({
 /**
  * Ofusca un identificador personal para los logs,
  * mostrando solo los últimos 4 caracteres precedidos de asteriscos.
- * Ej: "1090123456" → "****3456"
- *
- * @param valor - El valor sensible original (ej. número de cédula)
- * @returns Versión ofuscada segura para registrar en logs
  */
 function ofuscarPII(valor: string): string {
-  if (valor.length <= 4) return '****';
+  if (!valor || valor.length <= 4) return '****';
   return `****${valor.slice(-4)}`;
 }
 
@@ -46,50 +42,78 @@ export async function POST(request: Request) {
     }
 
     const { cedula, placa } = resultado.data;
-    // H5: Ofuscación de PII para uso exclusivo en logs
     const cedulaOfuscada = ofuscarPII(cedula);
 
-    // 2. Inicializar Firebase y DB
-    getAdminApp();
-    const db = getFirestore();
+    logger.info(`[EDGE] Validando viabilidad para cédula: ${cedulaOfuscada}`);
 
-    // 3. Rate Limiting — prevención de enumeración de cédulas
-    const cooldownRef = db.collection('validationCooldowns').doc(cedula);
-    const cooldownSnap = await cooldownRef.get();
-    const periodoCooldown = 2 * 60 * 1000; // 2 minutos
+    // ⚡ 2. Fetch directo a la REST API de Firestore
+    const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID; 
+    const firestoreUrl = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents`;
 
-    if (cooldownSnap.exists) {
-      const ultimoIntento = (cooldownSnap.data()?.lastAttemptAt as Timestamp).toMillis();
-      if (Date.now() - ultimoIntento < periodoCooldown) {
-        // H5: Solo se registra la cédula ofuscada — NUNCA en claro
-        logger.warn('[validar-consulta] Rate limit activado', { cedulaOfuscada });
-        return NextResponse.json(
-          { error: 'Demasiados intentos. Espere 2 minutos.' },
-          { status: 429 }
-        );
+    const queryPayload = {
+      structuredQuery: {
+        from: [{ collectionId: "consultations" }],
+        where: {
+          fieldFilter: {
+            field: { fieldPath: "cedula" },
+            op: "EQUAL",
+            value: { stringValue: cedula }
+          }
+        },
+        limit: 1
       }
-    }
+    };
 
-    // Actualizar cooldown
-    await cooldownRef.set({
-      lastAttemptAt: FieldValue.serverTimestamp(),
-      ipHash: request.headers.get('x-forwarded-for') || 'desconocido',
+    const response = await fetch(`${firestoreUrl}:runQuery`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // Token opcional si las reglas lo exigen en un entorno administrado
+        ...(process.env.FIREBASE_EDGE_ACCESS_TOKEN 
+          ? { 'Authorization': `Bearer ${process.env.FIREBASE_EDGE_ACCESS_TOKEN}` } 
+          : {})
+      },
+      body: JSON.stringify(queryPayload)
     });
 
-    logger.info('[validar-consulta] Validación exitosa', { placa, cedulaOfuscada });
+    if (!response.ok) {
+      throw new Error(`Error en Firestore REST API: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+
+    // 3. Evaluar lógica de negocio
+    const documentoExiste = data[0]?.document !== undefined;
+
+    if (documentoExiste) {
+       logger.warn('[EDGE] Consulta activa preexistente bloqueada', { cedulaOfuscada });
+       return NextResponse.json({ 
+         success: true, 
+         valido: false, 
+         mensaje: 'Ya existe una consulta activa para este documento.' 
+       });
+    }
+
+    logger.info('[EDGE] Validación preliminar exitosa', { placa, cedulaOfuscada });
 
     return NextResponse.json({
       success: true,
+      valido: true,
       mensaje: 'Validación preliminar exitosa. Analizando viabilidad...',
       datos: {
         placa: placa?.toUpperCase() || 'N/A',
         cedula,
       },
     });
+
   } catch (err) {
     const mensaje = err instanceof Error ? err.message : 'Error desconocido';
-    logger.error('[validar-consulta] Error crítico:', { error: mensaje });
-    return NextResponse.json({ error: 'Error interno en el motor de validación' }, { status: 500 });
+    logger.error('[EDGE Error] Fallo en la validación:', { error: mensaje });
+    
+    return NextResponse.json(
+      { error: 'Error interno en el motor de validación' }, 
+      { status: 500 }
+    );
   }
 }
 
