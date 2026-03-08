@@ -3,7 +3,6 @@ import { Metadata } from 'next';
 import ciudades from '@/lib/data/ciudades.json';
 import HomeClient from '@/app/_components/HomeClient';
 import { getShowcaseConfig, getFooterConfig } from '@/lib/site-config';
-import { getBlogPosts } from '@/lib/mdx';
 
 interface PageProps {
   params: Promise<{ ciudad: string }>;
@@ -61,10 +60,9 @@ export default async function PaginaCiudad({ params }: PageProps) {
   }
 
   // Obtenemos la configuración global (Server-Side)
-  const [showcaseData, footerData, blogPosts] = await Promise.all([
+  const [showcaseData, footerData] = await Promise.all([
     getShowcaseConfig(),
     getFooterConfig(),
-    getBlogPosts(),
   ]);
 
   // --- MANDATO-FILTRO v5.9.0 (SEO ESTRUCTURADO) ---
@@ -99,7 +97,6 @@ export default async function PaginaCiudad({ params }: PageProps) {
       <HomeClient
         showcaseData={showcaseData}
         footerData={footerData}
-        blogPosts={blogPosts}
         cityContext={ciudadActual.nombre}
       />
     </div>
