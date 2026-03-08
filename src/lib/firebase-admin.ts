@@ -1,46 +1,35 @@
 /**
  * Firebase Admin SDK — Singleton de inicialización segura.
  * 
- * Versión: 2.1.5 (Saneamiento de Llave ASN.1 y Corrección de Lint)
+ * Versión: 2.1.6 (Estabilización Quirúrgica de Llave RSA)
  */
 
 import { getApps, initializeApp, cert, type App } from 'firebase-admin/app';
 import { logger } from './logger/security-logger';
 
 /**
- * Normalización agresiva de la llave privada.
- * Extrae solo los datos base64 para evitar el error "Unparsed DER bytes".
+ * Realiza un corte exacto en la llave para evitar bytes sobrantes (ASN.1 error).
+ * Esta función es la "tijera" definitiva contra la basura DER de Vercel.
  */
 function normalizarLlavePrivada(llaveCruda: string | undefined): string {
   if (!llaveCruda) {
     throw new Error('VARIABLE_FIREBASE_PRIVATE_KEY_AUSENTE');
   }
 
-  // 1. Limpiar rastro de escapes y comillas de Vercel/Node (Usamos const para pasar el linter)
-  const limpio = llaveCruda.replace(/\\n/g, '\n').replace(/^["']+|["']+$/g, '').trim();
+  // 1. Limpiar rastro de escapes de red y comillas envolventes
+  let k = llaveCruda.replace(/\\n/g, '\n').replace(/^["']+|["']+$/g, '').trim();
 
-  // 2. Extraer solo el contenido entre los marcadores para ignorar basura DER externa
-  const match = limpio.match(/-----BEGIN PRIVATE KEY-----([\s\S]*)-----END PRIVATE KEY-----/);
-  
-  if (!match) {
-    // Si no tiene marcadores, intentamos limpiar la basura de todas formas línea por línea
-    logger.warn('[firebase-admin] La llave no tiene marcadores estándar. Intentando limpieza agresiva.');
-    const base64Pure = limpio
-      .split('\n')
-      .map(linea => linea.trim())
-      .filter(linea => linea.length > 0 && !linea.includes('-----'))
-      .join('');
-    return `-----BEGIN PRIVATE KEY-----\n${base64Pure}\n-----END PRIVATE KEY-----\n`;
+  // 2. CORTE QUIRÚRGICO: Localizar el marcador de cierre exacto
+  const marcadorFin = '-----END PRIVATE KEY-----';
+  const indiceFin = k.indexOf(marcadorFin);
+
+  if (indiceFin !== -1) {
+    // Cortamos TODO lo que esté después del marcador de fin.
+    // No permitimos ni un solo espacio ni salto de línea extra.
+    k = k.substring(0, indiceFin + marcadorFin.length);
   }
 
-  // 3. Reconstruir la llave desde el contenido base64 interno (el bloque del medio)
-  const contenidoBase64 = match[1]
-    .split('\n')
-    .map(linea => linea.trim())
-    .filter(linea => linea.length > 0)
-    .join('\n');
-
-  return `-----BEGIN PRIVATE KEY-----\n${contenidoBase64}\n-----END PRIVATE KEY-----\n`;
+  return k;
 }
 
 /**
@@ -56,7 +45,7 @@ export function getAdminApp(): App {
   const emailCliente = process.env.FIREBASE_CLIENT_EMAIL;
 
   if (!idProyecto || !emailCliente) {
-    throw new Error('[firebase-admin] Faltan credenciales esenciales en el entorno.');
+    throw new Error('[firebase-admin] Faltan credenciales de servidor (ProjectID/Email).');
   }
 
   try {
@@ -66,12 +55,12 @@ export function getAdminApp(): App {
       credential: cert({ 
         projectId: idProyecto, 
         clientEmail: emailCliente, 
-        privateKey: privateKey 
+        privateKey 
       }),
     });
   } catch (error) {
-    const errorMsg = error instanceof Error ? error.message : 'Error desconocido';
-    logger.error('[firebase-admin] Fallo crítico de inicialización:', { detalle: errorMsg });
+    const errorMsg = error instanceof Error ? error.message : 'Fallo desconocido';
+    logger.error('[firebase-admin] Error fatal de inicialización:', { detalle: errorMsg });
     throw error;
   }
 }
