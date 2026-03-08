@@ -1,35 +1,44 @@
 /**
  * Firebase Admin SDK — Singleton de inicialización segura.
  * 
- * Versión: 2.1.6 (Estabilización Quirúrgica de Llave RSA)
+ * Versión: 2.1.7 (Limpieza Atómica de Llave RSA)
  */
 
 import { getApps, initializeApp, cert, type App } from 'firebase-admin/app';
 import { logger } from './logger/security-logger';
 
 /**
- * Realiza un corte exacto en la llave para evitar bytes sobrantes (ASN.1 error).
- * Esta función es la "tijera" definitiva contra la basura DER de Vercel.
+ * Realiza una limpieza atómica de la llave privada.
+ * Extrae solo los caracteres Base64 y reconstruye el bloque PEM desde cero.
  */
-function normalizarLlavePrivada(llaveCruda: string | undefined): string {
-  if (!llaveCruda) {
-    throw new Error('VARIABLE_FIREBASE_PRIVATE_KEY_AUSENTE');
+function normalizarLlavePrivada(valorCrudo: string | undefined): string {
+  if (!valorCrudo) {
+    throw new Error('LLAVE_PRIVADA_NO_ENCONTRADA_EN_ENTORNO');
   }
 
-  // 1. Limpiar rastro de escapes de red y comillas envolventes
-  let k = llaveCruda.replace(/\\n/g, '\n').replace(/^["']+|["']+$/g, '').trim();
+  const MARCADOR_INICIO = '-----BEGIN PRIVATE KEY-----';
+  const MARCADOR_FIN = '-----END PRIVATE KEY-----';
 
-  // 2. CORTE QUIRÚRGICO: Localizar el marcador de cierre exacto
-  const marcadorFin = '-----END PRIVATE KEY-----';
-  const indiceFin = k.indexOf(marcadorFin);
+  // 1. Convertir escapes \n en saltos reales por si vienen de .env
+  let s = valorCrudo.replace(/\\n/g, '\n');
 
-  if (indiceFin !== -1) {
-    // Cortamos TODO lo que esté después del marcador de fin.
-    // No permitimos ni un solo espacio ni salto de línea extra.
-    k = k.substring(0, indiceFin + marcadorFin.length);
+  // 2. Localizar marcadores
+  const inicio = s.indexOf(MARCADOR_INICIO);
+  const fin = s.indexOf(MARCADOR_FIN);
+
+  if (inicio !== -1 && fin !== -1) {
+    // 3. EXTRAER SOLO EL CONTENIDO BASE64 INTERNO
+    const base64Interno = s
+      .substring(inicio + MARCADOR_INICIO.length, fin)
+      .replace(/[\s\r\n\t]/g, ''); // ELIMINAR CUALQUIER ESPACIO O SALTO INVISIBLE
+
+    // 4. RECONSTRUIR EL BLOQUE PEM PERFECTO
+    // Sin saltos de línea internos para evitar errores de red en el Handshake
+    return `${MARCADOR_INICIO}\n${base64Interno}\n${MARCADOR_FIN}\n`;
   }
 
-  return k;
+  // Fallback por si la llave ya viene limpia o procesada por Vercel
+  return s.trim();
 }
 
 /**
@@ -45,7 +54,7 @@ export function getAdminApp(): App {
   const emailCliente = process.env.FIREBASE_CLIENT_EMAIL;
 
   if (!idProyecto || !emailCliente) {
-    throw new Error('[firebase-admin] Faltan credenciales de servidor (ProjectID/Email).');
+    throw new Error('[firebase-admin] Credenciales de servidor insuficientes.');
   }
 
   try {
@@ -59,8 +68,8 @@ export function getAdminApp(): App {
       }),
     });
   } catch (error) {
-    const errorMsg = error instanceof Error ? error.message : 'Fallo desconocido';
-    logger.error('[firebase-admin] Error fatal de inicialización:', { detalle: errorMsg });
+    const detalleError = error instanceof Error ? error.message : 'Error desconocido';
+    logger.error('[firebase-admin] Fallo crítico en inicialización v2.1.7:', { detalle: detalleError });
     throw error;
   }
 }
