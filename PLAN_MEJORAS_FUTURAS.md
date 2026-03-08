@@ -1,4 +1,4 @@
-# Plan Estratégico de Mejoras Futuras — Desmulta (Post v1.9.0)
+# Plan Estratégico de Mejoras Futuras — Desmulta (Post v2.0.0)
 
 Este documento proyecta el roadmap de crecimiento tecnológico y de negocio para Desmulta, asegurando el escalado responsable bajo nuestro **MANDATO-FILTRO**. 
 

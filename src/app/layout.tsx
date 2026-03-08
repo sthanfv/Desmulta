@@ -10,6 +10,10 @@ import { ScrollProgressBar } from '@/components/ui/ScrollProgressBar';
 import { MotorFomo } from '@/components/MotorFomo';
 import { Analytics } from '@vercel/analytics/react';
 import { PwaRegistry } from '@/components/PwaRegistry';
+import { validateEnv } from '@/lib/env-check';
+
+// MANDATO-FILTRO: Validación proactiva de configuración
+validateEnv();
 
 const outfit = Outfit({
   subsets: ['latin'],

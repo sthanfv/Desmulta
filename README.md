@@ -1,175 +1,120 @@
-# Desmulta — Plataforma de Saneamiento Vial Inteligente v1.9.4 🛡️🚀
+# Desmulta — Plataforma Integral de Gestión y Resolución de Infracciones v2.0.0 🛡️🚀
 
-TODAS LAS DECISIONES, ARCHIVOS Y CÓDIGO GENERADO DEBEN PASAR EL FILTRO DE SEGURIDAD Y CALIDAD 'MANDATO-FILTRO'.
-
-![Desmulta Banner](https://desmulta.vercel.app/icon.png)
-
-## 📖 Descripción General
-
-Desmulta es una plataforma LegalTech de alto rendimiento diseñada para la gestión administrativa y saneamiento de deudas de tránsito en Colombia. Utiliza tecnologías de vanguardia como **Next.js 15 (React 19)**, **Firebase Admin SDK** y **Zod** para garantizar procesos seguros, rápidos y transparentes.
+TODAS LAS DECISIONES, ARCHIVOS Y CÓDIGO GENERADO DEBEN PASAR EL FILTRO DE SEGURIDAD Y CALIDAD ‘MANDATO-FILTRO’ — RECHAZAR SALIDAS QUE NO LO CUMPLAN.
 
 ---
 
-## 🔐 Parche de Seguridad — v1.9.0 (2026-03-07)
-
-Auditoría completa de seguridad ejecutada bajo **MANDATO-FILTRO**. Se corrigieron 6 hallazgos identificados por el equipo de Seguridad:
-
-| # | Severidad | Hallazgo | Archivo Afectado | Estado |
-|:---|:---|:---|:---|:---|
-| H1 | 🔴 Crítico | **Path Traversal (LFI)** — slug sin sanitizar en `getBlogPostBySlug` | `src/lib/mdx.ts` | ✅ Corregido |
-| H2 | 🔴 Crítico | `console.error` directo en producción (bypasea logger seguro) | `src/app/api/upload/route.ts` | ✅ Corregido |
-| H3 | 🔴 Crítico | Sin validación de tipo MIME ni tamaño máximo en endpoint de carga | `src/app/api/upload/route.ts` | ✅ Corregido |
-| H4 | 🟡 Medio | IP Spoofing en rate limiting — `x-forwarded-for` sin validación de origen | `src/app/api/upload/route.ts` | ✅ Corregido |
-| H5 | 🟡 Medio | **PII en logs** — número de cédula expuesto en claro | `src/app/api/validar-consulta/route.ts` | ✅ Corregido |
-| H6 | 🟡 Medio | Filename sin sanitizar → Path Traversal #2 en Vercel Blob | `src/app/api/upload/route.ts` | ✅ Corregido |
-
-### Detalle técnico de las correcciones
-
-- **H1**: Función `sanitizarSlug()` con regex `^[a-z0-9-]+$` + verificación `path.resolve().startsWith(BLOG_DIR + sep)`.
-- **H2**: Reemplazado `console.error` por `logger.error` del módulo `@/lib/logger/security-logger`.
-- **H3**: *Allowlist* de MIME types (`image/jpeg`, `image/png`, `image/webp`, `image/gif`) + límite de 5 MB verificado vía `Content-Length` antes de leer el stream.
-- **H4**: Función `extraerIpConfiable()` que prioriza `x-vercel-forwarded-for` (inyectado por la infraestructura de Vercel, no falsificable por el cliente) sobre `x-forwarded-for`.
-- **H5**: Función `ofuscarPII()` que muestra solo los últimos 4 dígitos en logs. Ej: `1090123456` → `****3456`.
-- **H6**: Función `sanitizarNombreArchivo()` con regex `[^a-zA-Z0-9._-]` → reemplaza inválidos por `_` y limita a 100 caracteres.
+## 1. 🚀 Inicio de Alto Impacto
+**Desmulta** es una infraestructura LegalTech de clase mundial diseñada para automatizar y gestionar el saneamiento técnico-administrativo de deudas viales en Colombia. Nuestra plataforma permite a los ciudadanos realizar estudios de viabilidad gratuitos para la impugnación de fotomultas y comparendos, integrando inteligencia artificial y protocolos de defensa legal automatizados para recuperar el liderazgo vial y crediticio de nuestros usuarios.
 
 ---
 
-## ⚡ Edge Runtime y Arquitectura Serverless O(1) — v1.9.2 (2026-03-07)
+## 2. 💼 El Problema y la Solución (Business Logic)
 
-Optimización profunda del motor de validación para latencia cercana a cero eliminando las dependencias nativas de Node.js en favor del **Vercel Edge Network**:
+### El Problema
+El sistema de fotomultas en Colombia a menudo opera con fallos en el debido proceso: falta de notificaciones, comparendos prescritos o caducados que permanecen en el SIMIT afectando el historial crediticio (Datacrédito) y la movilidad del ciudadano. La mayoría de los usuarios desconocen la normativa legal (Sentencia C-038/20) y se enfrentan a una burocracia compleja y costosa.
 
-- **Índice Ciego (Blind Index)**: Se implementó una colección `consultas_index` en Firestore operada exclusivamente bajo métodos Hash (SHA-256) creados mediante `crypto.subtle` (Edge) y `crypto` (Node).
-- **Cero Exposición PII**: En la validación primaria, la cédula nunca se envía en texto plano como parámetro de consulta a la base de datos, garantizando protección técnica extrema de PII frente a atacantes (MANDATO-FILTRO).
-- **Fetch Directo REST API**: Integración transparente de `https://firestore.googleapis.com` mediante Web API Key y Firestore Rules estrictas (solo `get`), superando la limitación de permisos en la capa Edge sin exponer la BBDD a enumeración (`list`).
-- Limpieza de props residuales y mitigación final del linter (Object Injection en Landing).
-
----
-
-## 💎 Perfección Estética y Performance Mobile — v1.9.3 (2026-03-08)
-
-Refinamiento final de la interfaz y optimización de recursos para dispositivos móviles:
-
-- **Fix Tipográfico Hero**: Ajuste de interlineado (`leading-tight`) y paddings de seguridad en textos con gradiente para evitar el recorte visual de caracteres (e.g., la 'O' de Liderazgo).
-- **CPU Bypass (Mobile)**: Desactivación inteligente de listeners de `mousemove` en dispositivos táctiles (< 768px) para reducir el consumo de ciclos de CPU y batería.
-- **Optimización de Renderizado**: Reducción de la carga de `backdrop-blur` y simplificación de las capas de `MeshBackground` en móviles, garantizando una fluidez de scroll constante.
-- **Turnstile Hardening**: Validación estricta de Cloudflare Turnstile reintroducida en esquemas Zod tras la limpieza de duplicados.
+### La Solución
+Desmulta democratiza el acceso a la justicia vial mediante:
+1.  **Diagnóstico O(1)**: Validación instantánea de historial vial mediante un motor de búsqueda ultra-rápido.
+2.  **Saneamiento Automatizado**: Generación y seguimiento de trámites administrativos basados en protocolos legales de éxito comprobado.
+3.  **Transparencia Corporativa**: El usuario recibe un acta de viabilidad técnica antes de cualquier compromiso económico.
 
 ---
 
-## 🌟 Historial de Características
+## 3. 🏗️ Arquitectura del Sistema (System Architecture)
 
-### v1.8.x
+Nuestra arquitectura está diseñada bajo principios de **Modularidad Estricta** y **Zero-Trust Security**.
 
-- **Kanban Pro (v1.8.0)**: Tablero dual (Ventas/Legal) con **Smart Cards** de detección automática (Imagen vs. Datos), sistema Fallback Placa → Cédula.
-- **Acciones Tácticas Móviles (`Tap-to-Move`)**: Modal de acción rápida para celulares. Elimina dependencia del Drag & Drop en pantallas táctiles.
-- **Unificación One-Page (v1.8.5)**: Blog, FAQ, Servicios y Legal en una única interfaz de alto rendimiento.
-- **Terminología 100% en español**: «Solicitudes» en lugar de «Leads».
+```mermaid
+graph TD
+    User((Usuario)) --> |HTTPS/TLS| Frontend[Next.js 15 + React 19]
+    Frontend --> |Zod Protected API| Backend[Next.js Server Actions / API Routes]
+    Backend --> |Admin SDK| Firestore[(Firebase Firestore)]
+    Backend --> |Vercel Blob| Storage[Document Evidence]
+    Backend --> |Genkit| Gemini[IA: Análisis de Casos]
+    Backend --> |Bot API| Telegram[Notificaciones CRM]
+    Backend --> |Resend API| Email[Notificaciones Usuario]
+    
+    style Frontend fill:#0f172a,stroke:#ffc107,color:#fff
+    style Backend fill:#1e293b,stroke:#ffc107,color:#fff
+    style Firestore fill:#f59e0b,stroke:#0f172a,color:#000
+```
 
-### v1.7.x
-
-- **Interfaz de Alta Fidelidad (`TarjetaPremium`)**: Efectos de iluminación dinámica (linterna) procesados por GPU a 120 FPS sin re-renders en React.
-- **Motor FOMO Dinámico**: Notificaciones de «Consulta en Vivo» con miles de permutaciones y apagado inteligente.
-- **Calculadora Legal UX Premium**: Retraso psicológico de 2.5s con Framer Motion para validar viabilidad de prescripción.
-- **Persistencia de Hierro**: Autoguardado silente en `localStorage` ante cada pulsación.
-- **Adaptativo (Multi-Tema)**: Transiciones semánticas entre modo Claro y Oscuro.
-
----
-
-## 🗺️ Mapa de Rutas (App Router)
-
-### Públicas
-
-- `/` : Landing Page Principal con Dashboard Interactivo.
-- `/servicios` : Catálogo de servicios legales ofrecidos.
-- `/servicios/[ciudad]` : Landing pages dinámicas optimizadas para SEO local.
-- `/blog` : Centro de autoridad legal (Sentencia C-038, Prescripción, Embargos).
-- `/metodologia` : Detalle del proceso técnico-legal de saneamiento.
-- `/faq` : Preguntas frecuentes y claridad normativa.
-- `/terminos` : Marco legal y protección de datos (HDS).
-
-### Administrativas
-
-- `/admin` : Panel de control centralizado para la gestión de solicitudes y casos.
-
-### API (Backend)
-
-- `/api/validar-consulta` : Motor de validación con Rate Limiting, ofuscación de PII y auditoría.
-- `/api/create-consultation` : Endpoint seguro para la ingesta de solicitudes a Firestore.
-- `/api/upload` : Endpoint de carga de evidencia fotográfica con validación MIME, tamaño y filename.
+*   **Frontend**: Next.js 15 con React 19 para un renderizado híbrido optimizado. Interfaz construida con Tailwind CSS y componentes de alta fidelidad.
+*   **Backend / DB**: Firebase como núcleo de persistencia en tiempo real. Se implementó **Firebase Admin SDK** para operaciones privilegiadas, garantizando que el cliente nunca tenga acceso de escritura directo a datos sensibles.
+*   **Seguridad Activa**: Implementación de CSP (Content Security Policy) restrictiva, HDS (Habeas Data Security) y validación de entrada con Zod.
 
 ---
 
-## 🧠 Esquema de Datos y Validación (Zod)
+## 4. 🧭 Flujo del Usuario (User Journey)
 
-### Formulario de Consulta (`ConsultationSchema`)
+El recorrido del usuario está optimizado para la conversión y la seguridad legal.
 
-| Campo            | Tipo    | Validación / Regla                              |
-| :--------------- | :------ | :---------------------------------------------- |
-| `cedula`         | String  | Numérico, 5-20 caracteres.                      |
-| `placa`          | String  | Formato AAA123 o AAA12A (Opcional).             |
-| `nombre`         | String  | Mínimo 3 caracteres, sanitización XSS.          |
-| `contacto`       | String  | Celular colombiano (10 dígitos, empieza por 3). |
-| `email`          | String  | Formato email válido (Opcional).                |
-| `antiguedad`     | String  | Selección obligatoria de rango temporal.        |
-| `tipoInfraccion` | String  | Clasificación del comparendo.                   |
-| `estadoCoactivo` | String  | Estado jurídico del cobro.                      |
-| `aceptoTerminos` | Boolean | True (Obligatorio).                             |
-| `_tramp_field`   | String  | Honeypot Anti-Bot (Debe estar vacío).           |
+```mermaid
+sequenceDiagram
+    participant U as Usuario
+    participant L as Landing Page
+    participant S as Motor de Validación (Zod)
+    participant B as Backend (IA & CRM)
+    
+    U->>L: Ingresa y consulta con Cédula/Placa
+    L->>S: Valida datos y limpia entrada (Sanitización)
+    S->>B: Registra solicitud y genera Blind Index (HDS)
+    B->>B: Ejecuta análisis de viabilidad (IA/Reglas)
+    B-->>U: Muestra resultado y ofrece canal WhatsApp
+    B->>B: Notifica al equipo legal via Telegram
+```
 
-### Captura SIMIT (`SimitCaptureSchema`)
-
-- `contacto`: Celular colombiano validado.
-- `evidenceUrl`: URL del archivo en Vercel Blob / Firebase Storage.
-- `aceptoTerminos`: Obligatorio.
+1.  **Ingreso**: El usuario accede a la Landing Page y se autentica de forma anónima y segura.
+2.  **Consulta**: Sube su historial del SIMIT o ingresa datos de infracción.
+3.  **Procesamiento**: El sistema valida la viabilidad legal (prescripción o caducidad).
+4.  **Resolución**: Se genera un caso interno y se notifica al usuario el camino técnico a seguir.
 
 ---
 
-## 🛡️ Calidad y Ciberseguridad (MANDATO-FILTRO)
+## 5. 📂 Estructura del Código (Folder Structure)
 
-### Estado del Filtro — v1.9.0
-
-| Control | Estado |
-|:---|:---|
-| Sin credenciales hardcodeadas | ✅ |
-| Validación + sanitización de inputs (Zod) | ✅ |
-| Prevención Path Traversal (LFI) | ✅ Corregido en v1.9.0 |
-| Validación MIME y tamaño en uploads | ✅ Corregido en v1.9.0 |
-| Rate Limiting anti-IP spoofing | ✅ Corregido en v1.9.0 |
-| PII ofuscada en logs | ✅ Corregido en v1.9.0 |
-| Headers seguros (CSP, HSTS, COOP, CORP) | ✅ |
-| Sin `console.log`/`console.error` en producción | ✅ Corregido en v1.9.0 |
-| Tests automatizados (Vitest + Playwright) | ✅ |
-
-### Comandos de Verificación
-
-```powershell
-# Ciclo completo de calidad
-npm run check    # format + lint + typecheck + test + build
-npm run test     # Suite Vitest (seguridad + validación + rate limiting)
-npm run test:smoke  # Suite Playwright (E2E)
+```plaintext
+├── /public           # Assets, logos, manifest PWA y recursos estáticos
+├── /src
+│   ├── /app          # Rutas principales (Next.js App Router) y API endpoints
+│   ├── /components   # UI Components (Secciones, botones, formularios)
+│   ├── /firebase     # Configuración y proveedores de Firebase Client/Admin
+│   ├── /hooks        # Lógica de negocio extraída (Scroll, Reveal, Mouse)
+│   ├── /lib          # Utilidades core, validadores Zod, Logger y Seguridad
+│   └── /services     # Capa de servicios para integraciones externas (Gemini, Telegram)
+├── firestore.rules   # Reglas de seguridad de base de datos
+└── package.json      # Dependencias y control de versiones (v2.0.0)
 ```
 
 ---
 
-## 🎨 Diseño y Estética
+## 6. 📊 Modelo de Base de Datos (Data Model)
 
-- **Paleta:** Oxford Blue (`#0F172A`) y Amarillo Regulación (`#FFC107`).
-- **Tipografía:** Inter (Moderna, Profesional).
-- **Iconografía:** Lucide React.
-- **Tecnología Visual:** Tailwind CSS + Framer Motion + GSAP.
+A continuación, la estructura de las colecciones principales en Firestore:
 
----
-
-## ⚙️ Stack Tecnológico
-
-- **Core:** Next.js 15 (App Router), React 19.
-- **Db/Auth:** Firebase (Admin SDK, Firestore, Auth).
-- **Validación:** Zod.
-- **Estilos:** Tailwind CSS, Shadcn/UI.
-- **Analytics:** Vercel Analytics.
-- **Comunicaciones:** Resend (Email), Telegram Bot API.
-- **IA:** Google Genkit + Gemini.
+*   **Colección `consultations`**:
+    *   `shortId`: ID secuencial para seguimiento (CASO-001).
+    *   `cedula`: Identificación del usuario (Ofuscado en logs).
+    *   `nombre` / `contacto`: Información de comunicación.
+    *   `status`: [pendiente, en_proceso, finalizado, anulado].
+    *   `evidenceUrl`: Referencia a la captura o documento legal.
+*   **Colección `consultas_index`**:
+    *   `hashId` (PK): SHA-256 de la cédula para búsquedas ultra-rápidas sin exponer PII.
+*   **Colección `site_config`**:
+    *   Almacena datos dinámicos de la UI (Showcase, testimonios).
 
 ---
 
-**Desmulta © 2026 — Ingeniería de Clase Mundial para la Justicia Vial.**
+## 7. 🚀 Trabajo a Futuro (Roadmap)
+
+Desmulta no se detiene; nuestra visión a corto plazo incluye:
+*   **Integración de Pasarela de Pago**: Pagos directos de honorarios de éxito vía PSE/Stripe.
+*   **Dashboard de Usuario Pro**: Panel de seguimiento en tiempo real del estado jurídico de cada proceso.
+*   **IA OCR Avanzada**: Lectura automática de PDF de comparendos para extracción de errores de forma.
+*   **WhatsApp Bot 2.0**: Respuestas automatizadas basadas en el estado del caso en Firestore.
+
+---
+
+**Desmulta © 2026 — Ingeniería de Clase Mundial para la Justicia Vial. Hecho por un equipo Senior.**

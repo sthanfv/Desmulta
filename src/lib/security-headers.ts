@@ -6,13 +6,13 @@ export const cspHeader = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://placehold.co https://picsum.photos https://*.public.blob.vercel-storage.com https://firebasestorage.googleapis.com https://www.google-analytics.com https://www.facebook.com https://*.facebook.com https://grainy-gradients.vercel.app",
   "media-src 'self'",
-  "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://api.telegram.org https://www.google-analytics.com https://connect.facebook.net https://grainy-gradients.vercel.app https://challenges.cloudflare.com https://va.vercel-scripts.com",
-  "frame-src 'self' https://challenges.cloudflare.com",
+  "form-action 'self' https://checkout.stripe.com https://wa.me",
+  "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://api.telegram.org https://www.google-analytics.com https://connect.facebook.net https://grainy-gradients.vercel.app https://challenges.cloudflare.com https://va.vercel-scripts.com https://*.vercel-storage.com",
+  "frame-src 'self' https://challenges.cloudflare.com https://www.facebook.com https://connect.facebook.net",
   "frame-ancestors 'none'",
   "object-src 'none'",
   "base-uri 'self'",
-  "form-action 'self'",
-  'upgrade-insecure-requests',
+  "upgrade-insecure-requests",
 ].join('; ');
 
 export const securityHeadersLabels = [
