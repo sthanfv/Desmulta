@@ -67,6 +67,10 @@ export function ImageUpload({
       );
 
       if (!response.ok) {
+        if (response.status === 429) {
+          const data = await response.json();
+          throw new Error(data.error || 'Has alcanzado el límite de 5 cargas por hoy.');
+        }
         throw new Error('Error al subir la imagen al servidor.');
       }
 
