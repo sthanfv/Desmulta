@@ -87,29 +87,29 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
     ),
     defaultValues: isSimitMode
       ? {
-        contacto: '',
-        aceptoTerminos: false,
-        _tramp_field: '',
-        evidenceUrl: '',
-        cedula: 'SIMIT-CAPTURA',
-        placa: '',
-        nombre: 'VÍA CAPTURA SIMIT',
-        antiguedad: 'N/A',
-        tipoInfraccion: 'N/A',
-        estadoCoactivo: 'N/A',
-      }
+          contacto: '',
+          aceptoTerminos: false,
+          _tramp_field: '',
+          evidenceUrl: '',
+          cedula: 'SIMIT-CAPTURA',
+          placa: '',
+          nombre: 'VÍA CAPTURA SIMIT',
+          antiguedad: 'N/A',
+          tipoInfraccion: 'N/A',
+          estadoCoactivo: 'N/A',
+        }
       : {
-        cedula: '',
-        placa: '',
-        nombre: '',
-        contacto: '',
-        aceptoTerminos: false,
-        _tramp_field: '',
-        antiguedad: '',
-        tipoInfraccion: '',
-        estadoCoactivo: '',
-        evidenceUrl: '',
-      },
+          cedula: '',
+          placa: '',
+          nombre: '',
+          contacto: '',
+          aceptoTerminos: false,
+          _tramp_field: '',
+          antiguedad: '',
+          tipoInfraccion: '',
+          estadoCoactivo: '',
+          evidenceUrl: '',
+        },
   });
 
   // Persistence logic (Modo Supervivencia)
@@ -183,10 +183,11 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
   };
 
   const onSubmit: SubmitHandler<ConsultationFormData> = async (data) => {
-    haptics.vibrate('medium'); // Immediate feedback on submit
+    haptics.vibrate('heavy'); // Fuerza táctil al iniciar el trámite
     try {
       if (!isHuman || !turnstileToken) {
-        throw new Error('El escudo de seguridad aún está validando o detectó anomalías. Espera un segundo.');
+        haptics.vibrate('warning');
+        throw new Error('El escudo de seguridad aún está validando. Por favor, espere un segundo.');
       }
 
       const auth = getAuth();
@@ -295,11 +296,24 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={(e) => {
+          form.handleSubmit(onSubmit)(e).catch(() => {
+            // Capturamos fallos de validación de Zod
+            if (process.env.NODE_ENV === 'development') {
+              console.warn('⚠️ Fallo de validación Zod:', form.formState.errors);
+            }
+            haptics.vibrate('warning');
+            toast({
+              variant: 'destructive',
+              title: 'Formulario Incompleto',
+              description: 'Por favor, revise los campos marcados en rojo.',
+            });
+          });
+        }}
         onMouseMove={handleInteraction}
         onKeyDown={handleInteraction}
         onTouchStart={handleInteraction}
-        className="space-y-8"
+        className="space-y-8 md:space-y-10"
       >
         <div className="px-1">
           <Progress
@@ -490,7 +504,7 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
             >
               <span
                 aria-hidden="true"
-                className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none shimmer-child"
+                className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent pointer-events-none animate-shimmer"
               />
               CONTINUAR ANÁLISIS
               <ChevronRight size={24} className="group-hover:translate-x-1 transition-transform" />
@@ -753,18 +767,20 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
 
             <div className="my-6 flex flex-col items-center justify-center min-h-[65px]">
               {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ? (
-                <Turnstile 
-                  siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} 
+                <Turnstile
+                  siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
                   onSuccess={(token) => setTurnstileToken(token)}
                   options={{
                     theme: 'dark',
-                    size: 'normal'
+                    size: 'normal',
                   }}
                 />
               ) : (
                 <div className="text-[10px] font-bold text-destructive animate-pulse uppercase tracking-widest text-center">
-                  ⚠️ Error de Configuración:<br/>
-                  Falta NEXT_PUBLIC_TURNSTILE_SITE_KEY.<br/>
+                  ⚠️ Error de Configuración:
+                  <br />
+                  Falta NEXT_PUBLIC_TURNSTILE_SITE_KEY.
+                  <br />
                   Reinicia el servidor (npm run dev).
                 </div>
               )}
@@ -772,13 +788,20 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
 
             <Button
               type="submit"
-              disabled={isSubmitting}
-              className="w-full bg-primary text-primary-foreground font-black py-8 rounded-3xl hover:bg-primary/95 transition-all flex items-center justify-center gap-3 h-20 text-xl shadow-xl shadow-primary/20 active:scale-95 border-none relative overflow-hidden"
+              disabled={isSubmitting || !turnstileToken}
+              className={cn(
+                'w-full font-black py-8 rounded-3xl transition-all flex items-center justify-center gap-3 h-20 text-base md:text-xl shadow-xl active:scale-95 border-none relative overflow-hidden',
+                turnstileToken
+                  ? 'bg-primary text-primary-foreground shadow-primary/20'
+                  : 'bg-muted text-muted-foreground grayscale cursor-not-allowed opacity-50'
+              )}
             >
-              <span
-                aria-hidden="true"
-                className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none shimmer-child"
-              />
+              {turnstileToken && (
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none animate-shimmer"
+                />
+              )}
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-3 h-6 w-6 animate-spin" />

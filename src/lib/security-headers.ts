@@ -12,7 +12,7 @@ export const cspHeader = [
   "frame-ancestors 'none'",
   "object-src 'none'",
   "base-uri 'self'",
-  "upgrade-insecure-requests",
+  'upgrade-insecure-requests',
 ].join('; ');
 
 export const securityHeadersLabels = [
@@ -23,6 +23,6 @@ export const securityHeadersLabels = [
   { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
   { key: 'Content-Security-Policy', value: cspHeader },
   { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
-  { key: 'Cross-Origin-Resource-Policy', value: 'cross-origin' },
+  { key: 'Cross-Origin-Resource-Policy', value: 'same-origin' },
   { key: 'X-DNS-Prefetch-Control', value: 'on' },
 ];

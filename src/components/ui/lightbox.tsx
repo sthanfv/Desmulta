@@ -37,47 +37,40 @@ export function Lightbox({ src, alt, className = '' }: LightboxProps) {
     </div>
   );
 
-  if (!mounted) {
-    return triggerContent;
-  }
-
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{triggerContent}</DialogTrigger>
 
-      {/* 
-        Utilizamos la variante max-w-7xl para permitir que la imagen sea inmensa y
-        borramos paddings y colores de fondo del DialogContent tradicional para dar un look premium.
-       */}
-      <DialogContent className="max-w-7xl w-[95vw] h-[95vh] p-0 bg-transparent border-none shadow-none flex flex-col justify-center items-center">
-        {/* Escondemos el título por accesibilidad sin mostrarlo en UI */}
-        <DialogPrimitive.Title className="sr-only">
-          {alt || 'Vista ampliada de la imagen'}
-        </DialogPrimitive.Title>
+      {mounted && (
+        <DialogContent className="max-w-7xl w-[95vw] h-[95vh] p-0 bg-transparent border-none shadow-none flex flex-col justify-center items-center">
+          <DialogPrimitive.Title className="sr-only">
+            {alt || 'Vista ampliada de la imagen'}
+          </DialogPrimitive.Title>
 
-        <div className="relative w-full h-[85vh] animate-in zoom-in-95 duration-300">
-          <Image
-            src={src}
-            alt={alt}
-            fill
-            sizes="95vw"
-            className="object-contain drop-shadow-2xl"
-            priority
-          />
-        </div>
+          <div className="relative w-full h-[85vh] animate-in zoom-in-95 duration-300">
+            <Image
+              src={src}
+              alt={alt}
+              fill
+              sizes="95vw"
+              className="object-contain drop-shadow-2xl"
+              priority
+            />
+          </div>
 
-        <div className="flex justify-center mt-6">
-          <a
-            href={src}
-            target="_blank"
-            rel="noreferrer"
-            className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-2xl backdrop-blur-md transition-all font-bold border border-white/10"
-          >
-            <ZoomIn size={20} />
-            Ver Resolución Completa
-          </a>
-        </div>
-      </DialogContent>
+          <div className="flex justify-center mt-6">
+            <a
+              href={src}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-2xl backdrop-blur-md transition-all font-bold border border-white/10"
+            >
+              <ZoomIn size={20} />
+              Ver Resolución Completa
+            </a>
+          </div>
+        </DialogContent>
+      )}
     </Dialog>
   );
 }

@@ -5,7 +5,7 @@ import { ConsultationSchema, SimitCaptureSchema } from '@/lib/definitions';
 import { logger } from '@/lib/logger/security-logger';
 import { z } from 'zod';
 import crypto from 'crypto';
-// import { analyzeViabilityFlow } from '@/lib/genkit';
+// IA Removida por solicitud del usuario - v2.1.0
 
 /**
  * MANDATO-FILTRO: Verificación server-side del token Cloudflare Turnstile.
@@ -20,7 +20,9 @@ async function verifyTurnstileToken(token: string | undefined): Promise<boolean>
   if (!secret) {
     // En desarrollo sin la key configurada, emitir advertencia y pasar
     if (process.env.NODE_ENV !== 'production') {
-      logger.warn('[turnstile] TURNSTILE_SECRET_KEY no definida. Saltando verificación en desarrollo.');
+      logger.warn(
+        '[turnstile] TURNSTILE_SECRET_KEY no definida. Saltando verificación en desarrollo.'
+      );
       return true;
     }
     // En producción sin la key: bloquear y alertar
@@ -43,7 +45,9 @@ async function verifyTurnstileToken(token: string | undefined): Promise<boolean>
 
     if (!data.success) {
       if (process.env.NODE_ENV !== 'production') {
-        logger.warn(`[turnstile] Fallo en desarrollo (${data['error-codes']?.join(', ') || 'sin códigos'}). Tolerado.`);
+        logger.warn(
+          `[turnstile] Fallo en desarrollo (${data['error-codes']?.join(', ') || 'sin códigos'}). Tolerado.`
+        );
         return true;
       }
       logger.security('[turnstile] Token inválido rechazado por Cloudflare.', {
@@ -117,7 +121,10 @@ export async function POST(request: NextRequest) {
     if (!turnstileValid) {
       logger.security('[create-consultation] Token Turnstile inválido o ausente.', { authorUid });
       return NextResponse.json(
-        { error: 'Verificación de seguridad fallida. Por favor, recargue la página e intente de nuevo.' },
+        {
+          error:
+            'Verificación de seguridad fallida. Por favor, recargue la página e intente de nuevo.',
+        },
         { status: 403 }
       );
     }
@@ -215,8 +222,8 @@ export async function POST(request: NextRequest) {
       if (finalDataToSave.cedula !== 'SIMIT-CAPTURA') {
         const hashValue = crypto.createHash('sha256').update(finalDataToSave.cedula).digest('hex');
         const indexRef = db.collection('consultas_index').doc(hashValue);
-        transaction.set(indexRef, { 
-          createdAt: FieldValue.serverTimestamp() 
+        transaction.set(indexRef, {
+          createdAt: FieldValue.serverTimestamp(),
         });
       }
 
@@ -254,19 +261,10 @@ export async function POST(request: NextRequest) {
         }
       }
 
+      // 6. Análisis IA Predictiva (Desactivado preventivamente - v2.1.2)
       /* 
-      // 6. Análisis IA Predictiva (Desactivado temporalmente por solicitud del usuario - v3.3.6)
-      try {
-        const aiAnalysis = await analyzeViabilityFlow({
-          antiquity: antiguedad,
-          type: tipoInfraccion,
-          coactive: estadoCoactivo,
-        });
-        await consultationRef.update({ aiAnalysis });
-        logger.info('[create-consultation] Análisis IA guardado.', { docId: consultationRef.id });
-      } catch (aiError) {
-        logger.error('[create-consultation] Fallo en IA:', { error: String(aiError) });
-      }
+      La lógica de IA ha sido purgada del sistema por directriz técnica.
+      Se prioriza el análisis humano determinístico.
       */
     });
 
