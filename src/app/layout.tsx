@@ -9,8 +9,8 @@ import { Outfit } from 'next/font/google';
 import { ScrollProgressBar } from '@/components/ui/ScrollProgressBar';
 import { MotorFomo } from '@/components/MotorFomo';
 import { Analytics } from '@vercel/analytics/react';
-import { PwaRegistry } from '@/components/PwaRegistry';
 import { validateEnv } from '@/lib/env-check';
+import { PwaUpdateToast } from '@/components/pwa/PwaUpdateToast';
 
 // MANDATO-FILTRO: Validación proactiva de configuración
 validateEnv();
@@ -220,7 +220,7 @@ export default function RootLayout({
             }}
           />
         )}
-        <PwaRegistry />
+        <PwaUpdateToast />
       </body>
     </html>
   );

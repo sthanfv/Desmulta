@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og';
 
 // Forzamos el Edge Runtime para que la imagen se genere en milisegundos cerca del usuario
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
 export const alt = 'Desmulta - Auditoría y Saneamiento Vial';
 export const size = { width: 1200, height: 630 };

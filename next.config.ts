@@ -8,10 +8,33 @@ const withPWA = withPWAInit({
   fallbacks: {
     document: '/offline',
   },
-  // Forzamos a no usar helpers de transpilación externos que fallan en sw.js
+  // Forzamos la estabilidad del Service Worker
   workboxOptions: {
     skipWaiting: true,
     clientsClaim: true,
+    cleanupOutdatedCaches: true,
+    runtimeCaching: [
+      {
+        urlPattern: /^https:\/\/.*\/$/, // Home page
+        handler: 'NetworkFirst',
+        options: {
+          cacheName: 'documents',
+          expiration: {
+            maxEntries: 10,
+          },
+        },
+      },
+      {
+        urlPattern: /\/$/, // Any other route
+        handler: 'NetworkFirst',
+        options: {
+          cacheName: 'documents',
+          expiration: {
+            maxEntries: 50,
+          },
+        },
+      },
+    ],
   },
 });
 

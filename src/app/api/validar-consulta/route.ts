@@ -11,8 +11,8 @@ import { logger } from '@/lib/logger/security-logger';
  * 3. Ejecución ultra-rápida sobre Vercel Edge Runtime.
  */
 
-// 🚀 1. Migración a Edge Runtime
-export const runtime = 'edge';
+// 🚀 1. Normalización a Node.js Runtime para estabilidad v2.3.0
+export const runtime = 'nodejs';
 
 const EsquemaValidacion = ConsultationSchema.pick({
   cedula: true,

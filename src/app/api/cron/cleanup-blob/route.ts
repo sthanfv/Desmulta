@@ -11,7 +11,7 @@ import { NextResponse } from 'next/server';
  * 3. Eliminación atómica para optimizar almacenamiento gratuito (250MB limit).
  */
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
 export async function GET(request: Request) {
   // Protección básica: CRON_SECRET obligatorio

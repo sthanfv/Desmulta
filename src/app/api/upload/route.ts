@@ -14,7 +14,6 @@ import { logger } from '@/lib/logger/security-logger';
 import type { NextRequest } from 'next/server';
 
 const MIMES_PERMITIDOS = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
-const TAMANO_MAXIMO_BYTES = 5 * 1024 * 1024;
 const LONGITUD_MAXIMA_FILENAME = 100;
 
 function sanitizarNombreArchivo(nombre: string): string {
