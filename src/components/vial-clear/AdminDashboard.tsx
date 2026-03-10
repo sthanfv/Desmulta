@@ -11,6 +11,8 @@ import {
   deleteSimitCaptures,
   getConsultations,
   getCases,
+  updateShowcaseConfig,
+  updateFooterConfig,
 } from '@/app/admin/actions';
 
 import { Button } from '@/components/ui/button';
@@ -18,6 +20,7 @@ import { Input } from '@/components/ui/input';
 import Image from 'next/image';
 
 import { useToast } from '@/hooks/use-toast';
+import { SHOWCASE_DEFAULTS } from '@/lib/site-config';
 import {
   Sparkle,
   Mail,
@@ -294,16 +297,17 @@ export function AdminDashboard() {
         }
       }
 
-      await setDoc(
-        showcaseRef,
-        {
-          beforeImageUrl,
-          afterImageUrl,
-          counterValue: data.counterValue || showcaseData?.counterValue || '754+',
-          counterLabel: data.counterLabel || showcaseData?.counterLabel || 'Casos Exitosos',
-        },
-        { merge: true }
-      );
+      const updateRes = await updateShowcaseConfig({
+        beforeImageUrl: beforeImageUrl || '',
+        afterImageUrl: afterImageUrl || '',
+        counterValue: data.counterValue || showcaseData?.counterValue || '754+',
+        counterLabel: data.counterLabel || showcaseData?.counterLabel || 'Casos Exitosos',
+      });
+
+      if (!updateRes.success) {
+        throw new Error(updateRes.error);
+      }
+
       toast({
         title: 'Éxito',
         description: 'Las imágenes del caso de éxito han sido actualizadas.',
@@ -339,7 +343,10 @@ export function AdminDashboard() {
     }
 
     try {
-      await setDoc(footerRef, data, { merge: true });
+      const updateRes = await updateFooterConfig(data);
+      if (!updateRes.success) {
+        throw new Error(updateRes.error);
+      }
       toast({
         title: 'Footer Actualizado',
         description: 'Los datos de contacto han sido guardados correctamente.',
@@ -360,7 +367,18 @@ export function AdminDashboard() {
     setIsSubmitting(true);
     try {
       if (showcaseRef) {
-        await setDoc(showcaseRef, { beforeImageUrl: null, afterImageUrl: null }, { merge: true });
+        const updateRes = await updateShowcaseConfig({
+          ...SHOWCASE_DEFAULTS, // Usamos defaults para vaciar
+          beforeImageUrl: '',
+          afterImageUrl: '',
+          counterValue: showcaseData?.counterValue || '0',
+          counterLabel: showcaseData?.counterLabel || 'Casos',
+        });
+
+        if (!updateRes.success) {
+          throw new Error(updateRes.error);
+        }
+
         toast({
           title: 'Caso eliminado',
           description: 'El caso de éxito fue retirado de la vista pública.',

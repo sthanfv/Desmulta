@@ -4,6 +4,55 @@ import { revalidatePath } from 'next/cache';
 import { getAdminApp } from '@/lib/firebase-admin';
 import { getFirestore, Timestamp, FieldValue } from 'firebase-admin/firestore';
 import { Consultation } from '@/lib/definitions';
+import { ShowcaseConfig, FooterConfig } from '@/lib/site-config';
+
+/**
+ * Actualiza la configuración del componente Showcase (Tablero/Hero)
+ * y fuerza la revalidación de la página principal.
+ */
+export async function updateShowcaseConfig(data: ShowcaseConfig) {
+  try {
+    getAdminApp();
+    const db = getFirestore();
+    const docRef = db.collection('site_config').doc('showcase');
+
+    await docRef.set(data, { merge: true });
+
+    // MANDATO-FILTRO: Sincronización de caché estática
+    revalidatePath('/');
+    revalidatePath('/admin');
+
+    return { success: true };
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : 'Error al actualizar Showcase';
+    console.error('[updateShowcaseConfig] Error:', msg);
+    return { success: false, error: msg };
+  }
+}
+
+/**
+ * Actualiza la configuración institucional (Footer)
+ * y fuerza la revalidación de la página principal.
+ */
+export async function updateFooterConfig(data: FooterConfig) {
+  try {
+    getAdminApp();
+    const db = getFirestore();
+    const docRef = db.collection('site_config').doc('footer');
+
+    await docRef.set(data, { merge: true });
+
+    // MANDATO-FILTRO: Sincronización de caché estática
+    revalidatePath('/');
+    revalidatePath('/admin');
+
+    return { success: true };
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : 'Error al actualizar Footer';
+    console.error('[updateFooterConfig] Error:', msg);
+    return { success: false, error: msg };
+  }
+}
 export async function uploadImage(
   formData: FormData,
   fileKey: string
@@ -84,8 +133,16 @@ export async function getConsultations(pageSize: number = 20, lastDocId?: string
 
     // 🛡️ LEY DEL LÍMITE ESTRICTO: Solo descargamos leads activos, bloqueando lecturas de DESCARTADOS
     // BUGFIX: Incluimos 'pendiente' y 'nuevo' porque el API guarda en diferentes variantes
-    let query = db.collection('consultations')
-      .where('status', 'in', ['pendiente', 'nuevo', 'contactado', 'estudio', 'en_proceso', 'radicado'])
+    let query = db
+      .collection('consultations')
+      .where('status', 'in', [
+        'pendiente',
+        'nuevo',
+        'contactado',
+        'estudio',
+        'en_proceso',
+        'radicado',
+      ])
       .orderBy('createdAt', 'desc')
       .limit(pageSize);
 
@@ -179,8 +236,17 @@ export async function getCases(pageSize: number = 20, lastDocId?: string | null)
     const db = getFirestore();
 
     // 🛡️ LEY DEL LÍMITE ESTRICTO: Solo casos legales en estado activo
-    let query = db.collection('cases')
-      .where('status', 'in', ['apertura', 'documentacion', 'estudio', 'tramite', 'resolucion', 'radicado', 'en_espera'])
+    let query = db
+      .collection('cases')
+      .where('status', 'in', [
+        'apertura',
+        'documentacion',
+        'estudio',
+        'tramite',
+        'resolucion',
+        'radicado',
+        'en_espera',
+      ])
       .orderBy('createdAt', 'desc')
       .limit(pageSize);
 

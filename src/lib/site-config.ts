@@ -33,15 +33,14 @@ export interface FooterConfig {
 }
 
 // ─── Valores por defecto (fallback seguro) ────────────────────────────────────
-
-const SHOWCASE_DEFAULTS: ShowcaseConfig = {
+export const SHOWCASE_DEFAULTS: ShowcaseConfig = {
   beforeImageUrl: '/hero-bg.avif',
   afterImageUrl: '/oficina.avif',
   counterValue: '1800+',
   counterLabel: 'Casos Gestionados',
 };
 
-const FOOTER_DEFAULTS: FooterConfig = {
+export const FOOTER_DEFAULTS: FooterConfig = {
   whatsapp: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '573005648309',
   email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'contactodesmulta@protonmail.com',
   address: 'Colombia — Servicio Nacional',
