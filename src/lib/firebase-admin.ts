@@ -1,6 +1,6 @@
 /**
  * Firebase Admin SDK — Singleton de inicialización segura.
- * 
+ *
  * Versión: 2.2.0 (Estabilización Local y Producción)
  */
 
@@ -14,36 +14,38 @@ import { logger } from './logger/security-logger';
 function normalizarLlavePrivada(valorCrudo: string | undefined): string {
   if (!valorCrudo) return '';
 
-  // 1. Limpieza de escapes y comillas.
-  // En Vercel, a veces las variables vienen con comillas dobles literales.
-  const s = valorCrudo
-    .replace(/\\n/g, '\n')
-    .replace(/^["']+|["']+$/g, '')
+  // 1. Limpieza agresiva de escapes y comillas.
+  // En Vercel, a veces las variables vienen con comillas dobles literales o doble escape \\n.
+  let s = valorCrudo
+    .replace(/\\n/g, '\n') // Unescape literal \n
+    .replace(/\\n/g, '\n') // Doble unescape por si acaso
+    .replace(/^["']+|["']+$/g, '') // Eliminar comillas extremas
     .trim();
 
   const INICIO = '-----BEGIN PRIVATE KEY-----';
   const FIN = '-----END PRIVATE KEY-----';
 
-  const indiceInicio = s.indexOf(INICIO);
-  const indiceFin = s.indexOf(FIN);
+  // Si ya tiene el formato correcto PEM con saltos de línea reales, aseguramos que termine en salto único
+  if (s.includes(INICIO) && s.includes(FIN)) {
+    // Si contiene saltos de línea reales, confiamos en el formato pero limpiamos basura al final
+    if (s.includes('\n')) {
+      return s.split(FIN)[0] + FIN + '\n';
+    }
 
-  if (indiceInicio !== -1 && indiceFin !== -1) {
-    // 2. Extraer solo el contenido base64 puro (sin espacios ni saltos previos)
+    // Si está todo en una sola línea pero tiene los marcadores, re-formateamos
     const base64Puro = s
-      .substring(indiceInicio + INICIO.length, indiceFin)
-      .replace(/[^A-Za-z0-9+/=]/g, '');
-
-    // 3. Re-formatear en bloques de 64 caracteres (estándar RFC 7468)
+      .split(INICIO)[1]
+      .split(FIN)[0]
+      .replace(/\s/g, ''); // Eliminar cualquier espacio
+      
     const lineas = base64Puro.match(/.{1,64}/g);
     if (lineas) {
-      // Devolvemos con el salto de línea final que algunos motores ASN.1 exigen
       return `${INICIO}\n${lineas.join('\n')}\n${FIN}\n`;
     }
   }
 
-  // Fallback: si no hay marcadores o algo falló, devolvemos el original limpio
-  // de escapes (esto es lo que funcionaba en versiones anteriores)
-  return s.includes('\n') ? s : s.replace(/\\n/g, '\n');
+  // Fallback de emergencia: Si no tiene marcadores, intentamos limpiar y añadir
+  return (s.includes('\n') ? s : s.replace(/\\n/g, '\n')) + '\n';
 }
 
 /**
@@ -64,15 +66,15 @@ export function getAdminApp(): App {
 
   try {
     const privateKey = normalizarLlavePrivada(process.env.FIREBASE_PRIVATE_KEY);
-    
+
     const app = initializeApp({
-      credential: cert({ 
-        projectId, 
-        clientEmail, 
-        privateKey 
+      credential: cert({
+        projectId,
+        clientEmail,
+        privateKey,
       }),
     });
-    
+
     logger.info('[firebase-admin] Inicialización exitosa v2.2.0');
     return app;
   } catch (error) {
