@@ -109,6 +109,7 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
           tipoInfraccion: '',
           estadoCoactivo: '',
           evidenceUrl: '',
+          email: '',
         },
   });
 
