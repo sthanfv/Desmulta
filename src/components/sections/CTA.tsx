@@ -24,8 +24,7 @@ export const CTA = ({ onConsultar, onOpenSimitTutorial }: CTAProps) => {
             Libérate hoy <br /> de las deudas.
           </h2>
           <p className="text-lg md:text-xl opacity-90 max-w-2xl mx-auto font-medium relative z-10">
-            No dejes que tu paz mental dependa de un comparendo injusto. Iniciemos tu defensa
-            ahora.
+            No dejes que tu paz mental dependa de un comparendo injusto. Iniciemos tu defensa ahora.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center relative z-10">
             <Button

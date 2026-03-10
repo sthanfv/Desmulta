@@ -60,10 +60,7 @@ export default async function PaginaCiudad({ params }: PageProps) {
   }
 
   // Obtenemos la configuración global (Server-Side)
-  const [showcaseData, footerData] = await Promise.all([
-    getShowcaseConfig(),
-    getFooterConfig(),
-  ]);
+  const [showcaseData, footerData] = await Promise.all([getShowcaseConfig(), getFooterConfig()]);
 
   // --- MANDATO-FILTRO v5.9.0 (SEO ESTRUCTURADO) ---
   const jsonLd = {

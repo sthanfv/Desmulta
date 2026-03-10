@@ -141,8 +141,6 @@ export function TableroKanbanReal({
     e.currentTarget.classList.add('opacity-50', 'scale-95');
   };
 
-
-
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
   };
@@ -198,14 +196,22 @@ export function TableroKanbanReal({
   };
 
   // 3. Cambiar estado desde el modal (Touch-to-Move)
-  const handleCambiarEstadoDesdeModal = async (id: string, nuevoEstado: string, tipo: 'lead' | 'caso') => {
+  const handleCambiarEstadoDesdeModal = async (
+    id: string,
+    nuevoEstado: string,
+    tipo: 'lead' | 'caso'
+  ) => {
     const estadoAnterior = itemSeleccionado?.estado || 'NUEVO';
 
     // UI Optimista
     if (tipo === 'lead') {
-      setLocalLeads((prev) => prev.map((item) => (item.id === id ? { ...item, estado: nuevoEstado } : item)));
+      setLocalLeads((prev) =>
+        prev.map((item) => (item.id === id ? { ...item, estado: nuevoEstado } : item))
+      );
     } else {
-      setLocalCasos((prev) => prev.map((item) => (item.id === id ? { ...item, estado: nuevoEstado } : item)));
+      setLocalCasos((prev) =>
+        prev.map((item) => (item.id === id ? { ...item, estado: nuevoEstado } : item))
+      );
     }
 
     try {
@@ -223,9 +229,13 @@ export function TableroKanbanReal({
       console.error('Fallo al cambiar estado', error);
       // Revertir UI
       if (tipo === 'lead') {
-        setLocalLeads((prev) => prev.map((item) => (item.id === id ? { ...item, estado: estadoAnterior } : item)));
+        setLocalLeads((prev) =>
+          prev.map((item) => (item.id === id ? { ...item, estado: estadoAnterior } : item))
+        );
       } else {
-        setLocalCasos((prev) => prev.map((item) => (item.id === id ? { ...item, estado: estadoAnterior } : item)));
+        setLocalCasos((prev) =>
+          prev.map((item) => (item.id === id ? { ...item, estado: estadoAnterior } : item))
+        );
       }
       toast({ variant: 'destructive', title: 'Error al actualizar.' });
       throw error;
@@ -262,8 +272,6 @@ export function TableroKanbanReal({
     }
   };
 
-
-
   const columnasActuales = modoVista === 'leads' ? COLUMNAS_LEADS : COLUMNAS_CASOS;
   const esCaso = modoVista === 'casos';
 
@@ -283,19 +291,21 @@ export function TableroKanbanReal({
         <div className="bg-black/40 p-1.5 rounded-2xl border border-white/10 inline-flex shadow-inner">
           <button
             onClick={() => cambiarVista('leads')}
-            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all text-sm uppercase tracking-widest ${modoVista === 'leads'
-              ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
-              : 'text-muted-foreground hover:text-white hover:bg-white/5'
-              }`}
+            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all text-sm uppercase tracking-widest ${
+              modoVista === 'leads'
+                ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
+                : 'text-muted-foreground hover:text-white hover:bg-white/5'
+            }`}
           >
             <Users className="w-4 h-4" /> Gestión de Solicitudes
           </button>
           <button
             onClick={() => cambiarVista('casos')}
-            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all text-sm uppercase tracking-widest ${modoVista === 'casos'
-              ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
-              : 'text-muted-foreground hover:text-white hover:bg-white/5'
-              }`}
+            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all text-sm uppercase tracking-widest ${
+              modoVista === 'casos'
+                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
+                : 'text-muted-foreground hover:text-white hover:bg-white/5'
+            }`}
           >
             <Briefcase className="w-4 h-4" /> Operación Legal
           </button>
@@ -334,10 +344,7 @@ export function TableroKanbanReal({
                 .filter((item) => item.estado === columna.id)
                 .map((item) => (
                   <div key={item.id} onClick={() => setItemSeleccionado(item)}>
-                    <TarjetaKanban
-                      data={item}
-                      onDragStart={handleDragStart}
-                    />
+                    <TarjetaKanban data={item} onDragStart={handleDragStart} />
                   </div>
                 ))}
 

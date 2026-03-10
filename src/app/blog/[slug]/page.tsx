@@ -84,9 +84,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
             </p>
             <div className="relative z-10">
               <Link href="/">
-                <Button 
-                  className="h-16 px-12 bg-foreground text-background hover:bg-foreground/90 font-black rounded-2xl active:scale-95 transition-all text-lg shadow-xl border-none"
-                >
+                <Button className="h-16 px-12 bg-foreground text-background hover:bg-foreground/90 font-black rounded-2xl active:scale-95 transition-all text-lg shadow-xl border-none">
                   ANALIZAR MI CASO GRATIS
                 </Button>
               </Link>

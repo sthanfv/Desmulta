@@ -16,15 +16,7 @@ import { getShowcaseConfig, getFooterConfig } from '@/lib/site-config';
 
 export default async function VialClearPage() {
   // Fetching en paralelo en el servidor — no bloquean entre sí
-  const [showcaseData, footerData] = await Promise.all([
-    getShowcaseConfig(),
-    getFooterConfig(),
-  ]);
+  const [showcaseData, footerData] = await Promise.all([getShowcaseConfig(), getFooterConfig()]);
 
-  return (
-    <HomeClient 
-      showcaseData={showcaseData} 
-      footerData={footerData} 
-    />
-  );
+  return <HomeClient showcaseData={showcaseData} footerData={footerData} />;
 }

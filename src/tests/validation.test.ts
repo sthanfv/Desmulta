@@ -11,6 +11,7 @@ describe('Escudo de Validación de Consultas (Zod)', () => {
     antiguedad: 'Más de 3 años',
     tipoInfraccion: 'Foto-Multa (Cámara)',
     estadoCoactivo: 'NO',
+    turnstileToken: 'mock-token',
   };
 
   it('✅ Debe permitir el paso de datos perfectamente válidos', () => {

@@ -72,7 +72,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const mimePrincipal = contentType.split(';')[0].trim().toLowerCase();
     if (!MIMES_PERMITIDOS.has(mimePrincipal)) {
       logger.warn('[upload] MIME no permitido:', { mimePrincipal });
-      return NextResponse.json({ error: `Formato ${mimePrincipal} no permitido.` }, { status: 415 });
+      return NextResponse.json(
+        { error: `Formato ${mimePrincipal} no permitido.` },
+        { status: 415 }
+      );
     }
 
     // Carga a Vercel Blob
@@ -84,25 +87,24 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     // Actualizar contador
     logger.info('[upload] Paso 4: Actualizando contador en DB...');
-    await rateLimitRef.set({
-      ip: clienteIp,
-      fecha: hoy,
-      count: contador + 1,
-      ultimaCargaEn: new Date().toISOString(),
-    }, { merge: true });
+    await rateLimitRef.set(
+      {
+        ip: clienteIp,
+        fecha: hoy,
+        count: contador + 1,
+        ultimaCargaEn: new Date().toISOString(),
+      },
+      { merge: true }
+    );
 
     logger.info('[upload] ¡ÉXITO!', { url: blob.url });
     return NextResponse.json(blob);
-
   } catch (error) {
     const mensaje = error instanceof Error ? error.message : 'Error desconocido';
-    logger.error('[upload] Error crítico v2.2.3:', { 
+    logger.error('[upload] Error crítico v2.2.3:', {
       error: mensaje,
-      stack: error instanceof Error ? error.stack : undefined
+      stack: error instanceof Error ? error.stack : undefined,
     });
-    return NextResponse.json(
-      { error: `Error del servidor: ${mensaje}` },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: `Error del servidor: ${mensaje}` }, { status: 500 });
   }
 }

@@ -35,9 +35,8 @@ export const Pillars = ({ showcaseData }: PillarsProps) => {
                   Respaldo Normativo
                 </h3>
                 <p className="text-muted-foreground leading-relaxed text-lg md:text-xl max-w-xl">
-                  Operamos bajo estrictos protocolos de defensa administrativa. Nuestro
-                  conocimiento especializado es su mayor garantía frente a las autoridades de
-                  tránsito.
+                  Operamos bajo estrictos protocolos de defensa administrativa. Nuestro conocimiento
+                  especializado es su mayor garantía frente a las autoridades de tránsito.
                 </p>
               </div>
             </div>

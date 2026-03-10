@@ -15,7 +15,13 @@ interface ImageUploadProps {
   currentUrl?: string; // 👈 Agregado para persistencia de previsualización
 }
 
-export function ImageUpload({ onUploadSuccess, onClear, className, required, currentUrl }: ImageUploadProps) {
+export function ImageUpload({
+  onUploadSuccess,
+  onClear,
+  className,
+  required,
+  currentUrl,
+}: ImageUploadProps) {
   const [preview, setPreview] = useState<string | null>(currentUrl || null);
   const [isUploading, setIsUploading] = useState(false);
   const [isUploaded, setIsUploaded] = useState(!!currentUrl); // Si ya hay URL, está subido
@@ -70,7 +76,7 @@ export function ImageUpload({ onUploadSuccess, onClear, className, required, cur
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Error desconocido';
       console.error('[ImageUpload] Error:', err);
-      setPreview(null); 
+      setPreview(null);
       setError(errorMsg);
       setIsUploaded(false);
     } finally {

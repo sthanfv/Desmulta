@@ -12,11 +12,7 @@ interface AnimatedCounterProps {
  * AnimatedCounter - Componente para mostrar contadores con animación de incremento.
  * MANDATO-FILTRO: UI interactiva y optimizada.
  */
-export const AnimatedCounter = ({
-  value,
-  label,
-  duration = 2000,
-}: AnimatedCounterProps) => {
+export const AnimatedCounter = ({ value, label, duration = 2000 }: AnimatedCounterProps) => {
   const [count, setCount] = useState(0);
   const target = parseInt(value.replace(/\D/g, '')) || 0;
   const suffix = value.replace(/[0-9]/g, '');

@@ -15,14 +15,15 @@ export function InstallPWA() {
   const [showInstallBtn, setShowInstallBtn] = useState(false);
 
   useEffect(() => {
-    // MANDATO-FILTRO: Evitar molestias recurrentes. 
+    // MANDATO-FILTRO: Evitar molestias recurrentes.
     // Revisar si el usuario ya cerró el banner hoy.
     const lastDismissed = localStorage.getItem('pwa-prompt-dismissed');
-    const isDismissedRecently = lastDismissed && (Date.now() - parseInt(lastDismissed)) < 1000 * 60 * 60 * 24; // 24 horas
+    const isDismissedRecently =
+      lastDismissed && Date.now() - parseInt(lastDismissed) < 1000 * 60 * 60 * 24; // 24 horas
 
     const handler = (e: Event) => {
       if (isDismissedRecently) return; // No asustar al usuario si ya lo cerró
-      
+
       // Previene que el navegador muestre el prompt automático
       e.preventDefault();
       // Guarda el evento para dispararlo más tarde

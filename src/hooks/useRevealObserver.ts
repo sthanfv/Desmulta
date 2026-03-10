@@ -18,7 +18,7 @@ export function useRevealObserver(threshold = 0.1) {
     );
 
     document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
-    
+
     return () => observer.disconnect();
   }, [threshold]);
 }

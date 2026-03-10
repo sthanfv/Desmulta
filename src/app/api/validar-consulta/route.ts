@@ -59,11 +59,11 @@ export async function POST(request: Request) {
     const dataBuf = encoder.encode(cedula);
     const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuf);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 
-    const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID; 
+    const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
     const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
-    
+
     // Petición directa GET O(1) al documento índice protegido (Cero exposición de PII)
     const firestoreUrl = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/consultas_index/${hashHex}?key=${apiKey}`;
 
@@ -72,13 +72,14 @@ export async function POST(request: Request) {
     });
 
     // 3. Evaluar lógica de negocio
-    if (response.ok) { // 200 OK significa que el documento existe
-       logger.warn('[EDGE] Consulta activa preexistente bloqueada', { cedulaOfuscada });
-       return NextResponse.json({ 
-         success: true, 
-         valido: false, 
-         mensaje: 'Ya existe una consulta activa para este documento.' 
-       });
+    if (response.ok) {
+      // 200 OK significa que el documento existe
+      logger.warn('[EDGE] Consulta activa preexistente bloqueada', { cedulaOfuscada });
+      return NextResponse.json({
+        success: true,
+        valido: false,
+        mensaje: 'Ya existe una consulta activa para este documento.',
+      });
     }
 
     if (response.status !== 404) {
@@ -96,15 +97,10 @@ export async function POST(request: Request) {
         cedula,
       },
     });
-
   } catch (err) {
     const mensaje = err instanceof Error ? err.message : 'Error desconocido';
     logger.error('[EDGE Error] Fallo en la validación:', { error: mensaje });
-    
-    return NextResponse.json(
-      { error: 'Error interno en el motor de validación' }, 
-      { status: 500 }
-    );
+
+    return NextResponse.json({ error: 'Error interno en el motor de validación' }, { status: 500 });
   }
 }
-

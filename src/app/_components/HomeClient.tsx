@@ -50,11 +50,7 @@ interface HomeClientProps {
   cityContext?: string;
 }
 
-export default function HomeClient({
-  showcaseData,
-  footerData,
-  cityContext,
-}: HomeClientProps) {
+export default function HomeClient({ showcaseData, footerData, cityContext }: HomeClientProps) {
   // --- Estados de UI ---
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formMode, setFormMode] = useState<'full' | 'simit'>('full');
@@ -67,7 +63,7 @@ export default function HomeClient({
   const handleMouseMove = useMouseFollow();
   useRevealObserver(0.1);
   useClipboardProtection();
-  
+
   const auth = useAuth();
 
   useEffect(() => {
@@ -209,8 +205,14 @@ export default function HomeClient({
               : 'opacity-0 translate-y-10 scale-50 pointer-events-none'
           }`}
         >
-          <svg className="w-9 h-9 animate-bounce" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-            <path d="M12 19V5M5 12l7-7 7 7" strokeLinecap="round" strokeLinejoin="round"/>
+          <svg
+            className="w-9 h-9 animate-bounce"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="3"
+          >
+            <path d="M12 19V5M5 12l7-7 7 7" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </button>
       </div>
@@ -279,7 +281,9 @@ export default function HomeClient({
                     <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex-shrink-0 flex items-center justify-center font-black text-sm">
                       {s.paso}
                     </div>
-                    <p className="text-sm font-bold text-foreground uppercase tracking-wider">{s.text}</p>
+                    <p className="text-sm font-bold text-foreground uppercase tracking-wider">
+                      {s.text}
+                    </p>
                   </div>
                 ))}
                 <div className="pt-4">

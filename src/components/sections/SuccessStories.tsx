@@ -108,20 +108,20 @@ export function SuccessStories() {
       const now = new Date();
       const startOfYear = new Date(now.getFullYear(), 0, 1);
       const dayOfYear = Math.floor((now.getTime() - startOfYear.getTime()) / 86400000);
-      
+
       const newStories = FALLBACK_STORIES.map((story, index) => {
         // Usamos dayOfYear para que cambie cada día, o weekNumber si prefieres cada semana
         const offset = dayOfYear + index;
-        
-        const cityIndex = (offset) % CITIES.length;
-        const amountIndex = (offset) % AMOUNTS.length;
-        const timeIndex = (offset) % TIMES.length;
-        
+
+        const cityIndex = offset % CITIES.length;
+        const amountIndex = offset % AMOUNTS.length;
+        const timeIndex = offset % TIMES.length;
+
         // Generamos un ID de expediente dinámico basado en una base + el offset
         const dynamicCaseId = `#${7000 + (offset % 3000)}`;
 
-        return { 
-          ...story, 
+        return {
+          ...story,
           caseId: dynamicCaseId,
           // MANDATO-FILTRO v6.0.0: .at() previene 'security/detect-object-injection'
           location: CITIES.at(cityIndex) || CITIES[0],

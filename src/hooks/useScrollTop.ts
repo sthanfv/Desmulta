@@ -9,7 +9,7 @@ export function useScrollTop(threshold = 400) {
 
   useEffect(() => {
     let lastScrollValue = window.scrollY;
-    
+
     const handleScroll = () => {
       const currentScroll = window.scrollY;
 

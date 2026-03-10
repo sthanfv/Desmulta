@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useFirestore, useDoc, useMemoFirebase, useAuth } from '@/firebase';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc } from 'firebase/firestore';
 import {
   deleteExpiredConsultations,
   uploadImage,
@@ -20,7 +20,7 @@ import { Input } from '@/components/ui/input';
 import Image from 'next/image';
 
 import { useToast } from '@/hooks/use-toast';
-import { SHOWCASE_DEFAULTS } from '@/lib/site-config';
+import { SHOWCASE_DEFAULTS } from '@/lib/config-constants';
 import {
   Sparkle,
   Mail,

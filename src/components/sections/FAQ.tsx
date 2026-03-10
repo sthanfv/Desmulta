@@ -30,9 +30,7 @@ export const FAQ = ({ mounted }: FAQProps) => {
         </div>
         {!mounted ? (
           <div className="w-full h-96 bg-card/20 animate-pulse rounded-[3rem] border border-white/10 flex items-center justify-center">
-            <p className="text-muted-foreground font-medium">
-              Sincronizando información legal...
-            </p>
+            <p className="text-muted-foreground font-medium">Sincronizando información legal...</p>
           </div>
         ) : (
           <Accordion type="single" collapsible className="w-full space-y-4">

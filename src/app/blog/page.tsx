@@ -4,7 +4,6 @@ import { BookOpen, ArrowLeft, ArrowUpRight, ShieldCheck } from 'lucide-react';
 import { getBlogPosts } from '@/lib/mdx';
 import { TarjetaPremium } from '@/components/ui/TarjetaPremium';
 
-
 export default async function BlogIndex() {
   const posts = await getBlogPosts();
   const brandName = process.env.NEXT_PUBLIC_BRAND_NAME || 'Desmulta';
@@ -54,8 +53,8 @@ export default async function BlogIndex() {
         {/* Grilla de Artículos */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {posts.map((post, i) => (
-            <TarjetaPremium 
-              key={post.slug} 
+            <TarjetaPremium
+              key={post.slug}
               className="p-8 hover:border-primary/50 transition-all animate-in fade-in slide-in-from-bottom-6 duration-700"
               style={{ animationDelay: `${i * 100}ms` }}
             >
@@ -74,7 +73,10 @@ export default async function BlogIndex() {
                   className="inline-flex items-center text-xs font-black text-primary pt-4 hover:translate-x-1 transition-transform group"
                 >
                   LEER ARTÍCULO COMPLETO
-                  <ArrowUpRight size={14} className="ml-1 group-hover:rotate-45 transition-transform" />
+                  <ArrowUpRight
+                    size={14}
+                    className="ml-1 group-hover:rotate-45 transition-transform"
+                  />
                 </Link>
               </div>
             </TarjetaPremium>

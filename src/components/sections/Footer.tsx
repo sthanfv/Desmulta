@@ -2,14 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import {
-  ShieldCheck,
-  MessageCircle,
-  Mail,
-  MapPin,
-  Instagram,
-  Facebook,
-} from 'lucide-react';
+import { ShieldCheck, MessageCircle, Mail, MapPin, Instagram, Facebook } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { FooterConfig } from '@/lib/site-config';
 
@@ -86,7 +79,13 @@ export const Footer = ({ footerData, onOpenWhatsAppWarning }: FooterProps) => {
               </h4>
               <nav className="flex flex-col gap-6">
                 {[
-                  { label: 'Inicio', href: '#', action: () => typeof window !== 'undefined' && window.scrollTo({ top: 0, behavior: 'smooth' }) },
+                  {
+                    label: 'Inicio',
+                    href: '#',
+                    action: () =>
+                      typeof window !== 'undefined' &&
+                      window.scrollTo({ top: 0, behavior: 'smooth' }),
+                  },
                   { label: 'Servicios', href: '#servicios' },
                   { label: 'Metodología', href: '#metodologia' },
                   { label: 'Guía Legal', href: '/blog' },
@@ -138,9 +137,7 @@ export const Footer = ({ footerData, onOpenWhatsAppWarning }: FooterProps) => {
                     <p className="text-xs font-black text-muted-foreground uppercase tracking-widest leading-none mb-1.5">
                       Base de Operaciones
                     </p>
-                    <p className="text-xl font-bold text-foreground">
-                      Cobertura Nacional Digital
-                    </p>
+                    <p className="text-xl font-bold text-foreground">Cobertura Nacional Digital</p>
                   </div>
                 </div>
               </div>

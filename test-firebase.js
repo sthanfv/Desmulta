@@ -1,10 +1,12 @@
-
 require('dotenv').config();
 const admin = require('firebase-admin');
 
 function normalizarLlavePrivada(valorCrudo) {
   if (!valorCrudo) return '';
-  const s = valorCrudo.replace(/\\n/g, '\n').replace(/^["']+|["']+$/g, '').trim();
+  const s = valorCrudo
+    .replace(/\\n/g, '\n')
+    .replace(/^["']+|["']+$/g, '')
+    .trim();
   const INICIO = '-----BEGIN PRIVATE KEY-----';
   const FIN = '-----END PRIVATE KEY-----';
   const indiceInicio = s.indexOf(INICIO);
