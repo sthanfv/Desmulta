@@ -297,18 +297,20 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
     <Form {...form}>
       <form
         onSubmit={(e) => {
-          form.handleSubmit(onSubmit)(e).catch(() => {
-            // Capturamos fallos de validación de Zod
-            if (process.env.NODE_ENV === 'development') {
-              console.warn('⚠️ Fallo de validación Zod:', form.formState.errors);
-            }
-            haptics.vibrate('warning');
-            toast({
-              variant: 'destructive',
-              title: 'Formulario Incompleto',
-              description: 'Por favor, revise los campos marcados en rojo.',
+          form
+            .handleSubmit(onSubmit)(e)
+            .catch(() => {
+              // Capturamos fallos de validación de Zod
+              if (process.env.NODE_ENV === 'development') {
+                console.warn('⚠️ Fallo de validación Zod:', form.formState.errors);
+              }
+              haptics.vibrate('warning');
+              toast({
+                variant: 'destructive',
+                title: 'Formulario Incompleto',
+                description: 'Por favor, revise los campos marcados en rojo.',
+              });
             });
-          });
         }}
         onMouseMove={handleInteraction}
         onKeyDown={handleInteraction}

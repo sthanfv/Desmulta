@@ -16,7 +16,7 @@ function normalizarLlavePrivada(valorCrudo: string | undefined): string {
 
   // 1. Limpieza agresiva de escapes y comillas.
   // En Vercel, a veces las variables vienen con comillas dobles literales o doble escape \\n.
-  let s = valorCrudo
+  const s = valorCrudo
     .replace(/\\n/g, '\n') // Unescape literal \n
     .replace(/\\n/g, '\n') // Doble unescape por si acaso
     .replace(/^["']+|["']+$/g, '') // Eliminar comillas extremas
@@ -33,11 +33,8 @@ function normalizarLlavePrivada(valorCrudo: string | undefined): string {
     }
 
     // Si está todo en una sola línea pero tiene los marcadores, re-formateamos
-    const base64Puro = s
-      .split(INICIO)[1]
-      .split(FIN)[0]
-      .replace(/\s/g, ''); // Eliminar cualquier espacio
-      
+    const base64Puro = s.split(INICIO)[1].split(FIN)[0].replace(/\s/g, ''); // Eliminar cualquier espacio
+
     const lineas = base64Puro.match(/.{1,64}/g);
     if (lineas) {
       return `${INICIO}\n${lineas.join('\n')}\n${FIN}\n`;
