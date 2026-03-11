@@ -138,14 +138,27 @@ export async function POST(request: NextRequest) {
         const lastAttempt = (cooldownSnap.data()?.lastAttemptAt as Timestamp).toMillis();
         const elapsedMs = Date.now() - lastAttempt;
         if (elapsedMs < fiveMinutes) {
-          const remainingMinutes = Math.ceil((fiveMinutes - elapsedMs) / 60000);
+          const remainingMs = fiveMinutes - elapsedMs;
+          const remainingMinutes = Math.floor(remainingMs / 60000);
+          const remainingSeconds = Math.ceil((remainingMs % 60000) / 1000);
+
+          let timeStr = '';
+          if (remainingMinutes > 0) {
+            timeStr = `${remainingMinutes} ${remainingMinutes === 1 ? 'minuto' : 'minutos'}`;
+            if (remainingSeconds > 0) {
+              timeStr += ` y ${remainingSeconds} ${remainingSeconds === 1 ? 'segundo' : 'segundos'}`;
+            }
+          } else {
+            timeStr = `${remainingSeconds} ${remainingSeconds === 1 ? 'segundo' : 'segundos'}`;
+          }
+
           return NextResponse.json(
             {
-              error: `¡Vas muy rápido! Para proteger tu información, por favor espera ${remainingMinutes} ${remainingMinutes === 1 ? 'minuto' : 'minutos'} antes de enviar otra consulta.`,
+              error: `¡Pausa de seguridad! Para proteger tu información, por favor espera ${timeStr} antes de enviar otra consulta.`,
             },
             {
               status: 429,
-              headers: { 'Retry-After': String(Math.ceil((fiveMinutes - elapsedMs) / 1000)) },
+              headers: { 'Retry-After': String(Math.ceil(remainingMs / 1000)) },
             }
           );
         }

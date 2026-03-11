@@ -1,7 +1,7 @@
 # MEMORY.md — Estado del Proyecto Desmulta 🛡️
 
 ## 1. Contexto Actual
-- **Versión**: v2.3.5
+- **Versión**: v2.3.6
 - **Estado**: Fase de reconocimiento inicial completada.
 - **Mando**: Equipo de Desarrollo Élite (Principal Engineer, DevSecOps, DBA, QA).
 
@@ -18,10 +18,10 @@
 - **Zero-Trust**: Validación de datos con Zod, protección de API con Turnstile, y logger que ofusca PII (Cédulas, Teléfonos).
 - **Sincronización Dinámica**: Uso de Server Actions para invalidar caché y actualizar el frontend instantáneamente.
 
-## 4. Auditoría de Seguridad e Integridad (v2.3.5)
+## 4. Auditoría de Seguridad e Integridad (v2.3.6)
 - **Vulnerabilidades**: 14 detectadas (Low) vía `npm audit`. Se ejecutó `npm audit fix`.
 - **Integridad**: Build verificado exitosamente por el usuario.
-- **UX**: Fase de humanización completada. Mensajes técnicos transformados a lenguaje natural para el ciudadano.
+- **UX**: Fase de humanización completada. Mensajes técnicos transformados a lenguaje natural para el ciudadano. Los límites de Rate Limit ahora muestran tiempo preciso (minutos/segundos o horas/minutos).
 - **Turnstile**: Verificado en modo *Managed*. Validación automática activada para el 90% de los casos.
 
 ## 5. Tareas Pendientes

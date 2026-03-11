@@ -1,7 +1,7 @@
 /**
  * Endpoint de Carga de Archivos — Desmulta
  *
- * MANDATO-FILTRO v2.3.5:
+ * MANDATO-FILTRO v2.3.6:
  * - Depuración agresiva con logs de cada paso.
  * - Saneamiento de linter y restauración de lógica de nombres.
  */
@@ -53,16 +53,31 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     const docSnap = await rateLimitRef.get();
     let contador = 0;
-    // MANDATO-FILTRO v2.3.5: Límite estricto de 5 cargas por IP/día solicitado por el usuario
+    // MANDATO-FILTRO v2.3.6: Límite estricto de 5 cargas por IP/día solicitado por el usuario
     const limite = 5;
 
     if (docSnap.exists) {
       contador = docSnap.data()?.count || 0;
       if (contador >= limite) {
         logger.warn('[upload] Límite excedido bloqueado:', { clienteIp, contador });
+        
+        // Calcular tiempo hasta medianoche UTC (cuando cambia la fecha ISO)
+        const ahora = new Date();
+        const mañana = new Date(Date.UTC(ahora.getUTCFullYear(), ahora.getUTCMonth(), ahora.getUTCDate() + 1));
+        const msFaltantes = mañana.getTime() - ahora.getTime();
+        const horas = Math.floor(msFaltantes / (1000 * 60 * 60));
+        const minutos = Math.floor((msFaltantes % (1000 * 60 * 60)) / (1000 * 60));
+
+        let tiempoEspera = '';
+        if (horas > 0) {
+          tiempoEspera = `${horas} ${horas === 1 ? 'hora' : 'horas'} y ${minutos} ${minutos === 1 ? 'minuto' : 'minutos'}`;
+        } else {
+          tiempoEspera = `${minutos} ${minutos === 1 ? 'minuto' : 'minutos'}`;
+        }
+
         return NextResponse.json(
           {
-            error: `¡Has alcanzado el límite de seguridad! Para proteger el sistema, solo permitimos ${limite} cargas por día. Por favor, vuelve mañana.`,
+            error: `¡Has alcanzado el límite de seguridad diario! Solo permitimos ${limite} cargas por día para proteger el sistema. Por favor, intenta de nuevo en ${tiempoEspera}.`,
           },
           { status: 429 }
         );
@@ -105,7 +120,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json(blob);
   } catch (error) {
     const mensaje = error instanceof Error ? error.message : 'Error desconocido';
-    logger.error('[upload] Error crítico v2.3.5:', {
+    logger.error('[upload] Error crítico v2.3.6:', {
       error: mensaje,
     });
     return NextResponse.json(

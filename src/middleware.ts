@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 import { cspHeader } from '@/lib/security-headers';
 
 /**
- * Middleware de Seguridad Global - MANDATO-FILTRO v2.3.5
+ * Middleware de Seguridad Global - MANDATO-FILTRO v2.3.6
  *
  * Responsabilidades:
  * 1. Hardening de Headers de Seguridad.
