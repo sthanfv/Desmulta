@@ -123,7 +123,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error:
-            'Verificación de seguridad fallida. Por favor, recargue la página e intente de nuevo.',
+            'Tu seguridad es lo primero. Por favor, asegúrate de que el escudo de protección esté activo y vuelve a intentarlo.',
         },
         { status: 403 }
       );
@@ -134,21 +134,22 @@ export async function POST(request: NextRequest) {
     const cooldownSnap = await cooldownRef.get();
     const fiveMinutes = 5 * 60 * 1000;
 
-    if (cooldownSnap.exists) {
-      const lastAttempt = (cooldownSnap.data()?.lastAttemptAt as Timestamp).toMillis();
-      const elapsedMs = Date.now() - lastAttempt;
-      if (elapsedMs < fiveMinutes) {
-        // MANDATO-FILTRO: RFC 6585 — Retry-After header obligatorio en respuestas 429
-        const remainingSeconds = Math.ceil((fiveMinutes - elapsedMs) / 1000);
-        return NextResponse.json(
-          { error: 'Límite de envíos alcanzado. Por favor, espere 5 minutos.' },
-          {
-            status: 429,
-            headers: { 'Retry-After': String(remainingSeconds) },
-          }
-        );
+      if (cooldownSnap.exists) {
+        const lastAttempt = (cooldownSnap.data()?.lastAttemptAt as Timestamp).toMillis();
+        const elapsedMs = Date.now() - lastAttempt;
+        if (elapsedMs < fiveMinutes) {
+          const remainingMinutes = Math.ceil((fiveMinutes - elapsedMs) / 60000);
+          return NextResponse.json(
+            {
+              error: `¡Vas muy rápido! Para proteger tu información, por favor espera ${remainingMinutes} ${remainingMinutes === 1 ? 'minuto' : 'minutos'} antes de enviar otra consulta.`,
+            },
+            {
+              status: 429,
+              headers: { 'Retry-After': String(Math.ceil((fiveMinutes - elapsedMs) / 1000)) },
+            }
+          );
+        }
       }
-    }
 
     // 2.1 Actualizar Cooldown (MANDATO-FILTRO: Persistencia de Seguridad)
     await cooldownRef.set({
@@ -272,6 +273,12 @@ export async function POST(request: NextRequest) {
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Error desconocido';
     logger.error('[create-consultation] Error crítico:', { error: message });
-    return NextResponse.json({ error: 'Error interno del servidor.' }, { status: 500 });
+    return NextResponse.json(
+      {
+        error:
+          'Lo sentimos, tuvimos un pequeño tropiezo técnico. Por favor, verifica tu conexión e intenta de nuevo en unos momentos.',
+      },
+      { status: 500 }
+    );
   }
 }

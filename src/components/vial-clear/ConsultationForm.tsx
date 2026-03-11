@@ -199,12 +199,12 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
     try {
       if (!turnstileToken) {
         haptics.vibrate('warning');
-        throw new Error('El escudo de seguridad aún está validando. Por favor, espere un segundo.');
+        throw new Error('Nuestro escudo de protección está terminando de activarse. Por favor, espera un segundo más para mayor seguridad.');
       }
 
       toast({
-        title: 'Iniciando envío...',
-        description: 'Estamos procesando tu solicitud, por favor no cierres la ventana.',
+        title: '¡Recibiendo tus datos!',
+        description: 'Estamos preparando todo con cuidado, por favor mantén esta ventana abierta.',
       });
 
       const auth = getAuth();
@@ -215,7 +215,7 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
         await new Promise((resolve) => setTimeout(resolve, 300));
         currentUser = auth.currentUser;
         if (!currentUser) {
-          throw new Error('Conexión en curso. Por favor, intente dar clic nuevamente.');
+          throw new Error('Estamos estableciendo una conexión segura. Por favor, pulsa el botón de nuevo.');
         }
       }
 
@@ -262,9 +262,9 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
       }
 
       toast({
-        title: '¡Análisis en Trámite!',
+        title: '¡Análisis Iniciado!',
         description:
-          'Tu información ha sido recibida con éxito. Un asesor especializado procesará tu análisis de viabilidad técnica.',
+          'Recibimos tu información con éxito. Muy pronto uno de nuestros asesores procesará tu estudio de viabilidad técnica y te contactará.',
         duration: 8000,
       });
       haptics.vibrate('success');
@@ -274,10 +274,10 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
       setTimeout(onSuccess, 3000);
     } catch (e: unknown) {
       haptics.vibrate('error');
-      const message = e instanceof Error ? e.message : 'Por favor, intente de nuevo más tarde.';
+      const message = e instanceof Error ? e.message : 'Tuvimos un pequeño inconveniente. Por favor, intenta de nuevo más tarde.';
       toast({
         variant: 'destructive',
-        title: 'Error de envío',
+        title: 'Revisa estos detalles',
         description: message,
       });
     }
@@ -352,7 +352,7 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
           <EnrutadorMagico form={form} />
         </Suspense>
 
-        {/* Honeypot anti-spam (MANDATO-FILTRO v2.3.4) */}
+        {/* Honeypot anti-spam (MANDATO-FILTRO v2.3.5) */}
         <div
           style={{ position: 'absolute', opacity: 0, top: -9999, left: -9999 }}
           aria-hidden="true"

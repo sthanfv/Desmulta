@@ -1,7 +1,7 @@
 /**
  * Firebase Admin SDK — Singleton de inicialización segura.
  *
- * Versión: 2.3.4 (Estabilización Local y Producción)
+ * Versión: 2.3.5 (Estabilización Local y Producción)
  */
 
 import { getApps, initializeApp, cert, type App } from 'firebase-admin/app';
@@ -72,11 +72,11 @@ export function getAdminApp(): App {
       }),
     });
 
-    logger.info('[firebase-admin] Inicialización exitosa v2.3.4');
+    logger.info('[firebase-admin] Inicialización exitosa v2.3.5');
     return app;
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Fallo desconocido';
-    logger.error('[firebase-admin] Error fatal de inicialización v2.3.4:', { detalle: errorMsg });
+    logger.error('[firebase-admin] Error fatal de inicialización v2.3.5:', { detalle: errorMsg });
     throw error;
   }
 }

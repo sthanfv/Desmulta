@@ -1,7 +1,7 @@
 /**
  * Endpoint de Carga de Archivos — Desmulta
  *
- * MANDATO-FILTRO v2.3.4:
+ * MANDATO-FILTRO v2.3.5:
  * - Depuración agresiva con logs de cada paso.
  * - Saneamiento de linter y restauración de lógica de nombres.
  */
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     const docSnap = await rateLimitRef.get();
     let contador = 0;
-    // MANDATO-FILTRO v2.3.4: Límite estricto de 5 cargas por IP/día solicitado por el usuario
+    // MANDATO-FILTRO v2.3.5: Límite estricto de 5 cargas por IP/día solicitado por el usuario
     const limite = 5;
 
     if (docSnap.exists) {
@@ -61,7 +61,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       if (contador >= limite) {
         logger.warn('[upload] Límite excedido bloqueado:', { clienteIp, contador });
         return NextResponse.json(
-          { error: `Límite diario de ${limite} cargas alcanzado.` },
+          {
+            error: `¡Has alcanzado el límite de seguridad! Para proteger el sistema, solo permitimos ${limite} cargas por día. Por favor, vuelve mañana.`,
+          },
           { status: 429 }
         );
       }
@@ -73,7 +75,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     if (!MIMES_PERMITIDOS.has(mimePrincipal)) {
       logger.warn('[upload] MIME no permitido:', { mimePrincipal });
       return NextResponse.json(
-        { error: `Formato ${mimePrincipal} no permitido.` },
+        {
+          error: `Ups, el formato de tu archivo no es una imagen válida. Por favor, usa una foto en formato JPG, PNG o WebP.`,
+        },
         { status: 415 }
       );
     }
@@ -97,14 +101,19 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       { merge: true }
     );
 
-    logger.info('[upload] ¡ÉXITO!', { url: blob.url });
+    logger.info('¡ÉXITO!', { url: blob.url });
     return NextResponse.json(blob);
   } catch (error) {
     const mensaje = error instanceof Error ? error.message : 'Error desconocido';
-    logger.error('[upload] Error crítico v2.3.4:', {
+    logger.error('[upload] Error crítico v2.3.5:', {
       error: mensaje,
-      stack: error instanceof Error ? error.stack : undefined,
     });
-    return NextResponse.json({ error: `Error del servidor: ${mensaje}` }, { status: 500 });
+    return NextResponse.json(
+      {
+        error:
+          'No pudimos subir tu captura en este momento. Por favor, verifica que tu internet funcione bien e intenta de nuevo.',
+      },
+      { status: 500 }
+    );
   }
 }

@@ -34,12 +34,12 @@ export function ImageUpload({
 
     // Validaciones de seguridad (MANDATO-FILTRO)
     if (!selectedFile.type.startsWith('image/')) {
-      setError('Solo se permiten archivos de imagen.');
+      setError('Por ahora solo podemos recibir fotos o imágenes. Por favor revisa el formato.');
       return;
     }
 
     if (selectedFile.size > 5 * 1024 * 1024) {
-      setError('La imagen no debe superar los 5MB.');
+      setError('Esta foto es demasiado pesada (máximo 5MB). ¿Podrías intentar con una un poco más pequeña?');
       return;
     }
 
@@ -69,9 +69,9 @@ export function ImageUpload({
       if (!response.ok) {
         if (response.status === 429) {
           const data = await response.json();
-          throw new Error(data.error || 'Has alcanzado el límite de 5 cargas por hoy.');
+          throw new Error(data.error || '¡Has alcanzado el límite de 5 cargas por hoy!');
         }
-        throw new Error('Error al subir la imagen al servidor.');
+        throw new Error('No pudimos subir tu foto en este momento. Por favor verifica tu conexión e intenta otra vez.');
       }
 
       const blob = (await response.json()) as { url: string };
