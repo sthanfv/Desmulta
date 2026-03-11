@@ -134,35 +134,35 @@ export async function POST(request: NextRequest) {
     const cooldownSnap = await cooldownRef.get();
     const fiveMinutes = 5 * 60 * 1000;
 
-      if (cooldownSnap.exists) {
-        const lastAttempt = (cooldownSnap.data()?.lastAttemptAt as Timestamp).toMillis();
-        const elapsedMs = Date.now() - lastAttempt;
-        if (elapsedMs < fiveMinutes) {
-          const remainingMs = fiveMinutes - elapsedMs;
-          const remainingMinutes = Math.floor(remainingMs / 60000);
-          const remainingSeconds = Math.ceil((remainingMs % 60000) / 1000);
+    if (cooldownSnap.exists) {
+      const lastAttempt = (cooldownSnap.data()?.lastAttemptAt as Timestamp).toMillis();
+      const elapsedMs = Date.now() - lastAttempt;
+      if (elapsedMs < fiveMinutes) {
+        const remainingMs = fiveMinutes - elapsedMs;
+        const remainingMinutes = Math.floor(remainingMs / 60000);
+        const remainingSeconds = Math.ceil((remainingMs % 60000) / 1000);
 
-          let timeStr = '';
-          if (remainingMinutes > 0) {
-            timeStr = `${remainingMinutes} ${remainingMinutes === 1 ? 'minuto' : 'minutos'}`;
-            if (remainingSeconds > 0) {
-              timeStr += ` y ${remainingSeconds} ${remainingSeconds === 1 ? 'segundo' : 'segundos'}`;
-            }
-          } else {
-            timeStr = `${remainingSeconds} ${remainingSeconds === 1 ? 'segundo' : 'segundos'}`;
+        let timeStr = '';
+        if (remainingMinutes > 0) {
+          timeStr = `${remainingMinutes} ${remainingMinutes === 1 ? 'minuto' : 'minutos'}`;
+          if (remainingSeconds > 0) {
+            timeStr += ` y ${remainingSeconds} ${remainingSeconds === 1 ? 'segundo' : 'segundos'}`;
           }
-
-          return NextResponse.json(
-            {
-              error: `¡Pausa de seguridad! Para proteger tu información, por favor espera ${timeStr} antes de enviar otra consulta.`,
-            },
-            {
-              status: 429,
-              headers: { 'Retry-After': String(Math.ceil(remainingMs / 1000)) },
-            }
-          );
+        } else {
+          timeStr = `${remainingSeconds} ${remainingSeconds === 1 ? 'segundo' : 'segundos'}`;
         }
+
+        return NextResponse.json(
+          {
+            error: `¡Pausa de seguridad! Para proteger tu información, por favor espera ${timeStr} antes de enviar otra consulta.`,
+          },
+          {
+            status: 429,
+            headers: { 'Retry-After': String(Math.ceil(remainingMs / 1000)) },
+          }
+        );
       }
+    }
 
     // 2.1 Actualizar Cooldown (MANDATO-FILTRO: Persistencia de Seguridad)
     await cooldownRef.set({

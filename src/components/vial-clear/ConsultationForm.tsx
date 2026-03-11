@@ -83,13 +83,8 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
   const [step, setStep] = useState(isSimitMode ? 2 : 0);
   const [isSuccess, setIsSuccess] = useState(false);
   const [showCedula, setShowCedula] = useState(false);
-  const [isHuman, setIsHuman] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const { toast } = useToast();
-
-  const handleInteraction = () => {
-    if (!isHuman) setIsHuman(true);
-  };
 
   const form = useForm<ConsultationFormData>({
     resolver: zodResolver(
@@ -199,7 +194,9 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
     try {
       if (!turnstileToken) {
         haptics.vibrate('warning');
-        throw new Error('Nuestro escudo de protección está terminando de activarse. Por favor, espera un segundo más para mayor seguridad.');
+        throw new Error(
+          'Nuestro escudo de protección está terminando de activarse. Por favor, espera un segundo más para mayor seguridad.'
+        );
       }
 
       toast({
@@ -215,7 +212,9 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
         await new Promise((resolve) => setTimeout(resolve, 300));
         currentUser = auth.currentUser;
         if (!currentUser) {
-          throw new Error('Estamos estableciendo una conexión segura. Por favor, pulsa el botón de nuevo.');
+          throw new Error(
+            'Estamos estableciendo una conexión segura. Por favor, pulsa el botón de nuevo.'
+          );
         }
       }
 
@@ -274,7 +273,10 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
       setTimeout(onSuccess, 3000);
     } catch (e: unknown) {
       haptics.vibrate('error');
-      const message = e instanceof Error ? e.message : 'Tuvimos un pequeño inconveniente. Por favor, intenta de nuevo más tarde.';
+      const message =
+        e instanceof Error
+          ? e.message
+          : 'Tuvimos un pequeño inconveniente. Por favor, intenta de nuevo más tarde.';
       toast({
         variant: 'destructive',
         title: 'Revisa estos detalles',
@@ -313,9 +315,6 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
   return (
     <Form {...form}>
       <form
-        onMouseMove={handleInteraction}
-        onKeyDown={handleInteraction}
-        onTouchStart={handleInteraction}
         onSubmit={form.handleSubmit(
           async (data) => {
             await onSubmit(data);
@@ -352,7 +351,7 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
           <EnrutadorMagico form={form} />
         </Suspense>
 
-        {/* Honeypot anti-spam (MANDATO-FILTRO v2.3.6) */}
+        {/* Honeypot anti-spam (MANDATO-FILTRO v2.3.7) */}
         <div
           style={{ position: 'absolute', opacity: 0, top: -9999, left: -9999 }}
           aria-hidden="true"
@@ -836,8 +835,12 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
             <div className="my-6 flex flex-col items-center justify-center min-h-[65px]">
               {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ? (
                 <Turnstile
+                  key={`turnstile-${mode}-${step}`} // 👈 MANDATO-FILTRO: Forzar re-montaje para evitar fallos de inicialización en pasos directos
                   siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
-                  onSuccess={(token) => setTurnstileToken(token)}
+                  onSuccess={(token) => {
+                    setTurnstileToken(token);
+                    haptics.vibrate('light');
+                  }}
                   options={{
                     theme: 'dark',
                     size: 'normal',

@@ -101,6 +101,12 @@ export async function POST(request: Request) {
     const mensaje = err instanceof Error ? err.message : 'Error desconocido';
     logger.error('[EDGE Error] Fallo en la validación:', { error: mensaje });
 
-    return NextResponse.json({ error: 'Hubo un inconveniente al validar tus datos. Por favor, intenta de nuevo en un momento.' }, { status: 500 });
+    return NextResponse.json(
+      {
+        error:
+          'Hubo un inconveniente al validar tus datos. Por favor, intenta de nuevo en un momento.',
+      },
+      { status: 500 }
+    );
   }
 }

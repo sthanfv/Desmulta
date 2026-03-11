@@ -6,7 +6,7 @@
  * - Deduplicar peticiones dentro del mismo request
  * - Pre-renderizar los datos estáticos junto al HTML inicial
  *
- * MANDATO-FILTRO v2.3.6: Sin credenciales hardcodeadas, sin console.log en prod,
+ * MANDATO-FILTRO v2.3.7: Sin credenciales hardcodeadas, sin console.log en prod,
  * fallback seguro a datos por defecto si Firestore no responde.
  */
 
