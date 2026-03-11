@@ -11,7 +11,7 @@ import {
   Eye,
   EyeOff,
   ShieldCheck,
-  Search,
+  User,
   MessageCircle,
 } from 'lucide-react';
 import { getAuth } from 'firebase/auth';
@@ -326,7 +326,10 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
             const errorKeys = Object.keys(errors);
             const firstFieldName = errorKeys[0];
             const firstError = errors[firstFieldName as keyof typeof errors];
-            const label = FIELD_LABELS[firstFieldName] || firstFieldName;
+            const label =
+              firstFieldName in FIELD_LABELS
+                ? FIELD_LABELS[firstFieldName as keyof typeof FIELD_LABELS]
+                : firstFieldName;
 
             toast({
               variant: 'destructive',
@@ -358,9 +361,14 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
             control={form.control}
             name="_tramp_field"
             render={({ field }) => (
-              <FormControl>
-                <Input {...field} autoComplete="new-password" tabIndex={-1} aria-hidden="true" />
-              </FormControl>
+              <div className="hidden" aria-hidden="true">
+                <input
+                  {...field}
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-label="Do not fill this field"
+                />
+              </div>
             )}
           />
         </div>
@@ -371,10 +379,10 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
               <div className="inline-flex px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-[10px] font-black uppercase tracking-widest text-primary">
                 Pre-Análisis Gratuito
               </div>
-              <h3 className="text-3xl font-black text-foreground tracking-tighter uppercase leading-tight">
+              <h2 className="text-3xl font-black text-foreground tracking-tighter uppercase leading-tight">
                 ¿Qué tanta <span className="text-primary">probabilidad</span> <br />
                 tienes de ganar?
-              </h3>
+              </h2>
             </div>
 
             <div className="grid grid-cols-1 gap-4">
@@ -413,6 +421,8 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
                     'p-6 rounded-[2rem] border-2 border-border/40 transition-all text-left flex flex-col gap-1 active:scale-95',
                     opt.bg
                   )}
+                  aria-label={`Seleccionar antigüedad: ${opt.label}`}
+                  aria-pressed={form.getValues('antiguedad') === opt.id}
                 >
                   <span className="font-black text-sm uppercase tracking-tight">{opt.label}</span>
                   <span
@@ -435,10 +445,10 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
               <div className="inline-flex px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-[10px] font-black uppercase tracking-widest text-primary">
                 Paso 1: Análisis de Viabilidad
               </div>
-              <h3 className="text-2xl font-black text-foreground tracking-tighter uppercase leading-none">
+              <h2 className="text-2xl font-black text-foreground tracking-tighter uppercase leading-none">
                 Califica tu caso <br />
                 <span className="text-primary">en 30 segundos</span>
-              </h3>
+              </h2>
             </div>
 
             <div className="space-y-8">
@@ -470,6 +480,8 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
                                   ? 'border-primary bg-primary/5 text-primary shadow-lg shadow-primary/10'
                                   : 'border-border/40 hover:border-border text-muted-foreground'
                               )}
+                              aria-label={`Seleccionar tipo de captura: ${option}`}
+                              aria-pressed={field.value === option}
                             >
                               {option}
                             </button>
@@ -494,22 +506,25 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
                     <FormControl>
                       <div className="grid grid-cols-3 gap-3">
                         {['SÍ', 'NO', 'NO SÉ'].map((option) => (
-                          <button
+                          <Button
                             key={option}
                             type="button"
+                            variant={field.value === option ? 'default' : 'outline'}
+                            className={cn(
+                              'h-12 md:h-14 rounded-xl md:rounded-2xl font-bold transition-all px-2 text-xs md:text-sm',
+                              field.value === option
+                                ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-[1.02]'
+                                : 'hover:border-primary/50'
+                            )}
                             onClick={() => {
                               field.onChange(option);
                               haptics.vibrate('light');
                             }}
-                            className={cn(
-                              'flex items-center justify-center h-14 rounded-2xl border-2 transition-all font-black text-sm',
-                              field.value === option
-                                ? 'border-primary bg-primary/5 text-primary shadow-lg shadow-primary/10'
-                                : 'border-border/40 hover:border-border text-muted-foreground'
-                            )}
+                            aria-label={`Seleccionar opción: ${option}`}
+                            aria-pressed={field.value === option}
                           >
                             {option}
-                          </button>
+                          </Button>
                         ))}
                       </div>
                     </FormControl>
@@ -542,6 +557,7 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
                   type="button"
                   onClick={() => setStep(0)}
                   className="text-xs font-bold text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 uppercase tracking-tighter"
+                  aria-label="Regresar al inicio del formulario"
                 >
                   ← Regresar al Inicio
                 </button>
@@ -551,7 +567,7 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
                   ? 'Envío Rápido con Captura SIMIT'
                   : 'Paso 2: Datos de Validación Técnica'}
               </div>
-              <h3 className="text-2xl font-black text-foreground tracking-tighter uppercase leading-none">
+              <h2 className="text-2xl font-black text-foreground tracking-tighter uppercase leading-none">
                 {isSimitMode ? (
                   <>
                     Sube tu captura <br />
@@ -563,7 +579,7 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
                     <span className="text-primary">tu certificación?</span>
                   </>
                 )}
-              </h3>
+              </h2>
             </div>
 
             <div className="space-y-6">
@@ -575,30 +591,36 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
                     name="cedula"
                     render={({ field }) => (
                       <FormItem className="space-y-2">
-                        <FormLabel className="text-[10px] font-black text-foreground/70 uppercase tracking-widest pl-1">
+                        <FormLabel
+                          htmlFor="cedula-input"
+                          className="text-[10px] font-black text-foreground/70 uppercase tracking-widest pl-1"
+                        >
                           Cédula del Propietario
                         </FormLabel>
-                        <div className="relative group">
+                        <div className="relative group/input">
                           <FormControl>
                             <Input
-                              type={showCedula ? 'text' : 'password'}
-                              placeholder="Identificación sin puntos ni comas"
-                              {...field}
-                              onChange={(e) => field.onChange(formatCedula(e.target.value))}
+                              id="cedula-input"
+                              placeholder="Ej: 1012345678"
                               className={cn(
-                                'w-full bg-background border-border/50 rounded-2xl pl-12 pr-12 h-16 text-lg font-medium focus:ring-primary/20 focus:border-primary transition-all shadow-Inner',
+                                'h-14 md:h-16 pl-14 pr-14 rounded-2xl md:rounded-3xl border-white/20 bg-white/50 dark:bg-black/20 focus:ring-primary/20 transition-all font-bold text-lg',
                                 field.value.length >= 6 && 'border-green-500/30 bg-green-500/[0.02]'
                               )}
+                              {...field}
+                              type={showCedula ? 'text' : 'password'}
+                              autoComplete="username"
+                              onChange={(e) => field.onChange(formatCedula(e.target.value))}
                             />
                           </FormControl>
-                          <Search
-                            className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"
-                            size={20}
+                          <User
+                            className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within/input:text-primary transition-colors"
+                            size={22}
                           />
                           <button
                             type="button"
                             onClick={() => setShowCedula(!showCedula)}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground"
+                            className="absolute right-5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors p-1"
+                            aria-label={showCedula ? 'Ocultar cédula' : 'Mostrar cédula'}
                           >
                             {showCedula ? <EyeOff size={20} /> : <Eye size={20} />}
                           </button>
@@ -614,11 +636,15 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
                       name="placa"
                       render={({ field }) => (
                         <FormItem className="space-y-2">
-                          <FormLabel className="text-[10px] font-black text-foreground/70 uppercase tracking-widest pl-1">
+                          <FormLabel
+                            htmlFor="placa-input"
+                            className="text-[10px] font-black text-foreground/70 uppercase tracking-widest pl-1"
+                          >
                             Placa <span className="opacity-40">(Opcional)</span>
                           </FormLabel>
                           <FormControl>
                             <Input
+                              id="placa-input"
                               placeholder="Ej: AAA123"
                               {...field}
                               onChange={(e) => field.onChange(formatPlaca(e.target.value))}
@@ -635,12 +661,16 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
                       name="contacto"
                       render={({ field }) => (
                         <FormItem className="space-y-2">
-                          <FormLabel className="text-[10px] font-black text-foreground/70 uppercase tracking-widest pl-1">
+                          <FormLabel
+                            htmlFor="whatsapp-input"
+                            className="text-[10px] font-black text-foreground/70 uppercase tracking-widest pl-1"
+                          >
                             WhatsApp Celular
                           </FormLabel>
                           <div className="relative">
                             <FormControl>
                               <Input
+                                id="whatsapp-input"
                                 type="tel"
                                 placeholder="300 123 4567"
                                 {...field}
@@ -651,6 +681,7 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
                             <MessageCircle
                               className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"
                               size={20}
+                              aria-hidden="true"
                             />
                           </div>
                           <FormMessage />
@@ -664,11 +695,15 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
                     name="nombre"
                     render={({ field }) => (
                       <FormItem className="space-y-2">
-                        <FormLabel className="text-[10px] font-black text-foreground/70 uppercase tracking-widest pl-1">
+                        <FormLabel
+                          htmlFor="nombre-input"
+                          className="text-[10px] font-black text-foreground/70 uppercase tracking-widest pl-1"
+                        >
                           Nombre Completo
                         </FormLabel>
                         <FormControl>
                           <Input
+                            id="nombre-input"
                             placeholder="Como aparece en el documento"
                             {...field}
                             className="w-full bg-background border-border/50 rounded-2xl px-6 h-16 text-lg font-medium shadow-Inner"
@@ -684,11 +719,15 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
                     name="email"
                     render={({ field }) => (
                       <FormItem className="space-y-2">
-                        <FormLabel className="text-[10px] font-black text-foreground/70 uppercase tracking-widest pl-1">
+                        <FormLabel
+                          htmlFor="email-input"
+                          className="text-[10px] font-black text-foreground/70 uppercase tracking-widest pl-1"
+                        >
                           Correo Electrónico <span className="opacity-40">(Opcional)</span>
                         </FormLabel>
                         <FormControl>
                           <Input
+                            id="email-input"
                             type="email"
                             placeholder="tu@correo.com"
                             {...field}
@@ -709,12 +748,19 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
                   name="contacto"
                   render={({ field }) => (
                     <FormItem className="space-y-2">
-                      <FormLabel className="text-[10px] font-black text-foreground/70 uppercase tracking-widest pl-1">
+                      <h3 className="text-xl font-black text-foreground uppercase tracking-tight">
+                        Consulta el SIMIT
+                      </h3>
+                      <FormLabel
+                        htmlFor="whatsapp-simit-input"
+                        className="text-[10px] font-black text-foreground/70 uppercase tracking-widest pl-1"
+                      >
                         WhatsApp Celular
                       </FormLabel>
                       <div className="relative">
                         <FormControl>
                           <Input
+                            id="whatsapp-simit-input"
                             type="tel"
                             placeholder="300 123 4567"
                             {...field}

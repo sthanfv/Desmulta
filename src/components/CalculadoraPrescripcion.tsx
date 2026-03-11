@@ -65,12 +65,19 @@ export function CalculadoraPrescripcion() {
       {/* Controles de la Calculadora */}
       <div className="space-y-5">
         <div>
-          <label className="block text-sm font-bold text-muted-foreground mb-2">
+          <label
+            htmlFor="fecha-infraccion"
+            className="block text-sm font-bold text-muted-foreground mb-2"
+          >
             ¿En qué fecha ocurrió la infracción?
           </label>
           <div className="relative">
-            <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/50" />
+            <Calendar
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/50"
+              aria-hidden="true"
+            />
             <input
+              id="fecha-infraccion"
               type="date"
               value={fecha}
               onChange={(e) => setFecha(e.target.value)}
@@ -78,6 +85,7 @@ export function CalculadoraPrescripcion() {
               min="2000-01-01"
               max={new Date().toISOString().split('T')[0]}
               className="w-full bg-muted border border-input text-foreground rounded-xl py-3 pl-11 pr-4 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all disabled:opacity-50"
+              aria-required="true"
             />
           </div>
         </div>

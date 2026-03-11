@@ -55,8 +55,9 @@ export const Footer = ({ footerData, onOpenWhatsAppWarning }: FooterProps) => {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-12 h-12 rounded-2xl bg-card border border-white/10 flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/30 transition-all active:scale-95"
+                  aria-label="Síguenos en Instagram"
                 >
-                  <Instagram size={24} />
+                  <Instagram size={24} aria-hidden="true" />
                 </Link>
               )}
               {footerData.facebookUrl && (
@@ -65,8 +66,9 @@ export const Footer = ({ footerData, onOpenWhatsAppWarning }: FooterProps) => {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-12 h-12 rounded-2xl bg-card border border-white/10 flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/30 transition-all active:scale-95"
+                  aria-label="Síguenos en Facebook"
                 >
-                  <Facebook size={24} />
+                  <Facebook size={24} aria-hidden="true" />
                 </Link>
               )}
             </div>

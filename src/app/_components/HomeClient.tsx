@@ -194,11 +194,13 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
         <button
           onClick={() => setIsWhatsAppWarningOpen(true)}
           className="bg-[#25D366] hover:bg-[#20ba59] text-white w-20 h-20 rounded-full flex items-center justify-center shadow-2xl shadow-green-500/30 transition-all hover:scale-110 active:scale-90"
+          aria-label="Abrir chat de WhatsApp para asesoría directa"
         >
-          <MessageCircle size={36} fill="currentColor" />
+          <MessageCircle size={36} fill="currentColor" aria-hidden="true" />
         </button>
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          aria-label="Volver arriba"
           className={`text-primary/70 hover:text-primary w-14 h-14 flex items-center justify-center transition-all duration-500 ${
             showScrollTop
               ? 'opacity-100 translate-y-0 scale-100'
@@ -211,6 +213,7 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
             fill="none"
             stroke="currentColor"
             strokeWidth="3"
+            aria-hidden="true"
           >
             <path d="M12 19V5M5 12l7-7 7 7" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
