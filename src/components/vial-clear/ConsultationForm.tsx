@@ -306,11 +306,9 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
         onTouchStart={handleInteraction}
         onSubmit={form.handleSubmit(
           async (data) => {
-            console.log('🚀 Submit triggering...', data);
             await onSubmit(data);
           },
           (errors) => {
-            console.error('❌ Error de Validación:', errors);
             haptics.vibrate('error');
 
             const errorKeys = Object.keys(errors);
@@ -338,7 +336,7 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
           <EnrutadorMagico form={form} />
         </Suspense>
 
-        {/* Honeypot anti-spam (MANDATO-FILTRO v5.9.0) */}
+        {/* Honeypot anti-spam (MANDATO-FILTRO v2.3.4) */}
         <div
           style={{ position: 'absolute', opacity: 0, top: -9999, left: -9999 }}
           aria-hidden="true"

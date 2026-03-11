@@ -1,9 +1,4 @@
-/**
- * TODAS LAS DECISIONES, ARCHIVOS Y CÓDIGO GENERADO DEBEN PASAR EL FILTRO
- * DE SEGURIDAD Y CALIDAD ‘MANDATO-FILTRO’
- *
- * SecurityLogger: Motor de auditoría con ofuscación automática de PII (Personally Identifiable Information).
- */
+ * SecurityLogger: Motor de auditoría con ofuscación automática de PII (v2.3.4).
 
 type LogLevel = 'info' | 'warn' | 'error' | 'security';
 
@@ -63,10 +58,10 @@ class SecurityLogger {
         ];
 
         if (sensitiveKeys.includes(key.toLowerCase())) {
-          // eslint-disable-next-line security/detect-object-injection -- Key is validated against prototype pollution and sanitized object has no prototype
+          // eslint-disable-next-line security/detect-object-injection
           sanitized[key] = this.obfuscate(value);
         } else {
-          // eslint-disable-next-line security/detect-object-injection -- Key is validated against prototype pollution and sanitized object has no prototype
+          // eslint-disable-next-line security/detect-object-injection
           sanitized[key] = this.obfuscate(value);
         }
       }

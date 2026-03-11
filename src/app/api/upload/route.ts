@@ -1,7 +1,7 @@
 /**
  * Endpoint de Carga de Archivos — Desmulta
  *
- * MANDATO-FILTRO v2.2.3:
+ * MANDATO-FILTRO v2.3.4:
  * - Depuración agresiva con logs de cada paso.
  * - Saneamiento de linter y restauración de lógica de nombres.
  */
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     const docSnap = await rateLimitRef.get();
     let contador = 0;
-    // MANDATO-FILTRO v2.3.2: Límite estricto de 5 cargas por IP/día solicitado por el usuario
+    // MANDATO-FILTRO v2.3.4: Límite estricto de 5 cargas por IP/día solicitado por el usuario
     const limite = 5;
 
     if (docSnap.exists) {
@@ -101,7 +101,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json(blob);
   } catch (error) {
     const mensaje = error instanceof Error ? error.message : 'Error desconocido';
-    logger.error('[upload] Error crítico v2.2.3:', {
+    logger.error('[upload] Error crítico v2.3.4:', {
       error: mensaje,
       stack: error instanceof Error ? error.stack : undefined,
     });

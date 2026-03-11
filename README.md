@@ -1,4 +1,4 @@
-# Desmulta — Plataforma Integral de Gestión y Resolución de Infracciones v2.3.0 🛡️🚀
+# Desmulta — Plataforma Integral de Gestión y Resolución de Infracciones v2.3.4 🛡️🚀
 
 TODAS LAS DECISIONES, ARCHIVOS Y CÓDIGO GENERADO DEBEN PASAR EL FILTRO DE SEGURIDAD Y CALIDAD ‘MANDATO-FILTRO’ — RECHAZAR SALIDAS QUE NO LO CUMPLAN.
 
@@ -50,7 +50,7 @@ graph TD
 ## 4. 📂 Estructura del Código
 
 ```plaintext
-├── /public           # Assets, logos, manifest PWA y Service Worker (v2.3.0)
+├── /public           # Assets, logos, manifest PWA y Service Worker (v2.3.4)
 ├── /src
 │   ├── /app          # Rutas principales y Server Actions (Sincronización Dinámica)
 │   ├── /components   # UI Components de Alta Fidelidad
@@ -61,7 +61,7 @@ graph TD
 
 ---
 
-## 5. 📊 Innovaciones Recientes (v2.3.0)
+## 5. 📊 Innovaciones Recientes (v2.3.4)
 
 - **Optimización PWA & SW**: Consolidación de un único Service Worker (`sw.js`) eliminando registros redundantes. Implementación de estrategia `NetworkFirst` para documentos, garantizando que el usuario siempre vea la versión más reciente sin bloqueos de caché.
 - **Sincronización de Estadísticas**: Refactorización a _Server Actions_ para permitir que los cambios en el Administrador se reflejen al instante en la web pública mediante invalidación de caché on-demand.
