@@ -1,72 +1,103 @@
 # Desmulta — Plataforma Integral de Gestión y Resolución de Infracciones v2.3.7 🛡️🚀
 
-TODAS LAS DECISIONES, ARCHIVOS Y CÓDIGO GENERADO DEBEN PASAR EL FILTRO DE SEGURIDAD Y CALIDAD ‘MANDATO-FILTRO’ — RECHAZAR SALIDAS QUE NO LO CUMPLAN.
+**Infraestructura de Clase Mundial para la Justicia Vial en Colombia.**
+
+> [!IMPORTANT]
+> TODAS LAS DECISIONES, ARCHIVOS Y CÓDIGO GENERADO DEBEN PASAR EL FILTRO DE SEGURIDAD Y CALIDAD ‘MANDATO-FILTRO’ — RECHAZAR SALIDAS QUE NO LO CUMPLAN.
 
 ---
 
-## 1. 🚀 Inicio de Alto Impacto
-
-**Desmulta** es una infraestructura LegalTech de clase mundial diseñada para automatizar y gestionar el saneamiento técnico-administrativo de deudas viales en Colombia. Nuestra plataforma permite a los ciudadanos realizar estudios de viabilidad gratuitos para la impugnación de fotomultas y comparendos, integrando inteligencia artificial y protocolos de defensa legal automatizados para recuperar el liderazgo vial y crediticio de nuestros usuarios.
-
----
-
-## 2. 💼 El Problema y la Solución
-
-### El Problema
-
-El sistema de fotomultas en Colombia a menudo opera con fallos en el debido proceso: falta de notificaciones, comparendos prescritos o caducados que permanecen en el SIMIT afectando el historial crediticio (Datacrédito) y la movilidad del ciudadano.
-
-### La Solución
-
-Desmulta democratiza el acceso a la justicia vial mediante:
-
-1.  **Diagnóstico O(1)**: Validación instantánea de historial vial.
-2.  **Saneamiento Automatizado**: Generación de trámites basados en protocolos de éxito.
-3.  **Sincronización Dinámica**: Panel administrativo que actualiza estadísticas e imágenes globalmente en tiempo real.
+## 1. 🚀 Visión General
+**Desmulta** es una solución LegalTech de alto impacto que automatiza el diagnóstico y saneamiento de deudas de tránsito. Mediante el uso de Inteligencia Artificial y protocolos administrativos precisos, permitimos que el ciudadano recupere su libertad financiera y vial frente a fotomultas e infracciones injustas.
 
 ---
 
-## 3. 🏗️ Arquitectura del Sistema
+## 2. 🛡️ Capacidades Core del Sistema
 
-Nuestra arquitectura está diseñada bajo principios de **Modularidad Estricta** y **Zero-Trust Security**.
+### 📋 Módulos de Operación
+1.  **Estudio de Viabilidad Técnica**: Formulario inteligente de 3 pasos que analiza la probabilidad de éxito (Prescripción, Caducidad o Fallos de Notificación).
+2.  **Captura Rápida SIMIT**: Flujo optimizado para usuarios móviles que permite subir una captura del SIMIT y recibir asesoría instantánea vía WhatsApp.
+3.  **Admin Dashboard v2.3.7**: Panel de control senior para la gestión de leads, estadísticas en tiempo real y supervisión de evidencias.
+
+### 🧠 Inteligencia & CRM
+-   **Análisis con Genkit AI**: Integración nativa con Google Gemini para el pre-análisis de casos complejos.
+-   **Notificaciones CRM**: Sistema de alertas automáticas vía **Telegram Bot** para el equipo jurídico ante nuevos registros.
+-   **Sincronización Dinámica**: Actualización instantánea del frontend mediante *Server Actions* e invalidación de caché optimizada.
+
+### 🔒 Seguridad de Nivel Bancario (Zero-Trust)
+-   **Shield Anti-Bot**: Implementación combinada de **Cloudflare Turnstile** (modo Managed) y **Honeypot dinámico**. El botón de envío se mantiene bloqueado hasta la validación exitosa.
+-   **Precisión en Rate Limiting**: Límites por IP y UID con retroalimentación exacta en minutos/segundos (consultas) u horas/minutos (imágenes) para evitar abusos.
+-   **Privacidad por Diseño**: Motor de auditoría `SecurityLogger` que ofusca datos de identificación (PII) en todos los logs de consola y servidor.
+-   **Hardening de Headers**: CSP (Content Security Policy) estricta implementada en el Middleware para mitigar ataques XSS y Clickjacking.
+
+---
+
+## 🏗️ 3. Arquitectura Técnica
 
 ```mermaid
 graph TD
-    User((Usuario)) --> |HTTPS/TLS| Frontend[Next.js 15 + React 19]
-    Frontend --> |Zod Protected API| Backend[Next.js Server Actions / API Routes]
-    Backend --> |Admin SDK| Firestore[(Firebase Firestore)]
-    Backend --> |Vercel Blob| Storage[Document Evidence]
-    Backend --> |Genkit| Gemini[IA: Análisis de Casos]
-    Backend --> |Bot API| Telegram[Notificaciones CRM]
+    User((Usuario)) --> |Cloudflare/HTTPS| Frontend[Next.js 15 + React 19]
+    Frontend --> |Server Actions| Logic[Business Domain Layer]
+    Logic --> |Admin SDK| Firestore[(Firestore DB)]
+    Logic --> |Uploader| Blob[Vercel Blob Storage]
+    Logic --> |AI Core| Gemini[Genkit + Gemini SDK]
+    Logic --> |Alerts| CRM[Telegram Bot API]
+    Frontend -.-> |PWA| SW[Service Worker: NetworkFirst]
 ```
 
-- **Frontend**: Next.js 15 con React 19 y empaquetado PWA optimizado.
-- **Backend / DB**: Firebase Admin SDK para operaciones seguras desde el servidor.
-- **Seguridad Activa**: CSP restrictiva, Ofuscación PII en logs y Normalización de Llaves Privadas.
-- **Sincronización**: Uso de `revalidatePath` para actualizaciones instantáneas de caché.
+### Stack Tecnológico
+-   **Framework**: Next.js 15.5.12 (App Router).
+-   **Frontend**: React 19, Tailwind CSS, Framer Motion, GSAP, Radix UI.
+-   **Backend**: Server Actions, API Routes (Edge Runtime ready), Zod Validation.
+-   **Base de Datos**: Firebase Firestore (Estrategia Singleton para Admin SDK).
+-   **Almacenamiento**: Vercel Blob con sistema de limpieza automática vía Cron.
+-   **PWA**: Soporte offline completo con `@ducanh2912/next-pwa` y manifest optimizado.
 
 ---
 
-## 4. 📂 Estructura del Código
+## 📂 4. Estructura del Proyecto
 
 ```plaintext
-├── /public           # Assets, logos, manifest PWA y Service Worker (v2.3.7)
+├── /public           # Assets, manifest PWA y Service Worker v2.3.7
 ├── /src
-│   ├── /app          # Rutas principales y Server Actions (Sincronización Dinámica)
-│   ├── /components   # UI Components de Alta Fidelidad
-│   ├── /firebase     # Configuración y proveedores (Client/Admin)
-│   ├── /lib          # Utilidades core, Logger de Seguridad y Constantes Neutras
-│   └── /services     # Capa de servicios e integraciones externas
+│   ├── /app          # Rutas, API Endpoints y Server Actions (Capa de Negocio)
+│   ├── /components   # UI Dinámica (Vial-Clear & Primitives)
+│   ├── /lib          # Core Logic: Schemas, Loggers, Env-Check, Security Headers
+│   ├── /services     # Capa de Integración (Firebase, Telegram, Gemini)
+│   ├── /hooks        # Lógica de estado y notificaciones (Toast)
+│   └── /tests        # Suite de pruebas Unitarias y de Integración con Vitest
 ```
 
 ---
 
-## 5. 📊 Innovaciones Recientes (v2.3.7)
+## 🛠️ 5. Configuración y Despliegue
 
-- **Optimización PWA & SW**: Consolidación de un único Service Worker (`sw.js`) eliminando registros redundantes. Implementación de estrategia `NetworkFirst` para documentos, garantizando que el usuario siempre vea la versión más reciente sin bloqueos de caché.
-- **Sincronización de Estadísticas**: Refactorización a _Server Actions_ para permitir que los cambios en el Administrador se reflejen al instante en la web pública mediante invalidación de caché on-demand.
-- **Blindaje Firebase**: Nuevo motor de normalización de llaves RSA para garantizar estabilidad 99.9% en infraestructuras Edge (Vercel).
-- **Consistencias Neutras**: Desacoplamiento de constantes en `config-constants.ts` para evitar fugas de Node.js al navegador.
+### Variables de Entorno Requeridas (.env)
+El sistema requiere una configuración estricta para operar bajo el MANDATO-FILTRO:
+
+| Variable | Propósito |
+| :--- | :--- |
+| `NEXT_PUBLIC_FIREBASE_API_KEY` | Cliente Firebase Web |
+| `FIREBASE_PRIVATE_KEY` | Autenticación Admin SDK (Server Side) |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Key pública de Cloudflare Turnstile |
+| `TURNSTILE_SECRET_KEY` | Validación Server-side de Turnstile |
+| `GEMINI_API_KEY` | Motor de IA para análisis de casos |
+| `TELEGRAM_BOT_TOKEN` | Token para notificaciones de leads |
+| `NEXT_PUBLIC_WHATSAPP_NUMBER` | Canal de contacto principal |
+
+### Ciclo de Desarrollo
+1.  **Instalación**: `npm install`
+2.  **Ejecución**: `npm run dev` (Puerto 9005)
+3.  **Calidad**: `npm run lint` && `npm run typecheck`
+4.  **Pruebas**: `npm run test`
+5.  **Producción**: `npm run build`
+
+---
+
+## 📊 6. SEO & Rendimiento
+-   **Indexación Estratégica**: `sitemap.xml` dinámico para todas las variantes de servicios por ciudad.
+-   **Web Vitals**: Optimización de tipografía (Outfit) y carga diferida para garantizar LCP < 1.2s.
+-   **Accesibilidad**: Cumplimiento de estándares ARIA en todos los componentes interactivos.
 
 ---
 
