@@ -38,6 +38,18 @@ import { haptics } from '@/lib/utils/haptics';
 import { ImageUpload } from './ImageUpload';
 
 type ConsultationFormData = z.infer<typeof ConsultationSchema>;
+const FIELD_LABELS: Record<string, string> = {
+  cedula: 'Cédula',
+  placa: 'Placa',
+  nombre: 'Nombre',
+  contacto: 'WhatsApp/Celular',
+  aceptoTerminos: 'Términos y Condiciones',
+  antiguedad: 'Antigüedad',
+  tipoInfraccion: 'Tipo de Infracción',
+  estadoCoactivo: 'Estado Coactivo',
+  evidenceUrl: 'Captura de pantalla',
+  email: 'Correo electrónico',
+};
 
 // --- ARMA DE CONVERSIÓN TÁCTICA: ENRUTADOR MÁGICO ---
 // Lee parámetros de WhatsApp/Ads en la URL y auto-rellena el estado sin interactuar
@@ -314,11 +326,12 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
             const errorKeys = Object.keys(errors);
             const firstFieldName = errorKeys[0];
             const firstError = errors[firstFieldName as keyof typeof errors];
+            const label = FIELD_LABELS[firstFieldName] || firstFieldName;
 
             toast({
               variant: 'destructive',
               title: 'Formulario Incompleto',
-              description: `El campo ${firstFieldName} tiene un problema: ${firstError?.message || 'Revisa el formato.'}`,
+              description: `El campo "${label}" tiene un problema: ${firstError?.message || 'Revisa el formato.'}`,
             });
           }
         )}
