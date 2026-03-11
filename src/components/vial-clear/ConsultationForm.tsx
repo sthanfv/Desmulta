@@ -184,12 +184,16 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
   };
 
   const onSubmit: SubmitHandler<ConsultationFormData> = async (data) => {
-    haptics.vibrate('heavy'); // Fuerza táctil al iniciar el trámite
     try {
-      if (!isHuman || !turnstileToken) {
+      if (!turnstileToken) {
         haptics.vibrate('warning');
         throw new Error('El escudo de seguridad aún está validando. Por favor, espere un segundo.');
       }
+
+      toast({
+        title: 'Iniciando envío...',
+        description: 'Estamos procesando tu solicitud, por favor no cierres la ventana.',
+      });
 
       const auth = getAuth();
       let currentUser = auth.currentUser;
@@ -297,25 +301,29 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
   return (
     <Form {...form}>
       <form
-        onSubmit={(e) => {
-          form
-            .handleSubmit(onSubmit)(e)
-            .catch(() => {
-              // Capturamos fallos de validación de Zod
-              if (process.env.NODE_ENV === 'development') {
-                console.warn('⚠️ Fallo de validación Zod:', form.formState.errors);
-              }
-              haptics.vibrate('warning');
-              toast({
-                variant: 'destructive',
-                title: 'Formulario Incompleto',
-                description: 'Por favor, revise los campos marcados en rojo.',
-              });
-            });
-        }}
         onMouseMove={handleInteraction}
         onKeyDown={handleInteraction}
         onTouchStart={handleInteraction}
+        onSubmit={form.handleSubmit(
+          async (data) => {
+            console.log('🚀 Submit triggering...', data);
+            await onSubmit(data);
+          },
+          (errors) => {
+            console.error('❌ Error de Validación:', errors);
+            haptics.vibrate('error');
+
+            const errorKeys = Object.keys(errors);
+            const firstFieldName = errorKeys[0];
+            const firstError = errors[firstFieldName as keyof typeof errors];
+
+            toast({
+              variant: 'destructive',
+              title: 'Formulario Incompleto',
+              description: `El campo ${firstFieldName} tiene un problema: ${firstError?.message || 'Revisa el formato.'}`,
+            });
+          }
+        )}
         className="space-y-8 md:space-y-10"
       >
         <div className="px-1">
