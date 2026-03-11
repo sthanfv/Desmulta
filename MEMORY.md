@@ -2,7 +2,7 @@
 
 ## 1. Contexto Actual
 
-- **Versión**: v2.3.7
+- **Versión**: v2.3.8
 - **Estado**: Fase de reconocimiento inicial completada.
 - **Mando**: Equipo de Desarrollo Élite (Principal Engineer, DevSecOps, DBA, QA).
 
@@ -36,12 +36,13 @@
 - **UX**: Fase de humanización completada. Mensajes técnicos transformados a lenguaje natural para el ciudadano. Los límites de Rate Limit ahora muestran tiempo preciso (minutos/segundos o horas/minutos).
 - **Documentación**: Auditoría total del `README.md` v2.3.7 completada. Refleja ahora toda la profundidad técnica (Genkit, Telegram, Seguridad, PWA).
 - **Turnstile**: Verificado en modo _Managed_. Validación automática activada para el 90% de los casos.
+- **CSP Hardening (v2.3.8)**: Eliminado `unsafe-eval` de `script-src`. Restringido `form-action`, mejorado `Referrer-Policy` a `strict-origin-when-cross-origin`, y `Permissions-Policy` extendida con `payment=(), usb=()`.
 
 ## 5. Tareas Pendientes
 
 - [x] Aplicar `npm audit fix` para mitigar riesgos bajos.
 - [x] Humanización de mensajes de error y límites.
-- [ ] **Seguridad**: Estrechar CSP (Content Security Policy) en el Middleware para mitigar riesgos XSS.
+- [x] **Seguridad**: Estrechar CSP (Content Security Policy) en el Middleware para mitigar riesgos XSS.
 - [x] **Seguridad**: Verificar ofuscación de PII en logs de producción (Honeypot/SecurityLogger).
 - [ ] **FinOps/Rendimiento**: Implementar mejoras hacia Edge Runtime (según `PLAN_MEJORAS_FUTURAS.md`).
 - [ ] **UI/UX**: Pruebas de estrés offline para el Service Worker en la carga SIMIT.

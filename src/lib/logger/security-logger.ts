@@ -43,19 +43,19 @@ export const sanitizarPII = (mensaje: string): string => {
 };
 
 export const SecurityLogger = {
-  info: (contexto: string, datos?: any) => {
+  info: (contexto: string, datos?: unknown) => {
     const logSanitizado = sanitizarPII(JSON.stringify(datos || {}));
     console.info(`[INFO] ${contexto}:`, logSanitizado);
   },
-  warn: (contexto: string, datos?: any) => {
+  warn: (contexto: string, datos?: unknown) => {
     const logSanitizado = sanitizarPII(JSON.stringify(datos || {}));
     console.warn(`[WARN] ${contexto}:`, logSanitizado);
   },
-  error: (contexto: string, error?: any) => {
+  error: (contexto: string, error?: unknown) => {
     const logSanitizado = sanitizarPII(JSON.stringify(error || {}));
     console.error(`[ERROR] ${contexto}:`, logSanitizado);
   },
-  security: (contexto: string, datos?: any) => {
+  security: (contexto: string, datos?: unknown) => {
     const logSanitizado = sanitizarPII(JSON.stringify(datos || {}));
     console.warn(`[SECURITY EVENT] ${contexto}:`, logSanitizado);
   }
