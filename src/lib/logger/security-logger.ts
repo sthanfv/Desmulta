@@ -1,4 +1,6 @@
+/**
  * SecurityLogger: Motor de auditoría con ofuscación automática de PII (v2.3.4).
+ */
 
 type LogLevel = 'info' | 'warn' | 'error' | 'security';
 
