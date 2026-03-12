@@ -142,6 +142,8 @@ export async function getConsultations(pageSize: number = 20, lastDocId?: string
         'estudio',
         'en_proceso',
         'radicado',
+        'descartado',
+        'finalizado',
       ])
       .orderBy('createdAt', 'desc')
       .limit(pageSize);
@@ -246,6 +248,7 @@ export async function getCases(pageSize: number = 20, lastDocId?: string | null)
         'resolucion',
         'radicado',
         'en_espera',
+        'finalizado',
       ])
       .orderBy('createdAt', 'desc')
       .limit(pageSize);
@@ -259,12 +262,27 @@ export async function getCases(pageSize: number = 20, lastDocId?: string | null)
 
     const snapshot = await query.get();
 
-    const cases = snapshot.docs.map((doc) => ({
-      ...doc.data(),
-      id: doc.id,
-      createdAt: doc.data().createdAt?.toDate().toISOString(),
-      updatedAt: doc.data().updatedAt?.toDate().toISOString(),
-    }));
+    const cases = snapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        ...data,
+        id: doc.id,
+        // Serialización segura de fechas raíz
+        createdAt: data.createdAt?.toDate?.().toISOString() || null,
+        updatedAt: data.updatedAt?.toDate?.().toISOString() || null,
+        // MANDATO-FILTRO: Saneamiento de arrays anidados (Timestamps -> ISO Strings)
+        history: (data.history || []).map((event: any) => ({
+          ...event,
+          date: event.date?.toDate?.() ? event.date.toDate().toISOString() : event.date,
+        })),
+        documents: (data.documents || []).map((docObj: any) => ({
+          ...docObj,
+          uploadedAt: docObj.uploadedAt?.toDate?.()
+            ? docObj.uploadedAt.toDate().toISOString()
+            : docObj.uploadedAt,
+        })),
+      };
+    });
 
     const lastVisible = snapshot.docs[snapshot.docs.length - 1];
 

@@ -1,4 +1,4 @@
-# Desmulta — Plataforma Integral de Gestión y Resolución de Infracciones v2.4.2 🛡️🚀
+# Desmulta — Plataforma Integral de Gestión y Resolución de Infracciones v2.4.3 🛡️🚀
 
 **Infraestructura de Clase Mundial para la Justicia Vial en Colombia.**
 
@@ -19,7 +19,7 @@
 
 1.  **Estudio de Viabilidad Técnica**: Formulario inteligente de 3 pasos que analiza la probabilidad de éxito (Prescripción, Caducidad o Fallos de Notificación).
 2.  **Captura Rápida SIMIT**: Flujo optimizado para usuarios móviles que permite subir una captura del SIMIT y recibir asesoría instantánea vía WhatsApp.
-3.  **Admin Dashboard v2.4.2**: Panel de control senior para la gestión de leads, estadísticas en tiempo real y supervisión de evidencias.
+3.  **Admin Dashboard v2.4.3**: Centro de comando avanzado con **Glosario Técnico de Gestión**, Kanban con persistencia atómica y visualización táctil optimizada.
 
 ### 🧠 Inteligencia & CRM
 

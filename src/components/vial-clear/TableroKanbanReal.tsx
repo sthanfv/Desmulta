@@ -11,8 +11,14 @@ import {
   ShieldCheck,
   Gavel,
   FileArchive,
+  Info,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { ModalDetalleLead } from './ModalDetalleLead';
 import { TarjetaKanban } from './TarjetaKanban';
 import { Consultation } from '@/lib/definitions';
@@ -23,6 +29,7 @@ const COLUMNAS_LEADS = [
     id: 'NUEVO',
     titulo: 'Nuevas Solicitudes',
     accion: 'Llamar hoy mismo',
+    descripcion: 'Leads frescos que acaban de entrar al sistema. Meta: contactar en menos de 2 horas para máxima conversión.',
     icono: AlertCircle,
     color: 'border-red-500/40 text-red-500',
     bgIcon: 'bg-red-500/10',
@@ -31,6 +38,7 @@ const COLUMNAS_LEADS = [
     id: 'CONTACTADO',
     titulo: 'Contactados',
     accion: 'Esperando documentos',
+    descripcion: 'Conversación técnica iniciada. Estamos a la espera de cédula o captura SIMIT para el estudio de viabilidad.',
     icono: Users,
     color: 'border-yellow-500/40 text-yellow-500',
     bgIcon: 'bg-yellow-500/10',
@@ -39,6 +47,7 @@ const COLUMNAS_LEADS = [
     id: 'ESTUDIO',
     titulo: 'En Proceso',
     accion: 'Listo para formalizar',
+    descripcion: 'Documentación en revisión por la mesa jurídica. El caso está siendo calificado para cierre comercial.',
     icono: Clock,
     color: 'border-blue-500/40 text-blue-500',
     bgIcon: 'bg-blue-500/10',
@@ -46,7 +55,8 @@ const COLUMNAS_LEADS = [
   {
     id: 'DESCARTADO',
     titulo: 'Descartados',
-    accion: 'No viables / No contestan',
+    accion: 'Gestión Finalizada',
+    descripcion: 'Solicitudes que no cumplen criterios técnicos, falsas alarmas o clientes que desistieron del proceso.',
     icono: FileArchive,
     color: 'border-slate-700/50 text-slate-500',
     bgIcon: 'bg-slate-800',
@@ -58,6 +68,7 @@ const COLUMNAS_CASOS = [
     id: 'APERTURA',
     titulo: 'Casos Nuevos',
     accion: 'Armar expediente',
+    descripcion: 'Caso formalizado. Recolectando pruebas, poderes y preparando el sustento jurídico para radicación.',
     icono: Briefcase,
     color: 'border-orange-500/40 text-orange-500',
     bgIcon: 'bg-orange-500/10',
@@ -66,6 +77,7 @@ const COLUMNAS_CASOS = [
     id: 'RADICADO',
     titulo: 'Radicados',
     accion: 'Enviado a Tránsito',
+    descripcion: 'Expediente entregado formalmente ante el organismo de tránsito. El reloj legal empieza a correr.',
     icono: ShieldCheck,
     color: 'border-purple-500/40 text-purple-500',
     bgIcon: 'bg-purple-500/10',
@@ -73,7 +85,8 @@ const COLUMNAS_CASOS = [
   {
     id: 'TRAMITE',
     titulo: 'En Espera',
-    accion: 'Vigilar términos legales',
+    accion: 'Vigilar términos',
+    descripcion: 'Seguimiento de términos de ley. Vigilando vencimientos y respuestas del tránsito para actuar de inmediato.',
     icono: Gavel,
     color: 'border-blue-500/40 text-blue-500',
     bgIcon: 'bg-blue-500/10',
@@ -81,7 +94,8 @@ const COLUMNAS_CASOS = [
   {
     id: 'FINALIZADO',
     titulo: 'Finalizados',
-    accion: 'Caso ganado / cerrado',
+    accion: 'Caso Ganado/Cerrado',
+    descripcion: 'Resolución final emitida. Caso saneado exitosamente o cerrado por orden administrativo.',
     icono: CheckCircle2,
     color: 'border-green-500/40 text-green-500',
     bgIcon: 'bg-green-500/10',
@@ -324,12 +338,30 @@ export function TableroKanbanReal({
             {/* CABECERA INTUITIVA PARA EL EMPLEADO */}
             <div className={`border-b-2 pb-3 mb-4 ${columna.color}`}>
               <div className="flex justify-between items-start">
-                <h3 className="font-black text-lg uppercase tracking-wide flex items-center gap-2">
+                <div className="flex items-center gap-2">
                   <div className={`p-1.5 rounded-lg ${columna.bgIcon}`}>
                     <columna.icono className="w-4 h-4" />
                   </div>
-                  {columna.titulo}
-                </h3>
+                  <h3 className="font-black text-lg uppercase tracking-wide">
+                    {columna.titulo}
+                  </h3>
+                  {/* GLOSARIO TÉCNICO (Popover para mejor UX en móvil/PC) */}
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button className="text-muted-foreground/40 hover:text-primary transition-colors p-1 @sm:p-0">
+                        <Info className="w-4 h-4" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="bg-slate-900 border-slate-700 text-white p-4 max-w-[260px] text-xs font-bold leading-relaxed rounded-2xl shadow-2xl z-[100]">
+                      <div className="space-y-2">
+                        <h4 className="font-black text-primary uppercase tracking-widest border-b border-primary/20 pb-1 mb-2">
+                          Guía de Gestión
+                        </h4>
+                        <p className="text-slate-200">{columna.descripcion}</p>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </div>
                 <span className="bg-white/10 text-muted-foreground font-black text-xs py-1 px-3 rounded-full">
                   {itemsActivos.filter((item) => item.estado === columna.id).length}
                 </span>

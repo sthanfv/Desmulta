@@ -2,9 +2,18 @@
 
 ## 1. Contexto Actual
 
-- **Versión**: v2.4.2
-- **Estado**: Fase de reconocimiento inicial completada.
-- **Mando**: Equipo de Desarrollo Élite (Principal Engineer, DevSecOps, DBA, QA).
+- **Versión**: v2.4.3
+- **Estado**: Lanzamiento de correcciones CSP y limpieza de Permissions-Policy (v2.4.3) completado.
+- **Mando**: Equipo de Desarrollo Élite.
+
+## 9. Actualización v2.4.3 (Estabilidad y Seguridad)
+
+- **Corrección CSP**: Se habilitó `challenges.cloudflare.com` y `va.vercel-scripts.com` en `script-src-elem`. Se restauró `unsafe-eval` dinámicamente solo para entorno de desarrollo (HMR).
+- **Limpieza de Permissions-Policy**: Eliminadas las directivas `browsing-topics` e `interest-cohort` que generaban warnings en navegadores modernos.
+- **Validación Humana**: Verificado que el 100% de los diálogos, Toasts y esquemas de validación Zod hablen un español natural y profesional.
+- **Hotfix de Persistencia**: Corregida la consulta de Firestore para persistir leads 'descartados' y 'finalizados'. Sincronizados los strings de estado entre DB y UI.
+- **Saneamiento de Serialización**: Implementado mapeo de arrays de historial y documentos para convertir Timestamps de Firestore en Strings ISO, evitando fallos en Client Components.
+- **Preparación Release**: Ejecutados checks de `format`, `lint`, `typecheck` y `build` satisfactorios. Código sincronizado con GitHub.
 
 ## 2. Stack Tecnológico Detectado
 

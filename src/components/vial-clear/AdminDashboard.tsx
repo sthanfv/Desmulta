@@ -108,15 +108,16 @@ export function AdminDashboard() {
   const mapStatusToKanban = (status: string, tipo: 'lead' | 'caso') => {
     const s = status?.toLowerCase() || '';
     if (tipo === 'lead') {
-      if (s === 'contactado' || s === 'en_proceso' || s === 'estudio') return 'ESTUDIO';
-      if (s === 'radicado') return 'RADICADO';
-      if (s === 'terminado' || s === 'finalizado') return 'FINALIZADO';
+      if (s === 'contactado') return 'CONTACTADO';
+      if (s === 'estudio' || s === 'en_proceso') return 'ESTUDIO';
+      if (s === 'descartado') return 'DESCARTADO';
+      if (s === 'finalizado' || s === 'terminado') return 'ESTUDIO'; // Por ahora, si terminó lead, se queda en el último paso visible
       return 'NUEVO';
     } else {
-      if (s === 'documentacion' || s === 'estudio') return 'ESTUDIO';
-      if (s === 'tramite' || s === 'resolucion' || s === 'radicado') return 'RADICADO';
-      if (s === 'finalizado' || s === 'archivo') return 'FINALIZADO';
-      return 'NUEVO';
+      if (s === 'radicado') return 'RADICADO';
+      if (s === 'tramite' || s === 'resolucion' || s === 'en_espera') return 'TRAMITE';
+      if (s === 'finalizado' || s === 'archivo' || s === 'descartado') return 'FINALIZADO';
+      return 'APERTURA';
     }
   };
 
@@ -487,7 +488,7 @@ export function AdminDashboard() {
                 PANEL CONTROL
               </h1>
               <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mt-1 opacity-70">
-                Desmulta Administrador v2.3.7
+                Desmulta Administrador v2.4.3
               </p>
             </div>
           </div>
