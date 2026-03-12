@@ -41,7 +41,7 @@ export function CalculadoraPrescripcion() {
         const msg = error instanceof Error ? error.message : 'Error inesperado en el motor.';
         setErrorMsg(msg);
       } finally {
-        setIsCalculating(false); // Apagamos el motor
+        setIsCalculating(false);
       }
     }, 2500);
   };
@@ -57,8 +57,10 @@ export function CalculadoraPrescripcion() {
           <Clock className="w-6 h-6 text-primary" />
         </div>
         <div>
-          <h2 className="text-2xl font-black text-card-foreground">Motor de Prescripción</h2>
-          <p className="text-muted-foreground text-sm">Auditoría de tiempos legales y caducidad</p>
+          <h2 className="text-2xl font-black text-card-foreground">Calculadora de Prescripción</h2>
+          <p className="text-muted-foreground text-sm">
+            Verifica si tu multa ya caducó o prescribió
+          </p>
         </div>
       </div>
 

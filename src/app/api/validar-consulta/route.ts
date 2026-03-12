@@ -3,12 +3,12 @@ import { ConsultationSchema } from '@/lib/definitions';
 import { logger } from '@/lib/logger/security-logger';
 
 /**
- * Motor de Validación — Desmulta v1.9.2 (Edge)
+ * Motor de Validación — Desmulta v1.9.2
  *
  * MANDATO-FILTRO:
  * 1. Validación estricta con Zod.
  * 2. Logging seguro con ofuscación PII.
- * 3. Ejecución ultra-rápida sobre Vercel Edge Runtime.
+ * 3. Ejecución estable sobre Node.js Runtime.
  */
 
 // 🚀 1. Normalización a Node.js Runtime para estabilidad v2.3.0
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
     const { cedula, placa } = resultado.data;
     const cedulaOfuscada = ofuscarPII(cedula);
 
-    logger.info(`[EDGE] Validando viabilidad para cédula: ${cedulaOfuscada}`);
+    logger.info(`[VALIDATION] Validando viabilidad para cédula: ${cedulaOfuscada}`);
 
     // 🛑 1. VERIFICACIÓN CLOUDFLARE TURNSTILE (Guardián Anti-Bot)
     // Deprecado en validar-consulta (Edge) en v2.1.9 para permitir que el token sea verificado
@@ -54,7 +54,7 @@ export async function POST(request: Request) {
 
     // ✅ FIN VERIFICACIÓN CLOUDFLARE
 
-    // ⚡ 2. Hash O(1) vía Web Crypto API (Edge Nativo)
+    // ⚡ 2. Hash O(1) vía Web Crypto API
     const encoder = new TextEncoder();
     const dataBuf = encoder.encode(cedula);
     const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuf);
@@ -74,7 +74,7 @@ export async function POST(request: Request) {
     // 3. Evaluar lógica de negocio
     if (response.ok) {
       // 200 OK significa que el documento existe
-      logger.warn('[EDGE] Consulta activa preexistente bloqueada', { cedulaOfuscada });
+      logger.warn('[VALIDATION] Consulta activa preexistente bloqueada', { cedulaOfuscada });
       return NextResponse.json({
         success: true,
         valido: false,
@@ -86,7 +86,7 @@ export async function POST(request: Request) {
       throw new Error(`Error en Firestore REST API GET: ${response.status} ${response.statusText}`);
     }
 
-    logger.info('[EDGE] Validación preliminar exitosa', { placa, cedulaOfuscada });
+    logger.info('[VALIDATION] Validación preliminar exitosa', { placa, cedulaOfuscada });
 
     return NextResponse.json({
       success: true,
@@ -99,7 +99,7 @@ export async function POST(request: Request) {
     });
   } catch (err) {
     const mensaje = err instanceof Error ? err.message : 'Error desconocido';
-    logger.error('[EDGE Error] Fallo en la validación:', { error: mensaje });
+    logger.error('[VALIDATION Error] Fallo en la validación:', { error: mensaje });
 
     return NextResponse.json(
       {

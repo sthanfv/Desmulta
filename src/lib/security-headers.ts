@@ -89,6 +89,6 @@ export const securityHeadersLabels = [
   },
   { key: 'Content-Security-Policy', value: cspHeader },
   { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
-  { key: 'Cross-Origin-Resource-Policy', value: 'cross-origin' },
+  { key: 'Cross-Origin-Resource-Policy', value: 'same-origin' },
   { key: 'X-DNS-Prefetch-Control', value: 'on' },
 ];

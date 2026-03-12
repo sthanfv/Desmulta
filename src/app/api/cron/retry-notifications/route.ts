@@ -14,6 +14,9 @@ function escapeHtml(text: string): string {
   return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 export async function GET(request: Request) {
   // ✅ AUTH: Verificar Bearer token para Vercel Cron
   const authHeader = request.headers.get('Authorization');

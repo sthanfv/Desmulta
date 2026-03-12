@@ -36,6 +36,7 @@ import { cn } from '@/lib/utils';
 import { Progress } from '../ui/progress';
 import { haptics } from '@/lib/utils/haptics';
 import { ImageUpload } from './ImageUpload';
+import { useTesseractPrewarm } from '@/hooks/useTesseractPrewarm';
 
 type ConsultationFormData = z.infer<typeof ConsultationSchema>;
 const FIELD_LABELS: Record<string, string> = {
@@ -85,6 +86,10 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
   const [showCedula, setShowCedula] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const { toast } = useToast();
+
+  // 🧠 Pre-calentamiento silencioso del modelo OCR de Tesseract
+  // Inicia el prefetch de spa.traineddata mientras el usuario llena el formulario
+  useTesseractPrewarm();
 
   const form = useForm<ConsultationFormData>({
     resolver: zodResolver(

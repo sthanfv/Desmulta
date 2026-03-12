@@ -11,6 +11,7 @@ import { NextResponse } from 'next/server';
  * 3. Eliminación atómica para optimizar almacenamiento gratuito (250MB limit).
  */
 
+export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 export async function GET(request: Request) {

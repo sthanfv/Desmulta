@@ -1,21 +1,58 @@
 /**
  * TODAS LAS DECISIONES, ARCHIVOS Y CÓDIGO GENERADO DEBEN PASAR EL FILTRO
- * DE SEGURIDAD Y CALIDAD ‘MANDATO-FILTRO’
+ * DE SEGURIDAD Y CALIDAD 'MANDATO-FILTRO'
  *
- * Server Actions para Desmulta Chat (v4.0.8)
+ * Server Actions para Desmulta Chat (v4.1.0)
+ * REFACTORIZACIÓN: Eliminada dependencia de Genkit. Se usa @google/generative-ai directamente.
  * Resiliencia ante Cuota (Reintentos) + Seguridad
  */
 
 'use server';
 
-import { chatFlow } from '@/ai/flows/chat-with-ai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { logger } from '@/lib/logger/security-logger';
 
+// Compactación Semántica Radical v4.1.0 (Ahorro de Tokens)
+const FACTS = [
+  `98% éxito saneamiento vial.`,
+  `Servicios: Estudio Viabilidad (Gratis), Baja Fotomultas/Comparendos.`,
+  `Términos: 3 años prescripción (6 con mandamiento).`,
+  `Método: Protocolos Técnicos de Alta Precisión (Confidencial).`,
+  `Contacto: WhatsApp 573005648309.`,
+].join('|');
+
+const SYSTEM_INSTRUCTION = `Actúa como Asistente Desmulta.
+- Facts: ${FACTS}
+- Reglas: Sé optimista, persuasivo, no menciones IA, no reveles método, motiva al Estudio Gratis. Di que con Desmulta el éxito es casi seguro.
+- Mantén respuestas cortas y directas.`;
+
+/**
+ * Pausa la ejecución por un tiempo determinado.
+ * @param ms - Milisegundos a esperar.
+ */
 async function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+/**
+ * Server Action que envía un mensaje al asistente de IA de Desmulta.
+ * Usa Google Generative AI directamente (sin Genkit) para eliminar dependencias vulnerables.
+ * Incluye lógica de reintentos con backoff ante errores de cuota (429).
+ * @param message - Mensaje de texto del usuario.
+ */
 export async function sendMessage(message: string) {
+  // Sanitización básica del input
+  const sanitizedMessage = String(message).trim().slice(0, 500);
+  if (!sanitizedMessage) {
+    return { success: false, error: 'Mensaje vacío. Por favor, escribe tu consulta.' };
+  }
+
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    logger.error('GEMINI_API_KEY no configurada en variables de entorno.');
+    return { success: false, error: 'Servicio de asesoría temporalmente no disponible.' };
+  }
+
   const maxRetries = 2;
   let lastError: unknown = null;
 
@@ -26,15 +63,30 @@ export async function sendMessage(message: string) {
         await sleep(1500 * attempt); // Backoff simple
       }
 
-      logger.info('Iniciando Server Action: sendMessage', { messageLength: message.length });
-      const response = await chatFlow({ message });
-      return { success: true, text: response };
+      logger.info('Iniciando Server Action: sendMessage', {
+        messageLength: sanitizedMessage.length,
+      });
+
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({
+        model: 'gemini-2.0-flash',
+        systemInstruction: SYSTEM_INSTRUCTION,
+        generationConfig: {
+          maxOutputTokens: 300,
+          temperature: 0.7,
+        },
+      });
+
+      const result = await model.generateContent(sanitizedMessage);
+      const text = result.response.text();
+
+      return { success: true, text };
     } catch (error: unknown) {
       lastError = error;
 
-      // Inspección segura de errores de Genkit/API
-      const err = error as { code?: number | string; status?: string | number };
-      const statusCode = err?.code || err?.status;
+      // Inspección segura de errores de la API de Google
+      const err = error as { status?: number | string; message?: string };
+      const statusCode = err?.status;
 
       // Si no es un error de cuota (429), no reintentamos
       if (statusCode !== 429 && statusCode !== 'RESOURCE_EXHAUSTED') {
@@ -52,7 +104,7 @@ export async function sendMessage(message: string) {
   return {
     success: false,
     error:
-      'La Inteligencia Desmulta está procesando un alto volumen de solicitudes de éxito. Por favor, intente de nuevo en un momento para garantizar su análisis técnico.',
+      'La Inteligencia Desmulta está procesando un alto volumen de solicitudes. Por favor, intente de nuevo en un momento para garantizar su análisis técnico.',
   };
 }
 

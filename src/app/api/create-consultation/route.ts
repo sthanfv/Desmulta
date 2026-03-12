@@ -232,7 +232,7 @@ export async function POST(request: NextRequest) {
       transaction.set(consultationRef, finalDataToSave);
       transaction.set(cooldownRef, { lastAttemptAt: FieldValue.serverTimestamp() });
 
-      // MANDATO-FILTRO: Guardar en el índice público ciego (O(1) Validation Edge)
+      // MANDATO-FILTRO: Guardar en el índice público ciego (O(1) Validation)
       if (finalDataToSave.cedula !== 'SIMIT-CAPTURA') {
         const hashValue = crypto.createHash('sha256').update(finalDataToSave.cedula).digest('hex');
         const indexRef = db.collection('consultas_index').doc(hashValue);
