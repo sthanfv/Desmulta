@@ -22,6 +22,6 @@ describe('Security Headers Verification', () => {
     const coop = securityHeadersLabels.find((h) => h.key === 'Cross-Origin-Opener-Policy');
     const corp = securityHeadersLabels.find((h) => h.key === 'Cross-Origin-Resource-Policy');
     expect(coop?.value).toBe('same-origin');
-    expect(corp?.value).toBe('same-origin');
+    expect(corp?.value).toBe('cross-origin');
   });
 });

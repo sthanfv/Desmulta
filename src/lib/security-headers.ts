@@ -7,16 +7,18 @@
 export const cspHeader = [
   "default-src 'self'",
 
-  // MANDATO-FILTRO: Se eliminó 'unsafe-eval'. Solo se permite inline para
+  // MANDATO-FILTRO: Se eliminó 'unsafe-eval' en Producción. Solo se permite inline para
   // compatibilidad con Next.js y scripts de terceros auditados.
+  // En Desarrollo, permitimos 'unsafe-eval' para que funcione el Hot Reloading (HMR).
   [
-    "script-src 'self' 'unsafe-inline'",
+    `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === 'development' ? " 'unsafe-eval'" : ''}`,
     'blob:',
     'https://www.googletagmanager.com',
     'https://connect.facebook.net',
     'https://challenges.cloudflare.com',
     'https://va.vercel-scripts.com',
     'https://apis.google.com',
+    'https://cdn.jsdelivr.net',
   ].join(' '),
 
   // Estilos: unsafe-inline requerido por Tailwind CSS / shadcn-ui
@@ -57,7 +59,19 @@ export const cspHeader = [
     'https://challenges.cloudflare.com',
     'https://va.vercel-scripts.com',
     'https://*.vercel-storage.com',
+    'https://cdn.jsdelivr.net',
   ].join(' '),
+
+  // Worker-src explícito para el Web Worker de Tesseract, y script-src-elem para scripts de inyección dinámica pura (Turnstile, Vercel Analytics)
+  [
+    "script-src-elem 'self' 'unsafe-inline'",
+    'https://cdn.jsdelivr.net',
+    'https://challenges.cloudflare.com',
+    'https://va.vercel-scripts.com',
+    'https://www.google-analytics.com',
+    'https://www.googletagmanager.com',
+  ].join(' '),
+  "worker-src 'self' blob: https://cdn.jsdelivr.net",
 
   // Frames: Solo Cloudflare Turnstile y Facebook Login
   "frame-src 'self' https://challenges.cloudflare.com https://www.facebook.com",
@@ -89,6 +103,6 @@ export const securityHeadersLabels = [
   },
   { key: 'Content-Security-Policy', value: cspHeader },
   { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
-  { key: 'Cross-Origin-Resource-Policy', value: 'same-origin' },
+  { key: 'Cross-Origin-Resource-Policy', value: 'cross-origin' },
   { key: 'X-DNS-Prefetch-Control', value: 'on' },
 ];
