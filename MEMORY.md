@@ -2,8 +2,8 @@
 
 ## 1. Contexto Actual
 
-- **Versión**: v2.4.4
-- **Estado**: Habilitación de copiado administrativo y hotfix de tipado estricto (v2.4.4) completado.
+- **Versión**: v2.4.5
+- **Estado**: Hiper-Localismo en el Edge y geolocalización nativa (v2.4.5) completado.
 - **Mando**: Equipo de Desarrollo Élite.
 
 ## 9. Actualización v2.4.3 (Estabilidad y Seguridad)
@@ -14,6 +14,7 @@
 - **Hotfix de Persistencia**: Corregida la consulta de Firestore para persistir leads 'descartados' y 'finalizados'. Sincronizados los strings de estado entre DB y UI.
 - **Saneamiento de Serialización**: Implementado mapeo de arrays de historial y documentos para convertir Timestamps de Firestore en Strings ISO, evitando fallos en Client Components.
 - **Preparación Release**: Ejecutados checks de `format`, `lint`, `typecheck` y `build` satisfactorios. Código sincronizado con GitHub.
+
 ## 10. Actualización v2.4.4 (Copiado y Calidad de Código)
 
 - **Copiado Inteligente**: Implementado `copyToClipboard` con botones dinámicos en el modal de detalles. Habilitada la selección de texto global (`user-select: auto`) para agilizar trámites en SIMIT.

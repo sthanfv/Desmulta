@@ -14,11 +14,7 @@ import {
   Info,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ModalDetalleLead } from './ModalDetalleLead';
 import { TarjetaKanban } from './TarjetaKanban';
 import { Consultation } from '@/lib/definitions';
@@ -29,7 +25,8 @@ const COLUMNAS_LEADS = [
     id: 'NUEVO',
     titulo: 'Nuevas Solicitudes',
     accion: 'Llamar hoy mismo',
-    descripcion: 'Leads frescos que acaban de entrar al sistema. Meta: contactar en menos de 2 horas para máxima conversión.',
+    descripcion:
+      'Leads frescos que acaban de entrar al sistema. Meta: contactar en menos de 2 horas para máxima conversión.',
     icono: AlertCircle,
     color: 'border-red-500/40 text-red-500',
     bgIcon: 'bg-red-500/10',
@@ -38,7 +35,8 @@ const COLUMNAS_LEADS = [
     id: 'CONTACTADO',
     titulo: 'Contactados',
     accion: 'Esperando documentos',
-    descripcion: 'Conversación técnica iniciada. Estamos a la espera de cédula o captura SIMIT para el estudio de viabilidad.',
+    descripcion:
+      'Conversación técnica iniciada. Estamos a la espera de cédula o captura SIMIT para el estudio de viabilidad.',
     icono: Users,
     color: 'border-yellow-500/40 text-yellow-500',
     bgIcon: 'bg-yellow-500/10',
@@ -47,7 +45,8 @@ const COLUMNAS_LEADS = [
     id: 'ESTUDIO',
     titulo: 'En Proceso',
     accion: 'Listo para formalizar',
-    descripcion: 'Documentación en revisión por la mesa jurídica. El caso está siendo calificado para cierre comercial.',
+    descripcion:
+      'Documentación en revisión por la mesa jurídica. El caso está siendo calificado para cierre comercial.',
     icono: Clock,
     color: 'border-blue-500/40 text-blue-500',
     bgIcon: 'bg-blue-500/10',
@@ -56,7 +55,8 @@ const COLUMNAS_LEADS = [
     id: 'DESCARTADO',
     titulo: 'Descartados',
     accion: 'Gestión Finalizada',
-    descripcion: 'Solicitudes que no cumplen criterios técnicos, falsas alarmas o clientes que desistieron del proceso.',
+    descripcion:
+      'Solicitudes que no cumplen criterios técnicos, falsas alarmas o clientes que desistieron del proceso.',
     icono: FileArchive,
     color: 'border-slate-700/50 text-slate-500',
     bgIcon: 'bg-slate-800',
@@ -68,7 +68,8 @@ const COLUMNAS_CASOS = [
     id: 'APERTURA',
     titulo: 'Casos Nuevos',
     accion: 'Armar expediente',
-    descripcion: 'Caso formalizado. Recolectando pruebas, poderes y preparando el sustento jurídico para radicación.',
+    descripcion:
+      'Caso formalizado. Recolectando pruebas, poderes y preparando el sustento jurídico para radicación.',
     icono: Briefcase,
     color: 'border-orange-500/40 text-orange-500',
     bgIcon: 'bg-orange-500/10',
@@ -77,7 +78,8 @@ const COLUMNAS_CASOS = [
     id: 'RADICADO',
     titulo: 'Radicados',
     accion: 'Enviado a Tránsito',
-    descripcion: 'Expediente entregado formalmente ante el organismo de tránsito. El reloj legal empieza a correr.',
+    descripcion:
+      'Expediente entregado formalmente ante el organismo de tránsito. El reloj legal empieza a correr.',
     icono: ShieldCheck,
     color: 'border-purple-500/40 text-purple-500',
     bgIcon: 'bg-purple-500/10',
@@ -86,7 +88,8 @@ const COLUMNAS_CASOS = [
     id: 'TRAMITE',
     titulo: 'En Espera',
     accion: 'Vigilar términos',
-    descripcion: 'Seguimiento de términos de ley. Vigilando vencimientos y respuestas del tránsito para actuar de inmediato.',
+    descripcion:
+      'Seguimiento de términos de ley. Vigilando vencimientos y respuestas del tránsito para actuar de inmediato.',
     icono: Gavel,
     color: 'border-blue-500/40 text-blue-500',
     bgIcon: 'bg-blue-500/10',
@@ -95,7 +98,8 @@ const COLUMNAS_CASOS = [
     id: 'FINALIZADO',
     titulo: 'Finalizados',
     accion: 'Caso Ganado/Cerrado',
-    descripcion: 'Resolución final emitida. Caso saneado exitosamente o cerrado por orden administrativo.',
+    descripcion:
+      'Resolución final emitida. Caso saneado exitosamente o cerrado por orden administrativo.',
     icono: CheckCircle2,
     color: 'border-green-500/40 text-green-500',
     bgIcon: 'bg-green-500/10',
@@ -342,9 +346,7 @@ export function TableroKanbanReal({
                   <div className={`p-1.5 rounded-lg ${columna.bgIcon}`}>
                     <columna.icono className="w-4 h-4" />
                   </div>
-                  <h3 className="font-black text-lg uppercase tracking-wide">
-                    {columna.titulo}
-                  </h3>
+                  <h3 className="font-black text-lg uppercase tracking-wide">{columna.titulo}</h3>
                   {/* GLOSARIO TÉCNICO (Popover para mejor UX en móvil/PC) */}
                   <Popover>
                     <PopoverTrigger asChild>

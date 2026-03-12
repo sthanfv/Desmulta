@@ -11,35 +11,32 @@ import { cspHeader } from '@/lib/security-headers';
  * 3. Preparación para filtrado geográfico (Vercel Edge).
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Next.js requiere este parámetro en la firma del middleware
-export function middleware(_request: NextRequest) {
-  const response = NextResponse.next();
+export function middleware(request: NextRequest) {
+  // 1. Interceptamos la geolocalización nativa de Vercel (Costo $0)
+  const vercelCity = request.headers.get('x-vercel-ip-city');
+  const ciudadUsuario = vercelCity ? decodeURIComponent(vercelCity) : 'Colombia';
 
-  // Inyección de Headers de Seguridad Estrictos
+  // 2. Clonamos los headers de la petición entrante para inyectar la ciudad
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-ciudad-usuario', ciudadUsuario);
+
+  // 3. Obtenemos la respuesta estándar
+  const response = NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
+
+  // 4. Inyección de Headers de Seguridad Estrictos (MANDATO-FILTRO v2.4.5)
   const headers = response.headers;
-
-  // Content Security Policy (CSP) — MANDATO-FILTRO: Fuente única de verdad en security-headers.ts
-  // Importado desde @/lib/security-headers para eliminar duplicación y divergencia entre
-  // next.config.ts (build-time) y middleware (runtime). Ambos usan exactamente la misma definición.
   headers.set('Content-Security-Policy', cspHeader);
-
-  // Prevenir que el sitio sea embebido en frames (Anti-Clickjacking)
   headers.set('X-Frame-Options', 'DENY');
-
-  // Forzar detección de tipo de contenido (Anti-MIME Sniffing)
   headers.set('X-Content-Type-Options', 'nosniff');
-
-  // Control de Referer para privacidad
-  headers.set('Referrer-Policy', 'no-referrer-when-downgrade');
-
-  // Permissions Policy: Limpieza absoluta (MANDATO-FILTRO)
-  headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
-
-  // COOP + CORP — Cross-Origin Isolation (relajado a cross-origin para CDNs externos y Turnstile)
+  headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=()');
   headers.set('Cross-Origin-Opener-Policy', 'same-origin');
   headers.set('Cross-Origin-Resource-Policy', 'cross-origin');
 
-  // HSTS (HTTP Strict Transport Security) - Solo en producción
-  // next.config.ts lo aplica en build-time; el middleware lo refuerza en runtime.
   if (process.env.NODE_ENV === 'production') {
     headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
   }

@@ -13,10 +13,19 @@
 
 import HomeClient from '@/app/_components/HomeClient';
 import { getShowcaseConfig, getFooterConfig } from '@/lib/site-config';
+import { headers } from 'next/headers';
 
 export default async function VialClearPage() {
-  // Fetching en paralelo en el servidor — no bloquean entre sí
-  const [showcaseData, footerData] = await Promise.all([getShowcaseConfig(), getFooterConfig()]);
+  // Fetching en paralelo: Datos de Firestore + Headers de Geolocalización
+  const [showcaseData, footerData, headersList] = await Promise.all([
+    getShowcaseConfig(),
+    getFooterConfig(),
+    headers(),
+  ]);
 
-  return <HomeClient showcaseData={showcaseData} footerData={footerData} />;
+  const ciudad = headersList.get('x-ciudad-usuario') || 'Colombia';
+
+  return (
+    <HomeClient showcaseData={showcaseData} footerData={footerData} cityContext={ciudad} />
+  );
 }
