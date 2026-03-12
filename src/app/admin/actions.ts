@@ -270,17 +270,23 @@ export async function getCases(pageSize: number = 20, lastDocId?: string | null)
         // Serialización segura de fechas raíz
         createdAt: data.createdAt?.toDate?.().toISOString() || null,
         updatedAt: data.updatedAt?.toDate?.().toISOString() || null,
-        // MANDATO-FILTRO: Saneamiento de arrays anidados (Timestamps -> ISO Strings)
-        history: (data.history || []).map((event: any) => ({
-          ...event,
-          date: event.date?.toDate?.() ? event.date.toDate().toISOString() : event.date,
-        })),
-        documents: (data.documents || []).map((docObj: any) => ({
-          ...docObj,
-          uploadedAt: docObj.uploadedAt?.toDate?.()
-            ? docObj.uploadedAt.toDate().toISOString()
-            : docObj.uploadedAt,
-        })),
+        // MANDATO-FILTRO: Saneamiento de arrays anidados sin 'any' para pasar ESLint
+        history: (data.history || []).map((event: Record<string, unknown>) => {
+          const e = event as { date?: { toDate?: () => Date } };
+          return {
+            ...event,
+            date: e.date?.toDate?.() ? e.date.toDate().toISOString() : e.date,
+          };
+        }),
+        documents: (data.documents || []).map((docObj: Record<string, unknown>) => {
+          const d = docObj as { uploadedAt?: { toDate?: () => Date } };
+          return {
+            ...docObj,
+            uploadedAt: d.uploadedAt?.toDate?.()
+              ? d.uploadedAt.toDate().toISOString()
+              : d.uploadedAt,
+          };
+        }),
       };
     });
 
