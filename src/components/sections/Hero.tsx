@@ -1,11 +1,13 @@
 'use client';
 
 import React from 'react';
-import { ShieldCheck, ArrowUp } from 'lucide-react';
+import { ShieldCheck, ArrowUp, FileText, ChevronRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { SavingsCounter } from '@/components/interactive/SavingsCounter';
 import { TarjetaPremium } from '@/components/ui/TarjetaPremium';
 import { Lightbox } from '@/components/ui/lightbox';
+import { useExpedienteStore } from '@/store/useExpedienteStore';
 import type { ShowcaseConfig } from '@/lib/site-config';
 
 interface HeroProps {
@@ -19,6 +21,8 @@ interface HeroProps {
  * MANDATO-FILTRO: Visualmente impactante y optimizada.
  */
 export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
+  const { multas } = useExpedienteStore();
+
   return (
     <section className="min-h-[95vh] flex items-center pt-36 pb-24 px-4 relative overflow-hidden">
       <div className="absolute inset-0 z-0 overflow-hidden bg-background">
@@ -68,6 +72,26 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
               </span>
             </Button>
           </div>
+          {multas.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="p-4 rounded-2xl bg-primary/10 border border-primary/20 backdrop-blur-md flex items-center gap-4 group/expediente cursor-pointer hover:bg-primary/20 transition-all"
+              onClick={onConsultar}
+            >
+              <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20">
+                <FileText size={20} />
+              </div>
+              <div>
+                <p className="text-xs font-black uppercase tracking-widest text-primary">Expediente Activo</p>
+                <p className="text-sm font-bold text-white">
+                  Tienes {multas.length} {multas.length === 1 ? 'multa detectada' : 'multas detectadas'} por analizar
+                </p>
+              </div>
+              <ChevronRight size={16} className="text-primary ml-auto group-hover/expediente:translate-x-1 transition-transform" />
+            </motion.div>
+          )}
+
           <div className="pt-10">
             <SavingsCounter />
           </div>

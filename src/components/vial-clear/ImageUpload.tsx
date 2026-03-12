@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { comprimirCaptura } from '@/lib/optimizador-imagenes';
 import { useSIMITValidator } from '@/hooks/useSIMITValidator';
+import { useExpedienteStore } from '@/store/useExpedienteStore';
 
 interface ImageUploadProps {
   onUploadSuccess: (url: string) => void;
@@ -46,12 +47,18 @@ export function ImageUpload({
     // ─── FILTRO ZERO-WASTE: OCR en el dispositivo del usuario ───
     // Si la imagen no parece un SIMIT real, se bloquea AQUÍ.
     // Nunca tocará Vercel Blob ni Firebase. Costo evitado: 100%.
+    const { addMultas } = useExpedienteStore.getState();
     const resultado = await validarImagenSIMIT(selectedFile);
     if (!resultado.esValida) {
       setPreview(null);
       setError(errorOCR || 'Imagen rechazada: No se detectaron datos del SIMIT.');
       if (fileInputRef.current) fileInputRef.current.value = '';
       return;
+    }
+
+    // --- EXPEDIENTE ÚNICO: Alimentar el Store con las multas detectadas ---
+    if (resultado.multasExtraidas && resultado.multasExtraidas.length > 0) {
+      addMultas(resultado.multasExtraidas);
     }
     // ────────────────────────────────────────────────────────────
 

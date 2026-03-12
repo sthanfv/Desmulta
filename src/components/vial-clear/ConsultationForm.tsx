@@ -37,6 +37,8 @@ import { Progress } from '../ui/progress';
 import { haptics } from '@/lib/utils/haptics';
 import { ImageUpload } from './ImageUpload';
 import { useTesseractPrewarm } from '@/hooks/useTesseractPrewarm';
+import { useExpedienteStore } from '@/store/useExpedienteStore';
+import { consolidarExpedienteEnDB } from '@/app/actions/expediente.actions';
 
 type ConsultationFormData = z.infer<typeof ConsultationSchema>;
 const FIELD_LABELS: Record<string, string> = {
@@ -264,6 +266,29 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
       if (!response.ok) {
         throw new Error(result.details || result.error || 'Ocurrió un error en el servidor.');
       }
+
+      // --- EXPEDIENTE ÚNICO: Consolidación FinOps ---
+      const { multas, clearExpediente } = useExpedienteStore.getState();
+      if (multas.length > 0) {
+        try {
+          await consolidarExpedienteEnDB({
+            cedula: data.cedula,
+            telefono: data.contacto,
+            nombre: data.nombre,
+            nuevasMultas: multas.map(({ comparendo, fecha, valor, estado }) => ({
+              comparendo,
+              fecha,
+              valor,
+              estado,
+            })),
+          });
+          clearExpediente();
+        } catch (consolidateError) {
+          // Loggear el error pero no bloquear la experiencia de usuario si el lead principal ya se creó
+          console.error('[FinOps] Fallo no crítico en consolidación:', consolidateError);
+        }
+      }
+      // ----------------------------------------------
 
       toast({
         title: '¡Análisis Iniciado!',

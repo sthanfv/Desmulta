@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import Tesseract from 'tesseract.js';
+import { extraerMultasDeTexto } from '@/lib/simit-parser';
+import { Multa } from '@/store/useExpedienteStore';
 
 /**
  * Heurística de anclaje visual basada en la UI oficial del SIMIT (Marzo 2026).
@@ -28,6 +30,7 @@ export interface ResultadoOCR {
   esValida: boolean;
   coincidencias: string[];
   textoExtraido?: string;
+  multasExtraidas?: Multa[];
 }
 
 /**
@@ -89,6 +92,7 @@ export const useSIMITValidator = () => {
         esValida: true,
         coincidencias,
         textoExtraido: resultado.data.text,
+        multasExtraidas: extraerMultasDeTexto(resultado.data.text),
       };
     } catch (error) {
       const mensaje =
