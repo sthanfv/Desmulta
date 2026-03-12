@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Phone, Calendar, ExternalLink, Loader2, Briefcase } from 'lucide-react';
+import { X, Phone, Calendar, ExternalLink, Loader2, Briefcase, Copy, Check } from 'lucide-react';
 import Image from 'next/image';
 import { KanbanItem } from './TableroKanbanReal';
 
@@ -19,6 +19,13 @@ export function ModalDetalleLead({
   esCaso,
 }: ModalDetalleLeadProps) {
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
+
+  const copyToClipboard = (text: string, field: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedField(field);
+    setTimeout(() => setCopiedField(null), 2000);
+  };
 
   if (!data) return null;
 
@@ -79,9 +86,20 @@ export function ModalDetalleLead({
               </div>
               <div className="flex flex-wrap gap-6">
                 {data.cedula && (
-                  <div>
-                    <p className="text-[10px] text-muted-foreground/60 font-black uppercase tracking-widest mb-1">
+                  <div className="group/item">
+                    <p className="text-[10px] text-muted-foreground/60 font-black uppercase tracking-widest mb-1 flex items-center justify-between">
                       Cédula
+                      <button
+                        onClick={() => copyToClipboard(data.cedula!, 'cedula')}
+                        className="opacity-0 group-hover/item:opacity-100 transition-opacity p-1 hover:text-primary"
+                        title="Copiar Cédula"
+                      >
+                        {copiedField === 'cedula' ? (
+                          <Check className="w-3 h-3 text-green-500" />
+                        ) : (
+                          <Copy className="w-3 h-3" />
+                        )}
+                      </button>
                     </p>
                     <p className="text-sm text-muted-foreground font-mono font-bold tracking-tight">
                       {data.cedula}
@@ -89,13 +107,26 @@ export function ModalDetalleLead({
                   </div>
                 )}
                 {data.placa && data.placa !== 'N/A' && data.placa !== 'Sin Identificar' && (
-                  <div>
-                    <p className="text-[10px] text-muted-foreground/60 font-black uppercase tracking-widest mb-1">
+                  <div className="group/item">
+                    <p className="text-[10px] text-muted-foreground/60 font-black uppercase tracking-widest mb-1 flex items-center justify-between">
                       Placa
+                      <button
+                        onClick={() => copyToClipboard(data.placa, 'placa')}
+                        className="opacity-0 group-hover/item:opacity-100 transition-opacity p-1 hover:text-primary"
+                        title="Copiar Placa"
+                      >
+                        {copiedField === 'placa' ? (
+                          <Check className="w-3 h-3 text-green-400" />
+                        ) : (
+                          <Copy className="w-3 h-3" />
+                        )}
+                      </button>
                     </p>
-                    <p className="text-sm font-black text-yellow-400 uppercase tracking-widest bg-yellow-400/10 px-2 py-0.5 rounded border border-yellow-400/20 w-fit">
-                      {data.placa}
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-black text-yellow-400 uppercase tracking-widest bg-yellow-400/10 px-2 py-0.5 rounded border border-yellow-400/20 w-fit">
+                        {data.placa}
+                      </p>
+                    </div>
                   </div>
                 )}
                 {data.ciudad && data.ciudad !== 'Por definir' && (

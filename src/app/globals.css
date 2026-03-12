@@ -62,7 +62,7 @@
     @apply bg-background text-foreground;
     overscroll-behavior: none;
     -webkit-tap-highlight-color: transparent;
-    user-select: none;
+    user-select: auto;
     scroll-behavior: smooth;
   }
 
