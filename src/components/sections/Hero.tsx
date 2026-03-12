@@ -83,12 +83,18 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
                 <FileText size={20} />
               </div>
               <div>
-                <p className="text-xs font-black uppercase tracking-widest text-primary">Expediente Activo</p>
+                <p className="text-xs font-black uppercase tracking-widest text-primary">
+                  Expediente Activo
+                </p>
                 <p className="text-sm font-bold text-white">
-                  Tienes {multas.length} {multas.length === 1 ? 'multa detectada' : 'multas detectadas'} por analizar
+                  Tienes {multas.length}{' '}
+                  {multas.length === 1 ? 'multa detectada' : 'multas detectadas'} por analizar
                 </p>
               </div>
-              <ChevronRight size={16} className="text-primary ml-auto group-hover/expediente:translate-x-1 transition-transform" />
+              <ChevronRight
+                size={16}
+                className="text-primary ml-auto group-hover/expediente:translate-x-1 transition-transform"
+              />
             </motion.div>
           )}
 

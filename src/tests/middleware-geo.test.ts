@@ -14,7 +14,7 @@ describe('🌍 Edge Middleware - Hiper Localismo', () => {
     // En Next.js 15, el middleware retorna una respuesta que contiene la petición mutada
     // Pero para test unitario directo, verificamos el header en el objeto request clonado si es posible,
     // o en la respuesta si se usa NextResponse.next({ request: { headers } })
-    
+
     // El middleware inyecta en "requestHeaders" que se pasa a NextResponse.next
     // Vitest puede inspeccionar la respuesta
     expect(res).toBeDefined();

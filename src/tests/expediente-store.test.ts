@@ -8,7 +8,7 @@ describe('🛒 Store de Expediente (Zustand)', () => {
 
   it('Debe agregar multas y calcular la deuda total correctamente', () => {
     const store = useExpedienteStore.getState();
-    
+
     store.addMulta({ id: '1', comparendo: '111', fecha: '2023', valor: 500000, estado: 'Cobro' });
     store.addMulta({ id: '2', comparendo: '222', fecha: '2024', valor: 350000, estado: 'Cobro' });
 
@@ -26,7 +26,7 @@ describe('🛒 Store de Expediente (Zustand)', () => {
 
   it('Debe bloquear multas duplicadas (mismo comparendo)', () => {
     const store = useExpedienteStore.getState();
-    
+
     store.addMulta({ id: '1', comparendo: '999', fecha: '2023', valor: 500000, estado: 'Cobro' });
     store.addMulta({ id: '2', comparendo: '999', fecha: '2023', valor: 500000, estado: 'Cobro' });
 

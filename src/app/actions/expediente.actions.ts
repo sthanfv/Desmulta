@@ -25,7 +25,7 @@ export async function consolidarExpedienteEnDB(payload: ConsolidarPayload) {
     const adminApp = getAdminApp();
     const db = getFirestore(adminApp);
     const leadsRef = db.collection('leads');
-    
+
     // 1. Buscamos si el usuario ya existe por su Cédula
     const snapshot = await leadsRef.where('cedula', '==', payload.cedula).limit(1).get();
 
@@ -45,23 +45,34 @@ export async function consolidarExpedienteEnDB(payload: ConsolidarPayload) {
         total_deuda_acumulada: valorNuevoLote,
         multas_registradas: payload.nuevasMultas,
       });
-      
-      logger.info('[FinOps] Nuevo expediente creado:', { docId: docRef.id, cedula: payload.cedula });
-      return { success: true, message: 'Expediente maestro creado.' };
+
+      logger.info('[FinOps] Nuevo expediente creado:', {
+        docId: docRef.id,
+        cedula: payload.cedula,
+      });
+      return { success: true, status: 'creado', message: 'Expediente maestro creado.' };
     } else {
       // CASO B: Usuario Recurrente. Hacemos MERGE (Ahorro masivo de DB)
       const docId = snapshot.docs[0].id;
-      
+
       await leadsRef.doc(docId).update({
         ultima_actualizacion: FieldValue.serverTimestamp(),
         total_deuda_acumulada: FieldValue.increment(valorNuevoLote),
         multas_registradas: FieldValue.arrayUnion(...payload.nuevasMultas),
         // Actualizamos teléfono si cambió
-        telefono: payload.telefono, 
+        telefono: payload.telefono,
       });
 
-      logger.info('[FinOps] Expediente consolidado:', { docId, cedula: payload.cedula, multasNuevas: payload.nuevasMultas.length });
-      return { success: true, message: 'Expediente actualizado con nuevas infracciones.' };
+      logger.info('[FinOps] Expediente consolidado:', {
+        docId,
+        cedula: payload.cedula,
+        multasNuevas: payload.nuevasMultas.length,
+      });
+      return {
+        success: true,
+        status: 'actualizado',
+        message: 'Expediente actualizado con nuevas infracciones.',
+      };
     }
   } catch (error) {
     logger.error('[DevSecOps] Error consolidando expediente:', error);

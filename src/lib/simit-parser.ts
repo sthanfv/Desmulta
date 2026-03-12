@@ -12,7 +12,7 @@ export function extraerMultasDeTexto(texto: string): Multa[] {
   // Patrón simple: Busca números de comparendo (generalmente 15-20 dígitos)
   // Ej: 05001000000012345678
   const regexComparendo = /\b\d{10,20}\b/g;
-  
+
   // Patrón de fecha (DD/MM/AAAA)
   const regexFecha = /(\d{2}\/\d{2}\/\d{4})/g;
 
@@ -21,17 +21,17 @@ export function extraerMultasDeTexto(texto: string): Multa[] {
 
   lineas.forEach((linea, index) => {
     const comparendosEncontrados = linea.match(regexComparendo);
-    
+
     if (comparendosEncontrados) {
       comparendosEncontrados.forEach((comp) => {
         // Intentamos encontrar fecha y valor en la misma línea o la siguiente (proximidad)
         const textoContexto = linea + (lineas[index + 1] || '');
         const fechas = textoContexto.match(regexFecha);
         const valores = textoContexto.match(regexValor);
-        
+
         const fecha = fechas ? fechas[0] : new Date().toLocaleDateString('es-CO');
         let valor = 0;
-        
+
         if (valores) {
           // Limpiamos el valor de puntos y símbolos
           const valorLimpio = valores[0].replace(/[^0-9]/g, '');
@@ -48,12 +48,12 @@ export function extraerMultasDeTexto(texto: string): Multa[] {
           comparendo: comp,
           fecha,
           valor,
-          estado
+          estado,
         });
       });
     }
   });
 
   // Eliminar duplicados por número de comparendo
-  return multas.filter((v, i, a) => a.findIndex(t => t.comparendo === v.comparendo) === i);
+  return multas.filter((v, i, a) => a.findIndex((t) => t.comparendo === v.comparendo) === i);
 }

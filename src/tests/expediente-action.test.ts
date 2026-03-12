@@ -13,18 +13,18 @@ vi.mock('firebase-admin/firestore', () => ({
         limit: vi.fn(() => ({
           get: vi.fn().mockResolvedValue({
             empty: true,
-            docs: []
-          })
-        }))
+            docs: [],
+          }),
+        })),
       })),
-      add: vi.fn().mockResolvedValue({ id: 'doc_nuevo_123' })
-    }))
+      add: vi.fn().mockResolvedValue({ id: 'doc_nuevo_123' }),
+    })),
   })),
   FieldValue: {
     serverTimestamp: vi.fn(),
     increment: vi.fn(),
     arrayUnion: vi.fn(),
-  }
+  },
 }));
 
 vi.mock('@/lib/logger/security-logger', () => ({
@@ -32,7 +32,7 @@ vi.mock('@/lib/logger/security-logger', () => ({
     info: vi.fn(),
     error: vi.fn(),
     warn: vi.fn(),
-  }
+  },
 }));
 
 describe('🏦 Server Action - Consolidación de Expediente', () => {
@@ -40,13 +40,11 @@ describe('🏦 Server Action - Consolidación de Expediente', () => {
     const payload = {
       cedula: '1090123456',
       telefono: '3001234567',
-      nuevasMultas: [
-        { comparendo: 'ABC', fecha: '2022', valor: 100000, estado: 'Cobro' }
-      ]
+      nuevasMultas: [{ comparendo: 'ABC', fecha: '2022', valor: 100000, estado: 'Cobro' }],
     };
 
     const respuesta = await consolidarExpedienteEnDB(payload);
-    
+
     expect(respuesta.success).toBe(true);
     expect(respuesta.message).toContain('creado');
   });

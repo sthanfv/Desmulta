@@ -25,7 +25,5 @@ export default async function VialClearPage() {
 
   const ciudad = headersList.get('x-ciudad-usuario') || 'Colombia';
 
-  return (
-    <HomeClient showcaseData={showcaseData} footerData={footerData} cityContext={ciudad} />
-  );
+  return <HomeClient showcaseData={showcaseData} footerData={footerData} cityContext={ciudad} />;
 }

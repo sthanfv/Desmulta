@@ -2,8 +2,8 @@
 
 ## 1. Contexto Actual
 
-- **Versión**: v2.4.5
-- **Estado**: Hiper-Localismo en el Edge y geolocalización nativa (v2.4.5) completado.
+- **Versión**: v2.4.7
+- **Estado**: Expediente Único, Suite de Pruebas Vitest y Optimizaciones de UX completadas.
 - **Mando**: Equipo de Desarrollo Élite.
 
 ## 9. Actualización v2.4.3 (Estabilidad y Seguridad)
@@ -19,7 +19,24 @@
 
 - **Copiado Inteligente**: Implementado `copyToClipboard` con botones dinámicos en el modal de detalles. Habilitada la selección de texto global (`user-select: auto`) para agilizar trámites en SIMIT.
 - **Zero 'any' Policy**: Refactorización de serialización en `actions.ts`. Se eliminó todo rastro de `any`, permitiendo que el build de producción se complete sin errores.
-- **Limpieza de Git**: Sincronización oficial de archivos técnicos y guías de mantenimiento.
+
+## 11. Actualización v2.4.5 (Hiper-Localismo en el Edge)
+
+- **Geolocalización Nativa**: Implementado middleware para interceptar `x-vercel-ip-city` e inyectar `x-ciudad-usuario` en las cabeceras.
+- **Contexto Dinámico**: La página de inicio y el Hero ahora adaptan su mensaje según la ciudad detectada (ej: "Lideramos el saneamiento vial en Medellín").
+
+## 12. Actualización v2.4.6 (Expediente Único y FinOps)
+
+- **Zustand Persist**: Implementado `useExpedienteStore` para persistir multas detectadas en el cliente (localStorage).
+- **Consolidación Atómica**: Nueva Server Action `consolidarExpedienteEnDB` que utiliza `arrayUnion` e `increment` en Firestore para evitar duplicados y reducir costos de escritura.
+- **Heurística OCR**: Integrado `extraerMultasDeTexto` para obtener datos estructurados (comparendo, fecha, valor) directamente desde el OCR de Tesseract.
+
+## 13. Actualización v2.4.7 (Suite de Pruebas y Pulido UX)
+
+- **Blindaje con Vitest**: Creada suite de pruebas con 36 tests (100% éxito) cubriendo Middleware, Zustand Store y Server Actions.
+- **Hotfix de Jerarquía Visual**: Elevado `z-index` de Toasts a `99999` para evitar que queden ocultos tras modales.
+- **UX Inteligente**: El flujo de éxito ahora distingue entre "Expediente Creado" y "Anexo de Multas", celebrando la actualización del usuario recurrente.
+- **Cierre Automático**: Implementado cierre de modales tras éxito para mejorar la fluidez del embudo.
 
 ## 2. Stack Tecnológico Detectado
 

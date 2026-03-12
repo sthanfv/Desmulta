@@ -269,9 +269,11 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
 
       // --- EXPEDIENTE ÚNICO: Consolidación FinOps ---
       const { multas, clearExpediente } = useExpedienteStore.getState();
+      let statusConsolidacion = 'creado';
+
       if (multas.length > 0) {
         try {
-          await consolidarExpedienteEnDB({
+          const resExpediente = await consolidarExpedienteEnDB({
             cedula: data.cedula,
             telefono: data.contacto,
             nombre: data.nombre,
@@ -282,20 +284,29 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
               estado,
             })),
           });
+          statusConsolidacion = resExpediente.status || 'creado';
           clearExpediente();
         } catch (consolidateError) {
-          // Loggear el error pero no bloquear la experiencia de usuario si el lead principal ya se creó
           console.error('[FinOps] Fallo no crítico en consolidación:', consolidateError);
         }
       }
-      // ----------------------------------------------
 
-      toast({
-        title: '¡Análisis Iniciado!',
-        description:
-          'Recibimos tu información con éxito. Muy pronto uno de nuestros asesores procesará tu estudio de viabilidad técnica y te contactará.',
-        duration: 8000,
-      });
+      if (statusConsolidacion === 'actualizado') {
+        toast({
+          title: '¡Expediente Actualizado!',
+          description:
+            'Hemos sumado estas nuevas infracciones a tu portal legal con éxito. Tu caso está blindado.',
+          duration: 6000,
+        });
+      } else {
+        toast({
+          title: '¡Análisis Iniciado!',
+          description:
+            'Recibimos tu información con éxito. Hemos creado tu expediente maestro y un asesor lo revisará en breve.',
+          duration: 8000,
+        });
+      }
+
       haptics.vibrate('success');
       setIsSuccess(true);
       localStorage.removeItem('consultation_draft');

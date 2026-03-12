@@ -26,9 +26,9 @@ export const useExpedienteStore = create<ExpedienteState>()(
       cedula: null,
       multas: [],
       setCedula: (cedula) => set({ cedula }),
-      addMulta: (multa) => 
+      addMulta: (multa) =>
         set((state) => {
-          if (state.multas.some(m => m.comparendo === multa.comparendo)) return state;
+          if (state.multas.some((m) => m.comparendo === multa.comparendo)) return state;
           return { multas: [...state.multas, multa] };
         }),
       addMultas: (nuevasMultas) =>
@@ -39,8 +39,7 @@ export const useExpedienteStore = create<ExpedienteState>()(
           if (multasFiltradas.length === 0) return state;
           return { multas: [...state.multas, ...multasFiltradas] };
         }),
-      removeMulta: (id) => 
-        set((state) => ({ multas: state.multas.filter(m => m.id !== id) })),
+      removeMulta: (id) => set((state) => ({ multas: state.multas.filter((m) => m.id !== id) })),
       getTotalDeuda: () => get().multas.reduce((total, multa) => total + multa.valor, 0),
       clearExpediente: () => set({ cedula: null, multas: [] }),
     }),
