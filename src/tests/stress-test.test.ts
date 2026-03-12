@@ -11,7 +11,7 @@ describe('Pruebas de Estrés: Auditoría DevSecOps & Red de Seguridad', () => {
     const explosionDeDatos = Array.from({ length: 100 }, (_, i) => ({
       id: i,
       info: `Usuario ${i} con cédula ${1010000000 + i}, teléfono 300123${i.toString().padStart(4, '0')} y correo usuario${i}@empresa.com`,
-      metadata: `Evento de estrés disparado para auditoría v2.3.7`,
+      metadata: `Evento de estrés disparado para auditoría v2.4.4`,
     }));
 
     const payloadInseguro = JSON.stringify(explosionDeDatos);

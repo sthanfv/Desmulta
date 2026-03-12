@@ -19,7 +19,7 @@
 
 1.  **Estudio de Viabilidad Técnica**: Formulario inteligente de 3 pasos que analiza la probabilidad de éxito (Prescripción, Caducidad o Fallos de Notificación).
 2.  **Captura Rápida SIMIT**: Flujo optimizado para usuarios móviles que permite subir una captura del SIMIT y recibir asesoría instantánea vía WhatsApp.
-3.  **Admin Dashboard v2.4.3**: Centro de comando avanzado con **Glosario Técnico de Gestión**, Kanban con persistencia atómica y visualización táctil optimizada.
+3.  **Admin Dashboard v2.4.4**: Centro de comando avanzado con **Glosario Técnico de Gestión**, Kanban con persistencia atómica y visualización táctil optimizada.
 
 ### 🧠 Inteligencia & CRM
 
@@ -63,7 +63,7 @@ graph TD
 ## 📂 4. Estructura del Proyecto
 
 ```plaintext
-├── /public           # Assets, manifest PWA y Service Worker v2.3.7
+├── /public           # Assets, manifest PWA y Service Worker v2.4.4
 ├── /src
 │   ├── /app          # Rutas, API Endpoints y Server Actions (Capa de Negocio)
 │   ├── /components   # UI Dinámica (Vial-Clear & Primitives)

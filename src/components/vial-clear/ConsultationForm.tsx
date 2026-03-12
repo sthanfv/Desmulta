@@ -356,7 +356,7 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
           <EnrutadorMagico form={form} />
         </Suspense>
 
-        {/* Honeypot anti-spam (MANDATO-FILTRO v2.3.7) */}
+        {/* Honeypot anti-spam (MANDATO-FILTRO v2.4.4) */}
         <div
           style={{ position: 'absolute', opacity: 0, top: -9999, left: -9999 }}
           aria-hidden="true"

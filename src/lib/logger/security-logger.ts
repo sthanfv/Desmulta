@@ -1,5 +1,5 @@
 /**
- * SecurityLogger: Motor de auditoría con ofuscación automática de PII (v2.3.7).
+ * SecurityLogger: Motor de auditoría con ofuscación automática de PII (v2.4.4).
  * MANDATO-FILTRO: Protección estricta de datos personales en logs.
  */
 /* eslint-disable security/detect-unsafe-regex */
