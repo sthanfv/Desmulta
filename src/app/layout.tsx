@@ -11,6 +11,7 @@ import { MotorFomo } from '@/components/MotorFomo';
 import { Analytics } from '@vercel/analytics/react';
 import { validateEnv } from '@/lib/env-check';
 import { PwaUpdateToast } from '@/components/pwa/PwaUpdateToast';
+import AuroraBackground from '@/components/ui/AuroraBackground';
 
 // MANDATO-FILTRO: Validación proactiva de configuración
 validateEnv();
@@ -189,7 +190,8 @@ export default function RootLayout({
           </>
         )}
       </head>
-      <body className={cn(outfit.className, 'antialiased')} suppressHydrationWarning={true}>
+      <body className={cn(outfit.className, 'antialiased bg-transparent')} suppressHydrationWarning={true}>
+        <AuroraBackground />
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           <FirebaseClientProvider>
             <ScrollProgressBar />

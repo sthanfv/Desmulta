@@ -34,7 +34,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
 import { cn } from '@/lib/utils';
 import { Progress } from '../ui/progress';
-import { haptics } from '@/lib/utils/haptics';
+import { triggerHaptic } from '@/lib/utils/haptics';
 import { ImageUpload } from './ImageUpload';
 import { useTesseractPrewarm } from '@/hooks/useTesseractPrewarm';
 import { useExpedienteStore } from '@/store/useExpedienteStore';
@@ -193,7 +193,7 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
     const isValid = await form.trigger(fieldsToValidate);
 
     if (isValid) {
-      haptics.vibrate('medium');
+      triggerHaptic('medium');
       setStep(2);
     } else {
       toast({
@@ -207,7 +207,7 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
   const onSubmit: SubmitHandler<ConsultationFormData> = async (data) => {
     try {
       if (!turnstileToken) {
-        haptics.vibrate('warning');
+        triggerHaptic('medium');
         throw new Error(
           'Nuestro escudo de protección está terminando de activarse. Por favor, espera un segundo más para mayor seguridad.'
         );
@@ -314,13 +314,13 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
         });
       }
 
-      haptics.vibrate('success');
+      triggerHaptic('success');
       setIsSuccess(true);
       localStorage.removeItem('consultation_draft');
       // Cerramos automáticamente tras un breve periodo de éxito
       setTimeout(onSuccess, 3000);
     } catch (e: unknown) {
-      haptics.vibrate('error');
+      triggerHaptic('error');
       const message =
         e instanceof Error
           ? e.message
@@ -368,7 +368,7 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
             await onSubmit(data);
           },
           (errors) => {
-            haptics.vibrate('error');
+            triggerHaptic('error');
 
             const errorKeys = Object.keys(errors);
             const firstFieldName = errorKeys[0];
@@ -461,7 +461,7 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
                   type="button"
                   onClick={() => {
                     form.setValue('antiguedad', opt.id);
-                    haptics.vibrate('medium');
+                    triggerHaptic('medium');
                     setStep(1);
                   }}
                   className={cn(
@@ -519,7 +519,7 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
                               type="button"
                               onClick={() => {
                                 field.onChange(option);
-                                haptics.vibrate('light');
+                                triggerHaptic('light');
                               }}
                               className={cn(
                                 'flex items-center justify-center h-14 rounded-2xl border-2 transition-all font-bold text-sm',
@@ -565,7 +565,7 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
                             )}
                             onClick={() => {
                               field.onChange(option);
-                              haptics.vibrate('light');
+                              triggerHaptic('light');
                             }}
                             aria-label={`Seleccionar opción: ${option}`}
                             aria-pressed={field.value === option}
@@ -919,7 +919,7 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
                   siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
                   onSuccess={(token) => {
                     setTurnstileToken(token);
-                    haptics.vibrate('light');
+                    triggerHaptic('light');
                   }}
                   options={{
                     theme: 'dark',

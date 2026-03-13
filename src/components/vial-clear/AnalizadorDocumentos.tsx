@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 import Image from 'next/image';
+import { triggerHaptic } from '@/lib/utils/haptics';
 
 export interface BoundingBox {
   x0: number;
@@ -35,6 +36,16 @@ export default function AnalizadorDocumentos({
   progress = 0,
 }: AnalizadorDocumentosProps) {
   const [imgDimensions, setImgDimensions] = useState({ width: 0, height: 0 });
+
+  // ─── Feedback Sensorial (MANDATO-FILTRO) ───
+  useEffect(() => {
+    if (words.length > 0) {
+      const hasCritical = words.some((w) => w.text.toLowerCase().includes('cobro'));
+      if (hasCritical) {
+        triggerHaptic('medium'); // El "click" de realidad al encontrar peligro
+      }
+    }
+  }, [words]);
 
   return (
     <div className="relative w-full max-w-md mx-auto overflow-hidden rounded-3xl border-2 border-slate-700 bg-slate-900 shadow-2xl group">

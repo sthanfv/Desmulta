@@ -1,4 +1,4 @@
-// ─── Security Headers (MANDATO-FILTRO v2.6.1) ────────────────────────────────
+// ─── Security Headers (MANDATO-FILTRO v2.6.3) ────────────────────────────────
 // Endurecimiento de CSP y Hotfix de Producción para Tesseract y Gradientes.
 
 const clean = (str: string) => str.replace(/\s+/g, ' ').trim();
