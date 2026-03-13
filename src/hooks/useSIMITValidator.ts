@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Tesseract from 'tesseract.js';
 import { extraerMultasDeTexto } from '@/lib/simit-parser';
 import { Multa } from '@/store/useExpedienteStore';
-import type { OcrWord } from '@/components/vial-clear/ScannerForense';
+import type { OcrWord } from '@/components/vial-clear/AnalizadorDocumentos';
 
 /**
  * Heurística de anclaje visual basada en la UI oficial del SIMIT (Marzo 2026).

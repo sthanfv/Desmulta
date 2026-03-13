@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 import { comprimirCaptura } from '@/lib/optimizador-imagenes';
 import { useSIMITValidator } from '@/hooks/useSIMITValidator';
 import { useExpedienteStore } from '@/store/useExpedienteStore';
-import type { OcrWord } from './ScannerForense';
+import type { OcrWord } from '@/components/vial-clear/AnalizadorDocumentos';
 
 interface ImageUploadProps {
   onUploadSuccess: (url: string) => void;

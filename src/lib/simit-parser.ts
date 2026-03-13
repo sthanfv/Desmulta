@@ -11,7 +11,6 @@ export function extraerMultasDeTexto(texto: string): Multa[] {
 
   // Patrón simple: Busca números de comparendo (generalmente 15-20 dígitos)
   // Ej: 05001000000012345678
-  // eslint-disable-next-line security/detect-unsafe-regex
   const regexComparendo = /\b\d{10,20}\b/g;
 
   // Patrón de fecha (DD/MM/AAAA)
