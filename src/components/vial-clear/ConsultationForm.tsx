@@ -98,7 +98,7 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
 
   // 🧠 Pre-calentamiento silencioso del modelo OCR de Tesseract
   // Inicia el prefetch de spa.traineddata mientras el usuario llena el formulario
-  useTesseractPrewarm();
+  // useTesseractPrewarm();
 
   const form = useForm<ConsultationFormData>({
     resolver: zodResolver(
@@ -854,7 +854,7 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
                     />
                   </FormControl>
                   <FormMessage className="text-center font-bold text-xs mt-2" />
-                  
+
                   {/* ESCÁNER FORENSE: Inyectado dinámicamente si hay imagen */}
                   {(isScanningOCR || detectedWords.length > 0) && (
                     <div className="mt-8 mb-4 animate-in zoom-in-95 duration-500">
@@ -871,11 +871,11 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
                           </>
                         )}
                       </h3>
-                      <AnalizadorDocumentos 
-                        imageSrc={(localPreview || field.value) || ''} 
-                        isScanning={isScanningOCR} 
+                      <AnalizadorDocumentos
+                        imageSrc={localPreview || field.value || ''}
+                        isScanning={isScanningOCR}
                         progress={ocrProgress}
-                        words={detectedWords} 
+                        words={detectedWords}
                       />
                     </div>
                   )}

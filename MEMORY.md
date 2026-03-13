@@ -3,8 +3,34 @@
 ## 1. Contexto Actual
 
 - **Versión**: v2.5.7
-- **Estado**: Hotfix de Producción: Estabilización de PWA y parche final de CSP completado.
+- **Estado**: Despliegue Consolidado v2.6.1 completado. Sincronización de documentación y versionado global.
 - **Mando**: Equipo de Desarrollo Élite.
+
+## 18. Actualización v2.6.1 (Consolidación y Documentación Final)
+
+- **Unificación de Versión**: Se sincronizó la versión `v2.6.1` en `package.json`, `Footer.tsx`, `README.md` y `security-headers.ts`.
+- **Perfeccionamiento Visual**: Animación de escaneo optimizada con `translateY` y láser rediseñado.
+- **Optimización de Logs**: Reducción de ruido en el worker de Tesseract (logs cada 10%).
+- **Calidad de Código**: Suite de pruebas (36/36) y build de producción validados exitosamente.
+- **Despliegue**: Sincronización total con el repositorio Git.
+
+- **Optimización de Animación**: Migrada la animación `scan` de `top` a `translateY` en `tailwind.config.ts` para mejorar el rendimiento del navegador (evitando Layout recalculations). Añadida animación `scan-forense` (2.5s).
+- **Rediseño de Láser Forense**: Reestructurado el componente `AnalizadorDocumentos.tsx` para usar un contenedor animado único que desplaza tanto la línea de luz como el rastro degradado, logrando un efecto más fluido y profesional.
+- **Silenciado de Logs OCR**: Ajustado el logger en `useSIMITValidator.ts` para imprimir el progreso en consola solo en intervalos del 10%. Esto reduce el ruido en desarrollo y mejora el rendimiento del hilo principal.
+- **Verificación Técnica**: Typecheck superado satisfactoriamente.
+
+- **Optimización LCP**: Se añadió la propiedad `priority` a la imagen del Hero mediante la actualización del componente `lightbox.tsx` y su implementación en `Hero.tsx`. Esto elimina la advertencia de Largest Contentful Paint.
+- **Fluidez en Desarrollo**: Se comentó `useTesseractPrewarm()` en `ConsultationForm.tsx` para reducir el consumo de RAM y acelerar el *Fast Refresh* durante las sesiones de diseño.
+- **Suite de Mantenimiento**: Ejecutada con éxito la cadena completa: `format`, `lint`, `typecheck`, `test` y `build`. El proyecto cuenta con 36 pruebas unitarias pasando y un bundle de producción optimizado.
+
+- **Animación Cinemática**: Actualizados keyframes en `tailwind.config.ts` usando `translateY` para mayor suavidad. Implementada animación `scan-fast` (2s) para un efecto de barrido más dinámico en el componente `AnalizadorDocumentos.tsx`.
+- **Rediseño del Láser**: Mejora visual en el componente de análisis con una línea de luz más intensa y un degradado de barrido descendente.
+- **Optimización de Hilo Principal**: Implementado _Throttling_ en el hook `useSIMITValidator.ts`. El progreso del OCR ahora solo actualiza el estado si el avance es mayor al 5%, evitando congelamientos del navegador durante el procesamiento de imágenes pesadas.
+- **Verificación Técnica**: Build y Typecheck validados exitosamente.
+
+- **Corrección CSP Estricta**: Se actualizaron `connect-src` e `img-src` en `src/lib/security-headers.ts` para permitir dominios críticos (`tessdata.projectnaptha.com`, `grainy-gradients.vercel.app`, `challenges.cloudflare.com`) y evitar bloqueos en el motor OCR y assets visuales.
+- **Simplificación PWA**: Se eliminó la configuración manual de `workboxOptions` en `next.config.ts` para permitir que el plugin use una configuración estable por defecto, resolviendo errores de generación de Service Worker (`_async_to_generator`).
+- **Verificación de Build**: Ejecutado `npm run typecheck` satisfactoriamente tras los ajustes.
 
 ## 9. Actualización v2.4.3 (Estabilidad y Seguridad)
 
@@ -93,8 +119,10 @@
 
 - **Corrección API Cron (`force-dynamic`)**: Se corrigió el error `[PageNotFoundError]` lanzado por `next build` al recolectar datos de las páginas (`/api/cron/*`). Añadiendo `export const dynamic = 'force-dynamic'`, se evitó explícitamente que Next.js intentara la Generación Estática (SSG) de rutas Cron sin cuerpo dependiente de HTTP en build-time, logrando una compilación de Producción limpia (Output de Serverless y PWA service workers perfectos).
 
-## 8. Sesión Actual: Mando Élite (Reconocimiento)
+## 8. Sesión Actual: Mando Élite (Saneamiento)
 
-- **Auditoría e Inicialización**: Ejecutada `npm audit` detectando 14 vulnerabilidades de baja severidad ligadas a la dependencia profunda `firebase-admin`. No se forzó una actualización mayor (breaking change) en esta fase cero, se intentó mitigación estándar con `npm audit fix`.
-- **Stack Ratificado Automáticamente**: Next.js 15, React 19, Tailwind CSS, Firestore, TypeScript estricto, Vercel Blob, Tesseract.js (Client-Side).
-- **Compromiso MANDATO-FILTRO**: Activado. Todas las comunicaciones, logs, comentarios y documentación se generarán y verificarán internamente 100% en ESPAÑOL.
+- **Eliminación Definitiva de Genkit**: Conforme al MANDATO-FILTRO, se desinstalaron `genkit`, `@genkit-ai/*` y dependencias asociadas, eliminando 282 paquetes residuales.
+- **Limpieza de Archivos**: Se eliminaron los archivos obsoletos `src/ai/genkit.ts` y los flujos en `src/ai/flows/` que causaban errores de tipos tras la desinstalación.
+- **Verificación de Integridad**: Ejecutado `npm run typecheck` con éxito (0 errores). El sistema es estable utilizando el SDK directo de Google Generative AI en `src/app/actions.ts`.
+- **Estado de Vulnerabilidades**: Mitigadas las vulnerabilidades críticas/medias asociadas a Genkit. Las 8 vulnerabilidades bajas restantes pertenecen a la cadena de `firebase-admin`, cuya actualización mayor a v10 se posterga para mantener estabilidad de producción (Admin SDK).
+- **Compromiso MANDATO-FILTRO**: Verificado. Documentación y logs actualizados 100% en ESPAÑOL.

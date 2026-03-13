@@ -10,9 +10,10 @@ interface LightboxProps {
   src: string;
   alt: string;
   className?: string; // Para estilizar la miniatura
+  priority?: boolean;
 }
 
-export function Lightbox({ src, alt, className = '' }: LightboxProps) {
+export function Lightbox({ src, alt, className = '', priority = false }: LightboxProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -29,6 +30,7 @@ export function Lightbox({ src, alt, className = '' }: LightboxProps) {
         fill
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         className="object-cover transition-transform duration-500 group-hover:scale-105"
+        priority={priority}
       />
       {/* Overlay interactivo */}
       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">

@@ -56,12 +56,16 @@ export default function AnalizadorDocumentos({
         />
       )}
 
-      {/* 2. El Efecto de Análisis Digital (Animación corregida) */}
+      {/* 2. El Efecto de Análisis Digital (Láser de Escaneo Forense) */}
       {isScanning && (
         <div className="absolute inset-0 pointer-events-none z-20 overflow-hidden">
-          <div className="w-full h-[2px] bg-primary shadow-[0_0_15px_3px_rgba(34,197,94,0.6)] animate-scan absolute left-0" style={{ top: '0%' }}>
-            {/* Brillo de barrido */}
-            <div className="absolute bottom-full left-0 w-full h-40 bg-gradient-to-t from-primary/20 to-transparent"></div>
+          {/* Contenedor animado que se mueve */}
+          <div className="w-full h-24 absolute top-0 animate-scan-forense">
+            {/* La línea brillante principal */}
+            <div className="w-full h-[2px] bg-primary shadow-[0_0_15px_2px_rgba(34,197,94,0.8)]" />
+            
+            {/* El rastro de luz (degradado) */}
+            <div className="w-full h-full bg-gradient-to-b from-primary/20 to-transparent" />
           </div>
         </div>
       )}
@@ -100,9 +104,7 @@ export default function AnalizadorDocumentos({
             <Loader2 className="w-3.5 h-3.5 mr-3 animate-spin" />
             Buscando datos oficiales...
           </div>
-          <div className="text-white text-xs font-black">
-            {progress.toFixed(0)}%
-          </div>
+          <div className="text-white text-xs font-black">{progress.toFixed(0)}%</div>
         </div>
       )}
     </div>

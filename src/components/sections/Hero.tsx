@@ -110,6 +110,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
               src="/hero-bg.avif"
               alt="Gestión de multas profesional - Desmulta"
               className="rounded-[3rem] object-cover aspect-[4/5] shadow-2xl"
+              priority
             />
             <div className="absolute bottom-8 left-8 right-8 z-10 pointer-events-none animate-float">
               <div className="glass p-4 rounded-3xl flex items-center gap-4 border-white/20 shadow-2xl">

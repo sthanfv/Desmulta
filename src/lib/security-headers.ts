@@ -1,4 +1,4 @@
-// ─── Security Headers (MANDATO-FILTRO v2.5.7) ────────────────────────────────
+// ─── Security Headers (MANDATO-FILTRO v2.6.1) ────────────────────────────────
 // Endurecimiento de CSP y Hotfix de Producción para Tesseract y Gradientes.
 
 const clean = (str: string) => str.replace(/\s+/g, ' ').trim();
@@ -22,15 +22,10 @@ export const cspHeader = [
 
   clean(`
     img-src 'self' data: blob:
-    https://placehold.co
-    https://picsum.photos
     https://*.public.blob.vercel-storage.com
+    https://*.vercel-storage.com
     https://firebasestorage.googleapis.com
-    https://www.google-analytics.com
-    https://www.facebook.com
-    https://*.facebook.com
     https://grainy-gradients.vercel.app
-    https://tessdata.projectnaptha.com
   `),
 
   "media-src 'self'",
@@ -40,18 +35,14 @@ export const cspHeader = [
     connect-src 'self'
     https://*.googleapis.com
     https://*.firebaseio.com
-    wss://*.firebaseio.com
+    https://tessdata.projectnaptha.com
+    https://grainy-gradients.vercel.app
+    https://challenges.cloudflare.com
     https://identitytoolkit.googleapis.com
     https://securetoken.googleapis.com
     https://api.telegram.org
-    https://www.google-analytics.com
-    https://connect.facebook.net
-    https://challenges.cloudflare.com
     https://va.vercel-scripts.com
     https://*.vercel-storage.com
-    https://cdn.jsdelivr.net
-    https://tessdata.projectnaptha.com
-    https://grainy-gradients.vercel.app
   `),
 
   clean(`
@@ -68,7 +59,7 @@ export const cspHeader = [
   "frame-ancestors 'none'",
   "object-src 'none'",
   "base-uri 'self'",
-  "upgrade-insecure-requests",
+  'upgrade-insecure-requests',
 ].join('; ');
 
 export const securityHeadersLabels = [

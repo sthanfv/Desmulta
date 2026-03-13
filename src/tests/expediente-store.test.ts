@@ -22,7 +22,7 @@ describe('🛒 Store de Expediente (Zustand Client-Side)', () => {
     const stateActualizado = useExpedienteStore.getState();
     expect(stateActualizado.multas.length).toBe(2);
     // 500,000 + 350,000 = 850,000
-    expect(stateActualizado.getTotalDeuda()).toBe(850000); 
+    expect(stateActualizado.getTotalDeuda()).toBe(850000);
   });
 
   it('Escudo FinOps: Debe bloquear multas duplicadas basadas en el número de comparendo', () => {
@@ -30,14 +30,14 @@ describe('🛒 Store de Expediente (Zustand Client-Side)', () => {
 
     // El usuario agrega la multa
     addMulta({ id: '1', comparendo: '99999', fecha: '2023', valor: 500000, estado: 'Cobro' });
-    
+
     // El usuario se equivoca e intenta agregar LA MISMA multa de nuevo
     addMulta({ id: '2', comparendo: '99999', fecha: '2023', valor: 500000, estado: 'Cobro' });
 
     const stateActualizado = useExpedienteStore.getState();
-    
+
     // El escudo debió bloquear la segunda. Solo debe existir 1 en el array.
-    expect(stateActualizado.multas.length).toBe(1); 
+    expect(stateActualizado.multas.length).toBe(1);
     expect(stateActualizado.getTotalDeuda()).toBe(500000);
   });
 });

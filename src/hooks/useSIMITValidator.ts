@@ -71,13 +71,17 @@ export const useSIMITValidator = () => {
       // Filtro 2: OCR en el dispositivo del usuario (Costo = $0)
       const resultRaw = await Tesseract.recognize(archivo, 'spa', {
         langPath: 'https://tessdata.projectnaptha.com/4.0.0', // Servidor estable a prueba de fallos
-        logger: (evento) => {
-          if (evento.status === 'recognizing text') {
-            const pct = Math.round(evento.progress * 100);
-            setProgresoOCR(pct);
-            if (process.env.NODE_ENV === 'development') {
-              console.log(`[DevSecOps - OCR]: ${evento.status} - ${pct}%`);
+        logger: (m) => {
+          if (m.status === 'recognizing text') {
+            const progress = Math.round(m.progress * 100);
+            // Solo imprimimos cada 10% para no saturar el hilo principal
+            if (progress % 10 === 0) {
+              if (process.env.NODE_ENV === 'development') {
+                console.log(`[Análisis Forense]: ${progress}%`);
+              }
             }
+            // Mantenemos el throttling de estado del 5% del paso anterior para UI fluida
+            setProgresoOCR((prev) => (progress > prev + 5 || progress === 100 ? progress : prev));
           }
         },
       });
