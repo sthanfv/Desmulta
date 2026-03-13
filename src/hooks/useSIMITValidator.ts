@@ -70,6 +70,7 @@ export const useSIMITValidator = () => {
 
       // Filtro 2: OCR en el dispositivo del usuario (Costo = $0)
       const resultRaw = await Tesseract.recognize(archivo, 'spa', {
+        langPath: 'https://tessdata.projectnaptha.com/4.0.0', // Servidor estable a prueba de fallos
         logger: (evento) => {
           if (evento.status === 'recognizing text') {
             const pct = Math.round(evento.progress * 100);

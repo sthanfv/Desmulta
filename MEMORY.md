@@ -2,8 +2,8 @@
 
 ## 1. Contexto Actual
 
-- **Versión**: v2.4.9
-- **Estado**: Versionado unificado y tests de Hiper-Localismo/FinOps actualizados.
+- **Versión**: v2.5.4
+- **Estado**: Saneamiento de infraestructura OCR y PWA completado.
 - **Mando**: Equipo de Desarrollo Élite.
 
 ## 9. Actualización v2.4.3 (Estabilidad y Seguridad)

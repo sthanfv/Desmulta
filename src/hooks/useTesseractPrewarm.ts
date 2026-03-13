@@ -2,8 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 
-const TESSERACT_CDN = 'https://cdn.jsdelivr.net/npm/tesseract.js@6/';
-const LANG_URL = `${TESSERACT_CDN}lang-data/4.0.0_best/spa.traineddata.gz`;
+const LANG_URL = 'https://tessdata.projectnaptha.com/4.0.0/spa.traineddata.gz';
 
 /**
  * Hook de Pre-calentamiento del Motor OCR (MANDATO-FILTRO v2.3.9)
