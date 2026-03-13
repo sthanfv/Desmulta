@@ -90,8 +90,8 @@ export const useSIMITValidator = () => {
         return { esValida: false, coincidencias };
       }
 
-      // Mapeamos los datos de Tesseract a nuestro formato forense
-      const palabrasDetectadas: OcrWord[] = (resultRaw.data as any).words.map((w: any) => ({
+      // INGENIERÍA DEFENSIVA: Si data.words es undefined, usamos un array vacío por defecto.
+      const palabrasDetectadas: OcrWord[] = (resultRaw.data?.words || []).map((w: any) => ({
         text: w.text,
         bbox: w.bbox,
         confidence: w.confidence,

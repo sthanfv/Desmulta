@@ -54,7 +54,7 @@ export default function ScannerForense({ imageSrc, isScanning, words = [], progr
 
       {/* 3. Las Cajas Delimitadoras (Bounding Boxes) */}
       {/* Solo se dibujan si tenemos las dimensiones de la imagen para calcular porcentajes */}
-      {imgDimensions.width > 0 && words.map((word, idx) => {
+      {imgDimensions.width > 0 && Array.isArray(words) && words.map((word, idx) => {
         // Matemática para hacer las cajas 100% responsivas
         const left = (word.bbox.x0 / imgDimensions.width) * 100;
         const top = (word.bbox.y0 / imgDimensions.height) * 100;
