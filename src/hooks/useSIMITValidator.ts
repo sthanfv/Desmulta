@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Tesseract from 'tesseract.js';
 import { extraerMultasDeTexto } from '@/lib/simit-parser';
 import { Multa } from '@/store/useExpedienteStore';
+import type { OcrWord } from '@/components/vial-clear/ScannerForense';
 
 /**
  * Heurística de anclaje visual basada en la UI oficial del SIMIT (Marzo 2026).
@@ -31,6 +32,7 @@ export interface ResultadoOCR {
   coincidencias: string[];
   textoExtraido?: string;
   multasExtraidas?: Multa[];
+  palabrasDetectadas?: OcrWord[];
 }
 
 /**
@@ -60,7 +62,7 @@ export const useSIMITValidator = () => {
       }
 
       // Filtro 2: OCR en el dispositivo del usuario (Costo = $0)
-      const resultado = await Tesseract.recognize(archivo, 'spa', {
+      const resultRaw = await Tesseract.recognize(archivo, 'spa', {
         logger: (evento) => {
           if (evento.status === 'recognizing text') {
             const pct = Math.round(evento.progress * 100);
@@ -73,7 +75,7 @@ export const useSIMITValidator = () => {
       });
 
       // Normalizar: minúsculas y colapsar espacios múltiples
-      const textoLimpio = resultado.data.text.toLowerCase().replace(/\s+/g, ' ');
+      const textoLimpio = resultRaw.data.text.toLowerCase().replace(/\s+/g, ' ');
 
       // Filtro 3: Heurística de anclaje — Frases infalibles de la UI del SIMIT
       const coincidencias = FRASES_CLAVE_SIMIT.filter((frase) => textoLimpio.includes(frase));
@@ -88,11 +90,19 @@ export const useSIMITValidator = () => {
         return { esValida: false, coincidencias };
       }
 
+      // Mapeamos los datos de Tesseract a nuestro formato forense
+      const palabrasDetectadas: OcrWord[] = resultRaw.data.words.map((w: any) => ({
+        text: w.text,
+        bbox: w.bbox,
+        confidence: w.confidence,
+      }));
+
       return {
         esValida: true,
         coincidencias,
-        textoExtraido: resultado.data.text,
-        multasExtraidas: extraerMultasDeTexto(resultado.data.text),
+        textoExtraido: resultRaw.data.text,
+        multasExtraidas: extraerMultasDeTexto(resultRaw.data.text),
+        palabrasDetectadas,
       };
     } catch (error) {
       const mensaje =

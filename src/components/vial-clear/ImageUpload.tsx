@@ -8,10 +8,12 @@ import { cn } from '@/lib/utils';
 import { comprimirCaptura } from '@/lib/optimizador-imagenes';
 import { useSIMITValidator } from '@/hooks/useSIMITValidator';
 import { useExpedienteStore } from '@/store/useExpedienteStore';
+import type { OcrWord } from './ScannerForense';
 
 interface ImageUploadProps {
   onUploadSuccess: (url: string) => void;
   onClear: () => void;
+  onOcrStateChange?: (scanning: boolean, progress: number, words: OcrWord[]) => void;
   className?: string;
   required?: boolean;
   currentUrl?: string;
@@ -20,6 +22,7 @@ interface ImageUploadProps {
 export function ImageUpload({
   onUploadSuccess,
   onClear,
+  onOcrStateChange,
   className,
   required,
   currentUrl,
@@ -49,6 +52,11 @@ export function ImageUpload({
     // Nunca tocará Vercel Blob ni Firebase. Costo evitado: 100%.
     const { addMultas } = useExpedienteStore.getState();
     const resultado = await validarImagenSIMIT(selectedFile);
+
+    if (onOcrStateChange) {
+      onOcrStateChange(false, 100, resultado.palabrasDetectadas || []);
+    }
+
     if (!resultado.esValida) {
       setPreview(null);
       setError(errorOCR || 'Imagen rechazada: No se detectaron datos del SIMIT.');
@@ -108,6 +116,13 @@ export function ImageUpload({
   const mensajeCarga = analizando
     ? `Analizando captura del SIMIT... ${progresoOCR}%`
     : 'Subiendo captura...';
+
+  // Efecto para reportar cambios de progreso al padre
+  React.useEffect(() => {
+    if (onOcrStateChange && analizando) {
+      onOcrStateChange(true, progresoOCR, []);
+    }
+  }, [analizando, progresoOCR, onOcrStateChange]);
 
   return (
     <div className={cn('space-y-4', className)}>

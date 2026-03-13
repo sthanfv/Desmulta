@@ -91,11 +91,16 @@ export default {
         shimmer: {
           '100%': { transform: 'translateX(100%)' },
         },
+        scan: {
+          '0%': { transform: 'translateY(-100%)' },
+          '100%': { transform: 'translateY(1000%)' }, // Atraviesa toda la imagen
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         shimmer: 'shimmer 1.5s infinite',
+        scan: 'scan 3s linear infinite',
       },
     },
   },

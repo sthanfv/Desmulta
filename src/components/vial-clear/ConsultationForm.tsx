@@ -39,6 +39,7 @@ import { ImageUpload } from './ImageUpload';
 import { useTesseractPrewarm } from '@/hooks/useTesseractPrewarm';
 import { useExpedienteStore } from '@/store/useExpedienteStore';
 import { consolidarExpedienteEnDB } from '@/app/actions/expediente.actions';
+import ScannerForense, { type OcrWord } from './ScannerForense';
 
 type ConsultationFormData = z.infer<typeof ConsultationSchema>;
 const FIELD_LABELS: Record<string, string> = {
@@ -88,6 +89,12 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
   const [showCedula, setShowCedula] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const { toast } = useToast();
+
+  // Estados para el Escáner Forense
+  const [isScanningOCR, setIsScanningOCR] = useState(false);
+  const [ocrProgress, setOcrProgress] = useState(0);
+  const [detectedWords, setDetectedWords] = useState<OcrWord[]>([]);
+  const [localPreview, setLocalPreview] = useState<string | null>(null);
 
   // 🧠 Pre-calentamiento silencioso del modelo OCR de Tesseract
   // Inicia el prefetch de spa.traineddata mientras el usuario llena el formulario
@@ -833,13 +840,45 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
                       }}
                       onClear={() => {
                         field.onChange('');
+                        setLocalPreview(null);
+                        setDetectedWords([]);
                         form.trigger('evidenceUrl');
+                      }}
+                      onOcrStateChange={(scanning, progress, words) => {
+                        setIsScanningOCR(scanning);
+                        setOcrProgress(progress);
+                        if (words.length > 0) setDetectedWords(words);
                       }}
                       required={isSimitMode}
                       currentUrl={field.value}
                     />
                   </FormControl>
                   <FormMessage className="text-center font-bold text-xs mt-2" />
+                  
+                  {/* ESCÁNER FORENSE: Inyectado dinámicamente si hay imagen */}
+                  {(isScanningOCR || detectedWords.length > 0) && (
+                    <div className="mt-8 mb-4 animate-in zoom-in-95 duration-500">
+                      <h3 className="text-slate-400 text-[10px] font-black mb-4 uppercase tracking-[0.3em] text-center flex items-center justify-center gap-2">
+                        {isScanningOCR ? (
+                          <>
+                            <Loader2 size={12} className="animate-spin text-primary" />
+                            Análisis Forense en Curso
+                          </>
+                        ) : (
+                          <>
+                            <ShieldCheck size={12} className="text-green-500" />
+                            Escaneo Algorítmico Completado
+                          </>
+                        )}
+                      </h3>
+                      <ScannerForense 
+                        imageSrc={localPreview || field.value} 
+                        isScanning={isScanningOCR} 
+                        progress={ocrProgress}
+                        words={detectedWords} 
+                      />
+                    </div>
+                  )}
                 </FormItem>
               )}
             />
