@@ -23,7 +23,14 @@ export default async function VialClearPage() {
     headers(),
   ]);
 
-  const ciudad = headersList.get('x-ciudad-usuario') || 'Colombia';
+  const rawCity = headersList.get('x-ciudad-usuario') || 'Colombia';
+  let ciudad = 'Colombia';
+
+  try {
+    ciudad = decodeURIComponent(rawCity);
+  } catch {
+    ciudad = 'Colombia'; // Fallback de seguridad
+  }
 
   return <HomeClient showcaseData={showcaseData} footerData={footerData} cityContext={ciudad} />;
 }

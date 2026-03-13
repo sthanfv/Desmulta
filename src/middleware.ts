@@ -13,8 +13,7 @@ import { cspHeader } from '@/lib/security-headers';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Next.js requiere este parámetro en la firma del middleware
 export function middleware(request: NextRequest) {
   // 1. Interceptamos la geolocalización nativa de Vercel (Costo $0)
-  const vercelCity = request.headers.get('x-vercel-ip-city');
-  const ciudadUsuario = vercelCity ? decodeURIComponent(vercelCity) : 'Colombia';
+  const ciudadUsuario = request.headers.get('x-vercel-ip-city') || 'Colombia';
 
   // 2. Clonamos los headers de la petición entrante para inyectar la ciudad
   const requestHeaders = new Headers(request.headers);
