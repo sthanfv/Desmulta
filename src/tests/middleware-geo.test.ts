@@ -3,27 +3,26 @@ import { NextRequest } from 'next/server';
 import { middleware } from '../middleware';
 
 describe('🌍 Edge Middleware - Hiper Localismo', () => {
-  it('Debe inyectar la ciudad detectada por Vercel en los headers', () => {
-    // Simulamos una petición donde Vercel detectó "Quibdo"
+  it('Debe transferir la ciudad codificada desde Vercel a nuestra cabecera personalizada', () => {
+    // 1. Simulamos una petición donde Vercel detectó "Cúcuta" codificado
     const req = new NextRequest('http://localhost:9005/');
-    req.headers.set('x-vercel-ip-city', 'Quibdo');
+    req.headers.set('x-vercel-ip-city', 'C%C3%BAcuta'); 
 
+    // 2. Pasamos la petición por nuestro middleware
     const res = middleware(req);
 
-    // Comprobamos que el middleware inyectó nuestra cabecera personalizada en los headers de la petición clonada
-    // En Next.js 15, el middleware retorna una respuesta que contiene la petición mutada
-    // Pero para test unitario directo, verificamos el header en el objeto request clonado si es posible,
-    // o en la respuesta si se usa NextResponse.next({ request: { headers } })
-
-    // El middleware inyecta en "requestHeaders" que se pasa a NextResponse.next
-    // Vitest puede inspeccionar la respuesta
-    expect(res).toBeDefined();
+    // 3. Verificamos que el middleware haya asignado el valor sin corromperlo
+    expect(res.headers.get('x-ciudad-usuario')).toBe('C%C3%BAcuta');
   });
 
-  it('Debe usar "Colombia" como fallback si no hay detección de IP', () => {
+  it('Debe usar "Colombia" como fallback si la petición no trae la cabecera de Vercel', () => {
+    // 1. Petición en blanco (como cuando desarrollas en tu PC local)
     const req = new NextRequest('http://localhost:9005/');
+    
+    // 2. Ejecutamos el middleware
     const res = middleware(req);
-    // Verificación de estabilidad estructural
-    expect(res.status).toBe(200);
+
+    // 3. Verificamos la red de seguridad
+    expect(res.headers.get('x-ciudad-usuario')).toBe('Colombia');
   });
 });

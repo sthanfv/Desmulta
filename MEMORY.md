@@ -2,8 +2,8 @@
 
 ## 1. Contexto Actual
 
-- **Versión**: v2.4.7
-- **Estado**: Expediente Único, Suite de Pruebas Vitest y Optimizaciones de UX completadas.
+- **Versión**: v2.4.9
+- **Estado**: Versionado unificado y tests de Hiper-Localismo/FinOps actualizados.
 - **Mando**: Equipo de Desarrollo Élite.
 
 ## 9. Actualización v2.4.3 (Estabilidad y Seguridad)

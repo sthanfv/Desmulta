@@ -19,14 +19,16 @@ export function middleware(request: NextRequest) {
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set('x-ciudad-usuario', ciudadUsuario);
 
-  // 3. Obtenemos la respuesta estándar
   const response = NextResponse.next({
     request: {
       headers: requestHeaders,
     },
   });
 
-  // 4. Inyección de Headers de Seguridad Estrictos (MANDATO-FILTRO v2.4.5)
+  // 4. Sincronizamos la cabecera en la respuesta para validación y tests
+  response.headers.set('x-ciudad-usuario', ciudadUsuario);
+
+  // 5. Inyección de Headers de Seguridad Estrictos (MANDATO-FILTRO v2.4.5)
   const headers = response.headers;
   headers.set('Content-Security-Policy', cspHeader);
   headers.set('X-Frame-Options', 'DENY');
