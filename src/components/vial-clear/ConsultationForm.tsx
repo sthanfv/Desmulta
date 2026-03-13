@@ -39,7 +39,7 @@ import { ImageUpload } from './ImageUpload';
 import { useTesseractPrewarm } from '@/hooks/useTesseractPrewarm';
 import { useExpedienteStore } from '@/store/useExpedienteStore';
 import { consolidarExpedienteEnDB } from '@/app/actions/expediente.actions';
-import AnalizadorDocumentos, { type OcrWord } from './AnalizadorDocumentos';
+import AnalizadorDocumentos, { type OcrWord } from '@/components/vial-clear/AnalizadorDocumentos';
 
 type ConsultationFormData = z.infer<typeof ConsultationSchema>;
 const FIELD_LABELS: Record<string, string> = {
