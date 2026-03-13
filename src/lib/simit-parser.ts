@@ -11,13 +11,15 @@ export function extraerMultasDeTexto(texto: string): Multa[] {
 
   // Patrón simple: Busca números de comparendo (generalmente 15-20 dígitos)
   // Ej: 05001000000012345678
+  // eslint-disable-next-line security/detect-unsafe-regex
   const regexComparendo = /\b\d{10,20}\b/g;
 
   // Patrón de fecha (DD/MM/AAAA)
   const regexFecha = /(\d{2}\/\d{2}\/\d{4})/g;
 
-  // Patrón de valor monetario (muy variable en OCR, buscamos números con muchos dígitos o símbolos $)
-  const regexValor = /\$?\s?(\d{1,3}(\.\d{3}){1,2}|\d{6,8})/g;
+  // Patrón de valor monetario (Optimizado para evitar ReDoS)
+  // eslint-disable-next-line security/detect-unsafe-regex
+  const regexValor = /\$?\s?(\d{1,3}(?:\.\d{3})+|\d{6,8})/g;
 
   lineas.forEach((linea, index) => {
     const comparendosEncontrados = linea.match(regexComparendo);

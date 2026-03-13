@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
+import Image from 'next/image';
 
 export interface BoundingBox {
   x0: number;
@@ -39,9 +40,12 @@ export default function AnalizadorDocumentos({
     <div className="relative w-full max-w-md mx-auto overflow-hidden rounded-3xl border-2 border-slate-700 bg-slate-900 shadow-2xl group">
       {/* 1. La Imagen Base */}
       {imageSrc && (
-        <img
+        <Image
           src={imageSrc}
           alt="Vista previa documento"
+          width={800}
+          height={600}
+          unoptimized
           className={`w-full h-auto object-contain transition-all duration-700 ${
             isScanning ? 'opacity-60 contrast-125 saturate-50' : 'opacity-100'
           }`}

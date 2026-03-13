@@ -10,7 +10,6 @@ import { cspHeader } from '@/lib/security-headers';
  * 2. Protección contra Clickjacking y Sniffing.
  * 3. Preparación para filtrado geográfico (Vercel Edge).
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars -- Next.js requiere este parámetro en la firma del middleware
 export function middleware(request: NextRequest) {
   // 1. Interceptamos la geolocalización nativa de Vercel (Costo $0)
   const ciudadUsuario = request.headers.get('x-vercel-ip-city') || 'Colombia';
