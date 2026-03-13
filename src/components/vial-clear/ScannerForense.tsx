@@ -29,16 +29,18 @@ export default function ScannerForense({ imageSrc, isScanning, words = [], progr
   return (
     <div className="relative w-full max-w-md mx-auto overflow-hidden rounded-xl border-2 border-slate-700 bg-slate-900 shadow-2xl group">
       {/* 1. La Imagen Base */}
-      <img
-        src={imageSrc}
-        alt="Documento SIMIT"
-        className={`w-full h-auto object-contain transition-all duration-700 ${isScanning ? 'opacity-60 contrast-125' : 'opacity-100'}`}
-        onLoad={(e) => {
-          // Capturamos las dimensiones reales para la matemática de las cajas
-          const target = e.target as HTMLImageElement;
-          setImgDimensions({ width: target.naturalWidth, height: target.naturalHeight });
-        }}
-      />
+      {imageSrc && (
+        <img
+          src={imageSrc}
+          alt="Documento SIMIT"
+          className={`w-full h-auto object-contain transition-all duration-700 ${isScanning ? 'opacity-60 contrast-125' : 'opacity-100'}`}
+          onLoad={(e) => {
+            // Capturamos las dimensiones reales para la matemática de las cajas
+            const target = e.target as HTMLImageElement;
+            setImgDimensions({ width: target.naturalWidth, height: target.naturalHeight });
+          }}
+        />
+      )}
 
       {/* 2. El Láser Forense (Solo visible si está escaneando) */}
       {isScanning && (

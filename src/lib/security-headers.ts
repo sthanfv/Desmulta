@@ -11,7 +11,7 @@ export const cspHeader = [
   // compatibilidad con Next.js y scripts de terceros auditados.
   // En Desarrollo, permitimos 'unsafe-eval' para que funcione el Hot Reloading (HMR).
   [
-    `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === 'development' ? " 'unsafe-eval'" : ''}`,
+    `script-src 'self' 'unsafe-inline' 'unsafe-eval'`,
     'blob:',
     'https://www.googletagmanager.com',
     'https://connect.facebook.net',

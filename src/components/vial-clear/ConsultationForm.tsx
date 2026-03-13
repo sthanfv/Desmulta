@@ -872,7 +872,7 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
                         )}
                       </h3>
                       <ScannerForense 
-                        imageSrc={localPreview || field.value} 
+                        imageSrc={(localPreview || field.value) || ''} 
                         isScanning={isScanningOCR} 
                         progress={ocrProgress}
                         words={detectedWords} 
