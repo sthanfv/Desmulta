@@ -92,8 +92,8 @@ export default {
           '100%': { transform: 'translateX(100%)' },
         },
         scan: {
-          '0%': { transform: 'translateY(-100%)' },
-          '100%': { transform: 'translateY(1000%)' }, // Atraviesa toda la imagen
+          '0%': { top: '0%' },
+          '100%': { top: '100%' },
         },
       },
       animation: {

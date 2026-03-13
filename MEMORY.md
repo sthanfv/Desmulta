@@ -2,8 +2,8 @@
 
 ## 1. Contexto Actual
 
-- **Versión**: v2.5.4
-- **Estado**: Saneamiento de infraestructura OCR y PWA completado.
+- **Versión**: v2.5.5
+- **Estado**: Saneamiento final de CSP, PWA y humanización de UI completado.
 - **Mando**: Equipo de Desarrollo Élite.
 
 ## 9. Actualización v2.4.3 (Estabilidad y Seguridad)

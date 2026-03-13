@@ -39,7 +39,7 @@ import { ImageUpload } from './ImageUpload';
 import { useTesseractPrewarm } from '@/hooks/useTesseractPrewarm';
 import { useExpedienteStore } from '@/store/useExpedienteStore';
 import { consolidarExpedienteEnDB } from '@/app/actions/expediente.actions';
-import ScannerForense, { type OcrWord } from './ScannerForense';
+import AnalizadorDocumentos, { type OcrWord } from './AnalizadorDocumentos';
 
 type ConsultationFormData = z.infer<typeof ConsultationSchema>;
 const FIELD_LABELS: Record<string, string> = {
@@ -862,16 +862,16 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
                         {isScanningOCR ? (
                           <>
                             <Loader2 size={12} className="animate-spin text-primary" />
-                            Análisis Forense en Curso
+                            Escaneando información...
                           </>
                         ) : (
                           <>
                             <ShieldCheck size={12} className="text-green-500" />
-                            Escaneo Algorítmico Completado
+                            Documento Verificado
                           </>
                         )}
                       </h3>
-                      <ScannerForense 
+                      <AnalizadorDocumentos 
                         imageSrc={(localPreview || field.value) || ''} 
                         isScanning={isScanningOCR} 
                         progress={ocrProgress}

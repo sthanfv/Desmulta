@@ -38,6 +38,7 @@ export const cspHeader = [
     'https://www.facebook.com',
     'https://*.facebook.com',
     'https://grainy-gradients.vercel.app',
+    'https://tessdata.projectnaptha.com',
   ].join(' '),
 
   "media-src 'self'",
@@ -60,6 +61,8 @@ export const cspHeader = [
     'https://va.vercel-scripts.com',
     'https://*.vercel-storage.com',
     'https://cdn.jsdelivr.net',
+    'https://tessdata.projectnaptha.com',
+    'https://grainy-gradients.vercel.app',
   ].join(' '),
 
   // Worker-src explícito para el Web Worker de Tesseract, y script-src-elem para scripts de inyección dinámica pura (Turnstile, Vercel Analytics)
