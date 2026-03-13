@@ -35,6 +35,13 @@ export interface ResultadoOCR {
   palabrasDetectadas?: OcrWord[];
 }
 
+// Tipos internos para saneamiento de Tesseract (v7+)
+interface TesseractWord {
+  text: string;
+  bbox: { x0: number; y0: number; x1: number; y1: number };
+  confidence: number;
+}
+
 /**
  * Hook de Validación Zero-Waste para imágenes del SIMIT.
  * Usa el procesador del dispositivo del usuario para analizar la imagen
@@ -90,8 +97,9 @@ export const useSIMITValidator = () => {
         return { esValida: false, coincidencias };
       }
 
-      // INGENIERÍA DEFENSIVA: Si data.words es undefined, usamos un array vacío por defecto.
-      const palabrasDetectadas: OcrWord[] = (resultRaw.data?.words || []).map((w: any) => ({
+      // INGENIERÍA DEFENSIVA: Extraemos palabras con tipado seguro
+      const data = resultRaw.data as unknown as { words: TesseractWord[]; text: string };
+      const palabrasDetectadas: OcrWord[] = (data.words || []).map((w) => ({
         text: w.text,
         bbox: w.bbox,
         confidence: w.confidence,
