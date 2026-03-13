@@ -2,8 +2,8 @@
 
 ## 1. Contexto Actual
 
-- **Versión**: v2.5.6
-- **Estado**: Pulido final de build y optimización LCP completado.
+- **Versión**: v2.5.7
+- **Estado**: Hotfix de Producción: Estabilización de PWA y parche final de CSP completado.
 - **Mando**: Equipo de Desarrollo Élite.
 
 ## 9. Actualización v2.4.3 (Estabilidad y Seguridad)
