@@ -24,6 +24,7 @@ import {
 import { ConsultationForm } from '@/components/vial-clear/ConsultationForm';
 import { ShieldCheck, Info, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 
 // Custom Hooks
 import { useScrollTop } from '@/hooks/useScrollTop';
@@ -188,7 +189,9 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
                     : 'Recibiremos su información para un análisis técnico detallado. La respuesta será enviada a su WhatsApp dentro de nuestros horarios laborales habituales.'}
                 </DialogDescription>
               </DialogHeader>
-              <ConsultationForm onSuccess={() => setIsModalOpen(false)} mode={formMode} />
+              <ErrorBoundary>
+                <ConsultationForm onSuccess={() => setIsModalOpen(false)} mode={formMode} />
+              </ErrorBoundary>
             </div>
           </div>
         </DialogContent>

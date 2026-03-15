@@ -2,9 +2,17 @@
 
 ## 1. Contexto Actual
 
-- **Versión**: v2.8.2
-- **Estado**: Fricción Premium (JurisprudenciaScroll) - COMPLETADO.
+- **Versión**: v2.8.3
+- **Estado**: Zero-Crash Architecture (Resiliencia Total) - COMPLETADO.
 - **Mando**: Equipo de Desarrollo Élite.
+
+## 37. Actualización v2.8.3 (Zero-Crash Architecture & Resiliencia)
+
+- **Next.js Error System**: Refactorizado `error.tsx` con UI de recuperación dinámica y vía de escape a WhatsApp.
+- **Defensa Raíz**: Implementado `global-error.tsx` para capturar fallos en el layout principal.
+- **Graceful Navigation**: Creado `not-found.tsx` premium para mantener al usuario en el flujo ante rutas rotas.
+- **Skeleton loading**: Implementado `loading.tsx` para eliminar la sensación de app "congelada".
+- **Granular Blindaje**: Creado componente `ErrorBoundary` y aplicado al `ConsultationForm` para evitar colapsos localizados.
 
 ## 36. Actualización v2.8.2 (JurisprudenciaScroll & Inercia GSAP)
 

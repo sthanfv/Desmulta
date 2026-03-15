@@ -1,4 +1,4 @@
-# Desmulta — Plataforma Integral de Gestión y Resolución de Infracciones v2.8.2 🛡️🚀
+# Desmulta — Plataforma Integral de Gestión y Resolución de Infracciones v2.8.3 🛡️🚀
 
 **Infraestructura de Clase Mundial para la Justicia Vial en Colombia.**
 
