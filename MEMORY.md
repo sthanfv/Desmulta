@@ -2,9 +2,15 @@
 
 ## 1. Contexto Actual
 
-- **Versión**: v2.8.3
-- **Estado**: Zero-Crash Architecture (Resiliencia Total) - COMPLETADO.
+- **Versión**: v2.8.4
+- **Estado**: UI Restoration (Floating Tooltips & Scroll) - COMPLETADO.
 - **Mando**: Equipo de Desarrollo Élite.
+
+## 38. Actualización v2.8.4 (UI Restoration & Tooltips)
+
+- **WhatsApp Tooltip**: Restaurado y mejorado el tooltip "¿Necesitas asesoría inmediata?" con `backdrop-blur-xl` y `group-hover` cinemático.
+- **Scroll Arrow Glass**: Rediseñado el botón de volver arriba con fondo `glass`, mejorando el contraste sobre las nuevas secciones dinámicas.
+- **Micro-interacciones**: Agregado pulsor de atención al botón de WhatsApp y animación de desplazamiento a la flecha de scroll.
 
 ## 37. Actualización v2.8.3 (Zero-Crash Architecture & Resiliencia)
 

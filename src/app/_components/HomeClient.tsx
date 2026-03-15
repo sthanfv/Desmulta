@@ -9,7 +9,8 @@
  * MANDATO-FILTRO v5.20.0: Lógica modularizada en custom hooks y componentes de sección.
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { cn } from '@/lib/utils';
 import { MeshBackground } from '@/components/ui/MeshBackground';
 import { InstallPWA } from '@/components/pwa/InstallPWA';
 import { SuccessStories } from '@/components/sections/SuccessStories';
@@ -198,25 +199,35 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
       </Dialog>
 
       {/* Floating Elements (WhatsApp & ScrollTop) */}
-      <div className="fixed bottom-8 right-8 z-50 flex flex-col items-end gap-4 group">
+      <div className="fixed bottom-8 right-8 z-50 flex flex-col items-end gap-5 group">
+        {/* Tooltip Proyectado */}
+        <div className="absolute right-full mr-4 top-1/2 -translate-y-1/2 bg-black/80 dark:bg-black/60 backdrop-blur-xl text-white px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] opacity-0 group-hover:opacity-100 transition-all duration-500 translate-x-4 group-hover:translate-x-0 pointer-events-none border border-white/10 whitespace-nowrap shadow-2xl flex items-center gap-2">
+          <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+          ¿Necesitas asesoría inmediata?
+        </div>
+
         <button
           onClick={() => setIsWhatsAppWarningOpen(true)}
-          className="bg-[#25D366] hover:bg-[#20ba59] text-white w-20 h-20 rounded-full flex items-center justify-center shadow-2xl shadow-green-500/30 transition-all hover:scale-110 active:scale-90"
+          className="bg-[#25D366] hover:bg-[#20ba59] text-white w-20 h-20 rounded-full flex items-center justify-center shadow-2xl shadow-green-500/30 transition-all hover:scale-110 active:scale-90 relative z-10"
           aria-label="Abrir chat de WhatsApp para asesoría directa"
         >
           <MessageCircle size={36} fill="currentColor" aria-hidden="true" />
+          {/* Pulsor de Atención */}
+          <div className="absolute inset-0 rounded-full bg-green-500/20 animate-ping -z-10" />
         </button>
+
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           aria-label="Volver arriba"
-          className={`text-primary/70 hover:text-primary w-14 h-14 flex items-center justify-center transition-all duration-500 ${
+          className={cn(
+            'w-14 h-14 rounded-full flex items-center justify-center transition-all duration-700 backdrop-blur-xl border border-white/10 shadow-2xl group/scroll',
             showScrollTop
-              ? 'opacity-100 translate-y-0 scale-100'
+              ? 'opacity-100 translate-y-0 scale-100 bg-white/10 dark:bg-black/40 text-primary'
               : 'opacity-0 translate-y-10 scale-50 pointer-events-none'
-          }`}
+          )}
         >
           <svg
-            className="w-9 h-9 animate-bounce"
+            className="w-8 h-8 group-hover/scroll:-translate-y-1 transition-transform duration-300"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
