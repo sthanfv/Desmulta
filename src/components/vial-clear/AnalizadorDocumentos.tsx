@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { triggerHaptic } from '@/lib/utils/haptics';
+import { isFuzzyMatch } from '@/lib/utils/string-matching';
 
 export interface BoundingBox {
   x0: number;
@@ -40,7 +41,9 @@ export default function AnalizadorDocumentos({
   // ─── Feedback Sensorial (MANDATO-FILTRO) ───
   useEffect(() => {
     if (words.length > 0) {
-      const hasCritical = words.some((w) => w.text.toLowerCase().includes('cobro'));
+      const hasCritical = words.some(
+        (w) => isFuzzyMatch(w.text, 'cobro', 1) || isFuzzyMatch(w.text, 'coactivo', 2)
+      );
       if (hasCritical) {
         triggerHaptic('medium'); // El "click" de realidad al encontrar peligro
       }
@@ -74,7 +77,7 @@ export default function AnalizadorDocumentos({
           <div className="w-full h-24 absolute top-0 animate-scan-forense">
             {/* La línea brillante principal */}
             <div className="w-full h-[2px] bg-primary shadow-[0_0_15px_2px_rgba(34,197,94,0.8)]" />
-            
+
             {/* El rastro de luz (degradado) */}
             <div className="w-full h-full bg-gradient-to-b from-primary/20 to-transparent" />
           </div>
@@ -90,7 +93,10 @@ export default function AnalizadorDocumentos({
           const width = ((word.bbox.x1 - word.bbox.x0) / imgDimensions.width) * 100;
           const height = ((word.bbox.y1 - word.bbox.y0) / imgDimensions.height) * 100;
 
-          const isCritical = word.text.toLowerCase().includes('cobro') || word.text.match(/\d{5,}/);
+          const isCritical =
+            isFuzzyMatch(word.text, 'cobro', 1) ||
+            isFuzzyMatch(word.text, 'coactivo', 2) ||
+            !!word.text.match(/\d{5,}/);
 
           return (
             <div

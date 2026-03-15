@@ -40,6 +40,7 @@ import { useTesseractPrewarm } from '@/hooks/useTesseractPrewarm';
 import { useExpedienteStore } from '@/store/useExpedienteStore';
 import { consolidarExpedienteEnDB } from '@/app/actions/expediente.actions';
 import AnalizadorDocumentos, { type OcrWord } from '@/components/vial-clear/AnalizadorDocumentos';
+import { analyzeLegalCase } from '@/lib/legal/triage-engine';
 
 type ConsultationFormData = z.infer<typeof ConsultationSchema>;
 const FIELD_LABELS: Record<string, string> = {
@@ -317,6 +318,19 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
       triggerHaptic('success');
       setIsSuccess(true);
       localStorage.removeItem('consultation_draft');
+
+      // --- REDIRECCIÓN INTELIGENTE A TELEGRAM (v2.7.1 - Codificación Segura) ---
+      if (isSimitMode) {
+        const triage = analyzeLegalCase(useExpedienteStore.getState().ocrRawText || '');
+        const telegramUrl = new URL('https://t.me/DesmultaOficial');
+        telegramUrl.searchParams.set('text', triage.legalDraft);
+
+        // Esperamos un segundo para que el usuario vea el mensaje de éxito y luego redirigimos
+        setTimeout(() => {
+          window.open(telegramUrl.toString(), '_blank');
+        }, 1500);
+      }
+
       // Cerramos automáticamente tras un breve periodo de éxito
       setTimeout(onSuccess, 3000);
     } catch (e: unknown) {
@@ -465,7 +479,7 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
                     setStep(1);
                   }}
                   className={cn(
-                    'p-6 rounded-[2rem] border-2 border-border/40 transition-all text-left flex flex-col gap-1 active:scale-95',
+                    'p-6 rounded-[2rem] border-2 border-border/40 transition-all text-left flex flex-col gap-1 active:scale-95 pwa-native-feel',
                     opt.bg
                   )}
                   aria-label={`Seleccionar antigüedad: ${opt.label}`}
@@ -522,7 +536,7 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
                                 triggerHaptic('light');
                               }}
                               className={cn(
-                                'flex items-center justify-center h-14 rounded-2xl border-2 transition-all font-bold text-sm',
+                                'flex items-center justify-center h-14 rounded-2xl border-2 transition-all font-bold text-sm pwa-native-feel',
                                 field.value === option
                                   ? 'border-primary bg-primary/5 text-primary shadow-lg shadow-primary/10'
                                   : 'border-border/40 hover:border-border text-muted-foreground'
@@ -558,7 +572,7 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
                             type="button"
                             variant={field.value === option ? 'default' : 'outline'}
                             className={cn(
-                              'h-12 md:h-14 rounded-xl md:rounded-2xl font-bold transition-all px-2 text-xs md:text-sm',
+                              'h-12 md:h-14 rounded-xl md:rounded-2xl font-bold transition-all px-2 text-xs md:text-sm pwa-native-feel',
                               field.value === option
                                 ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-[1.02]'
                                 : 'hover:border-primary/50'
@@ -584,7 +598,7 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
             <Button
               type="button"
               onClick={handleNextStep}
-              className="w-full bg-primary text-primary-foreground font-black py-8 rounded-3xl hover:bg-primary/95 transition-all flex items-center justify-center gap-3 h-20 text-xl shadow-xl shadow-primary/20 active:scale-95 border-none relative overflow-hidden group"
+              className="w-full bg-primary text-primary-foreground font-black py-8 rounded-3xl hover:bg-primary/95 transition-all flex items-center justify-center gap-3 h-20 text-xl shadow-xl shadow-primary/20 active:scale-95 border-none relative overflow-hidden group pwa-native-feel"
             >
               <span
                 aria-hidden="true"
@@ -847,7 +861,11 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
                       onOcrStateChange={(scanning, progress, words) => {
                         setIsScanningOCR(scanning);
                         setOcrProgress(progress);
-                        if (words.length > 0) setDetectedWords(words);
+                        if (words.length > 0) {
+                          setDetectedWords(words);
+                          const rawText = words.map((w) => w.text).join(' ');
+                          useExpedienteStore.getState().setOcrRawText(rawText);
+                        }
                       }}
                       required={isSimitMode}
                       currentUrl={field.value}
@@ -941,9 +959,20 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
               type="submit"
               disabled={isSubmitting || !turnstileToken}
               className={cn(
-                'w-full font-black py-8 rounded-3xl transition-all flex items-center justify-center gap-3 h-20 text-base md:text-xl shadow-xl active:scale-95 border-none relative overflow-hidden',
+                'w-full font-black py-8 rounded-3xl transition-all flex items-center justify-center gap-3 h-20 text-base md:text-xl shadow-xl active:scale-95 border-none relative overflow-hidden pwa-native-feel',
                 turnstileToken
-                  ? 'bg-primary text-primary-foreground shadow-primary/20'
+                  ? (() => {
+                      const triage = analyzeLegalCase(
+                        useExpedienteStore.getState().ocrRawText || ''
+                      );
+                      if (triage.priority === 'ALTA') {
+                        return 'bg-red-600 hover:bg-red-700 animate-pulse text-white shadow-red-500/20';
+                      }
+                      if (triage.priority === 'MEDIA') {
+                        return 'bg-blue-500 hover:bg-blue-600 text-white shadow-blue-500/10';
+                      }
+                      return 'bg-primary text-primary-foreground shadow-primary/20';
+                    })()
                   : 'bg-muted text-muted-foreground grayscale cursor-not-allowed opacity-50'
               )}
             >
@@ -959,7 +988,12 @@ export function ConsultationForm({ onSuccess, mode = 'full' }: ConsultationFormP
                   PROCESANDO...
                 </>
               ) : isSimitMode ? (
-                'ENVIAR CAPTURA SIMIT'
+                (() => {
+                  const triage = analyzeLegalCase(useExpedienteStore.getState().ocrRawText || '');
+                  return triage.priority === 'ALTA'
+                    ? '🚨 ENVIAR DIAGNÓSTICO URGENTE'
+                    : '✈️ ENVIAR A TELEGRAM PARA ESTUDIO';
+                })()
               ) : (
                 '¡FINALIZAR ESTUDIO GRATUITO!'
               )}

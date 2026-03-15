@@ -6,17 +6,17 @@ export const triggerHaptic = (type: 'light' | 'medium' | 'success' | 'error') =>
   if (typeof window !== 'undefined' && window.navigator && window.navigator.vibrate) {
     try {
       switch (type) {
-        case 'light': 
-          window.navigator.vibrate(10); 
+        case 'light':
+          window.navigator.vibrate(10);
           break;
-        case 'medium': 
-          window.navigator.vibrate(30); 
+        case 'medium':
+          window.navigator.vibrate(30);
           break;
-        case 'success': 
-          window.navigator.vibrate([20, 50, 20]); 
+        case 'success':
+          window.navigator.vibrate([20, 50, 20]);
           break;
-        case 'error': 
-          window.navigator.vibrate([100, 30, 100]); 
+        case 'error':
+          window.navigator.vibrate([100, 30, 100]);
           break;
         default:
           window.navigator.vibrate(10);

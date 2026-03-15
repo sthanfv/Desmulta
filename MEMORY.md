@@ -2,9 +2,113 @@
 
 ## 1. Contexto Actual
 
-- **Versión**: v2.5.7
-- **Estado**: Aurora UI & Háptica Avanzada v2.6.3 - DESPLEGADO.
+- **Versión**: v2.8.2
+- **Estado**: Fricción Premium (JurisprudenciaScroll) - COMPLETADO.
 - **Mando**: Equipo de Desarrollo Élite.
+
+## 36. Actualización v2.8.2 (JurisprudenciaScroll & Inercia GSAP)
+
+- **Motor de Jurisprudencia**: Implementado `JurisprudenciaScroll.tsx` con "scrubbing" de 1.5s de inercia, permitiendo que las armas legales se desplacen con suavidad táctil premium.
+- **Inyección Post-Bento**: Integrado en `HomeClient.tsx` para conectar la ingeniería técnica con la base legal de Desmulta.
+- **PWA Feel Consistency**: Aplicada la clase `.pwa-native-feel` a las tarjetas y títulos de la sección para evitar feedback web.
+- **GSAP Context Management**: Implementado `gsap.context()` para asegurar una gestión de memoria impecable en entornos React.
+
+## 35. Actualización v2.8.1 (Blindaje Android + Native Feel)
+
+- **Parche de Tacto Elite**: Implementado el `.pwa-native-feel` exacto solicitado por el usuario en `globals.css`, incluyendo `touch-action: pan-y` para una estabilidad de scroll superior.
+- **Blindaje en ConsultationForm**: Inyectada la clase de tacto nativo en todos los botones y selectores del formulario principal para eliminar destellos web y selecciones accidentales.
+- **Background Persistence**: Forzado `background-color` en el `body` para evitar parpadeos durante el overscroll del navegador.
+- **Sincronización v2.8.1**: Elevación global de versión.
+
+## 34. Actualización v2.8.0 (Evolución PWA & Cinematografía)
+
+- **Text Reveal Cinematográfico**: Implementado motor `LazyMotion` en `Hero.tsx` con la narrativa "Tumbamos tu fotomulta. Legalmente." usando curvas de freno Apple-like.
+- **Tacto Nativo**: Inyectada clase `.pwa-native-feel` en `globals.css` para eliminar destellos táctiles y selecciones accidentales en dispositivos móviles.
+- **Respect Hardware (Safe Areas)**: Refactorizado `layout.tsx` para usar `env(safe-area-inset-*)` respetando muescas (notches) y barras de gestos.
+- **Optimización Anti-Rebote**: Forzado `overscroll-behavior-y: none` para una experiencia de scrolling sólida.
+- **Sincronización v2.8.0**: Elevación global de versión.
+
+## 33. Actualización v2.7.9 (Refinamiento Narrativo)
+
+- **Simplificación de Comunicación**: Refactorizada la narrativa en `BentoDesmulta.tsx` para eliminar términos excesivamente técnicos (Zero-PII, SecurityLogger) y detalles de prescripción específicos (3 años, Art. 159).
+- **Protección de Know-how**: Se cambió "Prescripción" por "Blindaje de Caducidad" para mantener una ventaja estratégica en la comunicación con el cliente.
+- **Sincronización v2.7.9**: Elevación de la versión operativa.
+
+## 32. Actualización v2.7.8 (Hotfix de Estabilidad)
+
+- **Sincronización de Etiquetas**: Corregido error de sintaxis en `SuccessStories.tsx` donde la etiqueta de cierre no coincidía tras la migración a `MagneticCard`.
+- **Extensión de Props**: Añadido soporte para `onClick` en `MagneticCard.tsx` para permitir la apertura de modales desde las tarjetas premium.
+- **Sincronización v2.7.8**: Elevación de la versión de seguridad y operativa.
+
+## 31. Actualización v2.7.7 (Refinamiento de Alta Visibilidad)
+
+- **Hotfix de Contraste**: Se intensificó la opacidad del halo en `MagneticCard.tsx` (del 12% al 20% en light, 60% en dark) para asegurar que la "Mutación Visual" sea perceptible en pantallas de baja saturación.
+- **Borde Dinámico**: Añadido borde iluminado que reacciona al mouse en `MagneticCard.tsx` mejorando la sensación de profundidad.
+- **Consolidación de Componentes**: Reemplazado `TarjetaPremium` por el nuevo motor `MagneticCard` en `SuccessStories.tsx` para impacto visual inmediato.
+- **Sincronización v2.7.7**: Actualización global del versionado.
+
+## 30. Actualización v2.7.6 (Adaptabilidad de la Trinidad)
+
+- **Tokens Adaptables**: Refactorización de `MagneticCard.tsx` y `BentoDesmulta.tsx` para utilizar clases semánticas (`bg-card`, `text-foreground`, `border-border`).
+- **Soporte Light Mode**: El sistema ahora es totalmente funcional y estético tanto en tema oscuro como claro, manteniendo el efecto magnético y el desenfoque de fondo.
+- **Sincronización v2.7.6**: Actualización global del versionado y documentación del Design System adaptativo.
+
+## 29. Actualización v2.7.5 (La Obra Maestra Visual)
+
+- **BentoDesmulta**: Implementado grid asimétrico en `src/components/sections/BentoDesmulta.tsx`. Integración de narrativa legal con componentes elite.
+- **Integración Landing**: Inyectado el Bento Grid en `HomeClient.tsx` tras la sección de metodología.
+- **Mejora Reveal**: Refactorización de `src/components/animations/Reveal.tsx` para soportar `className`, permitiendo su uso en grids complejos.
+- **Sincronización v2.7.5**: Consolidación del versionado en todo el ADN del sistema.
+
+## 28. Actualización v2.7.4 (La Trinidad Visual - Parte I & II)
+
+- **MagneticCard**: Implementado motor táctil en `src/components/ui/MagneticCard.tsx`. Efecto de halo de luz primary dinámico.
+- **Reveal Global**: Implementado optimizador de animación en `src/components/animations/Reveal.tsx` usando `LazyMotion` para un rendimiento de 100 en Lighthouse.
+- **Sincronización v2.7.4**: Actualizado versionado global para reflejar la evolución visual.
+
+## 27. Actualización v2.7.3 (Consolidación Maestra)
+
+- **Single-Source Truth**: Se eliminó el directorio `/docs/` y se fusionó toda su información (Estrategia FinOps, Guía de Mantenimiento, Hoja de Ruta y Estructura de Datos) directamente en `README.md`.
+- **Higiene Documental**: El proyecto ahora solo cuenta con `README.md` (Documentación Técnica y Estratégica) y `MEMORY.md` (Historia y Registro Operativo).
+- **Sincronización v2.7.3**: Elevación de versión global en todos los puntos de contacto.
+
+## 26. Actualización v2.7.2 (La Biblia del Frontend)
+
+- **Documentación Exhaustiva**: Se actualizó el `README.md` con un desglose granular de la arquitectura de cliente, detallando el Diseño (Premium Dark), Animaciones (GSAP/Framer), Lógica de OCR Forense y Persistencia Anti-Crash.
+- **Claridad Técnica**: Detalle de heurísticas legales (C-038/Art 159) y su impacto en la UI dinámina.
+- **Consolidación**: Sincronización de la versión 2.7.2 en todos los activos del sistema.
+
+## 25. Actualización v2.7.1 (Codificación Segura Telegram)
+
+- **URL API Refactor**: Se eliminó `encodeURIComponent` del motor legal para favorecer el uso de la API nativa `URL` en la UI. Esto garantiza una construcción de enlaces "a prueba de balas" con manejo correcto de caracteres especiales y Markdown.
+- **Triage Pura**: El `triage-engine.ts` ahora entrega texto plano y natural, facilitando su reutilización en otros canales (Email, Logs, etc.).
+
+## 24. Actualización v2.7.0 (Consolidación Final)
+
+- **Salida Telegram**: Migrado el flujo de contacto de WhatsApp a Telegram (`https://t.me/DesmultaOficial`).
+- **Heurísticas Avanzadas**: El motor de triage ahora detecta fotomultas (Sentencia C-038) y posible prescripción (Art. 159 CNT) mediante expresiones regulares y lógica difusa.
+- **UI Dinámica**: Soporte para prioridad `MEDIA` (color azul) y mensajes formateados en Markdown para una mejor experiencia del analista en Telegram.
+- **Integración**: Sincronización total entre el OCR crudo, el store de persistencia y el motor de decisión legal.
+
+## 23. Actualización v2.6.6 (Persistencia y Triage Legal)
+
+- **Fase 3 Persistencia**: Store de Zustand actualizado con middleware `persist` y `partialize`. Protección contra pérdida de leads en recargas de RAM (Android/iOS).
+- **Fase 4 Triage Legal**: Implementado `src/lib/legal/triage-engine.ts` para análisis automático de severidad jurídica basado en OCR.
+- **UI Inteligente**: Botón de acción dinámico en `ConsultationForm.tsx` con estilos de urgencia (pulso rojo) y mensajes personalizados para WhatsApp.
+- **Integración OCR**: Sincronización del texto crudo del OCR con el estado global para análisis en tiempo real.
+
+## 22. Actualización v2.6.5 (Motor de Lógica Difusa)
+
+- **Fase 1 Mejoras**: Implementado el Motor de Lógica Difusa (`src/lib/utils/string-matching.ts`) basado en el algoritmo de Distancia de Levenshtein.
+- **Tolerancia OCR**: El sistema ahora permite validar coincidencias de texto con un margen de error configurable, mejorando la precisión tras procesos de Tesseract.js.
+- **Calidad**: Suite de tests unitarios (`src/tests/string-matching.test.ts`) pasando con éxito (3/3).
+
+## 21. Actualización v2.6.4 (Saneamiento de Seguridad y Hoja de Ruta)
+
+- **Auditoría de Seguridad**: Ejecutado `npm audit fix` para mitigar 2 vulnerabilidades de alto riesgo (`undici`).
+- **Planificación Futura**: Creado `docs/PLAN_MEJORAS_FUTURAS.md` definiendo la estrategia de migración a Edge Runtime y optimización FinOps.
+- **Validación de Integridad**: Suite de 36 pruebas unitarias verificada (100% éxito).
+- **Consolidación MANDATO-FILTRO**: Verificada la ofuscación de PII en `SecurityLogger` y saneamiento de dependencias obsoletas.
 
 ## 20. Actualización v2.6.3 (Troubleshooting y Consolidación Aurora)
 
@@ -25,7 +129,7 @@
 - **Verificación Técnica**: Typecheck superado satisfactoriamente.
 
 - **Optimización LCP**: Se añadió la propiedad `priority` a la imagen del Hero mediante la actualización del componente `lightbox.tsx` y su implementación en `Hero.tsx`. Esto elimina la advertencia de Largest Contentful Paint.
-- **Fluidez en Desarrollo**: Se comentó `useTesseractPrewarm()` en `ConsultationForm.tsx` para reducir el consumo de RAM y acelerar el *Fast Refresh* durante las sesiones de diseño.
+- **Fluidez en Desarrollo**: Se comentó `useTesseractPrewarm()` en `ConsultationForm.tsx` para reducir el consumo de RAM y acelerar el _Fast Refresh_ durante las sesiones de diseño.
 - **Suite de Mantenimiento**: Ejecutada con éxito la cadena completa: `format`, `lint`, `typecheck`, `test` y `build`. El proyecto cuenta con 36 pruebas unitarias pasando y un bundle de producción optimizado.
 
 - **Animación Cinemática**: Actualizados keyframes en `tailwind.config.ts` usando `translateY` para mayor suavidad. Implementada animación `scan-fast` (2s) para un efecto de barrido más dinámico en el componente `AnalizadorDocumentos.tsx`.

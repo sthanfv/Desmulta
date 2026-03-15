@@ -41,6 +41,8 @@ import { SuccessCases } from '@/components/sections/SuccessCases';
 import { FAQ } from '@/components/sections/FAQ';
 import { CTA } from '@/components/sections/CTA';
 import { Footer } from '@/components/sections/Footer';
+import { BentoDesmulta } from '@/components/sections/BentoDesmulta';
+import { JurisprudenciaScroll } from '@/components/sections/JurisprudenciaScroll';
 
 import type { ShowcaseConfig, FooterConfig } from '@/lib/site-config';
 
@@ -128,6 +130,9 @@ export default function HomeClient({ showcaseData, footerData, cityContext }: Ho
       <Pillars showcaseData={showcaseData} />
 
       <Methodology />
+
+      <BentoDesmulta />
+      <JurisprudenciaScroll />
 
       <SuccessCases showcaseData={showcaseData} />
 

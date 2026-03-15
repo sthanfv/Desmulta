@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { ShieldCheck, ArrowUp, FileText, ChevronRight } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, LazyMotion, domAnimation, m } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { SavingsCounter } from '@/components/interactive/SavingsCounter';
 import { TarjetaPremium } from '@/components/ui/TarjetaPremium';
@@ -36,24 +36,49 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
             <ShieldCheck size={18} className="animate-pulse" />
             <span className="tracking-wide">Trámite Administrativo Seguro</span>
           </div>
-          <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-[5.5rem] font-black text-white tracking-tighter leading-tight reveal uppercase drop-shadow-2xl">
-            {cityContext ? (
-              <>
-                MULTAS EN <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary/90 to-amber-200 italic drop-shadow-[0_0_30px_rgba(255,191,0,0.4)] pl-2 pr-5">
-                  {cityContext}&nbsp;
-                </span>
-              </>
-            ) : (
-              <>
-                RECUPERE <span className="text-white/90">SU</span> <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary/90 to-amber-200 italic drop-shadow-[0_0_30px_rgba(255,191,0,0.4)] px-4 -ml-4">
-                  Liderazgo
-                </span>
-                <span className="text-white/90"> VIAL</span>
-              </>
-            )}
-          </h1>
+          <LazyMotion features={domAnimation}>
+            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-[5.5rem] font-black text-white tracking-tighter leading-tight uppercase drop-shadow-2xl overflow-hidden pb-4">
+              {cityContext ? (
+                <>
+                  <m.span
+                    className="block"
+                    initial={{ y: '100%', opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                  >
+                    MULTAS EN
+                  </m.span>
+                  <m.span
+                    className="block text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary/90 to-amber-200 italic drop-shadow-[0_0_30px_rgba(255,191,0,0.4)]"
+                    initial={{ y: '100%', opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+                  >
+                    {cityContext}
+                  </m.span>
+                </>
+              ) : (
+                <>
+                  <m.span
+                    className="block"
+                    initial={{ y: '100%', opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                  >
+                    Tumbamos tu fotomulta.
+                  </m.span>
+                  <m.span
+                    className="block text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary/90 to-amber-200 italic drop-shadow-[0_0_30px_rgba(255,191,0,0.4)]"
+                    initial={{ y: '100%', opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+                  >
+                    Legalmente.
+                  </m.span>
+                </>
+              )}
+            </h1>
+          </LazyMotion>
           <p className="text-base sm:text-lg md:text-xl text-white/90 font-medium leading-[1.7] max-w-lg reveal reveal-delay-1 drop-shadow-md">
             {cityContext
               ? `¿Tienes comparendos pendientes en ${cityContext}? Blindaje legal experto para sus fotomultas y trámites administrativos con el tránsito local.`

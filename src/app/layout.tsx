@@ -190,13 +190,18 @@ export default function RootLayout({
           </>
         )}
       </head>
-      <body className={cn(outfit.className, 'antialiased bg-transparent')} suppressHydrationWarning={true}>
+      <body
+        className={cn(outfit.className, 'antialiased bg-transparent')}
+        suppressHydrationWarning={true}
+      >
         <AuroraBackground />
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           <FirebaseClientProvider>
             <ScrollProgressBar />
             <MotorFomo />
-            {children}
+            <main className="min-h-screen pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
+              {children}
+            </main>
             <Toaster />
           </FirebaseClientProvider>
         </ThemeProvider>

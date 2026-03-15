@@ -372,5 +372,41 @@
 }
 
 /* Colores de marca Desmulta */
-.blob-primary { background: #ffbf00; top: 20%; left: 30%; }
-.blob-secondary { background: #45a0f5; bottom: 10%; right: 20%; animation-duration: 30s; }
+.blob-primary {
+  background: #ffbf00;
+  top: 20%;
+  left: 30%;
+}
+.blob-secondary {
+  background: #45a0f5;
+  bottom: 10%;
+  right: 20%;
+  animation-duration: 30s;
+}
+
+/* ─── ADN NATIVO PARA PWA (Android/iOS) v2.8.1 ─── */
+
+/* 1. Evita el efecto de "rebote" (overscroll) al llegar al final de la app */
+body {
+  overscroll-behavior-y: none;
+  /* Mantiene el fondo oscuro nativo si el navegador intenta estirar la vista */
+  background-color: hsl(var(--background));
+  @apply pwa-native-feel;
+}
+
+@layer utilities {
+  .pwa-native-feel {
+    /* 2. Elimina el cuadro azul/gris feo que aparece al tocar un botón en Android */
+    -webkit-tap-highlight-color: transparent;
+
+    /* 3. Evita selecciones de texto UI accidentales */
+    user-select: none;
+    -webkit-user-select: none;
+
+    /* 4. Optimiza el motor de renderizado táctil para que el scroll no se trabe */
+    touch-action: pan-y;
+
+    /* 5. Previene menus contextuales en imagenes/iconos (Capa extra Desmulta) */
+    -webkit-touch-callout: none;
+  }
+}

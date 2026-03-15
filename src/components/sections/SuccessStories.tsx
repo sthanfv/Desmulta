@@ -6,6 +6,7 @@ import { CheckCircle2, MapPin, Calendar, ArrowUpRight, Activity } from 'lucide-r
 import { collection, query, orderBy, limit } from 'firebase/firestore';
 import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { TarjetaPremium } from '../ui/TarjetaPremium';
+import { MagneticCard } from '../ui/MagneticCard';
 
 const FALLBACK_STORIES = [
   {
@@ -225,8 +226,8 @@ export function SuccessStories() {
                 }}
                 className="relative"
               >
-                <TarjetaPremium
-                  className={`p-8 rounded-[2rem] group transition-all duration-300 cursor-pointer active:scale-[0.98] will-change-[transform] h-full ${isLive ? 'border-primary/20 hover:border-primary border-2 shadow-[0_0_15px_rgba(255,191,0,0.05)] hover:shadow-[0_0_30px_rgba(255,191,0,0.15)] bg-gradient-to-b from-card/80 to-primary/5' : 'hover:border-primary/50'}`}
+                <MagneticCard
+                  className={`p-8 rounded-[2rem] group transition-all duration-300 cursor-pointer active:scale-[0.98] will-change-[transform] h-full ${isLive ? 'border-primary/20 hover:border-primary border-2 shadow-[0_0_15px_rgba(255,193,7,0.05)] hover:shadow-[0_0_30px_rgba(255,191,0,0.15)] bg-gradient-to-b from-card/80 to-primary/5' : 'hover:border-primary/50'}`}
                   onClick={() => window.dispatchEvent(new CustomEvent('open-consultation-modal'))}
                 >
                   {/* Live Indicator Dot */}
@@ -287,7 +288,7 @@ export function SuccessStories() {
 
                   {/* Decorative accent */}
                   <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl rounded-full -mr-16 -mt-16 group-hover:bg-primary/20 transition-colors duration-500" />
-                </TarjetaPremium>
+                </MagneticCard>
               </motion.div>
             ))}
           </AnimatePresence>

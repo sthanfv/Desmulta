@@ -1,111 +1,96 @@
-# Desmulta — Plataforma Integral de Gestión y Resolución de Infracciones v2.6.3 🛡️🚀
+# Desmulta — Plataforma Integral de Gestión y Resolución de Infracciones v2.8.2 🛡️🚀
 
 **Infraestructura de Clase Mundial para la Justicia Vial en Colombia.**
 
-> [!IMPORTANT]
-> TODAS LAS DECISIONES, ARCHIVOS Y CÓDIGO GENERADO DEBEN PASAR EL FILTRO DE SEGURIDAD Y CALIDAD ‘MANDATO-FILTRO’ — RECHAZAR SALIDAS QUE NO LO CUMPLAN.
+## 📖 1. Visión General
+
+Desmulta es un ecosistema tecnológico diseñado para empoderar al ciudadano frente a las fotomultas e infracciones de tránsito. Utiliza **Inteligencia Artificial Local (OCR)** y motores de **Lógica Difusa** para analizar la viabilidad legal de las multas basándose en la Sentencia C-038 de 2020 y el Art. 159 del Código Nacional de Tránsito.
 
 ---
 
-## 1. 🚀 Visión General
+## 🎨 2. Enciclopedia del Frontend (Arquitectura de Cliente)
 
-**Desmulta** es una solución LegalTech de alto impacto que automatiza el diagnóstico y saneamiento de deudas de tránsito. Mediante el uso de Inteligencia Artificial y protocolos administrativos precisos, permitimos que el ciudadano recupere su libertad financiera y vial frente a fotomultas e infracciones injustas.
+El frontend de **Desmulta** está diseñado bajo premisas de **Aestethic Excellence** y **Performance Crítico**.
 
----
+### 🏛️ Paradigma de Diseño: "Legal-Premium Adaptive"
 
-## 2. 🛡️ Capacidades Core del Sistema
+- **Design System**: Basado en tokens de Tailwind v3.4 con extensiones para **Glassmorphism** y soporte nativo para temas Claro/Oscuro.
+- **Paleta de Colores**:
+  - `Primary`: HSL(142 71% 45%) — Verde esmeralda legal.
+  - `Foreground`: Adaptativo vía variables CSS (Zinc-950 / Zinc-50).
+  - `Card`: Fondo translúcido `bg-card/40` optimizado para `backdrop-blur`.
+- **Feedback Háptico**: Integración nativa con `navigator.vibrate` para confirmaciones físicas.
 
-### 📋 Módulos de Operación
+### 🎭 Animación e Interactividad
 
-1.  **Estudio de Viabilidad Técnica**: Formulario inteligente de 3 pasos que analiza la probabilidad de éxito (Prescripción, Caducidad o Fallos de Notificación).
-2.  **Captura Rápida SIMIT**: Flujo optimizado para usuarios móviles que permite subir una captura del SIMIT y recibir asesoría instantánea vía WhatsApp.
-3.  **Admin Dashboard v2.6.1**: Centro de comando avanzado con **Glosario Técnico de Gestión**, Kanban con persistencia atómica y visualización táctil optimizada.
+- **BentoDesmulta (Obra Maestra)**: Grid asimétrico que fusiona la narrativa legal con interactividad premium.
+- **MagneticCard (v1.2.0)**: Refinado para Alta Visibilidad en modo claro. Halo intensificado con variables CSS para rendimiento extremo.
+- **Reveal (LazyMotion)**: Optimizador de carga para animaciones cinemáticas "Apple-like".
+- **GSAP (GreenSock)**: Orquestación cinemática y ScrollTrigger.
 
-### 🧠 Inteligencia & CRM
+### 🧠 Módulos Inteligentes
 
-- **OCR Client-Side**: **Tesseract.js** para validar imágenes SIMIT en el dispositivo del usuario (Costo Cero, sin API key). Analiza el texto de la imagen y la rechaza si no contiene indicadores del reporte oficial.
-- **Notificaciones CRM**: Sistema de alertas automáticas vía **Telegram Bot** para el equipo jurídico ante nuevos registros.
-- **Sincronización Dinámica**: Actualización instantánea del frontend mediante _Server Actions_ e invalidación de caché optimizada.
-
-### 🔒 Seguridad de Nivel Bancario (Zero-Trust)
-
-- **Shield Anti-Bot**: Implementación combinada de **Cloudflare Turnstile** (modo Managed) y **Honeypot dinámico**. El botón de envío se mantiene bloqueado hasta la validación exitosa.
-- **Precisión en Rate Limiting**: Límites por IP y UID con retroalimentación exacta en minutos/segundos (consultas) u horas/minutos (imágenes) para evitar abusos.
-- **Privacidad por Diseño**: Motor de auditoría `SecurityLogger` que ofusca datos de identificación (PII) en todos los logs de consola y servidor.
-- **Hardening de Headers**: CSP (Content Security Policy) estricta implementada en el Middleware para mitigar ataques XSS y Clickjacking.
-
----
-
-## 🏗️ 3. Arquitectura Técnica
-
-```mermaid
-graph TD
-    User((Usuario)) --> |Cloudflare/HTTPS| Frontend[Next.js 15 + React 19]
-    Frontend --> |Server Actions| Logic[Business Domain Layer]
-    Logic --> |Admin SDK| Firestore[(Firestore DB)]
-    Logic --> |Uploader| Blob[Vercel Blob Storage]
-    Logic --> |OCR Client-Side| OCR[Tesseract.js en Dispositivo]
-    Logic --> |Alerts| CRM[Telegram Bot API]
-    Frontend -.-> |PWA CacheFirst| SW[Service Worker: spa.traineddata cached]
-```
-
-### Stack Tecnológico
-
-- **Framework**: Next.js 15.5.12 (App Router).
-- **Frontend**: React 19, Tailwind CSS, Framer Motion, GSAP, Radix UI.
-- **Backend**: Server Actions, API Routes (Node.js Runtime estable), Zod Validation.
-- **Base de Datos**: Firebase Firestore (Estrategia Singleton para Admin SDK).
-- **Almacenamiento**: Vercel Blob con sistema de limpieza automática vía Cron.
-- **PWA**: Soporte offline completo con `@ducanh2912/next-pwa` y manifest optimizado.
+- **OCR Forense**: Tesseract.js v7.0 con visualización de Bounding Boxes.
+- **Motor de Triage v1.1.0**: Análisis en tiempo real de `ocrRawText` para priorización de leads.
+- **Persistencia Anti-Crash**: Zustand con middleware `persist` y `partialize` para resiliencia en móviles gama baja.
 
 ---
 
-## 📂 4. Estructura del Proyecto
+## 🏗️ 3. Estructura de Datos & Seguridad (Firestore)
+
+### Entidades Principales
+
+- **Consultation**: Solicitudes iniciales representadas por procesos de viabilidad.
+- **Case**: Expedientes jurídicos administrados con historial de comparendos.
+- **Asset**: Metadatos de evidencias (imágenes/PDFs) almacenados en Vercel Blob.
+
+### Seguridad: Authorization Independence
+
+Este sistema implementa **Independencia de Autorización** mediante la denormalización de `assignedToId` en subcolecciones, permitiendo:
+
+1.  **Reglas Atómicas**: Verificaciones sin necesidad de llamadas `get()` cruzadas.
+2.  **Escalabilidad**: Soporte para transiciones y batches pesados sin degradación de rendimiento.
+
+---
+
+## 🛠️ 4. Guía de Mantenimiento & DevSecOps
+
+### Mantenimiento de Datos
+
+- **Colecciones Seguras (`consultations`, `cases`)**: Se pueden limpiar para reiniciar la operación comercial.
+- **Colección Protegida (`site_config`)**: **No borrar**. Contiene la identidad administrativa del sitio.
+- **Limpieza de Archivos**: Use el botón "LIMPIAR CAPTURAS" en el Admin para depurar archivos `simit_cap_*` en Vercel Blob.
+
+### Estrategia de Seguridad
+
+- **Cloudflare Turnstile**: Bloqueo reactivo de bots.
+- **Security Headers**: Política CSP endurecida (v2.7.3) para prevenir XSS y exfiltración de datos.
+- **Zero-PII Logging**: Ofuscación automática de datos sensibles en consola.
+
+---
+
+## 🚀 5. Hoja de Ruta & FinOps (Mejoras Futuras)
+
+### Próximos Hitos (v3.0.0)
+
+- **Edge Runtime Migration**: Transición de Server Actions críticas a Edge para reducir el TTFB, utilizando la REST API de Firebase para superar limitaciones del Admin SDK.
+- **Web Workers OCR**: Desplazamiento del procesamiento de Tesseract a hilos secundarios para un hilo principal 100% fluido en móviles.
+- **Limpieza Predictiva**: Heurísticas post-OCR para identificar y purgar capturas sin valor legal antes de 24h.
+
+---
+
+## 📂 6. Estructura del Proyecto
 
 ```plaintext
-├── /public           # Assets, manifest PWA y Service Worker v2.4.4
+├── /public           # Assets y Service Worker v2.7.3
 ├── /src
-│   ├── /app          # Rutas, API Endpoints y Server Actions (Capa de Negocio)
+│   ├── /app          # Server Actions y API Routes
 │   ├── /components   # UI Dinámica (Vial-Clear & Primitives)
-│   ├── /lib          # Core Logic: Schemas, Loggers, Env-Check, Security Headers
-│   ├── /services     # Capa de Integración (Firebase, Telegram)
-│   ├── /hooks        # Lógica de estado, OCR (useSIMITValidator, useTesseractPrewarm) y notificaciones
-│   └── /tests        # Suite de pruebas Unitarias y de Integración con Vitest
+│   ├── /lib          # Motores Legales, Seguridad y Utilidades
+│   ├── /store        # Estado Global Persistente (Zustand)
+│   └── /tests        # Suite de Calidad (Vitest)
 ```
 
 ---
 
-## 🛠️ 5. Configuración y Despliegue
-
-### Variables de Entorno Requeridas (.env)
-
-El sistema requiere una configuración estricta para operar bajo el MANDATO-FILTRO:
-
-| Variable                         | Propósito                             |
-| :------------------------------- | :------------------------------------ |
-| `NEXT_PUBLIC_FIREBASE_API_KEY`   | Cliente Firebase Web                  |
-| `FIREBASE_PRIVATE_KEY`           | Autenticación Admin SDK (Server Side) |
-| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Key pública de Cloudflare Turnstile   |
-| `TURNSTILE_SECRET_KEY`           | Validación Server-side de Turnstile   |
-| `TELEGRAM_BOT_TOKEN`             | Token para notificaciones de leads    |
-| `NEXT_PUBLIC_WHATSAPP_NUMBER`    | Canal de contacto principal           |
-
-### Ciclo de Desarrollo
-
-1.  **Instalación**: `npm install`
-2.  **Ejecución**: `npm run dev` (Puerto 9005)
-3.  **Calidad**: `npm run lint` && `npm run typecheck`
-4.  **Pruebas**: `npm run test`
-5.  **Producción**: `npm run build`
-
----
-
-## 📊 6. SEO & Rendimiento
-
-- **Indexación Estratégica**: `sitemap.xml` dinámico para todas las variantes de servicios por ciudad.
-- **Web Vitals**: Optimización de tipografía (Outfit) y carga diferida para garantizar LCP < 1.2s.
-- **Accesibilidad**: Cumplimiento de estándares ARIA en todos los componentes interactivos.
-
----
-
-**Desmulta © 2026 — Ingeniería de Clase Mundial para la Justicia Vial. Hecho por un equipo Senior.**
+**Desmulta - Equipo de Desarrollo Élite (MANDATO-FILTRO)**
