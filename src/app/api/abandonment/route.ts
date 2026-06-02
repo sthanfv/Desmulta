@@ -70,7 +70,11 @@ export async function POST(req: NextRequest) {
             parse_mode: 'Markdown',
             disable_notification: true,
           }),
-        }).catch(() => {});
+        }).then(async (res) => {
+          if (!res.ok) logger.warn('[abandonment] Telegram error', { status: res.status });
+        }).catch((err) => {
+          logger.warn('[abandonment] Telegram fetch falló', { err: err?.message });
+        });
       }
 
       // 2. Activar Web Push (Lead Nurturing) si el usuario ya tiene fcmToken

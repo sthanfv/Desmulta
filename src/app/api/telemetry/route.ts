@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { logger } from '@/lib/logger/security-logger';
 import { isCleanText } from '@/lib/utils/profanity-filter';
-import { getFirestore, Timestamp, FieldValue } from 'firebase-admin/firestore';
+import { rateLimit } from '@/lib/security/rate-limit';
+import { getFirestore } from 'firebase-admin/firestore';
 import { getAdminApp } from '@/lib/firebase-admin';
 
 // Inicializar Firebase Admin SDK via singleton seguro
@@ -54,41 +55,13 @@ export async function POST(req: Request) {
     const safeIpId = ip.replace(/[^a-zA-Z0-9]/g, '_');
 
     // 2. Verificación de Rate Limit contra Firestore
-    const cooldownRef = db.collection('telemetryCooldowns').doc(safeIpId);
-    const cooldownSnap = await cooldownRef.get();
-    const now = Date.now();
-
-    let count = 1;
-    if (cooldownSnap.exists) {
-      const data = cooldownSnap.data();
-      const windowStart = (data?.windowStartAt as Timestamp)?.toMillis() || now;
-      count = data?.count || 0;
-
-      if (now - windowStart > WINDOW_MS) {
-        // Reset window if it expired
-        count = 1;
-        await cooldownRef.set({
-          count: 1,
-          windowStartAt: FieldValue.serverTimestamp(),
-        });
-      } else {
-        if (count >= MAX_REQUESTS_PER_WINDOW) {
-          logger.security('[telemetry] Bloqueo por Rate Limit', { ip });
-          return NextResponse.json(
-            { error: 'Demasiadas solicitudes. Intente más tarde.' },
-            { status: 429 }
-          );
-        }
-        count += 1;
-        // Increment count within the active window
-        await cooldownRef.set({ count }, { merge: true });
-      }
-    } else {
-      // First request ever from this IP
-      await cooldownRef.set({
-        count: 1,
-        windowStartAt: FieldValue.serverTimestamp(),
-      });
+    const rl = await rateLimit(`telemetry:${safeIpId}`, MAX_REQUESTS_PER_WINDOW, WINDOW_MS, 'telemetryCooldowns');
+    if (!rl.success) {
+      logger.security('[telemetry] Bloqueo por Rate Limit', { ip });
+      return NextResponse.json(
+        { error: 'Demasiadas solicitudes. Intente más tarde.' },
+        { status: 429 }
+      );
     }
 
     // 4. Parseo del cuerpo JSON
