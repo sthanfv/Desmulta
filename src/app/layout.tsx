@@ -9,6 +9,7 @@ const geistSans = Geist({
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from 'sonner';
+import { Toaster as ShadcnToaster } from '@/components/ui/toaster';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import Script from 'next/script';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
@@ -184,6 +185,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   },
                 }}
               />
+              <ShadcnToaster />
             </ThemeProvider>
           </FirebaseClientProvider>
         </ErrorBoundary>
