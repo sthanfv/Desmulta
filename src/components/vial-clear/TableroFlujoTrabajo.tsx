@@ -222,7 +222,7 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
       filteredItems.forEach((item) => {
         worksheet.addRow({
           id: item.id,
-          tipo: item.tipo === 'lead' ? 'Petición (Lead)' : 'Caso Legal',
+          tipo: item.tipo === 'lead' ? 'Petición (Consulta)' : 'Caso Legal',
           estado: item.estado,
           placa: item.placa || 'N/A',
           cedula: item.cedula || 'N/A',
@@ -504,7 +504,7 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
           </p>
           <div className="flex items-center justify-center gap-2 text-xs font-semibold">
             <span className="px-2 py-1 bg-blue-500/10 text-blue-500 rounded-full border border-blue-500/20">
-              {totalLeads} leads activos
+              {totalLeads} consultas activas
             </span>
             <span className="px-2 py-1 bg-green-500/10 text-green-500 rounded-full border border-green-500/20">
               {totalCasos} casos
@@ -516,7 +516,7 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
                   : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
               }`}
             >
-              {realtimeNewLeadsCount || 0} leads activos · {urgentes} urgentes
+              {realtimeNewLeadsCount || 0} consultas activas · {urgentes} urgentes
             </span>
           </div>
         </div>

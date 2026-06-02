@@ -37,6 +37,7 @@ async function processCaseEmail(caseId: string, after: any, isNew: boolean, isLe
     const leadData = leadSnap.data();
     const emailCiudadano = leadData?.emailContacto || leadData?.email;
     const trackingUuid = leadData?.trackingUuid;
+    const shortId = leadData?.shortId || caseId.slice(0, 8);
 
     let operatorNote: string | undefined;
     const historyArray = after.history || after.timeline_updates || [];
@@ -132,7 +133,7 @@ async function processCaseEmail(caseId: string, after: any, isNew: boolean, isLe
         await sendCaseUpdateNotification(
           fcmToken,
           after.status,
-          caseId,
+          shortId,
           trackingUuid ? `https://desmulta.online/seguir/${trackingUuid}` : undefined,
           consultationId
         );

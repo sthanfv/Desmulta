@@ -221,7 +221,7 @@ export const onConsultationCreated = onDocumentCreated({
       if (ocrData || leadMultas.length > 0) {
         if (ocrData) {
           message += `\n⚙️ <b>Dictamen Técnico (OCR Actual):</b>\n`;
-          message += `<b>Status:</b> ${ocrData.isViable ? '🟢' : '🔴'} ${ocrData.status}\n`;
+          message += `<b>Estado:</b> ${ocrData.isViable ? '🟢' : '🔴'} ${ocrData.status}\n`;
           if (ocrData.technicalDictum) {
             message += `<i>"${escapeHtml(ocrData.technicalDictum)}"</i>\n\n`;
           }
