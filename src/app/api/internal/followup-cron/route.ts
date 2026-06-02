@@ -65,6 +65,7 @@ export async function GET(req: NextRequest) {
       .collection('consultations')
       .where('status', 'in', ELIGIBLE_STATUSES)
       .where('updatedAt', '<=', cutoffTimestamp)
+      .where('email', '!=', null)
       .limit(MAX_EMAILS_PER_RUN)
       .get();
 

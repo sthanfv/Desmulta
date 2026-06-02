@@ -31,19 +31,37 @@ export const cronLimpieza = onSchedule({
     // Nota: 'processed_callbacks', 'validar_consulta_rl' y 'otp_rate_limits'
     // ahora se limpian automáticamente por políticas de TTL en Firestore.
 
-    // ── 4. Upload rate limits con fecha anterior a hoy ────────────────────
-    // Estos documentos tienen ID con formato: "IP_FECHA" (ej: 186.31.12.44_2025-04-19)
-    // Se vuelven inútiles al día siguiente. Limpiamos los de hace más de 2 días.
-    const twoDaysAgo = new Date(ahora - 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-    const oldUploadRl = await db.collection('upload_rate_limits')
-      .where('fecha', '<', twoDaysAgo)
-      .limit(200).get();
+    // ── 4. Limpieza de Colecciones de Rate Limit y Cooldowns ──────────────
+    const COLLECTIONS_TO_CLEAN = [
+      'upload_rate_limits',
+      'otp_rate_limits',
+      'consultationCooldowns',
+      'telemetryCooldowns',
+      'abandonmentRateLimits',
+      'referidosCooldowns',
+    ];
 
-    if (!oldUploadRl.empty) {
-      const batch4 = db.batch();
-      oldUploadRl.docs.forEach(doc => batch4.delete(doc.ref));
-      await batch4.commit();
-      logger.info(`[cronLimpieza] Eliminados ${oldUploadRl.size} registros de upload_rate_limits.`);
+    const limitTimestamp = admin.firestore.Timestamp.fromMillis(ahora - 2 * 24 * 60 * 60 * 1000);
+    const limitDateStr = new Date(ahora - 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+    for (const colName of COLLECTIONS_TO_CLEAN) {
+      try {
+        let oldDocs;
+        if (colName === 'upload_rate_limits') {
+          oldDocs = await db.collection(colName).where('fecha', '<', limitDateStr).limit(200).get();
+        } else {
+          oldDocs = await db.collection(colName).where('updatedAt', '<', limitTimestamp).limit(200).get();
+        }
+
+        if (!oldDocs.empty) {
+          const batchLimit = db.batch();
+          oldDocs.docs.forEach(doc => batchLimit.delete(doc.ref));
+          await batchLimit.commit();
+          logger.info(`[cronLimpieza] Eliminados ${oldDocs.size} registros de ${colName}.`);
+        }
+      } catch (err) {
+        logger.warn(`[cronLimpieza] Error limpiando la colección ${colName} (posible falta de índice):`, err);
+      }
     }
 
     // ── 5. Imágenes de Vercel Blob: red de seguridad para simit_cap_ ──────
