@@ -50,6 +50,16 @@ export const COLUMNAS_LEADS = [
     color: 'border-slate-700/50 text-slate-500',
     bgIcon: 'bg-slate-800',
   },
+  {
+    id: 'CONVERTIDO',
+    titulo: 'Convertidos a Caso',
+    accion: 'Ver en pestaña Casos',
+    descripcion:
+      'Leads que avanzaron exitosamente a gestión formal. También aparecen en la pestaña Casos Activos.',
+    icono: CheckCircle2,
+    color: 'border-green-500/40 text-green-500',
+    bgIcon: 'bg-green-500/10',
+  },
 ];
 
 export const COLUMNAS_CASOS = [

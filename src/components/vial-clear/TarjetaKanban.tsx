@@ -8,6 +8,7 @@ import {
   Loader2,
   MessageCircle,
   ArrowRightCircle,
+  Clock,
 } from 'lucide-react';
 import Image from 'next/image';
 import { KanbanItem } from './TableroFlujoTrabajo';
@@ -142,6 +143,17 @@ export function TarjetaKanban({
               <span>Avanzar a {siguientePaso.label}</span>
               <ArrowRightCircle className="w-4 h-4" />
             </button>
+          )}
+
+          {data.createdAt && (
+            <p className={`text-[10px] font-bold mt-2 flex items-center gap-1 ${
+              data.estado === 'NUEVO' &&
+              Date.now() - new Date(data.createdAt).getTime() > 7200000
+                ? 'text-red-500 animate-pulse' : 'text-slate-400'
+            }`}>
+              <Clock className="w-3 h-3" />
+              {new Date(data.createdAt).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}
+            </p>
           )}
         </div>
       </div>

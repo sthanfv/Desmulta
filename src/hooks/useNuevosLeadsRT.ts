@@ -38,7 +38,7 @@ export function useNuevosLeadsRT(auth: Auth | null) {
     );
 
     return () => unsub();
-  }, [auth?.currentUser, auth?.currentUser?.uid]);
+  }, [auth?.currentUser?.uid]);
 
   return realtimeNewLeadsCount;
 }

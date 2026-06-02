@@ -353,7 +353,13 @@ export default function AuditPage() {
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [cursor, setCursor] = useState<string | undefined>();
   const [hasMore, setHasMore] = useState(true);
+  const [q, setQ] = useState('');
   const { toast } = useToast();
+
+  const filteredLogs = logs.filter(l =>
+    !q || [l.adminEmail, l.action, l.resource, JSON.stringify(l.details)]
+      .some(s => s?.toLowerCase().includes(q.toLowerCase()))
+  );
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -498,9 +504,18 @@ export default function AuditPage() {
               admins={Array.from(new Set(logs.map((l) => l.adminEmail).filter(Boolean)))}
             />
 
-            <div className="border border-zinc-800/80 rounded-xl overflow-x-auto bg-zinc-900/40 shadow-inner custom-scrollbar">
+            <div className="mb-4">
+              <Input
+                placeholder="Buscar por admin, acción, recurso o detalle..."
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                className="bg-zinc-950 border-zinc-800 text-white w-full md:max-w-md focus-visible:ring-red-500/50"
+              />
+            </div>
+
+            <div className="border border-zinc-800/80 rounded-xl overflow-auto bg-zinc-900/40 shadow-inner custom-scrollbar relative max-h-[65vh]">
               <table className="w-full text-sm text-left min-w-full">
-                <thead className="bg-zinc-900/80 border-b border-zinc-800/80 text-zinc-400">
+                <thead className="sticky top-0 z-10 bg-zinc-900/95 backdrop-blur-sm shadow-sm border-b border-zinc-800/80 text-zinc-400">
                   <tr>
                     <th className="px-5 py-4 font-semibold tracking-wide whitespace-nowrap">
                       Fecha
@@ -521,7 +536,7 @@ export default function AuditPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-800/40">
-                  {logs.map((log) => (
+                  {filteredLogs.map((log) => (
                     <tr key={log.id} className="hover:bg-zinc-800/40 transition-colors group">
                       <td className="px-5 py-4 text-zinc-300 whitespace-nowrap font-medium">
                         {new Date(log.timestamp as unknown as string).toLocaleString('es-CO', {
@@ -569,7 +584,7 @@ export default function AuditPage() {
                       </td>
                     </tr>
                   ))}
-                  {logs.length === 0 && !loading && (
+                  {filteredLogs.length === 0 && !loading && (
                     <tr>
                       <td colSpan={6} className="px-4 py-8 text-center text-zinc-500">
                         No hay registros de auditoría disponibles.
