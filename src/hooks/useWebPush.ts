@@ -39,7 +39,16 @@ export function useWebPush() {
         isSupported().then(async (soportado) => {
           if (!soportado) return;
           try {
-            const sw = await navigator.serviceWorker.ready;
+            // Registrar explícitamente firebase-messaging-sw.js ANTES de obtener el token
+            let swReg: ServiceWorkerRegistration | null = null;
+            try {
+              swReg = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
+                updateViaCache: 'none',
+                scope: '/',
+              });
+            } catch { /* sw.js Workbox ya registrado - usar ese */ }
+
+            const sw = swReg ?? await navigator.serviceWorker.ready;
             const messaging = getMessaging(app);
             const vapidKey = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
 
@@ -138,7 +147,16 @@ export function useWebPush() {
           throw new Error('Service Workers no soportados en este navegador.');
         }
 
-        const registration = await navigator.serviceWorker.ready;
+        // Registrar explícitamente firebase-messaging-sw.js ANTES de obtener el token
+        let swReg: ServiceWorkerRegistration | null = null;
+        try {
+          swReg = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
+            updateViaCache: 'none',
+            scope: '/',
+          });
+        } catch { /* sw.js Workbox ya registrado - usar ese */ }
+
+        const registration = swReg ?? await navigator.serviceWorker.ready;
 
         const messaging = getMessaging(app);
 

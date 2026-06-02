@@ -7,6 +7,7 @@ import { logger } from '@/lib/logger/security-logger';
 import { headers, cookies } from 'next/headers';
 import { SignJWT, jwtVerify } from 'jose';
 import { timingSafeEqual } from 'crypto';
+import { rateLimit } from '@/lib/security/rate-limit';
 
 export interface AdminUser {
   uid: string;
@@ -101,6 +102,14 @@ export async function logExportAction(payload: {
 // ============================================================================
 
 export async function verifyGodMode(password: string) {
+  const headersList = await headers();
+  const ip = headersList.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const rl = await rateLimit(`god-mode-auth:${ip}`, 3, 30 * 60 * 1000);
+  if (!rl.success) {
+    logger.security('[GodMode] Bloqueado por rate limit', { ip });
+    return { success: false, error: 'Demasiados intentos. Espera 30 minutos.' };
+  }
+
   const expectedPassword = process.env.SUPERADMIN_AUDIT_PASSWORD;
   if (!expectedPassword) {
     logger.error('CRITICAL: SUPERADMIN_AUDIT_PASSWORD no configurada.');
@@ -146,8 +155,11 @@ export async function checkGodModeSession() {
   if (!token) return false;
 
   try {
-    const jwtSecret =
-      process.env.GOD_MODE_JWT_SECRET || 'desmulta_god_mode_secret_development_only_123';
+    const jwtSecret = process.env.GOD_MODE_JWT_SECRET;
+    if (!jwtSecret) {
+      logger.error('CRITICAL: GOD_MODE_JWT_SECRET no configurada');
+      return false;
+    }
     const secret = new TextEncoder().encode(jwtSecret);
     await jwtVerify(token.value, secret);
     return true;

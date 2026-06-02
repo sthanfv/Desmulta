@@ -32,7 +32,7 @@ test.describe('God Mode Easter Egg', () => {
 
     // 3. Ingresar la contraseña maestra
     const passwordInput = page.getByPlaceholder('••••••••••••');
-    await passwordInput.fill('9316');
+    await passwordInput.fill(process.env.TEST_GOD_MODE_PIN || '');
     await page.getByRole('button', { name: /Desbloquear Panel/i }).click();
 
     // 4. Verificar que se renderiza el Audit Log (Tabla)
