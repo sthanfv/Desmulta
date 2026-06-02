@@ -1,0 +1,37 @@
+[
+  {
+    "slug": "fotomultas",
+    "nombre": "Fotomultas",
+    "titulo_seo": "Cómo Impugnar y Tumbar Fotomultas",
+    "descripcion_seo": "Aprende cómo apelar y eliminar fotomultas electrónicas. Conoce tus derechos y los errores comunes de las secretarías de tránsito en la notificación.",
+    "contexto_legal": "La Corte Constitucional (Sentencia C-038 de 2020) determinó que las fotomultas no pueden cobrarse al propietario del vehículo si no se identifica plenamente al conductor infractor. Muchas secretarías omiten este paso vital, lo que hace el comparendo altamente apelable."
+  },
+  {
+    "slug": "soat-vencido",
+    "nombre": "SOAT Vencido",
+    "titulo_seo": "Multas por SOAT Vencido detectado por Cámaras",
+    "descripcion_seo": "Defensa legal contra comparendos por SOAT vencido detectado por medios electrónicos. Descubre cómo prescriben y cómo defenderte.",
+    "contexto_legal": "Aunque tener el SOAT vigente es obligatorio, las fotodetecciones por este concepto deben cumplir los mismos requisitos de notificación personal y temporalidad (entregarse a la empresa de correos en 3 días hábiles). Un retraso en la guía de envío puede anular el cobro."
+  },
+  {
+    "slug": "pico-y-placa",
+    "nombre": "Pico y Placa",
+    "titulo_seo": "Exoneración de Multas por Pico y Placa",
+    "descripcion_seo": "Qué hacer si recibiste un comparendo por transitar en Pico y Placa. Estrategias legales para impugnación y prescripción.",
+    "contexto_legal": "Muchos comparendos por Pico y Placa se emiten a través de cámaras salvavidas que no identifican a la persona al volante. Además, si la señalización en la vía no es clara o la zona limitante no está bien demarcada en el acto, el comparendo es disputable."
+  },
+  {
+    "slug": "exceso-de-velocidad",
+    "nombre": "Exceso de Velocidad",
+    "titulo_seo": "Apelar Comparendos por Exceso de Velocidad",
+    "descripcion_seo": "Guía para impugnar multas por exceso de velocidad detectadas por radares. Argumentos legales sobre calibración y notificación.",
+    "contexto_legal": "Todo radar o cámara de velocidad debe contar con un certificado de calibración vigente emitido por una entidad competente y estar señalizado al menos 500 metros antes. Si la secretaría no anexa estas pruebas, la infracción carece de validez técnica."
+  },
+  {
+    "slug": "embargos",
+    "nombre": "Embargos de Cuentas",
+    "titulo_seo": "Levantar Embargos por Multas de Tránsito",
+    "descripcion_seo": "Soluciones legales inmediatas para levantar embargos de cuentas bancarias y salarios originados por comparendos y cobros coactivos.",
+    "contexto_legal": "El cobro coactivo y los embargos a menudo se inician sobre multas que ya han prescrito legalmente (más de 3 a 5 años sin mandamiento de pago debidamente notificado). Un análisis rápido permite solicitar el desembargo por caducidad o prescripción del comparendo."
+  }
+]

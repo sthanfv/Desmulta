@@ -1,0 +1,247 @@
+[
+  {
+    "slug": "bogota",
+    "nombre": "Bogotá",
+    "departamento": "Cundinamarca",
+    "entidadTransito": "Secretaría Distrital de Movilidad de Bogotá",
+    "textoContexto": "La capital concentra el mayor volumen de cámaras salvavidas del país, generando miles de comparendos automáticos diariamente, especialmente en corredores como la Autopista Norte y la Avenida Boyacá."
+  },
+  {
+    "slug": "medellin",
+    "nombre": "Medellín",
+    "departamento": "Antioquia",
+    "entidadTransito": "Secretaría de Movilidad de Medellín",
+    "textoContexto": "Con un sofisticado sistema de fotodetección en las principales vías y el sistema inteligente del Valle de Aburrá, las notificaciones por exceso de velocidad y pico y placa son las más comunes."
+  },
+  {
+    "slug": "cali",
+    "nombre": "Cali",
+    "departamento": "Valle del Cauca",
+    "entidadTransito": "Secretaría de Movilidad de Cali",
+    "textoContexto": "La Sultana del Valle mantiene estrictos controles electrónicos. Muchos conductores enfrentan cobros coactivos por notificaciones indebidas en direcciones desactualizadas en el RUNT."
+  },
+  {
+    "slug": "barranquilla",
+    "nombre": "Barranquilla",
+    "departamento": "Atlántico",
+    "entidadTransito": "Secretaría de Tránsito y Seguridad Vial de Barranquilla",
+    "textoContexto": "En la vía al Mar y las principales avenidas de la ciudad operan radares de velocidad que frecuentemente emiten comparendos susceptibles a prescripción legal."
+  },
+  {
+    "slug": "cartagena",
+    "nombre": "Cartagena",
+    "departamento": "Bolívar",
+    "entidadTransito": "Departamento Administrativo de Tránsito y Transporte (DATT)",
+    "textoContexto": "El DATT gestiona las infracciones locales. Es vital verificar si los tiempos procesales de la entidad superan los tres años reglamentarios para solicitar la caducidad."
+  },
+  {
+    "slug": "bucaramanga",
+    "nombre": "Bucaramanga",
+    "departamento": "Santander",
+    "entidadTransito": "Dirección de Tránsito de Bucaramanga",
+    "textoContexto": "La Ciudad Bonita y su área metropolitana han integrado tecnologías de control vial, haciendo fundamental la validación del debido proceso en la notificación de los comparendos."
+  },
+  {
+    "slug": "pereira",
+    "nombre": "Pereira",
+    "departamento": "Risaralda",
+    "entidadTransito": "Instituto de Movilidad de Pereira",
+    "textoContexto": "Las infracciones registradas en la capital de Risaralda muchas veces carecen de la identificación plena del conductor, un argumento sólido para la impugnación."
+  },
+  {
+    "slug": "manizales",
+    "nombre": "Manizales",
+    "departamento": "Caldas",
+    "entidadTransito": "Secretaría de Movilidad de Manizales",
+    "textoContexto": "Debido a su topografía, los controles de velocidad y accidentalidad son estrictos, pero toda infracción electrónica debe respetar el principio de solidaridad establecido por la Corte Constitucional."
+  },
+  {
+    "slug": "armenia",
+    "nombre": "Armenia",
+    "departamento": "Quindío",
+    "entidadTransito": "Secretaría de Tránsito y Transporte de Armenia (SETTA)",
+    "textoContexto": "En el Eje Cafetero, la SETTA regula el tráfico y emite órdenes de comparendo que nuestros especialistas pueden analizar para verificar vencimientos de términos."
+  },
+  {
+    "slug": "cucuta",
+    "nombre": "Cúcuta",
+    "departamento": "Norte de Santander",
+    "entidadTransito": "Secretaría de Tránsito y Transporte de Cúcuta",
+    "textoContexto": "Dada la dinámica fronteriza, los controles vehiculares son constantes. Miles de multas antiguas en esta región ya cumplen con los requisitos legales para ser prescritas."
+  },
+  {
+    "slug": "ibague",
+    "nombre": "Ibagué",
+    "departamento": "Tolima",
+    "entidadTransito": "Secretaría de Movilidad de Ibagué",
+    "textoContexto": "La capital musical cuenta con controles electrónicos en sus vías de acceso rápido. Verificamos que las autoridades locales hayan cumplido con la entrega a través de empresas de mensajería."
+  },
+  {
+    "slug": "santa-marta",
+    "nombre": "Santa Marta",
+    "departamento": "Magdalena",
+    "entidadTransito": "Secretaría de Movilidad Multimodal y Sostenible de Santa Marta",
+    "textoContexto": "Las infracciones turísticas y locales en la Perla de América a menudo se acumulan y entran a cobro coactivo sin agotar las vías previas del debido proceso legal."
+  },
+  {
+    "slug": "villavicencio",
+    "nombre": "Villavicencio",
+    "departamento": "Meta",
+    "entidadTransito": "Secretaría de Movilidad de Villavicencio",
+    "textoContexto": "En la puerta del Llano, las sanciones automáticas han aumentado. Ayudamos a los llaneros a defender su patrimonio eliminando comparendos viciados."
+  },
+  {
+    "slug": "valledupar",
+    "nombre": "Valledupar",
+    "departamento": "Cesar",
+    "entidadTransito": "Secretaría de Tránsito y Transporte de Valledupar",
+    "textoContexto": "Para las multas originadas en el Valle de Upar, nuestro equipo aplica las sentencias más recientes que anulan la presunción de culpabilidad automática del propietario del vehículo."
+  },
+  {
+    "slug": "monteria",
+    "nombre": "Montería",
+    "departamento": "Córdoba",
+    "entidadTransito": "Secretaría de Tránsito de Montería",
+    "textoContexto": "Las fotodetecciones en esta zona frecuentemente carecen de la calibración certificada de los radares, argumento que utilizamos en nuestra defensa jurídica."
+  },
+  {
+    "slug": "pasto",
+    "nombre": "Pasto",
+    "departamento": "Nariño",
+    "entidadTransito": "Secretaría de Tránsito y Transporte de Pasto",
+    "textoContexto": "Analizamos expedientes en el sur del país para garantizar que la Secretaría de Tránsito no exija cobros sobre multas legalmente vencidas o prescritas."
+  },
+  {
+    "slug": "popayan",
+    "nombre": "Popayán",
+    "departamento": "Cauca",
+    "entidadTransito": "Secretaría de Tránsito y Transporte de Popayán",
+    "textoContexto": "Si le ha sido notificado un mandamiento de pago por deudas de tránsito antiguas en Popayán, nuestro análisis confirmará si el cobro conserva aún vigencia legal."
+  },
+  {
+    "slug": "floridablanca",
+    "nombre": "Floridablanca",
+    "departamento": "Santander",
+    "entidadTransito": "Dirección de Tránsito y Transporte de Floridablanca (DTTF)",
+    "textoContexto": "Particularmente conocida por su alta densidad de cámaras de detección, la DTTF genera comparendos donde la debida notificación a tiempo suele fallar constantemente."
+  },
+  {
+    "slug": "palmira",
+    "nombre": "Palmira",
+    "departamento": "Valle del Cauca",
+    "entidadTransito": "Secretaría de Movilidad de Palmira",
+    "textoContexto": "Las vías nacionales y locales que atraviesan la Villa de las Palmas son un foco constante de detección. Su defensa vial exige la aplicación estricta de la jurisprudencia de la Corte."
+  },
+  {
+    "slug": "envigado",
+    "nombre": "Envigado",
+    "departamento": "Antioquia",
+    "entidadTransito": "Secretaría de Movilidad de Envigado",
+    "textoContexto": "Parte fundamental del sur del Valle de Aburrá, sus sistemas de captación electrónica deben cumplir estrictos tiempos normativos para que el cobro sea exigible legalmente."
+  },
+  {
+    "slug": "tunja",
+    "nombre": "Tunja",
+    "departamento": "Boyacá",
+    "entidadTransito": "Secretaría de Tránsito y Transporte de Tunja",
+    "textoContexto": "El tránsito en la capital boyacense cuenta con rigurosas normativas que, en muchas ocasiones, no superan el escrutinio de los tiempos legales de notificación."
+  },
+  {
+    "slug": "neiva",
+    "nombre": "Neiva",
+    "departamento": "Huila",
+    "entidadTransito": "Secretaría de Movilidad de Neiva",
+    "textoContexto": "Verificamos los comparendos electrónicos impuestos en Neiva para garantizar que la caducidad y prescripción de tres años se cumpla a cabalidad."
+  },
+  {
+    "slug": "riohacha",
+    "nombre": "Riohacha",
+    "departamento": "La Guajira",
+    "entidadTransito": "Instituto de Tránsito de Riohacha (INSTRAMD)",
+    "textoContexto": "Nuestros especialistas jurídicos revisan las multas emitidas en La Guajira, donde la falta de notificación personal suele invalidar el proceso de cobro."
+  },
+  {
+    "slug": "sincelejo",
+    "nombre": "Sincelejo",
+    "departamento": "Sucre",
+    "entidadTransito": "Secretaría de Tránsito y Transporte de Sincelejo",
+    "textoContexto": "Ayudamos a los ciudadanos de Sincelejo a defender sus derechos frente a fotodetecciones que no identifican plenamente al infractor, basándonos en fallos constitucionales."
+  },
+  {
+    "slug": "florencia",
+    "nombre": "Florencia",
+    "departamento": "Caquetá",
+    "entidadTransito": "Secretaría de Transporte y Movilidad de Florencia",
+    "textoContexto": "Si usted tiene un proceso de cobro coactivo por multas en Florencia, analizamos su historial para aplicar la exoneración de pagos injustificados."
+  },
+  {
+    "slug": "quibdo",
+    "nombre": "Quibdó",
+    "departamento": "Chocó",
+    "entidadTransito": "Secretaría de Movilidad y Tránsito de Quibdó",
+    "textoContexto": "Nuestra asesoría permite a los conductores del Chocó exigir el cumplimiento del debido proceso en cada multa impuesta de manera irregular."
+  },
+  {
+    "slug": "yopal",
+    "nombre": "Yopal",
+    "departamento": "Casanare",
+    "entidadTransito": "Secretaría de Tránsito y Transporte de Yopal",
+    "textoContexto": "Muchos conductores en la capital del Casanare son víctimas de notificaciones fuera de término. Reclamamos legalmente sus derechos patrimoniales."
+  },
+  {
+    "slug": "arauca",
+    "nombre": "Arauca",
+    "departamento": "Arauca",
+    "entidadTransito": "Instituto de Tránsito y Transporte de Arauca (ITDAR)",
+    "textoContexto": "El ITDAR gestiona el tránsito local. Defendemos a los conductores araucanos de fotomultas que violan la presunción de inocencia."
+  },
+  {
+    "slug": "leticia",
+    "nombre": "Leticia",
+    "departamento": "Amazonas",
+    "entidadTransito": "Secretaría de Tránsito y Transporte de Leticia",
+    "textoContexto": "Atendemos los procesos contravencionales en Leticia, certificando la nulidad de aquellas infracciones que no cumplen las normativas nacionales de tránsito."
+  },
+  {
+    "slug": "san-jose-del-guaviare",
+    "nombre": "San José del Guaviare",
+    "departamento": "Guaviare",
+    "entidadTransito": "Secretaría de Tránsito y Transporte del Guaviare",
+    "textoContexto": "Revisamos los expedientes físicos y digitales en Guaviare para frenar cobros ilegales a través del mecanismo de caducidad y prescripción."
+  },
+  {
+    "slug": "mocoa",
+    "nombre": "Mocoa",
+    "departamento": "Putumayo",
+    "entidadTransito": "Instituto de Tránsito del Putumayo",
+    "textoContexto": "Protegemos a los ciudadanos de Mocoa frente a la expedición de fotomultas que carecen del soporte técnico y de calibración exigido por el Ministerio."
+  },
+  {
+    "slug": "puerto-carreno",
+    "nombre": "Puerto Carreño",
+    "departamento": "Vichada",
+    "entidadTransito": "Secretaría de Tránsito y Transporte de Vichada",
+    "textoContexto": "Nuestros expertos especializados en tránsito asumen su defensa ante el Tránsito de Vichada, limpiando su historial de infracciones viciadas."
+  },
+  {
+    "slug": "inirida",
+    "nombre": "Inírida",
+    "departamento": "Guainía",
+    "entidadTransito": "Secretaría de Tránsito y Transporte de Inírida",
+    "textoContexto": "Garantizamos que toda sanción impuesta en Guainía respete el principio constitucional de identificación previa del infractor."
+  },
+  {
+    "slug": "mitu",
+    "nombre": "Mitú",
+    "departamento": "Vaupés",
+    "entidadTransito": "Secretaría de Tránsito y Transporte de Mitú",
+    "textoContexto": "Brindamos soporte legal para invalidar cobros originados en Mitú que excedan los límites temporales establecidos por la ley de tránsito."
+  },
+  {
+    "slug": "san-andres",
+    "nombre": "San Andrés",
+    "departamento": "San Andrés y Providencia",
+    "entidadTransito": "Secretaría de Movilidad de San Andrés Isla",
+    "textoContexto": "Asesoramos en el saneamiento de multas para residentes y turistas del archipiélago, exigiendo que todo proceso coactivo esté fundamentado legalmente."
+  }
+]

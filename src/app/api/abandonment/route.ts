@@ -1,0 +1,104 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
+import { rateLimit } from '@/lib/security/rate-limit';
+import { logger } from '@/lib/logger/security-logger';
+
+// Configurar el entorno de ejecución (Node.js para soportar firebase-admin)
+// export const runtime = 'nodejs';
+
+const AbandonmentSchema = z.object({
+  contacto: z
+    .string()
+    .regex(/^3[0-9]{9}$/, 'Número de teléfono inválido')
+    .nullable()
+    .optional(),
+  email: z.string().email().nullable().optional(),
+  accion: z.enum(['ping', 'clear']),
+  fcmToken: z.string().nullable().optional(),
+});
+
+export async function POST(req: NextRequest) {
+  try {
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown';
+
+    // 🛡️ Rate Limit: máximo 10 intentos por minuto por IP
+    const { success, isError } = await rateLimit(ip, 10, 1 * 60 * 1000, 'abandonmentRateLimits');
+
+    if (!success) {
+      if (isError) {
+        logger.error(`[SECURITY] Rate Limit falló por error de infraestructura para: ${ip}`);
+        return NextResponse.json(
+          { error: 'Servicio temporalmente no disponible.' },
+          { status: 500 }
+        );
+      }
+      return NextResponse.json(
+        { error: 'Demasiadas solicitudes. Intente más tarde.' },
+        { status: 429 }
+      );
+    }
+
+    const body = await req.json();
+    const parsed = AbandonmentSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Payload inválido' }, { status: 400 });
+    }
+
+    const { contacto, email, accion, fcmToken } = parsed.data;
+
+    // Si no hay información útil, no hacemos nada
+    if (!contacto && !email && !fcmToken) {
+      return NextResponse.json({ success: true });
+    }
+
+    if (accion === 'ping') {
+      // 1. Notificar vía Telegram al operador (si hay datos de contacto)
+      const botToken = process.env.TELEGRAM_BOT_TOKEN;
+      const chatId = process.env.TELEGRAM_CHAT_ID;
+
+      if (botToken && chatId && (contacto || email)) {
+        const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+        const text = `⚠️ *Lead Parcial Capturado* ⚠️\n\nEl usuario ingresó datos pero no ha finalizado:\n- 📞 *Contacto:* ${contacto || 'N/A'}\n- 📧 *Email:* ${email || 'N/A'}\n\n_Atención: si no recibes el form completo en unos minutos, es un abandono._`;
+
+        fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text,
+            parse_mode: 'Markdown',
+            disable_notification: true,
+          }),
+        }).catch(() => {});
+      }
+
+      // 2. Activar Web Push (Lead Nurturing) si el usuario ya tiene fcmToken
+      if (fcmToken) {
+        try {
+          const { getAdminApp } = await import('@/lib/firebase-admin');
+          const { getMessaging } = await import('firebase-admin/messaging');
+          const app = getAdminApp();
+
+          await getMessaging(app).send({
+            token: fcmToken,
+            notification: {
+              title: '⏳ ¡No pierdas tu progreso!',
+              body: 'Notamos que no finalizaste tu consulta. Termina de enviarnos tus datos para evaluar tus multas gratuitamente.',
+            },
+            data: {
+              action: 'resume_consultation',
+              url: '/consultar',
+            },
+          });
+        } catch (pushErr) {
+          console.error('[Abandonment] Error sending Web Push:', pushErr);
+        }
+      }
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (_error) {
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "placeholderImages": [
+    {
+      "id": "desmulta-antes",
+      "description": "A representation of a traffic fine system showing a large debt amount.",
+      "imageUrl": "/hero-bg.avif",
+      "imageHint": "debt screen"
+    },
+    {
+      "id": "desmulta-despues",
+      "description": "A representation of a traffic fine system showing a zero balance or 'paid in full' status.",
+      "imageUrl": "/oficina.avif",
+      "imageHint": "clear screen"
+    }
+  ]
+}

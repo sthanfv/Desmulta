@@ -1,0 +1,24 @@
+# 🚩 Desmulta — Documentación Centralizada
+
+> [!IMPORTANT]
+> **PARA AGENTES DE IA Y DESARROLLADORES:**
+> Toda la documentación técnica, memoria del proyecto y guías de arquitectura se encuentran unificadas en la carpeta `/docs`.
+
+---
+
+## 🔗 Enlaces Rápidos
+
+- 📘 [**Documentación Principal (README)**](docs/README.md)
+- 🏗️ [**Arquitectura Técnica**](docs/ARCHITECTURE.md)
+- ⚖️ [**Marco Legal y Privacidad**](docs/LEGAL.md)
+- 🧠 [**Memoria de Sesiones (MEMORY.md)**](docs/MEMORY.md)
+
+---
+
+## 🚀 Inicio Rápido
+```bash
+npm ci
+npm run dev
+```
+
+*Desmulta v8.10.0*

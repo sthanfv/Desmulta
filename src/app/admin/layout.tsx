@@ -1,0 +1,145 @@
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useUser, useAuth } from '@/firebase';
+import { Button } from '@/components/ui/button';
+import { Loader2, RefreshCw } from 'lucide-react';
+import { OfflineBanner } from '@/components/ui/offline-banner';
+
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+  const auth = useAuth();
+  const { user, isUserLoading } = useUser();
+
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [isAdminLoading, setIsAdminLoading] = useState<boolean>(true);
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+
+  // 🛡️ MANDATO-FILTRO: Vigía de Sesión (Activa la redirección en cliente)
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      window.location.href = '/acceso-panel';
+    }
+  }, [user, isUserLoading]);
+
+  // Verificar Custom Claims (admin: true) sin leer Firestore
+  useEffect(() => {
+    let mounted = true;
+    if (user) {
+      user
+        .getIdTokenResult()
+        .then((idTokenResult) => {
+          if (mounted) {
+            setIsAdmin(!!idTokenResult.claims.admin);
+            setIsAdminLoading(false);
+          }
+        })
+        .catch((e) => {
+          console.error('Error verificando permisos de administrador', e);
+          if (mounted) {
+            setIsAdmin(false);
+            setIsAdminLoading(false);
+          }
+        });
+    } else if (!isUserLoading) {
+      if (mounted) {
+        setIsAdmin(false);
+        setIsAdminLoading(false);
+      }
+    }
+    return () => {
+      mounted = false;
+    };
+  }, [user, isUserLoading]);
+
+  const handleRefreshPermissions = async () => {
+    if (!user) return;
+    setIsRefreshing(true);
+    try {
+      const idTokenResult = await user.getIdTokenResult(true); // true = force refresh
+      setIsAdmin(!!idTokenResult.claims.admin);
+      if (!!idTokenResult.claims.admin) {
+        // Recargar la página para que el middleware de Next.js obtenga la cookie actualizada si es necesario
+        window.location.reload();
+      }
+    } catch (e) {
+      console.error('Error forzando refresco de token', e);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  const isLoading = isUserLoading || isAdminLoading;
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  // Si no hay usuario, el middleware o el cliente ya deberían haberlo redirigido,
+  // pero por precaución devolvemos un estado vacío mientras ocurre la redirección.
+  if (!user) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="flex h-screen w-full flex-col items-center justify-center gap-6 bg-background p-4 text-center">
+        <h1 className="text-3xl font-bold text-destructive">Acceso Denegado</h1>
+        <p className="text-muted-foreground">
+          La cuenta con la que ha iniciado sesión no tiene permisos de administrador.
+        </p>
+        <p className="text-sm text-zinc-500 max-w-md">
+          Si le acaban de otorgar permisos desde el panel principal (God Mode), necesita refrescar
+          sus credenciales locales para que tengan efecto.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 mt-4">
+          <Button
+            variant="default"
+            onClick={handleRefreshPermissions}
+            disabled={isRefreshing}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white"
+          >
+            {isRefreshing ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <RefreshCw className="w-4 h-4 mr-2" />
+            )}
+            Refrescar Permisos
+          </Button>
+
+          <Button
+            variant="outline"
+            onClick={async () => {
+              await fetch('/api/auth/session', { method: 'DELETE' });
+              if (auth) {
+                await auth.signOut();
+              }
+              window.location.href = '/acceso-panel';
+            }}
+          >
+            Cerrar Sesión
+          </Button>
+          <Button variant="ghost" onClick={() => router.push('/')}>
+            Volver al Inicio
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <OfflineBanner />
+      {children}
+    </>
+  );
+}

@@ -1,0 +1,132 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null && request.auth.token.admin == true;
+    }
+
+    match /admins/{userId} {
+      allow read: if request.auth.uid == userId || isAdmin();
+      allow write: if false;
+    }
+
+    match /site_config/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /success_cases/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /success_stories/{docId} {
+      allow read, write: if false;
+    }
+
+    match /consultations/{consultationId} {
+      allow read, write: if isAdmin();
+
+      // ─── FIX CRÍTICO: Subcolección /private era accesible sin regla específica ───
+      // Sin esta regla, Firestore aplica el comportamiento "denegar todo" por defecto
+      // en reglas estrictas, PERO si hay alguna regla de comodín ({document=**})
+      // podría filtrarse. Añadirla explícitamente es la práctica correcta.
+      //
+      // La subcolección /private/push contiene el FCM token del usuario.
+      // SOLO el Admin SDK (Firebase Functions) puede escribir aquí.
+      // El cliente escribe VÍA /api/web-push/register (del lado del servidor), no directamente.
+      match /private/{privateDoc} {
+        allow read: if false; // Nunca desde el cliente
+        allow write: if false; // Solo SDK de administración desde Cloud Functions / servidor Next.js
+      }
+    }
+
+    match /public_tracking/{trackingUuid} {
+      allow get: if true;
+      allow list: if false;
+      allow write: if false;
+    }
+
+    match /consultas_index/{hashId} {
+      allow get: if true;
+      allow write: if false;
+    }
+
+    // FIX: colección referidos faltaba completamente en las reglas anteriores
+    match /referidos/{referralId} {
+      allow read, list: if isAdmin();
+      allow write: if false; // Solo Admin SDK (server-side) puede escribir
+    }
+
+    match /consultationCooldowns/{uid} {
+      allow read, write: if false;
+    }
+
+    // FIX: referidosCooldowns tampoco tenía regla
+    match /referidosCooldowns/{uid} {
+      allow read, write: if false;
+    }
+
+    match /leads/{docId} {
+      allow read, write: if false;
+    }
+
+    match /telemetryCooldowns/{docId} {
+      allow read, write: if false;
+    }
+
+    match /otp_rate_limits/{docId} {
+      allow read, write: if false;
+    }
+
+    match /metadata/{docId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    match /edge_telemetry/{document} {
+      allow write: if request.resource.data.keys().hasAll(['event', 'ts'])
+                   && request.resource.data.keys().hasOnly(['event','ts','ciudad','path'])
+                   && request.resource.data.event is string
+                   && request.resource.data.event.size() < 100
+                   && request.resource.data.ts is number;
+      allow read: if false;
+    }
+
+    match /cases/{caseId} {
+      allow read, write: if false;
+    }
+
+    match /upload_rate_limits/{docId} {
+      allow read, write: if false;
+    }
+
+    match /validar_consulta_rl/{docId} {
+      allow read, write: if false;
+    }
+
+    match /shards/{docId} {
+      allow read, write: if false;
+    }
+
+    match /legal_mandates/{docId} {
+      allow read, write: if false;
+    }
+
+    match /processed_callbacks/{docId} {
+      allow read, write: if false;
+    }
+
+    match /audit_logs/{docId} {
+      allow read, write: if false; // Solo backend escribe logs
+    }
+
+    match /vip_auth_rl/{docId} {
+      allow read, write: if false; // Denegar desde frontend
+    }
+
+    // Rate limits están denegados implícitamente por defecto en Firestore.
+  }
+}

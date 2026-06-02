@@ -1,0 +1,26 @@
+// This file configures the initialization of Sentry for edge features (middleware, edge routes, and so on).
+// The config you add here will be used whenever one of the edge features is loaded.
+// Note that this config is unrelated to the Vercel Edge Runtime and is also required when running locally.
+// https://docs.sentry.io/platforms/javascript/guides/nextjs/
+
+import * as Sentry from '@sentry/nextjs';
+import type { ErrorEvent } from '@sentry/nextjs';
+import { applyPIIScrubber } from '@/lib/security/piiScrubber';
+
+Sentry.init({
+  dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+
+  tracesSampleRate: 0.1,
+  enableLogs: true,
+  sendDefaultPii: false,
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  beforeSend(event: ErrorEvent) {
+    try {
+      return applyPIIScrubber(event);
+    } catch (error) {
+      console.error('[DevSecOps] Sanitización fallida en Edge Sentry. Destruyendo evento.', error);
+      return null;
+    }
+  },
+});
