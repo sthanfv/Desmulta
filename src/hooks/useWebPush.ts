@@ -46,9 +46,11 @@ export function useWebPush() {
                 updateViaCache: 'none',
                 scope: '/',
               });
-            } catch { /* sw.js Workbox ya registrado - usar ese */ }
+            } catch {
+              /* sw.js Workbox ya registrado - usar ese */
+            }
 
-            const sw = swReg ?? await navigator.serviceWorker.ready;
+            const sw = swReg ?? (await navigator.serviceWorker.ready);
             const messaging = getMessaging(app);
             const vapidKey = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
 
@@ -154,9 +156,11 @@ export function useWebPush() {
             updateViaCache: 'none',
             scope: '/',
           });
-        } catch { /* sw.js Workbox ya registrado - usar ese */ }
+        } catch {
+          /* sw.js Workbox ya registrado - usar ese */
+        }
 
-        const registration = swReg ?? await navigator.serviceWorker.ready;
+        const registration = swReg ?? (await navigator.serviceWorker.ready);
 
         const messaging = getMessaging(app);
 

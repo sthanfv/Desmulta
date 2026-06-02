@@ -26,6 +26,7 @@ function escapeHtml(text: string): string {
 export const onConsultationCreated = onDocumentCreated({
   document: 'consultations/{id}',
   region: 'us-central1',
+  timeoutSeconds: 120,
   secrets: ['RESEND_API_KEY', 'TELEGRAM_BOT_TOKEN', 'TELEGRAM_CHAT_ID', 'INTERNAL_API_SECRET']
 }, async (event) => {
   const data = event.data?.data();

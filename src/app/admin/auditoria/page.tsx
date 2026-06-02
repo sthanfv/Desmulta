@@ -356,9 +356,12 @@ export default function AuditPage() {
   const [q, setQ] = useState('');
   const { toast } = useToast();
 
-  const filteredLogs = logs.filter(l =>
-    !q || [l.adminEmail, l.action, l.resource, JSON.stringify(l.details)]
-      .some(s => s?.toLowerCase().includes(q.toLowerCase()))
+  const filteredLogs = logs.filter(
+    (l) =>
+      !q ||
+      [l.adminEmail, l.action, l.resource, JSON.stringify(l.details)].some((s) =>
+        s?.toLowerCase().includes(q.toLowerCase())
+      )
   );
 
   const handleLogin = async (e: React.FormEvent) => {

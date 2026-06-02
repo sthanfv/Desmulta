@@ -146,13 +146,18 @@ export function TarjetaKanban({
           )}
 
           {data.createdAt && (
-            <p className={`text-[10px] font-bold mt-2 flex items-center gap-1 ${
-              data.estado === 'NUEVO' &&
-              Date.now() - new Date(data.createdAt).getTime() > 7200000
-                ? 'text-red-500 animate-pulse' : 'text-slate-400'
-            }`}>
+            <p
+              className={`text-[10px] font-bold mt-2 flex items-center gap-1 ${
+                data.estado === 'NUEVO' && Date.now() - new Date(data.createdAt).getTime() > 7200000
+                  ? 'text-red-500 animate-pulse'
+                  : 'text-slate-400'
+              }`}
+            >
               <Clock className="w-3 h-3" />
-              {new Date(data.createdAt).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}
+              {new Date(data.createdAt).toLocaleTimeString('es-CO', {
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
             </p>
           )}
         </div>

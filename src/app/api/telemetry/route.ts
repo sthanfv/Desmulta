@@ -55,7 +55,12 @@ export async function POST(req: Request) {
     const safeIpId = ip.replace(/[^a-zA-Z0-9]/g, '_');
 
     // 2. Verificación de Rate Limit contra Firestore
-    const rl = await rateLimit(`telemetry:${safeIpId}`, MAX_REQUESTS_PER_WINDOW, WINDOW_MS, 'telemetryCooldowns');
+    const rl = await rateLimit(
+      `telemetry:${safeIpId}`,
+      MAX_REQUESTS_PER_WINDOW,
+      WINDOW_MS,
+      'telemetryCooldowns'
+    );
     if (!rl.success) {
       logger.security('[telemetry] Bloqueo por Rate Limit', { ip });
       return NextResponse.json(
@@ -150,7 +155,10 @@ _Solicitud captada desde la calculadora pública_
         response: errorText,
       });
       // Tolerado: No bloquear al usuario final si la notificación interna (Telegram) falla
-      return NextResponse.json({ success: true, warning: 'Fallo al notificar al asesor' }, { status: 200 });
+      return NextResponse.json(
+        { success: true, warning: 'Fallo al notificar al asesor' },
+        { status: 200 }
+      );
     }
 
     return NextResponse.json({ success: true }, { status: 200 });
