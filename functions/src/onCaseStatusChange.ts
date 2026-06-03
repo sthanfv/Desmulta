@@ -44,7 +44,8 @@ interface CaseAfterData {
 
 async function processCaseEmail(caseId: string, after: CaseAfterData, isNew: boolean, isLead: boolean = false) {
   const consultationId = isLead ? caseId : after.consultationId;
-  if (!consultationId || consultationId === 'N/A') {
+  const status = after.status;
+  if (!consultationId || consultationId === 'N/A' || !status) {
     return;
   }
 
@@ -134,7 +135,7 @@ async function processCaseEmail(caseId: string, after: CaseAfterData, isNew: boo
       },
     };
 
-    const info = descripciones[after.status.toLowerCase()] || {
+    const info = descripciones[status.toLowerCase()] || {
       asunto: '📬 Novedades en tu expediente - Desmulta',
       titulo: 'Actualización en tu proceso legal',
       explicacion: 'Hola, te informamos que hemos actualizado el estado de tu expediente administrativo. Seguimos trabajando con el compromiso de siempre para defender tus intereses.',
@@ -155,7 +156,7 @@ async function processCaseEmail(caseId: string, after: CaseAfterData, isNew: boo
       try {
         await sendCaseUpdateNotification(
           fcmToken,
-          after.status,
+          status,
           shortId,
           trackingUuid ? `https://desmulta.online/seguir/${trackingUuid}` : undefined,
           consultationId
@@ -203,7 +204,7 @@ async function processCaseEmail(caseId: string, after: CaseAfterData, isNew: boo
               ` : ''}
 
               <div style="margin: 30px 0; padding: 20px; background: #fffbeb; border-left: 4px solid ${info.color}; border-radius: 4px;">
-                <p style="margin: 0; font-size: 14px; color: #2d3748; font-weight: bold;">Nuevo estado legal: <span style="color: ${info.color}; text-transform: uppercase;">${after.status.replace('_', ' ')}</span></p>
+                <p style="margin: 0; font-size: 14px; color: #2d3748; font-weight: bold;">Nuevo estado legal: <span style="color: ${info.color}; text-transform: uppercase;">${status.replace('_', ' ')}</span></p>
               </div>
 
               ${trackingUuid ? `
