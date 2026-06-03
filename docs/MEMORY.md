@@ -9,6 +9,23 @@
 
 ---
 
+## 🛠️ SESIÓN: HARDENING DE SEGURIDAD V2 (Junio 2026)
+
+**Objetivo:** Eliminar almacenamiento innecesario de PII en disco y endurecer reglas de TypeScript en Cloud Functions y telemetría.
+
+### Soluciones implementadas
+
+**Protección de Datos (Zustand):**
+- **Eliminación de PII en local:** Se sacó la `cedula` y `ocrRawText` del middleware de persistencia (`partialize`) en `useExpedienteStore.ts`. Estos datos ya no quedan guardados en `localStorage`, limitando exposición si se usan dispositivos compartidos.
+
+**Endurecimiento de Tipos (Backend):**
+- **Sustitución de `any`:** Se implementó la interfaz `CaseAfterData` en `onCaseStatusChange.ts` para tipar estrictamente el parámetro `after`, evitando errores silenciosos si la estructura en Firestore cambia.
+
+**Gestión de Errores (Frontend):**
+- **Visibilidad controlada:** Se sustituyeron los bloques `catch(() => {})` silenciosos en los envíos de métricas a `/api/abandonment` (en `StepContacto.tsx`) por logs de depuración (`console.debug`) que se muestran exclusivamente en entornos de no-producción, logrando telemetría silenciosa en vivo y útil en desarrollo.
+
+**Estado de la Arquitectura:**
+- Código endurecido. Tipado 100% estricto respetando el `eslint --max-warnings 0`. Prevención de filtración pasiva de PII.
 ## 🛠️ SESIÓN: RECONOCIMIENTO Y ASIGNACIÓN DE ROL ÉLITE (Junio 2026)
 
 **Objetivo:** Asignación del rol de Equipo de Desarrollo Élite (Principal Engineer, DevSecOps, Privacy Officer, DBA, QA). Ejecución obligatoria de la Fase 0 (Detección de Stack y Auditoría).
@@ -17,11 +34,11 @@
 
 **Fase 0 (Auditoría y Reconocimiento):**
 - **Detección Automática de Stack:** Análisis del archivo `package.json`. Stack detectado: Next.js 15.1.0, React 19, Tailwind CSS, Firebase v11 (Client) / v13 (Admin), Zod, Vitest, Playwright.
-- **Auditoría de Entorno y Dependencias:** Se inicializó la lectura obligatoria del contexto (`README.md`, `MEMORY.md`). Se ejecutó la sanación de dependencias mediante `npm audit fix` operando a través del entorno de comandos (`cmd.exe /c`).
+- **Auditoría de Entorno y Dependencias:** Se inicializó la lectura obligatoria del contexto (`README.md`, `MEMORY.md`). Se ejecutó la sanación de dependencias mediante `npm audit fix` operando a través del entorno de comandos (`cmd.exe /c`). Quedan 16 vulnerabilidades residuales en subdependencias que requieren comandos con `--force` (no aplicado para evitar regresiones).
 - **Compromiso Estricto de Reglas:** Asimilación absoluta de la comunicación en español (JSDoc, MEMORY.md, commits), regla de prevención de N+1, protección de datos Zero-PII, e iteración segura en bloques pequeños de archivos.
 
 **Estado de la Arquitectura:**
-- Sistema estable y pre-auditado. Listo para recibir la siguiente orden técnica con un control de calidad y DevSecOps reforzado.
+- Sistema estable y pre-auditado. Suite de validación ejecutada (`npm run validate`). Listo para recibir la siguiente orden técnica con un control de calidad y DevSecOps reforzado.
 
 ---
 

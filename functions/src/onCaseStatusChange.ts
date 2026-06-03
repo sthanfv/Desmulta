@@ -19,7 +19,30 @@ function escapeHtml(unsafe: string): string {
  * Escucha cambios y creaciones en 'cases/{caseId}' y envía emails de notificación al ciudadano.
  */
 
-async function processCaseEmail(caseId: string, after: any, isNew: boolean, isLead: boolean = false) {
+interface CaseAfterData {
+  consultationId?: string;
+  status?: string;
+  history?: Array<{
+    operatorNote?: string;
+    date?: string;
+    description?: string;
+    type?: string;
+  }>;
+  timeline_updates?: Array<{
+    operatorNote?: string;
+  }>;
+  cedula?: string;
+  nombre?: string;
+  contacto?: string;
+  trackingUuid?: string;
+  shortId?: string;
+  emailContacto?: string;
+  email?: string;
+  telegramMessageId?: string;
+  fcmToken?: string;
+}
+
+async function processCaseEmail(caseId: string, after: CaseAfterData, isNew: boolean, isLead: boolean = false) {
   const consultationId = isLead ? caseId : after.consultationId;
   if (!consultationId || consultationId === 'N/A') {
     return;

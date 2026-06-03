@@ -182,7 +182,7 @@ export const useSIMITValidator = () => {
           mediaLogger.log('OCR', 'Fallo en IA, haciendo fallback a Tesseract local', {
             err: String(iaError),
           });
-          
+
           const ocrTask = async () => {
             mediaLogger.log('OCR', 'Inicializando motor Tesseract...');
             await tesseractManager.init((m: { status: string; progress: number }) => {
@@ -218,12 +218,14 @@ export const useSIMITValidator = () => {
             return await tesseractManager.recognize(objectUrl);
           };
 
-          resultRaw = await Promise.race([ocrTask(), timeoutPromise]) as typeof resultRaw;
+          resultRaw = (await Promise.race([ocrTask(), timeoutPromise])) as typeof resultRaw;
 
           const palabrasRaw = resultRaw.data.words || [];
           const avgConf =
             palabrasRaw.length > 0
-              ? Math.round(palabrasRaw.reduce((acc, w) => acc + w.confidence, 0) / palabrasRaw.length)
+              ? Math.round(
+                  palabrasRaw.reduce((acc, w) => acc + w.confidence, 0) / palabrasRaw.length
+                )
               : 0;
           mediaLogger.log('OCR', 'Escaneo local completado con éxito', {
             wordCount: palabrasRaw.length,

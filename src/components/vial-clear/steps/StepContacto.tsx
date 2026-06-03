@@ -267,7 +267,11 @@ export default function StepContacto({
                                   accion: 'ping',
                                   fcmToken,
                                 }),
-                              }).catch(() => {});
+                              }).catch((e: unknown) => {
+                                if (process.env.NODE_ENV !== 'production') {
+                                  console.debug('[telemetry-ping] fallo silencioso:', e);
+                                }
+                              });
                             }
                           }}
                           className="w-full bg-background border-border/50 rounded-2xl pl-12 h-16 text-lg font-medium shadow-Inner"
@@ -376,7 +380,11 @@ export default function StepContacto({
                               accion: 'ping',
                               fcmToken,
                             }),
-                          }).catch(() => {});
+                          }).catch((e: unknown) => {
+                            if (process.env.NODE_ENV !== 'production') {
+                              console.debug('[telemetry-ping] fallo silencioso:', e);
+                            }
+                          });
                         }
                       }}
                       required={requiresOperator}
@@ -431,7 +439,11 @@ export default function StepContacto({
                               accion: 'ping',
                               fcmToken,
                             }),
-                          }).catch(() => {});
+                          }).catch((e: unknown) => {
+                            if (process.env.NODE_ENV !== 'production') {
+                              console.debug('[telemetry-ping] fallo silencioso:', e);
+                            }
+                          });
                         }
                       }}
                       className="w-full bg-background border-border/50 rounded-2xl pl-12 h-16 text-lg font-medium shadow-Inner"

@@ -57,9 +57,10 @@ export const useExpedienteStore = create<ExpedienteState>()(
       storage: createJSONStorage(() => localStorage),
       // Solo persistimos datos ligeros para evitar crash de RAM
       partialize: (state) => ({
-        cedula: state.cedula,
+        // ✅ cedula eliminada del localStorage — es PII sensible.
+        // Si el usuario comparte dispositivo, no quedan datos personales.
         multas: state.multas,
-        ocrRawText: state.ocrRawText,
+        // ocrRawText también puede contener nombre/placa del SIMIT — eliminado.
       }),
     }
   )
