@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { logger } from '@/lib/logger/security-logger';
 import { isCleanText } from '@/lib/utils/profanity-filter';
 import { rateLimit } from '@/lib/security/rate-limit';
-import { getFirestore } from 'firebase-admin/firestore';
+
 import { getAdminApp } from '@/lib/firebase-admin';
 
 // Inicializar Firebase Admin SDK via singleton seguro
@@ -47,7 +47,6 @@ function escapeMarkdownV2(text: string): string {
 export async function POST(req: Request) {
   try {
     getAdminApp();
-    const db = getFirestore();
 
     // 1. Identificación de IP para rate limiting en Firestore
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown_ip';

@@ -24,6 +24,7 @@
     "docs:lint": "markdownlint README.md CONTRIBUTING.md CHANGELOG.md docs/*.md"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@hookform/resolvers": "^3.10.0",
     "@marsidev/react-turnstile": "^1.1.0",
     "@next/third-parties": "^16.2.1",

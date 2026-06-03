@@ -22,7 +22,7 @@ const envSchema = z.object({
   NEXT_PUBLIC_TURNSTILE_SITE_KEY: z.string().min(1, 'Falta Site Key de Cloudflare Turnstile'),
 
   // Server Side (Optional but recommended)
-  // GEMINI_API_KEY: z.string().optional(), // PURGA v7.4.3
+  GEMINI_API_KEY: z.string().min(10, 'Falta GEMINI_API_KEY para OCR multimodelo'),
   RESEND_API_KEY: z.string().optional(),
   TELEGRAM_BOT_TOKEN: z.string().optional(),
   TELEGRAM_CHAT_ID: z.string().optional(),
@@ -56,7 +56,7 @@ export const validateEnv = () => {
       NEXT_PUBLIC_WHATSAPP_NUMBER: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER,
       NEXT_PUBLIC_BRAND_NAME: process.env.NEXT_PUBLIC_BRAND_NAME,
       NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
-      // GEMINI_API_KEY: process.env.GEMINI_API_KEY, // PURGA v7.4.3
+      GEMINI_API_KEY: process.env.GEMINI_API_KEY,
       RESEND_API_KEY: process.env.RESEND_API_KEY,
       TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN,
       TELEGRAM_CHAT_ID: process.env.TELEGRAM_CHAT_ID,

@@ -131,6 +131,10 @@ service cloud.firestore {
       allow read, write: if false; // Solo Admin SDK
     }
 
+    match /ocrRateLimits/{docId} {
+      allow read, write: if false; // Solo Admin SDK
+    }
+
     // Rate limits están denegados implícitamente por defecto en Firestore.
   }
 }
