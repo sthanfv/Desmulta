@@ -40,8 +40,8 @@ export function ImageUploader() {
       const blob = (await response.json()) as { url: string };
       setUploadedUrl(blob.url);
     } catch (err) {
-      logger.error(err);
       const e = err as Error;
+      logger.error('Error en carga de imagen', { error: e.message || String(err) });
       setError(e.message || 'Error desconocido al subir el archivo.');
     } finally {
       setIsUploading(false);

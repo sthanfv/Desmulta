@@ -24,7 +24,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    logger.error('Granular Error Boundary caught:', error, errorInfo);
+    logger.error('Granular Error Boundary caught', { error: error.message, errorInfo });
   }
 
   public render() {

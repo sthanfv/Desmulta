@@ -254,7 +254,7 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
 
       toast({ title: 'Exportación a Excel exitosa' });
     } catch (error) {
-      logger.error('Error al exportar a Excel:', error);
+      SecurityLogger.error('Error al exportar a Excel', { error: String(error) });
       toast({ variant: 'destructive', title: 'Error al exportar los datos a Excel' });
     }
   }, [filteredItems, toast, auth?.currentUser?.email]);
@@ -406,7 +406,7 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
 
       toast({ title: 'Exportación a PDF exitosa' });
     } catch (error) {
-      logger.error('Error al exportar a PDF:', error);
+      SecurityLogger.error('Error al exportar a PDF', { error: String(error) });
       toast({ variant: 'destructive', title: 'Error al exportar los datos a PDF' });
     }
   };

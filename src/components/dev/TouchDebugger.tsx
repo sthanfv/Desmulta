@@ -177,7 +177,7 @@ function patchConsole() {
     logger.error('Unhandled Rejection:', event.reason);
   });
   window.addEventListener('error', (event) => {
-    logger.error('Window Error:', event.message, event.filename, event.lineno);
+    logger.error('Window Error', { message: event.message, filename: event.filename, lineno: event.lineno });
   });
 }
 
