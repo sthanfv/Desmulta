@@ -1,4 +1,5 @@
 'use client';
+import { logger } from '@/lib/logger/security-logger';
 
 import { useState, useEffect } from 'react';
 
@@ -40,7 +41,7 @@ export function InstallPWA() {
 
   // Para debugging en consola si fuera necesario
   if (deferredPrompt) {
-    // console.log('PWA: Instalación disponible');
+    // logger.info('PWA: Instalación disponible');
   }
 
   return null;

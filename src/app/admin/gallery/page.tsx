@@ -1,4 +1,5 @@
 'use client';
+import { logger } from '@/lib/logger/security-logger';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/firebase';
@@ -48,7 +49,7 @@ export default function GalleryAdminPage() {
       const data = await res.json();
       setCases(data.cases ?? []);
     } catch (e) {
-      console.error('[Galería] Error al cargar casos:', e);
+      logger.error('[Galería] Error al cargar casos:', e);
       toast({
         title: 'Error',
         description: 'No se pudieron cargar los casos existentes.',

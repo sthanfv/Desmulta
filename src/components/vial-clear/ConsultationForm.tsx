@@ -1,4 +1,5 @@
 'use client';
+import { logger } from '@/lib/logger/security-logger';
 
 import { useState, useEffect, Suspense, useRef } from 'react';
 import { useForm, type SubmitHandler, type UseFormReturn } from 'react-hook-form';
@@ -156,7 +157,7 @@ export function ConsultationForm({ onSuccess, mode = 'full', nonce }: Consultati
             });
           } catch (e) {
             if (process.env.NODE_ENV === 'development') {
-              console.error('Error al recuperar borrador', e);
+              logger.error('Error al recuperar borrador', e);
             }
           }
         }
@@ -177,7 +178,7 @@ export function ConsultationForm({ onSuccess, mode = 'full', nonce }: Consultati
           estadoCoactivo: formValue.estadoCoactivo,
         }).catch((e) => {
           if (process.env.NODE_ENV === 'development') {
-            console.error('Error al guardar borrador', e);
+            logger.error('Error al guardar borrador', e);
           }
         });
       });
@@ -450,7 +451,7 @@ export function ConsultationForm({ onSuccess, mode = 'full', nonce }: Consultati
           statusConsolidacion = resExpediente.status || 'creado';
           clearExpediente();
         } catch (consolidateError) {
-          console.error('[FinOps] Fallo no crítico en consolidación:', consolidateError);
+          logger.error('[FinOps] Fallo no crítico en consolidación:', consolidateError);
         }
       }
 
@@ -500,7 +501,7 @@ export function ConsultationForm({ onSuccess, mode = 'full', nonce }: Consultati
         }
       } catch (fError) {
         if (process.env.NODE_ENV === 'development') {
-          console.warn('[ReturnToken] Error generando token de retorno:', fError);
+          logger.warn('[ReturnToken] Error generando token de retorno:', fError);
         }
       }
 

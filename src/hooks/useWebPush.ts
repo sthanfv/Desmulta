@@ -1,4 +1,5 @@
 'use client';
+import { logger } from '@/lib/logger/security-logger';
 
 import { useState, useCallback, useEffect } from 'react';
 import { getMessaging, getToken, isSupported, deleteToken } from 'firebase/messaging';
@@ -56,7 +57,7 @@ export function useWebPush() {
 
             // FIX: Verificar VAPID key antes de intentar obtener token
             if (!vapidKey) {
-              console.error('[useWebPush] NEXT_PUBLIC_FIREBASE_VAPID_KEY no está configurada.');
+              logger.error('[useWebPush] NEXT_PUBLIC_FIREBASE_VAPID_KEY no está configurada.');
               return;
             }
 
@@ -68,7 +69,7 @@ export function useWebPush() {
           } catch (err) {
             // FIX: No loggear el error completo en prod; puede contener info de config
             if (process.env.NODE_ENV === 'development') {
-              console.error('[useWebPush] Error al restaurar token FCM:', err);
+              logger.error('[useWebPush] Error al restaurar token FCM:', err);
             }
           }
         });
@@ -114,7 +115,7 @@ export function useWebPush() {
         // FIX: Verificar VAPID key ANTES de solicitar permiso al usuario
         const vapidKey = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
         if (!vapidKey) {
-          console.error('[useWebPush] NEXT_PUBLIC_FIREBASE_VAPID_KEY no configurada.');
+          logger.error('[useWebPush] NEXT_PUBLIC_FIREBASE_VAPID_KEY no configurada.');
           toast({
             variant: 'destructive',
             title: 'Error de Configuración',
@@ -164,7 +165,7 @@ export function useWebPush() {
 
         const messaging = getMessaging(app);
 
-        // FIX: Eliminados console.log con datos sensibles (App Options, VAPID key)
+        // FIX: Eliminados logger.info con datos sensibles (App Options, VAPID key)
         // Solo logging en development:
         if (process.env.NODE_ENV === 'development') {
           console.debug('[useWebPush] SW registrado en scope:', registration.scope);
@@ -207,7 +208,7 @@ export function useWebPush() {
       } catch (error) {
         // FIX: No loggear el error completo con stack trace en producción
         if (process.env.NODE_ENV === 'development') {
-          console.error('[useWebPush] FCM Token falló:', error);
+          logger.error('[useWebPush] FCM Token falló:', error);
         }
 
         // SELF-HEALING: Si el token o SW están corruptos, los destruimos.

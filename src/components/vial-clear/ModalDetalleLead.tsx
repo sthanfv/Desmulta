@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger/security-logger';
 import React, { useState } from 'react';
 import {
   X,
@@ -89,7 +90,7 @@ export function ModalDetalleLead({
       await actionFn();
       onClose();
     } catch (error) {
-      console.error(`Error en ${actionName}:`, error);
+      logger.error(`Error en ${actionName}:`, error);
       setIsProcessing(null);
     }
   };
@@ -132,7 +133,7 @@ export function ModalDetalleLead({
 
       toast({ title: '✅ Poder generado', description: `Archivo: ${result.filename}` });
     } catch (err) {
-      console.error('[ModalDetalleLead] Error descargando poder:', err);
+      logger.error('[ModalDetalleLead] Error descargando poder:', err);
       toast({ variant: 'destructive', title: 'Error inesperado al generar el PDF.' });
     } finally {
       setIsProcessing(null);

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger/security-logger';
 import React, { useState } from 'react';
 import {
   X,
@@ -128,7 +129,7 @@ export function ModalDetalleExpediente({
       await actionFn();
       onClose();
     } catch (error) {
-      console.error(`Error en ${actionName}:`, error);
+      logger.error(`Error en ${actionName}:`, error);
       setIsProcessing(null);
     }
   };
@@ -216,7 +217,7 @@ export function ModalDetalleExpediente({
         setPdfPreviews(newPreviews);
       }
     } catch (err) {
-      console.error('[ModalDetalleExpediente] Error:', err);
+      logger.error('[ModalDetalleExpediente] Error:', err);
       toast({ variant: 'destructive', title: 'Error inesperado al generar los PDF.' });
     } finally {
       setIsProcessing(null);

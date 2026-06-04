@@ -1,4 +1,5 @@
 'use client';
+import { logger } from '@/lib/logger/security-logger';
 
 import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
@@ -23,7 +24,7 @@ export function PWAAutoUpdater() {
         const hoursInactive = (now - lastActiveRef.current) / 1000 / 60 / 60;
 
         if (hoursInactive >= 2) {
-          console.log(
+          logger.info(
             '[PWAAutoUpdater] Tab inactiva por más de 2h. Forzando revalidación suave...'
           );
           router.refresh();
@@ -44,7 +45,7 @@ export function PWAAutoUpdater() {
         try {
           // BARRERA ANTI-BUCLE: Usamos una cookie porque healPwaCache destruye el sessionStorage
           if (document.cookie.includes('pwa_healed=true')) {
-            console.info(
+            logger.info(
               '[PWAAutoUpdater] 🛡️ App recién sanada. Bloqueando detecciones recursivas.'
             );
             return; // La cookie expira sola en 30 segundos, no necesitamos setTimeout
@@ -57,7 +58,7 @@ export function PWAAutoUpdater() {
             if (newWorker) {
               newWorker.addEventListener('statechange', () => {
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  console.warn(
+                  logger.warn(
                     '[PWAAutoUpdater] ¡Nueva versión de la app detectada! Iniciando Auto-Sanación...'
                   );
                   // Inyectamos la cookie con 30 segundos de vida (max-age=30)
@@ -87,7 +88,7 @@ export function PWAAutoUpdater() {
           errorMsg.toLowerCase().includes('failed to fetch dynamically imported module');
 
         if (isChunkError) {
-          console.error('🚨 [PWAAutoUpdater] ChunkLoadError detectado. Auto-sanando aplicación...');
+          logger.error('🚨 [PWAAutoUpdater] ChunkLoadError detectado. Auto-sanando aplicación...');
           Sentry.captureMessage('PWAAutoUpdater interceptó ChunkLoadError y ejecutó healPwaCache');
 
           // Barrera también aquí para evitar bucle por error de importación

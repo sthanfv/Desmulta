@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger/security-logger';
 import { useState, useEffect } from 'react';
 import type { Auth } from 'firebase/auth';
 import { collection, query, where, onSnapshot, orderBy, Timestamp } from 'firebase/firestore';
@@ -32,7 +33,7 @@ export function useNuevosLeadsRT(auth: Auth | null) {
         setRealtimeNewLeadsCount(snap.docs.length);
       },
       (error) => {
-        console.warn('[useNuevosLeadsRT] Error o permisos insuficientes en onSnapshot:', error);
+        logger.warn('[useNuevosLeadsRT] Error o permisos insuficientes en onSnapshot:', error);
         // Fallback seguro: si fallan las reglas de Firestore (ej. no es admin aún), evitamos crashear
       }
     );

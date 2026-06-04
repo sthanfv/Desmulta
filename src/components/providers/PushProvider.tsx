@@ -1,4 +1,5 @@
 'use client';
+import { logger } from '@/lib/logger/security-logger';
 
 import { useEffect } from 'react';
 import { getMessaging, onMessage, isSupported } from 'firebase/messaging';
@@ -42,7 +43,7 @@ export function PushProvider({ children }: { children: React.ReactNode }) {
         });
       } catch (err) {
         // Fallo silencioso — no bloquea la carga de la aplicación
-        console.warn('[PushProvider] No se pudo inicializar el listener de push:', err);
+        logger.warn('[PushProvider] No se pudo inicializar el listener de push:', err);
       }
     };
 

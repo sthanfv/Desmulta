@@ -1,4 +1,5 @@
 'use client';
+import { logger } from '@/lib/logger/security-logger';
 
 import React, { useEffect, useState, useCallback } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
@@ -35,7 +36,7 @@ export function PDFPreviewModal({ isOpen, onClose, base64, filename }: PDFPrevie
       blobUrl = URL.createObjectURL(blob);
       setUrl(blobUrl);
     } catch (err) {
-      console.error('[PDFPreviewModal] Error al decodificar base64:', err);
+      logger.error('[PDFPreviewModal] Error al decodificar base64:', err);
       setDecodeError(true);
     } finally {
       setIsLoading(false);

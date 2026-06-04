@@ -5,6 +5,7 @@ import { FirebaseProvider } from '@/firebase/provider';
 import { initializeFirebase } from '@/firebase';
 import { enableIndexedDbPersistence } from 'firebase/firestore';
 import { initializeAppCheck, ReCaptchaEnterpriseProvider } from 'firebase/app-check';
+import { logger } from '@/lib/logger/security-logger';
 
 interface FirebaseClientProviderProps {
   children: ReactNode;
@@ -30,9 +31,9 @@ export function FirebaseClientProvider({ children }: FirebaseClientProviderProps
           provider: new ReCaptchaEnterpriseProvider(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY),
           isTokenAutoRefreshEnabled: true, // Renueva el escudo en segundo plano
         });
-        console.log('[🛡️ App Check] Escudo reCAPTCHA inicializado');
+        logger.info('[🛡️ App Check] Escudo reCAPTCHA inicializado');
       } catch (error) {
-        console.error('[🛡️ App Check] Error al inicializar:', error);
+        logger.error('[🛡️ App Check] Error al inicializar', error);
       }
     }
   }, [firebaseServices.firebaseApp]);
@@ -47,11 +48,11 @@ export function FirebaseClientProvider({ children }: FirebaseClientProviderProps
       if (err.code === 'failed-precondition') {
         // Caso normal: múltiples pestañas abiertas → solo la primera tab activa tiene persistencia.
         // NO es un error, es comportamiento esperado del SDK de Firebase.
-        console.info('[Desmulta] Persistencia offline activa en otra pestaña del navegador.');
+        logger.info('[Desmulta] Persistencia offline activa en otra pestaña del navegador.');
       } else if (err.code === 'unimplemented') {
         // Navegador antiguo o modo incógnito restringido sin soporte a IndexedDB.
         // La app sigue funcionando, solo sin modo offline.
-        console.warn(
+        logger.warn(
           '[Desmulta] Este navegador no soporta persistencia offline (IndexedDB no disponible).'
         );
       }

@@ -1,4 +1,5 @@
 'use client';
+import { logger } from '@/lib/logger/security-logger';
 
 /**
  * TouchDebugger v9.0 — Panel de diagnóstico forense avanzado (F12 Móvil)
@@ -173,10 +174,10 @@ function patchConsole() {
   });
 
   window.addEventListener('unhandledrejection', (event) => {
-    console.error('Unhandled Rejection:', event.reason);
+    logger.error('Unhandled Rejection:', event.reason);
   });
   window.addEventListener('error', (event) => {
-    console.error('Window Error:', event.message, event.filename, event.lineno);
+    logger.error('Window Error:', event.message, event.filename, event.lineno);
   });
 }
 
@@ -442,7 +443,7 @@ export function TouchDebugger() {
         setTimeout(() => setCopied(false), 2500);
       })
       .catch((err) => {
-        console.warn('Fallo al copiar con API de Clipboard, usando descarga de archivo', err);
+        logger.warn('Fallo al copiar con API de Clipboard, usando descarga de archivo', err);
         handleDownload(e);
       });
   };
@@ -455,7 +456,7 @@ export function TouchDebugger() {
         await navigator.share({ title: `Diagnóstico Desmulta - ${activeTab}`, text: logText });
         return;
       } catch (err) {
-        console.warn('Share API cancelada o fallida, usando descarga', err);
+        logger.warn('Share API cancelada o fallida, usando descarga', err);
       }
     }
     handleDownload(e);

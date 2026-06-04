@@ -1,4 +1,5 @@
 'use client';
+import { logger } from '@/lib/logger/security-logger';
 
 // Importamos el contexto interno directamente para poder hacer un null-check
 // en lugar de depender del throw del hook useOCR (que requería el Provider en root)
@@ -24,7 +25,7 @@ export const useTesseractPrewarm = () => {
  */
 export const prefetchTesseractModel = () => {
   if (process.env.NODE_ENV === 'development') {
-    console.log(
+    logger.info(
       '[OCR] La inicialización ocurre en OCRProvider (lazy, dentro del ConsultationForm).'
     );
   }

@@ -1,4 +1,5 @@
 'use client';
+import { logger } from '@/lib/logger/security-logger';
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -36,7 +37,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           }
         })
         .catch((e) => {
-          console.error('Error verificando permisos de administrador', e);
+          logger.error('Error verificando permisos de administrador', e);
           if (mounted) {
             setIsAdmin(false);
             setIsAdminLoading(false);
@@ -64,7 +65,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         window.location.reload();
       }
     } catch (e) {
-      console.error('Error forzando refresco de token', e);
+      logger.error('Error forzando refresco de token', e);
     } finally {
       setIsRefreshing(false);
     }

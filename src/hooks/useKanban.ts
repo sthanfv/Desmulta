@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger/security-logger';
 import { useState, useCallback, useEffect } from 'react';
 import { useAuth } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
@@ -73,7 +74,7 @@ export function useKanban(leadsReales: KanbanItem[], casosReales: KanbanItem[]) 
         esModalDetalle: false,
       });
     } catch (err) {
-      console.error('Error in onDrop parse:', err);
+      logger.error('Error in onDrop parse:', err);
     }
   }, []);
 
@@ -116,7 +117,7 @@ export function useKanban(leadsReales: KanbanItem[], casosReales: KanbanItem[]) 
         if (!result.success) throw new Error(result.error || 'Error desconocido');
         toast({ title: 'Solicitud promovida a Gestión de Caso exitosamente' });
       } catch (error) {
-        console.error('Fallo al promover', error);
+        logger.error('Fallo al promover', error);
         toast({ variant: 'destructive', title: 'Error al promover a caso.' });
         throw error;
       }
@@ -202,7 +203,7 @@ export function useKanban(leadsReales: KanbanItem[], casosReales: KanbanItem[]) 
           setItemSeleccionado((prev) => (prev ? { ...prev, estado: nuevoEstado } : prev));
         }
       } catch (error) {
-        console.error('Error al actualizar estado:', error);
+        logger.error('Error al actualizar estado:', error);
         toast({
           variant: 'destructive',
           title: 'Error al sincronizar con el servidor',

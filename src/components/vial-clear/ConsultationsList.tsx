@@ -1,4 +1,5 @@
 'use client';
+import { logger } from '@/lib/logger/security-logger';
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { getConsultations, convertToCase } from '@/app/admin/actions';
@@ -180,7 +181,7 @@ export function ConsultationsList() {
         );
       }
     } catch (err) {
-      console.error('Error al actualizar estado:', err);
+      logger.error('Error al actualizar estado:', err);
     } finally {
       setConvertingId(null);
     }

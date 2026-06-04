@@ -1,4 +1,5 @@
 'use client';
+import { logger } from '@/lib/logger/security-logger';
 
 import { useState } from 'react';
 import { calcularViabilidadLegal } from '@/lib/calculadora-legal';
@@ -125,7 +126,7 @@ export function CalculadoraPrescripcion({ cityContext }: { cityContext?: string 
         setLeadNombre('');
       }, 5000);
     } catch (error) {
-      console.error('Fallo en lead capture:', error);
+      logger.error('Fallo en lead capture:', error);
       setErrorMsg(error instanceof Error ? error.message : 'Error al procesar la solicitud');
       setLeadState('error');
 

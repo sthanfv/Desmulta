@@ -1,4 +1,5 @@
 'use client';
+import { logger } from '@/lib/logger/security-logger';
 
 import React, { useState, useEffect, useCallback } from 'react';
 import {
@@ -154,7 +155,7 @@ function ExportControls({ admins }: { admins: string[] }) {
       const fileName = `Audit_Desmulta_${new Date().getTime()}.pdf`;
       doc.save(fileName);
     } catch (error) {
-      console.error('Error exportando datos:', error);
+      logger.error('Error exportando datos:', error);
     } finally {
       setIsExporting(false);
     }

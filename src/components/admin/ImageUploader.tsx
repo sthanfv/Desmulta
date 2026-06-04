@@ -1,4 +1,5 @@
 'use client';
+import { logger } from '@/lib/logger/security-logger';
 
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
@@ -39,7 +40,7 @@ export function ImageUploader() {
       const blob = (await response.json()) as { url: string };
       setUploadedUrl(blob.url);
     } catch (err) {
-      console.error(err);
+      logger.error(err);
       const e = err as Error;
       setError(e.message || 'Error desconocido al subir el archivo.');
     } finally {

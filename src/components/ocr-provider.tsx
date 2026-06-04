@@ -1,4 +1,5 @@
 'use client';
+import { logger } from '@/lib/logger/security-logger';
 
 import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { tesseractManager, type RecognizeResult } from '@/lib/ocr/tesseract-worker';
@@ -36,7 +37,7 @@ export function OCRProvider({ children }: { children: React.ReactNode }) {
         })
         .catch((err) => {
           if (isMounted) setError('Fallo en el motor de lectura óptica. Recarga la página.');
-          console.error('[OCR] Pre-warming abortado:', err);
+          logger.error('[OCR] Pre-warming abortado:', err);
         });
     }
 
