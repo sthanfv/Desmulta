@@ -13,6 +13,7 @@ export interface AnalyticsData {
   growthData: { date: string; count: number }[];
   statusData: { name: string; value: number }[];
   infractionData: { name: string; value: number }[];
+  funnelData?: { name: string; value: number; fill: string }[];
 }
 
 export function useAnalyticsStats(auth: Auth | null) {

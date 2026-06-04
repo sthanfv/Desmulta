@@ -16,6 +16,7 @@ vi.mock('firebase-admin/firestore', () => ({
   getFirestore: vi.fn(() => ({
     collection: vi.fn(() => ({
       doc: vi.fn((docId) => ({
+        id: docId,
         get: vi.fn().mockImplementation(async () => {
           const data = mockCooldowns.get(docId);
           return {
@@ -32,10 +33,36 @@ vi.mock('firebase-admin/firestore', () => ({
         }),
       })),
     })),
+    runTransaction: vi.fn().mockImplementation(async (updateFunction) => {
+      // Mock básico de transaction
+      const t = {
+        get: vi.fn().mockImplementation(async (docRef) => await docRef.get()),
+        set: vi.fn().mockImplementation((docRef, data, options) => docRef.set(data, options)),
+        update: vi.fn().mockImplementation((docRef, data) => {
+          const currentData = mockCooldowns.get(docRef.id) || {};
+          mockCooldowns.set(docRef.id, { ...currentData, ...data });
+        }),
+      };
+      return await updateFunction(t);
+    }),
   })),
   FieldValue: {
     serverTimestamp: vi.fn(() => ({
       toMillis: () => Date.now(),
+    })),
+  },
+  Timestamp: {
+    now: vi.fn(() => ({
+      toMillis: () => Date.now(),
+      toDate: () => new Date(),
+    })),
+    fromDate: vi.fn((date) => ({
+      toMillis: () => date.getTime(),
+      toDate: () => date,
+    })),
+    fromMillis: vi.fn((ms) => ({
+      toMillis: () => ms,
+      toDate: () => new Date(ms),
     })),
   },
 }));

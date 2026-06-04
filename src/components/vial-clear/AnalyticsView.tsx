@@ -418,7 +418,41 @@ export function AnalyticsView({ data, isLoading, error }: AnalyticsViewProps) {
           </div>
         </div>
 
-        {/* ── Embudo de Conversión (Growth Audit) ── */}
+        {/* ── Embudo de Conversión (Drop-off del Formulario) ── */}
+        <div className="lg:col-span-2">
+          <ChartCard title="Embudo del Formulario (Drop-off entre pasos)">
+            {data.funnelData && data.funnelData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart
+                  data={data.funnelData}
+                  layout="vertical"
+                  margin={{ top: 20, right: 30, left: 40, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} opacity={0.3} />
+                  <XAxis type="number" hide />
+                  <YAxis dataKey="name" type="category" width={120} tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+                  <Tooltip 
+                    cursor={{ fill: 'hsl(var(--muted))', opacity: 0.2 }}
+                    content={({ active, payload }) => (
+                      <ChartTooltip active={active} payload={payload} valueLabel="usuarios" />
+                    )}
+                  />
+                  <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={32}>
+                    {data.funnelData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.fill} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-40 text-muted-foreground text-sm">
+                Sin datos de abandono registrados aún.
+              </div>
+            )}
+          </ChartCard>
+        </div>
+
+        {/* ── Embudo de Conversión de Negocio (Growth Funnel) ── */}
         <div className="lg:col-span-2">
           <ChartCard title="Embudo de Conversión (Growth Funnel)">
             <div className="flex flex-col md:flex-row items-center gap-4 py-4 w-full justify-between">

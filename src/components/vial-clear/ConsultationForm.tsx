@@ -223,6 +223,26 @@ export function ConsultationForm({ onSuccess, mode = 'full', nonce }: Consultati
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [form, step, successData, fcmToken]);
 
+  // ── FUNNEL TELEMETRY ──
+  // Enviar un ping silencioso cada vez que el usuario cambia de paso
+  useEffect(() => {
+    // Si ya completó el form, no reportamos steps de "éxito" como parte del drop-off
+    if (form.formState.isSubmitSuccessful || successData) return;
+
+    const payload = JSON.stringify({
+      accion: 'funnel_step',
+      step: step,
+      isSimitMode: isSimitMode,
+    });
+    
+    // Preferir sendBeacon si está disponible para no bloquear el hilo
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon('/api/abandonment', payload);
+    } else {
+      fetch('/api/abandonment', { method: 'POST', body: payload, keepalive: true }).catch(() => {});
+    }
+  }, [step, isSimitMode, form.formState.isSubmitSuccessful, successData]);
+
   const formatPhone = (value: string) => {
     const numbers = value.replace(/\D/g, '');
     if (numbers.length <= 3) return numbers;

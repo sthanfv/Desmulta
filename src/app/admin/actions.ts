@@ -14,14 +14,13 @@ import { ShowcaseConfig, FooterConfig } from '@/lib/site-config';
  */
 export async function updateShowcaseConfig(idToken: string, data: ShowcaseConfig) {
   try {
-    await requireAdminSession(idToken);
+    const decodedToken = await requireAdminSession(idToken);
     getAdminApp();
     const db = getFirestore();
     const docRef = db.collection('site_config').doc('showcase');
 
     await docRef.set(data, { merge: true });
 
-    const decodedToken = await requireAdminSession(idToken);
     const { logAdminAction } = await import('@/app/admin/audit-actions');
     await logAdminAction({
       adminEmail: decodedToken.email || decodedToken.uid,
@@ -48,14 +47,13 @@ export async function updateShowcaseConfig(idToken: string, data: ShowcaseConfig
  */
 export async function updateFooterConfig(idToken: string, data: FooterConfig) {
   try {
-    await requireAdminSession(idToken);
+    const decodedToken = await requireAdminSession(idToken);
     getAdminApp();
     const db = getFirestore();
     const docRef = db.collection('site_config').doc('footer');
 
     await docRef.set(data, { merge: true });
 
-    const decodedToken = await requireAdminSession(idToken);
     const { logAdminAction } = await import('@/app/admin/audit-actions');
     await logAdminAction({
       adminEmail: decodedToken.email || decodedToken.uid,
@@ -80,8 +78,9 @@ export async function uploadImage(
   formData: FormData,
   fileKey: string
 ): Promise<{ url: string } | { error: string }> {
+  let decodedToken: any;
   try {
-    await requireAdminSession(idToken);
+    decodedToken = await requireAdminSession(idToken);
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Error de auth';
     return { error: msg };
@@ -117,7 +116,6 @@ export async function uploadImage(
     // Revalidate the homepage to reflect the new image
     revalidatePath('/');
 
-    const decodedToken = await requireAdminSession(idToken);
     const { logAdminAction } = await import('@/app/admin/audit-actions');
     await logAdminAction({
       adminEmail: decodedToken.email || decodedToken.uid,
@@ -139,7 +137,7 @@ export async function deleteExpiredConsultations(idToken: string): Promise<{
   error?: string;
 }> {
   try {
-    await requireAdminSession(idToken);
+    const decodedToken = await requireAdminSession(idToken);
     getAdminApp();
     const db = getFirestore();
 
@@ -166,7 +164,6 @@ export async function deleteExpiredConsultations(idToken: string): Promise<{
 
     await batch.commit();
 
-    const decodedToken = await requireAdminSession(idToken);
     const { logAdminAction } = await import('@/app/admin/audit-actions');
     await logAdminAction({
       adminEmail: decodedToken.email || decodedToken.uid,
@@ -267,9 +264,10 @@ export async function convertToCase(
   customDb?: FirebaseFirestore.Firestore
 ) {
   try {
+    let decodedToken: any;
     // Si se provee un customDb (test mode), saltamos la sesión de admin
     if (!customDb) {
-      await requireAdminSession(idToken);
+      decodedToken = await requireAdminSession(idToken);
       getAdminApp();
     }
 
@@ -336,10 +334,12 @@ export async function convertToCase(
       }
     });
 
-    const decodedToken = await requireAdminSession(idToken);
+    if (!customDb && !decodedToken) {
+      decodedToken = await requireAdminSession(idToken);
+    }
     const { logAdminAction } = await import('@/app/admin/audit-actions');
     await logAdminAction({
-      adminEmail: decodedToken.email || decodedToken.uid,
+      adminEmail: decodedToken?.email || decodedToken?.uid || 'SYSTEM',
       action: 'CREATE',
       resource: 'Case',
       details: { caseId, leadId: lead.id },
@@ -614,7 +614,7 @@ export async function deleteSimitCaptures(idToken: string): Promise<{
   error?: string;
 }> {
   try {
-    await requireAdminSession(idToken);
+    const decodedToken = await requireAdminSession(idToken);
     const { list, del } = await import('@vercel/blob');
     // Listar blobs con el prefijo específico
     const { blobs } = await list({ prefix: 'simit_cap_' });
@@ -629,7 +629,6 @@ export async function deleteSimitCaptures(idToken: string): Promise<{
     // Eliminar en lote
     await del(urls);
 
-    const decodedToken = await requireAdminSession(idToken);
     const { logAdminAction } = await import('@/app/admin/audit-actions');
     await logAdminAction({
       adminEmail: decodedToken.email || decodedToken.uid,
@@ -938,6 +937,30 @@ const getCachedAnalyticsStats = unstable_cache(
       .sort((a, b) => b[1] - a[1])
       .slice(0, 5)
       .map(([name, value]) => ({ name, value }));
+      
+    // ── Funnel Drop-off Telemetry ───────────────────────────────────────────────
+    // Leemos la colección edge_telemetry para eventos funnel_step (últimos 30 días para no sobrecargar, aunque por ahora leemos todo por simplicidad)
+    const edgeTelemetrySnap = await db.collection('edge_telemetry').where('event', '==', 'funnel_step').get();
+    
+    // Conteo por pasos (0: Placa/Cédula, 1: Contacto, 2: Pre-Análisis)
+    let step0 = 0;
+    let step1 = 0;
+    let step2 = 0;
+    
+    edgeTelemetrySnap.forEach((doc) => {
+      const { funnelStep } = doc.data();
+      if (funnelStep === 0) step0++;
+      if (funnelStep === 1) step1++;
+      if (funnelStep === 2) step2++;
+    });
+    
+    // Para el gráfico de embudo (Recharts FunnelChart)
+    const funnelData = [
+      { name: 'Paso 0: Inicio', value: step0, fill: '#8884d8' },
+      { name: 'Paso 1: Contacto', value: step1, fill: '#82ca9d' },
+      { name: 'Paso 2: Pre-Análisis', value: step2, fill: '#ffc658' },
+      { name: 'Completados (Leads)', value: totalLeads, fill: '#ff8042' }
+    ];
 
     // ── Tiempo promedio de resolución real ────────────────────────────────────
     // Calcula la diferencia real entre createdAt y updatedAt en casos finalizados.
@@ -992,6 +1015,7 @@ const getCachedAnalyticsStats = unstable_cache(
       growthData,
       statusData,
       infractionData,
+      funnelData,
     };
   },
   ['admin-analytics-stats'],
@@ -1062,7 +1086,7 @@ export async function getReferrals(idToken: string) {
  */
 export async function updateReferralStatus(idToken: string, referralId: string, status: string) {
   try {
-    await requireAdminSession(idToken);
+    const decodedToken = await requireAdminSession(idToken);
     getAdminApp();
     const db = getFirestore();
 
@@ -1072,7 +1096,6 @@ export async function updateReferralStatus(idToken: string, referralId: string, 
       updatedAt: Timestamp.now(),
     });
 
-    const decodedToken = await requireAdminSession(idToken);
     const { logAdminAction } = await import('@/app/admin/audit-actions');
     await logAdminAction({
       adminEmail: decodedToken.email || decodedToken.uid,

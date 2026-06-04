@@ -5,6 +5,7 @@ import { signVipSession } from '@/lib/security/vip-jwt';
 import { hashPII } from '@/lib/security/server-crypto';
 
 import { rateLimit } from '@/lib/security/rate-limit';
+import { logger } from '@/lib/logger/security-logger';
 
 export async function POST(request: Request) {
   try {
@@ -112,7 +113,9 @@ export async function POST(request: Request) {
 
     return response;
   } catch (error) {
-    console.error('Error en autenticación VIP:', error);
+    logger.error('Error en autenticación VIP', { 
+      error: error instanceof Error ? error.message : String(error) 
+    });
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
   }
 }

@@ -15,6 +15,52 @@ vi.mock('next/headers', () => ({
   })),
 }));
 
+vi.mock('firebase-admin/firestore', () => ({
+  getFirestore: vi.fn(() => ({
+    collection: vi.fn(() => ({
+      doc: vi.fn((docId) => ({
+        id: docId,
+        get: vi.fn().mockImplementation(async () => ({
+          exists: false,
+          data: () => undefined,
+        })),
+        set: vi.fn(),
+      })),
+    })),
+    runTransaction: vi.fn().mockImplementation(async (updateFunction) => {
+      const t = {
+        get: vi.fn().mockImplementation(async (docRef) => await docRef.get()),
+        set: vi.fn().mockImplementation((docRef, data, options) => docRef.set(data, options)),
+        update: vi.fn(),
+      };
+      return await updateFunction(t);
+    }),
+  })),
+  FieldValue: {
+    serverTimestamp: vi.fn(() => ({
+      toMillis: () => Date.now(),
+    })),
+  },
+  Timestamp: {
+    now: vi.fn(() => ({
+      toMillis: () => Date.now(),
+      toDate: () => new Date(),
+    })),
+    fromDate: vi.fn((date) => ({
+      toMillis: () => date.getTime(),
+      toDate: () => date,
+    })),
+    fromMillis: vi.fn((ms) => ({
+      toMillis: () => ms,
+      toDate: () => new Date(ms),
+    })),
+  },
+}));
+
+vi.mock('@/lib/firebase-admin', () => ({
+  getAdminApp: vi.fn(),
+}));
+
 describe('God Mode Security System', () => {
   beforeEach(() => {
     vi.clearAllMocks();

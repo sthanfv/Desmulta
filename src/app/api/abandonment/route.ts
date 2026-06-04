@@ -13,8 +13,10 @@ const AbandonmentSchema = z.object({
     .nullable()
     .optional(),
   email: z.string().email().nullable().optional(),
-  accion: z.enum(['ping', 'clear']),
+  accion: z.enum(['ping', 'clear', 'funnel_step']),
   fcmToken: z.string().nullable().optional(),
+  step: z.number().optional(),
+  isSimitMode: z.boolean().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -45,10 +47,31 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Payload inválido' }, { status: 400 });
     }
 
-    const { contacto, email, accion, fcmToken } = parsed.data;
+    const { contacto, email, accion, fcmToken, step, isSimitMode } = parsed.data;
 
-    // Si no hay información útil, no hacemos nada
-    if (!contacto && !email && !fcmToken) {
+    // Si no hay información útil y no es funnel step, no hacemos nada
+    if (!contacto && !email && !fcmToken && accion !== 'funnel_step') {
+      return NextResponse.json({ success: true });
+    }
+
+    if (accion === 'funnel_step' && typeof step === 'number') {
+      try {
+        const { getAdminApp } = await import('@/lib/firebase-admin');
+        const { getFirestore, FieldValue } = await import('firebase-admin/firestore');
+        const app = getAdminApp();
+        const db = getFirestore(app);
+        
+        // Escribimos a la colección edge_telemetry (usando Admin SDK ignoramos las reglas restrictivas del cliente)
+        await db.collection('edge_telemetry').add({
+          event: 'funnel_step',
+          funnelStep: step,
+          isSimitMode: !!isSimitMode,
+          ts: Date.now(),
+          timestamp: FieldValue.serverTimestamp()
+        });
+      } catch (err) {
+        logger.warn('[Abandonment] Error saving funnel step:', err);
+      }
       return NextResponse.json({ success: true });
     }
 
@@ -98,7 +121,9 @@ export async function POST(req: NextRequest) {
             },
           });
         } catch (pushErr) {
-          console.error('[Abandonment] Error sending Web Push:', pushErr);
+          logger.error('[Abandonment] Error sending Web Push', {
+            error: pushErr instanceof Error ? pushErr.message : String(pushErr),
+          });
         }
       }
     }
