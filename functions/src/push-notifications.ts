@@ -119,7 +119,8 @@ export async function sendCaseUpdateNotification(
       newStatus,
     });
     return response;
-  } catch (error: any) {
+  } catch (err: unknown) {
+    const error = err as { code?: string };
     if (
       consultationId && (
         error?.code === 'messaging/registration-token-not-registered' ||
@@ -136,7 +137,7 @@ export async function sendCaseUpdateNotification(
       } catch (e) {}
     }
     logger.error('[PushNotifications] Error al enviar notificación:', {
-      error: error instanceof Error ? error.message : 'Error desconocido',
+      error: err instanceof Error ? err.message : 'Error desconocido',
       caseId,
       newStatus,
     });

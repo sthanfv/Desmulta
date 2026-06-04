@@ -25,7 +25,7 @@ import { saveToVault } from '@/lib/pwa/idb-vault';
 import { tesseractManager } from '@/lib/ocr/tesseract-worker';
 import { useWebPush } from '@/hooks/useWebPush';
 import { PushPermissionBanner } from './PushPermissionBanner';
-
+import { useConsultationForm } from '@/hooks/useConsultationForm';
 type ConsultationFormData = z.infer<typeof ConsultationSchema>;
 const FIELD_LABELS: Record<string, string> = {
   cedula: 'Cédula',
@@ -85,21 +85,48 @@ const StepSuccess = dynamic(() => import('./steps/StepSuccess'), {
 });
 
 export function ConsultationForm({ onSuccess, mode = 'full', nonce }: ConsultationFormProps) {
-  const isSimitMode = mode === 'simit';
-  const [step, setStep] = useState(isSimitMode ? 2 : 0);
-  const [successData, setSuccessData] = useState<{ docId: string; trackingUuid?: string } | null>(
-    null
-  );
-  const [showCedula, setShowCedula] = useState(false);
-  // 🛡️ DEVSECOPS: Estado de escudo Cloudflare Turnstile
-  const [cfToken, setCfToken] = useState<string | null>(null);
-  const { toast } = useToast();
-  const topRef = useRef<HTMLDivElement>(null);
-  const [duplicateError, setDuplicateError] = useState<string | null>(null);
+  const {
+    step,
+    setStep,
+    cfToken,
+    setCfToken,
+    analisisTecnico,
+    setAnalisisTecnico,
+    isScanningOCR,
+    setIsScanningOCR,
+    activarEscaner,
+    setActivarEscaner,
+    showCedula,
+    setShowCedula,
+    duplicateError,
+    setDuplicateError,
+    successData,
+    setSuccessData,
+    topRef,
+    form,
+    toast,
+    rateLimitState,
+    handleRateLimitResponse,
+    clearRateLimit,
+    isSystemDegraded,
+    forceRecoverAll,
+    webPush,
+    isSimitMode,
+  } = useConsultationForm(mode);
 
-  // 🛡️ CIRCUIT BREAKER: Estado de salud
-  const { isSystemDegraded, forceRecoverAll } = useSystemHealth();
+  const {
+    requestNotificationPermission,
+    mostrarBannerPushNotificacion,
+    cerrarBannerPush,
+    isHandlingPermission,
+    fcmToken,
+    mostrarBannerPush,
+    estadoPermiso,
+  } = webPush;
+
+  const [hasInteractedWithPush, setHasInteractedWithPush] = useState(false);
   const [isRecovering, setIsRecovering] = useState(false);
+  const [turnstileRefreshCount, setTurnstileRefreshCount] = useState(0);
 
   const handleForceRecover = () => {
     setIsRecovering(true);
@@ -114,143 +141,6 @@ export function ConsultationForm({ onSuccess, mode = 'full', nonce }: Consultati
       });
     }, 800);
   };
-
-  useEffect(() => {
-    if (isSystemDegraded && step < 2 && !isSimitMode) {
-      setStep(2);
-    }
-  }, [isSystemDegraded, step, isSimitMode]);
-
-  // 🛑 RATE-LIMIT: Banner inline con countdown preciso desde header Retry-After
-  const { rateLimitState, handleRateLimitResponse, clearRateLimit } = useRateLimit();
-
-  // 🧠 UX: Reset de scroll crítico (Simplificado v2 — Soporte nativo para Vaul/Android)
-  useEffect(() => {
-    if (!topRef.current) return;
-
-    /**
-     * @description Fuerza el scroll del elemento de anclaje (topRef) hacia la parte
-     * superior de su contenedor scrollable más cercano (Drawer, Modal o Window).
-     * El comportamiento 'instant' es crucial para evitar el motor de inercia de Android.
-     */
-    const performScroll = () => {
-      topRef.current?.scrollIntoView({
-        behavior: 'instant' as ScrollBehavior,
-        block: 'start',
-      });
-    };
-
-    // Ejecución inmediata (para el placeholder/Suspense)
-    performScroll();
-
-    // Re-ejecución tras un ciclo de renderizado para asegurar que next/dynamic
-    // haya inyectado el contenido real y las dimensiones sean finales.
-    const rafId = requestAnimationFrame(() => {
-      performScroll();
-    });
-
-    return () => cancelAnimationFrame(rafId);
-  }, [step]);
-
-  // 🛡️ DEVSECOPS: Liberación de recursos al abandonar el flujo (Singleton pattern)
-  useEffect(() => {
-    return () => {
-      tesseractManager.terminate();
-    };
-  }, []);
-
-  // Estados para el Escáner Forense
-  const [isScanningOCR, setIsScanningOCR] = useState(false);
-
-  /**
-   * Almacena el dictamen del Motor Heurístico Técnico tras el análisis OCR.
-   * Se inicializa en `undefined` y se populea cuando `ImageUpload` llama a `onAnalisisTecnico`.
-   * Se incluye en el payload POST para persistencia en Firestore y Telegram.
-   */
-  const [analisisTecnico, setAnalisisTecnico] = useState<OCRAnalysisResult | undefined>(undefined);
-
-  // 🛡️ Barrera de Interacción OCR (v5.1.0): El motor Tesseract.js NO se descarga
-  // hasta que el usuario pulse el botón "Subir Captura". Esto elimina el chunk de 2.7s
-  // del Critical Rendering Path, desbloqueando el FCP en dispositivos móviles.
-  const [activarEscaner, setActivarEscaner] = useState(false);
-
-  // 🔔 SISTEMA PUSH ZERO-COST: Para suscribir al ciudadano a notificaciones de éxito
-  const {
-    requestNotificationPermission,
-    mostrarBannerPushNotificacion,
-    cerrarBannerPush,
-    isHandlingPermission,
-    fcmToken,
-    mostrarBannerPush,
-    estadoPermiso,
-  } = useWebPush();
-  const [hasInteractedWithPush, setHasInteractedWithPush] = useState(false);
-
-  // 🧠 Recuperación inteligente de Vault (Corregido: Turnstile expirado)
-  useEffect(() => {
-    import('@/lib/pwa/idb-vault').then(({ hasPendingVaultData, getFromVault }) => {
-      hasPendingVaultData().then((hasPending) => {
-        if (hasPending) {
-          getFromVault().then((saved) => {
-            if (saved?.data) {
-              toast({
-                title: '📋 Consulta guardada encontrada',
-                description:
-                  'Recuperamos un formulario que no se pudo enviar. Tus datos fueron restaurados. Completa el envío cuando estés listo.',
-              });
-            }
-          });
-        }
-      });
-    });
-  }, [toast]);
-
-  // 🧠 Pre-calentamiento silencioso del modelo OCR de Tesseract
-  // Se carga dinámicamente para NO bloquear la hidratación inicial.
-  useEffect(() => {
-    import('@/hooks/useTesseractPrewarm').then(({ prefetchTesseractModel }) => {
-      prefetchTesseractModel();
-    });
-  }, []);
-
-  // 🛡️ REPARACIÓN: Estado para forzar recarga del widget de Turnstile si el token expira
-  // Evita el bloqueo "timeout-or-duplicate" de Cloudflare si enviar el form falla tardíamente
-  const [turnstileRefreshCount, setTurnstileRefreshCount] = useState(0);
-
-  const form = useForm<ConsultationFormData>({
-    resolver: zodResolver(
-      isSimitMode
-        ? (SimitCaptureSchema as unknown as typeof ConsultationSchema)
-        : ConsultationSchema
-    ),
-    defaultValues: isSimitMode
-      ? {
-          contacto: '',
-          aceptoTerminos: false,
-          websiteHoneypot: '',
-          evidenceUrl: '',
-          cedula: 'SIMIT-CAPTURA',
-          placa: '',
-          nombre: 'VÍA CAPTURA SIMIT',
-          antiguedad: 'N/A',
-          tipoInfraccion: 'N/A',
-          estadoCoactivo: 'N/A',
-        }
-      : {
-          cedula: '',
-          placa: '',
-          nombre: '',
-          contacto: '',
-          aceptoTerminos: false,
-          websiteHoneypot: '',
-          antiguedad: '',
-          tipoInfraccion: '',
-          estadoCoactivo: '',
-          evidenceUrl: '',
-          email: '',
-          requiresOperatorFiling: false,
-        },
-  });
 
   // Lógica de persistencia (Modo Supervivencia con IndexedDB)
   useEffect(() => {

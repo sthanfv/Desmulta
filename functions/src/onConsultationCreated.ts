@@ -201,7 +201,7 @@ export const onConsultationCreated = onDocumentCreated({
       
       // ── 1.5 Buscar Datos Financieros y Dictamen en Leads (Delay para evitar Race Condition)
       let leadDeuda = 0;
-      let leadMultas: any[] = [];
+      let leadMultas: Array<{ comparendo?: string; fecha?: string; valor?: number }> = [];
       if (data.cedula && data.cedula !== 'SIMIT-CAPTURA') {
         try {
           const leadSnap = await db.collection('leads')
@@ -233,7 +233,7 @@ export const onConsultationCreated = onDocumentCreated({
           message += `💰 <b>Total Deuda:</b> $${leadDeuda.toLocaleString('es-CO')}\n`;
           message += `🚨 <b>Multas (${leadMultas.length}):</b>\n`;
           leadMultas.slice(0, 5).forEach((m, i) => {
-            message += `   • ${m.comparendo} (${m.fecha}) - $${m.valor.toLocaleString('es-CO')}\n`;
+            message += `   • ${m.comparendo || 'Desconocido'} (${m.fecha || 'Sin fecha'}) - $${(m.valor || 0).toLocaleString('es-CO')}\n`;
           });
           if (leadMultas.length > 5) message += `   • ...y ${leadMultas.length - 5} más\n`;
         } else if (ocrData) {

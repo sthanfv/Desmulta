@@ -9,8 +9,10 @@ if (!apiKey && process.env.NODE_ENV === 'production') {
   );
 }
 
+import { logger } from '@/lib/logger/security-logger';
+
 if (!apiKey) {
-  console.warn('⚠️ RESEND_API_KEY no detectada. El envío de correos fallará en desarrollo.');
+  logger.warn('[Resend] RESEND_API_KEY no detectada. El envío de correos fallará en desarrollo.');
 }
 
 export const resend = new Resend(apiKey);

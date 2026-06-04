@@ -373,7 +373,9 @@ export function TouchDebugger() {
           if (k) entries.push({ key: k, value: sessionStorage.getItem(k) || '', type: 'session' });
         }
         setStorageEntries(entries);
-      } catch (_e) {}
+      } catch (_e) {
+        console.debug('Storage error', _e);
+      }
     }
   }, []);
 
@@ -534,7 +536,9 @@ export function TouchDebugger() {
               entries.push({ key: k, value: sessionStorage.getItem(k) || '', type: 'session' });
           }
           setStorageEntries(entries);
-        } catch (_e) {}
+        } catch (_e) {
+          console.debug('Storage interval error', _e);
+        }
       }
     }, 1000);
     return () => {

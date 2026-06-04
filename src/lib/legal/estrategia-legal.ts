@@ -6,6 +6,8 @@ interface EvaluacionLegal {
   argumento: string;
 }
 
+import { differenceInYears } from 'date-fns';
+
 export function evaluarCasoTransito(
   fechaInfraccion?: string,
   esFotomulta?: boolean,
@@ -19,8 +21,7 @@ export function evaluarCasoTransito(
     };
   }
 
-  const añosTranscurridos =
-    (new Date().getTime() - new Date(fechaInfraccion).getTime()) / (1000 * 60 * 60 * 24 * 365);
+  const añosTranscurridos = differenceInYears(new Date(), new Date(fechaInfraccion));
 
   // 1. Regla de Prescripción (Ley 769 de 2002 - Art 159)
   if (añosTranscurridos >= 3 && !tieneCobroCoactivo) {
@@ -33,7 +34,7 @@ export function evaluarCasoTransito(
   }
 
   // 2. Regla de Tutela / Debido Proceso (Fotomultas)
-  if (esFotomulta && añosTranscurridos > 1) {
+  if (esFotomulta && añosTranscurridos >= 1) {
     return {
       estrategia: 'TUTELA',
       certeza: 'MEDIA',

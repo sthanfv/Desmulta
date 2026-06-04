@@ -53,7 +53,7 @@ export const cronRetryNotifications = onSchedule({
       });
 
       if (telegramRes.ok) {
-        const tgData = await telegramRes.json() as any;
+        const tgData = await telegramRes.json() as { result?: { message_id?: number } };
         const telegramMsgId = tgData?.result?.message_id;
 
         await docSnap.ref.update({

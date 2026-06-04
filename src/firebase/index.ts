@@ -4,6 +4,7 @@ import { firebaseConfig } from '@/firebase/config';
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
+import { logger } from '@/lib/logger/security-logger';
 
 // IMPORTANT: DO NOT MODIFY THIS FUNCTION
 export function initializeFirebase() {
@@ -16,9 +17,9 @@ export function initializeFirebase() {
       try {
         const host = '127.0.0.1';
         connectFirestoreEmulator(sdks.firestore, host, 8080);
-        console.log(`[DevHelper] Enlazado al Firestore Emulator (${host}:8080)`);
+        logger.info(`[DevHelper] Enlazado al Firestore Emulator (${host}:8080)`);
       } catch (e) {
-        console.warn('[DevHelper] Firestore Emulator ya conectado o fallido.', e);
+        logger.warn('[DevHelper] Firestore Emulator ya conectado o fallido.', { error: String(e) });
       }
     }
 

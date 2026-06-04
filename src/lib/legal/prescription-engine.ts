@@ -1,3 +1,4 @@
+import { differenceInYears } from 'date-fns';
 /**
  * Motor de Heurísticas Técnicas (Zero-PII)
  * Implementa Ley 769 de 2002 (Prescripción/Caducidad) y Sentencia C-038/2020.
@@ -85,9 +86,7 @@ export class PrescriptionEngine {
     const infractionDate = new Date(`${year}-${month}-${day}`);
     const currentDate = new Date();
 
-    // Calcular diferencia en años
-    const yearsDiff =
-      (currentDate.getTime() - infractionDate.getTime()) / (1000 * 60 * 60 * 24 * 365.25);
+    const yearsDiff = differenceInYears(currentDate, infractionDate);
 
     // 1. Prescripción (Art. 159, Ley 769 de 2002) - 3 años
     // ✅ Este chequeo es MATEMÁTICO (solo usa fechas), no depende de palabras,

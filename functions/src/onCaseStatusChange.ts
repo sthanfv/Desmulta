@@ -66,7 +66,7 @@ async function processCaseEmail(caseId: string, after: CaseAfterData, isNew: boo
     let operatorNote: string | undefined;
     const historyArray = after.history || after.timeline_updates || [];
     if (Array.isArray(historyArray)) {
-      const lastNoteEvent = historyArray.slice().reverse().find((e: any) => e.operatorNote);
+      const lastNoteEvent = historyArray.slice().reverse().find((e: { operatorNote?: string }) => e.operatorNote);
       if (lastNoteEvent) operatorNote = lastNoteEvent.operatorNote;
     }
 
@@ -256,7 +256,7 @@ async function processCaseEmail(caseId: string, after: CaseAfterData, isNew: boo
  */
 async function notifyTelegramStatusChange(
   consultationId: string,
-  after: any,
+  after: admin.firestore.DocumentData,
   changedBy: 'kanban' | 'sistema' = 'kanban'
 ) {
   const botToken = process.env.TELEGRAM_BOT_TOKEN;
@@ -294,7 +294,7 @@ async function notifyTelegramStatusChange(
     let operatorNote: string | undefined;
     const historyArray = after.history || after.timeline_updates || [];
     if (Array.isArray(historyArray)) {
-      const lastNoteEvent = historyArray.slice().reverse().find((e: any) => e.operatorNote);
+      const lastNoteEvent = historyArray.slice().reverse().find((e: { operatorNote?: string }) => e.operatorNote);
       if (lastNoteEvent) operatorNote = lastNoteEvent.operatorNote;
     }
 
@@ -315,7 +315,7 @@ async function notifyTelegramStatusChange(
     if (telegramMessageId) {
       // ✅ EDITAR el mensaje original en vez de enviar uno nuevo
       const endpoint = telegramHasPhoto ? 'editMessageCaption' : 'editMessageText';
-      const bodyPayload: any = {
+      const bodyPayload: Record<string, unknown> = {
         chat_id: chatId,
         message_id: telegramMessageId,
         parse_mode: 'HTML',

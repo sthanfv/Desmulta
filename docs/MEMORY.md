@@ -15,17 +15,26 @@
 
 ### Soluciones implementadas
 
-**Protección de Datos (Zustand):**
+**Protección de Datos (Zustand) y Privacidad de Negocio:**
 - **Eliminación de PII en local:** Se sacó la `cedula` y `ocrRawText` del middleware de persistencia (`partialize`) en `useExpedienteStore.ts`. Estos datos ya no quedan guardados en `localStorage`, limitando exposición si se usan dispositivos compartidos.
+- **Ofuscación de IDs:** Se modificó la generación de `shortId` en `src/app/api/create-consultation/route.ts` para usar un UUID truncado (`crypto.randomUUID()`) en lugar del contador secuencial, evitando revelar el volumen de negocio a competidores. El contador real se preserva privadamente en `internalRef`.
 
-**Endurecimiento de Tipos (Backend):**
+**Endurecimiento de Tipos y Precisión Legal:**
 - **Sustitución de `any`:** Se implementó la interfaz `CaseAfterData` en `onCaseStatusChange.ts` para tipar estrictamente el parámetro `after`, evitando errores silenciosos si la estructura en Firestore cambia.
+- **Lógica de Fechas Exacta:** Se migraron los cálculos manuales de diferencia de años a la función `differenceInYears` de `date-fns` en `estrategia-legal.ts` y `prescription-engine.ts`, resolviendo el bug de saltos en años bisiestos para dictámenes legales.
 
-**Gestión de Errores (Frontend):**
-- **Visibilidad controlada:** Se sustituyeron los bloques `catch(() => {})` silenciosos en los envíos de métricas a `/api/abandonment` (en `StepContacto.tsx`) por logs de depuración (`console.debug`) que se muestran exclusivamente en entornos de no-producción, logrando telemetría silenciosa en vivo y útil en desarrollo.
+**Gestión de Errores y Logging:**
+- **Visibilidad controlada:** Se sustituyeron los bloques `catch(() => {})` silenciosos en los envíos de métricas a `/api/abandonment` (en `StepContacto.tsx`) por logs de depuración (`console.debug`) exclusivos de desarrollo.
+- **Centralización de Telemetría:** Se reemplazaron las llamadas `console.log` y `console.warn` en `src/firebase/index.ts` y `src/lib/resend.ts` por el logger centralizado del sistema (`@/lib/logger/security-logger`), mejorando la observabilidad en producción y limpiando las consolas de los usuarios.
+
+**Calidad y Pruebas Unitarias (Fix 8):**
+- **Cobertura Mínima de Tests:** Se implementó cobertura oficial en el entorno `vitest.config.ts` utilizando `@vitest/coverage-v8`. Se exigen umbrales estrictos (`lines: 70`, `functions: 70`, `branches: 65`) para los módulos más críticos (`src/lib/security/**`, `src/lib/legal/**`, `src/app/api/**`), asegurando que cualquier regresión en seguridad o dictámenes legales rompa los despliegues de CI. Se añadieron los comandos `test:coverage` y `test:coverage:ci` a `package.json`.
+
+**Refactorización Arquitectónica UI:**
+- **Extracción de Estado UI:** Se creó el custom hook `useConsultationForm.ts` (`src/hooks/useConsultationForm.ts`) para aislar más de 20 estados, refs y subscripciones de eventos del componente de vista `ConsultationForm.tsx`. Esto reduce el acoplamiento y aumenta drásticamente la legibilidad del UI principal.
 
 **Estado de la Arquitectura:**
-- Código endurecido. Tipado 100% estricto respetando el `eslint --max-warnings 0`. Prevención de filtración pasiva de PII.
+- Código endurecido, ofuscado comercialmente, modularizado y con fechas precisas. Tipado 100% estricto respetando el `eslint --max-warnings 0`. Prevención de filtración pasiva de PII.
 ## 🛠️ SESIÓN: RECONOCIMIENTO Y ASIGNACIÓN DE ROL ÉLITE (Junio 2026)
 
 **Objetivo:** Asignación del rol de Equipo de Desarrollo Élite (Principal Engineer, DevSecOps, Privacy Officer, DBA, QA). Ejecución obligatoria de la Fase 0 (Detección de Stack y Auditoría).
@@ -153,6 +162,20 @@
 Cada cambio de estado disparaba 2 funciones en paralelo (`onCaseStatusChange` + `onConsultationStatusChange`) y cada una enviaba un mensaje nuevo a Telegram, resultando en 2–4 mensajes por movimiento. Además, `actions.ts` tenía una Fase 3 que enviaba email y push directamente, creando 2–3 emails por cambio.
 
 ### Soluciones implementadas
+
+### 🚧 Bloqueos y Tareas Pendientes
+*   **Siguiente Paso Inmediato:** Las tareas críticas de la sesión actual han sido completadas:
+    1.  Limpieza de `any` completada en `push-notifications.ts`, `onConsultationCreated.ts`, `onCaseStatusChange.ts` y `cronRetryNotifications.ts` con tipado estricto.
+    2.  Actualizados los bloques `catch` silenciados por `console.debug` en el frontend (`TrackingClientUI.tsx` y `TouchDebugger.tsx`).
+    3.  Finalizado el reemplazo de `Math.random()` por `crypto.randomUUID()` en el API de creación de consultas (`create-consultation/route.ts`).
+    4.  El test legal relacionado con las fechas de fotomulta fue ajustado (`>= 1` año) para reflejar fielmente la ley y el comportamiento de `differenceInYears`.
+    5.  `npm run build` en la carpeta `functions` compila exitosamente bajo tipado estricto. (Ojo: Algunos tests de integración pueden fallar localmente por falta de credenciales de Firebase en el entorno).
+
+### 📁 Documentación Relacionada
+*   `docs/MEMORY.md`: Historial de decisiones actualizado.
+*   `C:\Users\Sthan\.gemini\antigravity\brain\542f348c-33bd-4918-a2e7-8f3922684ebc\task.md`: Lista de verificación (checklist) activa del plan de saneamiento.
+
+**Estado del Sistema:** Operativo y bajo supervisión estricta de calidad. Tipado estricto garantizado en Cloud Functions críticas..
 
 **Telegram sin duplicados:**
 - `onConsultationCreated` guarda el `telegramMessageId` de la respuesta de Telegram.

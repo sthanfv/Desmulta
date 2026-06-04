@@ -10,6 +10,20 @@ export default defineConfig({
     },
   },
   test: {
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'html'],
+      thresholds: {
+        lines: 70,
+        functions: 70,
+        branches: 65,
+      },
+      include: [
+        'src/lib/security/**',
+        'src/lib/legal/**',
+        'src/app/api/**',
+      ],
+    },
     include: [
       '**/__tests__/**/*.test.{ts,tsx,js}',
       'src/tests/**/*.test.{ts,tsx}',

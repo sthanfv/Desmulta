@@ -157,7 +157,7 @@ export async function POST(request: NextRequest) {
           success: true,
           docId: 'BOT_TRAPPED',
           message: 'Consulta recibida.',
-          shortId: 'EXP-BOT-' + Math.floor(Math.random() * 1000),
+          shortId: 'EXP-BOT-' + crypto.randomUUID().slice(0, 8),
         },
         { status: 201 }
       );
@@ -318,7 +318,8 @@ export async function POST(request: NextRequest) {
 
       transaction.set(shardRef, { count: shardCount }, { merge: true });
 
-      const idSecuencial = `EXP-${shardIndex}-${shardCount.toString().padStart(3, '0')}`;
+      const idSecuencial = `EXP-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
+      const internalCounter = `${shardIndex}-${shardCount}`;
 
       const nameParts = dataToSave.nombre.split(' ');
       const obfuscatedName = nameParts
@@ -328,6 +329,7 @@ export async function POST(request: NextRequest) {
       const finalDataToSave = {
         ...dataToSave,
         shortId: idSecuencial,
+        internalRef: internalCounter,
         trackingUuid,
       };
 

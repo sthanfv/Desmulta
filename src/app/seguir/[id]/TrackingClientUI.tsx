@@ -171,7 +171,9 @@ export default function TrackingClientUI({
         const keysToRemove = remainingKeys.slice(5).map((k) => k.key);
         keysToRemove.forEach((key) => localStorage.removeItem(key));
       }
-    } catch (_e) {}
+    } catch (_e) {
+      console.debug('Cleanup LS error', _e);
+    }
 
     setWindowUrl(window.location.href);
   }, []);
