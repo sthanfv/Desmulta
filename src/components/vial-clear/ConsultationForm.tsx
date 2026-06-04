@@ -594,29 +594,32 @@ export function ConsultationForm({ onSuccess, mode = 'full', nonce }: Consultati
     <OCRProvider>
       <Form {...form}>
         <form
-          onSubmit={form.handleSubmit(
-            async (data) => {
-              await onSubmit(data);
-            },
-            (errors) => {
-              if (Object.keys(errors).length > 0) {
-                Haptics.error();
-              }
-              const errorKeys = Object.keys(errors);
-              const firstFieldName = errorKeys[0];
-              const firstError = errors[firstFieldName as keyof typeof errors];
-              const label =
-                firstFieldName in FIELD_LABELS
-                  ? FIELD_LABELS[firstFieldName as keyof typeof FIELD_LABELS]
-                  : firstFieldName;
+          onSubmit={(e) => {
+            e.preventDefault();
+            void form.handleSubmit(
+              async (data) => {
+                await onSubmit(data);
+              },
+              (errors) => {
+                if (Object.keys(errors).length > 0) {
+                  Haptics.error();
+                }
+                const errorKeys = Object.keys(errors);
+                const firstFieldName = errorKeys[0];
+                const firstError = errors[firstFieldName as keyof typeof errors];
+                const label =
+                  firstFieldName in FIELD_LABELS
+                    ? FIELD_LABELS[firstFieldName as keyof typeof FIELD_LABELS]
+                    : firstFieldName;
 
-              toast({
-                variant: 'destructive',
-                title: 'Formulario Incompleto',
-                description: `El campo "${label}" tiene un problema: ${firstError?.message || 'Revisa el formato.'}`,
-              });
-            }
-          )}
+                toast({
+                  variant: 'destructive',
+                  title: 'Formulario Incompleto',
+                  description: `El campo "${label}" tiene un problema: ${firstError?.message || 'Revisa el formato.'}`,
+                });
+              }
+            )(e);
+          }}
           className="space-y-8 md:space-y-10"
         >
           <div ref={topRef} className="px-1">
