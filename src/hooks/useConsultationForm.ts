@@ -6,10 +6,7 @@ import { ConsultationSchema } from '@/lib/definitions';
 import { useToast } from '@/hooks/use-toast';
 import { useRateLimit } from '@/components/ui/RateLimitBanner';
 import { useSystemHealth } from '@/components/providers/SystemHealthProvider';
-import { useExpedienteStore } from '@/store/useExpedienteStore';
 import { useWebPush } from '@/hooks/useWebPush';
-import { encryptE2EPayload } from '@/lib/security/client-crypto';
-import { saveToVault } from '@/lib/pwa/idb-vault';
 import { tesseractManager } from '@/lib/ocr/tesseract-worker';
 import type { OCRAnalysisResult } from '@/lib/definitions';
 

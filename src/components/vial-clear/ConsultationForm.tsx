@@ -452,7 +452,7 @@ export function ConsultationForm({ onSuccess, mode = 'full', nonce }: Consultati
       const { multas, clearExpediente } = useExpedienteStore.getState();
       let statusConsolidacion = 'creado';
 
-      if (multas.length > 0) {
+      if (multas && multas.length > 0) {
         try {
           const extractedIdClean = analisisTecnico?.extractedId?.replace(/\D/g, '');
           const resExpediente = await consolidarExpedienteEnDB({
