@@ -64,8 +64,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         // Recargar la página para que el middleware de Next.js obtenga la cookie actualizada si es necesario
         window.location.reload();
       }
-    } catch (e) {
-      logger.error('Error forzando refresco de token', e);
+    } catch (e: unknown) {
+      logger.error('Error forzando refresco de token', e instanceof Error ? e.message : String(e));
     } finally {
       setIsRefreshing(false);
     }

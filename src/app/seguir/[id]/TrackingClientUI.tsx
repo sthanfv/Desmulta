@@ -172,7 +172,9 @@ export default function TrackingClientUI({
         keysToRemove.forEach((key) => localStorage.removeItem(key));
       }
     } catch (_e) {
-      console.debug('Cleanup LS error', _e);
+      if (process.env.NODE_ENV === 'development') {
+        console.debug('Cleanup LS error', _e);
+      }
     }
 
     setWindowUrl(window.location.href);

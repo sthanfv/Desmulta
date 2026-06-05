@@ -48,8 +48,8 @@ export default function GalleryAdminPage() {
       const res = await fetch('/api/gallery');
       const data = await res.json();
       setCases(data.cases ?? []);
-    } catch (e) {
-      logger.error('[Galería] Error al cargar casos:', e);
+    } catch (e: unknown) {
+      logger.error('[Galería] Error al cargar casos:', e instanceof Error ? e.message : String(e));
       toast({
         title: 'Error',
         description: 'No se pudieron cargar los casos existentes.',

@@ -14,6 +14,20 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
+      - name: Unit tests with coverage
+        run: npm run test:coverage:ci
+        env:
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
+          NEXT_PUBLIC_SITE_URL: "https://desmulta.online"
+          NEXT_PUBLIC_BRAND_NAME: "Desmulta"
+          VIP_JWT_SECRET: ${{ secrets.VIP_JWT_SECRET }}
+          PII_HMAC_SECRET: ${{ secrets.PII_HMAC_SECRET }}
+          COOKIE_SIGNATURE_SECRET: ${{ secrets.COOKIE_SIGNATURE_SECRET }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          RSA_PRIVATE_KEY: ${{ secrets.RSA_PRIVATE_KEY }}
+
       - name: Full Stack Validation (Unit, Integration, E2E, Build)
         run: npm run validate
         env:

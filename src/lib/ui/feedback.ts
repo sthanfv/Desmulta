@@ -1,4 +1,5 @@
 import { toast } from 'sonner';
+import { SecurityLogger } from '@/lib/logger/security-logger';
 
 /**
  * Controlador centralizado de notificaciones In-App (MANDATO-FILTRO v5.4.5).
@@ -20,7 +21,9 @@ export const Feedback = {
    */
   error: (title: string, rawError?: unknown) => {
     // DevSecOps: El error real solo viaja a logs internos (y Sentry vía instrumentation)
-    console.error(`[DevSecOps-Feedback-Internal]`, rawError);
+    SecurityLogger.error('[Feedback] Error de usuario capturado', {
+      error: rawError instanceof Error ? rawError.message : String(rawError),
+    });
 
     toast.error(title, {
       description:

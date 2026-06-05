@@ -7,6 +7,7 @@
  * - Errores reales se relanza para que el caller pueda decidir qué hacer.
  * - Logging solo en desarrollo para no exponer detalles de configuración.
  */
+import { SecurityLogger } from '@/lib/logger/security-logger';
 
 /**
  * Inicializa y gestiona la suscripción a notificaciones Web Push.
@@ -40,10 +41,10 @@ export async function subscribeToPushNotifications(
 
     return subscription;
   } catch (error) {
-    // Solo logear en desarrollo — en producción Sentry lo captura vía SecurityLogger
-    if (process.env.NODE_ENV === 'development') {
-      console.error('[pushService] Error en negociación de PushSubscription:', error);
-    }
+    // En producción Sentry lo captura vía SecurityLogger
+    SecurityLogger.error('[pushService] Error en negociación de PushSubscription', {
+      error: error instanceof Error ? error.message : String(error),
+    });
 
     // IMPORTANTE: Relanzamos para que el caller sepa que hubo un fallo real.
     // Antes devolvíamos null aquí y el caller pensaba que todo estaba bien.

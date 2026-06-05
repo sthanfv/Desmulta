@@ -9,13 +9,13 @@
 
 ---
 
-## 📝 [Sesión Actual] Estabilización v7.10.0 y Cumplimiento de Pruebas
-**Objetivo:** Finalizar la preparación para producción de Desmulta v7.10.0 estabilizando las pruebas unitarias y componentes de seguridad.
+## 📝 [Sesión Actual] Estabilización v7.10.0 y Saneamiento de Logs / Producción
+**Objetivo:** Finalizar la preparación para producción de Desmulta v7.10.0 estabilizando las pruebas unitarias, sanitizando los logs del cliente, refactorizando tipados inseguros y reduciendo costos de lectura en Firestore.
 **Acciones Realizadas:**
-1. **Infraestructura de Tests (Firestore Mocks):** Se completó la implementación del mock de Firestore en `telemetry.test.ts` y `audit-actions.test.ts`. Específicamente, se inyectó la propiedad `id` faltante en `docRef` (`vi.fn((docId) => ({ id: docId, ... }))`), permitiendo que el middleware de rate-limiting (que lee `docRef.id`) funcione sin fallos. Todos los tests de telemetría y seguridad pasan exitosamente.
-2. **Higiene de Logs (Producción Segura):** Se reemplazaron todas las llamadas inseguras a `console.log` y `console.error` en las rutas `/api/abandonment`, `/api/vip/auth`, y `/api/vip/web-push` por el sistema centralizado `logger.error`, garantizando cero fugas de PII y mejor trazabilidad en Sentry.
-3. **Validación de Cobertura CI:** Se solucionó una incompatibilidad de versiones entre `vitest` y `@vitest/coverage-v8` (actualizando ambas a `4.1.8`) que causaba que el comando `npm run test:coverage:ci` fallara o se colgara. Las pruebas automatizadas corren exitosamente, y la plataforma cumple con los estándares de DevSecOps requeridos.
-4. **Roadmap Estratégico:** Se documentaron los próximos pasos de evolución de Desmulta en `docs/ROADMAP.md` abordando escalabilidad Edge, seguridad Zero-PII, e integraciones comerciales de cobro.
+1. **Infraestructura de Tests y Cobertura en CI:** Se inyectó la validación estricta de cobertura (`npm run test:coverage:ci`) en `.github/workflows/ci.yml` para garantizar que el pipeline falle si no se cumple el umbral del 70%.
+2. **Higiene de Logs (Cero Fugas en Producción):** Se limpiaron todos los `console.log`, `console.error` y `console.warn` en `src/lib/env-check.ts`, `tesseract-worker.ts`, `pushService.ts` y componentes UI. Se implementó el envío directo a `SecurityLogger`. 
+3. **Optimización FinOps (Firestore):** Se refactorizó la recolección de métricas `edge_telemetry` en el dashboard de administrador para leer solo documentos de los últimos 30 días y con límite de 5000, evitando colapsos y cobros excesivos por lecturas masivas a toda la colección.
+4. **Tipado Estricto & Sentry:** Se eliminaron tipados inseguros `any` en funciones críticas (como `DecodedIdToken | undefined` al leer las sesiones) y se corrigieron bloques catch para usar `catch (e: unknown)`. Sentry fue acoplado de forma nativa a `SecurityLogger.error/security` para capturar el payload y los detalles exactos en producción.
 
 **Estado Arquitectónico:**
 El pipeline QA está reparado. El código de producción cumple con los requisitos de logging seguro y manejo de estado. La aplicación está lista para el release v7.10.0.

@@ -68,36 +68,24 @@ export const SecurityLogger = {
       Sentry.captureMessage(`[WARN] ${contexto}`);
     });
   },
-  error: (contexto: string, error?: unknown) => {
-    const logSanitizado = sanitizarPII(JSON.stringify(error || {}));
+  error: (contexto: string, datos?: unknown) => {
+    const logSanitizado = sanitizarPII(JSON.stringify(datos || {}));
     console.error(`[ERROR] ${contexto}:`, logSanitizado);
 
-    const fp = getFingerprint(contexto);
-    Sentry.withScope((scope) => {
-      scope.setFingerprint(fp);
-      scope.setLevel('error');
-      scope.setExtra('contexto', contexto);
-      // Extraemos propiedades nativas del error si existen
-      if (error instanceof Error) {
-        scope.setExtra('stack', sanitizarPII(error.stack || ''));
-        Sentry.captureException(error);
-      } else {
-        scope.setExtra('rawPayload', logSanitizado);
-        Sentry.captureMessage(`[ERROR] ${contexto}`);
-      }
+    // ✅ NUEVO: También captura en Sentry para visibilidad en producción
+    Sentry.captureMessage(`${contexto}: ${logSanitizado}`, {
+      level: 'error',
+      fingerprint: getFingerprint(contexto),
     });
   },
   security: (contexto: string, datos?: unknown) => {
     const logSanitizado = sanitizarPII(JSON.stringify(datos || {}));
     console.warn(`[SECURITY EVENT] ${contexto}:`, logSanitizado);
 
-    const fp = getFingerprint(contexto);
-    Sentry.withScope((scope) => {
-      scope.setFingerprint(['security-breach', ...fp]);
-      scope.setLevel('fatal');
-      scope.setExtra('contexto', contexto);
-      scope.setExtra('datos', logSanitizado);
-      Sentry.captureMessage(`[SECURITY] ${contexto}`);
+    // ✅ NUEVO: Los eventos de seguridad siempre van a Sentry con prioridad alta
+    Sentry.captureMessage(`[SECURITY] ${contexto}: ${logSanitizado}`, {
+      level: 'warning',
+      fingerprint: ['security-event', ...getFingerprint(contexto)],
     });
   },
 };

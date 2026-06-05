@@ -4,6 +4,7 @@ import { revalidatePath, revalidateTag } from 'next/cache';
 import { requireAdminSession } from '@/lib/auth/require-admin-session';
 import { getAdminApp } from '@/lib/firebase-admin';
 import { getFirestore, Timestamp, FieldValue } from 'firebase-admin/firestore';
+import type { DecodedIdToken } from 'firebase-admin/auth';
 import { Consultation } from '@/lib/definitions';
 import { DocumentType } from '@/lib/legal/document-templates';
 import { ShowcaseConfig, FooterConfig } from '@/lib/site-config';
@@ -78,7 +79,7 @@ export async function uploadImage(
   formData: FormData,
   fileKey: string
 ): Promise<{ url: string } | { error: string }> {
-  let decodedToken: any;
+  let decodedToken: DecodedIdToken | undefined;
   try {
     decodedToken = await requireAdminSession(idToken);
   } catch (error) {
@@ -264,7 +265,7 @@ export async function convertToCase(
   customDb?: FirebaseFirestore.Firestore
 ) {
   try {
-    let decodedToken: any;
+    let decodedToken: DecodedIdToken | undefined;
     // Si se provee un customDb (test mode), saltamos la sesión de admin
     if (!customDb) {
       decodedToken = await requireAdminSession(idToken);
@@ -939,8 +940,17 @@ const getCachedAnalyticsStats = unstable_cache(
       .map(([name, value]) => ({ name, value }));
       
     // ── Funnel Drop-off Telemetry ───────────────────────────────────────────────
-    // Leemos la colección edge_telemetry para eventos funnel_step (últimos 30 días para no sobrecargar, aunque por ahora leemos todo por simplicidad)
-    const edgeTelemetrySnap = await db.collection('edge_telemetry').where('event', '==', 'funnel_step').get();
+    // Leemos la colección edge_telemetry para eventos funnel_step (últimos 30 días para no sobrecargar)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const edgeTelemetrySnap = await db
+      .collection('edge_telemetry')
+      .where('event', '==', 'funnel_step')
+      .where('ts', '>=', thirtyDaysAgo.getTime())
+      .orderBy('ts', 'desc')
+      .limit(5000)
+      .get();
     
     // Conteo por pasos (0: Placa/Cédula, 1: Contacto, 2: Pre-Análisis)
     let step0 = 0;

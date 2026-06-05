@@ -72,14 +72,9 @@ export const validateEnv = () => {
     return parsed;
   } catch (error) {
     if (error instanceof z.ZodError) {
-      console.error('❌ Error de configuración (Variables de Entorno):');
-      error.errors.forEach((err) => {
-        console.error(`   - ${err.path.join('.')}: ${err.message}`);
-      });
+      const messages = error.errors.map((err) => `  - ${err.path.join('.')}: ${err.message}`).join('\n');
+      throw new Error(`❌ Error de configuración (Variables de Entorno):\n${messages}`);
     }
-    // En producción queremos que falle rápido si la configuración es crítica
-    if (process.env.NODE_ENV === 'production') {
-      throw new Error('Configuración de entorno inválida. Abortando.');
-    }
+    throw error;
   }
 };

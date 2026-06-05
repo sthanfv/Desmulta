@@ -5,6 +5,7 @@
  */
 import { createWorker, Worker, RecognizeResult } from 'tesseract.js';
 import { mediaLogger } from '@/lib/logger/media-logger';
+import { SecurityLogger } from '@/lib/logger/security-logger';
 
 export type { RecognizeResult };
 
@@ -53,7 +54,7 @@ class TesseractWorkerManager {
       } catch (error) {
         this.initializing = null;
         mediaLogger.log('ERROR', 'Fallo crítico al crear Worker', { err: String(error) });
-        console.error('[OCR] Error crítico al inicializar el Worker:', error);
+        SecurityLogger.error('[OCR] Error crítico al inicializar el Worker', { error: String(error) });
         throw error;
       }
     })();

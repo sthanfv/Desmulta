@@ -3,6 +3,20 @@
 Todas las versiones y cambios significativos del proyecto.
 
 ## [v1.0.0] - Mayo 2026
+### 🚀 Estabilidad & CI/CD
+- **Full Coverage Enforcement:** El workflow de GitHub Actions ahora incluye validación dura de cobertura de tests (`npm run test:coverage:ci`) antes de realizar el build.
+- **Tipado Estricto de Errores:** Bloques `catch (e)` refactorizados a `catch (e: unknown)` y chequeos de `instanceof Error` a lo largo del panel de administración (Galería, Layout) para evitar crashes por tipos `any` inseguros.
+
+### 🔒 Security & Sentry
+- **Logs Cero-Exposición:** Reemplazados llamados genéricos de `console.error` y `console.warn` en `env-check.ts`, `tesseract-worker.ts`, y `pushService.ts` por envíos directos a `SecurityLogger`.
+- **Sentry Nativo:** Refactorizado el `SecurityLogger` para delegar directamente payloads con contexto enriquecido mediante `Sentry.captureMessage`, eliminando variables envueltas que dificultaban la lectura de incidentes de seguridad y errores en producción.
+- **Limpieza de UI Logs:** Los logs informativos del lado cliente como la limpieza de `localStorage` en el Tracking UI ahora están ocultos detrás de chequeos `process.env.NODE_ENV === 'development'`.
+
+### ⚡ Rendimiento & FinOps
+- **Query Optimizada:** La recolección de métricas `edge_telemetry` ahora acota por fecha (30 días) y límite (5000 docs) evitando escaneos masivos en colecciones crecientes, reduciendo severamente las cuotas de lectura de Firestore.
+- **DecodedIdToken Seguro:** Refactorizados cast inseguros (`let decodedToken: any`) hacia el estándar `DecodedIdToken | undefined` en las Firebase Functions del Admin.
+
+## [v1.0.0] - Mayo 2026
 ### 🚀 Features & UX
 - **Auditoría Forense:** Traducción dinámica de acciones técnicas (`UPDATE`, `UPLOAD`) a etiquetas legibles ("MOVER / ESTADO", "SUBIR ARCHIVO") en el UI administrativo y en la exportación PDF.
 - **Admin Panel:** El Dashboard de auditoría ahora exporta reportes forenses más limpios utilizando `jspdf-autotable`.

@@ -100,7 +100,7 @@ export function useDoc<T = DocumentData>(
         // trigger global error propagation solo si no está suprimido
         if (!options?.suppressGlobalError) {
           errorEmitter.emit('permission-error', contextualError);
-        } else {
+        } else if (process.env.NODE_ENV === 'development') {
           console.warn(
             '[useDoc] Permiso denegado silenciado (suppressGlobalError) para:',
             memoizedDocRef.path
