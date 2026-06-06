@@ -136,7 +136,7 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // ── 5. Páginas públicas — CSP con nonce ──────────────────────────────────
+  // ── 6. Páginas públicas — CSP con nonce ──────────────────────────────────
   const nonce = generateNonce();
 
   // CSP: se añade el nonce SOLO en script-src, y SOLO en producción.

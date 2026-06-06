@@ -49,10 +49,12 @@ export function analyzeTechnicalCase(ocrText: string): TriageResult {
   }
 
   // Heurística 3: Prescripción (Años antiguos - Art. 159 CNT)
-  const matchYear = text.match(/201[0-9]|202[0-2]/);
-  if (matchYear && !triggers.includes('POSIBLE_PRESCRIPCION')) {
+  const currentYear = new Date().getFullYear();
+  const matchYears = text.match(/\b20[0-9]{2}\b/g);
+  const oldYear = matchYears?.find((y) => currentYear - parseInt(y, 10) >= 3);
+  if (oldYear && !triggers.includes('POSIBLE_PRESCRIPCION')) {
     triggers.push('POSIBLE_PRESCRIPCION');
-    technicalDraft += `⏳ *ANTIGÜEDAD:* Multa del año ${matchYear[0]}. Posible prescripción (Art. 159 CNT).\n`;
+    technicalDraft += `⏳ *ANTIGÜEDAD:* Multa del año ${oldYear}. Posible prescripción (Art. 159 CNT).\n`;
   }
 
   // Heurística 4: Alcoholemia / Embriaguez (Casos Complejos Ley 1696)
