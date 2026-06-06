@@ -1,5 +1,6 @@
 import { del } from '@vercel/blob';
 import { NextResponse } from 'next/server';
+import { timingSafeEqual } from 'crypto';
 import { logger } from '@/lib/logger/security-logger';
 
 /**
@@ -20,7 +21,12 @@ export async function POST(request: Request) {
     const authHeader = request.headers.get('x-internal-secret');
     const internalSecret = process.env.INTERNAL_API_SECRET;
 
-    if (!internalSecret || authHeader !== internalSecret) {
+    if (!internalSecret) {
+      return new NextResponse('Unauthorized', { status: 401 });
+    }
+    const provided = Buffer.from(authHeader ?? '');
+    const expected = Buffer.from(internalSecret);
+    if (provided.length !== expected.length || !timingSafeEqual(provided, expected)) {
       return new NextResponse('Unauthorized', { status: 401 });
     }
 

@@ -16,6 +16,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { timingSafeEqual } from 'crypto';
 import { getAdminApp } from '@/lib/firebase-admin';
 import { getFirestore, Timestamp, FieldValue } from 'firebase-admin/firestore';
 import { resend } from '@/lib/resend';
@@ -40,7 +41,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Configuración incompleta en servidor.' }, { status: 500 });
   }
 
-  if (authHeader !== `Bearer ${cronSecret}`) {
+  const provided = Buffer.from(authHeader ?? '');
+  const expected = Buffer.from(`Bearer ${cronSecret}`);
+  if (provided.length !== expected.length || !timingSafeEqual(provided, expected)) {
     logger.warn('[followup-cron] Intento de acceso no autorizado.', {
       ip: req.headers.get('x-forwarded-for') ?? 'unknown',
     });

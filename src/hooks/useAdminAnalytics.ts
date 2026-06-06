@@ -35,7 +35,7 @@ export function useAdminAnalytics(idToken: string | null) {
       if (data.success && data.stats) {
         setAnalytics(data.stats as AnalyticsData);
       } else {
-        setError(data.error as string || 'Error');
+        setError((data.error as string) || 'Error');
       }
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Error cargando analytics');

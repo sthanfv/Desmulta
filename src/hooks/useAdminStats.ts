@@ -121,7 +121,7 @@ export function useAdminStats(auth: Auth | null) {
     loadingMoreRef.current = true;
     setIsLoadingMore(true);
     try {
-      const idToken = (await auth.currentUser.getIdToken(true)) || '';
+      const idToken = (await auth.currentUser.getIdToken()) || '';
       const res = await getConsultations(idToken, 20, lastLeadId);
       if (res.success && res.data) {
         const newLeads = processLeads(res.data as DocumentData[]);
@@ -147,7 +147,7 @@ export function useAdminStats(auth: Auth | null) {
     loadingMoreRef.current = true;
     setIsLoadingMore(true);
     try {
-      const idToken = (await auth.currentUser.getIdToken(true)) || '';
+      const idToken = (await auth.currentUser.getIdToken()) || '';
       const res = await getCases(idToken, 20, lastCaseId);
       if (res.success && res.data) {
         const newCases = processCases(res.data as DocumentData[]);
@@ -172,7 +172,7 @@ export function useAdminStats(auth: Auth | null) {
     if (!auth?.currentUser) return;
     setIsLoadingKanban(true);
     try {
-      const idToken = (await auth.currentUser.getIdToken(true)) || '';
+      const idToken = (await auth.currentUser.getIdToken()) || '';
       const [leadsRes, casesRes] = await Promise.all([
         getConsultations(idToken, 30),
         getCases(idToken, 30),

@@ -25,7 +25,7 @@ export function useAnalyticsStats(auth: Auth | null) {
     if (!auth?.currentUser) return;
     setIsLoading(true);
     try {
-      const idToken = await auth.currentUser.getIdToken(true);
+      const idToken = await auth.currentUser.getIdToken();
       const res = await getAnalyticsStats(idToken);
       if (res.success && res.stats) {
         setData(res.stats);

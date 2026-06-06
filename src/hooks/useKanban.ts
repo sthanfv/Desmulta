@@ -69,9 +69,10 @@ export function useKanban(leadsReales: KanbanItem[], casosReales: KanbanItem[]) 
         prev.map((item) => (item.id === id ? { ...item, estado: nuevaColumna } : item))
       );
 
-      const indiceAnterior = COLUMNAS_UNIFICADAS.findIndex(c => c.id === estadoActual);
-      const indiceNuevo = COLUMNAS_UNIFICADAS.findIndex(c => c.id === nuevaColumna);
-      const esRetroceso = indiceNuevo < indiceAnterior && indiceAnterior !== -1 && indiceNuevo !== -1;
+      const indiceAnterior = COLUMNAS_UNIFICADAS.findIndex((c) => c.id === estadoActual);
+      const indiceNuevo = COLUMNAS_UNIFICADAS.findIndex((c) => c.id === nuevaColumna);
+      const esRetroceso =
+        indiceNuevo < indiceAnterior && indiceAnterior !== -1 && indiceNuevo !== -1;
 
       setModalNota({
         isOpen: true,
@@ -93,9 +94,10 @@ export function useKanban(leadsReales: KanbanItem[], casosReales: KanbanItem[]) 
         prev.map((item) => (item.id === id ? { ...item, estado: nuevoEstado } : item))
       );
 
-      const indiceAnterior = COLUMNAS_UNIFICADAS.findIndex(c => c.id === estadoAnterior);
-      const indiceNuevo = COLUMNAS_UNIFICADAS.findIndex(c => c.id === nuevoEstado);
-      const esRetroceso = indiceNuevo < indiceAnterior && indiceAnterior !== -1 && indiceNuevo !== -1;
+      const indiceAnterior = COLUMNAS_UNIFICADAS.findIndex((c) => c.id === estadoAnterior);
+      const indiceNuevo = COLUMNAS_UNIFICADAS.findIndex((c) => c.id === nuevoEstado);
+      const esRetroceso =
+        indiceNuevo < indiceAnterior && indiceAnterior !== -1 && indiceNuevo !== -1;
 
       setModalNota({
         isOpen: true,
