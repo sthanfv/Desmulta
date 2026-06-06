@@ -963,6 +963,7 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
         }}
         onConfirm={confirmCambioEstado}
         estadoDestino={modalNota.nuevoEstado}
+        esRetroceso={modalNota.esRetroceso}
       />
     </div>
   );
