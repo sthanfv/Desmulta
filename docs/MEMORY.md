@@ -19,7 +19,7 @@
 4. **Pruebas Unitarias de Casos de Borde:** Integradas 4 suites críticas (`rate-limit-failclosed`, `prescription-engine-edge`, `middleware-auth`, `piiScrubber-colombia`) consolidando el entorno `npm run validate` como muro infranqueable.
 
 **Estado Arquitectónico:**
-La versión 1.0.1 se encuentra blindada y documentada, operando bajo estricta validación de QA y proporcionando una experiencia de usuario ultra fluida.
+La versión 1.0.0 se encuentra blindada y documentada, operando bajo estricta validación de QA y proporcionando una experiencia de usuario ultra fluida.
 
 ---
 
