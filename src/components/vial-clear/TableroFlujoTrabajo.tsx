@@ -23,7 +23,6 @@ import type { PlantillasDisponibles } from '@/lib/legal/legal-types';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
-import 'mobile-drag-drop/default.css';
 
 export interface KanbanItem {
   id: string;
@@ -87,17 +86,6 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
 
-  useEffect(() => {
-    // Inicializar polyfill para habilitar Drag and Drop nativo en móviles (Android/iOS)
-    // Usamos holdToDrag para que el usuario pueda hacer scroll (swipe) normalmente
-    // sin activar el drag de inmediato. Esto recupera el snap magnético.
-    import('mobile-drag-drop').then(({ polyfill }) => {
-      polyfill({
-        holdToDrag: 300,
-      });
-    });
-  }, []);
-
   const handleRefresh = useCallback(async () => {
     if (!refreshKanban) return;
     setIsRefreshing(true);
@@ -117,9 +105,6 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
     setItemSeleccionado,
     modalNota,
     setModalNota,
-    onDragStart: handleDragStart,
-    onDragOver: handleDragOver,
-    onDrop: handleDrop,
     handleCambiarEstadoDesdeModal,
     handlePromoverDesdeModal,
     confirmCambioEstado,
@@ -141,6 +126,124 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
     },
     [allItems, setModalNota]
   );
+
+  // NUEVO: Motor Táctil Magnético (Pointer Events + Hardware Acceleration)
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    let activeElement: HTMLElement | null = null;
+    let clone: HTMLElement | null = null;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    const onPointerDown = (e: PointerEvent) => {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      
+      const target = e.target as HTMLElement;
+      // Validamos que no estemos tocando un botón interno de la tarjeta (ej. WhatsApp)
+      if (target.closest('button, a')) return;
+
+      const draggable = target.closest('.touch-draggable') as HTMLElement;
+      if (!draggable) return;
+
+      e.preventDefault();
+      activeElement = draggable;
+      const rect = activeElement.getBoundingClientRect();
+
+      offsetX = e.clientX - rect.left;
+      offsetY = e.clientY - rect.top;
+
+      // Desactivamos temporalmente el snap magnético para evitar tirones
+      container.style.scrollSnapType = 'none';
+
+      // Clon visual estricto
+      clone = activeElement.cloneNode(true) as HTMLElement;
+      clone.style.position = 'fixed';
+      clone.style.zIndex = '9999';
+      clone.style.pointerEvents = 'none';
+      clone.style.width = `${rect.width}px`;
+      clone.style.height = `${rect.height}px`;
+      clone.style.left = '0px';
+      clone.style.top = '0px';
+      clone.style.transform = `translate3d(${rect.left}px, ${rect.top}px, 0) scale(1.02) rotate(2deg)`;
+      clone.style.boxShadow = '0 25px 50px -12px rgba(0, 0, 0, 0.4)';
+      clone.style.transition = 'transform 0.05s ease';
+      clone.style.opacity = '0.9';
+
+      document.body.appendChild(clone);
+      activeElement.style.opacity = '0.3'; // Ocultamos parcialmente el original
+
+      if (navigator.vibrate) navigator.vibrate(30);
+    };
+
+    const onPointerMove = (e: PointerEvent) => {
+      if (!activeElement || !clone) return;
+      e.preventDefault();
+
+      const x = e.clientX - offsetX;
+      const y = e.clientY - offsetY;
+      clone.style.transform = `translate3d(${x}px, ${y}px, 0) scale(1.02) rotate(2deg)`;
+
+      // Resaltado visual de la columna destino
+      const elementBelow = document.elementFromPoint(e.clientX, e.clientY);
+      document.querySelectorAll('.kanban-column').forEach(col => col.classList.remove('border-primary', 'bg-primary/5'));
+      
+      const dropzone = elementBelow?.closest('.kanban-column');
+      if (dropzone) {
+        dropzone.classList.add('border-primary', 'bg-primary/5');
+      }
+    };
+
+    const onPointerUp = (e: PointerEvent) => {
+      if (!activeElement) return;
+
+      // Reactivamos el snap magnético
+      container.style.scrollSnapType = '';
+
+      const elementBelow = document.elementFromPoint(e.clientX, e.clientY);
+      const dropzone = elementBelow?.closest('.kanban-column') as HTMLElement;
+
+      document.querySelectorAll('.kanban-column').forEach(col => col.classList.remove('border-primary', 'bg-primary/5'));
+
+      if (dropzone) {
+        const estadoDestino = dropzone.getAttribute('data-column-id');
+        const itemId = activeElement.getAttribute('data-item-id');
+        const estadoActual = activeElement.getAttribute('data-estado-actual');
+
+        if (itemId && estadoDestino && estadoActual !== estadoDestino) {
+          // CONEXIÓN CON REACT: Disparamos la lógica de negocio real
+          handleAvanzar(itemId, estadoDestino);
+          
+          // Centrado magnético en la nueva columna
+          setTimeout(() => {
+            dropzone.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+          }, 50);
+        }
+      }
+
+      // Limpieza del DOM
+      activeElement.style.opacity = '1';
+      if (clone) clone.remove();
+      
+      activeElement = null;
+      clone = null;
+
+      if (navigator.vibrate) navigator.vibrate(15);
+    };
+
+    document.addEventListener('pointerdown', onPointerDown, { passive: false });
+    document.addEventListener('pointermove', onPointerMove, { passive: false });
+    document.addEventListener('pointerup', onPointerUp);
+    document.addEventListener('pointercancel', onPointerUp);
+
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown);
+      document.removeEventListener('pointermove', onPointerMove);
+      document.removeEventListener('pointerup', onPointerUp);
+      document.removeEventListener('pointercancel', onPointerUp);
+    };
+  }, [handleAvanzar]);
 
   // Filtro de fechas (Rango)
   const [filterFechaInicio, setFilterFechaInicio] = useState('');
@@ -724,8 +827,7 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
               <div
                 key={columna.id}
                 data-index={index}
-                onDragOver={handleDragOver}
-                onDrop={(e) => handleDrop(e, columna.id)}
+                data-column-id={columna.id}
                 className="kanban-column w-[85vw] max-w-[320px] lg:w-auto lg:flex-1 lg:min-w-[280px] shrink-0 snap-center bg-card/40 backdrop-blur-xl rounded-3xl border border-white/5 p-4 flex flex-col shadow-xl transition-all hover:border-white/10"
               >
                 <div className={`border-b-2 pb-3 mb-4 ${columna.color}`}>
@@ -784,7 +886,6 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
                       <div key={item.id} onClick={() => setItemSeleccionado(item)}>
                         <TarjetaKanban
                           data={item}
-                          onDragStart={handleDragStart}
                           onAvanzar={handleAvanzar}
                         />
                       </div>

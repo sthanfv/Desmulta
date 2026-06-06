@@ -25,11 +25,9 @@ const SIGUIENTE_ESTADO: Record<string, { id: string; label: string }> = {
 
 export function TarjetaKanban({
   data,
-  onDragStart,
   onAvanzar,
 }: {
   data: KanbanItem;
-  onDragStart: (e: React.DragEvent, id: string, estado: string) => void;
   onAvanzar?: (id: string, estadoSiguiente: string) => void;
 }) {
   const esCaptura = Boolean(data.evidenceUrl);
@@ -38,11 +36,11 @@ export function TarjetaKanban({
   const siguientePaso = SIGUIENTE_ESTADO[data.estado];
 
   return (
-    <TarjetaPremium className="p-4 cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md transition-all rounded-xl relative group">
+    <TarjetaPremium className="p-4 shadow-sm hover:shadow-md transition-all rounded-xl relative group">
       <div
-        draggable
-        onDragStart={(e) => onDragStart(e, data.id, data.estado)}
-        className="w-full h-full select-none"
+        className="touch-draggable w-full h-full select-none touch-none cursor-grab active:cursor-grabbing"
+        data-item-id={data.id}
+        data-estado-actual={data.estado}
       >
         {/* Indicador lateral */}
         <div
@@ -76,8 +74,9 @@ export function TarjetaKanban({
         </div>
 
         <div className="flex items-start gap-2">
-          <GripVertical className="w-4 h-4 text-muted-foreground group-hover:text-primary mt-1 shrink-0" />
-          <div className="flex-1 min-w-0">
+          {/* El Grip ahora actúa como indicador visual de arrastre */}
+          <GripVertical className="w-4 h-4 text-muted-foreground group-hover:text-primary mt-1 shrink-0 pointer-events-none" />
+          <div className="flex-1 min-w-0 pointer-events-none">
             <h4 className="text-slate-900 dark:text-foreground font-black text-base uppercase tracking-tight truncate">
               {data.placa && data.placa !== 'N/A'
                 ? data.placa
@@ -92,10 +91,10 @@ export function TarjetaKanban({
         </div>
 
         <div className="mt-3 flex flex-col gap-3">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between pointer-events-none">
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
-                <p className="text-[10px] font-bold text-slate-500 flex items-center gap-1">
+                <p className="text-[10px] font-bold text-slate-500 flex items-center gap-1 pointer-events-none">
                   <Phone className="w-3 h-3" /> {data.contacto || 'Sin contacto'}
                 </p>
                 {data.contacto && (
@@ -104,23 +103,22 @@ export function TarjetaKanban({
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => e.stopPropagation()}
-                    className="bg-green-500/10 text-green-600 hover:bg-green-500 hover:text-white transition-colors rounded-full p-1 border border-green-500/20"
+                    className="bg-green-500/10 text-green-600 hover:bg-green-500 hover:text-white transition-colors rounded-full p-1 border border-green-500/20 pointer-events-auto"
                     title="Contactar por WhatsApp"
-                    aria-label="Contactar por WhatsApp"
                   >
                     <MessageCircle className="w-3 h-3" />
                   </a>
                 )}
               </div>
               {data.ciudad && (
-                <p className="text-[10px] font-bold text-slate-600 dark:text-slate-400 flex items-center gap-1">
+                <p className="text-[10px] font-bold text-slate-600 dark:text-slate-400 flex items-center gap-1 pointer-events-none">
                   <MapPin className="w-3 h-3" /> {data.ciudad}
                 </p>
               )}
             </div>
 
             {esCaptura && data.evidenceUrl && (
-              <div className="relative w-10 h-10 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 shrink-0">
+              <div className="relative w-10 h-10 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 shrink-0 pointer-events-none">
                 <Image
                   src={data.evidenceUrl}
                   alt="SIMIT"
@@ -131,14 +129,13 @@ export function TarjetaKanban({
             )}
           </div>
 
-          {/* Botón de Siguiente Paso (Solo Móvil) */}
           {siguientePaso && onAvanzar && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 onAvanzar(data.id, siguientePaso.id);
               }}
-              className="md:hidden w-full mt-1 flex items-center justify-center gap-2 py-2 px-3 bg-slate-100 dark:bg-white/5 hover:bg-primary/10 hover:text-primary border border-slate-200 dark:border-white/10 rounded-lg text-[11px] font-black uppercase tracking-wide text-slate-600 dark:text-muted-foreground transition-colors active:scale-95"
+              className="md:hidden w-full mt-1 flex items-center justify-center gap-2 py-2 px-3 bg-slate-100 dark:bg-white/5 hover:bg-primary/10 hover:text-primary border border-slate-200 dark:border-white/10 rounded-lg text-[11px] font-black uppercase tracking-wide text-slate-600 dark:text-muted-foreground transition-colors active:scale-95 pointer-events-auto"
             >
               <span>Avanzar a {siguientePaso.label}</span>
               <ArrowRightCircle className="w-4 h-4" />
@@ -147,7 +144,7 @@ export function TarjetaKanban({
 
           {data.createdAt && (
             <p
-              className={`text-[10px] font-bold mt-2 flex items-center gap-1 ${
+              className={`text-[10px] font-bold mt-2 flex items-center gap-1 pointer-events-none ${
                 data.estado === 'NUEVO' && Date.now() - new Date(data.createdAt).getTime() > 7200000
                   ? 'text-red-500 animate-pulse'
                   : 'text-slate-400'
