@@ -105,6 +105,7 @@ export function TarjetaKanban({
                     onClick={(e) => e.stopPropagation()}
                     className="bg-green-500/10 text-green-600 hover:bg-green-500 hover:text-white transition-colors rounded-full p-1 border border-green-500/20 pointer-events-auto"
                     title="Contactar por WhatsApp"
+                    aria-label="Contactar por WhatsApp"
                   >
                     <MessageCircle className="w-3 h-3" />
                   </a>
