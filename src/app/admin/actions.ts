@@ -230,6 +230,7 @@ export async function getConsultations(
         createdAt: data.createdAt?.toDate?.().toISOString() || null,
         updatedAt: data.updatedAt?.toDate?.().toISOString() || null,
         notifiedAt: data.notifiedAt?.toDate?.().toISOString() || null,
+        retriedAt: data.retriedAt?.toDate?.().toISOString() || null,
         timeline_updates: (data.timeline_updates || []).map((event: Record<string, unknown>) => {
           const e = event as { date?: { toDate?: () => Date } };
           return {
