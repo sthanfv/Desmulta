@@ -71,8 +71,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, message: 'FCM Token vinculado exitosamente.' });
   } catch (error) {
-    logger.error('Error al registrar web push vip', { 
-      error: error instanceof Error ? error.message : String(error)
+    logger.error('Error al registrar web push vip', {
+      error: error instanceof Error ? error.message : String(error),
     });
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
   }

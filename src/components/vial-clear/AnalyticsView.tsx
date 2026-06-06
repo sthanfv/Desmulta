@@ -430,8 +430,15 @@ export function AnalyticsView({ data, isLoading, error }: AnalyticsViewProps) {
                 >
                   <CartesianGrid strokeDasharray="3 3" horizontal={false} opacity={0.3} />
                   <XAxis type="number" hide />
-                  <YAxis dataKey="name" type="category" width={120} tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
-                  <Tooltip 
+                  <YAxis
+                    dataKey="name"
+                    type="category"
+                    width={120}
+                    tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <Tooltip
                     cursor={{ fill: 'hsl(var(--muted))', opacity: 0.2 }}
                     content={({ active, payload }) => (
                       <ChartTooltip active={active} payload={payload} valueLabel="usuarios" />

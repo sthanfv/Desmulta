@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// src/lib/security/rate-limit.ts  — v2.0.0
+// src/lib/security/rate-limit.ts  — v1.0.0
 //
 // CAMBIOS vs versión anterior:
 //   - Fail-CLOSED: si el motor falla, se bloquea (no se abre). Esto protege
@@ -62,7 +62,7 @@ function anonymizeIp(ip: string): string {
 }
 
 /**
- * Motor de Rate Limiting Persistente — Desmulta Security v2.0.0
+ * Motor de Rate Limiting Persistente — Desmulta Security v1.0.0
  *
  * Implementa ventana de tiempo fija persistida en Firestore.
  * Usa transacción atómica para garantizar consistencia incluso en serverless.

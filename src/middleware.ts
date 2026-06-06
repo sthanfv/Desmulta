@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// src/middleware.ts  — v2.0.0
+// src/middleware.ts  — v1.0.0
 //
 // CAMBIOS vs versión anterior:
 //   - Se añade HSTS preload en TODAS las respuestas de producción, incluyendo

@@ -2,7 +2,7 @@
  * TODAS LAS DECISIONES, ARCHIVOS Y CÓDIGO GENERADO DEBEN PASAR EL FILTRO
  * DE SEGURIDAD Y CALIDAD 'MANDATO-FILTRO'
  *
- * Server Actions para Desmulta (v8.10.1)
+ * Server Actions para Desmulta (v1.0.0)
  * PURGA DE IA: Eliminada integración con Google Gemini y Chat.
  */
 

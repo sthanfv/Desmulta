@@ -23,7 +23,7 @@ vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: { children?: import('react').ReactNode }) => <>{children}</>,
 }));
 
-describe('SemaforoCiudadano Component (Premium v8.10.1)', () => {
+describe('SemaforoCiudadano Component (Premium v1.0.0)', () => {
   it('debe renderizar el estado PRESCRITO con el diseño correcto', () => {
     render(<SemaforoCiudadano status="PRESCRITO" />);
 

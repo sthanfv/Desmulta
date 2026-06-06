@@ -61,19 +61,23 @@ export function ModalNotaOperador({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-3xl p-6">
         <DialogHeader className="mb-4">
-          <DialogTitle className={`text-xl font-black flex items-center gap-2 ${esRetroceso ? 'text-red-600 dark:text-red-400' : 'text-slate-900 dark:text-white'}`}>
+          <DialogTitle
+            className={`text-xl font-black flex items-center gap-2 ${esRetroceso ? 'text-red-600 dark:text-red-400' : 'text-slate-900 dark:text-white'}`}
+          >
             {esRetroceso ? '⚠️ Regreso de Caso' : '✨ El Toque Humano'}
           </DialogTitle>
           <DialogDescription className="text-slate-600 dark:text-slate-400 mt-2">
             {esRetroceso ? (
               <>
-                Estás regresando este caso a la etapa <strong className="text-red-500">{estadoDestino}</strong>. 
-                Por motivos de seguridad, es <strong>obligatorio</strong> escribir una justificación.
+                Estás regresando este caso a la etapa{' '}
+                <strong className="text-red-500">{estadoDestino}</strong>. Por motivos de seguridad,
+                es <strong>obligatorio</strong> escribir una justificación.
               </>
             ) : (
               <>
-                Estás a punto de avanzar el estado a <strong className="text-primary">{estadoDestino}</strong>. 
-                ¿Deseas agregar una nota para el cliente?
+                Estás a punto de avanzar el estado a{' '}
+                <strong className="text-primary">{estadoDestino}</strong>. ¿Deseas agregar una nota
+                para el cliente?
               </>
             )}
           </DialogDescription>
@@ -97,10 +101,14 @@ export function ModalNotaOperador({
             onChange={(e) => setNota(e.target.value)}
             maxLength={500}
             autoFocus
-            placeholder={esRetroceso ? "Escribe la razón obligatoria por la que regresas este caso..." : "Ej: Hola, acabo de revisar tu caso y veo que todo está en orden. Procederemos a..."}
+            placeholder={
+              esRetroceso
+                ? 'Escribe la razón obligatoria por la que regresas este caso...'
+                : 'Ej: Hola, acabo de revisar tu caso y veo que todo está en orden. Procederemos a...'
+            }
             className={`w-full min-h-[120px] border p-4 rounded-2xl outline-none focus:ring-1 text-sm transition-all resize-none shadow-inner ${
-              esRetroceso 
-                ? 'bg-red-50/50 dark:bg-red-900/10 border-red-200 dark:border-red-900/30 focus:border-red-500 focus:ring-red-500/20 text-red-900 dark:text-red-100 placeholder:text-red-400/50' 
+              esRetroceso
+                ? 'bg-red-50/50 dark:bg-red-900/10 border-red-200 dark:border-red-900/30 focus:border-red-500 focus:ring-red-500/20 text-red-900 dark:text-red-100 placeholder:text-red-400/50'
                 : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-white/10 focus:border-primary/50 focus:ring-primary/20 text-slate-900 dark:text-white'
             }`}
           />
@@ -122,13 +130,16 @@ export function ModalNotaOperador({
             onClick={handleConfirm}
             disabled={esRetroceso && !nota.trim()}
             className={`px-6 py-2 text-sm font-bold rounded-xl shadow-lg transition-all flex items-center gap-2
-              ${esRetroceso 
-                ? (nota.trim() ? 'bg-red-600 hover:bg-red-700 text-white active:scale-95' : 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed')
-                : 'bg-primary text-primary-foreground hover:bg-primary/90 active:scale-95'
+              ${
+                esRetroceso
+                  ? nota.trim()
+                    ? 'bg-red-600 hover:bg-red-700 text-white active:scale-95'
+                    : 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed'
+                  : 'bg-primary text-primary-foreground hover:bg-primary/90 active:scale-95'
               }
             `}
           >
-            {esRetroceso ? 'Confirmar Reversión' : (nota.trim() ? 'Guardar con Nota' : 'Confirmar')}
+            {esRetroceso ? 'Confirmar Reversión' : nota.trim() ? 'Guardar con Nota' : 'Confirmar'}
           </button>
         </DialogFooter>
       </DialogContent>

@@ -329,10 +329,14 @@ export async function convertToCase(
       // Sincronizar vista materializada
       if (leadData?.trackingUuid) {
         const publicRef = db.collection('public_tracking').doc(leadData.trackingUuid);
-        transaction.set(publicRef, {
-          status: 'en_proceso',
-          updatedAt: FieldValue.serverTimestamp(),
-        }, { merge: true });
+        transaction.set(
+          publicRef,
+          {
+            status: 'en_proceso',
+            updatedAt: FieldValue.serverTimestamp(),
+          },
+          { merge: true }
+        );
       }
     });
 
@@ -522,10 +526,14 @@ export async function updateCaseStatus(
 
       // 3. Sincronizar con la vista materializada (pública)
       if (publicRef) {
-        transaction.set(publicRef, {
-          status: publicStatus,
-          updatedAt: FieldValue.serverTimestamp(),
-        }, { merge: true });
+        transaction.set(
+          publicRef,
+          {
+            status: publicStatus,
+            updatedAt: FieldValue.serverTimestamp(),
+          },
+          { merge: true }
+        );
       }
 
       return currentLeadData;
@@ -692,11 +700,15 @@ export async function updateConsultationStatus(
       });
 
       if (publicRef) {
-        transaction.set(publicRef, {
-          status: newStatus,
-          timeline_updates: FieldValue.arrayUnion(timelineEvent),
-          updatedAt: FieldValue.serverTimestamp(),
-        }, { merge: true });
+        transaction.set(
+          publicRef,
+          {
+            status: newStatus,
+            timeline_updates: FieldValue.arrayUnion(timelineEvent),
+            updatedAt: FieldValue.serverTimestamp(),
+          },
+          { merge: true }
+        );
       }
 
       return leadData;
@@ -939,7 +951,7 @@ const getCachedAnalyticsStats = unstable_cache(
       .sort((a, b) => b[1] - a[1])
       .slice(0, 5)
       .map(([name, value]) => ({ name, value }));
-      
+
     // ── Funnel Drop-off Telemetry ───────────────────────────────────────────────
     // Leemos la colección edge_telemetry para eventos funnel_step (últimos 30 días para no sobrecargar)
     const thirtyDaysAgo = new Date();
@@ -952,25 +964,25 @@ const getCachedAnalyticsStats = unstable_cache(
       .orderBy('ts', 'desc')
       .limit(5000)
       .get();
-    
+
     // Conteo por pasos (0: Placa/Cédula, 1: Contacto, 2: Pre-Análisis)
     let step0 = 0;
     let step1 = 0;
     let step2 = 0;
-    
+
     edgeTelemetrySnap.forEach((doc) => {
       const { funnelStep } = doc.data();
       if (funnelStep === 0) step0++;
       if (funnelStep === 1) step1++;
       if (funnelStep === 2) step2++;
     });
-    
+
     // Para el gráfico de embudo (Recharts FunnelChart)
     const funnelData = [
       { name: 'Paso 0: Inicio', value: step0, fill: '#8884d8' },
       { name: 'Paso 1: Contacto', value: step1, fill: '#82ca9d' },
       { name: 'Paso 2: Pre-Análisis', value: step2, fill: '#ffc658' },
-      { name: 'Completados (Leads)', value: totalLeads, fill: '#ff8042' }
+      { name: 'Completados (Leads)', value: totalLeads, fill: '#ff8042' },
     ];
 
     // ── Tiempo promedio de resolución real ────────────────────────────────────

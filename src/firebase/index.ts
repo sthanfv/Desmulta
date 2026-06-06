@@ -19,7 +19,9 @@ export function initializeFirebase() {
         connectFirestoreEmulator(sdks.firestore, host, 8080);
         logger.info(`[DevHelper] Enlazado al Firestore Emulator (${host}:8080)`);
       } catch (e: unknown) {
-        logger.warn('[DevHelper] Firestore Emulator ya conectado o fallido.', { error: e instanceof Error ? e.message : String(e) });
+        logger.warn('[DevHelper] Firestore Emulator ya conectado o fallido.', {
+          error: e instanceof Error ? e.message : String(e),
+        });
       }
     }
 

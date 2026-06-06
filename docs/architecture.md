@@ -1,4 +1,4 @@
-# Arquitectura Técnica — Desmulta v2.0.0
+# Arquitectura Técnica — Desmulta v1.0.0
 
 > Fuente de verdad técnica. Actualizar con cada cambio arquitectónico significativo.
 

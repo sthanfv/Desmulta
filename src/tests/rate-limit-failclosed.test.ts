@@ -21,7 +21,7 @@ vi.mock('firebase-admin/firestore', () => {
 describe('Rate Limit Fail-Closed Behavior', () => {
   it('debe bloquear la petición (fail-closed) cuando la infraestructura de base de datos falla', async () => {
     const result = await rateLimit('192.168.1.1', 5, 60000);
-    
+
     expect(result.success).toBe(false);
     expect(result.blocked).toBe(true);
     expect(result.isError).toBe(true);

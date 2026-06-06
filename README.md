@@ -21,4 +21,4 @@ npm ci
 npm run dev
 ```
 
-*Desmulta v8.10.0*
+*Desmulta v1.0.0*

@@ -13,7 +13,7 @@ describe('PrescriptionEngine Edge Cases (C-038 & Calidad OCR)', () => {
 
     // Simulamos un OCR con baja confianza (por debajo del umbral típico de 60-70)
     const result = PrescriptionEngine.evaluate('FOTOMULTA SIN RESOLUCION', [dateStr], 40);
-    
+
     expect(result.status).toBe('REQUIERE_REVISION');
     expect(result.lowConfidence).toBe(true);
     expect(result.isViable).toBe(false);
@@ -30,7 +30,7 @@ describe('PrescriptionEngine Edge Cases (C-038 & Calidad OCR)', () => {
 
     // La confianza matemática de prescripción antecede al filtro de OCR (confianza bajísima)
     const result = PrescriptionEngine.evaluate('TEXTO ILEGIBLE', [dateStr], 10);
-    
+
     expect(result.status).toBe('PRESCRITO');
     expect(result.isViable).toBe(true);
   });

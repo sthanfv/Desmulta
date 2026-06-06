@@ -2,7 +2,7 @@
 import { logger } from '@/lib/logger/security-logger';
 
 /**
- * TouchDebugger v9.0 — Panel de diagnóstico forense avanzado (F12 Móvil)
+ * TouchDebugger v1.0.0 — Panel de diagnóstico forense avanzado (F12 Móvil)
  *
  * Mejoras sobre v8.0:
  * - Añadido interceptor de Consola Global (Log, Warn, Error, Info, Unhandled Rejections).
@@ -391,7 +391,7 @@ export function TouchDebugger() {
 
   // ── Generar texto de diagnóstico estructurado en español ──────────────────────
   const getFormattedLogText = () => {
-    let body = `=== DIAGNÓSTICO DESMULTA: ${activeTab} v9.0 ===\n\n`;
+    let body = `=== DIAGNÓSTICO DESMULTA: ${activeTab} v1.0.0 ===\n\n`;
 
     if (activeTab === 'TOUCH') {
       body += touchLogs
@@ -666,7 +666,7 @@ export function TouchDebugger() {
         onPointerCancel={onPointerUp}
       >
         <span className="text-[9px] text-zinc-500 font-bold tracking-widest uppercase pointer-events-none">
-          ::: TouchDebugger v9.0 :::
+          ::: TouchDebugger v1.0.0 :::
         </span>
         <button
           onClick={(e) => {

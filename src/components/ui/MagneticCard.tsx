@@ -11,9 +11,9 @@ interface MagneticCardProps {
 }
 
 /**
- * MagneticCard v2.0.0 — Motor Táctil GPU-First (Elite DNA)
+ * MagneticCard v1.0.0 — Motor Táctil GPU-First (Elite DNA)
  *
- * CAMBIO CRÍTICO v2.0.0: Migrado de useState (re-render en cada movimiento
+ * CAMBIO CRÍTICO v1.0.0: Migrado de useState (re-render en cada movimiento
  * del ratón) a useRef + mutación directa del DOM. El halo de luz se calcula
  * y aplica 100% fuera del ciclo de render de React, garantizando 60 FPS.
  */

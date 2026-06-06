@@ -171,7 +171,8 @@ export default function StepContacto({
                         placeholder="Ej: 1012345678"
                         className={cn(
                           'h-14 md:h-16 pl-14 pr-14 rounded-2xl md:rounded-3xl border-white/20 bg-white/50 dark:bg-black/20 focus:ring-primary/20 transition-all font-bold text-lg',
-                          (field.value?.length || 0) >= 6 && 'border-green-500/30 bg-green-500/[0.02]'
+                          (field.value?.length || 0) >= 6 &&
+                            'border-green-500/30 bg-green-500/[0.02]'
                         )}
                         {...field}
                         type={showCedula ? 'text' : 'password'}

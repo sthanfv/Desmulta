@@ -234,7 +234,7 @@ export function ConsultationForm({ onSuccess, mode = 'full', nonce }: Consultati
       step: step,
       isSimitMode: isSimitMode,
     });
-    
+
     // Preferir sendBeacon si está disponible para no bloquear el hilo
     if (navigator.sendBeacon) {
       navigator.sendBeacon('/api/abandonment', payload);

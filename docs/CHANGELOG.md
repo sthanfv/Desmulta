@@ -6,7 +6,7 @@ Todas las versiones y cambios significativos del proyecto.
 ### ✨ Features & UX
 - **Kanban Cinético:** Implementación de un motor de *edge-scroll* basado en `requestAnimationFrame` para la versión móvil del Tablero Flujo de Trabajo, mejorando radicalmente la usabilidad al arrastrar tarjetas hacia los bordes.
 - **Loading Skeletons (SSR):** Incorporados estados de carga (`loading.tsx`) nativos de Next.js en las rutas de mayor impacto (Blog, Multas por ciudad y Portal VIP) evitando destellos visuales durante la hidratación y revalidación SSG.
-- **Auditoría Forense Avanzada:** `TouchDebugger` evolucionó a la **v9.0**, integrando intercepción global de red y consola, auto-heal (Botón NUCLEAR) perfeccionado sin bloqueos en Android (sin `window.confirm`), y correcciones de fugas de memoria al desmontar.
+- **Auditoría Forense Avanzada:** `TouchDebugger` evolucionó a la **v1.0.0**, integrando intercepción global de red y consola, auto-heal (Botón NUCLEAR) perfeccionado sin bloqueos en Android (sin `window.confirm`), y correcciones de fugas de memoria al desmontar.
 
 ### 🔒 Security & FinOps
 - **Zero-PII & Fail-Closed Testing:** Se reforzó el pipeline DevSecOps con 4 nuevas suites de pruebas (`piiScrubber-colombia`, `rate-limit-failclosed`, `prescription-engine-edge`, `middleware-auth`) garantizando que ninguna regresión rompa la anonimización legal y el firewall.

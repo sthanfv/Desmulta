@@ -37,7 +37,9 @@ export function ModalEdicionDatos({
     <div className="space-y-4 p-4 bg-muted/20 rounded-xl border border-border">
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
-          <Label htmlFor="edit-nombre" className="text-xs">Nombre</Label>
+          <Label htmlFor="edit-nombre" className="text-xs">
+            Nombre
+          </Label>
           <Input
             id="edit-nombre"
             value={datos.nombre}
@@ -47,7 +49,9 @@ export function ModalEdicionDatos({
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="edit-placa" className="text-xs">Placa</Label>
+          <Label htmlFor="edit-placa" className="text-xs">
+            Placa
+          </Label>
           <Input
             id="edit-placa"
             value={datos.placa}
@@ -58,7 +62,9 @@ export function ModalEdicionDatos({
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="edit-ciudad" className="text-xs">Ciudad</Label>
+          <Label htmlFor="edit-ciudad" className="text-xs">
+            Ciudad
+          </Label>
           <Input
             id="edit-ciudad"
             value={datos.ciudad}
@@ -70,7 +76,9 @@ export function ModalEdicionDatos({
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="edit-nota" className="text-xs">Nota del operador</Label>
+        <Label htmlFor="edit-nota" className="text-xs">
+          Nota del operador
+        </Label>
         <textarea
           id="edit-nota"
           value={datos.operatorNote}

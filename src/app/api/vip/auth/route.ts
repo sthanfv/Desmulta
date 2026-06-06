@@ -113,8 +113,8 @@ export async function POST(request: Request) {
 
     return response;
   } catch (error) {
-    logger.error('Error en autenticación VIP', { 
-      error: error instanceof Error ? error.message : String(error) 
+    logger.error('Error en autenticación VIP', {
+      error: error instanceof Error ? error.message : String(error),
     });
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
   }

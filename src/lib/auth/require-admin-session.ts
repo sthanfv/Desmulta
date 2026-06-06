@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// src/lib/auth/require-admin-session.ts  — v2.0.0
+// src/lib/auth/require-admin-session.ts  — v1.0.0
 //
 // CAMBIOS vs versión anterior:
 //   - Se añade validación de `exp` del token para rechazar tokens que,

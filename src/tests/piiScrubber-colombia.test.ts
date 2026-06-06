@@ -4,7 +4,9 @@ import { sanitizePII } from '@/lib/security/piiScrubber';
 describe('PII Scrubber for Colombia', () => {
   it('debe ofuscar placas vehiculares colombianas (ej. ABC123, ABC-123)', () => {
     const text = 'El vehículo con placa ABC123 y el XYZ-987 estuvieron involucrados.';
-    expect(sanitizePII(text)).toBe('El vehículo con placa [PLACA_OCULTA] y el [PLACA_OCULTA] estuvieron involucrados.');
+    expect(sanitizePII(text)).toBe(
+      'El vehículo con placa [PLACA_OCULTA] y el [PLACA_OCULTA] estuvieron involucrados.'
+    );
   });
 
   it('debe ofuscar cédulas de ciudadanía (8-10 dígitos)', () => {

@@ -60,14 +60,14 @@ export async function POST(req: NextRequest) {
         const { getFirestore, FieldValue } = await import('firebase-admin/firestore');
         const app = getAdminApp();
         const db = getFirestore(app);
-        
+
         // Escribimos a la colección edge_telemetry (usando Admin SDK ignoramos las reglas restrictivas del cliente)
         await db.collection('edge_telemetry').add({
           event: 'funnel_step',
           funnelStep: step,
           isSimitMode: !!isSimitMode,
           ts: Date.now(),
-          timestamp: FieldValue.serverTimestamp()
+          timestamp: FieldValue.serverTimestamp(),
         });
       } catch (err) {
         logger.warn('[Abandonment] Error saving funnel step:', err);

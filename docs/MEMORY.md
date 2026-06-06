@@ -1,10 +1,10 @@
-# 🧠 MEMORIA ARQUITECTÓNICA — DESMULTA v2.0.0
+# 🧠 MEMORIA ARQUITECTÓNICA — DESMULTA v1.0.0
 
 | Versión | Estado     | Hitos Principales |
 | :---    | :---       | :---              |
-| v2.0.0  | 🟢 Estable | VIP Portal + Push Notifications + Toque Humano + Telegram sin duplicados |
-| v8.10.2 | 🟢 Estable | Auditoría PDF + Previsualización Premium |
-| v8.10.1 | 🟢 Estable | Reingeniería PDF + Word-wrap + Saneamiento Linter |
+| v1.0.0  | 🟢 Estable | VIP Portal + Push Notifications + Toque Humano + Telegram sin duplicados |
+| v1.0.0 | 🟢 Estable | Auditoría PDF + Previsualización Premium |
+| v1.0.0 | 🟢 Estable | Reingeniería PDF + Word-wrap + Saneamiento Linter |
 | v8.8.0  | 🟢 Estable | Motor OCR Tesseract 5.0 Integration |
 
 ---
@@ -14,7 +14,7 @@
 
 **Acciones Realizadas:**
 1. **Edge-Scroll Cinético en Kanban:** Se reescribió la lógica de arrastre en `TableroFlujoTrabajo.tsx` integrando una heurística de aceleración táctil (`requestAnimationFrame`) que permite navegar horizontalmente el tablero acercando la tarjeta a los bordes.
-2. **TouchDebugger v9.0:** Se eliminó la dependencia a `window.innerHeight` que rompía el SSR, se purgó la memoria de los arrays estáticos en `cleanup`, y se evadió la inestabilidad de `window.confirm` en dispositivos Android reemplazando el botón "Nuclear" con un patrón de doble-tap.
+2. **TouchDebugger v1.0.0:** Se eliminó la dependencia a `window.innerHeight` que rompía el SSR, se purgó la memoria de los arrays estáticos en `cleanup`, y se evadió la inestabilidad de `window.confirm` en dispositivos Android reemplazando el botón "Nuclear" con un patrón de doble-tap.
 3. **Optimización Visual (Loading States):** Prevención de bloqueos o destellos en Next.js creando esqueletos visuales (`loading.tsx`) consistentes con el diseño para Blog, Multas y VIP Dashboard.
 4. **Pruebas Unitarias de Casos de Borde:** Integradas 4 suites críticas (`rate-limit-failclosed`, `prescription-engine-edge`, `middleware-auth`, `piiScrubber-colombia`) consolidando el entorno `npm run validate` como muro infranqueable.
 
@@ -23,8 +23,8 @@ La versión 1.0.0 se encuentra blindada y documentada, operando bajo estricta va
 
 ---
 
-## 📝 [Sesión Anterior] Estabilización v7.10.0 y Saneamiento de Logs / Producción
-**Objetivo:** Finalizar la preparación para producción de Desmulta v7.10.0 estabilizando las pruebas unitarias, sanitizando los logs del cliente, refactorizando tipados inseguros y reduciendo costos de lectura en Firestore.
+## 📝 [Sesión Anterior] Estabilización v1.0.0 y Saneamiento de Logs / Producción
+**Objetivo:** Finalizar la preparación para producción de Desmulta v1.0.0 estabilizando las pruebas unitarias, sanitizando los logs del cliente, refactorizando tipados inseguros y reduciendo costos de lectura en Firestore.
 **Acciones Realizadas:**
 1. **Infraestructura de Tests y Cobertura en CI:** Se inyectó la validación estricta de cobertura (`npm run test:coverage:ci`) en `.github/workflows/ci.yml` para garantizar que el pipeline falle si no se cumple el umbral del 70%.
 2. **Higiene de Logs (Cero Fugas en Producción):** Se limpiaron todos los `console.log`, `console.error` y `console.warn` en `src/lib/env-check.ts`, `tesseract-worker.ts`, `pushService.ts` y componentes UI. Se implementó el envío directo a `SecurityLogger`. 
@@ -32,7 +32,7 @@ La versión 1.0.0 se encuentra blindada y documentada, operando bajo estricta va
 4. **Tipado Estricto & Sentry:** Se eliminaron tipados inseguros `any` en funciones críticas (como `DecodedIdToken | undefined` al leer las sesiones) y se corrigieron bloques catch para usar `catch (e: unknown)`. Sentry fue acoplado de forma nativa a `SecurityLogger.error/security` para capturar el payload y los detalles exactos en producción.
 
 **Estado Arquitectónico:**
-El pipeline QA está reparado. El código de producción cumple con los requisitos de logging seguro y manejo de estado. La aplicación está lista para el release v7.10.0.
+El pipeline QA está reparado. El código de producción cumple con los requisitos de logging seguro y manejo de estado. La aplicación está lista para el release v1.0.0.
 
 ---
 

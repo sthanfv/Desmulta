@@ -40,7 +40,7 @@ describe('Middleware Security & Auth', () => {
       headers: new Map([['x-vercel-ip-city', 'Bogota']]),
       cookies: { get: vi.fn() },
     } as any;
-    
+
     await middleware(req);
     expect(mockRedirect).toHaveBeenCalled();
   });
@@ -52,7 +52,7 @@ describe('Middleware Security & Auth', () => {
       headers: new Map([['x-vercel-ip-city', 'Medellin']]),
       cookies: { get: vi.fn() },
     } as any;
-    
+
     const res = await middleware(req);
     expect(res.headers.get('X-Frame-Options')).toBe('DENY');
     expect(res.headers.get('X-Content-Type-Options')).toBe('nosniff');

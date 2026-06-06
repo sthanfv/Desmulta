@@ -72,7 +72,9 @@ export const validateEnv = () => {
     return parsed;
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const messages = error.errors.map((err) => `  - ${err.path.join('.')}: ${err.message}`).join('\n');
+      const messages = error.errors
+        .map((err) => `  - ${err.path.join('.')}: ${err.message}`)
+        .join('\n');
       throw new Error(`❌ Error de configuración (Variables de Entorno):\n${messages}`);
     }
     throw error;

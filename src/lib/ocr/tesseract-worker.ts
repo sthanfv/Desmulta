@@ -54,7 +54,9 @@ class TesseractWorkerManager {
       } catch (error) {
         this.initializing = null;
         mediaLogger.log('ERROR', 'Fallo crítico al crear Worker', { err: String(error) });
-        SecurityLogger.error('[OCR] Error crítico al inicializar el Worker', { error: String(error) });
+        SecurityLogger.error('[OCR] Error crítico al inicializar el Worker', {
+          error: String(error),
+        });
         throw error;
       }
     })();

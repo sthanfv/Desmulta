@@ -726,12 +726,12 @@ export function ModalDetalleExpediente({
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/60 dark:bg-black/80 backdrop-blur-xl p-4 sm:p-6 transition-all">
           <div className="absolute inset-0" onClick={() => setPdfPreviews([])} />
           <div className="bg-white dark:bg-[#0a0f1c] border border-slate-200/60 dark:border-slate-800 rounded-2xl w-full max-w-4xl flex flex-col overflow-hidden shadow-2xl relative z-10 p-4">
-             <ModalDocumentos 
-               documentos={pdfPreviews}
-               indiceActual={currentPreviewIndex}
-               onCambiarIndice={setCurrentPreviewIndex}
-               onCerrar={() => setPdfPreviews([])}
-             />
+            <ModalDocumentos
+              documentos={pdfPreviews}
+              indiceActual={currentPreviewIndex}
+              onCambiarIndice={setCurrentPreviewIndex}
+              onCerrar={() => setPdfPreviews([])}
+            />
           </div>
         </div>
       )}

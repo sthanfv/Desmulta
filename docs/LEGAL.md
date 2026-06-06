@@ -40,7 +40,7 @@ Solo se brinda soporte de seguridad para la rama principal activa.
 | Versión | Estado |
 |---------|-----------|
 | **v8.12.x** | ✅ Soporte Total (Motor Jurídico Dinámico + Zero-PII) |
-| **v8.10.x** | ✅ Soporte (Semáforo Ciudadano) |
+| **v1.0.0** | ✅ Soporte (Semáforo Ciudadano) |
 | **< v8.0** | ❌ Depreciado |
 
 ### 3.2. Cifrado y Protección de Datos

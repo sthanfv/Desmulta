@@ -144,8 +144,8 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
     let offsetY = 0;
 
     // ── Edge-scroll: variables para el scroll automático ──────────────────────
-    let scrollRafId: number | null = null;      // ID del requestAnimationFrame activo
-    let scrollVelocity = 0;                     // velocidad actual del scroll (-ve = izquierda, +ve = derecha)
+    let scrollRafId: number | null = null; // ID del requestAnimationFrame activo
+    let scrollVelocity = 0; // velocidad actual del scroll (-ve = izquierda, +ve = derecha)
 
     // Zona de activación: los últimos/primeros 80px de la pantalla
     const EDGE_ZONE = 80;
@@ -217,7 +217,9 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
 
       activeElement.style.opacity = '0.3';
 
-      try { activeElement.setPointerCapture(e.pointerId); } catch {}
+      try {
+        activeElement.setPointerCapture(e.pointerId);
+      } catch {}
 
       document.body.style.overflow = 'hidden';
       document.body.style.touchAction = 'none';
@@ -244,7 +246,10 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
       } else if (newVelocity === 0 && scrollVelocity !== 0) {
         // Salió de la zona de borde: detener el scroll
         scrollVelocity = 0;
-        if (scrollRafId) { cancelAnimationFrame(scrollRafId); scrollRafId = null; }
+        if (scrollRafId) {
+          cancelAnimationFrame(scrollRafId);
+          scrollRafId = null;
+        }
       } else {
         // Actualizar velocidad si cambió (más o menos cerca del borde)
         scrollVelocity = newVelocity;
@@ -253,9 +258,9 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
       // ── Resaltado visual de la columna destino ─────────────────────────────
       // elementFromPoint ignora el clon porque tiene pointerEvents: none
       const elementBelow = document.elementFromPoint(e.clientX, e.clientY);
-      document.querySelectorAll('.kanban-column').forEach(col =>
-        col.classList.remove('border-primary', 'bg-primary/5')
-      );
+      document
+        .querySelectorAll('.kanban-column')
+        .forEach((col) => col.classList.remove('border-primary', 'bg-primary/5'));
       const dropzone = elementBelow?.closest('.kanban-column');
       if (dropzone) dropzone.classList.add('border-primary', 'bg-primary/5');
     };
@@ -265,15 +270,18 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
 
       // Detener edge-scroll
       scrollVelocity = 0;
-      if (scrollRafId) { cancelAnimationFrame(scrollRafId); scrollRafId = null; }
+      if (scrollRafId) {
+        cancelAnimationFrame(scrollRafId);
+        scrollRafId = null;
+      }
 
       container.style.scrollSnapType = '';
       document.body.style.overflow = '';
       document.body.style.touchAction = '';
 
-      document.querySelectorAll('.kanban-column').forEach(col =>
-        col.classList.remove('border-primary', 'bg-primary/5')
-      );
+      document
+        .querySelectorAll('.kanban-column')
+        .forEach((col) => col.classList.remove('border-primary', 'bg-primary/5'));
 
       if (e.type !== 'pointercancel') {
         const elementBelow = document.elementFromPoint(e.clientX, e.clientY);
@@ -295,10 +303,15 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
         }
       }
 
-      try { activeElement.releasePointerCapture(e.pointerId); } catch {}
+      try {
+        activeElement.releasePointerCapture(e.pointerId);
+      } catch {}
 
       activeElement.style.opacity = '1';
-      if (clone) { clone.remove(); clone = null; }
+      if (clone) {
+        clone.remove();
+        clone = null;
+      }
       activeElement = null;
 
       if (navigator.vibrate) navigator.vibrate(15);
