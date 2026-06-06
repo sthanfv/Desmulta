@@ -116,9 +116,10 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
       const item = allItems.find((i) => i.id === id);
       if (!item) return;
 
-      const indiceAnterior = COLUMNAS_UNIFICADAS.findIndex(c => c.id === item.estado);
-      const indiceNuevo = COLUMNAS_UNIFICADAS.findIndex(c => c.id === estadoSiguiente);
-      const esRetroceso = indiceNuevo < indiceAnterior && indiceAnterior !== -1 && indiceNuevo !== -1;
+      const indiceAnterior = COLUMNAS_UNIFICADAS.findIndex((c) => c.id === item.estado);
+      const indiceNuevo = COLUMNAS_UNIFICADAS.findIndex((c) => c.id === estadoSiguiente);
+      const esRetroceso =
+        indiceNuevo < indiceAnterior && indiceAnterior !== -1 && indiceNuevo !== -1;
 
       setModalNota({
         isOpen: true,
@@ -142,11 +143,49 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
     let offsetX = 0;
     let offsetY = 0;
 
+    // ── Edge-scroll: variables para el scroll automático ──────────────────────
+    let scrollRafId: number | null = null;      // ID del requestAnimationFrame activo
+    let scrollVelocity = 0;                     // velocidad actual del scroll (-ve = izquierda, +ve = derecha)
+
+    // Zona de activación: los últimos/primeros 80px de la pantalla
+    const EDGE_ZONE = 80;
+    // Velocidad máxima de scroll en px por frame (≈16ms)
+    const MAX_SPEED = 18;
+
+    // Bucle de scroll que corre mientras hay arrastre activo cerca del borde
+    const runEdgeScroll = () => {
+      if (!activeElement || scrollVelocity === 0) {
+        scrollRafId = null;
+        return;
+      }
+      container.scrollLeft += scrollVelocity;
+      scrollRafId = requestAnimationFrame(runEdgeScroll);
+    };
+
+    // Calcula la velocidad según qué tan cerca está el dedo del borde
+    // Devuelve 0 (sin scroll), negativo (izquierda) o positivo (derecha)
+    const getEdgeVelocity = (clientX: number): number => {
+      const screenW = window.innerWidth;
+
+      if (clientX < EDGE_ZONE) {
+        // Zona izquierda: más cerca del borde = más rápido
+        const ratio = 1 - clientX / EDGE_ZONE;
+        return -(ratio * MAX_SPEED);
+      }
+
+      if (clientX > screenW - EDGE_ZONE) {
+        // Zona derecha: más cerca del borde = más rápido
+        const ratio = 1 - (screenW - clientX) / EDGE_ZONE;
+        return ratio * MAX_SPEED;
+      }
+
+      return 0; // Centro de pantalla: sin scroll
+    };
+
     const onPointerDown = (e: PointerEvent) => {
       if (e.pointerType === 'mouse' && e.button !== 0) return;
-      
+
       const target = e.target as HTMLElement;
-      // Validamos que no estemos tocando un botón interno de la tarjeta (ej. WhatsApp)
       if (target.closest('button, a')) return;
 
       const draggable = target.closest('.touch-draggable') as HTMLElement;
@@ -159,10 +198,9 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
       offsetX = e.clientX - rect.left;
       offsetY = e.clientY - rect.top;
 
-      // Desactivamos temporalmente el snap magnético para evitar tirones
       container.style.scrollSnapType = 'none';
 
-      // Clon visual estricto
+      // Clon visual
       clone = activeElement.cloneNode(true) as HTMLElement;
       clone.style.position = 'fixed';
       clone.style.zIndex = '9999';
@@ -171,20 +209,16 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
       clone.style.height = `${rect.height}px`;
       clone.style.left = '0px';
       clone.style.top = '0px';
-      clone.style.transform = `translate3d(${rect.left}px, ${rect.top}px, 0) scale(1.02) rotate(2deg)`;
+      clone.style.transform = `translate3d(${rect.left}px, ${rect.top}px, 0) scale(1.03) rotate(1.5deg)`;
       clone.style.boxShadow = '0 25px 50px -12px rgba(0, 0, 0, 0.4)';
-      clone.style.transition = 'transform 0.05s ease';
-      clone.style.opacity = '0.9';
-
+      clone.style.opacity = '0.92';
+      clone.style.willChange = 'transform';
       document.body.appendChild(clone);
-      activeElement.style.opacity = '0.3'; // Ocultamos parcialmente el original
 
-      // Capturamos el puntero para evitar que se pierda si el usuario sale del área
-      try {
-        activeElement.setPointerCapture(e.pointerId);
-      } catch (err) {}
-      
-      // Bloqueamos el scroll del body temporalmente
+      activeElement.style.opacity = '0.3';
+
+      try { activeElement.setPointerCapture(e.pointerId); } catch {}
+
       document.body.style.overflow = 'hidden';
       document.body.style.touchAction = 'none';
 
@@ -195,37 +229,55 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
       if (!activeElement || !clone) return;
       e.preventDefault();
 
+      // Mover el clon siguiendo el dedo
       const x = e.clientX - offsetX;
       const y = e.clientY - offsetY;
-      clone.style.transform = `translate3d(${x}px, ${y}px, 0) scale(1.02) rotate(2deg)`;
+      clone.style.transform = `translate3d(${x}px, ${y}px, 0) scale(1.03) rotate(1.5deg)`;
 
-      // Resaltado visual de la columna destino
-      const elementBelow = document.elementFromPoint(e.clientX, e.clientY);
-      document.querySelectorAll('.kanban-column').forEach(col => col.classList.remove('border-primary', 'bg-primary/5'));
-      
-      const dropzone = elementBelow?.closest('.kanban-column');
-      if (dropzone) {
-        dropzone.classList.add('border-primary', 'bg-primary/5');
+      // ── Edge-scroll magnético ──────────────────────────────────────────────
+      const newVelocity = getEdgeVelocity(e.clientX);
+
+      if (newVelocity !== 0 && scrollVelocity === 0) {
+        // Acaba de entrar en zona de borde: arrancar el bucle
+        scrollVelocity = newVelocity;
+        if (!scrollRafId) scrollRafId = requestAnimationFrame(runEdgeScroll);
+      } else if (newVelocity === 0 && scrollVelocity !== 0) {
+        // Salió de la zona de borde: detener el scroll
+        scrollVelocity = 0;
+        if (scrollRafId) { cancelAnimationFrame(scrollRafId); scrollRafId = null; }
+      } else {
+        // Actualizar velocidad si cambió (más o menos cerca del borde)
+        scrollVelocity = newVelocity;
       }
+
+      // ── Resaltado visual de la columna destino ─────────────────────────────
+      // elementFromPoint ignora el clon porque tiene pointerEvents: none
+      const elementBelow = document.elementFromPoint(e.clientX, e.clientY);
+      document.querySelectorAll('.kanban-column').forEach(col =>
+        col.classList.remove('border-primary', 'bg-primary/5')
+      );
+      const dropzone = elementBelow?.closest('.kanban-column');
+      if (dropzone) dropzone.classList.add('border-primary', 'bg-primary/5');
     };
 
     const onPointerUp = (e: PointerEvent) => {
       if (!activeElement) return;
 
-      // Reactivamos el snap magnético
+      // Detener edge-scroll
+      scrollVelocity = 0;
+      if (scrollRafId) { cancelAnimationFrame(scrollRafId); scrollRafId = null; }
+
       container.style.scrollSnapType = '';
-      
-      // Restauramos el body
       document.body.style.overflow = '';
       document.body.style.touchAction = '';
 
-      if (e.type === 'pointercancel') {
-        document.querySelectorAll('.kanban-column').forEach(col => col.classList.remove('border-primary', 'bg-primary/5'));
-      } else {
+      document.querySelectorAll('.kanban-column').forEach(col =>
+        col.classList.remove('border-primary', 'bg-primary/5')
+      );
+
+      if (e.type !== 'pointercancel') {
         const elementBelow = document.elementFromPoint(e.clientX, e.clientY);
         const dropzone = elementBelow?.closest('.kanban-column') as HTMLElement;
-
-        document.querySelectorAll('.kanban-column').forEach(col => col.classList.remove('border-primary', 'bg-primary/5'));
 
         if (dropzone) {
           const estadoDestino = dropzone.getAttribute('data-column-id');
@@ -233,27 +285,21 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
           const estadoActual = activeElement.getAttribute('data-estado-actual');
 
           if (itemId && estadoDestino && estadoActual !== estadoDestino) {
-            // CONEXIÓN CON REACT: Disparamos la lógica de negocio real
             handleAvanzar(itemId, estadoDestino);
-            
-            // Centrado magnético en la nueva columna
+
+            // Snap magnético a la columna destino
             setTimeout(() => {
               dropzone.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-            }, 50);
+            }, 60);
           }
         }
       }
 
-      try {
-        activeElement.releasePointerCapture(e.pointerId);
-      } catch (err) {}
+      try { activeElement.releasePointerCapture(e.pointerId); } catch {}
 
-      // Limpieza del DOM
       activeElement.style.opacity = '1';
-      if (clone) clone.remove();
-      
+      if (clone) { clone.remove(); clone = null; }
       activeElement = null;
-      clone = null;
 
       if (navigator.vibrate) navigator.vibrate(15);
     };
@@ -264,6 +310,8 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
     document.addEventListener('pointercancel', onPointerUp);
 
     return () => {
+      // Limpiar el scroll si el componente se desmonta durante un arrastre
+      if (scrollRafId) cancelAnimationFrame(scrollRafId);
       document.removeEventListener('pointerdown', onPointerDown);
       document.removeEventListener('pointermove', onPointerMove);
       document.removeEventListener('pointerup', onPointerUp);
@@ -910,10 +958,7 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
                     .filter((item: KanbanItem) => item.estado === columna.id)
                     .map((item: KanbanItem) => (
                       <div key={item.id} onClick={() => setItemSeleccionado(item)}>
-                        <TarjetaKanban
-                          data={item}
-                          onAvanzar={handleAvanzar}
-                        />
+                        <TarjetaKanban data={item} onAvanzar={handleAvanzar} />
                       </div>
                     ))}
 
