@@ -6,6 +6,8 @@ import { ShieldCheck, ArrowRight, BookOpen, AlertTriangle, Scale } from 'lucide-
 import ciudadesData from '@/lib/data/ciudades.json';
 import infraccionesData from '@/lib/data/infracciones.json';
 
+export const revalidate = 2592000; // 30 días — el contenido legal cambia muy poco
+
 type Props = {
   params: Promise<{
     ciudad: string;

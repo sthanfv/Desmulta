@@ -14,13 +14,17 @@ vi.mock('firebase-admin', () => {
   const update = mocks.mockFirestoreUpdate;
   const doc = vi.fn(() => ({ update }));
   const collection = vi.fn(() => ({ doc }));
+  const runTransaction = vi.fn(async (cb) => cb({
+    get: vi.fn(async () => ({ data: () => ({ processingStatus: undefined }) })),
+    update: mocks.mockFirestoreUpdate
+  }));
   return {
     default: {
-      firestore: vi.fn(() => ({ collection })),
+      firestore: vi.fn(() => ({ collection, runTransaction })),
       apps: ['mock'],
       initializeApp: vi.fn()
     },
-    firestore: Object.assign(vi.fn(() => ({ collection })), {
+    firestore: Object.assign(vi.fn(() => ({ collection, runTransaction })), {
       FieldValue: {
         serverTimestamp: vi.fn(() => 'mock-timestamp')
       }

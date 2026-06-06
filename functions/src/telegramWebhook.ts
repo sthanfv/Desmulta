@@ -39,62 +39,7 @@ interface TelegramUpdate {
 
 // ─── Helpers de Telegram API ──────────────────────────────────────────────────
 
-async function sendMessage(
-  token: string,
-  chatId: number,
-  text: string,
-  replyMarkup?: unknown
-): Promise<void> {
-  await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      chat_id: chatId,
-      text,
-      parse_mode: 'HTML',
-      link_preview_options: { is_disabled: true },
-      ...(replyMarkup ? { reply_markup: replyMarkup } : {}),
-    }),
-  });
-}
-
-async function editMessageText(
-  token: string,
-  chatId: number,
-  messageId: number,
-  text: string,
-  replyMarkup?: unknown
-): Promise<void> {
-  await fetch(`https://api.telegram.org/bot${token}/editMessageText`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      chat_id: chatId,
-      message_id: messageId,
-      text,
-      parse_mode: 'HTML',
-      link_preview_options: { is_disabled: true },
-      ...(replyMarkup ? { reply_markup: replyMarkup } : {}),
-    }),
-  });
-}
-
-async function answerCallbackQuery(
-  token: string,
-  callbackQueryId: string,
-  text: string,
-  showAlert = false
-): Promise<void> {
-  await fetch(`https://api.telegram.org/bot${token}/answerCallbackQuery`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      callback_query_id: callbackQueryId,
-      text,
-      show_alert: showAlert,
-    }),
-  });
-}
+import { sendMessage, editMessageText, answerCallbackQuery } from './telegram-utils';
 
 // ─── Mapa de estados ──────────────────────────────────────────────────────────
 const ESTADOS: Record<string, { label: string; emoji: string; desc: string }> = {

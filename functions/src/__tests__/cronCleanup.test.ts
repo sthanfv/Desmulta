@@ -45,6 +45,7 @@ vi.mock('firebase-admin', () => {
       Timestamp: {
         fromDate: vi.fn((d) => d),
         now: vi.fn(() => new Date()),
+        fromMillis: vi.fn((m) => new Date(m)),
       }
     }),
   };
@@ -96,12 +97,12 @@ describe('cronCleanup - Unit Tests', () => {
     
     await wrapped({});
 
-    // 3 colecciones purgadas (upload_rl, consultations, tokens push inactivos)
-    // Nota: El resto ahora las gestiona el TTL nativo
-    expect(mocks.mockFirestoreGet).toHaveBeenCalledTimes(3);
+    // 8 colecciones purgadas (6 de rate limits, consultations, tokens push inactivos)
+    // Nota: Algunas las gestiona el TTL nativo, pero COLLECTIONS_TO_CLEAN tiene 6
+    expect(mocks.mockFirestoreGet).toHaveBeenCalledTimes(8);
     expect(mocks.mockBatchDelete).toHaveBeenCalled();
-    // 3 commits: uno por upload_rl, uno por consultations, uno por tokens push
-    expect(mocks.mockBatchCommit).toHaveBeenCalledTimes(3);
+    // 8 commits: uno por cada colección de COLLECTIONS_TO_CLEAN, uno por consultations, uno por tokens push
+    expect(mocks.mockBatchCommit).toHaveBeenCalledTimes(8);
 
     // Purga de blobs
     expect(mocks.mockBlobList).toHaveBeenCalled();

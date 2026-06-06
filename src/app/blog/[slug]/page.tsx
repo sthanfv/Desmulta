@@ -5,6 +5,16 @@ import { Button } from '@/components/ui/button';
 import { getBlogPostBySlug } from '@/lib/mdx';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
+import { getBlogPosts } from '@/lib/mdx';
+
+export const revalidate = 86400; // 24 horas en segundos
+
+export async function generateStaticParams() {
+  const posts = await getBlogPosts();
+  return posts.map((post) => ({
+    slug: post.slug,
+  }));
+}
 
 export async function generateMetadata({
   params,

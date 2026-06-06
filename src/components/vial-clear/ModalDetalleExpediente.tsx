@@ -24,6 +24,8 @@ import { useAuth } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { CAUSALES_TRANSITO } from '@/lib/legal/legal-types';
 import { PDFPreviewModal } from '../admin/PDFPreviewModal';
+import { ModalDocumentos } from './modal-parts/ModalDocumentos';
+import { ModalEdicionDatos } from './modal-parts/ModalEdicionDatos';
 
 interface ModalDetalleExpedienteProps {
   data: KanbanItem;
@@ -101,6 +103,8 @@ export function ModalDetalleExpediente({
     email: templateData.email,
     ticketNumber: templateData.ticketNumber,
     placa: templateData.placa,
+    ciudad: data && 'ciudad' in data ? String(data.ciudad) : '',
+    operatorNote: '',
   });
 
   const isInvalid =
@@ -619,71 +623,13 @@ export function ModalDetalleExpediente({
                   </div>
                 )}
 
-                <div className="grid grid-cols-2 gap-3 p-4 bg-white/50 dark:bg-[#0f1523]/50 rounded-xl border border-slate-200/50 dark:border-slate-800/50">
-                  <input
-                    type="text"
-                    value={editData.nombre}
-                    onChange={(e) => setEditData({ ...editData, nombre: e.target.value })}
-                    placeholder="Nombre Completo"
-                    className="w-full col-span-2 bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 p-3 rounded-lg text-sm font-medium shadow-sm outline-none focus:border-amber-500 transition-all placeholder:text-slate-400"
-                  />
-                  <input
-                    type="text"
-                    value={editData.cedula}
-                    onChange={(e) => setEditData({ ...editData, cedula: e.target.value })}
-                    placeholder="Cédula"
-                    className="w-full bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 p-3 rounded-lg text-sm font-mono shadow-sm outline-none focus:border-amber-500 transition-all placeholder:text-slate-400"
-                  />
-                  <input
-                    type="text"
-                    value={editData.placa}
-                    onChange={(e) =>
-                      setEditData({ ...editData, placa: e.target.value.toUpperCase() })
-                    }
-                    placeholder="Placa"
-                    className="w-full bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 p-3 rounded-lg text-sm font-bold shadow-sm outline-none focus:border-amber-500 transition-all placeholder:text-slate-400 uppercase"
-                  />
-                  <input
-                    type="text"
-                    value={editData.ticketNumber}
-                    onChange={(e) => setEditData({ ...editData, ticketNumber: e.target.value })}
-                    placeholder="N° Comparendo"
-                    className="w-full col-span-2 bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 p-3 rounded-lg text-sm font-medium shadow-sm outline-none focus:border-amber-500 transition-all placeholder:text-slate-400"
-                  />
-                  <input
-                    type="email"
-                    value={editData.email}
-                    onChange={(e) => setEditData({ ...editData, email: e.target.value })}
-                    placeholder="Correo Electrónico (Requerido)"
-                    className="w-full col-span-2 bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 p-3 rounded-lg text-sm font-medium shadow-sm outline-none focus:border-amber-500 transition-all placeholder:text-slate-400"
-                    required
-                  />
-                </div>
-
-                <div className="flex gap-3 pt-2">
-                  <button
-                    onClick={() => setIsEditing(false)}
-                    className="px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-all border border-transparent hover:border-slate-300 dark:hover:border-slate-700"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    onClick={handleGenerarDocumentos}
-                    disabled={
-                      isProcessing === 'pdf' ||
-                      isInvalid ||
-                      selectedDocs.length === 0 ||
-                      (selectedDocs.includes('peticion') && selectedCausal === '')
-                    }
-                    className="flex-1 bg-amber-500 hover:bg-amber-400 text-amber-950 p-3.5 rounded-xl flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest shadow-[0_10px_20px_-10px_rgba(245,158,11,0.5)] transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
-                  >
-                    {isProcessing === 'pdf' ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      'Construir y Descargar PDF'
-                    )}
-                  </button>
-                </div>
+                <ModalEdicionDatos
+                  datos={editData}
+                  onChange={(campo, valor) => setEditData((prev) => ({ ...prev, [campo]: valor }))}
+                  onGuardar={handleGenerarDocumentos}
+                  onCancelar={() => setIsEditing(false)}
+                  isGuardando={isProcessing === 'pdf'}
+                />
               </div>
             </div>
           )}
@@ -709,6 +655,8 @@ export function ModalDetalleExpediente({
                   email: templateData.email,
                   ticketNumber: templateData.ticketNumber,
                   placa: templateData.placa,
+                  ciudad: data && 'ciudad' in data ? String(data.ciudad) : '',
+                  operatorNote: '',
                 });
                 setIsEditing(true);
               }}
@@ -775,25 +723,16 @@ export function ModalDetalleExpediente({
       </div>
 
       {pdfPreviews.length > 0 && (
-        <PDFPreviewModal
-          isOpen={true}
-          onClose={() => setPdfPreviews([])}
-          base64={pdfPreviews[currentPreviewIndex].base64}
-          filename={pdfPreviews[currentPreviewIndex].filename}
-        />
-      )}
-
-      {pdfPreviews.length > 1 && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-slate-950/90 backdrop-blur-xl border border-white/10 rounded-full flex gap-1 p-1 shadow-2xl ring-1 ring-white/5">
-          {pdfPreviews.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrentPreviewIndex(i)}
-              className={`px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-wider transition-all ${currentPreviewIndex === i ? 'bg-white text-slate-950' : 'text-slate-400 hover:text-white hover:bg-white/10'}`}
-            >
-              Doc {i + 1}
-            </button>
-          ))}
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/60 dark:bg-black/80 backdrop-blur-xl p-4 sm:p-6 transition-all">
+          <div className="absolute inset-0" onClick={() => setPdfPreviews([])} />
+          <div className="bg-white dark:bg-[#0a0f1c] border border-slate-200/60 dark:border-slate-800 rounded-2xl w-full max-w-4xl flex flex-col overflow-hidden shadow-2xl relative z-10 p-4">
+             <ModalDocumentos 
+               documentos={pdfPreviews}
+               indiceActual={currentPreviewIndex}
+               onCambiarIndice={setCurrentPreviewIndex}
+               onCerrar={() => setPdfPreviews([])}
+             />
+          </div>
         </div>
       )}
     </div>

@@ -20,7 +20,7 @@ interface PageProps {
  * - dynamicParams = false: cualquier slug no pre-generado en build devuelve 404,
  *   previniendo generación dinámica en tiempo de ejecución y posibles abusos.
  */
-export const revalidate = 3600;
+export const revalidate = 604800; // 7 días en segundos
 export const dynamicParams = false;
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {

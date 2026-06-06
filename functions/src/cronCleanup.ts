@@ -127,6 +127,31 @@ export const cronLimpieza = onSchedule({
       }
     }
 
+    // ── 8. Purgar edge_telemetry más antigua de 90 días ─────────────────────────
+    try {
+      const noventaDiasAtras = admin.firestore.Timestamp.fromMillis(
+        ahora - 90 * 24 * 60 * 60 * 1000
+      );
+
+      const telemetriaVieja = await db
+        .collection('edge_telemetry')
+        .where('ts', '<', noventaDiasAtras.toMillis())
+        .limit(500)
+        .get();
+
+      if (!telemetriaVieja.empty) {
+        // Borrar en lotes de 500 (límite de batch de Firestore)
+        const batch = db.batch();
+        telemetriaVieja.docs.forEach((doc) => batch.delete(doc.ref));
+        await batch.commit();
+        logger.info(
+          `[cronLimpieza] Purgados ${telemetriaVieja.size} registros de edge_telemetry (>90 días).`
+        );
+      }
+    } catch (err) {
+      logger.warn('[cronLimpieza] Error limpiando edge_telemetry:', err);
+    }
+
     logger.info('[cronLimpieza] Proceso de limpieza completado exitosamente.');
   } catch (error) {
     logger.error('[cronLimpieza] Error crítico durante la limpieza:', error);

@@ -41,16 +41,28 @@ export const onConsultationCreated = onDocumentCreated({
   const db = admin.firestore();
 
   // 🛡️ IDEMPOTENCIA (v8.9.2)
-  // Verificar si ya fue procesado para evitar duplicidad en retries automáticos
-  if (data.telegramStatus === 'sent' && data.welcomeEmailSent === true) {
-    logger.info(`[onConsultationCreated] ${docId} ya procesado — saltando.`);
+  const consultationRef = db.collection('consultations').doc(docId);
+
+  // Verificación atómica: solo procesar si no está ya en proceso o completado
+  let yaFueProcesado = false;
+  await db.runTransaction(async (transaction) => {
+    const snap = await transaction.get(consultationRef);
+    const d = snap.data();
+    if (!d) return;
+
+    const status = d.processingStatus;
+    if (status === 'processing' || status === 'done') {
+      yaFueProcesado = true;
+      return;
+    }
+
+    transaction.update(consultationRef, { processingStatus: 'processing' });
+  });
+
+  if (yaFueProcesado) {
+    logger.info(`[onConsultationCreated] ${docId} ya en proceso o completado — saltando.`);
     return;
   }
-
-  // Marcar como "en proceso" para evitar colisiones en ejecuciones paralelas si las hubiera
-  await db.collection('consultations').doc(docId).update({
-    telegramStatus: 'processing',
-  });
 
   // 1. Email de Bienvenida / Confirmación con Dictamen Técnico
   if (emailCiudadano) {
@@ -347,4 +359,11 @@ export const onConsultationCreated = onDocumentCreated({
       logger.warn('[onConsultationCreated] INTERNAL_API_SECRET no configurado, el blob no se purgará.');
     }
   }
+
+  // Marcar como completado para futuros retries
+  await db.collection('consultations').doc(docId).update({
+    processingStatus: 'done',
+    telegramStatus: 'sent',
+    welcomeEmailSent: true,
+  });
 });

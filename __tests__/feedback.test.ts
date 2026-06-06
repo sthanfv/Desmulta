@@ -35,7 +35,10 @@ describe('QA DevSecOps: Controlador Central de Feedback (In-App Toasts)', () => 
     Feedback.error('Fallo en la consulta', rawDatabaseError);
 
     // 1. Verifica que el error crudo se registre en el servidor (para telemetría interna)
-    expect(console.error).toHaveBeenCalledWith('[DevSecOps-Feedback-Internal]', rawDatabaseError);
+    expect(console.error).toHaveBeenCalledWith(
+      expect.stringContaining('[ERROR] [Feedback] Error de usuario capturado:'),
+      expect.stringContaining('[object Object]')
+    );
 
     // 2. Verifica que el cliente (toast) reciba estrictamente el mensaje sanitizado, NUNCA el error crudo
     expect(toast.error).toHaveBeenCalledWith('Fallo en la consulta', {

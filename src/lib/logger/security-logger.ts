@@ -72,21 +72,25 @@ export const SecurityLogger = {
     const logSanitizado = sanitizarPII(JSON.stringify(datos || {}));
     console.error(`[ERROR] ${contexto}:`, logSanitizado);
 
-    // ✅ NUEVO: También captura en Sentry para visibilidad en producción
-    Sentry.captureMessage(`${contexto}: ${logSanitizado}`, {
-      level: 'error',
-      fingerprint: getFingerprint(contexto),
-    });
+    // Capturar en Sentry para visibilidad en producción
+    if (process.env.NODE_ENV === 'production') {
+      Sentry.captureMessage(`${contexto}: ${logSanitizado}`, {
+        level: 'error',
+        fingerprint: getFingerprint(contexto),
+      });
+    }
   },
   security: (contexto: string, datos?: unknown) => {
     const logSanitizado = sanitizarPII(JSON.stringify(datos || {}));
     console.warn(`[SECURITY EVENT] ${contexto}:`, logSanitizado);
 
-    // ✅ NUEVO: Los eventos de seguridad siempre van a Sentry con prioridad alta
-    Sentry.captureMessage(`[SECURITY] ${contexto}: ${logSanitizado}`, {
-      level: 'warning',
-      fingerprint: ['security-event', ...getFingerprint(contexto)],
-    });
+    // Los eventos de seguridad siempre van a Sentry
+    if (process.env.NODE_ENV === 'production') {
+      Sentry.captureMessage(`[SECURITY] ${contexto}: ${logSanitizado}`, {
+        level: 'warning',
+        fingerprint: ['security-event', ...getFingerprint(contexto)],
+      });
+    }
   },
 };
 

@@ -15,7 +15,7 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Unit tests with coverage
-        run: npm run test:coverage:ci
+        run: npm run test:coverage
         env:
           NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
           NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}

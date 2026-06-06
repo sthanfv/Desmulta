@@ -39,7 +39,7 @@ import {
 import { TableroFlujoTrabajo } from '@/components/vial-clear/TableroFlujoTrabajo';
 import { AnalyticsView } from '@/components/vial-clear/AnalyticsView';
 import { ReferralsAdminView } from '@/components/vial-clear/ReferralsAdminView';
-import { useAnalyticsStats } from '@/hooks/useAnalyticsStats';
+import { useAdminAnalytics } from '@/hooks/useAdminAnalytics';
 import { ThemeToggle } from '@/components/vial-clear/ThemeToggle';
 // Removed HiddenAuditPanel
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -242,11 +242,19 @@ export function AdminDashboard() {
     },
   });
 
+  const [idToken, setIdToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (analyticsEnabled && auth?.currentUser) {
+      auth.currentUser.getIdToken().then(setIdToken);
+    }
+  }, [analyticsEnabled, auth?.currentUser]);
+
   const {
-    data: analyticsData,
+    analytics: analyticsData,
     isLoading: isAnalyticsLoading,
     error: analyticsError,
-  } = useAnalyticsStats(analyticsEnabled ? auth : null);
+  } = useAdminAnalytics(idToken);
 
   const showcaseForm = useForm<ShowcaseFormData>({
     resolver: zodResolver(showcaseSchema),

@@ -6,6 +6,8 @@ import { ShieldAlert, ArrowRight, Scale, MapPin } from 'lucide-react';
 import ciudadesData from '@/lib/data/ciudades.json';
 import infraccionesData from '@/lib/data/infracciones.json';
 
+export const revalidate = 604800; // 7 días
+
 type Props = {
   params: Promise<{
     ciudad: string;
@@ -45,7 +47,41 @@ export default async function MultasCiudadPage(props: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white selection:bg-brand-500/30 selection:text-white">
+    <>
+      {/* SEO: JSON-LD LegalService + LocalBusiness */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': ['LegalService', 'LocalBusiness'],
+            name: `Desmulta — Defensa de Fotomultas en ${ciudad.nombre}`,
+            description: `Auditoría legal contra fotomultas, comparendos y embargos en ${ciudad.nombre}. Prescripción, caducidad y nulidades ante la ${ciudad.entidadTransito}.`,
+            url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://desmulta.online'}/multas/${ciudad.slug}`,
+            areaServed: {
+              '@type': 'City',
+              name: ciudad.nombre,
+              containedInPlace: {
+                '@type': 'State',
+                name: ciudad.departamento,
+              },
+            },
+            serviceType: 'Defensa legal contra multas de tránsito',
+            provider: {
+              '@type': 'Organization',
+              name: 'Desmulta',
+              url: process.env.NEXT_PUBLIC_SITE_URL || 'https://desmulta.online',
+            },
+            offers: {
+              '@type': 'Offer',
+              price: '0',
+              priceCurrency: 'COP',
+              description: 'Consulta inicial gratuita',
+            },
+          }),
+        }}
+      />
+      <div className="min-h-screen bg-black text-white selection:bg-brand-500/30 selection:text-white">
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 px-6 md:px-12 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-brand-900/20 to-black/90 pointer-events-none" />
@@ -142,5 +178,6 @@ export default async function MultasCiudadPage(props: Props) {
         </div>
       </section>
     </div>
+    </>
   );
 }

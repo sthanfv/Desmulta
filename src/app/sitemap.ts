@@ -1,11 +1,13 @@
 import type { MetadataRoute } from 'next';
 import ciudades from '@/lib/data/ciudades.json';
 import infracciones from '@/lib/data/infracciones.json';
+import { getBlogPosts } from '@/lib/mdx';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://desmulta.online';
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const sitemapData: MetadataRoute.Sitemap = [
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  // Rutas estáticas principales
+  const staticRoutes: MetadataRoute.Sitemap = [
     {
       url: SITE_URL,
       lastModified: new Date(),
@@ -31,10 +33,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     },
     {
-      url: `${SITE_URL}/privacidad`,
+      url: `${SITE_URL}/blog`,
       lastModified: new Date(),
-      changeFrequency: 'yearly',
-      priority: 0.5,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    {
+      url: `${SITE_URL}/metodologia`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.7,
     },
     {
       url: `${SITE_URL}/multas`,
@@ -44,8 +52,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
+  // Rutas del blog (dinámicas, desde los archivos .mdx)
+  const posts = await getBlogPosts();
+  const blogRoutes: MetadataRoute.Sitemap = posts.map((post) => ({
+    url: `${SITE_URL}/blog/${post.slug}`,
+    lastModified: post.date ? new Date(post.date) : new Date(),
+    changeFrequency: 'monthly' as const,
+    priority: 0.75,
+  }));
+
+  // Rutas por ciudad e infracción
   const cityRoutes: MetadataRoute.Sitemap = ciudades.flatMap((ciudad) => {
-    // 1. Ruta base de la ciudad
     const routes: MetadataRoute.Sitemap = [
       {
         url: `${SITE_URL}/multas/${ciudad.slug}`,
@@ -53,9 +70,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
         changeFrequency: 'weekly',
         priority: 0.9,
       },
+      {
+        url: `${SITE_URL}/servicios/${ciudad.slug}`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly',
+        priority: 0.85,
+      },
     ];
 
-    // 2. Sub-rutas por infracción en esa ciudad
     infracciones.forEach((infraccion) => {
       routes.push({
         url: `${SITE_URL}/multas/${ciudad.slug}/${infraccion.slug}`,
@@ -68,5 +90,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     return routes;
   });
 
-  return [...sitemapData, ...cityRoutes];
+  return [...staticRoutes, ...blogRoutes, ...cityRoutes];
 }
