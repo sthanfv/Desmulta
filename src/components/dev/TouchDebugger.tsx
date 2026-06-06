@@ -177,7 +177,11 @@ function patchConsole() {
     logger.error('Unhandled Rejection:', event.reason);
   });
   window.addEventListener('error', (event) => {
-    logger.error('Window Error', { message: event.message, filename: event.filename, lineno: event.lineno });
+    logger.error('Window Error', {
+      message: event.message,
+      filename: event.filename,
+      lineno: event.lineno,
+    });
   });
 }
 
@@ -203,10 +207,15 @@ export function TouchDebugger() {
   const [copied, setCopied] = useState(false);
   const [sentToSentry, setSentToSentry] = useState(false);
   const [confirmClear, setConfirmClear] = useState(false);
+  const [confirmNuclear, setConfirmNuclear] = useState(false);
 
   // Estados de posición y tamaño
-  const [pos, setPos] = useState({ x: 10, y: window.innerHeight - 300 });
+  const [pos, setPos] = useState({ x: 10, y: 0 });
   const [size, setSize] = useState({ w: 320, h: 250 });
+
+  useEffect(() => {
+    setPos({ x: 10, y: window.innerHeight - 300 });
+  }, []);
 
   const isDragging = useRef(false);
   const dragStart = useRef({ x: 0, y: 0 });
@@ -514,7 +523,11 @@ export function TouchDebugger() {
   // ── Listeners ───────────────────────────────────────────────────────────────
   useEffect(() => {
     document.addEventListener('touchstart', handleActivationTap, { passive: true });
-    return () => document.removeEventListener('touchstart', handleActivationTap);
+    return () => {
+      document.removeEventListener('touchstart', handleActivationTap);
+      consoleLog.length = 0;
+      networkLog.length = 0;
+    };
   }, [handleActivationTap]);
 
   useEffect(() => {
@@ -921,19 +934,24 @@ export function TouchDebugger() {
           {sentToSentry ? '✓ Enviado' : 'Sentry'}
         </button>
         <button
-          onClick={() => {
-            if (
-              window.confirm(
-                '🚨 ¿EJECUTAR AUTO-HEAL?\\n\\nEsto destruirá LocalStorage, IndexedDB y ServiceWorkers para forzar limpieza total.'
-              )
-            ) {
-              healPwaCache();
+          onClick={(e) => {
+            e.stopPropagation();
+            if (!confirmNuclear) {
+              setConfirmNuclear(true);
+              setTimeout(() => setConfirmNuclear(false), 2500);
+              return;
             }
+            setConfirmNuclear(false);
+            healPwaCache();
           }}
-          className="px-2 py-1.5 rounded text-[9px] font-black uppercase tracking-wide transition-all active:scale-95 bg-red-950/80 text-red-400 hover:bg-red-900/80 border border-red-500/30"
+          className={`px-2 py-1.5 rounded text-[9px] font-black uppercase tracking-wide transition-all active:scale-95 border ${
+            confirmNuclear
+              ? 'bg-red-600 text-white border-red-500'
+              : 'bg-red-950/80 text-red-400 hover:bg-red-900/80 border-red-500/30'
+          }`}
           title="Destruir estado local (Auto-Heal)"
         >
-          NUCLEAR
+          {confirmNuclear ? '¿SEGURO?' : 'NUCLEAR'}
         </button>
         <button
           onClick={handleClear}
