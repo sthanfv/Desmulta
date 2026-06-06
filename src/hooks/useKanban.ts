@@ -5,6 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import { updateConsultationStatus, updateCaseStatus, convertToCase } from '@/app/admin/actions';
 import { Consultation } from '@/lib/definitions';
 import { KanbanItem } from '@/components/vial-clear/TableroFlujoTrabajo';
+import { COLUMNAS_UNIFICADAS } from '@/lib/constants/kanban-columns';
 
 const MAPEO_ESTADOS = new Map<string, string>([
   ['NUEVO', 'pendiente'],
@@ -35,12 +36,14 @@ export function useKanban(leadsReales: KanbanItem[], casosReales: KanbanItem[]) 
     nuevoEstado: string;
     estadoAnterior: string;
     esModalDetalle: boolean;
+    esRetroceso: boolean;
   }>({
     isOpen: false,
     itemId: '',
     nuevoEstado: '',
     estadoAnterior: '',
     esModalDetalle: false,
+    esRetroceso: false,
   });
 
   const onDragStart = useCallback((e: React.DragEvent, id: string, estadoActual: string) => {
@@ -66,12 +69,17 @@ export function useKanban(leadsReales: KanbanItem[], casosReales: KanbanItem[]) 
         prev.map((item) => (item.id === id ? { ...item, estado: nuevaColumna } : item))
       );
 
+      const indiceAnterior = COLUMNAS_UNIFICADAS.findIndex(c => c.id === estadoActual);
+      const indiceNuevo = COLUMNAS_UNIFICADAS.findIndex(c => c.id === nuevaColumna);
+      const esRetroceso = indiceNuevo < indiceAnterior && indiceAnterior !== -1 && indiceNuevo !== -1;
+
       setModalNota({
         isOpen: true,
         itemId: id,
         nuevoEstado: nuevaColumna,
         estadoAnterior: estadoActual,
         esModalDetalle: false,
+        esRetroceso,
       });
     } catch (err) {
       logger.error('Error in onDrop parse:', err);
@@ -85,12 +93,17 @@ export function useKanban(leadsReales: KanbanItem[], casosReales: KanbanItem[]) 
         prev.map((item) => (item.id === id ? { ...item, estado: nuevoEstado } : item))
       );
 
+      const indiceAnterior = COLUMNAS_UNIFICADAS.findIndex(c => c.id === estadoAnterior);
+      const indiceNuevo = COLUMNAS_UNIFICADAS.findIndex(c => c.id === nuevoEstado);
+      const esRetroceso = indiceNuevo < indiceAnterior && indiceAnterior !== -1 && indiceNuevo !== -1;
+
       setModalNota({
         isOpen: true,
         itemId: id,
         nuevoEstado,
         estadoAnterior,
         esModalDetalle: true,
+        esRetroceso,
       });
     },
     [itemSeleccionado?.estado]
@@ -99,8 +112,8 @@ export function useKanban(leadsReales: KanbanItem[], casosReales: KanbanItem[]) 
   const handlePromoverDesdeModal = useCallback(
     async (item: KanbanItem) => {
       try {
-        // Fix (getIdToken(true))
-        const idToken = (await auth?.currentUser?.getIdToken(true)) || '';
+        // Use cached token to avoid network failures on strict mobile browsers (Brave Shields)
+        const idToken = (await auth?.currentUser?.getIdToken()) || '';
         const result = await convertToCase(
           idToken,
           {
@@ -138,8 +151,8 @@ export function useKanban(leadsReales: KanbanItem[], casosReales: KanbanItem[]) 
       );
 
       try {
-        // Fix getIdToken(true)
-        const idToken = (await auth?.currentUser?.getIdToken(true)) || '';
+        // Use cached token
+        const idToken = (await auth?.currentUser?.getIdToken()) || '';
 
         if (item.tipo === 'lead' && targetIsCasoInfo) {
           const result = await convertToCase(

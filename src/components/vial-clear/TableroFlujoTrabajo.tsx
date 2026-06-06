@@ -116,12 +116,17 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
       const item = allItems.find((i) => i.id === id);
       if (!item) return;
 
+      const indiceAnterior = COLUMNAS_UNIFICADAS.findIndex(c => c.id === item.estado);
+      const indiceNuevo = COLUMNAS_UNIFICADAS.findIndex(c => c.id === estadoSiguiente);
+      const esRetroceso = indiceNuevo < indiceAnterior && indiceAnterior !== -1 && indiceNuevo !== -1;
+
       setModalNota({
         isOpen: true,
         itemId: id,
         nuevoEstado: estadoSiguiente,
         estadoAnterior: item.estado,
         esModalDetalle: false,
+        esRetroceso,
       });
     },
     [allItems, setModalNota]
@@ -174,6 +179,15 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
       document.body.appendChild(clone);
       activeElement.style.opacity = '0.3'; // Ocultamos parcialmente el original
 
+      // Capturamos el puntero para evitar que se pierda si el usuario sale del área
+      try {
+        activeElement.setPointerCapture(e.pointerId);
+      } catch (err) {}
+      
+      // Bloqueamos el scroll del body temporalmente
+      document.body.style.overflow = 'hidden';
+      document.body.style.touchAction = 'none';
+
       if (navigator.vibrate) navigator.vibrate(30);
     };
 
@@ -200,27 +214,39 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
 
       // Reactivamos el snap magnético
       container.style.scrollSnapType = '';
+      
+      // Restauramos el body
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
 
-      const elementBelow = document.elementFromPoint(e.clientX, e.clientY);
-      const dropzone = elementBelow?.closest('.kanban-column') as HTMLElement;
+      if (e.type === 'pointercancel') {
+        document.querySelectorAll('.kanban-column').forEach(col => col.classList.remove('border-primary', 'bg-primary/5'));
+      } else {
+        const elementBelow = document.elementFromPoint(e.clientX, e.clientY);
+        const dropzone = elementBelow?.closest('.kanban-column') as HTMLElement;
 
-      document.querySelectorAll('.kanban-column').forEach(col => col.classList.remove('border-primary', 'bg-primary/5'));
+        document.querySelectorAll('.kanban-column').forEach(col => col.classList.remove('border-primary', 'bg-primary/5'));
 
-      if (dropzone) {
-        const estadoDestino = dropzone.getAttribute('data-column-id');
-        const itemId = activeElement.getAttribute('data-item-id');
-        const estadoActual = activeElement.getAttribute('data-estado-actual');
+        if (dropzone) {
+          const estadoDestino = dropzone.getAttribute('data-column-id');
+          const itemId = activeElement.getAttribute('data-item-id');
+          const estadoActual = activeElement.getAttribute('data-estado-actual');
 
-        if (itemId && estadoDestino && estadoActual !== estadoDestino) {
-          // CONEXIÓN CON REACT: Disparamos la lógica de negocio real
-          handleAvanzar(itemId, estadoDestino);
-          
-          // Centrado magnético en la nueva columna
-          setTimeout(() => {
-            dropzone.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-          }, 50);
+          if (itemId && estadoDestino && estadoActual !== estadoDestino) {
+            // CONEXIÓN CON REACT: Disparamos la lógica de negocio real
+            handleAvanzar(itemId, estadoDestino);
+            
+            // Centrado magnético en la nueva columna
+            setTimeout(() => {
+              dropzone.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }, 50);
+          }
         }
       }
+
+      try {
+        activeElement.releasePointerCapture(e.pointerId);
+      } catch (err) {}
 
       // Limpieza del DOM
       activeElement.style.opacity = '1';

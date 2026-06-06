@@ -329,10 +329,10 @@ export async function convertToCase(
       // Sincronizar vista materializada
       if (leadData?.trackingUuid) {
         const publicRef = db.collection('public_tracking').doc(leadData.trackingUuid);
-        transaction.update(publicRef, {
+        transaction.set(publicRef, {
           status: 'en_proceso',
           updatedAt: FieldValue.serverTimestamp(),
-        });
+        }, { merge: true });
       }
     });
 
@@ -522,10 +522,10 @@ export async function updateCaseStatus(
 
       // 3. Sincronizar con la vista materializada (pública)
       if (publicRef) {
-        transaction.update(publicRef, {
+        transaction.set(publicRef, {
           status: publicStatus,
           updatedAt: FieldValue.serverTimestamp(),
-        });
+        }, { merge: true });
       }
 
       return currentLeadData;
