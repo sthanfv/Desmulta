@@ -28,6 +28,101 @@ export function GET(request: NextRequest) {
   const ciudad = searchParams.get('ciudad') || 'Colombia';
   const dept = searchParams.get('dept') || '';
 
+  const type = searchParams.get('type') || 'city';
+  const title = searchParams.get('title') || '';
+
+  if (type === 'blog') {
+    return new ImageResponse(
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          width: '100%',
+          height: '100%',
+          backgroundColor: '#09090b',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        <div
+          style={{
+            position: 'absolute',
+            top: '-200px',
+            right: '-200px',
+            width: '800px',
+            height: '800px',
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(255,191,0,0.2) 0%, rgba(255,191,0,0) 70%)',
+          }}
+        />
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'flex-start',
+            padding: '80px 96px',
+            flex: 1,
+            gap: '32px',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              background: 'rgba(255,191,0,0.15)',
+              border: '1px solid rgba(255,191,0,0.3)',
+              borderRadius: '100px',
+              padding: '8px 20px',
+            }}
+          >
+            <span
+              style={{
+                color: '#fde047',
+                fontSize: '18px',
+                fontWeight: 700,
+                letterSpacing: '0.15em',
+                textTransform: 'uppercase',
+              }}
+            >
+              BLOG LEGAL
+            </span>
+          </div>
+          <span
+            style={{
+              color: '#ffffff',
+              fontSize: title.length > 50 ? '60px' : '72px',
+              fontWeight: 900,
+              letterSpacing: '-0.03em',
+              lineHeight: 1.1,
+              maxWidth: '900px',
+            }}
+          >
+            {title}
+          </span>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '24px 96px',
+            borderTop: '1px solid rgba(255,255,255,0.08)',
+          }}
+        >
+          <span style={{ color: '#52525b', fontSize: '20px', fontWeight: 600 }}>
+            Desmulta.online
+          </span>
+        </div>
+      </div>,
+      {
+        width: OG_WIDTH,
+        height: OG_HEIGHT,
+      }
+    );
+  }
+
   // Línea secundaria: si hay departamento, lo mostramos; si no, solo Colombia
   const subtitulo = dept ? `${dept}, Colombia` : 'Colombia';
 
