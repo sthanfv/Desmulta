@@ -692,11 +692,11 @@ export async function updateConsultationStatus(
       });
 
       if (publicRef) {
-        transaction.update(publicRef, {
+        transaction.set(publicRef, {
           status: newStatus,
           timeline_updates: FieldValue.arrayUnion(timelineEvent),
           updatedAt: FieldValue.serverTimestamp(),
-        });
+        }, { merge: true });
       }
 
       return leadData;
