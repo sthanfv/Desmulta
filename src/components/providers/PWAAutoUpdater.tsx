@@ -58,12 +58,10 @@ export function PWAAutoUpdater() {
             if (newWorker) {
               newWorker.addEventListener('statechange', () => {
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  logger.warn(
-                    '[PWAAutoUpdater] ¡Nueva versión de la app detectada! Iniciando Auto-Sanación...'
+                  logger.info(
+                    '[PWAAutoUpdater] ¡Nueva versión de la app descargada en 2do plano! Se aplicará en el próximo reinicio natural.'
                   );
-                  // Inyectamos la cookie con 30 segundos de vida (max-age=30)
-                  document.cookie = 'pwa_healed=true; max-age=30; path=/';
-                  healPwaCache();
+                  // NOTA: Se eliminó healPwaCache() aquí porque causaba reinicios agresivos (fricción al usuario)
                 }
               });
             }
