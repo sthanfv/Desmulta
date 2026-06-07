@@ -6,7 +6,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { Search, RefreshCw, Download, FileArchive, Filter, Wallet } from 'lucide-react';
+import { Search, RefreshCw, Download, FileArchive, Filter, Wallet, Undo2 } from 'lucide-react';
 
 interface ModalAyudaOperadorProps {
   isOpen: boolean;
@@ -91,10 +91,21 @@ export function ModalAyudaOperador({ isOpen, onClose }: ModalAyudaOperadorProps)
                 <FileArchive className="w-5 h-5 text-red-600" />
               </div>
               <div>
-                <h4 className="font-bold text-sm text-slate-900 dark:text-white">Generar PDF</h4>
+                <h4 className="font-bold text-sm text-slate-900 dark:text-white">Generar PDF (Requiere SIMIT)</h4>
                 <p className="text-xs text-slate-500">
-                  Crea un reporte formal en formato PDF de la vista actual del tablero. Útil para
-                  imprimir resúmenes.
+                  Crea un reporte formal en formato PDF. <strong>Importante:</strong> El sistema ahora exige que primero se haya subido la captura SIMIT del cliente para poder generar documentos legales.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <div className="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center shrink-0">
+                <Undo2 className="w-5 h-5 text-amber-600" />
+              </div>
+              <div>
+                <h4 className="font-bold text-sm text-slate-900 dark:text-white">Retroceso de Estados</h4>
+                <p className="text-xs text-slate-500">
+                  Si mueves una tarjeta hacia atrás (ej. de Trámite a Estudio), el sistema te pedirá obligatoriamente una nota justificando la razón. Esto queda registrado para auditoría.
                 </p>
               </div>
             </div>
