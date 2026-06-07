@@ -84,6 +84,9 @@ const nextConfig: NextConfig = {
   experimental: {
     // Font subsetting: elimina pesos de fuente no usados en Geist, lucide-react y framer-motion
     optimizePackageImports: ['lucide-react', 'framer-motion', '@radix-ui/react-icons', 'geist'],
+    outputFileTracingIncludes: {
+      '/api/**/*': ['./node_modules/@sparticuz/chromium/bin/**/*'],
+    },
   },
   turbopack: {},
   async rewrites() {
