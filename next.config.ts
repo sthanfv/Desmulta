@@ -80,7 +80,7 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  serverExternalPackages: ['sharp'],
+  serverExternalPackages: ['sharp', '@sparticuz/chromium'],
   experimental: {
     // Font subsetting: elimina pesos de fuente no usados en Geist, lucide-react y framer-motion
     optimizePackageImports: ['lucide-react', 'framer-motion', '@radix-ui/react-icons', 'geist'],
