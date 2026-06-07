@@ -18,11 +18,11 @@ import { ModalDetalleExpediente } from './ModalDetalleExpediente';
 import { TarjetaKanban } from './TarjetaKanban';
 import { ModalNotaOperador } from './ModalNotaOperador';
 import { ModalAyudaOperador } from './ModalAyudaOperador';
+import { ModalAuthPin } from './ModalAuthPin';
 
 import type { PlantillasDisponibles } from '@/lib/legal/legal-types';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 
 export interface KanbanItem {
   id: string;
@@ -86,6 +86,13 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
 
+  const [pinAuth, setPinAuth] = useState<{
+    isOpen: boolean;
+    actionName: string;
+    onSuccess: (pin?: string) => void;
+    onCancel?: () => void;
+  }>({ isOpen: false, actionName: '', onSuccess: () => {} });
+
   const handleRefresh = useCallback(async () => {
     if (!refreshKanban) return;
     setIsRefreshing(true);
@@ -129,9 +136,7 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
         return;
       }
 
-      setAllItems((prev) =>
-        prev.map((i) => (i.id === id ? { ...i, estado: estadoSiguiente } : i))
-      );
+      setAllItems((prev) => prev.map((i) => (i.id === id ? { ...i, estado: estadoSiguiente } : i)));
 
       const indiceAnterior = COLUMNAS_UNIFICADAS.findIndex((c) => c.id === item.estado);
       const indiceNuevo = COLUMNAS_UNIFICADAS.findIndex((c) => c.id === estadoSiguiente);
@@ -466,155 +471,66 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
     }
   }, [filteredItems, toast, auth?.currentUser?.email]);
 
-  const exportToPDF = async () => {
+  const exportToPDF = async (pin?: string) => {
+    if (!pin) {
+      toast({ variant: 'destructive', title: 'Error: PIN no proporcionado' });
+      return;
+    }
+
     try {
-      const pdfDoc = await PDFDocument.create();
-      const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-      const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-      let page = pdfDoc.addPage([842, 595]); // A4 Landscape
-      let y = 550;
+      toast({ title: 'Generando PDF en el servidor...' });
 
-      page.drawText('Reporte Desmulta — ' + new Date().toLocaleDateString('es-CO'), {
-        x: 40,
-        y: y + 20,
-        size: 16,
-        font: boldFont,
-        color: rgb(0, 0, 0),
+      const user = auth?.currentUser;
+
+      const data = {
+        items: filteredItems.map((i: KanbanItem) => ({
+          id: i.id,
+          tipo: i.tipo,
+          estado: i.estado,
+          placa: i.placa,
+          cedula: i.cedula,
+          nombre: i.nombre,
+          ciudad: i.ciudad,
+          createdAt: i.createdAt,
+        })),
+        fechaExportacion: new Date().toLocaleDateString('es-CO'),
+        operatorDetails: {
+          nombre: user?.displayName || 'N/A',
+          email: user?.email || 'N/A',
+          telefono: user?.phoneNumber || 'N/A',
+        },
+        filtros: {
+          ciudad: filterCiudad,
+          estado: filterEstado,
+          fechaInicio: '',
+          fechaFin: '',
+        },
+      };
+
+      const res = await fetch('/api/admin/export-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin, data }),
       });
 
-      const cols = [
-        { name: 'Tipo', x: 40, w: 80 },
-        { name: 'Nombre', x: 120, w: 150 },
-        { name: 'Cédula', x: 270, w: 90 },
-        { name: 'Placa', x: 360, w: 80 },
-        { name: 'Ciudad', x: 440, w: 120 },
-        { name: 'Estado', x: 560, w: 120 },
-        { name: 'Fecha', x: 680, w: 120 },
-      ];
-
-      // Draw Headers
-      page.drawLine({
-        start: { x: 40, y },
-        end: { x: 800, y },
-        thickness: 1,
-        color: rgb(0.5, 0.5, 0.5),
-      });
-      y -= 15;
-      for (const col of cols) {
-        page.drawText(col.name, {
-          x: col.x,
-          y,
-          size: 10,
-          font: boldFont,
-          color: rgb(0.2, 0.2, 0.2),
-        });
-      }
-      y -= 10;
-      page.drawLine({
-        start: { x: 40, y },
-        end: { x: 800, y },
-        thickness: 1,
-        color: rgb(0.5, 0.5, 0.5),
-      });
-      y -= 20;
-
-      for (const item of filteredItems) {
-        if (y < 40) {
-          page = pdfDoc.addPage([842, 595]);
-          y = 550;
-          page.drawLine({
-            start: { x: 40, y },
-            end: { x: 800, y },
-            thickness: 1,
-            color: rgb(0.5, 0.5, 0.5),
-          });
-          y -= 15;
-          for (const col of cols) {
-            page.drawText(col.name, {
-              x: col.x,
-              y,
-              size: 10,
-              font: boldFont,
-              color: rgb(0.2, 0.2, 0.2),
-            });
-          }
-          y -= 10;
-          page.drawLine({
-            start: { x: 40, y },
-            end: { x: 800, y },
-            thickness: 1,
-            color: rgb(0.5, 0.5, 0.5),
-          });
-          y -= 20;
-        }
-
-        const fontSize = 9;
-        const color = rgb(0.2, 0.2, 0.2);
-        const tipo = item.tipo === 'lead' ? 'Petición' : 'Caso';
-        const dateStr = item.createdAt
-          ? new Date(item.createdAt).toLocaleDateString('es-CO')
-          : 'N/A';
-
-        page.drawText(tipo.substring(0, 15), { x: cols[0].x, y, size: fontSize, font, color });
-        page.drawText((item.nombre || 'N/A').substring(0, 22), {
-          x: cols[1].x,
-          y,
-          size: fontSize,
-          font,
-          color,
-        });
-        page.drawText((item.cedula || 'N/A').substring(0, 12), {
-          x: cols[2].x,
-          y,
-          size: fontSize,
-          font,
-          color,
-        });
-        page.drawText((item.placa || 'N/A').substring(0, 8), {
-          x: cols[3].x,
-          y,
-          size: fontSize,
-          font,
-          color,
-        });
-        page.drawText((item.ciudad || 'N/A').substring(0, 15), {
-          x: cols[4].x,
-          y,
-          size: fontSize,
-          font,
-          color,
-        });
-        page.drawText(item.estado.substring(0, 20), {
-          x: cols[5].x,
-          y,
-          size: fontSize,
-          font,
-          color,
-        });
-        page.drawText(dateStr, { x: cols[6].x, y, size: fontSize, font, color });
-
-        y -= 20;
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.error || errJson.details || 'Error al compilar PDF en el servidor');
       }
 
-      const bytes = await pdfDoc.save();
-      const blob = new Blob([bytes as unknown as BlobPart], { type: 'application/pdf' });
+      const blob = await res.blob();
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
       a.download = `Reporte_Desmulta_${new Date().toISOString().split('T')[0]}.pdf`;
       a.click();
 
-      const userEmail = auth?.currentUser?.email || 'desconocido';
-      SecurityLogger.info('auditoria-exportacion', {
-        user: userEmail,
-        type: 'pdf',
-        count: filteredItems.length,
-      });
-      logExportAction({ user: userEmail, type: 'pdf', count: filteredItems.length });
-
       toast({ title: 'Exportación a PDF exitosa' });
     } catch (error) {
       SecurityLogger.error('Error al exportar a PDF', { error: String(error) });
-      toast({ variant: 'destructive', title: 'Error al exportar los datos a PDF' });
+      toast({
+        variant: 'destructive',
+        title: error instanceof Error ? error.message : 'Error al exportar los datos a PDF',
+      });
     }
   };
 
@@ -778,7 +694,13 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button
-                    onClick={exportToExcel}
+                    onClick={() =>
+                      setPinAuth({
+                        isOpen: true,
+                        actionName: 'Exportar a Excel',
+                        onSuccess: exportToExcel,
+                      })
+                    }
                     className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 hover:border-green-500/50 hover:bg-green-500/10 text-slate-900 dark:text-white p-4 rounded-[1.5rem] flex items-center justify-center transition-all group shadow-inner"
                     title="Exportar a Excel"
                   >
@@ -793,7 +715,13 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button
-                    onClick={exportToPDF}
+                    onClick={() =>
+                      setPinAuth({
+                        isOpen: true,
+                        actionName: 'Exportar a PDF',
+                        onSuccess: (pin) => exportToPDF(pin),
+                      })
+                    }
                     className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 hover:border-red-500/50 hover:bg-red-500/10 text-slate-900 dark:text-white p-4 rounded-[1.5rem] flex items-center justify-center transition-all group shadow-inner"
                     title="Exportar a PDF"
                   >
@@ -932,7 +860,7 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
                 key={columna.id}
                 data-index={index}
                 data-column-id={columna.id}
-                className="kanban-column w-[85vw] max-w-[320px] lg:w-auto lg:flex-1 lg:min-w-[280px] shrink-0 snap-center bg-card/40 backdrop-blur-xl rounded-3xl border border-white/5 p-4 flex flex-col shadow-xl transition-all hover:border-white/10"
+                className="kanban-column w-[85vw] max-w-[340px] lg:w-auto lg:flex-1 lg:min-w-[320px] shrink-0 snap-center bg-slate-50/80 dark:bg-[#0a0a0c]/80 backdrop-blur-2xl rounded-[2rem] border border-slate-200/60 dark:border-white/5 p-5 flex flex-col shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_20px_40px_rgb(0,0,0,0.2)] transition-all hover:border-slate-300 dark:hover:border-white/10"
               >
                 <div className={`border-b-2 pb-3 mb-4 ${columna.color}`}>
                   <div className="flex justify-between items-start">
@@ -1020,10 +948,29 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
           data={itemSeleccionado}
           onClose={() => setItemSeleccionado(null)}
           onCambiarEstado={handleCambiarEstadoDesdeModal}
-          onPromoverACaso={handlePromoverDesdeModal}
+          onPromoverACaso={(item) => {
+            return new Promise<void>((resolve, reject) => {
+              setPinAuth({
+                isOpen: true,
+                actionName: 'Formalizar Expediente',
+                onSuccess: () => {
+                  handlePromoverDesdeModal(item).then(resolve).catch(reject);
+                },
+                onCancel: () => reject(new Error('Cancelado')),
+              });
+            });
+          }}
           esCaso={itemSeleccionado.tipo === 'caso'}
         />
       )}
+
+      <ModalAuthPin
+        isOpen={pinAuth.isOpen}
+        actionName={pinAuth.actionName}
+        onSuccess={pinAuth.onSuccess}
+        onCancel={pinAuth.onCancel}
+        onClose={() => setPinAuth((prev) => ({ ...prev, isOpen: false }))}
+      />
 
       <ModalNotaOperador
         isOpen={modalNota.isOpen}
@@ -1036,7 +983,20 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
           );
           setModalNota((prev) => ({ ...prev, isOpen: false }));
         }}
-        onConfirm={confirmCambioEstado}
+        onConfirm={(nota) => {
+          const isCriticalPromotion =
+            ['APERTURA', 'RADICADO', 'TRAMITE', 'FINALIZADO'].includes(modalNota.nuevoEstado) &&
+            allItems.find((i) => i.id === modalNota.itemId)?.tipo === 'lead';
+          if (isCriticalPromotion) {
+            setPinAuth({
+              isOpen: true,
+              actionName: `Promover a ${modalNota.nuevoEstado}`,
+              onSuccess: () => confirmCambioEstado(nota),
+            });
+          } else {
+            confirmCambioEstado(nota);
+          }
+        }}
         estadoDestino={modalNota.nuevoEstado}
         esRetroceso={modalNota.esRetroceso}
       />

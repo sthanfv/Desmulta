@@ -373,3 +373,106 @@ export async function revokeAdminAccess(uid: string, targetEmail: string) {
     return { success: false, error: 'Error al revocar permisos' };
   }
 }
+
+// ----------------------------------------------------------------------
+// Operaciones Críticas (Hardening V1.1.0)
+// ----------------------------------------------------------------------
+
+export async function verifyOperatorPin(pin: string) {
+  const expectedPin = process.env.OPERATOR_PIN;
+  if (!expectedPin) {
+    logger.error('CRITICAL: OPERATOR_PIN no configurada.');
+    return { success: false, error: 'Configuración de seguridad ausente' };
+  }
+
+  const bufPin = Buffer.from(pin);
+  const bufExpected = Buffer.from(expectedPin);
+
+  if (bufPin.length !== bufExpected.length || !timingSafeEqual(bufPin, bufExpected)) {
+    const headersList = await headers();
+    const ip = headersList.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    logger.security('Intento fallido de PIN operacional', { ip });
+    return { success: false, error: 'PIN incorrecto' };
+  }
+
+  return { success: true };
+}
+
+export async function logRevealAuditAction(expedienteId: string) {
+  try {
+    const { getTokens } = await import('next-firebase-auth-edge/lib/next/tokens');
+    const cookieStore = await cookies();
+
+    const tokens = await getTokens(cookieStore, {
+      cookieName: '__session',
+      cookieSignatureKeys: [
+        process.env.AUTH_COOKIE_SIGNATURE_KEY_CURRENT || '',
+        process.env.AUTH_COOKIE_SIGNATURE_KEY_PREVIOUS || '',
+      ],
+      serviceAccount: {
+        projectId:
+          process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || '',
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL || '',
+        privateKey: (process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
+      },
+      apiKey:
+        process.env.NEXT_PUBLIC_BASE_API_KEY || process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '',
+    });
+
+    const adminEmail = tokens?.decodedToken?.email || 'admin_desconocido@desmulta.com';
+
+    await logAdminAction({
+      adminEmail,
+      action: 'ACCESS',
+      resource: `expediente/${expedienteId}`,
+      details: {
+        reason: 'Revelado de datos sensibles en UI (Zero-PII unmasking)',
+      },
+    });
+
+    return { success: true };
+  } catch (error) {
+    logger.error('Error al registrar auditoría de revelación', { error: String(error) });
+    return { success: false, error: 'Error de auditoría' };
+  }
+}
+
+export async function logExportPdfAction(filtrosStr: string) {
+  try {
+    const { getTokens } = await import('next-firebase-auth-edge/lib/next/tokens');
+    const cookieStore = await cookies();
+
+    const tokens = await getTokens(cookieStore, {
+      cookieName: '__session',
+      cookieSignatureKeys: [
+        process.env.AUTH_COOKIE_SIGNATURE_KEY_CURRENT || '',
+        process.env.AUTH_COOKIE_SIGNATURE_KEY_PREVIOUS || '',
+      ],
+      serviceAccount: {
+        projectId:
+          process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || '',
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL || '',
+        privateKey: (process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
+      },
+      apiKey:
+        process.env.NEXT_PUBLIC_BASE_API_KEY || process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '',
+    });
+
+    const adminEmail = tokens?.decodedToken?.email || 'admin_desconocido@desmulta.com';
+
+    await logAdminAction({
+      adminEmail,
+      action: 'EXPORT',
+      resource: 'expedientes/pdf',
+      details: {
+        filtros: filtrosStr,
+        reason: 'Exportación masiva de datos (Server-Side WeasyPrint)',
+      },
+    });
+
+    return { success: true };
+  } catch (error) {
+    logger.error('Error al registrar auditoría de exportación PDF', { error: String(error) });
+    return { success: false, error: 'Error de auditoría' };
+  }
+}

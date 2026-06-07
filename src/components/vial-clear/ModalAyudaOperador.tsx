@@ -91,9 +91,13 @@ export function ModalAyudaOperador({ isOpen, onClose }: ModalAyudaOperadorProps)
                 <FileArchive className="w-5 h-5 text-red-600" />
               </div>
               <div>
-                <h4 className="font-bold text-sm text-slate-900 dark:text-white">Generar PDF (Requiere SIMIT)</h4>
+                <h4 className="font-bold text-sm text-slate-900 dark:text-white">
+                  Generar PDF (Requiere SIMIT)
+                </h4>
                 <p className="text-xs text-slate-500">
-                  Crea un reporte formal en formato PDF. <strong>Importante:</strong> El sistema ahora exige que primero se haya subido la captura SIMIT del cliente para poder generar documentos legales.
+                  Crea un reporte formal en formato PDF. <strong>Importante:</strong> El sistema
+                  ahora exige que primero se haya subido la captura SIMIT del cliente para poder
+                  generar documentos legales.
                 </p>
               </div>
             </div>
@@ -103,9 +107,13 @@ export function ModalAyudaOperador({ isOpen, onClose }: ModalAyudaOperadorProps)
                 <Undo2 className="w-5 h-5 text-amber-600" />
               </div>
               <div>
-                <h4 className="font-bold text-sm text-slate-900 dark:text-white">Retroceso de Estados</h4>
+                <h4 className="font-bold text-sm text-slate-900 dark:text-white">
+                  Retroceso de Estados
+                </h4>
                 <p className="text-xs text-slate-500">
-                  Si mueves una tarjeta hacia atrás (ej. de Trámite a Estudio), el sistema te pedirá obligatoriamente una nota justificando la razón. Esto queda registrado para auditoría.
+                  Si mueves una tarjeta hacia atrás (ej. de Trámite a Estudio), el sistema te pedirá
+                  obligatoriamente una nota justificando la razón. Esto queda registrado para
+                  auditoría.
                 </p>
               </div>
             </div>

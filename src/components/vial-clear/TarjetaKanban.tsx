@@ -13,6 +13,9 @@ import {
 import Image from 'next/image';
 import { KanbanItem } from './TableroFlujoTrabajo';
 import { TarjetaPremium } from '../ui/TarjetaPremium';
+import { maskData } from '@/lib/security/masking';
+
+import { motion } from 'framer-motion';
 
 const SIGUIENTE_ESTADO: Record<string, { id: string; label: string }> = {
   NUEVO: { id: 'CONTACTADO', label: 'Contactado' },
@@ -36,15 +39,25 @@ export function TarjetaKanban({
   const siguientePaso = SIGUIENTE_ESTADO[data.estado];
 
   return (
-    <TarjetaPremium className="p-4 shadow-sm hover:shadow-md transition-all rounded-xl relative group">
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      whileHover={{ y: -4, scale: 1.01 }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      className="bg-white/90 dark:bg-zinc-900/80 backdrop-blur-2xl border border-slate-200/60 dark:border-white/5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] dark:shadow-none dark:hover:shadow-[0_0_30px_rgba(255,255,255,0.03)] p-4 rounded-2xl relative group overflow-hidden"
+    >
       <div
-        className="touch-draggable w-full h-full select-none touch-none cursor-grab active:cursor-grabbing"
+        className="touch-draggable w-full h-full select-none touch-none cursor-grab active:cursor-grabbing relative z-10"
         data-item-id={data.id}
         data-estado-actual={data.estado}
       >
-        {/* Indicador lateral */}
+        {/* Glow de fondo premium en dark mode */}
+        <div className="absolute -inset-24 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 blur-2xl transition-opacity duration-500 pointer-events-none" />
+
+        {/* Indicador lateral sutil */}
         <div
-          className={`absolute left-0 top-0 bottom-0 w-1 ${esCaso ? 'bg-blue-500' : 'bg-primary'}`}
+          className={`absolute left-[-16px] top-[-16px] bottom-[-16px] w-1.5 ${esCaso ? 'bg-blue-500/80 shadow-[0_0_15px_rgba(59,130,246,0.5)]' : 'bg-primary/80 shadow-[0_0_15px_rgba(var(--primary),0.5)]'}`}
         />
 
         {/* Cabecera de la tarjeta */}
@@ -79,13 +92,13 @@ export function TarjetaKanban({
           <div className="flex-1 min-w-0 pointer-events-none">
             <h4 className="text-slate-900 dark:text-foreground font-black text-base uppercase tracking-tight truncate">
               {data.placa && data.placa !== 'N/A'
-                ? data.placa
+                ? maskData(data.placa, 'plate')
                 : data.cedula
-                  ? `C.C. ${data.cedula}`
+                  ? `C.C. ${maskData(data.cedula, 'id')}`
                   : 'Sin Id'}
             </h4>
             <p className="text-slate-500 dark:text-muted-foreground text-xs truncate">
-              {data.nombre || 'Usuario Desmulta'}
+              {data.nombre ? maskData(data.nombre, 'name') : 'Usuario Desmulta'}
             </p>
           </div>
         </div>
@@ -95,21 +108,9 @@ export function TarjetaKanban({
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
                 <p className="text-[10px] font-bold text-slate-500 flex items-center gap-1 pointer-events-none">
-                  <Phone className="w-3 h-3" /> {data.contacto || 'Sin contacto'}
+                  <Phone className="w-3 h-3" />{' '}
+                  {data.contacto ? maskData(data.contacto, 'phone') : 'Sin contacto'}
                 </p>
-                {data.contacto && (
-                  <a
-                    href={`https://wa.me/57${data.contacto.replace(/\D/g, '')}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                    className="bg-green-500/10 text-green-600 hover:bg-green-500 hover:text-white transition-colors rounded-full p-1 border border-green-500/20 pointer-events-auto"
-                    title="Contactar por WhatsApp"
-                    aria-label="Contactar por WhatsApp"
-                  >
-                    <MessageCircle className="w-3 h-3" />
-                  </a>
-                )}
               </div>
               {data.ciudad && (
                 <p className="text-[10px] font-bold text-slate-600 dark:text-slate-400 flex items-center gap-1 pointer-events-none">
@@ -160,6 +161,6 @@ export function TarjetaKanban({
           )}
         </div>
       </div>
-    </TarjetaPremium>
+    </motion.div>
   );
 }

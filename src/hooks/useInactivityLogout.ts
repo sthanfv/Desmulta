@@ -33,7 +33,7 @@ interface UseInactivityLogoutOptions {
  * @param options - Configuración del timeout y callbacks.
  */
 export function useInactivityLogout({
-  timeoutMs = 30 * 60 * 1000, // 30 minutos por defecto
+  timeoutMs = 5 * 60 * 1000, // 5 minutos por defecto
   onWarning,
   onLogout,
   enabled,

@@ -16,6 +16,7 @@ import {
   ChevronRight,
   ShieldAlert,
   Download,
+  Eye,
 } from 'lucide-react';
 import Image from 'next/image';
 import { QRCodeSVG, QRCodeCanvas } from 'qrcode.react';
@@ -23,9 +24,11 @@ import { KanbanItem } from './TableroFlujoTrabajo';
 import { useAuth } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { CAUSALES_TRANSITO } from '@/lib/legal/legal-types';
+import { logRevealAuditAction } from '@/app/admin/audit-actions';
 import { PDFPreviewModal } from '../admin/PDFPreviewModal';
 import { ModalDocumentos } from './modal-parts/ModalDocumentos';
 import { ModalEdicionDatos } from './modal-parts/ModalEdicionDatos';
+import { maskData } from '@/lib/security/masking';
 
 interface ModalDetalleExpedienteProps {
   data: KanbanItem;
@@ -44,6 +47,7 @@ export function ModalDetalleExpediente({
 }: ModalDetalleExpedienteProps) {
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [isRevealed, setIsRevealed] = useState(false);
   const auth = useAuth();
   const { toast } = useToast();
   const [pdfPreviews, setPdfPreviews] = useState<{ base64: string; filename: string }[]>([]);
@@ -134,6 +138,30 @@ export function ModalDetalleExpediente({
       onClose();
     } catch (error) {
       logger.error(`Error en ${actionName}:`, error);
+      setIsProcessing(null);
+    }
+  };
+
+  const handleReveal = async () => {
+    setIsProcessing('reveal');
+    try {
+      const result = await logRevealAuditAction(data.id);
+      if (result.success) {
+        setIsRevealed(true);
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Error de Seguridad',
+          description: result.error || 'Error al revelar',
+        });
+      }
+    } catch (e) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'No se pudo auditar la acción',
+      });
+    } finally {
       setIsProcessing(null);
     }
   };
@@ -278,7 +306,23 @@ export function ModalDetalleExpediente({
             <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] ml-1">
               Identidad del Ciudadano
             </h3>
-            <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800/80 rounded-2xl overflow-hidden shadow-sm">
+            <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800/80 rounded-2xl overflow-hidden shadow-sm relative">
+              {!isRevealed && (
+                <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/60 dark:bg-black/60 backdrop-blur-md">
+                  <button
+                    onClick={handleReveal}
+                    disabled={isProcessing === 'reveal'}
+                    className="flex items-center gap-2 bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl"
+                  >
+                    {isProcessing === 'reveal' ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                    Revelar Información Sensible
+                  </button>
+                </div>
+              )}
               {/* Fila Nombre */}
               <div className="flex items-center p-4 border-b border-slate-100 dark:border-slate-800/60">
                 <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 shrink-0">
@@ -286,8 +330,10 @@ export function ModalDetalleExpediente({
                 </div>
                 <div className="ml-4 flex-1">
                   <p className="text-base font-bold text-slate-950 dark:text-white">
-                    {data.nombre ||
-                      (esCaptura ? 'Usuario de SIMIT (Requiere Validación)' : 'Sin Registrar')}
+                    {isRevealed
+                      ? data.nombre ||
+                        (esCaptura ? 'Usuario de SIMIT (Requiere Validación)' : 'Sin Registrar')
+                      : maskData(data.nombre || 'Sin Registrar', 'name')}
                   </p>
                 </div>
               </div>
@@ -303,12 +349,17 @@ export function ModalDetalleExpediente({
                           Documento
                         </p>
                         <p className="text-sm font-mono font-bold text-slate-900 dark:text-slate-200 tracking-tight">
-                          {data.cedula}
+                          {isRevealed ? data.cedula : maskData(data.cedula!, 'id')}
                         </p>
                       </div>
                     </div>
                     <button
-                      onClick={() => copyToClipboard(data.cedula!, 'cedula')}
+                      onClick={() =>
+                        copyToClipboard(
+                          isRevealed ? data.cedula! : maskData(data.cedula!, 'id'),
+                          'cedula'
+                        )
+                      }
                       className="p-2 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700 transition-all border border-transparent hover:border-slate-200 dark:hover:border-slate-600 shadow-sm opacity-0 group-hover:opacity-100"
                     >
                       {copiedField === 'cedula' ? (
@@ -329,12 +380,17 @@ export function ModalDetalleExpediente({
                           Contacto
                         </p>
                         <p className="text-sm font-mono font-bold text-slate-900 dark:text-slate-200 tracking-tight">
-                          {data.contacto}
+                          {isRevealed ? data.contacto : maskData(data.contacto!, 'phone')}
                         </p>
                       </div>
                     </div>
                     <button
-                      onClick={() => copyToClipboard(data.contacto!, 'telefono')}
+                      onClick={() =>
+                        copyToClipboard(
+                          isRevealed ? data.contacto! : maskData(data.contacto!, 'phone'),
+                          'telefono'
+                        )
+                      }
                       className="p-2 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700 transition-all border border-transparent hover:border-slate-200 dark:hover:border-slate-600 shadow-sm opacity-0 group-hover:opacity-100"
                     >
                       {copiedField === 'telefono' ? (
@@ -467,16 +523,24 @@ export function ModalDetalleExpediente({
               {/* Placa Destacada */}
               {data.placa && data.placa !== 'N/A' && data.placa !== 'Sin Identificar' && (
                 <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-5 shadow-sm flex flex-col justify-center relative overflow-hidden group">
+                  {!isRevealed && (
+                    <div className="absolute inset-0 z-10 bg-white/60 dark:bg-black/60 backdrop-blur-md" />
+                  )}
                   <div className="absolute top-0 right-0 w-24 h-24 bg-yellow-400/10 dark:bg-yellow-500/5 rounded-bl-full pointer-events-none transition-transform group-hover:scale-110" />
                   <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
                     <Car className="w-3.5 h-3.5" /> Vehículo Implicado
                   </p>
                   <div className="flex items-center justify-between">
                     <p className="text-3xl font-black text-yellow-600 dark:text-yellow-500 tracking-widest uppercase">
-                      {data.placa}
+                      {isRevealed ? data.placa : maskData(data.placa!, 'plate')}
                     </p>
                     <button
-                      onClick={() => copyToClipboard(data.placa!, 'placa')}
+                      onClick={() =>
+                        copyToClipboard(
+                          isRevealed ? data.placa! : maskData(data.placa!, 'plate'),
+                          'placa'
+                        )
+                      }
                       className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-yellow-600 dark:hover:text-yellow-400 transition-all border border-slate-200 dark:border-slate-700 hover:border-yellow-400 dark:hover:border-yellow-600/50 shadow-sm"
                     >
                       {copiedField === 'placa' ? (
@@ -638,10 +702,20 @@ export function ModalDetalleExpediente({
         {/* FOOTER & ACTIONS */}
         <div className="p-6 bg-white dark:bg-[#080d18] border-t border-slate-100 dark:border-slate-800/80 flex flex-col gap-3 shrink-0 relative z-20">
           <a
-            href={linkWhatsApp}
-            target="_blank"
+            href={isRevealed ? linkWhatsApp : '#'}
+            target={isRevealed ? '_blank' : undefined}
             rel="noopener noreferrer"
-            className="w-full bg-[#25D366] hover:bg-[#1EBE5D] text-white font-black py-4 rounded-xl flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-[0_15px_30px_-10px_rgba(37,211,102,0.4)] text-sm uppercase tracking-widest"
+            onClick={(e) => {
+              if (!isRevealed) {
+                e.preventDefault();
+                toast({
+                  variant: 'destructive',
+                  title: 'Acceso Denegado',
+                  description: 'Debe revelar la información sensible para contactar al cliente.',
+                });
+              }
+            }}
+            className={`w-full font-black py-4 rounded-xl flex items-center justify-center gap-2 transition-all text-sm uppercase tracking-widest ${isRevealed ? 'bg-[#25D366] hover:bg-[#1EBE5D] text-white hover:scale-[1.02] active:scale-[0.98] shadow-[0_15px_30px_-10px_rgba(37,211,102,0.4)]' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed opacity-70'}`}
           >
             <Phone className="w-5 h-5 fill-current" /> Enviar Mensaje a Cliente
           </a>

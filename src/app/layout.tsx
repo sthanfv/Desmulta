@@ -143,7 +143,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           </Script>
         )}
       </head>
-      <body className="antialiased min-h-screen selection:bg-primary/30 selection:text-primary-foreground">
+      <body suppressHydrationWarning className="antialiased min-h-screen selection:bg-primary/30 selection:text-primary-foreground">
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-lg focus:font-bold"

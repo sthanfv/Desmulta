@@ -41,6 +41,7 @@ import { AnalyticsView } from '@/components/vial-clear/AnalyticsView';
 import { ReferralsAdminView } from '@/components/vial-clear/ReferralsAdminView';
 import { useAdminAnalytics } from '@/hooks/useAdminAnalytics';
 import { ThemeToggle } from '@/components/vial-clear/ThemeToggle';
+import { ModalAuthPin } from '@/components/vial-clear/ModalAuthPin';
 // Removed HiddenAuditPanel
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -170,6 +171,12 @@ export function AdminDashboard() {
   const [isCleaning, setIsCleaning] = useState(false);
   const [isCleaningSimit, setIsCleaningSimit] = useState(false);
   const [analyticsEnabled, setAnalyticsEnabled] = useState(false);
+  const [pinAuth, setPinAuth] = useState<{
+    isOpen: boolean;
+    actionName: string;
+    onSuccess: () => void;
+    onCancel?: () => void;
+  }>({ isOpen: false, actionName: '', onSuccess: () => {} });
   // Removed isAuditOpen state
 
   const showcaseRef = useMemoFirebase(
@@ -211,7 +218,7 @@ export function AdminDashboard() {
 
   // 🔒 Auto-logout por inactividad
   useInactivityLogout({
-    timeoutMs: 30 * 60 * 1000,
+    timeoutMs: 5 * 60 * 1000,
     enabled: !!auth?.currentUser,
     onWarning: () => {
       toast({
@@ -237,7 +244,7 @@ export function AdminDashboard() {
       toast({
         variant: 'destructive',
         title: 'Sesión cerrada',
-        description: 'Desconectado por inactividad (30 min).',
+        description: 'Desconectado por inactividad (5 min).',
       });
     },
   });
@@ -768,7 +775,13 @@ export function AdminDashboard() {
                   <AlertDialogFooter>
                     <AlertDialogCancel className="rounded-xl text-sm">Cancelar</AlertDialogCancel>
                     <AlertDialogAction
-                      onClick={handleDeleteExpired}
+                      onClick={() => {
+                        setPinAuth({
+                          isOpen: true,
+                          actionName: 'Depurar Consultas Vencidas',
+                          onSuccess: handleDeleteExpired,
+                        });
+                      }}
                       className="rounded-xl bg-destructive text-sm"
                     >
                       Sí, depurar
@@ -808,7 +821,13 @@ export function AdminDashboard() {
                   <AlertDialogFooter>
                     <AlertDialogCancel className="rounded-xl text-sm">Cancelar</AlertDialogCancel>
                     <AlertDialogAction
-                      onClick={handleDeleteSimitCaptures}
+                      onClick={() => {
+                        setPinAuth({
+                          isOpen: true,
+                          actionName: 'Vaciar SIMIT',
+                          onSuccess: handleDeleteSimitCaptures,
+                        });
+                      }}
                       className="rounded-xl text-sm"
                     >
                       Sí, limpiar
@@ -831,6 +850,14 @@ export function AdminDashboard() {
           </span>
         </div>
       </footer>
+
+      <ModalAuthPin
+        isOpen={pinAuth.isOpen}
+        actionName={pinAuth.actionName}
+        onSuccess={pinAuth.onSuccess}
+        onCancel={pinAuth.onCancel}
+        onClose={() => setPinAuth((prev) => ({ ...prev, isOpen: false }))}
+      />
 
       {/* HiddenAuditPanel was moved to /admin/auditoria */}
     </div>

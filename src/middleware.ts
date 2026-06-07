@@ -106,6 +106,20 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/acceso-panel', request.url));
       }
 
+      // Validar inactividad máxima de 5 minutos (300 segundos) desde la emisión del token
+      const nowInSeconds = Math.floor(Date.now() / 1000);
+      const MAX_INACTIVITY_SECONDS = 5 * 60;
+
+      if (
+        tokens.decodedToken.iat &&
+        nowInSeconds - tokens.decodedToken.iat > MAX_INACTIVITY_SECONDS
+      ) {
+        // Token expirado por regla estricta de inactividad
+        const response = NextResponse.redirect(new URL('/acceso-panel', request.url));
+        response.cookies.delete('__session');
+        return response;
+      }
+
       // Token válido: continuar. La validación de rol admin se hace en el layout
       // client-side (segunda capa de defensa). El middleware solo valida la sesión.
     } catch {

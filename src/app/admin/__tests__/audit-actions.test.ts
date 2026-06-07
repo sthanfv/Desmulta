@@ -91,3 +91,23 @@ describe('God Mode Security System', () => {
     });
   });
 });
+
+describe('Operator Security PIN & Actions', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    process.env.OPERATOR_PIN = '123456';
+  });
+
+  it('verifyOperatorPin - Debe rechazar un PIN incorrecto en tiempo constante', async () => {
+    const { verifyOperatorPin } = await import('../audit-actions');
+    const result = await verifyOperatorPin('000000');
+    expect(result.success).toBe(false);
+    expect(result.error).toBe('PIN incorrecto');
+  });
+
+  it('verifyOperatorPin - Debe aceptar el PIN correcto', async () => {
+    const { verifyOperatorPin } = await import('../audit-actions');
+    const result = await verifyOperatorPin('123456');
+    expect(result.success).toBe(true);
+  });
+});
