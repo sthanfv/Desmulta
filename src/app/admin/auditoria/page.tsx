@@ -107,7 +107,7 @@ function ExportControls({ admins }: { admins: string[] }) {
 
       const doc = new jsPDF('landscape');
       doc.setFontSize(14);
-      doc.text('Reporte de Auditoria - Sistema Desmulta (God Mode)', 14, 15);
+      doc.text('Reporte de Auditoria - Sistema Desmulta (Modo Dios)', 14, 15);
 
       doc.setFontSize(10);
       doc.setTextColor(100);
@@ -373,7 +373,7 @@ export default function AuditPage() {
       setIsAuthorized(true);
       toast({
         title: 'Acceso Autorizado',
-        description: 'God Mode Activado. Tienes 30 minutos.',
+        description: 'Modo Dios Activado. Tienes 30 minutos.',
         variant: 'default',
         className: 'bg-emerald-950 border-emerald-800 text-emerald-100',
       });

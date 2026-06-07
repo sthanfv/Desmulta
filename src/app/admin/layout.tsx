@@ -99,7 +99,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           La cuenta con la que ha iniciado sesión no tiene permisos de administrador.
         </p>
         <p className="text-sm text-zinc-500 max-w-md">
-          Si le acaban de otorgar permisos desde el panel principal (God Mode), necesita refrescar
+          Si le acaban de otorgar permisos desde el panel principal (Modo Dios), necesita refrescar
           sus credenciales locales para que tengan efecto.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 mt-4">
