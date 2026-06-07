@@ -4,6 +4,13 @@
  * No contienen lógica de negocio — solo HTTP wrappers.
  */
 
+export async function sendSecurityAlert(text: string): Promise<void> {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_SECURITY_CHAT_ID;
+  if (!token || !chatId) return;
+  await sendMessage(token, Number(chatId), text);
+}
+
 export async function sendMessage(
   token: string,
   chatId: number,

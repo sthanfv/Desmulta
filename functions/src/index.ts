@@ -10,3 +10,4 @@ export { onCaseStatusChange, onCaseCreated, onConsultationStatusChange } from '.
 export { onConsultationCreated } from './onConsultationCreated';
 export { onPushOptIn } from './onPushOptIn';
 export { telegramWebhook } from './telegramWebhook';
+export { onCasoChanged, onConsultaChanged } from './auditTriggers';

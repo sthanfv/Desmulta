@@ -89,6 +89,24 @@ export async function logExportAction(payload: {
   type: 'excel' | 'pdf';
   count: number;
 }) {
+  // Enviar alerta a Telegram
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_SECURITY_CHAT_ID;
+  if (token && chatId) {
+    try {
+      const typeStr = payload.type === 'excel' ? 'Excel' : 'PDF';
+      const msg = `🚨 <b>ALERTA DE SEGURIDAD</b> 🚨\n\n<b>Operador:</b> ${payload.user}\n<b>Acción:</b> Exportación masiva de Base de Datos\n<b>Formato:</b> ${typeStr}\n<b>Registros:</b> ${payload.count}\n\n<i>Esto fue generado desde el panel de administrador.</i>`;
+      
+      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: chatId, text: msg, parse_mode: 'HTML' })
+      });
+    } catch (err) {
+      logger.error('Error enviando alerta de Telegram', { error: String(err) });
+    }
+  }
+
   return logAdminAction({
     adminEmail: payload.user,
     action: 'EXPORT',

@@ -504,6 +504,7 @@ export async function updateCaseStatus(
         status: newStatus,
         history: FieldValue.arrayUnion(event),
         updatedAt: FieldValue.serverTimestamp(),
+        _lastOperatorEmail: decodedToken.email || decodedToken.uid,
       });
 
       // Mapeo de estados Legales a Públicos (Cero tecnicismos para el ciudadano)
@@ -539,13 +540,7 @@ export async function updateCaseStatus(
       return currentLeadData;
     });
 
-    const { logAdminAction } = await import('@/app/admin/audit-actions');
-    await logAdminAction({
-      adminEmail: decodedToken.email || decodedToken.uid,
-      action: 'UPDATE',
-      resource: 'CaseStatus',
-      details: { caseId, newStatus },
-    });
+    // Auditoría delegada a Cloud Functions (Mejora A)
 
     revalidateTag('tracking'); // ⚡ Esto destruye el caché de la CDN instantáneamente
 
@@ -697,6 +692,7 @@ export async function updateConsultationStatus(
         status: newStatus,
         timeline_updates: FieldValue.arrayUnion(timelineEvent),
         updatedAt: FieldValue.serverTimestamp(),
+        _lastOperatorEmail: decodedToken.email || decodedToken.uid,
       });
 
       if (publicRef) {
@@ -718,13 +714,7 @@ export async function updateConsultationStatus(
     // Se delega a la Cloud Function `onConsultationStatusChange`
     // el envío del Web Push y Correo al detectar el cambio de estado.
 
-    const { logAdminAction } = await import('@/app/admin/audit-actions');
-    await logAdminAction({
-      adminEmail: decodedToken.email || decodedToken.uid,
-      action: 'UPDATE',
-      resource: 'ConsultationStatus',
-      details: { consultationId: id, newStatus },
-    });
+    // Auditoría delegada a Cloud Functions (Mejora A)
 
     // Esto hace que la tabla se refresque sola sin F5
     revalidatePath('/admin');
