@@ -385,12 +385,19 @@ export async function verifyOperatorPin(pin: string) {
     return { success: false, error: 'Configuración de seguridad ausente' };
   }
 
+  // ── Rate limit: máximo 5 intentos por IP en 15 minutos ──────────────────
+  const headersList = await headers();
+  const ip = headersList.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const rl = await rateLimit(`operator-pin:${ip}`, 5, 15 * 60 * 1000);
+  if (!rl.success) {
+    logger.security('Rate limit PIN operacional alcanzado', { ip });
+    return { success: false, error: 'Demasiados intentos. Espera 15 minutos.' };
+  }
+
   const bufPin = Buffer.from(pin);
   const bufExpected = Buffer.from(expectedPin);
 
   if (bufPin.length !== bufExpected.length || !timingSafeEqual(bufPin, bufExpected)) {
-    const headersList = await headers();
-    const ip = headersList.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
     logger.security('Intento fallido de PIN operacional', { ip });
     return { success: false, error: 'PIN incorrecto' };
   }

@@ -218,7 +218,7 @@ export function AdminDashboard() {
 
   // 🔒 Auto-logout por inactividad
   useInactivityLogout({
-    timeoutMs: 5 * 60 * 1000,
+    timeoutMs: 15 * 60 * 1000,
     enabled: !!auth?.currentUser,
     onWarning: () => {
       toast({
@@ -244,7 +244,7 @@ export function AdminDashboard() {
       toast({
         variant: 'destructive',
         title: 'Sesión cerrada',
-        description: 'Desconectado por inactividad (5 min).',
+        description: 'Desconectado por inactividad (15 min).',
       });
     },
   });

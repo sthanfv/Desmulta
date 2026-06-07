@@ -5,7 +5,8 @@ import puppeteer from 'puppeteer-core';
 import chromium from '@sparticuz/chromium';
 import { createHash } from 'crypto';
 import { cookies } from 'next/headers';
-
+import { SecurityLogger } from '@/lib/logger/security-logger';
+import { getTokens } from 'next-firebase-auth-edge';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -49,7 +50,7 @@ export async function POST(request: Request) {
         adminEmail = tokens.decodedToken.email;
       }
     } catch (e) {
-      console.warn('Error al obtener tokens de sesión para el watermark', e);
+      SecurityLogger.warn('[export-pdf] Error obteniendo tokens para watermark', { error: String(e) });
     }
 
     const filtrosArr = [
@@ -88,7 +89,7 @@ export async function POST(request: Request) {
       // Configuración de Chromium para Vercel Serverless (o MS Edge para entorno local)
       const isLocal = !process.env.VERCEL;
       const executablePath = isLocal
-        ? 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe'
+        ? process.env.LOCAL_CHROMIUM_PATH || '/usr/bin/chromium-browser'
         : await chromium.executablePath();
 
       const browser = await puppeteer.launch({
@@ -119,7 +120,7 @@ export async function POST(request: Request) {
         },
       });
     } catch (pdfError) {
-      console.error('Error ejecutando Puppeteer/Chromium:', pdfError);
+      SecurityLogger.error('[export-pdf] Error ejecutando Puppeteer/Chromium', { error: String(pdfError) });
 
       return NextResponse.json(
         {
@@ -130,7 +131,7 @@ export async function POST(request: Request) {
       );
     }
   } catch (error) {
-    console.error('Error general en export-pdf:', error);
+    SecurityLogger.error('[export-pdf] Error general', { error: String(error) });
     return NextResponse.json({ error: 'Error procesando la solicitud' }, { status: 500 });
   }
 }

@@ -35,6 +35,8 @@ const envSchema = z.object({
   TELEGRAM_WEBHOOK_SECRET: z.string().min(20),
   VIP_JWT_SECRET: z.string().min(32, 'Falta VIP_JWT_SECRET para firmar sesiones'),
   PII_HMAC_SECRET: z.string().min(32, 'Falta PII_HMAC_SECRET para hashear datos sensibles'),
+  OPERATOR_PIN: z.string().min(4, 'OPERATOR_PIN debe tener al menos 4 caracteres'),
+  GOD_MODE_JWT_SECRET: z.string().min(32, 'Falta GOD_MODE_JWT_SECRET para firmar sesiones de nivel admin').optional(),
 });
 
 export type EnvConfig = z.infer<typeof envSchema>;
@@ -68,6 +70,8 @@ export const validateEnv = () => {
       TELEGRAM_WEBHOOK_SECRET: process.env.TELEGRAM_WEBHOOK_SECRET,
       VIP_JWT_SECRET: process.env.VIP_JWT_SECRET,
       PII_HMAC_SECRET: process.env.PII_HMAC_SECRET,
+      OPERATOR_PIN: process.env.OPERATOR_PIN,
+      GOD_MODE_JWT_SECRET: process.env.GOD_MODE_JWT_SECRET,
     });
     return parsed;
   } catch (error) {

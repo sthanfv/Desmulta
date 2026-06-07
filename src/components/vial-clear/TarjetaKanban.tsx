@@ -43,10 +43,12 @@ export function TarjetaKanban({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      whileHover={{ y: -4, scale: 1.01 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
       className="bg-white/90 dark:bg-zinc-900/80 backdrop-blur-2xl border border-slate-200/60 dark:border-white/5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] dark:shadow-none dark:hover:shadow-[0_0_30px_rgba(255,255,255,0.03)] p-4 rounded-2xl relative group overflow-hidden"
     >
+      {/* El hover solo aplica en desktop — el drag en móvil no activa esto */}
+      <div className="hidden md:block absolute inset-0 pointer-events-none group-hover:-translate-y-1 group-hover:scale-[1.01] transition-transform duration-200 ease-out" />
+
       <div
         className="touch-draggable w-full h-full select-none touch-none cursor-grab active:cursor-grabbing relative z-10"
         data-item-id={data.id}
@@ -111,6 +113,18 @@ export function TarjetaKanban({
                   <Phone className="w-3 h-3" />{' '}
                   {data.contacto ? maskData(data.contacto, 'phone') : 'Sin contacto'}
                 </p>
+                {data.contacto && (
+                  <a
+                    href={`https://wa.me/57${data.contacto.replace(/\D/g, '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="p-1 rounded-full bg-green-500/10 text-green-600 hover:bg-green-500 hover:text-white transition-colors pointer-events-auto"
+                    title="Abrir chat de WhatsApp"
+                  >
+                    <MessageCircle className="w-3 h-3" />
+                  </a>
+                )}
               </div>
               {data.ciudad && (
                 <p className="text-[10px] font-bold text-slate-600 dark:text-slate-400 flex items-center gap-1 pointer-events-none">
