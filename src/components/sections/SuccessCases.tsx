@@ -245,6 +245,41 @@ export const SuccessCases = ({ showcaseData }: SuccessCasesProps) => {
   const [escalaZoom, setEscalaZoom] = useState(1);
   const [dynamicCases, setDynamicCases] = useState<SuccessCase[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
+
+  // ── Navegación entre casos ─────────────────────────────────────────────
+  const irAlAnterior = useCallback(() => {
+    setActiveIndex((prev) => (prev === 0 ? dynamicCases.length - 1 : prev - 1));
+  }, [dynamicCases.length]);
+
+  const irAlSiguiente = useCallback(() => {
+    setActiveIndex((prev) => (prev === dynamicCases.length - 1 ? 0 : prev + 1));
+  }, [dynamicCases.length]);
+
+  // Teclado: flechas izquierda/derecha
+  useEffect(() => {
+    if (dynamicCases.length <= 1) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') irAlAnterior();
+      if (e.key === 'ArrowRight') irAlSiguiente();
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [dynamicCases.length, irAlAnterior, irAlSiguiente]);
+
+  // Swipe táctil entre casos
+  const swipeStartX = useRef<number | null>(null);
+  const handleSwipeStart = (e: React.TouchEvent) => {
+    swipeStartX.current = e.touches[0].clientX;
+  };
+  const handleSwipeEnd = (e: React.TouchEvent) => {
+    if (swipeStartX.current === null) return;
+    const delta = swipeStartX.current - e.changedTouches[0].clientX;
+    if (Math.abs(delta) > 50) {
+      delta > 0 ? irAlSiguiente() : irAlAnterior();
+      Haptics.impact();
+    }
+    swipeStartX.current = null;
+  };
   /** isLoading: true mientras el fetch no ha completado (éxito o error) */
   const [isLoading, setIsLoading] = useState(true);
 
@@ -331,35 +366,75 @@ export const SuccessCases = ({ showcaseData }: SuccessCasesProps) => {
            * o mientras el fetch está en vuelo. */
           <SkeletonSlider />
         ) : hayImagenes ? (
-          <div className="space-y-6">
-            <div className="relative p-2 md:p-3 rounded-[2.5rem] bg-gradient-to-br from-primary/10 via-background to-background shadow-inner border border-primary/10">
+          <div className="space-y-4">
+            {/* Contador de casos */}
+            {dynamicCases.length > 1 && (
+              <div className="flex items-center justify-center gap-3">
+                <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                  Caso {activeIndex + 1} de {dynamicCases.length}
+                </span>
+              </div>
+            )}
+
+            {/* Slider con flechas y swipe */}
+            <div
+              className="relative p-2 md:p-3 rounded-[2.5rem] bg-gradient-to-br from-primary/10 via-background to-background shadow-inner border border-primary/10"
+              onTouchStart={handleSwipeStart}
+              onTouchEnd={handleSwipeEnd}
+            >
+              {/* Flecha izquierda */}
+              {dynamicCases.length > 1 && (
+                <button
+                  onClick={irAlAnterior}
+                  className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-20 w-10 h-10 rounded-full bg-background/90 border border-border shadow-lg flex items-center justify-center hover:bg-primary/10 hover:border-primary/30 transition-all active:scale-90 md:-translate-x-6"
+                  aria-label="Caso anterior"
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
+              )}
+
               <div className="bg-card/40 shadow-2xl rounded-[2rem] overflow-hidden border border-white/5 relative group">
+                {/* Título del caso activo */}
+                {dynamicCases[activeIndex]?.title && (
+                  <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 px-4 py-1.5 bg-black/60 backdrop-blur-md border border-white/10 rounded-full pointer-events-none">
+                    <span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-white/90">
+                      {dynamicCases[activeIndex].title}
+                    </span>
+                  </div>
+                )}
                 <ImageSlider
                   beforeSrc={currentBefore}
                   afterSrc={currentAfter}
-                  onExpand={() => {
-                    setEscalaZoom(1);
-                    setVisorAbierto(true);
-                  }}
+                  onExpand={() => { setEscalaZoom(1); setVisorAbierto(true); }}
                 />
               </div>
+
+              {/* Flecha derecha */}
+              {dynamicCases.length > 1 && (
+                <button
+                  onClick={irAlSiguiente}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-20 w-10 h-10 rounded-full bg-background/90 border border-border shadow-lg flex items-center justify-center hover:bg-primary/10 hover:border-primary/30 transition-all active:scale-90 md:translate-x-6"
+                  aria-label="Caso siguiente"
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><path d="M9 18l6-6-6-6"/></svg>
+                </button>
+              )}
             </div>
 
-            {/* Indicadores / Miniaturas */}
+            {/* Puntos indicadores (más limpios que los botones de texto) */}
             {dynamicCases.length > 1 && (
-              <div className="flex flex-wrap justify-center gap-2 mt-4">
-                {dynamicCases.map((c, idx) => (
+              <div className="flex justify-center gap-2 mt-2">
+                {dynamicCases.map((_, idx) => (
                   <button
-                    key={c.id}
-                    onClick={() => setActiveIndex(idx)}
-                    className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
+                    key={idx}
+                    onClick={() => { setActiveIndex(idx); Haptics.impact(); }}
+                    className={`rounded-full transition-all duration-300 ${
                       idx === activeIndex
-                        ? 'bg-primary text-primary-foreground shadow-lg scale-105'
-                        : 'bg-muted/50 hover:bg-muted text-muted-foreground'
+                        ? 'w-6 h-2 bg-primary'
+                        : 'w-2 h-2 bg-muted-foreground/30 hover:bg-muted-foreground/60'
                     }`}
-                  >
-                    {c.title}
-                  </button>
+                    aria-label={`Ir al caso ${idx + 1}`}
+                  />
                 ))}
               </div>
             )}

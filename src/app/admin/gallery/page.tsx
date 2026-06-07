@@ -35,6 +35,7 @@ export default function GalleryAdminPage() {
   const formRef = useRef<HTMLFormElement>(null);
 
   const [cases, setCases] = useState<SuccessCase[]>([]);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [title, setTitle] = useState('');
@@ -101,7 +102,7 @@ export default function GalleryAdminPage() {
 
     setSubmitting(true);
     try {
-      const token = await user.getIdToken(true);
+      const token = await user.getIdToken();
       const formData = new FormData();
       formData.append('title', title.trim());
       formData.append('beforeImage', beforeFile);
@@ -139,11 +140,16 @@ export default function GalleryAdminPage() {
   };
 
   const handleDelete = async (item: SuccessCase) => {
-    if (!user || !confirm(`¿Eliminar el caso "${item.title}"? Esta acción no se puede deshacer.`))
+    if (!user) return;
+    if (confirmDeleteId !== item.id) {
+      setConfirmDeleteId(item.id);
+      setTimeout(() => setConfirmDeleteId(null), 2500);
       return;
+    }
+    setConfirmDeleteId(null);
 
     try {
-      const token = await user.getIdToken(true);
+      const token = await user.getIdToken();
       const res = await fetch('/api/gallery', {
         method: 'DELETE',
         headers: {
@@ -388,9 +394,12 @@ export default function GalleryAdminPage() {
                     variant="ghost"
                     size="icon"
                     onClick={() => handleDelete(c)}
-                    className="text-destructive hover:text-destructive hover:bg-destructive/10 shrink-0"
+                    className={confirmDeleteId === c.id
+                      ? "text-white bg-destructive hover:bg-destructive"
+                      : "text-destructive hover:text-destructive hover:bg-destructive/10 shrink-0"
+                    }
                   >
-                    <Trash2 size={16} />
+                    {confirmDeleteId === c.id ? '¿Seguro?' : <Trash2 size={16} />}
                   </Button>
                 </CardHeader>
                 <CardContent>
