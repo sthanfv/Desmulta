@@ -387,6 +387,7 @@
   animation: aurora-liquid 18s ease-in-out infinite alternate;
   border-radius: 50%;
   will-change: transform;
+  transform: translateZ(0);
 }
 
 .blob-primary {

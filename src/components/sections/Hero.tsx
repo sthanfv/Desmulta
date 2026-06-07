@@ -28,7 +28,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
     <section className="min-h-[100svh] flex items-center pt-32 sm:pt-40 md:pt-48 pb-12 sm:pb-20 md:pb-24 px-4 relative overflow-hidden">
       {/* Atmósfera institucional — ámbar muy suave, sin neón */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/15 blur-[120px] opacity-50 rounded-full" />
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/15 blur-[60px] sm:blur-[120px] opacity-50 rounded-full" />
         <div className="absolute bottom-0 left-0 right-0 h-2/3 bg-gradient-to-t from-background via-background/80 to-transparent z-10" />
       </div>
 
