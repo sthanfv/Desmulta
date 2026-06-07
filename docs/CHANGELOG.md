@@ -9,8 +9,15 @@ Todas las versiones y cambios significativos del proyecto.
 - **Auditoría Forense Avanzada:** `TouchDebugger` evolucionó a la **v1.0.0**, integrando intercepción global de red y consola, auto-heal (Botón NUCLEAR) perfeccionado sin bloqueos en Android (sin `window.confirm`), y correcciones de fugas de memoria al desmontar.
 
 ### 🔒 Security & FinOps
+- **Auditoría Inmutable (Mejora A):** Migración del registro de auditoría desde el cliente hacia Firebase Cloud Functions (`onDocumentWritten`). Ahora los cambios de estado en Prospectos y Casos se registran automáticamente en Firestore, incluyendo identificadores del operador (`_lastOperatorEmail`) para trazabilidad inquebrantable.
+- **Alertas de Seguridad en Tiempo Real (Mejora C):** Integración de Telegram Security Alerts. Se disparan notificaciones críticas inmediatas a un canal privado cuando se detecta una eliminación (DELETE) directa en la base de datos o cuando se realiza una exportación masiva de datos desde el Modo Dios.
+- **Rate Limiting Modo Dios:** Implementación de control de tasa para los intentos de ingreso al Modo Dios mediante PIN, mitigando ataques de fuerza bruta.
 - **Zero-PII & Fail-Closed Testing:** Se reforzó el pipeline DevSecOps con 4 nuevas suites de pruebas (`piiScrubber-colombia`, `rate-limit-failclosed`, `prescription-engine-edge`, `middleware-auth`) garantizando que ninguna regresión rompa la anonimización legal y el firewall.
 - **Índices Firestore Strict:** Creado índice compuesto (`event` ASC, `ts` DESC) en `edge_telemetry` para asegurar la velocidad extrema de las consultas de analíticas sin desbordar el consumo.
+
+### 🐛 Fixes
+- **Vercel PDF Export Fix:** Configuración de `outputFileTracingIncludes` en `next.config.ts` para forzar la inclusión de los binarios de `@sparticuz/chromium`, solucionando el error 500 al generar PDFs en el entorno de producción.
+- **Traducción Modo Dios:** Renombramiento de toda la interfaz administrativa de "God Mode" a "Modo Dios" para mejorar la experiencia UX del operador local.
 
 ## [v1.0.0] - Mayo 2026
 ### 🚀 Estabilidad & CI/CD

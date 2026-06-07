@@ -119,6 +119,8 @@ onCaseStatusChange          onConsultationStatusChange
 
 | Función | Trigger | Propósito |
 |---|---|---|
+| `onCasoChanged` | Firestore `onDocumentWritten` `casos/` | Auditoría inmutable (Mejora A) y alertas de seguridad Telegram ante DELETE (Mejora C). |
+| `onConsultaChanged` | Firestore `onDocumentWritten` `consultations/` | Auditoría inmutable (Mejora A) y alertas de seguridad Telegram ante DELETE (Mejora C). |
 | `onConsultationCreated` | Firestore create `consultations/` | Envía mensaje a Telegram con dictamen + guarda `telegramMessageId` |
 | `onCaseStatusChange` | Firestore update `cases/` | Email + Push + edita mensaje Telegram |
 | `onCaseCreated` | Firestore create `cases/` | Email de bienvenida al caso |
