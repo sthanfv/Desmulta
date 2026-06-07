@@ -99,8 +99,7 @@ export function ReferralsClient() {
             </h1>
 
             <p className="text-lg md:text-xl text-white/60 max-w-lg leading-relaxed">
-              ¿Conoces a alguien con problemas de fotomultas? Refiérelos hoy y recibe descuentos
-              exclusivos o bonos en efectivo cuando finalicen su trámite con éxito.
+              ¿Conoces a alguien con problemas de fotomultas o comparendos? Refiérelos hoy y recibe descuentos exclusivos en tu trámite o bonos en efectivo cuando finalicen su proceso con éxito.
             </p>
 
             <div className="flex gap-4 items-center">
@@ -147,7 +146,7 @@ export function ReferralsClient() {
                   <div className="space-y-2">
                     <h3 className="text-2xl font-black text-white">Ingresa los datos</h3>
                     <p className="text-sm text-white/50">
-                      Mantenemos estricta confidencialidad (Zero-PII).
+                      Mantenemos estricta confidencialidad.
                     </p>
                   </div>
 
