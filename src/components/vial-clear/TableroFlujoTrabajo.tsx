@@ -116,6 +116,23 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
       const item = allItems.find((i) => i.id === id);
       if (!item) return;
 
+      const targetIsCasoInfo = ['APERTURA', 'RADICADO', 'TRAMITE', 'FINALIZADO'].includes(
+        estadoSiguiente
+      );
+
+      if (item.tipo === 'caso' && !targetIsCasoInfo) {
+        toast({
+          variant: 'destructive',
+          title: 'Operación no permitida',
+          description: 'No puedes devolver un Caso al flujo de Peticiones.',
+        });
+        return;
+      }
+
+      setAllItems((prev) =>
+        prev.map((i) => (i.id === id ? { ...i, estado: estadoSiguiente } : i))
+      );
+
       const indiceAnterior = COLUMNAS_UNIFICADAS.findIndex((c) => c.id === item.estado);
       const indiceNuevo = COLUMNAS_UNIFICADAS.findIndex((c) => c.id === estadoSiguiente);
       const esRetroceso =
@@ -130,7 +147,7 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
         esRetroceso,
       });
     },
-    [allItems, setModalNota]
+    [allItems, setModalNota, setAllItems, toast]
   );
 
   // NUEVO: Motor Táctil Magnético (Pointer Events + Hardware Acceleration)
@@ -147,10 +164,10 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
     let scrollRafId: number | null = null; // ID del requestAnimationFrame activo
     let scrollVelocity = 0; // velocidad actual del scroll (-ve = izquierda, +ve = derecha)
 
-    // Zona de activación: los últimos/primeros 80px de la pantalla
-    const EDGE_ZONE = 80;
+    // Zona de activación: los últimos/primeros 120px de la pantalla
+    const EDGE_ZONE = 120;
     // Velocidad máxima de scroll en px por frame (≈16ms)
-    const MAX_SPEED = 18;
+    const MAX_SPEED = 40;
 
     // Bucle de scroll que corre mientras hay arrastre activo cerca del borde
     const runEdgeScroll = () => {

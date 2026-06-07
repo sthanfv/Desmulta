@@ -56,36 +56,55 @@ export function useKanban(leadsReales: KanbanItem[], casosReales: KanbanItem[]) 
     e.dataTransfer.dropEffect = 'move';
   }, []);
 
-  const onDrop = useCallback((e: React.DragEvent, nuevaColumna: string) => {
-    e.preventDefault();
-    try {
-      const rawData = e.dataTransfer.getData('text/plain');
-      if (!rawData) return;
-      const { id, estadoActual } = JSON.parse(rawData);
+  const onDrop = useCallback(
+    (e: React.DragEvent, nuevaColumna: string) => {
+      e.preventDefault();
+      try {
+        const rawData = e.dataTransfer.getData('text/plain');
+        if (!rawData) return;
+        const { id, estadoActual } = JSON.parse(rawData);
 
-      if (estadoActual === nuevaColumna) return;
+        if (estadoActual === nuevaColumna) return;
 
-      setAllItems((prev) =>
-        prev.map((item) => (item.id === id ? { ...item, estado: nuevaColumna } : item))
-      );
+        const draggedItem = allItems.find((i) => i.id === id);
+        if (!draggedItem) return;
 
-      const indiceAnterior = COLUMNAS_UNIFICADAS.findIndex((c) => c.id === estadoActual);
-      const indiceNuevo = COLUMNAS_UNIFICADAS.findIndex((c) => c.id === nuevaColumna);
-      const esRetroceso =
-        indiceNuevo < indiceAnterior && indiceAnterior !== -1 && indiceNuevo !== -1;
+        const targetIsCasoInfo = ['APERTURA', 'RADICADO', 'TRAMITE', 'FINALIZADO'].includes(
+          nuevaColumna
+        );
 
-      setModalNota({
-        isOpen: true,
-        itemId: id,
-        nuevoEstado: nuevaColumna,
-        estadoAnterior: estadoActual,
-        esModalDetalle: false,
-        esRetroceso,
-      });
-    } catch (err) {
-      logger.error('Error in onDrop parse:', err);
-    }
-  }, []);
+        if (draggedItem.tipo === 'caso' && !targetIsCasoInfo) {
+          toast({
+            variant: 'destructive',
+            title: 'Operación no permitida',
+            description: 'No puedes devolver un Caso al flujo de Peticiones.',
+          });
+          return;
+        }
+
+        setAllItems((prev) =>
+          prev.map((item) => (item.id === id ? { ...item, estado: nuevaColumna } : item))
+        );
+
+        const indiceAnterior = COLUMNAS_UNIFICADAS.findIndex((c) => c.id === estadoActual);
+        const indiceNuevo = COLUMNAS_UNIFICADAS.findIndex((c) => c.id === nuevaColumna);
+        const esRetroceso =
+          indiceNuevo < indiceAnterior && indiceAnterior !== -1 && indiceNuevo !== -1;
+
+        setModalNota({
+          isOpen: true,
+          itemId: id,
+          nuevoEstado: nuevaColumna,
+          estadoAnterior: estadoActual,
+          esModalDetalle: false,
+          esRetroceso,
+        });
+      } catch (err) {
+        logger.error('Error in onDrop parse:', err);
+      }
+    },
+    [allItems, toast]
+  );
 
   const handleCambiarEstadoDesdeModal = useCallback(
     async (id: string, nuevoEstado: string, _tipo: 'lead' | 'caso') => {
