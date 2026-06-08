@@ -11,8 +11,8 @@ import { TASA_EA_VIGENTE } from '@/lib/config-constants';
 
 export function SavingsCalculator() {
   // Estados Financieros
-  const [montoBase, setMontoBase] = useState(800000);
-  const [mesesMora, setMesesMora] = useState(12);
+  const [montoBase, setMontoBase] = useState(0);
+  const [mesesMora, setMesesMora] = useState(0);
   const [intereses, setIntereses] = useState(0);
   
   // Estados Legales y de Conversión
@@ -131,7 +131,7 @@ export function SavingsCalculator() {
               <Slider
                 value={[montoBase]}
                 onValueChange={(val) => { setMontoBase(val[0]); setIsExpanded(true); }}
-                min={150000}
+                min={0}
                 max={5000000}
                 step={50000}
                 className="py-2"
