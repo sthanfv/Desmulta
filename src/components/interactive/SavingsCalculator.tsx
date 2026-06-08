@@ -165,7 +165,7 @@ export function SavingsCalculator() {
                 </div>
                 {coactivo && <CheckCircle2 className="w-4 h-4 text-primary absolute pointer-events-none" />}
               </div>
-              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">El SIMIT indica "Cobro Coactivo"</span>
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">El SIMIT indica &quot;Cobro Coactivo&quot;</span>
             </label>
           </div>
 
