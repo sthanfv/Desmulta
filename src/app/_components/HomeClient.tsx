@@ -61,7 +61,7 @@ const TouchDebugger = dynamic(
   { ssr: false }
 );
 
-import { ShieldCheck, Info, MessageCircle, Calculator } from 'lucide-react';
+import { ShieldCheck, Info, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { ResponsiveModal } from '@/components/ui/responsive-modal';
@@ -292,21 +292,7 @@ export default function HomeClient({
           ¿Necesitas asesoría inmediata?
         </div>
 
-        {/* Botón flotante para la Calculadora (Visible solo en celular) */}
-        <button
-          onClick={() => {
-            const el = document.getElementById('calculadora-hero');
-            if (el) {
-              const y = el.getBoundingClientRect().top + window.scrollY - 100;
-              window.scrollTo({ top: y, behavior: 'smooth' });
-            }
-          }}
-          className="pointer-events-auto bg-primary hover:bg-primary/90 text-white w-14 h-14 sm:w-16 sm:h-16 shrink-0 min-h-[56px] min-w-[56px] rounded-full flex lg:hidden items-center justify-center shadow-2xl shadow-primary/30 transition-all hover:scale-110 active:scale-90 relative z-10"
-          aria-label="Ir a la calculadora"
-        >
-          <Calculator size={28} strokeWidth={2.5} aria-hidden="true" />
-          <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping -z-10" />
-        </button>
+
 
         <button
           onClick={() => setIsWhatsAppWarningOpen(true)}
