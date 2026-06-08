@@ -70,6 +70,10 @@ const STATUS_TEMPLATES: Record<string, (caseId: string) => PushMessage> = {
 
 /**
  * Envía una notificación push a un token FCM específico basado en el nuevo estado de un caso.
+ * Si el token es inválido, lo limpia de Firestore automáticamente.
+ *
+ * @deprecated Usar `dispatchPush` de `@/lib/notifications/notification-dispatcher` para nuevas implementaciones.
+ *   Esta función se mantiene por compatibilidad con código existente.
  */
 export async function sendCaseUpdateNotification(
   fcmToken: string,
@@ -118,8 +122,45 @@ export async function sendCaseUpdateNotification(
     });
     return response;
   } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : 'Error desconocido';
+    const esTokenInvalido =
+      errorMsg.includes('registration-token-not-registered') ||
+      errorMsg.includes('invalid-registration-token') ||
+      errorMsg.includes('invalid-argument');
+
+    if (esTokenInvalido) {
+      // FIX FALLA 5: Limpiar el token inválido de Firestore para no reintentar indefinidamente
+      logger.warn('[PushNotifications] Token FCM inválido — iniciando limpieza en Firestore', {
+        caseId,
+        newStatus,
+      });
+      try {
+        const { getFirestore, FieldValue } = await import('firebase-admin/firestore');
+        const db = getFirestore();
+        // Buscar y limpiar tanto en consultations como en cases
+        for (const coleccion of ['consultations', 'cases']) {
+          const snap = await db
+            .collection(coleccion)
+            .where('fcmToken', '==', fcmToken)
+            .limit(1)
+            .get();
+          if (!snap.empty) {
+            await snap.docs[0].ref.update({
+              fcmToken: FieldValue.delete(),
+              fcmTokenInvalidatedAt: FieldValue.serverTimestamp(),
+            });
+          }
+        }
+      } catch (cleanErr) {
+        logger.error('[PushNotifications] Error al limpiar token inválido', {
+          error: cleanErr instanceof Error ? cleanErr.message : 'Error desconocido',
+        });
+      }
+      return;
+    }
+
     logger.error('[PushNotifications] Error al enviar notificación:', {
-      error: error instanceof Error ? error.message : 'Error desconocido',
+      error: errorMsg,
       caseId,
       newStatus,
     });

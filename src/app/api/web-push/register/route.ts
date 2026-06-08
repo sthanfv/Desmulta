@@ -92,6 +92,7 @@ export async function POST(request: Request) {
 
     const now = new Date().toISOString();
 
+    // FUENTE DE VERDAD: Subcolección private/push (acceso restringido por reglas Firestore)
     await targetDocRef
       .collection('private')
       .doc('push')
@@ -104,6 +105,18 @@ export async function POST(request: Request) {
         },
         { merge: true }
       );
+
+    // SINCRONIZACIÓN AL RAÍZ: Necesaria para que updateCaseStatus y updateConsultationStatus
+    // puedan leer el token sin necesidad de acceder a la subcolección desde una transacción.
+    // Campo raíz es de solo escritura interna (Server SDK), nunca expuesto al cliente.
+    await targetDocRef.set(
+      {
+        fcmToken: fcmToken as string,
+        fcmTokenUpdatedAt: now,
+        pushOptIn: true,
+      },
+      { merge: true }
+    );
 
     if (uid && docSnap.data()?.authorUid !== uid) {
       logger.info('[Push Register] Token registrado por UID distinto al autor', {

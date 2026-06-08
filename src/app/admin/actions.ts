@@ -540,14 +540,39 @@ export async function updateCaseStatus(
       return currentLeadData;
     });
 
-    // Auditoría delegada a Cloud Functions (Mejora A)
+    revalidateTag('tracking'); // ⚡ Destruye el caché de la CDN instantáneamente
 
-    revalidateTag('tracking'); // ⚡ Esto destruye el caché de la CDN instantáneamente
-
-    // NOTA: Fase 3 eliminada por duplicidad.
-    // Las notificaciones (Email y Web Push) ahora son manejadas EXCLUSIVAMENTE
-    // de manera asíncrona por las Cloud Functions (onCaseStatusChange)
-    // cuando detectan el cambio en Firestore.
+    // DESPACHO DE NOTIFICACIÓN PUSH — Directo y verificado
+    // Se usa el dispatcher centralizado que busca el token en la subcolección
+    // private/push y en el campo raíz del documento (retrocompatibilidad).
+    if (_leadData?.consultationId) {
+      try {
+        const { dispatchPush } = await import('@/lib/notifications/notification-dispatcher');
+        const { STATUS_TEMPLATES } = await import('@/lib/notifications/push-notifications');
+        const templateFn =
+          STATUS_TEMPLATES[newStatus.toLowerCase() as keyof typeof STATUS_TEMPLATES];
+        if (templateFn) {
+          const { title, body } = templateFn(caseId);
+          const trackingUrl = _leadData.trackingUuid
+            ? `https://desmulta.online/seguir/${_leadData.trackingUuid}`
+            : undefined;
+          // Fire-and-forget: no bloqueamos la respuesta al admin por las notificaciones
+          dispatchPush(
+            _leadData.consultationId as string,
+            { title, body, url: trackingUrl },
+            'consultations'
+          ).catch((e) =>
+            logger.warn('[updateCaseStatus] Fallo al despachar push (no crítico)', {
+              error: e?.message,
+            })
+          );
+        }
+      } catch (pushErr) {
+        logger.warn('[updateCaseStatus] Error al importar dispatcher (no crítico)', {
+          error: pushErr instanceof Error ? pushErr.message : 'Error desconocido',
+        });
+      }
+    }
 
     return { success: true };
   } catch (error: unknown) {
@@ -710,15 +735,32 @@ export async function updateConsultationStatus(
       return leadData;
     });
 
-    // NOTA: Las notificaciones directas han sido removidas.
-    // Se delega a la Cloud Function `onConsultationStatusChange`
-    // el envío del Web Push y Correo al detectar el cambio de estado.
-
-    // Auditoría delegada a Cloud Functions (Mejora A)
-
     // Esto hace que la tabla se refresque sola sin F5
     revalidatePath('/admin');
-    revalidateTag('tracking'); // ⚡ Esto destruye el caché de la CDN instantáneamente
+    revalidateTag('tracking'); // ⚡ Destruye el caché de la CDN instantáneamente
+
+    // DESPACHO DE NOTIFICACIÓN PUSH — Directo y verificado
+    try {
+      const { dispatchPush } = await import('@/lib/notifications/notification-dispatcher');
+      const { STATUS_TEMPLATES } = await import('@/lib/notifications/push-notifications');
+      const templateFn =
+        STATUS_TEMPLATES[newStatus.toLowerCase() as keyof typeof STATUS_TEMPLATES];
+      if (templateFn) {
+        const leadId = id;
+        const { title, body } = templateFn(leadId);
+        // Fire-and-forget: no bloquea la respuesta al admin
+        dispatchPush(leadId, { title, body }, 'consultations').catch((e) =>
+          logger.warn('[updateConsultationStatus] Fallo al despachar push (no crítico)', {
+            error: e?.message,
+          })
+        );
+      }
+    } catch (pushErr) {
+      logger.warn('[updateConsultationStatus] Error al importar dispatcher (no crítico)', {
+        error: pushErr instanceof Error ? pushErr.message : 'Error desconocido',
+      });
+    }
+
     return { success: true };
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Error al actualizar estado';

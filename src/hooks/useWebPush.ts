@@ -74,6 +74,9 @@ export function useWebPush() {
           }
         });
       }
+      // FIX FALLA 3: Si el permiso está denegado, NO hacemos nada aquí.
+      // La revocación del token en Firestore se hace solo cuando el usuario
+      // interacta activamente con el botón (en requestNotificationPermission).
     }
   }, []);
 
@@ -141,6 +144,19 @@ export function useWebPush() {
             duration: 8000,
           });
           setYaTienePermiso(true);
+
+          // FIX FALLA 3: Revocar el token en Firestore cuando el usuario niega el permiso.
+          // Evita que el servidor siga intentando enviar push a un token que FCM rechazará.
+          if (permiso === 'denied' && docId && docId !== 'OFFLINE_PENDING') {
+            fetch('/api/web-push/revoke', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ docId }),
+            }).catch(() => {
+              // Silenciar: el usuario ya denegó, no es crítico si falla
+            });
+          }
+
           return null;
         }
 
@@ -211,11 +227,15 @@ export function useWebPush() {
           logger.error('[useWebPush] FCM Token falló:', error);
         }
 
-        // SELF-HEALING: Si el token o SW están corruptos, los destruimos.
+        // FIX FALLA 4: Auto-sanación SELECTIVA — solo desregistrar el SW de Firebase,
+        // NO todos los SWs (evitar destruir el SW principal de Workbox/next-pwa).
         try {
           const regs = await navigator.serviceWorker.getRegistrations();
           for (const r of regs) {
-            await r.unregister();
+            // Solo desregistrar el SW de Firebase Messaging
+            if (r.active?.scriptURL?.includes('firebase-messaging-sw')) {
+              await r.unregister();
+            }
           }
           try {
             const tempMessaging = getMessaging(app);

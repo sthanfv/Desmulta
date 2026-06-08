@@ -65,7 +65,29 @@ export async function middleware(request: NextRequest) {
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set('x-ciudad-usuario', ciudadUsuario);
 
-  // ── 2. Rutas /api ─────────────────────────────────────────────────────────
+  // ── 2. Geobloqueo por país (x-vercel-ip-country, $0 en Vercel) ───────────
+  // Solo Colombia (CO) tiene acceso. Rutas internas server-to-server y
+  // rutas de assets están exentas. En desarrollo, la cabecera no existe
+  // y se permite el paso (modo de fallo seguro = abierto en dev).
+  const paisUsuario = request.headers.get('x-vercel-ip-country');
+  const esRutaInterna = pathname.startsWith('/api/internal');
+  const esRutaAuth = pathname.startsWith('/api/auth');
+  const esRutaAssets = pathname.startsWith('/_next');
+  const esPaginaBloqueo = pathname.startsWith('/geo-bloqueado');
+
+  if (
+    paisUsuario && // Solo bloquear si Vercel inyectó la cabecera (no en dev)
+    paisUsuario !== 'CO' &&
+    !esRutaInterna &&
+    !esRutaAuth &&
+    !esRutaAssets &&
+    !esPaginaBloqueo
+  ) {
+    // HTTP 451: estándar para contenido no disponible por razones geográficas/legales
+    return NextResponse.redirect(new URL('/geo-bloqueado', request.url), { status: 302 });
+  }
+
+  // ── 3. Rutas /api ─────────────────────────────────────────────────────────
   // Headers básicos sin CSP completa (evita overhead). El rate-limit y auth
   // son responsabilidad de cada handler individual.
   if (pathname.startsWith('/api')) {
