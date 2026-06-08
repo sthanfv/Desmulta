@@ -14,6 +14,7 @@ import Image from 'next/image';
 import { KanbanItem } from './TableroFlujoTrabajo';
 
 import { maskData } from '@/lib/security/masking';
+import DecryptedText from '../ui/DecryptedText';
 
 import { motion } from 'framer-motion';
 
@@ -94,13 +95,18 @@ export function TarjetaKanban({
           <div className="flex-1 min-w-0 pointer-events-none">
             <h4 className="text-slate-900 dark:text-foreground font-black text-base uppercase tracking-tight truncate">
               {data.placa && data.placa !== 'N/A'
-                ? maskData(data.placa, 'plate')
+                ? <DecryptedText parentClassName="pointer-events-auto" animateOn="hoverReveal" speed={40} text={maskData(data.placa, 'plate')} />
                 : data.cedula
-                  ? `C.C. ${maskData(data.cedula, 'id')}`
-                  : 'Sin Id'}
+                  ? <DecryptedText parentClassName="pointer-events-auto" animateOn="hoverReveal" speed={40} text={`C.C. ${maskData(data.cedula, 'id')}`} />
+                  : <DecryptedText parentClassName="pointer-events-auto" animateOn="hoverReveal" speed={40} text="Sin Id" />}
             </h4>
             <p className="text-slate-500 dark:text-muted-foreground text-xs truncate">
-              {data.nombre ? maskData(data.nombre, 'name') : 'Usuario Desmulta'}
+              <DecryptedText 
+                parentClassName="pointer-events-auto" 
+                animateOn="hoverReveal" 
+                speed={40} 
+                text={data.nombre ? maskData(data.nombre, 'name') : 'Usuario Desmulta'} 
+              />
             </p>
           </div>
         </div>
@@ -111,7 +117,12 @@ export function TarjetaKanban({
               <div className="flex items-center gap-2">
                 <p className="text-[10px] font-bold text-slate-500 flex items-center gap-1 pointer-events-none">
                   <Phone className="w-3 h-3" />{' '}
-                  {data.contacto ? maskData(data.contacto, 'phone') : 'Sin contacto'}
+                  <DecryptedText 
+                    parentClassName="pointer-events-auto" 
+                    animateOn="hoverReveal" 
+                    speed={40} 
+                    text={data.contacto ? maskData(data.contacto, 'phone') : 'Sin contacto'} 
+                  />
                 </p>
                 {data.contacto && (
                   <a
