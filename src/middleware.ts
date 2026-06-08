@@ -106,22 +106,10 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/acceso-panel', request.url));
       }
 
-      // Validar inactividad máxima de 5 minutos (300 segundos) desde la emisión del token
-      const nowInSeconds = Math.floor(Date.now() / 1000);
-      const MAX_INACTIVITY_SECONDS = 5 * 60;
-
-      if (
-        tokens.decodedToken.iat &&
-        nowInSeconds - tokens.decodedToken.iat > MAX_INACTIVITY_SECONDS
-      ) {
-        // Token expirado por regla estricta de inactividad
-        const response = NextResponse.redirect(new URL('/acceso-panel', request.url));
-        response.cookies.delete('__session');
-        return response;
-      }
-
-      // Token válido: continuar. La validación de rol admin se hace en el layout
-      // client-side (segunda capa de defensa). El middleware solo valida la sesión.
+      // Token válido: La expiración estándar de Firebase (1h) es gestionada por getTokens().
+      // FIX: Se eliminó la validación incorrecta por `iat` que rechazaba sesiones válidas
+      // a los 5 minutos de haberse autenticado. `iat` = tiempo de emisión, ≠ inactividad.
+      // La validación de rol admin se hace en el layout client-side (segunda capa de defensa).
     } catch {
       // Token expirado, corrupto o error de red → redirect a login
       return NextResponse.redirect(new URL('/acceso-panel', request.url));

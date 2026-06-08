@@ -60,10 +60,17 @@ export function SavingsCalculator() {
 
   const enviarLead = async () => {
     if (leadHp) return;
+
+    // Validación client-side robusta del teléfono colombiano (complementa la validación Zod del servidor)
+    const cleanPhone = leadContacto.replace(/\D/g, '');
+    if (!/^3[0-9]{9}$/.test(cleanPhone)) {
+      setErrorMsg('Número inválido. Debe ser un celular colombiano de 10 dígitos (ej: 300 123 4567).');
+      return;
+    }
+
     setLeadState('sending');
     setErrorMsg(null);
     try {
-      const cleanPhone = leadContacto.replace(/\D/g, '');
       const response = await fetch('/api/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -71,7 +78,8 @@ export function SavingsCalculator() {
           tipo: 'SIMIT_LEAD',
           probability: resultado?.probabilidadExito,
           contacto: cleanPhone,
-          nombre: leadNombre.trim() || undefined,
+          // Truncar nombre a 60 chars para evitar overflow antes de enviarlo al servidor
+          nombre: leadNombre.trim().slice(0, 60) || undefined,
           website_hp: leadHp,
           deuda_total: total,
           ahorro_potencial: intereses
@@ -251,8 +259,10 @@ export function SavingsCalculator() {
                     type="text"
                     placeholder="Tu nombre (opcional)"
                     value={leadNombre}
+                    maxLength={60}
                     onChange={(e) => { setLeadNombre(e.target.value); setIsExpanded(true); }}
                     className="w-full bg-foreground/5 dark:bg-black/50 border border-foreground/15 rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                    aria-label="Tu nombre (opcional)"
                   />
                   
                   <div className="flex gap-2">
@@ -260,8 +270,12 @@ export function SavingsCalculator() {
                       type="tel"
                       placeholder="Tu número de WhatsApp"
                       value={leadContacto}
+                      maxLength={15}
+                      inputMode="numeric"
+                      pattern="[0-9]*"
                       onChange={(e) => { setLeadContacto(e.target.value); setIsExpanded(true); }}
                       className="flex-1 bg-foreground/5 dark:bg-black/50 border border-foreground/15 rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                      aria-label="Tu número de WhatsApp para contacto"
                     />
                     <button
                       onClick={enviarLead}

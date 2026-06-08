@@ -117,6 +117,9 @@ export function calcularViabilidadLegal(
  * @returns El valor total de los intereses generados.
  */
 export function calcularIntereses(montoBase: number, fechaInfraccionISO: string): number {
+  // Validación temprana: monto nulo o negativo retorna 0 de forma segura
+  if (!montoBase || montoBase <= 0) return 0;
+
   const fechaInfraccion = new Date(`${fechaInfraccionISO}T00:00:00Z`);
   const hoy = new Date();
   const hoyUTC = new Date(Date.UTC(hoy.getUTCFullYear(), hoy.getUTCMonth(), hoy.getUTCDate()));
@@ -131,7 +134,10 @@ export function calcularIntereses(montoBase: number, fechaInfraccionISO: string)
   if (diasTotales <= 0) return 0;
 
   const tasaDiaria = Math.pow(1 + TASA_EA_VIGENTE, 1 / 365) - 1;
-  const intereses = montoBase * tasaDiaria * diasTotales;
+
+  // Fórmula de interés COMPUESTO diario (más precisa que el interés simple):
+  // Intereses = Monto * ((1 + tasaDiaria)^días - 1)
+  const intereses = montoBase * (Math.pow(1 + tasaDiaria, diasTotales) - 1);
   
   return intereses;
 }
