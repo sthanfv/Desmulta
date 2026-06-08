@@ -301,16 +301,23 @@ export default function HomeClient({
         >
           <MessageCircle size={36} fill="currentColor" aria-hidden="true" />
           {/* Animated Magic Rings Background */}
+          {/* CORRECCIÓN: canvas 3x el tamaño del botón para que los anillos */}
+          {/* nunca choquen contra el borde del quad WebGL (eliminando el corte cuadrado) */}
           <div 
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[180px] h-[180px] sm:w-[200px] sm:h-[200px] pointer-events-none -z-10"
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] sm:w-[320px] sm:h-[320px] pointer-events-none -z-10"
           >
             <MagicRings 
-              color="#25D366" 
-              colorTwo="#128C7E" 
+              color="#25D366"
+              colorTwo="#25D366"
               ringCount={2} 
-              baseRadius={0.22}
-              radiusStep={0.12}
-              opacity={1}
+              baseRadius={0.12}
+              radiusStep={0.10}
+              scaleRate={0.28}
+              attenuation={14}
+              lineThickness={1.8}
+              opacity={0.85}
+              fadeIn={0.3}
+              fadeOut={0.55}
             />
           </div>
         </button>
