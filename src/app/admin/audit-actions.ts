@@ -67,8 +67,8 @@ export async function logAdminAction(payload: {
       resource: payload.resource,
       details: payload.details,
       ipAddress: ip,
-      timestamp: now,
-      expireAt: expireDate, // Campo clave para el TTL gratuito de Firebase
+      timestamp: Timestamp.fromDate(now),
+      expireAt: Timestamp.fromDate(expireDate), // Campo clave para el TTL gratuito de Firebase
     };
 
     await db.collection('audit_logs').add(logEntry);
