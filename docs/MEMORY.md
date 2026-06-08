@@ -30,7 +30,10 @@ DevSecOps alineado y entorno preparado para recibir nuevos mandatos operativos.
 2. **[2026-06-08] Refactor Hero UI y Accesibilidad:**
   - Conversión del bloque `Hero.tsx` en 2 columnas en Desktop.
   - Resolución de inconsistencias entre Dark/Light Mode en el simulador.
-  - **Resolución de UI Móvil:** Se restauró el ícono flotante de la "Calculadora" (FAB) exclusivamente para la vista móvil (`lg:hidden`), asegurando que ancle (scroll suave) al bloque de simulación sin contaminar el layout de escritorio.
+3. **Refinamiento UI/UX del Simulador:**
+  - **Corrección de Renderizado Crítico:** Se eliminó la directiva `contain: 'strict'` en `StarBorder.tsx` que causaba el colapso (altura 0) del componente, recuperando la visibilidad del simulador en PC y Móvil.
+  - **Limpieza de Interfaz:** Se eliminaron botones y accesos flotantes (FAB) redundantes hacia la calculadora desde la barra superior (`Header.tsx`) para limpiar el diseño y enfocar la atención en el Hero, evitando solapamiento con el logo.
+  - **Reset de Estado Cero:** Se inicializaron explícitamente en `$0` y `0 meses` los valores de arranque del simulador y se ajustó el Slider para permitir arrancar limpiamente, evitando sesgos cognitivos por datos pre-cargados al recargar la página.
 2. **Flujo Híbrido de Tensión (UX):** Se implementó una actualización instantánea para los cálculos financieros (capital + meses), pero se conservó un retraso intencional de 2.5 segundos para la respuesta de viabilidad legal (botón "Evaluando Prescripción..."), generando tensión psicológica antes de revelar el Ahorro Potencial.
 3. **Limpieza de Código Muerto:** Se eliminó por completo el archivo redundante `CalculadoraPrescripcion.tsx`, limpiando la deuda técnica y unificando el punto de contacto en la arquitectura.
 4. **Captura Directa (Zero-PII Lead Gen):** El formulario para captura de leads (`/api/telemetry`) fue acoplado directamente al resultado positivo de la evaluación legal, requiriendo únicamente el número de celular para iniciar el flujo de conversión mediante WhatsApp.
