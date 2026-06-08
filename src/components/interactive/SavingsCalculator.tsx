@@ -205,28 +205,30 @@ export function SavingsCalculator() {
                     <span className="font-black text-2xl text-foreground tracking-tight">{formatCurrency(total)}</span>
                   </div>
 
-                  <div className={`p-4 rounded-2xl border flex items-start gap-3 ${
-                    resultado.estado === 'CADUCIDAD ESTIMADA'
-                      ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400'
-                      : 'bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400'
-                  }`}>
-                    {resultado.estado === 'CADUCIDAD ESTIMADA' ? (
-                      <ShieldCheck className="w-5 h-5 mt-0.5 shrink-0 text-emerald-500" />
-                    ) : (
-                      <TrendingDown className="w-5 h-5 mt-0.5 shrink-0 text-amber-500" />
-                    )}
-                    <div>
-                      <h4 className="font-bold text-sm">
-                        {resultado.estado === 'CADUCIDAD ESTIMADA' ? 'Apta para Prescripción' : 'Requiere Defensa Técnica'}
-                      </h4>
-                      <p className="text-xs opacity-90 mt-1 leading-relaxed">
-                        {resultado.disclaimerLegal}
-                      </p>
-                      <div className="mt-2 inline-block px-2 py-1 rounded bg-foreground/10 text-[10px] font-bold uppercase tracking-wider">
-                        Éxito Histórico: {resultado.probabilidadExito}%
+                  {resultado && (
+                    <div className={`p-4 rounded-2xl border flex items-start gap-3 ${
+                      resultado.estado === 'CADUCIDAD ESTIMADA'
+                        ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400'
+                        : 'bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400'
+                    }`}>
+                      {resultado.estado === 'CADUCIDAD ESTIMADA' ? (
+                        <ShieldCheck className="w-5 h-5 mt-0.5 shrink-0 text-emerald-500" />
+                      ) : (
+                        <TrendingDown className="w-5 h-5 mt-0.5 shrink-0 text-amber-500" />
+                      )}
+                      <div>
+                        <h4 className="font-bold text-sm">
+                          {resultado.estado === 'CADUCIDAD ESTIMADA' ? 'Apta para Prescripción' : 'Requiere Defensa Técnica'}
+                        </h4>
+                        <p className="text-xs opacity-90 mt-1 leading-relaxed">
+                          {resultado.disclaimerLegal}
+                        </p>
+                        <div className="mt-2 inline-block px-2 py-1 rounded bg-foreground/10 text-[10px] font-bold uppercase tracking-wider">
+                          Éxito Histórico: {resultado.probabilidadExito}%
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
                 </div>
 
                 {/* FORMULARIO DE CAPTURA - LEAD AUTOMÁTICO */}

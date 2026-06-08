@@ -98,10 +98,6 @@ export async function POST(request: Request) {
       // Por defecto a desmulta-colombia si no está la env
       const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'desmulta-colombia';
       
-      const functionUrl = isLocal 
-        ? `http://127.0.0.1:5001/${projectId}/us-central1/generatePdf` 
-        : `https://generatepdf-fok3w4h4ya-uc.a.run.app`; // O URL de CFv2. Si CFv1 es https://us-central1-${projectId}.cloudfunctions.net/generatePdf
-      
       // En functions v2 la url es dada por cloud run, pero usaremos un custom domain o la url estandar si está disponible. Mejor usamos la var de entorno si está, o el formato genérico de v1 fallback.
       const finalUrl = process.env.PDF_CLOUD_FUNCTION_URL || 
         (isLocal ? `http://127.0.0.1:5001/${projectId}/us-central1/generatePdf` : `https://us-central1-${projectId}.cloudfunctions.net/generatePdf`);

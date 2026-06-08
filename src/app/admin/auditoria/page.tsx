@@ -87,6 +87,16 @@ function formatAuditDetails(resource: string, details: unknown): string {
   }
 }
 
+interface ExportLogRecord {
+  id: string;
+  fecha: string;
+  administrador: string;
+  accion: string;
+  recurso: string;
+  detalles: string;
+  ip: string;
+}
+
 function ExportControls({ admins }: { admins: string[] }) {
   const [adminFilter, setAdminFilter] = useState('ALL');
   const [startDate, setStartDate] = useState('');
@@ -94,7 +104,7 @@ function ExportControls({ admins }: { admins: string[] }) {
   const [isExporting, setIsExporting] = useState(false);
 
   const fetchAllLogs = async () => {
-    let allRecords: any[] = [];
+    let allRecords: ExportLogRecord[] = [];
     let currentCursor: string | undefined = undefined;
     let hasMore = true;
 
@@ -108,7 +118,7 @@ function ExportControls({ admins }: { admins: string[] }) {
       });
 
       if (response.logs && response.logs.length > 0) {
-        allRecords = [...allRecords, ...response.logs];
+        allRecords = [...allRecords, ...response.logs] as ExportLogRecord[];
       }
       
       currentCursor = response.nextCursor;
@@ -150,7 +160,7 @@ function ExportControls({ admins }: { admins: string[] }) {
       );
 
       const tableColumn = ['Fecha', 'Administrador', 'Acción', 'Recurso', 'Detalles', 'IP'];
-      const tableRows = logs.map((r: any) => {
+      const tableRows = (logs as ExportLogRecord[]).map((r: ExportLogRecord) => {
         const dateObj = new Date(r.fecha);
         const formattedDate = dateObj.toLocaleString('es-CO', {
           year: 'numeric',
