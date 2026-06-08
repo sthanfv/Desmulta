@@ -32,6 +32,7 @@ interface DecryptedTextProps extends HTMLMotionProps<'span'> {
   encryptedClassName?: string;
   animateOn?: 'view' | 'hover' | 'inViewHover' | 'click' | 'hoverReveal';
   clickMode?: 'once' | 'toggle';
+  hideDelay?: number;
 }
 
 type Direction = 'forward' | 'reverse';
@@ -49,6 +50,7 @@ export default function DecryptedText({
   encryptedClassName = '',
   animateOn = 'hover',
   clickMode = 'once',
+  hideDelay = 3000,
   ...props
 }: DecryptedTextProps) {
   const [displayText, setDisplayText] = useState<string>(text);
@@ -62,6 +64,9 @@ export default function DecryptedText({
   const orderRef = useRef<number[]>([]);
   const pointerRef = useRef<number>(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+
 
   const availableChars = useMemo<string[]>(() => {
     return useOriginalCharsOnly
@@ -137,6 +142,20 @@ export default function DecryptedText({
     setIsDecrypted(false);
     setDirection('forward');
   }, [text, shuffleText]);
+
+  const clearHideTimer = useCallback(() => {
+    if (hideTimeoutRef.current) {
+      clearTimeout(hideTimeoutRef.current);
+      hideTimeoutRef.current = null;
+    }
+  }, []);
+
+  const startHideTimer = useCallback(() => {
+    clearHideTimer();
+    hideTimeoutRef.current = setTimeout(() => {
+      encryptInstantly();
+    }, hideDelay);
+  }, [encryptInstantly, clearHideTimer, hideDelay]);
 
   const triggerDecrypt = useCallback(() => {
     if (sequential) {
@@ -274,7 +293,10 @@ export default function DecryptedText({
       });
     }, speed);
 
-    return () => clearInterval(intervalRef.current ?? undefined);
+    return () => {
+      clearInterval(intervalRef.current ?? undefined);
+      clearHideTimer();
+    };
   }, [
     isAnimating,
     text,
@@ -287,7 +309,8 @@ export default function DecryptedText({
     fillAllIndices,
     removeRandomIndices,
     characters,
-    useOriginalCharsOnly
+    useOriginalCharsOnly,
+    clearHideTimer
   ]);
 
   /* Click Behaviour */
@@ -381,8 +404,16 @@ export default function DecryptedText({
         }
       : animateOn === 'hoverReveal'
       ? {
-          onMouseEnter: triggerDecrypt,
-          onMouseLeave: encryptInstantly
+          onMouseEnter: () => {
+            clearHideTimer();
+            if (!isDecrypted && !isAnimating) triggerDecrypt();
+          },
+          onMouseLeave: startHideTimer,
+          onTouchStart: () => {
+            clearHideTimer();
+            if (!isDecrypted && !isAnimating) triggerDecrypt();
+          },
+          onTouchEnd: startHideTimer
         }
       : animateOn === 'click'
         ? {
