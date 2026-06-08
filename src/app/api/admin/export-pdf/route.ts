@@ -7,8 +7,19 @@ import { createHash } from 'crypto';
 import { cookies } from 'next/headers';
 import { SecurityLogger } from '@/lib/logger/security-logger';
 import { getTokens } from 'next-firebase-auth-edge';
+import { rateLimit } from '@/lib/security/rate-limit';
 export async function POST(request: Request) {
   try {
+    // Protección Rate Limit (10 por 30 mins)
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    const rl = await rateLimit(`export-pdf:${ip}`, 10, 30 * 60 * 1000, 'exportPdfLimits');
+    if (!rl.success) {
+      return NextResponse.json(
+        { error: 'Demasiadas exportaciones de PDF. Espera 30 minutos.' },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const { pin, data } = body as { pin: string; data: PDFTemplateData };
 
@@ -26,7 +37,6 @@ export async function POST(request: Request) {
     }
 
     // Paso B: Auditoría y Extracción de Identidad
-    const { getTokens } = await import('next-firebase-auth-edge/lib/next/tokens');
     const cookieStore = await cookies();
 
     let adminEmail = 'admin_desconocido@desmulta.com';
@@ -99,6 +109,14 @@ export async function POST(request: Request) {
       });
 
       const page = await browser.newPage();
+
+      // Prevención de SSRF (OWASP A10): Bloquear JS y red para evitar inyecciones maliciosas
+      await page.setJavaScriptEnabled(false);
+      await page.setRequestInterception(true);
+      page.on('request', (req) => {
+        // Bloqueo total de red saliente
+        req.abort();
+      });
 
       // Establecer contenido HTML
       await page.setContent(htmlContent, { waitUntil: 'domcontentloaded' });

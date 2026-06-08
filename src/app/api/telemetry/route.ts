@@ -18,7 +18,7 @@ try {
 const TelemetryPayloadSchema = z.object({
   date: z.string().min(10, 'Formato de fecha inválido'),
   coactivo: z.boolean(),
-  status: z.enum(['VIGENTE', 'ALERTA', 'PRESCRITA']),
+  status: z.enum(['VIGENTE', 'ALERTA', 'CADUCIDAD ESTIMADA']),
   probability: z.string().min(1),
   // 🇨🇴 Prefix check: 300-305, 310-324, 350-351
   contacto: z

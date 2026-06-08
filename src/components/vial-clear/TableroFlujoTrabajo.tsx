@@ -21,6 +21,7 @@ import { ModalAyudaOperador } from './ModalAyudaOperador';
 import { ModalAuthPin } from './ModalAuthPin';
 
 import type { PlantillasDisponibles } from '@/lib/legal/legal-types';
+import { Badge } from '@/components/ui/badge';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 
@@ -154,6 +155,22 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
     },
     [allItems, setModalNota, setAllItems, toast]
   );
+
+  // Reproducir sonido cuando llegan nuevos leads en tiempo real
+  const prevLeadsCountRef = useRef(realtimeNewLeadsCount || 0);
+  useEffect(() => {
+    const currentCount = realtimeNewLeadsCount || 0;
+    if (currentCount > prevLeadsCountRef.current) {
+      try {
+        const audio = new Audio('/notification.mp3');
+        // Usamos una promesa vacía para ignorar el error si el navegador bloquea el autoplay sin interacción previa
+        audio.play().catch(() => {});
+      } catch (e) {
+        // Ignorar
+      }
+    }
+    prevLeadsCountRef.current = currentCount;
+  }, [realtimeNewLeadsCount]);
 
   // NUEVO: Motor Táctil Magnético (Pointer Events + Hardware Acceleration)
   useEffect(() => {
@@ -871,10 +888,9 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
                       <h3 className="font-black text-lg uppercase tracking-wide flex items-center gap-2">
                         {columna.titulo}
                         {columna.id === 'NUEVO' && (realtimeNewLeadsCount || 0) > 0 && (
-                          <span className="relative flex h-3 w-3">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-                          </span>
+                          <Badge variant="destructive" className="ml-2 animate-bounce border-none font-black shadow-[0_0_15px_rgba(239,68,68,0.5)]">
+                            {realtimeNewLeadsCount} Nuevo{realtimeNewLeadsCount !== 1 ? 's' : ''}
+                          </Badge>
                         )}
                       </h3>
                       <Popover>

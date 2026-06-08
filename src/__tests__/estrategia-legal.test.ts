@@ -18,10 +18,17 @@ describe('Motor Heurístico — evaluarCasoTransito', () => {
     expect(resultado.certeza).toBe('BAJA');
   });
 
-  it('debe sugerir PRESCRIPCION si pasaron más de 3 años sin cobro coactivo', () => {
-    // Fecha: 4 años atrás (Mayo 2022)
-    const resultado = evaluarCasoTransito('2022-05-09T10:00:00Z', false, false);
+  it('debe sugerir PRESCRIPCION si pasaron más de 3 años desde la notificación sin cobro coactivo', () => {
+    // Fecha infraccion: 4 años atrás, Fecha notificacion: 3.5 años atrás
+    const resultado = evaluarCasoTransito('2022-05-09T10:00:00Z', false, false, '2022-11-09T10:00:00Z');
     expect(resultado.estrategia).toBe('PRESCRIPCION');
+    expect(resultado.certeza).toBe('ALTA');
+  });
+
+  it('debe sugerir PETICION si pasaron 3 años desde infracción pero no hay fecha de notificación', () => {
+    // Fecha infraccion: 4 años atrás, Fecha notificacion: undefined
+    const resultado = evaluarCasoTransito('2022-05-09T10:00:00Z', false, false, undefined);
+    expect(resultado.estrategia).toBe('PETICION');
     expect(resultado.certeza).toBe('ALTA');
   });
 

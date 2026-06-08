@@ -7,7 +7,7 @@ export interface ResultadoPrescripcion {
     dias: number;
   };
   diasTotales: number;
-  estado: 'VIGENTE' | 'ALERTA' | 'PRESCRITA';
+  estado: 'VIGENTE' | 'ALERTA' | 'CADUCIDAD ESTIMADA';
   porcentajeCaducidad: number;
   probabilidadExito: string;
   disclaimerLegal: string;
@@ -72,22 +72,23 @@ export function calcularViabilidadLegal(
   const diasMeta = Math.floor((fechaLimite.getTime() - fechaInfraccion.getTime()) / msPorDia);
 
   let porcentaje = (diasTotales / diasMeta) * 100;
-  if (porcentaje > 100) porcentaje = 100;
+  // Blindaje legal: Nunca prometer el 100% de caducidad hasta el dictamen oficial.
+  if (porcentaje >= 98) porcentaje = 98;
   if (porcentaje < 0) porcentaje = 0;
 
   // 5. Motor de Decisión (Triage)
-  let estado: 'VIGENTE' | 'ALERTA' | 'PRESCRITA';
+  let estado: 'VIGENTE' | 'ALERTA' | 'CADUCIDAD ESTIMADA';
   let probabilidadExito: string;
 
-  if (porcentaje >= 100) {
-    estado = 'PRESCRITA';
-    probabilidadExito = '95% - Altamente Viable';
+  if (porcentaje >= 98) {
+    estado = 'CADUCIDAD ESTIMADA';
+    probabilidadExito = '98% - Sujeto a revisión de actos administrativos y mandamientos de pago';
   } else if (porcentaje >= 90) {
     estado = 'ALERTA';
-    probabilidadExito = '70% - En zona de riesgo de cobro / Cerca a caducar';
+    probabilidadExito = '70% - Riesgo inminente de embargo procesal activo';
   } else {
     estado = 'VIGENTE';
-    probabilidadExito = '30% - Viable solo si existen fallas de notificación (Sentencia C-038)';
+    probabilidadExito = '30% - Viable condicionado a vicios de notificación (Ley 1843)';
   }
 
   // 6. La Capa de Protección Legal (El Disclaimer Aprox)

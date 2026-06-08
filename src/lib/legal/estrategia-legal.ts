@@ -11,9 +11,10 @@ import { differenceInYears } from 'date-fns';
 export function evaluarCasoTransito(
   fechaInfraccion?: string,
   esFotomulta?: boolean,
-  tieneCobroCoactivo?: boolean
+  tieneCobroCoactivo?: boolean,
+  fechaNotificacion?: string
 ): EvaluacionLegal {
-  if (!fechaInfraccion) {
+  if (!fechaInfraccion && !fechaNotificacion) {
     return {
       estrategia: 'PETICION',
       certeza: 'BAJA',
@@ -21,17 +22,31 @@ export function evaluarCasoTransito(
     };
   }
 
-  const añosTranscurridos = differenceInYears(new Date(), new Date(fechaInfraccion));
-
-  // 1. Regla de Prescripción (Ley 769 de 2002 - Art 159)
-  if (añosTranscurridos >= 3 && !tieneCobroCoactivo) {
-    return {
-      estrategia: 'PRESCRIPCION',
-      certeza: 'ALTA',
-      argumento:
-        'Han transcurrido mas de 3 anos sin notificacion de cobro coactivo. Procede solicitud de prescripcion directa.',
-    };
+  // La prescripción en Colombia se cuenta desde la notificación del comparendo, no desde la infracción
+  if (fechaNotificacion) {
+    const añosDesdeNotificacion = differenceInYears(new Date(), new Date(fechaNotificacion));
+    if (añosDesdeNotificacion >= 3 && !tieneCobroCoactivo) {
+      return {
+        estrategia: 'PRESCRIPCION',
+        certeza: 'ALTA',
+        argumento:
+          'Han transcurrido mas de 3 anos desde la notificacion sin cobro coactivo. Procede solicitud de prescripcion directa.',
+      };
+    }
+  } else if (fechaInfraccion) {
+    const añosDesdeInfraccion = differenceInYears(new Date(), new Date(fechaInfraccion));
+    if (añosDesdeInfraccion >= 3 && !tieneCobroCoactivo) {
+      return {
+        estrategia: 'PETICION',
+        certeza: 'ALTA',
+        argumento:
+          'Han pasado 3 anos desde la infraccion. Se sugiere Derecho de Peticion para validar la fecha real de notificacion y exigir prescripcion si aplica.',
+      };
+    }
   }
+
+  const fechaBaseTriage = fechaInfraccion || fechaNotificacion;
+  const añosTranscurridos = fechaBaseTriage ? differenceInYears(new Date(), new Date(fechaBaseTriage)) : 0;
 
   // 2. Regla de Tutela / Debido Proceso (Fotomultas)
   if (esFotomulta && añosTranscurridos >= 1) {
