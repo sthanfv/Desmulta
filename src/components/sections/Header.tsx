@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ShieldCheck, BookOpen, Camera, Calculator } from 'lucide-react';
+import { ShieldCheck, BookOpen, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import dynamic from 'next/dynamic';
 
@@ -49,19 +49,7 @@ export const Header = ({ onOpenModal }: HeaderProps) => {
 
         {/* Navegación de Escritorio (Oculta en móviles) */}
         <div className="hidden lg:flex items-center gap-3">
-          <button
-            onClick={() => {
-              const el = document.getElementById('calculadora-hero');
-              if (el) {
-                const y = el.getBoundingClientRect().top + window.scrollY - 100;
-                window.scrollTo({ top: y, behavior: 'smooth' });
-              }
-            }}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-foreground/80 hover:text-primary hover:bg-primary/5 rounded-xl transition-all"
-          >
-            <Calculator className="w-4 h-4" />
-            <span>Simulador</span>
-          </button>
+
           <Link
             href="/estado"
             className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-foreground/80 hover:text-primary hover:bg-primary/5 rounded-xl transition-all"
@@ -152,22 +140,7 @@ export const Header = ({ onOpenModal }: HeaderProps) => {
         aria-hidden={!isMobileMenuOpen}
       >
         <div className="glass rounded-3xl p-5 flex flex-col gap-4 shadow-2xl border-white/5 border">
-          <button
-            onClick={() => {
-              closeMenu();
-              const el = document.getElementById('calculadora-hero');
-              if (el) {
-                const y = el.getBoundingClientRect().top + window.scrollY - 100;
-                window.scrollTo({ top: y, behavior: 'smooth' });
-              }
-            }}
-            className="flex w-full items-center gap-3 px-4 py-3 text-sm font-bold text-foreground hover:bg-primary/10 rounded-2xl transition-colors text-left"
-          >
-            <div className="bg-primary/10 p-2 rounded-xl text-primary">
-              <Calculator className="w-5 h-5" />
-            </div>
-            <span>Simulador de Ahorro</span>
-          </button>
+
           <Link
             href="/estado"
             onClick={closeMenu}
