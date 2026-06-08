@@ -61,7 +61,11 @@ export async function POST(req: Request) {
       'telemetryCooldowns'
     );
     if (!rl.success) {
-      logger.security('[telemetry] Bloqueo por Rate Limit', { ip });
+      // Zero-PII: solo los dos primeros octetos en logs
+      const anonIp = ip.includes(':')
+        ? ip.split(':').slice(0, 2).join(':') + ':x:x:x:x:x:x'
+        : ip.split('.').slice(0, 2).join('.') + '.x.x';
+      logger.security('[telemetry] Bloqueo por Rate Limit', { ip: anonIp });
       return NextResponse.json(
         { error: 'Demasiadas solicitudes. Intente más tarde.' },
         { status: 429 }
