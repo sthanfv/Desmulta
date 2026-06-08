@@ -298,18 +298,16 @@ export default function HomeClient({
           aria-label="Abrir chat de WhatsApp para asesoría directa"
         >
           <MessageCircle size={36} fill="currentColor" aria-hidden="true" />
-          {/* Anillos Mágicos de Atención (WebGL 3D) */}
+          {/* Animated Magic Rings Background */}
           <div 
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140px] h-[140px] pointer-events-none -z-10"
-            style={{ 
-              maskImage: 'radial-gradient(circle at center, black 30%, transparent 72%)', 
-              WebkitMaskImage: 'radial-gradient(circle at center, black 30%, transparent 72%)' 
-            }}
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[180px] h-[180px] sm:w-[200px] sm:h-[200px] pointer-events-none -z-10"
           >
             <MagicRings 
               color="#25D366" 
               colorTwo="#128C7E" 
-              ringCount={4} 
+              ringCount={2} 
+              baseRadius={0.22}
+              radiusStep={0.12}
               opacity={1}
             />
           </div>
