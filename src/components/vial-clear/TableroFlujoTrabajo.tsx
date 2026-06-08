@@ -165,7 +165,7 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
         const audio = new Audio('/notification.mp3');
         // Usamos una promesa vacía para ignorar el error si el navegador bloquea el autoplay sin interacción previa
         audio.play().catch(() => {});
-      } catch (e) {
+      } catch (_e) {
         // Ignorar
       }
     }

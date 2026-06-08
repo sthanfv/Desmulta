@@ -275,7 +275,11 @@ export const SuccessCases = ({ showcaseData }: SuccessCasesProps) => {
     if (swipeStartX.current === null) return;
     const delta = swipeStartX.current - e.changedTouches[0].clientX;
     if (Math.abs(delta) > 50) {
-      delta > 0 ? irAlSiguiente() : irAlAnterior();
+      if (delta > 0) {
+        irAlSiguiente();
+      } else {
+        irAlAnterior();
+      }
       Haptics.impact();
     }
     swipeStartX.current = null;

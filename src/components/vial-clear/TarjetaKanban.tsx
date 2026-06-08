@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import { KanbanItem } from './TableroFlujoTrabajo';
-import { TarjetaPremium } from '../ui/TarjetaPremium';
+
 import { maskData } from '@/lib/security/masking';
 
 import { motion } from 'framer-motion';

@@ -1,30 +1,27 @@
 'use client';
 import { logger } from '@/lib/logger/security-logger';
 
-import { useState, useEffect, Suspense, useRef } from 'react';
-import { useForm, type SubmitHandler, type UseFormReturn } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useState, useEffect, Suspense } from 'react';
+import { type SubmitHandler, type UseFormReturn } from 'react-hook-form';
 import { z } from 'zod';
 import { Progress } from '../ui/progress';
 import { ShieldCheck, AlertTriangle, X, RefreshCw, Activity } from 'lucide-react';
 import { getAuth } from 'firebase/auth';
 import { useSearchParams } from 'next/navigation';
 
-import { ConsultationSchema, SimitCaptureSchema, type OCRAnalysisResult } from '@/lib/definitions';
+import { ConsultationSchema } from '@/lib/definitions';
 import { OCRProvider } from '@/components/ocr-provider';
 import dynamic from 'next/dynamic';
-import { useSystemHealth } from '@/components/providers/SystemHealthProvider';
 
-import { useToast } from '@/hooks/use-toast';
-import { RateLimitBanner, useRateLimit } from '@/components/ui/RateLimitBanner';
+
+import { RateLimitBanner } from '@/components/ui/RateLimitBanner';
 import { Form } from '@/components/ui/form';
 import { Haptics } from '@/lib/utils/haptics';
 import { useExpedienteStore } from '@/store/useExpedienteStore';
 import { consolidarExpedienteEnDB } from '@/app/actions/expediente.actions';
 import { encryptE2EPayload } from '@/lib/security/client-crypto';
 import { saveToVault } from '@/lib/pwa/idb-vault';
-import { tesseractManager } from '@/lib/ocr/tesseract-worker';
-import { useWebPush } from '@/hooks/useWebPush';
+
 import { PushPermissionBanner } from './PushPermissionBanner';
 import { useConsultationForm } from '@/hooks/useConsultationForm';
 type ConsultationFormData = z.infer<typeof ConsultationSchema>;
@@ -163,7 +160,6 @@ export function ConsultationForm({ onSuccess, mode = 'full', nonce }: Consultati
         }
       });
 
-    // eslint-disable-next-line react-hooks/incompatible-library
     const { unsubscribe } = form.watch((value) => {
       const formValue = value as Partial<ConsultationFormData>;
 

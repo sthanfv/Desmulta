@@ -62,7 +62,7 @@ export function ModalAuthPin({
           description: 'El PIN proporcionado es incorrecto',
         });
       }
-    } catch (err: unknown) {
+    } catch (_err: unknown) {
       toast({
         variant: 'destructive',
         title: 'Error',

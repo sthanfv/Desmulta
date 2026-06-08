@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { Slider } from '@/components/ui/slider';
-import { Calculator, TrendingDown, Info, ShieldCheck, Database, Loader2, AlertTriangle, CheckCircle2, ArrowRight } from 'lucide-react';
+import { Calculator, TrendingDown, Info, ShieldCheck, Loader2, AlertTriangle, CheckCircle2, ArrowRight } from 'lucide-react';
 import { TarjetaPremium } from '@/components/ui/TarjetaPremium';
 import { StarBorder } from '@/components/ui/star-border';
 import { calcularViabilidadLegal } from '@/lib/calculadora-legal';
@@ -96,7 +96,7 @@ export function SavingsCalculator() {
         setLeadNombre(''); 
         setIsExpanded(false);
       }, 5000);
-    } catch (error) {
+    } catch (_error) {
       setErrorMsg('Error al procesar la solicitud');
       setLeadState('error');
       setTimeout(() => setErrorMsg(null), 6000);

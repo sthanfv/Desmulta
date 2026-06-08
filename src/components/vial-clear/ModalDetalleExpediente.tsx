@@ -25,7 +25,6 @@ import { useAuth } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { CAUSALES_TRANSITO } from '@/lib/legal/legal-types';
 import { logRevealAuditAction } from '@/app/admin/audit-actions';
-import { PDFPreviewModal } from '../admin/PDFPreviewModal';
 import { ModalDocumentos } from './modal-parts/ModalDocumentos';
 import { ModalEdicionDatos } from './modal-parts/ModalEdicionDatos';
 import { maskData } from '@/lib/security/masking';
@@ -111,12 +110,6 @@ export function ModalDetalleExpediente({
     operatorNote: '',
   });
 
-  const isInvalid =
-    editData.nombre === 'REQUIERE INGRESO MANUAL' ||
-    editData.cedula === 'REQUIERE INGRESO MANUAL' ||
-    !editData.email ||
-    !editData.email.includes('@');
-
   const copyToClipboard = (text: string, field: string) => {
     navigator.clipboard.writeText(text);
     setCopiedField(field);
@@ -155,7 +148,7 @@ export function ModalDetalleExpediente({
           description: result.error || 'Error al revelar',
         });
       }
-    } catch (e) {
+    } catch (_e) {
       toast({
         variant: 'destructive',
         title: 'Error',

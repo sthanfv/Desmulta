@@ -61,7 +61,7 @@ describe('Export PDF API - Smoke Test & Anti-Leak Validation', () => {
     vi.clearAllMocks();
   });
 
-  const generateRequest = (body: any) => {
+  const generateRequest = (body: unknown) => {
     return new Request('https://desmulta.com/api/admin/export-pdf', {
       method: 'POST',
       body: JSON.stringify(body),
