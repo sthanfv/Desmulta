@@ -156,6 +156,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
 
           {/* Simulador — IZQUIERDA, debajo del texto */}
           <m.div
+            id="calculadora-hero"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, delay: 0.5 }}

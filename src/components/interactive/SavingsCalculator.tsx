@@ -111,9 +111,9 @@ export function SavingsCalculator() {
             </div>
             <div>
               <h3 className="font-bold text-lg text-slate-900 dark:text-white leading-tight">
-                Simulador de Prescripción y Ahorro
+                Simulador de Ahorro y Blindaje Legal
               </h3>
-              <p className="text-xs text-muted-foreground font-medium">Auditoría Legal y Ahorro Inmediato</p>
+              <p className="text-xs text-muted-foreground font-medium">Diagnóstico instantáneo de viabilidad judicial</p>
             </div>
           </div>
 
