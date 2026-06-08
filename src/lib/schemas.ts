@@ -146,3 +146,23 @@ export const MandateSchema = z
   );
 
 export type MandateInput = z.infer<typeof MandateSchema>;
+
+/**
+ * Esquema para Leads capturados directamente desde la Calculadora (SavingsCalculator)
+ */
+export const SimitLeadSchema = z.object({
+  tipo: z.literal('SIMIT_LEAD').optional(),
+  probability: z.string().optional(),
+  contacto: z
+    .string()
+    .transform((v) => v.replace(/\D/g, ''))
+    .pipe(
+      z.string().regex(/^3[0-9]{9}$/, {
+        message: 'Debe ser un número de celular colombiano válido (10 dígitos, ej: 300 123 4567).',
+      })
+    ),
+  nombre: z.string().optional(),
+  website_hp: z.string().optional(),
+  deuda_total: z.number().optional(),
+  ahorro_potencial: z.number().optional(),
+});

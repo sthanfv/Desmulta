@@ -283,9 +283,9 @@ export default function HomeClient({
           opacity-0 group-hover:opacity-100 transition-all duration-500
           border border-white/10 whitespace-nowrap shadow-2xl
           flex items-center gap-2
-          bottom-full mb-4 right-0 sm:right-auto sm:bottom-auto
-          sm:right-full sm:mr-4 sm:top-1/2 sm:-translate-y-1/2
-          translate-y-2 group-hover:translate-y-0 sm:translate-x-4 sm:translate-y-0 sm:group-hover:translate-x-0
+          bottom-full mb-3 right-0
+          lg:right-full lg:mr-4 lg:top-1/2 lg:-translate-y-1/2 lg:bottom-auto lg:right-auto
+          translate-y-2 group-hover:translate-y-0 lg:translate-x-4 lg:translate-y-0 lg:group-hover:translate-x-0
         "
         >
           <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />

@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import { verifyOperatorPin, logExportPdfAction } from '@/app/admin/audit-actions';
 import { generarHtmlReporte, PDFTemplateData } from '@/lib/pdf/template';
-import puppeteer from 'puppeteer-core';
-import chromium from '@sparticuz/chromium';
 import { createHash } from 'crypto';
 import { cookies } from 'next/headers';
 import { SecurityLogger } from '@/lib/logger/security-logger';
@@ -96,38 +94,33 @@ export async function POST(request: Request) {
     const htmlContent = generarHtmlReporte(data);
 
     try {
-      // Configuración de Chromium para Vercel Serverless (o MS Edge para entorno local)
-      const isLocal = !process.env.VERCEL;
-      const executablePath = isLocal
-        ? process.env.LOCAL_CHROMIUM_PATH || '/usr/bin/chromium-browser'
-        : await chromium.executablePath();
+      const isLocal = process.env.NODE_ENV === 'development';
+      // Por defecto a desmulta-colombia si no está la env
+      const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'desmulta-colombia';
+      
+      const functionUrl = isLocal 
+        ? `http://127.0.0.1:5001/${projectId}/us-central1/generatePdf` 
+        : `https://generatepdf-fok3w4h4ya-uc.a.run.app`; // O URL de CFv2. Si CFv1 es https://us-central1-${projectId}.cloudfunctions.net/generatePdf
+      
+      // En functions v2 la url es dada por cloud run, pero usaremos un custom domain o la url estandar si está disponible. Mejor usamos la var de entorno si está, o el formato genérico de v1 fallback.
+      const finalUrl = process.env.PDF_CLOUD_FUNCTION_URL || 
+        (isLocal ? `http://127.0.0.1:5001/${projectId}/us-central1/generatePdf` : `https://us-central1-${projectId}.cloudfunctions.net/generatePdf`);
 
-      const browser = await puppeteer.launch({
-        args: isLocal ? ['--no-sandbox', '--disable-setuid-sandbox'] : chromium.args,
-        executablePath: executablePath,
-        headless: true,
+      const functionRes = await fetch(finalUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.PDF_API_SECRET || 'dev_secret'}`
+        },
+        body: JSON.stringify({ htmlContent })
       });
 
-      const page = await browser.newPage();
+      if (!functionRes.ok) {
+        const errorText = await functionRes.text();
+        throw new Error(`Cloud Function devolvió status: ${functionRes.status} - ${errorText}`);
+      }
 
-      // Prevención de SSRF (OWASP A10): Bloquear JS y red para evitar inyecciones maliciosas
-      await page.setJavaScriptEnabled(false);
-      await page.setRequestInterception(true);
-      page.on('request', (req) => {
-        // Bloqueo total de red saliente
-        req.abort();
-      });
-
-      // Establecer contenido HTML
-      await page.setContent(htmlContent, { waitUntil: 'domcontentloaded' });
-
-      // Generar PDF. Usamos preferCSSPageSize para respetar las reglas @page de CSS (Paged Media)
-      const pdfBuffer = await page.pdf({
-        printBackground: true,
-        preferCSSPageSize: true,
-      });
-
-      await browser.close();
+      const pdfBuffer = await functionRes.arrayBuffer();
 
       // Retornar el PDF binario
       return new NextResponse(Buffer.from(pdfBuffer), {
@@ -138,7 +131,7 @@ export async function POST(request: Request) {
         },
       });
     } catch (pdfError) {
-      SecurityLogger.error('[export-pdf] Error ejecutando Puppeteer/Chromium', { error: String(pdfError) });
+      SecurityLogger.error('[export-pdf] Error llamando a Cloud Function generatePdf', { error: String(pdfError) });
 
       return NextResponse.json(
         {

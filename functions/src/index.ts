@@ -11,3 +11,4 @@ export { onConsultationCreated } from './onConsultationCreated';
 export { onPushOptIn } from './onPushOptIn';
 export { telegramWebhook } from './telegramWebhook';
 export { onCasoChanged, onConsultaChanged } from './auditTriggers';
+export { generatePdf } from './generatePdf';

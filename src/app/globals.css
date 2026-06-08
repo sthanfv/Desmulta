@@ -497,6 +497,17 @@ body {
   }
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes star-movement-bottom {
+    0% { transform: translateX(50%) translateY(10%); }
+    100% { transform: translateX(-100%) translateY(10%); }
+  }
+  @keyframes star-movement-top {
+    0% { transform: translateX(-50%) translateY(-10%); }
+    100% { transform: translateX(100%) translateY(-10%); }
+  }
+}
+
 /* View Transition API */
 ::view-transition-group(*),
 ::view-transition-old(*),

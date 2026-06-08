@@ -37,6 +37,7 @@ export const StarBorder = <T extends React.ElementType = 'div'>({
         '--border-width': borderWidth,
         '--border-radius': borderRadius,
         'borderRadius': 'var(--border-radius)',
+        contain: 'strict',
         ...(rest.style as object)
       } as React.CSSProperties}
       {...(rest as any)}
@@ -47,6 +48,7 @@ export const StarBorder = <T extends React.ElementType = 'div'>({
         style={{
           background: `radial-gradient(circle, ${color} 0%, transparent 10%)`,
           animation: `star-movement-bottom ${speed} linear infinite alternate`,
+          willChange: 'transform',
         }}
       />
       {/* Top beam */}
@@ -55,19 +57,9 @@ export const StarBorder = <T extends React.ElementType = 'div'>({
         style={{
           background: `radial-gradient(circle, ${color} 0%, transparent 10%)`,
           animation: `star-movement-top ${speed} linear infinite alternate`,
+          willChange: 'transform',
         }}
       />
-      {/* Definición de la animación inline para no depender del config */}
-      <style>{`
-        @keyframes star-movement-bottom {
-          0% { transform: translateX(50%) translateY(10%); }
-          100% { transform: translateX(-100%) translateY(10%); }
-        }
-        @keyframes star-movement-top {
-          0% { transform: translateX(-50%) translateY(-10%); }
-          100% { transform: translateX(100%) translateY(-10%); }
-        }
-      `}</style>
       
       {/* Inner content wrapper that hides the center of the gradient */}
       <div 

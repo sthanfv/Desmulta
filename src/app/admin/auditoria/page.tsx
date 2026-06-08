@@ -24,10 +24,12 @@ import {
   Download,
   ArrowLeft,
   UserPlus,
+  FileSpreadsheet,
 } from 'lucide-react';
 import Link from 'next/link';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import ExcelJS from 'exceljs';
 
 const ACTION_MAP: Record<string, string> = {
   CREATE: 'CREAR',
@@ -91,18 +93,48 @@ function ExportControls({ admins }: { admins: string[] }) {
   const [endDate, setEndDate] = useState('');
   const [isExporting, setIsExporting] = useState(false);
 
-  const handleDownload = async () => {
-    setIsExporting(true);
-    try {
-      const records = await exportAuditLogs({
+  const fetchAllLogs = async () => {
+    let allRecords: any[] = [];
+    let currentCursor: string | undefined = undefined;
+    let hasMore = true;
+
+    while (hasMore) {
+      const response = await exportAuditLogs({
         adminEmail: adminFilter,
         startDate: startDate || undefined,
         endDate: endDate || undefined,
+        cursor: currentCursor,
+        limit: 200,
       });
 
-      if (records.length === 0) {
+      if (response.logs && response.logs.length > 0) {
+        allRecords = [...allRecords, ...response.logs];
+      }
+      
+      currentCursor = response.nextCursor;
+      hasMore = !!currentCursor;
+    }
+
+    return allRecords;
+  };
+
+  const handleDownloadPDF = async () => {
+    setIsExporting(true);
+    try {
+      const { logs } = await exportAuditLogs({
+        adminEmail: adminFilter,
+        startDate: startDate || undefined,
+        endDate: endDate || undefined,
+        limit: 200 // Para PDF limitamos a 200 para evitar congelar el navegador
+      });
+
+      if (!logs || logs.length === 0) {
         alert('No se encontraron registros con los filtros seleccionados.');
         return;
+      }
+
+      if (logs.length === 200) {
+        alert('Mostrando los primeros 200 registros. Usa "Exportar CSV" para descargas masivas completas.');
       }
 
       const doc = new jsPDF('landscape');
@@ -118,7 +150,7 @@ function ExportControls({ admins }: { admins: string[] }) {
       );
 
       const tableColumn = ['Fecha', 'Administrador', 'Acción', 'Recurso', 'Detalles', 'IP'];
-      const tableRows = records.map((r) => {
+      const tableRows = logs.map((r: any) => {
         const dateObj = new Date(r.fecha);
         const formattedDate = dateObj.toLocaleString('es-CO', {
           year: 'numeric',
@@ -155,7 +187,63 @@ function ExportControls({ admins }: { admins: string[] }) {
       const fileName = `Audit_Desmulta_${new Date().getTime()}.pdf`;
       doc.save(fileName);
     } catch (error) {
-      logger.error('Error exportando datos:', error);
+      logger.error('Error exportando datos PDF:', error);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleDownloadCSV = async () => {
+    setIsExporting(true);
+    try {
+      const records = await fetchAllLogs();
+
+      if (records.length === 0) {
+        alert('No se encontraron registros con los filtros seleccionados.');
+        return;
+      }
+
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('Auditoría');
+
+      worksheet.columns = [
+        { header: 'Fecha', key: 'fecha', width: 25 },
+        { header: 'Administrador', key: 'admin', width: 35 },
+        { header: 'Acción', key: 'accion', width: 15 },
+        { header: 'Recurso', key: 'recurso', width: 25 },
+        { header: 'Detalles', key: 'detalles', width: 50 },
+        { header: 'IP', key: 'ip', width: 15 },
+      ];
+
+      worksheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+      worksheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF16A34A' } };
+
+      records.forEach((r) => {
+        const dateObj = new Date(r.fecha);
+        const formattedDate = dateObj.toLocaleString('es-CO');
+        const cleanDetails = formatAuditDetails(r.recurso, r.detalles);
+        const accionTraducida = getActionDisplayName(r.accion, r.recurso);
+
+        worksheet.addRow({
+          fecha: formattedDate,
+          admin: r.administrador,
+          accion: accionTraducida,
+          recurso: r.recurso,
+          detalles: cleanDetails,
+          ip: r.ip,
+        });
+      });
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Audit_Desmulta_Masivo_${new Date().getTime()}.xlsx`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      logger.error('Error exportando datos CSV:', error);
     } finally {
       setIsExporting(false);
     }
@@ -199,14 +287,25 @@ function ExportControls({ admins }: { admins: string[] }) {
         />
       </div>
 
-      <button
-        onClick={handleDownload}
-        disabled={isExporting}
-        className="h-9 px-4 bg-red-600 text-white rounded-lg font-semibold flex items-center gap-2 hover:bg-red-700 active:scale-[0.98] transition-all disabled:opacity-50"
-      >
-        {isExporting ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
-        Exportar PDF
-      </button>
+      <div className="flex gap-2">
+        <button
+          onClick={handleDownloadPDF}
+          disabled={isExporting}
+          className="h-9 px-4 bg-zinc-800 text-white rounded-lg font-semibold flex items-center gap-2 hover:bg-zinc-700 active:scale-[0.98] transition-all disabled:opacity-50 border border-zinc-700"
+        >
+          {isExporting ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
+          Exportar PDF
+        </button>
+
+        <button
+          onClick={handleDownloadCSV}
+          disabled={isExporting}
+          className="h-9 px-4 bg-emerald-600 text-white rounded-lg font-semibold flex items-center gap-2 hover:bg-emerald-700 active:scale-[0.98] transition-all disabled:opacity-50"
+        >
+          {isExporting ? <Loader2 size={14} className="animate-spin" /> : <FileSpreadsheet size={14} />}
+          Exportar CSV (Masivo)
+        </button>
+      </div>
     </div>
   );
 }

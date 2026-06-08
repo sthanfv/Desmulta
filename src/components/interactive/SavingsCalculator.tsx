@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
 import { Calculator, TrendingDown, Info, ShieldCheck, Loader2, AlertTriangle, CheckCircle2, ArrowRight } from 'lucide-react';
 import { TarjetaPremium } from '@/components/ui/TarjetaPremium';
 import { StarBorder } from '@/components/ui/star-border';
-import { calcularViabilidadLegal } from '@/lib/calculadora-legal';
+import { calcularViabilidadLegal, calcularIntereses } from '@/lib/calculadora-legal';
+import { TASA_EA_VIGENTE } from '@/lib/config-constants';
 
 export function SavingsCalculator() {
   // Estados Financieros
@@ -24,38 +25,26 @@ export function SavingsCalculator() {
   const [leadContacto, setLeadContacto] = useState('');
   const [leadHp, setLeadHp] = useState(''); // Honeypot
 
-  const [isExpanded, setIsExpanded] = useState(false);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-
-  const resetTimer = useCallback(() => {
-    if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => {
-      setIsExpanded(false);
-    }, 15000); // 15 segundos de inactividad
-  }, []);
-
-  const handleInteraction = useCallback(() => {
-    setIsExpanded(true);
-    resetTimer();
-  }, [resetTimer]);
+  const [isExpanded, setIsExpanded] = useState(true);
 
   useEffect(() => {
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, []);
-
-  const TASA_EA = 0.265;
+    if (isExpanded) {
+      const timeoutId = setTimeout(() => {
+        setIsExpanded(false);
+      }, 15000);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [montoBase, mesesMora, coactivo, leadNombre, leadContacto, isExpanded]);
 
   useEffect(() => {
-    const tasaDiaria = Math.pow(1 + TASA_EA, 1 / 365) - 1;
-    const diasMora = mesesMora * 30;
-    const interesCalculado = montoBase * tasaDiaria * diasMora;
-    setIntereses(interesCalculado);
-    
     const simulatedDate = new Date();
     simulatedDate.setMonth(simulatedDate.getMonth() - mesesMora);
-    const res = calcularViabilidadLegal(simulatedDate.toISOString().split('T')[0], coactivo);
+    const fechaInfraccionISO = simulatedDate.toISOString().split('T')[0];
+
+    const interesCalculado = calcularIntereses(montoBase, fechaInfraccionISO);
+    setIntereses(interesCalculado);
+    
+    const res = calcularViabilidadLegal(fechaInfraccionISO, coactivo);
     setResultado(res);
   }, [montoBase, mesesMora, coactivo]);
 
@@ -141,11 +130,13 @@ export function SavingsCalculator() {
               </div>
               <Slider
                 value={[montoBase]}
-                onValueChange={(val) => { setMontoBase(val[0]); handleInteraction(); }}
+                onValueChange={(val) => { setMontoBase(val[0]); setIsExpanded(true); }}
                 min={150000}
                 max={5000000}
                 step={50000}
                 className="py-2"
+                aria-label="Valor original de la multa"
+                aria-valuetext={`${montoBase} pesos`}
               />
             </div>
 
@@ -170,42 +161,40 @@ export function SavingsCalculator() {
               </div>
               <Slider
                 value={[mesesMora]}
-                onValueChange={(val) => { setMesesMora(val[0]); handleInteraction(); }}
+                onValueChange={(val) => { setMesesMora(val[0]); setIsExpanded(true); }}
                 min={0}
                 max={120}
                 step={1}
                 className="py-2"
+                aria-label="Tiempo de mora en meses"
+                aria-valuetext={`${mesesMora} meses`}
               />
             </div>
 
             <label className="flex items-center gap-3 p-3 rounded-xl border border-foreground/10 bg-foreground/5 hover:bg-foreground/10 transition-colors cursor-pointer group">
               <div className="relative flex items-center justify-center">
-                <input
-                  type="checkbox"
+                <Checkbox
+                  id="coactivo"
                   checked={coactivo}
-                  onChange={(e) => { setCoactivo(e.target.checked); handleInteraction(); }}
-                  className="w-5 h-5 rounded border-gray-300 dark:border-gray-600 bg-transparent text-primary focus:ring-primary focus:ring-offset-gray-900 appearance-none cursor-pointer"
+                  onCheckedChange={(checked) => { setCoactivo(checked === true); setIsExpanded(true); }}
+                  className="w-5 h-5 rounded border-gray-300 dark:border-gray-600 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground focus:ring-primary focus:ring-offset-gray-900"
                 />
                 <div className="absolute pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
                   <div className="w-5 h-5 bg-primary/20 rounded absolute inset-0 animate-ping"></div>
                 </div>
-                {coactivo && <CheckCircle2 className="w-4 h-4 text-primary absolute pointer-events-none" />}
               </div>
               <span className="text-sm font-medium text-slate-700 dark:text-slate-300">El SIMIT indica &quot;Cobro Coactivo&quot;</span>
             </label>
           </div>
 
           {/* --- PANEL DE RESULTADOS Y CONVERSIÓN --- */}
-          <AnimatePresence mode="wait">
-            {resultado && isExpanded && (
-              <m.div
-                key="resultados"
-                initial={{ opacity: 0, height: 0, y: 10 }}
-                animate={{ opacity: 1, height: 'auto', y: 0 }}
-                exit={{ opacity: 0, height: 0, y: -10 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                className="pt-4 border-t border-foreground/10 space-y-6"
-              >
+          <div
+            className={`grid transition-all duration-500 ease-in-out ${
+              resultado && isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+            }`}
+          >
+            <div className="overflow-hidden">
+              <div className="pt-4 border-t border-foreground/10 space-y-6">
                 <div className="space-y-4">
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-muted-foreground">Intereses proyectados</span>
@@ -260,7 +249,7 @@ export function SavingsCalculator() {
                     type="text"
                     placeholder="Tu nombre (opcional)"
                     value={leadNombre}
-                    onChange={(e) => { setLeadNombre(e.target.value); handleInteraction(); }}
+                    onChange={(e) => { setLeadNombre(e.target.value); setIsExpanded(true); }}
                     className="w-full bg-foreground/5 dark:bg-black/50 border border-foreground/15 rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
                   />
                   
@@ -269,7 +258,7 @@ export function SavingsCalculator() {
                       type="tel"
                       placeholder="Tu número de WhatsApp"
                       value={leadContacto}
-                      onChange={(e) => { setLeadContacto(e.target.value); handleInteraction(); }}
+                      onChange={(e) => { setLeadContacto(e.target.value); setIsExpanded(true); }}
                       className="flex-1 bg-foreground/5 dark:bg-black/50 border border-foreground/15 rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
                     />
                     <button
@@ -298,14 +287,13 @@ export function SavingsCalculator() {
                     </div>
                   )}
                 </div>
-              </m.div>
-
-            )}
-          </AnimatePresence>
+              </div>
+            </div>
+          </div>
 
           <div className="flex items-center gap-1.5 justify-center text-[10px] text-muted-foreground font-medium text-center pt-2">
             <Info className="w-3 h-3 flex-shrink-0" />
-            <span>Cálculo proyectado (26.5% E.A.). Valores reales SIMIT pueden variar ligeramente.</span>
+            <span>Cálculo proyectado ({(TASA_EA_VIGENTE * 100).toFixed(1)}% E.A.). Valores reales SIMIT pueden variar ligeramente.</span>
           </div>
         </div>
       </TarjetaPremium>

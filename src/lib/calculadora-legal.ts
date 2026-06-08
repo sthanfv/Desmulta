@@ -1,4 +1,5 @@
 // src/lib/calculadora-legal.ts
+import { TASA_EA_VIGENTE } from './config-constants';
 
 export interface ResultadoPrescripcion {
   tiempoTranscurrido: {
@@ -72,9 +73,6 @@ export function calcularViabilidadLegal(
   const diasMeta = Math.floor((fechaLimite.getTime() - fechaInfraccion.getTime()) / msPorDia);
 
   let porcentaje = (diasTotales / diasMeta) * 100;
-  // Blindaje legal: Nunca prometer el 100% de caducidad hasta el dictamen oficial.
-  if (porcentaje >= 98) porcentaje = 98;
-  if (porcentaje < 0) porcentaje = 0;
 
   // 5. Motor de Decisión (Triage)
   let estado: 'VIGENTE' | 'ALERTA' | 'CADUCIDAD ESTIMADA';
@@ -91,6 +89,10 @@ export function calcularViabilidadLegal(
     probabilidadExito = '30% - Viable condicionado a vicios de notificación (Ley 1843)';
   }
 
+  // Blindaje legal: Nunca prometer el 100% de caducidad hasta el dictamen oficial.
+  if (porcentaje >= 98) porcentaje = 98;
+  if (porcentaje < 0) porcentaje = 0;
+
   // 6. La Capa de Protección Legal (El Disclaimer Aprox)
   const disclaimer = `⚠️ Cálculo aproximado. Llevas exactamente ${anos} años, ${meses} meses y ${dias} días desde la infracción. Este sistema asume una probabilidad de éxito del ${
     probabilidadExito.split('%')[0]
@@ -104,4 +106,32 @@ export function calcularViabilidadLegal(
     probabilidadExito,
     disclaimerLegal: disclaimer,
   };
+}
+
+/**
+ * Calcula los intereses moratorios basados en la Tasa Efectiva Anual (EA) vigente,
+ * calculando la diferencia exacta de días desde la fecha de infracción hasta hoy (UTC).
+ *
+ * @param montoBase El capital adeudado original.
+ * @param fechaInfraccionISO La fecha de la infracción en formato YYYY-MM-DD.
+ * @returns El valor total de los intereses generados.
+ */
+export function calcularIntereses(montoBase: number, fechaInfraccionISO: string): number {
+  const fechaInfraccion = new Date(`${fechaInfraccionISO}T00:00:00Z`);
+  const hoy = new Date();
+  const hoyUTC = new Date(Date.UTC(hoy.getUTCFullYear(), hoy.getUTCMonth(), hoy.getUTCDate()));
+
+  if (isNaN(fechaInfraccion.getTime())) {
+    return 0; // Fallback seguro
+  }
+
+  const msPorDia = 1000 * 60 * 60 * 24;
+  const diasTotales = Math.floor((hoyUTC.getTime() - fechaInfraccion.getTime()) / msPorDia);
+
+  if (diasTotales <= 0) return 0;
+
+  const tasaDiaria = Math.pow(1 + TASA_EA_VIGENTE, 1 / 365) - 1;
+  const intereses = montoBase * tasaDiaria * diasTotales;
+  
+  return intereses;
 }

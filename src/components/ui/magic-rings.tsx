@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import { useReducedMotion } from 'framer-motion';
 
 const vertexShader = `
 void main() {
@@ -117,6 +118,7 @@ export function MagicRings({
   const hoverAmountRef = useRef(0);
   const isHoveredRef = useRef(false);
   const burstRef = useRef(0);
+  const reducedMotion = useReducedMotion();
 
   useEffect(() => {
     propsRef.current = {
@@ -128,6 +130,8 @@ export function MagicRings({
   });
 
   useEffect(() => {
+    if (reducedMotion) return;
+
     const mount = mountRef.current;
     if (!mount) return;
 
@@ -182,7 +186,7 @@ export function MagicRings({
     const resize = () => {
       const w = mount.clientWidth;
       const h = mount.clientHeight;
-      const dpr = Math.min(window.devicePixelRatio, 2);
+      const dpr = Math.min(window.devicePixelRatio, 1.5);
       renderer.setSize(w, h);
       renderer.setPixelRatio(dpr);
       uniforms.uResolution.value.set(w * dpr, h * dpr);
@@ -193,27 +197,36 @@ export function MagicRings({
     const ro = new ResizeObserver(resize);
     ro.observe(mount);
 
+    let lastInteraction = Date.now();
+    const updateInteraction = () => { lastInteraction = Date.now(); };
+
     const onMouseMove = (e: MouseEvent) => {
+      updateInteraction();
       const rect = mount.getBoundingClientRect();
       mouseRef.current[0] = (e.clientX - rect.left) / rect.width - 0.5;
       mouseRef.current[1] = -((e.clientY - rect.top) / rect.height - 0.5);
     };
-    const onMouseEnter = () => { isHoveredRef.current = true; };
+    const onMouseEnter = () => { updateInteraction(); isHoveredRef.current = true; };
     const onMouseLeave = () => {
+      updateInteraction();
       isHoveredRef.current = false;
       mouseRef.current[0] = 0;
       mouseRef.current[1] = 0;
     };
-    const onClick = () => { burstRef.current = 1; };
+    const onClick = () => { updateInteraction(); burstRef.current = 1; };
 
     mount.addEventListener('mousemove', onMouseMove);
     mount.addEventListener('mouseenter', onMouseEnter);
     mount.addEventListener('mouseleave', onMouseLeave);
     mount.addEventListener('click', onClick);
+    mount.addEventListener('touchstart', updateInteraction, { passive: true });
+    mount.addEventListener('touchmove', updateInteraction, { passive: true });
 
     let frameId: number;
     const animate = (t: number) => {
       frameId = requestAnimationFrame(animate);
+      if (document.hidden || Date.now() - lastInteraction > 30000) return;
+
       const p = propsRef.current!;
 
       smoothMouseRef.current[0] += (mouseRef.current[0] - smoothMouseRef.current[0]) * 0.08;
@@ -256,11 +269,24 @@ export function MagicRings({
       mount.removeEventListener('mouseenter', onMouseEnter);
       mount.removeEventListener('mouseleave', onMouseLeave);
       mount.removeEventListener('click', onClick);
+      mount.removeEventListener('touchstart', updateInteraction);
+      mount.removeEventListener('touchmove', updateInteraction);
       mount.removeChild(renderer.domElement);
       renderer.dispose();
       material.dispose();
     };
-  }, []);
+  }, [reducedMotion]);
 
-  return <div ref={mountRef} className="w-full h-full" style={blur > 0 ? { filter: `blur(${blur}px)` } : undefined} />;
+  if (reducedMotion) return null;
+
+  return (
+    <div 
+      ref={mountRef} 
+      className="w-full h-full" 
+      style={{ 
+        willChange: 'transform',
+        ...(blur > 0 ? { filter: `blur(${blur}px)` } : {})
+      }} 
+    />
+  );
 }

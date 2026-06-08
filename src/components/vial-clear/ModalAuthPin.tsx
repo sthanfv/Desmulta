@@ -75,7 +75,13 @@ export function ModalAuthPin({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent className="sm:max-w-[425px] bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+      <DialogContent 
+        className="sm:max-w-[425px] bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800"
+        onOpenAutoFocus={(e) => {
+          e.preventDefault();
+          document.getElementById('pin-input')?.focus();
+        }}
+      >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">
             <Lock className="w-5 h-5 text-red-500" />
@@ -91,6 +97,7 @@ export function ModalAuthPin({
         <form onSubmit={handleSubmit} className="space-y-6 mt-4">
           <div className="flex justify-center">
             <Input
+              id="pin-input"
               type="password"
               inputMode="numeric"
               maxLength={4}
@@ -98,7 +105,6 @@ export function ModalAuthPin({
               onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
               placeholder="••••"
               className="w-32 text-center text-4xl tracking-[0.5em] font-black h-16 border-2 focus:border-red-500 rounded-2xl"
-              autoFocus
             />
           </div>
 

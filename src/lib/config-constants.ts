@@ -41,3 +41,6 @@ export const FOOTER_DEFAULTS: FooterConfig = {
 
 // ─── Heurísticas Legales (OCR) ────────────────────────────────────────────────
 export const UMBRAL_CONFIANZA_OCR = 45;
+
+// ─── Financiero ───────────────────────────────────────────────────────────────
+export const TASA_EA_VIGENTE = 0.265;

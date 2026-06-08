@@ -8,6 +8,7 @@ import { headers, cookies } from 'next/headers';
 import { SignJWT, jwtVerify } from 'jose';
 import { timingSafeEqual } from 'crypto';
 import { rateLimit } from '@/lib/security/rate-limit';
+import { getTokens } from 'next-firebase-auth-edge/lib/next/tokens';
 
 export interface AdminUser {
   uid: string;
@@ -247,6 +248,8 @@ export async function exportAuditLogs(filters: {
   adminEmail?: string;
   startDate?: string; // Formato YYYY-MM-DD
   endDate?: string; // Formato YYYY-MM-DD
+  cursor?: string;
+  limit?: number;
 }) {
   const isGodMode = await checkGodModeSession();
   if (!isGodMode) throw new Error('No autorizado');
@@ -269,10 +272,20 @@ export async function exportAuditLogs(filters: {
     query = query.where('timestamp', '<=', end);
   }
 
-  // Límite de seguridad alto para exportaciones sin romper la memoria de la función Serverless
-  const snapshot = await query.limit(1000).get();
+  // Límite por defecto para evitar timeouts y agotar memoria
+  const fetchLimit = filters.limit || 200;
+  query = query.limit(fetchLimit);
 
-  return snapshot.docs.map((doc) => {
+  if (filters.cursor) {
+    const cursorDoc = await db.collection('audit_logs').doc(filters.cursor).get();
+    if (cursorDoc.exists) {
+      query = query.startAfter(cursorDoc);
+    }
+  }
+
+  const snapshot = await query.get();
+
+  const logs = snapshot.docs.map((doc) => {
     const data = doc.data();
     return {
       id: doc.id,
@@ -284,6 +297,11 @@ export async function exportAuditLogs(filters: {
       ip: data.ipAddress,
     };
   });
+
+  const lastCursor =
+    snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1].id : undefined;
+
+  return { logs, nextCursor: lastCursor };
 }
 
 // ----------------------------------------------------------------------
@@ -423,28 +441,30 @@ export async function verifyOperatorPin(pin: string) {
   return { success: true };
 }
 
+async function getAdminEmailFromSession(): Promise<string> {
+  const cookieStore = await cookies();
+  const tokens = await getTokens(cookieStore, {
+    cookieName: '__session',
+    cookieSignatureKeys: [
+      process.env.AUTH_COOKIE_SIGNATURE_KEY_CURRENT || '',
+      process.env.AUTH_COOKIE_SIGNATURE_KEY_PREVIOUS || '',
+    ],
+    serviceAccount: {
+      projectId:
+        process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || '',
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL || '',
+      privateKey: (process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
+    },
+    apiKey:
+      process.env.NEXT_PUBLIC_BASE_API_KEY || process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '',
+  });
+
+  return tokens?.decodedToken?.email || 'admin_desconocido@desmulta.com';
+}
+
 export async function logRevealAuditAction(expedienteId: string) {
   try {
-    const { getTokens } = await import('next-firebase-auth-edge/lib/next/tokens');
-    const cookieStore = await cookies();
-
-    const tokens = await getTokens(cookieStore, {
-      cookieName: '__session',
-      cookieSignatureKeys: [
-        process.env.AUTH_COOKIE_SIGNATURE_KEY_CURRENT || '',
-        process.env.AUTH_COOKIE_SIGNATURE_KEY_PREVIOUS || '',
-      ],
-      serviceAccount: {
-        projectId:
-          process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || '',
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL || '',
-        privateKey: (process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
-      },
-      apiKey:
-        process.env.NEXT_PUBLIC_BASE_API_KEY || process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '',
-    });
-
-    const adminEmail = tokens?.decodedToken?.email || 'admin_desconocido@desmulta.com';
+    const adminEmail = await getAdminEmailFromSession();
 
     await logAdminAction({
       adminEmail,
@@ -464,26 +484,7 @@ export async function logRevealAuditAction(expedienteId: string) {
 
 export async function logExportPdfAction(filtrosStr: string) {
   try {
-    const { getTokens } = await import('next-firebase-auth-edge/lib/next/tokens');
-    const cookieStore = await cookies();
-
-    const tokens = await getTokens(cookieStore, {
-      cookieName: '__session',
-      cookieSignatureKeys: [
-        process.env.AUTH_COOKIE_SIGNATURE_KEY_CURRENT || '',
-        process.env.AUTH_COOKIE_SIGNATURE_KEY_PREVIOUS || '',
-      ],
-      serviceAccount: {
-        projectId:
-          process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || '',
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL || '',
-        privateKey: (process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
-      },
-      apiKey:
-        process.env.NEXT_PUBLIC_BASE_API_KEY || process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '',
-    });
-
-    const adminEmail = tokens?.decodedToken?.email || 'admin_desconocido@desmulta.com';
+    const adminEmail = await getAdminEmailFromSession();
 
     await logAdminAction({
       adminEmail,

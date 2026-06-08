@@ -5,6 +5,7 @@ import {
   ConsultationSchemaBase,
   ConsultationSchema,
   SimitCaptureSchema,
+  SimitLeadSchema,
 } from './schemas';
 
 export {
@@ -13,7 +14,9 @@ export {
   ConsultationSchemaBase,
   ConsultationSchema,
   SimitCaptureSchema,
+  SimitLeadSchema,
 };
+
 
 export type OCRAnalysisResult = z.infer<typeof OCRAnalysisSchema>;
 export type LegalStatus = z.infer<typeof LegalStatusEnum>;
