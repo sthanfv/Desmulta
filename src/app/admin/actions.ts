@@ -545,7 +545,7 @@ export async function updateCaseStatus(
     // DESPACHO DE NOTIFICACIÓN PUSH — Directo y verificado
     // Se usa el dispatcher centralizado que busca el token en la subcolección
     // private/push y en el campo raíz del documento (retrocompatibilidad).
-    if (_leadData?.consultationId) {
+    if (caseId) {
       try {
         const { dispatchPush } = await import('@/lib/notifications/notification-dispatcher');
         const { STATUS_TEMPLATES } = await import('@/lib/notifications/push-notifications');
@@ -553,14 +553,14 @@ export async function updateCaseStatus(
           STATUS_TEMPLATES[newStatus.toLowerCase() as keyof typeof STATUS_TEMPLATES];
         if (templateFn) {
           const { title, body } = templateFn(caseId);
-          const trackingUrl = _leadData.trackingUuid
-            ? `https://desmulta.online/seguir/${_leadData.trackingUuid}`
+          const trackingUrl = _leadData?.trackingUuid
+            ? `https://desmulta.online/seguir/${_leadData?.trackingUuid}`
             : undefined;
           // Fire-and-forget: no bloqueamos la respuesta al admin por las notificaciones
           dispatchPush(
-            _leadData.consultationId as string,
+            caseId,
             { title, body, url: trackingUrl },
-            'consultations'
+            'cases'
           ).catch((e) =>
             logger.warn('[updateCaseStatus] Fallo al despachar push (no crítico)', {
               error: e?.message,

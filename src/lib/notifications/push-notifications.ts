@@ -9,7 +9,7 @@ export interface PushMessage {
 
 const formatId = (rawId: string) => rawId.replace(/^(CASE|LEAD)-/i, '');
 
-const STATUS_TEMPLATES: Record<string, (caseId: string) => PushMessage> = {
+export const STATUS_TEMPLATES: Record<string, (caseId: string) => PushMessage> = {
   pendiente: (id) => ({
     title: '⏳ Solicitud Recibida',
     body: `Hemos recibido tu solicitud y pronto un asesor la revisará. Expediente: ${formatId(id)}`,
