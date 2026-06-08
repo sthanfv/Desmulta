@@ -4,7 +4,7 @@ import React from 'react';
 import { ArrowUp, FileText, ChevronRight, Shield } from 'lucide-react';
 import { m } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { SavingsCounter } from '@/components/interactive/SavingsCounter';
+import { SavingsCalculator } from '@/components/interactive/SavingsCalculator';
 import { TarjetaPremium } from '@/components/ui/TarjetaPremium';
 import { Lightbox } from '@/components/ui/lightbox';
 import { useExpedienteStore } from '@/store/useExpedienteStore';
@@ -19,34 +19,40 @@ interface HeroProps {
 
 /**
  * Hero - Sección de impacto principal.
- * Tono corporativo-legal: autoridad, claridad y confianza institucional.
+ * Layout: 2 columnas en desktop.
+ * IZQUIERDA: Texto + CTA + Calculadora
+ * DERECHA: Imagen + Contador
  */
 export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
   const { multas } = useExpedienteStore();
 
   return (
-    <section className="min-h-[100svh] flex items-center pt-32 sm:pt-40 md:pt-48 pb-12 sm:pb-20 md:pb-24 px-4 relative overflow-hidden">
-      {/* Atmósfera institucional — ámbar muy suave, sin neón */}
+    <section className="min-h-[100svh] flex items-center pt-24 sm:pt-32 md:pt-36 pb-12 sm:pb-20 md:pb-24 px-4 relative overflow-hidden">
+      {/* Atmósfera institucional */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/15 blur-[60px] sm:blur-[120px] opacity-50 rounded-full" />
         <div className="absolute bottom-0 left-0 right-0 h-2/3 bg-gradient-to-t from-background via-background/80 to-transparent z-10" />
       </div>
 
-      <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-24 items-center relative z-20 w-full">
-        <div className="space-y-10 lg:space-y-12 z-20">
-          {/* Badge institucional — sin giro, sin neón */}
+      {/* Grid principal: 1 columna en móvil, 2 columnas en desktop */}
+      <div className="max-w-6xl mx-auto w-full relative z-20 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
+
+        {/* ─── COLUMNA IZQUIERDA: Título + CTA + Calculadora ─── */}
+        <div className="flex flex-col gap-8">
+
+          {/* Badge */}
           <m.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-semibold border border-primary/20 backdrop-blur-sm"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-semibold border border-primary/20 backdrop-blur-sm w-fit"
           >
             <Shield size={15} className="text-primary" />
             <span className="tracking-wide">Gestión administrativa vial</span>
           </m.div>
 
-          {/* Titular — limpio, sin gradient italic naranja */}
-          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[6rem] font-bold text-foreground tracking-tighter leading-[0.95] pb-4">
+          {/* Titular */}
+          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-bold text-foreground tracking-tighter leading-[0.95]">
             {cityContext ? (
               <>
                 <m.span
@@ -88,23 +94,23 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
             )}
           </h1>
 
+          {/* Descripción */}
           <m.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-base sm:text-lg md:text-xl text-muted-foreground font-medium leading-[1.7] max-w-lg"
+            className="text-base sm:text-lg text-muted-foreground font-medium leading-[1.7] max-w-lg"
           >
             {cityContext
               ? `¿Tiene comparendos pendientes en ${cityContext}? Le explicamos qué dice la ley sobre su caso específico. Sin cobro por el diagnóstico.`
               : '¿Tiene multas o comparendos en el SIMIT? Analizamos su caso sin costo y le decimos si hay argumentos legales para actuar — prescripción, caducidad o vicios de notificación.'}
           </m.p>
 
-          {/* CTA primario — sólido, sin glow de 50px */}
+          {/* CTA */}
           <m.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="flex flex-col sm:flex-row gap-4 pt-6"
           >
             <Button
               onClick={onConsultar}
@@ -148,13 +154,19 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
             </m.div>
           )}
 
-          <div className="pt-10">
-            <SavingsCounter />
-          </div>
+          {/* Simulador — IZQUIERDA, debajo del texto */}
+          <m.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.5 }}
+            className="w-full hidden sm:block"
+          >
+            <SavingsCalculator />
+          </m.div>
         </div>
 
-        {/* Imagen hero — visible desde lg, bordes contenidos */}
-        <div className="relative group animate-in zoom-in-95 duration-1000 delay-200 z-10 hidden lg:block">
+        {/* ─── COLUMNA DERECHA: Imagen + Contador ─── */}
+        <div className="relative group animate-in zoom-in-95 duration-1000 delay-200 z-10 w-full">
           <div className="absolute -inset-4 bg-primary/10 rounded-3xl blur-[60px] opacity-50 group-hover:opacity-70 transition-opacity duration-700" />
           <TarjetaPremium className="relative glass-ultra p-4 overflow-hidden shadow-2xl rounded-3xl">
             <Lightbox
@@ -178,6 +190,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
             </div>
           </TarjetaPremium>
         </div>
+
       </div>
     </section>
   );

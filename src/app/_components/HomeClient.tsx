@@ -25,11 +25,7 @@ const MeshBackground = dynamic(
   { ssr: false, loading: () => <div className="fixed inset-0 -z-20 bg-background" /> }
 );
 
-// ─── Lazy Load: CalculadoraPrescripcion arrastra framer-motion y validadores complejos.
-const CalculadoraPrescripcion = dynamic(
-  () => import('@/components/CalculadoraPrescripcion').then((m) => m.CalculadoraPrescripcion),
-  { ssr: false, loading: () => <div className="h-64 animate-pulse bg-muted rounded-2xl w-full" /> }
-);
+
 
 // ─── Lazy Load: ConsultationForm arrastra Tesseract.js (~20 MB) y el motor OCR.
 // Solo se carga cuando el usuario abre el modal → FCP mínimo garantizado.
@@ -91,6 +87,7 @@ import { BentoDesmulta } from '@/components/sections/BentoDesmulta';
 import { JurisprudenciaScroll } from '@/components/sections/JurisprudenciaScroll';
 
 import { WelcomeModal } from '@/components/vial-clear/WelcomeModal';
+import { MagicRings } from '@/components/ui/magic-rings';
 
 import type { ShowcaseConfig, FooterConfig } from '@/lib/site-config';
 
@@ -215,23 +212,7 @@ export default function HomeClient({
         <JurisprudenciaScroll />
       </div>
 
-      <section
-        id="calculadora"
-        className="py-24 px-4 relative overflow-hidden bg-muted/10 scroll-mt-24"
-      >
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16 space-y-4">
-            <h2 className="text-3xl md:text-5xl font-black text-foreground tracking-tight reveal">
-              ¿Tu Multa es <span className="text-primary italic">Prescribible?</span>
-            </h2>
-            <p className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto reveal reveal-delay-1">
-              No todas las multas se deben pagar. Usa nuestro motor matemático para saber si por ley
-              puedes solicitar la exoneración total de tu deuda.
-            </p>
-          </div>
-          <CalculadoraPrescripcion cityContext={cityContext} />
-        </div>
-      </section>
+
 
       <div className="defer-render">
         <FAQ mounted={mounted} />
@@ -292,7 +273,7 @@ export default function HomeClient({
 
       {/* Floating Elements (WhatsApp & ScrollTop) */}
       {/* MANDATO-FILTRO v7.4.3: safe-area-inset-bottom respeta la barra de gestos nativa de Android */}
-      <div className="fixed bottom-[calc(env(safe-area-inset-bottom,0px)+2rem)] right-6 sm:right-8 z-50 flex flex-col items-end gap-4 sm:gap-5 group pointer-events-none">
+      <div className="fixed bottom-[calc(env(safe-area-inset-bottom,0px)+2rem)] right-10 sm:right-12 z-50 flex flex-col items-end gap-4 sm:gap-5 group pointer-events-none overflow-visible">
         {/* Tooltip — En desktop apunta a la izquierda, en móvil apunta hacia arriba */}
         <div
           className="
@@ -313,12 +294,25 @@ export default function HomeClient({
 
         <button
           onClick={() => setIsWhatsAppWarningOpen(true)}
-          className="pointer-events-auto bg-[#25D366] hover:bg-[#20ba59] text-white w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center shadow-2xl shadow-green-500/30 transition-all hover:scale-110 active:scale-90 relative z-10"
+          className="pointer-events-auto bg-[#25D366] hover:bg-[#20ba59] text-white w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center shadow-2xl shadow-green-500/30 transition-all hover:scale-110 active:scale-90 relative z-10 overflow-visible"
           aria-label="Abrir chat de WhatsApp para asesoría directa"
         >
           <MessageCircle size={36} fill="currentColor" aria-hidden="true" />
-          {/* Pulsor de Atención */}
-          <div className="absolute inset-0 rounded-full bg-green-500/20 animate-ping -z-10" />
+          {/* Anillos Mágicos de Atención (WebGL 3D) */}
+          <div 
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140px] h-[140px] pointer-events-none -z-10"
+            style={{ 
+              maskImage: 'radial-gradient(circle at center, black 30%, transparent 72%)', 
+              WebkitMaskImage: 'radial-gradient(circle at center, black 30%, transparent 72%)' 
+            }}
+          >
+            <MagicRings 
+              color="#25D366" 
+              colorTwo="#128C7E" 
+              ringCount={4} 
+              opacity={1}
+            />
+          </div>
         </button>
 
         <button
