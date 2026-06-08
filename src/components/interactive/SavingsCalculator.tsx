@@ -25,7 +25,7 @@ export function SavingsCalculator() {
   const [leadContacto, setLeadContacto] = useState('');
   const [leadHp, setLeadHp] = useState(''); // Honeypot
 
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
     if (isExpanded) {
