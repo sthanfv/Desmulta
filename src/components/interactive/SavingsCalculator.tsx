@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { Slider } from '@/components/ui/slider';
 import { Calculator, TrendingDown, Info, ShieldCheck, Database, Loader2, AlertTriangle, CheckCircle2, ArrowRight } from 'lucide-react';
@@ -23,6 +23,27 @@ export function SavingsCalculator() {
   const [leadNombre, setLeadNombre] = useState('');
   const [leadContacto, setLeadContacto] = useState('');
   const [leadHp, setLeadHp] = useState(''); // Honeypot
+
+  const [isExpanded, setIsExpanded] = useState(false);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const resetTimer = useCallback(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      setIsExpanded(false);
+    }, 15000); // 15 segundos de inactividad
+  }, []);
+
+  const handleInteraction = useCallback(() => {
+    setIsExpanded(true);
+    resetTimer();
+  }, [resetTimer]);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
 
   const TASA_EA = 0.265;
 
@@ -69,7 +90,12 @@ export function SavingsCalculator() {
       });
       if (!response.ok) throw new Error('Error en el envío');
       setLeadState('success');
-      setTimeout(() => { setLeadState('idle'); setLeadContacto(''); setLeadNombre(''); }, 5000);
+      setTimeout(() => { 
+        setLeadState('idle'); 
+        setLeadContacto(''); 
+        setLeadNombre(''); 
+        setIsExpanded(false);
+      }, 5000);
     } catch (error) {
       setErrorMsg('Error al procesar la solicitud');
       setLeadState('error');
@@ -115,7 +141,7 @@ export function SavingsCalculator() {
               </div>
               <Slider
                 value={[montoBase]}
-                onValueChange={(val) => setMontoBase(val[0])}
+                onValueChange={(val) => { setMontoBase(val[0]); handleInteraction(); }}
                 min={150000}
                 max={5000000}
                 step={50000}
@@ -144,7 +170,7 @@ export function SavingsCalculator() {
               </div>
               <Slider
                 value={[mesesMora]}
-                onValueChange={(val) => setMesesMora(val[0])}
+                onValueChange={(val) => { setMesesMora(val[0]); handleInteraction(); }}
                 min={0}
                 max={120}
                 step={1}
@@ -157,7 +183,7 @@ export function SavingsCalculator() {
                 <input
                   type="checkbox"
                   checked={coactivo}
-                  onChange={(e) => setCoactivo(e.target.checked)}
+                  onChange={(e) => { setCoactivo(e.target.checked); handleInteraction(); }}
                   className="w-5 h-5 rounded border-gray-300 dark:border-gray-600 bg-transparent text-primary focus:ring-primary focus:ring-offset-gray-900 appearance-none cursor-pointer"
                 />
                 <div className="absolute pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
@@ -171,7 +197,7 @@ export function SavingsCalculator() {
 
           {/* --- PANEL DE RESULTADOS Y CONVERSIÓN --- */}
           <AnimatePresence mode="wait">
-            {resultado && (
+            {resultado && isExpanded && (
               <m.div
                 key="resultados"
                 initial={{ opacity: 0, height: 0, y: 10 }}
@@ -234,7 +260,7 @@ export function SavingsCalculator() {
                     type="text"
                     placeholder="Tu nombre (opcional)"
                     value={leadNombre}
-                    onChange={(e) => setLeadNombre(e.target.value)}
+                    onChange={(e) => { setLeadNombre(e.target.value); handleInteraction(); }}
                     className="w-full bg-foreground/5 dark:bg-black/50 border border-foreground/15 rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
                   />
                   
@@ -243,7 +269,7 @@ export function SavingsCalculator() {
                       type="tel"
                       placeholder="Tu número de WhatsApp"
                       value={leadContacto}
-                      onChange={(e) => setLeadContacto(e.target.value)}
+                      onChange={(e) => { setLeadContacto(e.target.value); handleInteraction(); }}
                       className="flex-1 bg-foreground/5 dark:bg-black/50 border border-foreground/15 rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
                     />
                     <button
