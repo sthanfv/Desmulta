@@ -279,7 +279,7 @@ export function SavingsCalculator() {
                   {leadState === 'success' && (
                     <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex gap-2 text-emerald-400 mt-2">
                       <CheckCircle2 className="w-4 h-4 shrink-0" />
-                      <p className="text-xs font-medium">¡Solicitud recibida! Un abogado experto te contactará en los próximos minutos.</p>
+                      <p className="text-xs font-medium">¡Solicitud recibida! Un experto analizará tu caso y te contactará a la brevedad posible.</p>
                     </div>
                   )}
                   {errorMsg && (
