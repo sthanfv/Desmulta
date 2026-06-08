@@ -37,7 +37,7 @@ export const StarBorder = <T extends React.ElementType = 'div'>({
         '--border-width': borderWidth,
         '--border-radius': borderRadius,
         'borderRadius': 'var(--border-radius)',
-        contain: 'strict',
+        contain: 'content',
         ...(rest.style as object)
       } as React.CSSProperties}
       {...(rest as any)}

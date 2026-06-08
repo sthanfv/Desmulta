@@ -87,21 +87,6 @@ export const Header = ({ onOpenModal }: HeaderProps) => {
         {/* Botón Principal y Menú Hamburguesa (Móvil) */}
         <div className="flex items-center gap-1 sm:gap-2 lg:hidden">
           <Button
-            onClick={() => {
-              const el = document.getElementById('calculadora-hero');
-              if (el) {
-                const y = el.getBoundingClientRect().top + window.scrollY - 100;
-                window.scrollTo({ top: y, behavior: 'smooth' });
-              }
-            }}
-            variant="outline"
-            size="icon"
-            className="w-10 h-10 rounded-full border-primary/20 text-primary hover:bg-primary/10 shadow-sm"
-            aria-label="Ir a Simulador"
-          >
-            <Calculator size={18} />
-          </Button>
-          <Button
             onClick={() => onOpenModal('simit')}
             variant="outline"
             size="icon"
