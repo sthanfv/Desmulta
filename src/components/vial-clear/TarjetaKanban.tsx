@@ -13,7 +13,7 @@ import {
 import Image from 'next/image';
 import { KanbanItem } from './TableroFlujoTrabajo';
 
-import { maskData } from '@/lib/security/masking';
+
 import DecryptedText from '../ui/DecryptedText';
 
 import { motion } from 'framer-motion';
@@ -95,9 +95,9 @@ export function TarjetaKanban({
           <div className="flex-1 min-w-0 pointer-events-none">
             <h4 className="text-slate-900 dark:text-foreground font-black text-base uppercase tracking-tight truncate">
               {data.placa && data.placa !== 'N/A'
-                ? <DecryptedText parentClassName="pointer-events-auto" animateOn="hoverReveal" speed={40} text={maskData(data.placa, 'plate')} />
+                ? <DecryptedText parentClassName="pointer-events-auto" animateOn="hoverReveal" speed={40} text={data.placa} />
                 : data.cedula
-                  ? <DecryptedText parentClassName="pointer-events-auto" animateOn="hoverReveal" speed={40} text={`C.C. ${maskData(data.cedula, 'id')}`} />
+                  ? <DecryptedText parentClassName="pointer-events-auto" animateOn="hoverReveal" speed={40} text={`C.C. ${data.cedula}`} />
                   : <DecryptedText parentClassName="pointer-events-auto" animateOn="hoverReveal" speed={40} text="Sin Id" />}
             </h4>
             <p className="text-slate-500 dark:text-muted-foreground text-xs truncate">
@@ -105,7 +105,7 @@ export function TarjetaKanban({
                 parentClassName="pointer-events-auto" 
                 animateOn="hoverReveal" 
                 speed={40} 
-                text={data.nombre ? maskData(data.nombre, 'name') : 'Usuario Desmulta'} 
+                text={data.nombre ? data.nombre : 'Usuario Desmulta'} 
               />
             </p>
           </div>
@@ -121,7 +121,7 @@ export function TarjetaKanban({
                     parentClassName="pointer-events-auto" 
                     animateOn="hoverReveal" 
                     speed={40} 
-                    text={data.contacto ? maskData(data.contacto, 'phone') : 'Sin contacto'} 
+                    text={data.contacto ? data.contacto : 'Sin contacto'} 
                   />
                 </p>
                 {data.contacto && (
