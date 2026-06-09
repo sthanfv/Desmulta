@@ -36,4 +36,3 @@ describe('🌍 Edge Middleware - Geobloqueo y Hiper Localismo', () => {
     expect(res.status).toBe(200);
   });
 });
-

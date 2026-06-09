@@ -13,7 +13,6 @@ import { ConsultationSchema } from '@/lib/definitions';
 import { OCRProvider } from '@/components/ocr-provider';
 import dynamic from 'next/dynamic';
 
-
 import { RateLimitBanner } from '@/components/ui/RateLimitBanner';
 import { Form } from '@/components/ui/form';
 import { Haptics } from '@/lib/utils/haptics';

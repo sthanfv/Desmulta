@@ -65,7 +65,23 @@ export function useWebPush() {
               vapidKey,
               serviceWorkerRegistration: sw,
             });
-            if (token) setFcmToken(token);
+            if (token) {
+              setFcmToken(token);
+
+              // RE-REGISTRO SILENCIOSO: Si el token fue limpiado de Firestore
+              // (por invalidación de FCM o revocación), re-vincularlo automáticamente
+              // al docId activo para que el sistema no quede sordo.
+              const activeCase = localStorage.getItem('desmulta_active_case');
+              if (activeCase) {
+                fetch('/api/web-push/register', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ docId: activeCase, fcmToken: token }),
+                }).catch(() => {
+                  // Silencioso: es un intento best-effort en background
+                });
+              }
+            }
           } catch (err) {
             // FIX: No loggear el error completo en prod; puede contener info de config
             if (process.env.NODE_ENV === 'development') {

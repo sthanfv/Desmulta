@@ -34,23 +34,20 @@ export default function GeoBloqueadoPage() {
         </div>
 
         <h1 className="text-4xl font-black text-white mb-4 tracking-tight">
-          Solo disponible en{' '}
-          <span className="text-amber-400">Colombia 🇨🇴</span>
+          Solo disponible en <span className="text-amber-400">Colombia 🇨🇴</span>
         </h1>
 
         <p className="text-white/60 text-base leading-relaxed mb-8">
           Desmulta es una plataforma especializada en la legislación de tránsito colombiana.
-          Nuestros servicios, análisis y defensa están diseñados exclusivamente para ciudadanos
-          y residentes en Colombia.
+          Nuestros servicios, análisis y defensa están diseñados exclusivamente para ciudadanos y
+          residentes en Colombia.
         </p>
 
         <div className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-8">
           <p className="text-white/40 text-sm font-mono">
             HTTP 451 — Unavailable For Legal Reasons
           </p>
-          <p className="text-white/30 text-xs mt-1">
-            Tu IP fue detectada fuera de Colombia
-          </p>
+          <p className="text-white/30 text-xs mt-1">Tu IP fue detectada fuera de Colombia</p>
         </div>
 
         <p className="text-white/30 text-xs">

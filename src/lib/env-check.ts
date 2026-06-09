@@ -36,7 +36,10 @@ const envSchema = z.object({
   VIP_JWT_SECRET: z.string().min(32, 'Falta VIP_JWT_SECRET para firmar sesiones'),
   PII_HMAC_SECRET: z.string().min(32, 'Falta PII_HMAC_SECRET para hashear datos sensibles'),
   OPERATOR_PIN: z.string().min(4, 'OPERATOR_PIN debe tener al menos 4 caracteres'),
-  GOD_MODE_JWT_SECRET: z.string().min(32, 'Falta GOD_MODE_JWT_SECRET para firmar sesiones de nivel admin').optional(),
+  GOD_MODE_JWT_SECRET: z
+    .string()
+    .min(32, 'Falta GOD_MODE_JWT_SECRET para firmar sesiones de nivel admin')
+    .optional(),
 });
 
 export type EnvConfig = z.infer<typeof envSchema>;

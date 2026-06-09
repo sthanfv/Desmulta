@@ -72,7 +72,7 @@ describe('Export PDF API - Smoke Test & Anti-Leak Validation', () => {
     const req = generateRequest({});
     const res = await POST(req);
     const json = await res.json();
-    
+
     expect(res.status).toBe(400);
     expect(json.error).toBe('Faltan parámetros requeridos');
   });
@@ -82,10 +82,10 @@ describe('Export PDF API - Smoke Test & Anti-Leak Validation', () => {
       pin: 'wrong_pin',
       data: { items: [] },
     });
-    
+
     const res = await POST(req);
     const json = await res.json();
-    
+
     expect(res.status).toBe(403);
     expect(json.error).toBe('PIN incorrecto');
   });
@@ -95,17 +95,19 @@ describe('Export PDF API - Smoke Test & Anti-Leak Validation', () => {
       pin: 'correct_pin',
       data: {
         items: [{ id: '1', nombre: 'Test' }],
-        filtros: { ciudad: 'Bogotá' }
+        filtros: { ciudad: 'Bogotá' },
       },
     });
 
     const res = await POST(req);
-    
+
     // Verificamos respuesta exitosa
     expect(res.status).toBe(200);
     expect(res.headers.get('content-type')).toBe('application/pdf');
-    expect(res.headers.get('content-disposition')).toContain('attachment; filename="Reporte_Desmulta');
-    
+    expect(res.headers.get('content-disposition')).toContain(
+      'attachment; filename="Reporte_Desmulta'
+    );
+
     // Verificamos que el buffer haya sido extraído
     const blob = await res.blob();
     expect(blob.size).toBeGreaterThan(0);

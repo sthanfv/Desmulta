@@ -36,10 +36,8 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
 
       {/* Grid principal: 1 columna en móvil, 2 columnas en desktop */}
       <div className="max-w-6xl mx-auto w-full relative z-20 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
-
         {/* ─── COLUMNA IZQUIERDA: Título + CTA + Calculadora ─── */}
         <div className="flex flex-col gap-8">
-
           {/* Badge */}
           <m.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -191,7 +189,6 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
             </div>
           </TarjetaPremium>
         </div>
-
       </div>
     </section>
   );

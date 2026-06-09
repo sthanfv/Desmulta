@@ -13,7 +13,6 @@ import {
 import Image from 'next/image';
 import { KanbanItem } from './TableroFlujoTrabajo';
 
-
 import DecryptedText from '../ui/DecryptedText';
 
 import { motion } from 'framer-motion';
@@ -40,11 +39,11 @@ export function TarjetaKanban({
   const siguientePaso = SIGUIENTE_ESTADO[data.estado];
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
       className="bg-white/90 dark:bg-zinc-900/80 backdrop-blur-2xl border border-slate-200/60 dark:border-white/5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] dark:shadow-none dark:hover:shadow-[0_0_30px_rgba(255,255,255,0.03)] p-4 rounded-2xl relative group overflow-hidden"
     >
       {/* El hover solo aplica en desktop — el drag en móvil no activa esto */}
@@ -94,18 +93,35 @@ export function TarjetaKanban({
           <GripVertical className="w-4 h-4 text-muted-foreground group-hover:text-primary mt-1 shrink-0 pointer-events-none" />
           <div className="flex-1 min-w-0 pointer-events-none">
             <h4 className="text-slate-900 dark:text-foreground font-black text-base uppercase tracking-tight truncate">
-              {data.placa && data.placa !== 'N/A'
-                ? <DecryptedText parentClassName="pointer-events-auto" animateOn="hoverReveal" speed={40} text={data.placa} />
-                : data.cedula
-                  ? <DecryptedText parentClassName="pointer-events-auto" animateOn="hoverReveal" speed={40} text={`C.C. ${data.cedula}`} />
-                  : <DecryptedText parentClassName="pointer-events-auto" animateOn="hoverReveal" speed={40} text="Sin Id" />}
+              {data.placa && data.placa !== 'N/A' ? (
+                <DecryptedText
+                  parentClassName="pointer-events-auto"
+                  animateOn="hoverReveal"
+                  speed={40}
+                  text={data.placa}
+                />
+              ) : data.cedula ? (
+                <DecryptedText
+                  parentClassName="pointer-events-auto"
+                  animateOn="hoverReveal"
+                  speed={40}
+                  text={`C.C. ${data.cedula}`}
+                />
+              ) : (
+                <DecryptedText
+                  parentClassName="pointer-events-auto"
+                  animateOn="hoverReveal"
+                  speed={40}
+                  text="Sin Id"
+                />
+              )}
             </h4>
             <p className="text-slate-500 dark:text-muted-foreground text-xs truncate">
-              <DecryptedText 
-                parentClassName="pointer-events-auto" 
-                animateOn="hoverReveal" 
-                speed={40} 
-                text={data.nombre ? data.nombre : 'Usuario Desmulta'} 
+              <DecryptedText
+                parentClassName="pointer-events-auto"
+                animateOn="hoverReveal"
+                speed={40}
+                text={data.nombre ? data.nombre : 'Usuario Desmulta'}
               />
             </p>
           </div>
@@ -117,11 +133,11 @@ export function TarjetaKanban({
               <div className="flex items-center gap-2">
                 <p className="text-[10px] font-bold text-slate-500 flex items-center gap-1 pointer-events-none">
                   <Phone className="w-3 h-3" />{' '}
-                  <DecryptedText 
-                    parentClassName="pointer-events-auto" 
-                    animateOn="hoverReveal" 
-                    speed={40} 
-                    text={data.contacto ? data.contacto : 'Sin contacto'} 
+                  <DecryptedText
+                    parentClassName="pointer-events-auto"
+                    animateOn="hoverReveal"
+                    speed={40}
+                    text={data.contacto ? data.contacto : 'Sin contacto'}
                   />
                 </p>
                 {data.contacto && (

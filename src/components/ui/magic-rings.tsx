@@ -123,10 +123,27 @@ export function MagicRings({
 
   useEffect(() => {
     propsRef.current = {
-      color, colorTwo, speed, ringCount, attenuation, lineThickness,
-      baseRadius, radiusStep, scaleRate, opacity, blur, noiseAmount,
-      rotation, ringGap, fadeIn, fadeOut, followMouse, mouseInfluence,
-      hoverScale, parallax, clickBurst,
+      color,
+      colorTwo,
+      speed,
+      ringCount,
+      attenuation,
+      lineThickness,
+      baseRadius,
+      radiusStep,
+      scaleRate,
+      opacity,
+      blur,
+      noiseAmount,
+      rotation,
+      ringGap,
+      fadeIn,
+      fadeOut,
+      followMouse,
+      mouseInfluence,
+      hoverScale,
+      parallax,
+      clickBurst,
     };
   });
 
@@ -149,7 +166,12 @@ export function MagicRings({
     }
 
     renderer.setClearColor(0x000000, 0);
-    mount.appendChild(renderer.domElement);
+    const canvas = renderer.domElement;
+    // Forzar transparencia en el canvas DOM — el navegador en modo claro
+    // puede aplicar background-color: white heredado aunque Three.js
+    // configure alpha: true en el contexto WebGL.
+    canvas.style.background = 'transparent';
+    mount.appendChild(canvas);
 
     const scene = new THREE.Scene();
     const camera = new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0.1, 10);
@@ -180,7 +202,12 @@ export function MagicRings({
       uBurst: { value: 0 },
     };
 
-    const material = new THREE.ShaderMaterial({ vertexShader, fragmentShader, uniforms, transparent: true });
+    const material = new THREE.ShaderMaterial({
+      vertexShader,
+      fragmentShader,
+      uniforms,
+      transparent: true,
+    });
     const quad = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), material);
     scene.add(quad);
 
@@ -199,7 +226,9 @@ export function MagicRings({
     ro.observe(mount);
 
     let lastInteraction = Date.now();
-    const updateInteraction = () => { lastInteraction = Date.now(); };
+    const updateInteraction = () => {
+      lastInteraction = Date.now();
+    };
 
     const onMouseMove = (e: MouseEvent) => {
       updateInteraction();
@@ -207,14 +236,20 @@ export function MagicRings({
       mouseRef.current[0] = (e.clientX - rect.left) / rect.width - 0.5;
       mouseRef.current[1] = -((e.clientY - rect.top) / rect.height - 0.5);
     };
-    const onMouseEnter = () => { updateInteraction(); isHoveredRef.current = true; };
+    const onMouseEnter = () => {
+      updateInteraction();
+      isHoveredRef.current = true;
+    };
     const onMouseLeave = () => {
       updateInteraction();
       isHoveredRef.current = false;
       mouseRef.current[0] = 0;
       mouseRef.current[1] = 0;
     };
-    const onClick = () => { updateInteraction(); burstRef.current = 1; };
+    const onClick = () => {
+      updateInteraction();
+      burstRef.current = 1;
+    };
 
     mount.addEventListener('mousemove', onMouseMove);
     mount.addEventListener('mouseenter', onMouseEnter);
@@ -281,13 +316,13 @@ export function MagicRings({
   if (reducedMotion) return null;
 
   return (
-    <div 
-      ref={mountRef} 
-      className="w-full h-full" 
-      style={{ 
+    <div
+      ref={mountRef}
+      className="w-full h-full"
+      style={{
         willChange: 'transform',
-        ...(blur > 0 ? { filter: `blur(${blur}px)` } : {})
-      }} 
+        ...(blur > 0 ? { filter: `blur(${blur}px)` } : {}),
+      }}
     />
   );
 }

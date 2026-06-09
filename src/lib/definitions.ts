@@ -17,7 +17,6 @@ export {
   SimitLeadSchema,
 };
 
-
 export type OCRAnalysisResult = z.infer<typeof OCRAnalysisSchema>;
 export type LegalStatus = z.infer<typeof LegalStatusEnum>;
 

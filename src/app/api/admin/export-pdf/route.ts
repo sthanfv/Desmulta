@@ -58,7 +58,9 @@ export async function POST(request: Request) {
         adminEmail = tokens.decodedToken.email;
       }
     } catch (e) {
-      SecurityLogger.warn('[export-pdf] Error obteniendo tokens para watermark', { error: String(e) });
+      SecurityLogger.warn('[export-pdf] Error obteniendo tokens para watermark', {
+        error: String(e),
+      });
     }
 
     const filtrosArr = [
@@ -97,18 +99,21 @@ export async function POST(request: Request) {
       const isLocal = process.env.NODE_ENV === 'development';
       // Por defecto a desmulta-colombia si no está la env
       const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'desmulta-colombia';
-      
+
       // En functions v2 la url es dada por cloud run, pero usaremos un custom domain o la url estandar si está disponible. Mejor usamos la var de entorno si está, o el formato genérico de v1 fallback.
-      const finalUrl = process.env.PDF_CLOUD_FUNCTION_URL || 
-        (isLocal ? `http://127.0.0.1:5001/${projectId}/us-central1/generatePdf` : `https://us-central1-${projectId}.cloudfunctions.net/generatePdf`);
+      const finalUrl =
+        process.env.PDF_CLOUD_FUNCTION_URL ||
+        (isLocal
+          ? `http://127.0.0.1:5001/${projectId}/us-central1/generatePdf`
+          : `https://us-central1-${projectId}.cloudfunctions.net/generatePdf`);
 
       const functionRes = await fetch(finalUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.PDF_API_SECRET || 'dev_secret'}`
+          Authorization: `Bearer ${process.env.PDF_API_SECRET || 'dev_secret'}`,
         },
-        body: JSON.stringify({ htmlContent })
+        body: JSON.stringify({ htmlContent }),
       });
 
       if (!functionRes.ok) {
@@ -127,7 +132,9 @@ export async function POST(request: Request) {
         },
       });
     } catch (pdfError) {
-      SecurityLogger.error('[export-pdf] Error llamando a Cloud Function generatePdf', { error: String(pdfError) });
+      SecurityLogger.error('[export-pdf] Error llamando a Cloud Function generatePdf', {
+        error: String(pdfError),
+      });
 
       return NextResponse.json(
         {

@@ -138,6 +138,6 @@ export function calcularIntereses(montoBase: number, fechaInfraccionISO: string)
   // Fórmula de interés COMPUESTO diario (más precisa que el interés simple):
   // Intereses = Monto * ((1 + tasaDiaria)^días - 1)
   const intereses = montoBase * (Math.pow(1 + tasaDiaria, diasTotales) - 1);
-  
+
   return intereses;
 }

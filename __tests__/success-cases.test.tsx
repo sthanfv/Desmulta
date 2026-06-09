@@ -193,7 +193,7 @@ describe('SuccessCases — Skeleton Loader + Intersection Observer Lazy Fetch', 
 
     await waitFor(() => {
       expect(screen.getByText('Caso Bogotá 2024')).toBeTruthy();
-      expect(screen.getByText('Caso Medellín 2024')).toBeTruthy();
+      expect(screen.getByText('Caso 1 de 2')).toBeTruthy();
     });
   });
 

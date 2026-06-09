@@ -118,16 +118,11 @@ async function limpiarTokenInvalido(
 
   try {
     // Limpiar subcolección
-    await db
-      .collection(coleccion)
-      .doc(expedienteId)
-      .collection('private')
-      .doc('push')
-      .update({
-        fcmToken: FieldValue.delete(),
-        fcmTokenInvalidatedAt: FieldValue.serverTimestamp(),
-        tokenRevokedReason: 'FCM_NOT_REGISTERED',
-      });
+    await db.collection(coleccion).doc(expedienteId).collection('private').doc('push').update({
+      fcmToken: FieldValue.delete(),
+      fcmTokenInvalidatedAt: FieldValue.serverTimestamp(),
+      tokenRevokedReason: 'FCM_NOT_REGISTERED',
+    });
   } catch {
     // El documento puede no existir, ignorar
   }
@@ -209,8 +204,7 @@ export async function dispatchPush(
   } catch (error: unknown) {
     const errorCode =
       error instanceof Error
-        ? (error as Error & { errorInfo?: { code: string } }).errorInfo?.code ||
-          error.message
+        ? (error as Error & { errorInfo?: { code: string } }).errorInfo?.code || error.message
         : 'Error desconocido';
 
     // Verificar si el token es inválido de forma permanente

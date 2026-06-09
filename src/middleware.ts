@@ -61,7 +61,8 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   // ── 1. Headers de ciudad (geolocalización Vercel, costo $0) ──────────────
-  const ciudadUsuario = request.headers.get('x-vercel-ip-city') || process.env.DEV_CIUDAD_OVERRIDE || 'Colombia';
+  const ciudadUsuario =
+    request.headers.get('x-vercel-ip-city') || process.env.DEV_CIUDAD_OVERRIDE || 'Colombia';
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set('x-ciudad-usuario', ciudadUsuario);
 

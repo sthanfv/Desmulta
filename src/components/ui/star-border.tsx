@@ -29,17 +29,16 @@ export const StarBorder = <T extends React.ElementType = 'div'>({
 
   return (
     <Component
-      className={cn(
-        "relative overflow-hidden p-[var(--border-width)]",
-        className
-      )}
-      style={{
-        '--border-width': borderWidth,
-        '--border-radius': borderRadius,
-        'borderRadius': 'var(--border-radius)',
-        contain: 'content',
-        ...(rest.style as object)
-      } as React.CSSProperties}
+      className={cn('relative overflow-hidden p-[var(--border-width)]', className)}
+      style={
+        {
+          '--border-width': borderWidth,
+          '--border-radius': borderRadius,
+          borderRadius: 'var(--border-radius)',
+          contain: 'content',
+          ...(rest.style as object),
+        } as React.CSSProperties
+      }
       {...(rest as any)}
     >
       {/* Bot beam */}
@@ -60,10 +59,10 @@ export const StarBorder = <T extends React.ElementType = 'div'>({
           willChange: 'transform',
         }}
       />
-      
+
       {/* Inner content wrapper that hides the center of the gradient */}
-      <div 
-        className={cn("relative z-10 h-full w-full", innerClassName)}
+      <div
+        className={cn('relative z-10 h-full w-full', innerClassName)}
         style={{ borderRadius: 'calc(var(--border-radius) - var(--border-width))' }}
       >
         {children}

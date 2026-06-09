@@ -393,7 +393,15 @@ export const SuccessCases = ({ showcaseData }: SuccessCasesProps) => {
                   className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-20 w-10 h-10 rounded-full bg-background/90 border border-border shadow-lg flex items-center justify-center hover:bg-primary/10 hover:border-primary/30 transition-all active:scale-90 md:-translate-x-6"
                   aria-label="Caso anterior"
                 >
-                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><path d="M15 18l-6-6 6-6"/></svg>
+                  <svg
+                    className="w-4 h-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2.5}
+                  >
+                    <path d="M15 18l-6-6 6-6" />
+                  </svg>
                 </button>
               )}
 
@@ -409,7 +417,10 @@ export const SuccessCases = ({ showcaseData }: SuccessCasesProps) => {
                 <ImageSlider
                   beforeSrc={currentBefore}
                   afterSrc={currentAfter}
-                  onExpand={() => { setEscalaZoom(1); setVisorAbierto(true); }}
+                  onExpand={() => {
+                    setEscalaZoom(1);
+                    setVisorAbierto(true);
+                  }}
                 />
               </div>
 
@@ -420,7 +431,15 @@ export const SuccessCases = ({ showcaseData }: SuccessCasesProps) => {
                   className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-20 w-10 h-10 rounded-full bg-background/90 border border-border shadow-lg flex items-center justify-center hover:bg-primary/10 hover:border-primary/30 transition-all active:scale-90 md:translate-x-6"
                   aria-label="Caso siguiente"
                 >
-                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><path d="M9 18l6-6-6-6"/></svg>
+                  <svg
+                    className="w-4 h-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2.5}
+                  >
+                    <path d="M9 18l6-6-6-6" />
+                  </svg>
                 </button>
               )}
             </div>
@@ -431,7 +450,10 @@ export const SuccessCases = ({ showcaseData }: SuccessCasesProps) => {
                 {dynamicCases.map((_, idx) => (
                   <button
                     key={idx}
-                    onClick={() => { setActiveIndex(idx); Haptics.impact(); }}
+                    onClick={() => {
+                      setActiveIndex(idx);
+                      Haptics.impact();
+                    }}
                     className={`rounded-full transition-all duration-300 ${
                       idx === activeIndex
                         ? 'w-6 h-2 bg-primary'

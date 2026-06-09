@@ -5,7 +5,7 @@ import type { HTMLMotionProps } from 'framer-motion';
 const styles = {
   wrapper: {
     display: 'inline-block',
-    whiteSpace: 'pre-wrap'
+    whiteSpace: 'pre-wrap',
   },
   srOnly: {
     position: 'absolute' as const,
@@ -15,8 +15,8 @@ const styles = {
     margin: '-1px',
     overflow: 'hidden',
     clip: 'rect(0,0,0,0)',
-    border: 0
-  }
+    border: 0,
+  },
 };
 
 interface DecryptedTextProps extends HTMLMotionProps<'span'> {
@@ -57,7 +57,9 @@ export default function DecryptedText({
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
   const [revealedIndices, setRevealedIndices] = useState<Set<number>>(new Set());
   const [hasAnimated, setHasAnimated] = useState<boolean>(false);
-  const [isDecrypted, setIsDecrypted] = useState<boolean>(animateOn !== 'click' && animateOn !== 'hoverReveal');
+  const [isDecrypted, setIsDecrypted] = useState<boolean>(
+    animateOn !== 'click' && animateOn !== 'hoverReveal'
+  );
   const [direction, setDirection] = useState<Direction>('forward');
 
   const containerRef = useRef<HTMLSpanElement>(null);
@@ -66,11 +68,9 @@ export default function DecryptedText({
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-
-
   const availableChars = useMemo<string[]>(() => {
     return useOriginalCharsOnly
-      ? Array.from(new Set(text.split(''))).filter(char => char !== ' ')
+      ? Array.from(new Set(text.split(''))).filter((char) => char !== ' ')
       : characters.split('');
   }, [useOriginalCharsOnly, text, characters]);
 
@@ -217,7 +217,7 @@ export default function DecryptedText({
     };
 
     intervalRef.current = setInterval(() => {
-      setRevealedIndices(prevRevealed => {
+      setRevealedIndices((prevRevealed) => {
         if (sequential) {
           // Forward
           if (direction === 'forward') {
@@ -310,7 +310,7 @@ export default function DecryptedText({
     removeRandomIndices,
     characters,
     useOriginalCharsOnly,
-    clearHideTimer
+    clearHideTimer,
   ]);
 
   /* Click Behaviour */
@@ -358,7 +358,7 @@ export default function DecryptedText({
     if (animateOn !== 'view' && animateOn !== 'inViewHover') return;
 
     const observerCallback = (entries: IntersectionObserverEntry[]) => {
-      entries.forEach(entry => {
+      entries.forEach((entry) => {
         if (entry.isIntersecting && !hasAnimated) {
           triggerDecrypt();
           setHasAnimated(true);
@@ -369,7 +369,7 @@ export default function DecryptedText({
     const observerOptions = {
       root: null,
       rootMargin: '0px',
-      threshold: 0.1
+      threshold: 0.1,
     };
 
     const observer = new IntersectionObserver(observerCallback, observerOptions);
@@ -400,29 +400,35 @@ export default function DecryptedText({
     animateOn === 'hover' || animateOn === 'inViewHover'
       ? {
           onMouseEnter: triggerHoverDecrypt,
-          onMouseLeave: resetToPlainText
+          onMouseLeave: resetToPlainText,
         }
       : animateOn === 'hoverReveal'
-      ? {
-          onMouseEnter: () => {
-            clearHideTimer();
-            if (!isDecrypted && !isAnimating) triggerDecrypt();
-          },
-          onMouseLeave: startHideTimer,
-          onTouchStart: () => {
-            clearHideTimer();
-            if (!isDecrypted && !isAnimating) triggerDecrypt();
-          },
-          onTouchEnd: startHideTimer
-        }
-      : animateOn === 'click'
         ? {
-            onClick: handleClick
+            onMouseEnter: () => {
+              clearHideTimer();
+              if (!isDecrypted && !isAnimating) triggerDecrypt();
+            },
+            onMouseLeave: startHideTimer,
+            onTouchStart: () => {
+              clearHideTimer();
+              if (!isDecrypted && !isAnimating) triggerDecrypt();
+            },
+            onTouchEnd: startHideTimer,
           }
-        : {};
+        : animateOn === 'click'
+          ? {
+              onClick: handleClick,
+            }
+          : {};
 
   return (
-    <motion.span className={parentClassName} ref={containerRef} style={styles.wrapper} {...animateProps} {...props}>
+    <motion.span
+      className={parentClassName}
+      ref={containerRef}
+      style={styles.wrapper}
+      {...animateProps}
+      {...props}
+    >
       <span style={styles.srOnly}>{displayText}</span>
 
       <span aria-hidden="true">

@@ -91,7 +91,10 @@ If it is a valid document, extract all text from this image exactly as it appear
       if (textoCompleto.trim() === 'NO_VALID_DOCUMENT') {
         logger.warn('[OCR] Imagen rechazada: no parece un documento de tránsito válido', { ip });
         return NextResponse.json(
-          { error: 'La imagen no parece ser una multa o resolución válida. Intenta con otra foto más clara.' },
+          {
+            error:
+              'La imagen no parece ser una multa o resolución válida. Intenta con otra foto más clara.',
+          },
           { status: 422 }
         );
       }
@@ -119,7 +122,9 @@ If it is a valid document, extract all text from this image exactly as it appear
         // Configurar Tesseract.js en el entorno Node.js
         const worker = await createWorker('spa');
         const dataUri = `data:${mimeType};base64,${imageBase64}`;
-        const { data: { text } } = await worker.recognize(dataUri);
+        const {
+          data: { text },
+        } = await worker.recognize(dataUri);
         await worker.terminate();
 
         if (!text || text.trim().length === 0) {

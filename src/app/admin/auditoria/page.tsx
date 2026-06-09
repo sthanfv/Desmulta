@@ -120,7 +120,7 @@ function ExportControls({ admins }: { admins: string[] }) {
       if (response.logs && response.logs.length > 0) {
         allRecords = [...allRecords, ...response.logs] as ExportLogRecord[];
       }
-      
+
       currentCursor = response.nextCursor;
       hasMore = !!currentCursor;
     }
@@ -135,7 +135,7 @@ function ExportControls({ admins }: { admins: string[] }) {
         adminEmail: adminFilter,
         startDate: startDate || undefined,
         endDate: endDate || undefined,
-        limit: 200 // Para PDF limitamos a 200 para evitar congelar el navegador
+        limit: 200, // Para PDF limitamos a 200 para evitar congelar el navegador
       });
 
       if (!logs || logs.length === 0) {
@@ -144,7 +144,9 @@ function ExportControls({ admins }: { admins: string[] }) {
       }
 
       if (logs.length === 200) {
-        alert('Mostrando los primeros 200 registros. Usa "Exportar CSV" para descargas masivas completas.');
+        alert(
+          'Mostrando los primeros 200 registros. Usa "Exportar CSV" para descargas masivas completas.'
+        );
       }
 
       const doc = new jsPDF('landscape');
@@ -226,7 +228,11 @@ function ExportControls({ admins }: { admins: string[] }) {
       ];
 
       worksheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
-      worksheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF16A34A' } };
+      worksheet.getRow(1).fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FF16A34A' },
+      };
 
       records.forEach((r) => {
         const dateObj = new Date(r.fecha);
@@ -245,7 +251,9 @@ function ExportControls({ admins }: { admins: string[] }) {
       });
 
       const buffer = await workbook.xlsx.writeBuffer();
-      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const blob = new Blob([buffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -312,7 +320,11 @@ function ExportControls({ admins }: { admins: string[] }) {
           disabled={isExporting}
           className="h-9 px-4 bg-emerald-600 text-white rounded-lg font-semibold flex items-center gap-2 hover:bg-emerald-700 active:scale-[0.98] transition-all disabled:opacity-50"
         >
-          {isExporting ? <Loader2 size={14} className="animate-spin" /> : <FileSpreadsheet size={14} />}
+          {isExporting ? (
+            <Loader2 size={14} className="animate-spin" />
+          ) : (
+            <FileSpreadsheet size={14} />
+          )}
           Exportar CSV (Masivo)
         </button>
       </div>

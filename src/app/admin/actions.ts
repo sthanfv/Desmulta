@@ -557,11 +557,7 @@ export async function updateCaseStatus(
             ? `https://desmulta.online/seguir/${_leadData?.trackingUuid}`
             : undefined;
           // Fire-and-forget: no bloqueamos la respuesta al admin por las notificaciones
-          dispatchPush(
-            caseId,
-            { title, body, url: trackingUrl },
-            'cases'
-          ).catch((e) =>
+          dispatchPush(caseId, { title, body, url: trackingUrl }, 'cases').catch((e) =>
             logger.warn('[updateCaseStatus] Fallo al despachar push (no crítico)', {
               error: e?.message,
             })
@@ -743,8 +739,7 @@ export async function updateConsultationStatus(
     try {
       const { dispatchPush } = await import('@/lib/notifications/notification-dispatcher');
       const { STATUS_TEMPLATES } = await import('@/lib/notifications/push-notifications');
-      const templateFn =
-        STATUS_TEMPLATES[newStatus.toLowerCase() as keyof typeof STATUS_TEMPLATES];
+      const templateFn = STATUS_TEMPLATES[newStatus.toLowerCase() as keyof typeof STATUS_TEMPLATES];
       if (templateFn) {
         const leadId = id;
         const { title, body } = templateFn(leadId);

@@ -49,7 +49,6 @@ export const Header = ({ onOpenModal }: HeaderProps) => {
 
         {/* Navegación de Escritorio (Oculta en móviles) */}
         <div className="hidden lg:flex items-center gap-3">
-
           <Link
             href="/estado"
             className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-foreground/80 hover:text-primary hover:bg-primary/5 rounded-xl transition-all"
@@ -140,7 +139,6 @@ export const Header = ({ onOpenModal }: HeaderProps) => {
         aria-hidden={!isMobileMenuOpen}
       >
         <div className="glass rounded-3xl p-5 flex flex-col gap-4 shadow-2xl border-white/5 border">
-
           <Link
             href="/estado"
             onClick={closeMenu}

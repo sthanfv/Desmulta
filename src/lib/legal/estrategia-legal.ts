@@ -46,7 +46,9 @@ export function evaluarCasoTransito(
   }
 
   const fechaBaseTriage = fechaInfraccion || fechaNotificacion;
-  const añosTranscurridos = fechaBaseTriage ? differenceInYears(new Date(), new Date(fechaBaseTriage)) : 0;
+  const añosTranscurridos = fechaBaseTriage
+    ? differenceInYears(new Date(), new Date(fechaBaseTriage))
+    : 0;
 
   // 2. Regla de Tutela / Debido Proceso (Fotomultas)
   if (esFotomulta && añosTranscurridos >= 1) {

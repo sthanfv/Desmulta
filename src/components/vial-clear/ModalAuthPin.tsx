@@ -75,7 +75,7 @@ export function ModalAuthPin({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent 
+      <DialogContent
         className="sm:max-w-[425px] bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800"
         onOpenAutoFocus={(e) => {
           e.preventDefault();

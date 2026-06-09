@@ -25,8 +25,6 @@ const MeshBackground = dynamic(
   { ssr: false, loading: () => <div className="fixed inset-0 -z-20 bg-background" /> }
 );
 
-
-
 // ─── Lazy Load: ConsultationForm arrastra Tesseract.js (~20 MB) y el motor OCR.
 // Solo se carga cuando el usuario abre el modal → FCP mínimo garantizado.
 const ConsultationForm = dynamic(
@@ -212,8 +210,6 @@ export default function HomeClient({
         <JurisprudenciaScroll />
       </div>
 
-
-
       <div className="defer-render">
         <FAQ mounted={mounted} />
       </div>
@@ -292,8 +288,6 @@ export default function HomeClient({
           ¿Necesitas asesoría inmediata?
         </div>
 
-
-
         <button
           onClick={() => setIsWhatsAppWarningOpen(true)}
           className="pointer-events-auto bg-[#25D366] hover:bg-[#20ba59] text-white w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center shadow-2xl shadow-green-500/30 transition-all hover:scale-110 active:scale-90 relative z-10 overflow-visible"
@@ -303,15 +297,13 @@ export default function HomeClient({
           {/* Animated Magic Rings Background */}
           {/* CORRECCIÓN: canvas 3x el tamaño del botón para que los anillos */}
           {/* nunca choquen contra el borde del quad WebGL (eliminando el corte cuadrado) */}
-          <div 
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] sm:w-[320px] sm:h-[320px] pointer-events-none -z-10"
-          >
-            <MagicRings 
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] sm:w-[320px] sm:h-[320px] pointer-events-none -z-10">
+            <MagicRings
               color="#25D366"
               colorTwo="#25D366"
-              ringCount={2} 
+              ringCount={2}
               baseRadius={0.12}
-              radiusStep={0.10}
+              radiusStep={0.1}
               scaleRate={0.28}
               attenuation={14}
               lineThickness={1.8}

@@ -394,9 +394,10 @@ export default function GalleryAdminPage() {
                     variant="ghost"
                     size="icon"
                     onClick={() => handleDelete(c)}
-                    className={confirmDeleteId === c.id
-                      ? "text-white bg-destructive hover:bg-destructive"
-                      : "text-destructive hover:text-destructive hover:bg-destructive/10 shrink-0"
+                    className={
+                      confirmDeleteId === c.id
+                        ? 'text-white bg-destructive hover:bg-destructive'
+                        : 'text-destructive hover:text-destructive hover:bg-destructive/10 shrink-0'
                     }
                   >
                     {confirmDeleteId === c.id ? '¿Seguro?' : <Trash2 size={16} />}

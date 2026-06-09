@@ -97,11 +97,11 @@ export async function logExportAction(payload: {
     try {
       const typeStr = payload.type === 'excel' ? 'Excel' : 'PDF';
       const msg = `🚨 <b>ALERTA DE SEGURIDAD</b> 🚨\n\n<b>Operador:</b> ${payload.user}\n<b>Acción:</b> Exportación masiva de Base de Datos\n<b>Formato:</b> ${typeStr}\n<b>Registros:</b> ${payload.count}\n\n<i>Esto fue generado desde el panel de administrador.</i>`;
-      
+
       await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: chatId, text: msg, parse_mode: 'HTML' })
+        body: JSON.stringify({ chat_id: chatId, text: msg, parse_mode: 'HTML' }),
       });
     } catch (err) {
       logger.error('Error enviando alerta de Telegram', { error: String(err) });
@@ -455,8 +455,7 @@ async function getAdminEmailFromSession(): Promise<string> {
       clientEmail: process.env.FIREBASE_CLIENT_EMAIL || '',
       privateKey: (process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
     },
-    apiKey:
-      process.env.NEXT_PUBLIC_BASE_API_KEY || process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '',
+    apiKey: process.env.NEXT_PUBLIC_BASE_API_KEY || process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '',
   });
 
   return tokens?.decodedToken?.email || 'admin_desconocido@desmulta.com';
