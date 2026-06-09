@@ -89,7 +89,6 @@ If it is a valid document, extract all text from this image exactly as it appear
       ];
 
       // Compite Gemini contra el reloj de 25 segundos
-      // @ts-expect-error El SDK a veces no infiere bien el tipo de Promise.race
       const result = await Promise.race([
         model.generateContent([prompt, ...imageParts]),
         timeoutPromise,
@@ -145,7 +144,6 @@ If it is a valid document, extract all text from this image exactly as it appear
 
         const dataUri = `data:${mimeType};base64,${imageBase64}`;
         
-        // @ts-expect-error type inference
         const recognizeResult = await Promise.race([
           worker.recognize(dataUri),
           tesseractTimeout
