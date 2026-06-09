@@ -7,14 +7,100 @@ import { getAuth } from 'firebase/auth';
 import { app } from '@/lib/firebase-client';
 import { useToast } from './use-toast';
 
-export function useWebPush() {
+// ─────────────────────────────────────────────────────────────────────────────
+// UTILIDADES INTERNAS
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Registra el firebase-messaging-sw.js y devuelve la instancia del SW.
+ * Si ya está registrado (Workbox), devuelve el SW activo.
+ */
+async function registrarFirebaseSW(): Promise<ServiceWorkerRegistration> {
+  let swReg: ServiceWorkerRegistration | null = null;
+  try {
+    swReg = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
+      updateViaCache: 'none',
+      scope: '/',
+    });
+  } catch {
+    // sw.js Workbox ya registrado - usar el existente
+  }
+  return swReg ?? (await navigator.serviceWorker.ready);
+}
+
+/**
+ * Obtiene el token FCM actual o intenta regenerarlo.
+ * Retorna null si no es posible (sin permisos, sin soporte).
+ */
+async function obtenerTokenFCM(vapidKey: string): Promise<string | null> {
+  const soportado = await isSupported();
+  if (!soportado) return null;
+
+  const sw = await registrarFirebaseSW();
+  const messaging = getMessaging(app);
+
+  try {
+    const token = await getToken(messaging, {
+      vapidKey,
+      serviceWorkerRegistration: sw,
+    });
+    return token || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Envía el token FCM al backend para vincularlo al expediente.
+ * Llama al endpoint /api/web-push/register.
+ */
+async function registrarTokenEnBackend(docId: string, fcmToken: string): Promise<boolean> {
+  try {
+    const auth = getAuth(app);
+    const user = auth.currentUser;
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (user) {
+      const idToken = await user.getIdToken(true);
+      headers['Authorization'] = `Bearer ${idToken}`;
+    }
+
+    const res = await fetch('/api/web-push/register', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ docId, fcmToken }),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HOOK PRINCIPAL
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface UseWebPushOptions {
+  /**
+   * ID del expediente activo (shortId o docId).
+   * Si se provee, el hook intentará re-registrar el token automáticamente
+   * en cada montaje cuando el permiso ya esté concedido.
+   * Útil para el portal de seguimiento donde el docId siempre está disponible.
+   */
+  docId?: string;
+}
+
+export function useWebPush(options: UseWebPushOptions = {}) {
+  const { docId: propDocId } = options;
+
   const [isHandlingPermission, setIsHandlingPermission] = useState(false);
   const [fcmToken, setFcmToken] = useState<string | null>(null);
   const [yaTienePermiso, setYaTienePermiso] = useState(false);
   const [mostrarBannerPush, setMostrarBannerPush] = useState(false);
   const { toast } = useToast();
 
-  // Al montar: registrar SW de Firebase incondicionalmente y restaurar token si hay permiso
+  // ──────────────────────────────────────────────────────────────────────────
+  // EFECTO DE MONTAJE: Restaurar token y re-registrar si hay permiso previo
+  // ──────────────────────────────────────────────────────────────────────────
   useEffect(() => {
     if (
       typeof window === 'undefined' ||
@@ -23,7 +109,7 @@ export function useWebPush() {
     )
       return;
 
-    // Esperar a que el SW de next-pwa esté listo (sw.js ahora importa la lógica de Firebase)
+    // Esperar a que el SW de next-pwa esté listo
     navigator.serviceWorker.ready
       .then((reg) => {
         if (process.env.NODE_ENV === 'development') {
@@ -33,77 +119,49 @@ export function useWebPush() {
       .catch(() => {});
 
     const permisoActual = Notification.permission;
+
     if (permisoActual === 'granted' || permisoActual === 'denied') {
       setYaTienePermiso(true);
-
-      if (permisoActual === 'granted') {
-        isSupported().then(async (soportado) => {
-          if (!soportado) return;
-          try {
-            // Registrar explícitamente firebase-messaging-sw.js ANTES de obtener el token
-            let swReg: ServiceWorkerRegistration | null = null;
-            try {
-              swReg = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
-                updateViaCache: 'none',
-                scope: '/',
-              });
-            } catch {
-              /* sw.js Workbox ya registrado - usar ese */
-            }
-
-            const sw = swReg ?? (await navigator.serviceWorker.ready);
-            const messaging = getMessaging(app);
-            const vapidKey = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
-
-            // FIX: Verificar VAPID key antes de intentar obtener token
-            if (!vapidKey) {
-              logger.error('[useWebPush] NEXT_PUBLIC_FIREBASE_VAPID_KEY no está configurada.');
-              return;
-            }
-
-            const token = await getToken(messaging, {
-              vapidKey,
-              serviceWorkerRegistration: sw,
-            });
-            if (token) {
-              setFcmToken(token);
-
-              // RE-REGISTRO SILENCIOSO: Si el token fue limpiado de Firestore
-              // (por invalidación de FCM o revocación), re-vincularlo automáticamente
-              // al docId activo para que el sistema no quede sordo.
-              const activeCase = localStorage.getItem('desmulta_active_case');
-              if (activeCase) {
-                fetch('/api/web-push/register', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ docId: activeCase, fcmToken: token }),
-                }).catch(() => {
-                  // Silencioso: es un intento best-effort en background
-                });
-              }
-            }
-          } catch (err) {
-            // FIX: No loggear el error completo en prod; puede contener info de config
-            if (process.env.NODE_ENV === 'development') {
-              logger.error('[useWebPush] Error al restaurar token FCM:', err);
-            }
-          }
-        });
-      }
-      // FIX FALLA 3: Si el permiso está denegado, NO hacemos nada aquí.
-      // La revocación del token en Firestore se hace solo cuando el usuario
-      // interacta activamente con el botón (en requestNotificationPermission).
     }
-  }, []);
 
-  /**
-   * mostrarBannerPushNotificacion — activa el banner no intrusivo.
-   * Solo si el usuario aún no ha concedido o denegado.
-   */
+    if (permisoActual === 'granted') {
+      const vapidKey = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
+      if (!vapidKey) {
+        logger.error('[useWebPush] NEXT_PUBLIC_FIREBASE_VAPID_KEY no está configurada.');
+        return;
+      }
+
+      // Restaurar + re-registrar token en background (best-effort)
+      (async () => {
+        const token = await obtenerTokenFCM(vapidKey);
+        if (!token) return;
+
+        setFcmToken(token);
+
+        // Determinar el docId a usar: prop > localStorage
+        const targetDocId = propDocId || localStorage.getItem('desmulta_active_case');
+
+        if (targetDocId) {
+          // RE-REGISTRO SILENCIOSO: re-vincula el token aunque el anterior
+          // haya sido limpiado por FCM o expirado. Esto cura la "sordera" del
+          // sistema cuando el usuario reinstala o cambia de navegador.
+          const ok = await registrarTokenEnBackend(targetDocId, token);
+          if (process.env.NODE_ENV === 'development') {
+            console.debug('[useWebPush] Re-registro silencioso:', ok ? 'OK' : 'FALLO', targetDocId);
+          }
+        }
+      })();
+    }
+  }, [propDocId]);
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // mostrarBannerPushNotificacion
+  // ──────────────────────────────────────────────────────────────────────────
   const mostrarBannerPushNotificacion = useCallback(() => {
     if (typeof window === 'undefined' || !('Notification' in window)) return;
     const permiso = Notification.permission;
-    if (permiso !== 'granted') {
+    // Solo mostrar si el usuario aún no ha tomado una decisión
+    if (permiso === 'default') {
       setMostrarBannerPush(true);
     }
   }, []);
@@ -113,25 +171,28 @@ export function useWebPush() {
     setYaTienePermiso(true);
   }, []);
 
-  /**
-   * requestNotificationPermission — solicita permiso, obtiene token FCM
-   * y lo registra en Firestore vinculado al docId del expediente.
-   */
+  // ──────────────────────────────────────────────────────────────────────────
+  // requestNotificationPermission
+  // Solicita permiso al usuario, obtiene el token FCM y lo registra en Firestore.
+  // ──────────────────────────────────────────────────────────────────────────
   const requestNotificationPermission = useCallback(
-    async (docId: string) => {
+    async (docId: string): Promise<string | null> => {
       setIsHandlingPermission(true);
       setMostrarBannerPush(false);
+
       try {
+        // 1. Verificar soporte del navegador
         const soportado = await isSupported();
         if (!soportado) {
           toast({
             title: 'Navegador no compatible',
-            description: 'Tu navegador no admite notificaciones push.',
+            description:
+              'Tu navegador no admite notificaciones push. Intenta con Chrome, Edge o Firefox.',
           });
           return null;
         }
 
-        // FIX: Verificar VAPID key ANTES de solicitar permiso al usuario
+        // 2. Verificar configuración de VAPID
         const vapidKey = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
         if (!vapidKey) {
           logger.error('[useWebPush] NEXT_PUBLIC_FIREBASE_VAPID_KEY no configurada.');
@@ -144,33 +205,32 @@ export function useWebPush() {
           return null;
         }
 
+        // 3. Solicitar permiso si aún no está decidido
         let permiso = Notification.permission;
         if (permiso === 'default') {
           permiso = await Notification.requestPermission();
         }
 
+        // 4. Manejar rechazo
         if (permiso !== 'granted') {
           toast({
             variant: 'destructive',
             title: permiso === 'denied' ? 'Bloqueado por el Navegador' : 'Notificaciones Omitidas',
             description:
               permiso === 'denied'
-                ? 'Toca el candado 🔒 junto a desmulta.online en la barra de arriba y activa las notificaciones para que funcionen.'
+                ? 'Toca el candado 🔒 junto a desmulta.online en la barra de dirección y activa las notificaciones.'
                 : 'No podremos notificarte el resultado en tiempo real.',
             duration: 8000,
           });
           setYaTienePermiso(true);
 
-          // FIX FALLA 3: Revocar el token en Firestore cuando el usuario niega el permiso.
-          // Evita que el servidor siga intentando enviar push a un token que FCM rechazará.
+          // Revocar el token en Firestore para no reintentar con tokens stale
           if (permiso === 'denied' && docId && docId !== 'OFFLINE_PENDING') {
             fetch('/api/web-push/revoke', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ docId }),
-            }).catch(() => {
-              // Silenciar: el usuario ya denegó, no es crítico si falla
-            });
+            }).catch(() => {});
           }
 
           return null;
@@ -178,31 +238,18 @@ export function useWebPush() {
 
         setYaTienePermiso(true);
 
+        // 5. Obtener token FCM
         if (!('serviceWorker' in navigator)) {
           throw new Error('Service Workers no soportados en este navegador.');
         }
 
-        // Registrar explícitamente firebase-messaging-sw.js ANTES de obtener el token
-        let swReg: ServiceWorkerRegistration | null = null;
-        try {
-          swReg = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
-            updateViaCache: 'none',
-            scope: '/',
-          });
-        } catch {
-          /* sw.js Workbox ya registrado - usar ese */
-        }
+        const registration = await registrarFirebaseSW();
 
-        const registration = swReg ?? (await navigator.serviceWorker.ready);
-
-        const messaging = getMessaging(app);
-
-        // FIX: Eliminados logger.info con datos sensibles (App Options, VAPID key)
-        // Solo logging en development:
         if (process.env.NODE_ENV === 'development') {
           console.debug('[useWebPush] SW registrado en scope:', registration.scope);
         }
 
+        const messaging = getMessaging(app);
         const token = await getToken(messaging, {
           vapidKey,
           serviceWorkerRegistration: registration,
@@ -212,43 +259,41 @@ export function useWebPush() {
 
         setFcmToken(token);
 
-        // Registrar token en Firestore (funciona con o sin usuario autenticado)
-        const auth = getAuth(app);
-        const user = auth.currentUser;
-        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-        if (user) {
-          const idToken = await user.getIdToken(true);
-          headers['Authorization'] = `Bearer ${idToken}`;
-        }
+        // 6. Registrar token en backend (con retry implícito: si falla,
+        //    el re-registro silencioso en el próximo montaje lo recuperará)
+        const registrado = await registrarTokenEnBackend(docId, token);
 
-        const respuesta = await fetch('/api/web-push/register', {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({ docId, fcmToken: token }),
-        });
+        if (registrado) {
+          // Guardar en localStorage para el re-registro silencioso en futuras visitas
+          localStorage.setItem('desmulta_active_case', docId);
 
-        if (respuesta.ok) {
           toast({
             title: '🔔 Notificaciones Activadas',
             description:
               'Recibirás alertas nativas en este dispositivo cada vez que tu caso tenga novedades.',
             duration: 8000,
           });
+        } else {
+          // El registro en backend falló pero tenemos el token — mostrar advertencia leve
+          toast({
+            title: 'Notificaciones casi listas',
+            description:
+              'Hay un problema de conexión temporal. Las alertas se activarán completamente en tu próxima visita.',
+            duration: 6000,
+          });
         }
 
         return token;
       } catch (error) {
-        // FIX: No loggear el error completo con stack trace en producción
         if (process.env.NODE_ENV === 'development') {
           logger.error('[useWebPush] FCM Token falló:', error);
         }
 
-        // FIX FALLA 4: Auto-sanación SELECTIVA — solo desregistrar el SW de Firebase,
-        // NO todos los SWs (evitar destruir el SW principal de Workbox/next-pwa).
+        // Auto-sanación selectiva: solo desregistrar el SW de Firebase Messaging
+        // para no destruir el SW principal de Workbox/next-pwa
         try {
           const regs = await navigator.serviceWorker.getRegistrations();
           for (const r of regs) {
-            // Solo desregistrar el SW de Firebase Messaging
             if (r.active?.scriptURL?.includes('firebase-messaging-sw')) {
               await r.unregister();
             }
@@ -261,7 +306,7 @@ export function useWebPush() {
 
         toast({
           variant: 'destructive',
-          title: 'Error de Configuración',
+          title: 'Error al activar alertas',
           description:
             'No se pudo activar el sistema de alertas. Por favor, recarga la página e intenta de nuevo.',
         });
@@ -284,6 +329,6 @@ export function useWebPush() {
     estadoPermiso:
       typeof window !== 'undefined' && 'Notification' in window
         ? Notification.permission
-        : 'default',
+        : ('default' as NotificationPermission),
   };
 }

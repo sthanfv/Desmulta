@@ -9,6 +9,8 @@ import {
   MessageCircle,
   ArrowRightCircle,
   Clock,
+  BellOff,
+  AlertCircle,
 } from 'lucide-react';
 import Image from 'next/image';
 import { KanbanItem } from './TableroFlujoTrabajo';
@@ -83,6 +85,22 @@ export function TarjetaKanban({
                 title="Captura SIMIT"
               >
                 <ImageIcon className="w-3 h-3" />
+              </span>
+            )}
+            {data._lastPushAttempt?.status === 'error' && (
+              <span
+                className="bg-red-500/10 dark:bg-red-500/20 text-red-600 dark:text-red-400 p-1 rounded-md animate-pulse"
+                title={`Fallo de Notificación: ${data._lastPushAttempt.reason}`}
+              >
+                <AlertCircle className="w-3 h-3" />
+              </span>
+            )}
+            {data._lastPushAttempt?.status === 'token_invalid' && (
+              <span
+                className="bg-orange-500/10 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 p-1 rounded-md"
+                title="Token FCM revocado o reinstalación detectada. El cliente debe volver a entrar."
+              >
+                <BellOff className="w-3 h-3" />
               </span>
             )}
           </div>

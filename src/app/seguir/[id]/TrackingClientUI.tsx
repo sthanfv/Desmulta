@@ -201,7 +201,11 @@ export default function TrackingClientUI({
   const [latestEvent, setLatestEvent] = useState<EventoTracking | null>(null);
   const [newEventsCount, setNewEventsCount] = useState<number>(0);
 
-  const { requestNotificationPermission, yaTienePermiso, isHandlingPermission } = useWebPush();
+  // Pasar docId directamente al hook para que el re-registro silencioso
+  // funcione aunque localStorage esté vacío (primera visita directa a /seguir/[id]).
+  const { requestNotificationPermission, yaTienePermiso, isHandlingPermission } = useWebPush({
+    docId: caseData.shortId,
+  });
 
   useEffect(() => {
     if (eventos.length > 0) {

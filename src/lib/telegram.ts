@@ -272,3 +272,59 @@ El cliente <b>${escapeHtml(nombre)}</b> (Ref: <code>${escapeHtml(shortId)}</code
     return false;
   }
 }
+
+/**
+ * sendTelegramPushError — Notifica al equipo administrador cuando una notificación
+ * push falla de manera crítica (token huérfano, revocado, o error de red).
+ * Garantiza que las fallas no queden ocultas en la base de datos.
+ */
+export async function sendTelegramPushError(
+  docId: string,
+  statusCode: string,
+  reason: string,
+  shortId?: string
+): Promise<boolean> {
+  const { TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID } = process.env;
+
+  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) return false;
+
+  try {
+    const errorTypeMap: Record<string, string> = {
+      no_token: '📵 USUARIO INCOMUNICADO (Sin Permisos)',
+      token_invalid: '🗑️ TOKEN MUERTO (Rechazado por FCM)',
+      error: '⚠️ FALLO DE ENTREGA (Error de Red/FCM)',
+    };
+
+    const displayId = shortId || docId;
+    const errorType = errorTypeMap[statusCode] || '❌ ERROR DESCONOCIDO';
+
+    const message = `🚨 <b>ALERTA DE SISTEMA: FALLO DE NOTIFICACIÓN PUSH</b>
+━━━━━━━━━━━━━━━━━━━━
+<b>Caso/Consulta:</b> <code>${escapeHtml(displayId)}</code>
+<b>Tipo de Fallo:</b> ${errorType}
+
+<b>Diagnóstico Técnico:</b>
+<code>${escapeHtml(reason)}</code>
+
+⚠️ <i>El operador debe comunicarse con el usuario por un canal alternativo (Ej. WhatsApp o Correo) y solicitarle que vuelva a autorizar notificaciones en la página de seguimiento.</i>
+━━━━━━━━━━━━━━━━━━━━`;
+
+    // Fire-and-forget: No esperamos respuesta para no bloquear flujos
+    fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        text: message,
+        parse_mode: 'HTML',
+      }),
+    }).catch((err) => {
+      logger.error('[telegram-service] Fallo enviando alerta de error Push a Telegram', err);
+    });
+
+    return true;
+  } catch (err) {
+    logger.error('[telegram-service] Error construyendo alerta de error Push:', err);
+    return false;
+  }
+}

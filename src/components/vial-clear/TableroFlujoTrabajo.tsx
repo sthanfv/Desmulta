@@ -48,6 +48,11 @@ export interface KanbanItem {
   trackingUuid?: string;
   ticketNumber?: string;
   plantillasDisponibles?: PlantillasDisponibles;
+  _lastPushAttempt?: {
+    status: string;
+    reason?: string;
+    at: string;
+  };
 }
 
 import { COLUMNAS_UNIFICADAS, COLUMNAS_LEADS } from '@/lib/constants/kanban-columns';

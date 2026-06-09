@@ -19,6 +19,11 @@ export interface ConsultationRow {
   cedula?: string;
   contacto?: string;
   email?: string;
+  _lastPushAttempt?: {
+    status: string;
+    reason?: string;
+    at: string;
+  };
 }
 
 export interface CaseRow {
@@ -33,6 +38,11 @@ export interface CaseRow {
   cedula?: string;
   contacto?: string;
   email?: string;
+  _lastPushAttempt?: {
+    status: string;
+    reason?: string;
+    at: string;
+  };
 }
 
 export function useAdminStats(auth: Auth | null) {
@@ -87,6 +97,7 @@ export function useAdminStats(auth: Auth | null) {
           email: l.email, // v7.8.0 support
           trackingUuid: l.trackingUuid,
           tipo: 'lead',
+          _lastPushAttempt: l._lastPushAttempt,
         } as KanbanItem;
       });
     },
@@ -110,6 +121,7 @@ export function useAdminStats(auth: Auth | null) {
           email: c.email, // v7.8.0 support
           trackingUuid: c.trackingUuid,
           tipo: 'caso',
+          _lastPushAttempt: c._lastPushAttempt,
         } as KanbanItem;
       });
     },
