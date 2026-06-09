@@ -68,7 +68,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'La imagen excede el límite de 4MB' }, { status: 400 });
     }
 
-    // 4. Llamar a Google Gemini
+    // 4. Llamar a Google Gemini con Timeout de 25s para evitar Vercel 504 Timeout
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error('OCR_TIMEOUT_25S')), 25000);
+    });
+
     try {
       const model = getGeminiModel();
       const prompt = `First, check if this image appears to be a traffic ticket or legal document by looking for words like: "COMPARENDO", "INFRACCION", "SIMIT", "REPUBLICA DE COLOMBIA", "SECRETARIA", "TRANSITO", "RESOLUCION", or "MULTA". 
@@ -84,7 +88,13 @@ If it is a valid document, extract all text from this image exactly as it appear
         },
       ];
 
-      const result = await model.generateContent([prompt, ...imageParts]);
+      // Compite Gemini contra el reloj de 25 segundos
+      // @ts-expect-error El SDK a veces no infiere bien el tipo de Promise.race
+      const result = await Promise.race([
+        model.generateContent([prompt, ...imageParts]),
+        timeoutPromise,
+      ]) as any;
+      
       const response = await result.response;
       const textoCompleto = response.text();
 
@@ -114,17 +124,34 @@ If it is a valid document, extract all text from this image exactly as it appear
         proveedor: 'google-gemini-2.5-flash',
       });
     } catch (geminiError) {
+      const gMsg = geminiError instanceof Error ? geminiError.message : 'Error desconocido';
       logger.error('[OCR] Error al procesar imagen con Gemini, intentando fallback con Tesseract', {
-        error: geminiError instanceof Error ? geminiError.message : 'Error desconocido',
+        error: gMsg,
       });
+
+      // Si el error fue por timeout de Vercel, no vale la pena intentar Tesseract (es muy lento)
+      if (gMsg.includes('OCR_TIMEOUT_25S')) {
+        throw new Error('Timeout de 25s alcanzado. Gemini tardó demasiado (Alta Demanda 503).');
+      }
 
       try {
         // Configurar Tesseract.js en el entorno Node.js
         const worker = await createWorker('spa');
+        
+        // Competir Tesseract contra el reloj restante (10s aprox si Gemini falló rápido)
+        const tesseractTimeout = new Promise<never>((_, reject) => {
+          setTimeout(() => reject(new Error('TESSERACT_TIMEOUT_10S')), 10000);
+        });
+
         const dataUri = `data:${mimeType};base64,${imageBase64}`;
-        const {
-          data: { text },
-        } = await worker.recognize(dataUri);
+        
+        // @ts-expect-error type inference
+        const recognizeResult = await Promise.race([
+          worker.recognize(dataUri),
+          tesseractTimeout
+        ]) as any;
+        
+        const { data: { text } } = recognizeResult;
         await worker.terminate();
 
         if (!text || text.trim().length === 0) {
@@ -141,18 +168,37 @@ If it is a valid document, extract all text from this image exactly as it appear
           proveedor: 'tesseract-js-fallback',
         });
       } catch (tesseractError) {
+        const tMsg = tesseractError instanceof Error ? tesseractError.message : 'Error desconocido';
         logger.error('[OCR] Error al procesar imagen con Tesseract (Fallback fallido)', {
-          error: tesseractError instanceof Error ? tesseractError.message : 'Error desconocido',
+          error: tMsg,
         });
 
-        return NextResponse.json(
-          { error: 'Error al procesar la imagen con IA y OCR local falló. Intenta de nuevo.' },
-          { status: 500 }
-        );
+        throw new Error(`Fallback Tesseract falló: ${tMsg}. Error original Gemini: ${gMsg}`);
       }
     }
   } catch (error) {
-    logger.error('[OCR] Error general', { error });
-    return NextResponse.json({ error: 'Error interno en servidor' }, { status: 500 });
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    logger.error('[OCR] Error general', { error: errorMsg });
+
+    // 🚨 ENVIAR ALERTA A TELEGRAM ANTES DE MORIR
+    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
+    
+    if (botToken && chatId) {
+      const telegramText = `🚨 *ALERTA SIMIT (OCR FALLIDO)* 🚨\n\nEl sistema de extracción de texto falló o se agotó el tiempo (Timeout/503).\n\n*Diagnóstico:*\n\`${errorMsg}\`\n\n_El cliente recibió un error. Podría abandonar el embudo._`;
+      fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: telegramText,
+          parse_mode: 'Markdown',
+        })
+      }).catch(() => {});
+    }
+
+    // Retornamos 503 para que el cliente sepa que es saturación temporal
+    const statusCode = errorMsg.includes('Timeout') || errorMsg.includes('503') ? 503 : 500;
+    return NextResponse.json({ error: 'Nuestros servidores de IA están temporalmente saturados por alta demanda. Por favor, intenta de nuevo en unos minutos.' }, { status: statusCode });
   }
 }
