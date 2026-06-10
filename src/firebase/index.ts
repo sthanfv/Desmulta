@@ -3,7 +3,7 @@
 import { firebaseConfig } from '@/firebase/config';
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
+import { getFirestore, connectFirestoreEmulator, initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore';
 import { logger } from '@/lib/logger/security-logger';
 
 // IMPORTANT: DO NOT MODIFY THIS FUNCTION
@@ -35,11 +35,6 @@ export function getSdks(firebaseApp: FirebaseApp) {
   let firestore;
   try {
     if (typeof window !== 'undefined') {
-      const {
-        initializeFirestore,
-        persistentLocalCache,
-        persistentMultipleTabManager,
-      } = require('firebase/firestore');
       firestore = initializeFirestore(firebaseApp, {
         localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
       });
