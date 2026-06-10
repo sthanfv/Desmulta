@@ -32,6 +32,11 @@ vi.mock('@/lib/pdf/template', () => ({
   generarHtmlReporte: vi.fn(() => '<html><body>Test</body></html>'),
 }));
 
+// Mock del Rate Limiter
+vi.mock('@/lib/security/rate-limit', () => ({
+  checkRateLimit: vi.fn(async () => ({ allowed: true })),
+}));
+
 // Mock Puppeteer & Sparticuz
 vi.mock('puppeteer-core', () => {
   const mockPage = {
