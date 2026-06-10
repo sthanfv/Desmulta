@@ -448,7 +448,9 @@ export const onConsultationStatusChange = onDocumentUpdated({
     consultationId,
   };
 
-  // Solo email al cliente — Telegram se maneja desde onCaseStatusChange
-  // para evitar mensajes duplicados cuando cambia cases Y consultations al mismo tiempo.
-  await processCaseEmail(consultationId, fakeAfterForLead, false, true);
+  // Enviar email al cliente y notificar al operador en Telegram para los cambios de estado iniciales.
+  await Promise.allSettled([
+    processCaseEmail(consultationId, fakeAfterForLead, false, true),
+    notifyTelegramStatusChange(consultationId, after, 'kanban'),
+  ]);
 });

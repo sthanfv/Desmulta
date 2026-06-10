@@ -302,6 +302,10 @@ export function useWebPush(options: UseWebPushOptions = {}) {
             const tempMessaging = getMessaging(app);
             await deleteToken(tempMessaging).catch(() => {});
           } catch {}
+          // Forzar el borrado de la base de datos de IndexedDB donde FCM guarda los tokens
+          try {
+            window.indexedDB.deleteDatabase('firebase-messaging-database');
+          } catch {}
         } catch {}
 
         toast({

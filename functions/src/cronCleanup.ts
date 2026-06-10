@@ -76,9 +76,33 @@ export const cronLimpieza = onSchedule({
       const blobsViejos = blobs.filter(b => new Date(b.uploadedAt) < sevenDaysAgo);
 
       if (blobsViejos.length > 0) {
-        const urlsParaBorrar = blobsViejos.map(b => b.url);
-        await del(urlsParaBorrar, { token: blobToken });
-        logger.info(`[cronLimpieza] Purgados ${blobsViejos.length} blobs de Vercel huérfanos.`);
+        const urlsParaBorrar = [];
+        for (const b of blobsViejos) {
+          const url = b.url;
+          
+          // Verificar si aún está en uso en consultas (prospectos activos)
+          const consSnap = await db.collection('consultations').where('evidenceUrl', '==', url).limit(1).get();
+          if (!consSnap.empty) continue;
+          
+          // Verificar si aún está en uso en casos (expedientes activos)
+          const caseSnap = await db.collection('cases').where('evidenceUrl', '==', url).limit(1).get();
+          if (!caseSnap.empty) {
+            const caseData = caseSnap.docs[0].data();
+            // Si el caso NO está cerrado o archivado, conservamos la imagen
+            if (caseData.estado !== 'cerrado' && caseData.estado !== 'archivado' && caseData.status !== 'finalizado' && caseData.status !== 'archivo') {
+              continue;
+            }
+          }
+          
+          urlsParaBorrar.push(url);
+        }
+
+        if (urlsParaBorrar.length > 0) {
+          await del(urlsParaBorrar, { token: blobToken });
+          logger.info(`[cronLimpieza] Purgados ${urlsParaBorrar.length} blobs de Vercel huérfanos.`);
+        } else {
+          logger.info(`[cronLimpieza] No hay blobs huérfanos para borrar, se conservaron los que están en casos activos.`);
+        }
       }
     } else {
       logger.warn('[cronLimpieza] BLOB_READ_WRITE_TOKEN no configurado — omitiendo purga de blobs.');

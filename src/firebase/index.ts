@@ -32,10 +32,24 @@ export function initializeFirebase() {
 }
 
 export function getSdks(firebaseApp: FirebaseApp) {
+  let firestore;
+  try {
+    if (typeof window !== 'undefined') {
+      const { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } = require('firebase/firestore');
+      firestore = initializeFirestore(firebaseApp, {
+        localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
+      });
+    } else {
+      firestore = getFirestore(firebaseApp);
+    }
+  } catch (e) {
+    firestore = getFirestore(firebaseApp);
+  }
+
   return {
     firebaseApp,
     auth: getAuth(firebaseApp),
-    firestore: getFirestore(firebaseApp),
+    firestore,
   };
 }
 
