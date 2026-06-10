@@ -213,7 +213,7 @@ describe('onConsultationStatusChange — Unit Tests', () => {
     expect(mocks.mockFetch).not.toHaveBeenCalled();
   });
 
-  it('debe enviar email (y no duplicar notif en Telegram) cuando el lead avanza de estado', async () => {
+  it('debe enviar email y notificar en Telegram cuando el lead avanza de estado', async () => {
     const wrapped = testEnv.wrap(onConsultationStatusChange as any);
     const before = testEnv.firestore.makeDocumentSnapshot({ status: 'pendiente', emailContacto: 'lead@test.com' }, 'consultations/lead-1');
     const after  = testEnv.firestore.makeDocumentSnapshot({ status: 'contactado', emailContacto: 'lead@test.com', consultationId: 'lead-1' }, 'consultations/lead-1');
@@ -234,11 +234,11 @@ describe('onConsultationStatusChange — Unit Tests', () => {
     // ✅ Email al cliente
     expect(mocks.mockEmailsSend).toHaveBeenCalled();
 
-    // ✅ NO Telegram al operador (se delegó a onCaseStatusChange)
+    // ✅ SÍ notifica en Telegram al operador (corregido el bug de notificaciones perdidas)
     const fetchCalls = mocks.mockFetch.mock.calls;
     const telegramCalls = fetchCalls.filter((callArgs: any[]) =>
       callArgs[0].includes('api.telegram.org') && callArgs[0].includes('sendMessage')
     );
-    expect(telegramCalls.length).toBe(0);
+    expect(telegramCalls.length).toBeGreaterThanOrEqual(1);
   });
 });

@@ -89,11 +89,11 @@ If it is a valid document, extract all text from this image exactly as it appear
       ];
 
       // Compite Gemini contra el reloj de 25 segundos
-      const result = await Promise.race([
+      const result = (await Promise.race([
         model.generateContent([prompt, ...imageParts]),
         timeoutPromise,
-      ]) as any;
-      
+      ])) as any;
+
       const response = await result.response;
       const textoCompleto = response.text();
 
@@ -136,20 +136,22 @@ If it is a valid document, extract all text from this image exactly as it appear
       try {
         // Configurar Tesseract.js en el entorno Node.js
         const worker = await createWorker('spa');
-        
+
         // Competir Tesseract contra el reloj restante (10s aprox si Gemini falló rápido)
         const tesseractTimeout = new Promise<never>((_, reject) => {
           setTimeout(() => reject(new Error('TESSERACT_TIMEOUT_10S')), 10000);
         });
 
         const dataUri = `data:${mimeType};base64,${imageBase64}`;
-        
-        const recognizeResult = await Promise.race([
+
+        const recognizeResult = (await Promise.race([
           worker.recognize(dataUri),
-          tesseractTimeout
-        ]) as any;
-        
-        const { data: { text } } = recognizeResult;
+          tesseractTimeout,
+        ])) as any;
+
+        const {
+          data: { text },
+        } = recognizeResult;
         await worker.terminate();
 
         if (!text || text.trim().length === 0) {
@@ -181,7 +183,7 @@ If it is a valid document, extract all text from this image exactly as it appear
     // 🚨 ENVIAR ALERTA A TELEGRAM ANTES DE MORIR
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
-    
+
     if (botToken && chatId) {
       const telegramText = `🚨 *ALERTA SIMIT (OCR FALLIDO)* 🚨\n\nEl sistema de extracción de texto falló o se agotó el tiempo (Timeout/503).\n\n*Diagnóstico:*\n\`${errorMsg}\`\n\n_El cliente recibió un error. Podría abandonar el embudo._`;
       fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
@@ -191,12 +193,18 @@ If it is a valid document, extract all text from this image exactly as it appear
           chat_id: chatId,
           text: telegramText,
           parse_mode: 'Markdown',
-        })
+        }),
       }).catch(() => {});
     }
 
     // Retornamos 503 para que el cliente sepa que es saturación temporal
     const statusCode = errorMsg.includes('Timeout') || errorMsg.includes('503') ? 503 : 500;
-    return NextResponse.json({ error: 'Nuestros servidores de IA están temporalmente saturados por alta demanda. Por favor, intenta de nuevo en unos minutos.' }, { status: statusCode });
+    return NextResponse.json(
+      {
+        error:
+          'Nuestros servidores de IA están temporalmente saturados por alta demanda. Por favor, intenta de nuevo en unos minutos.',
+      },
+      { status: statusCode }
+    );
   }
 }

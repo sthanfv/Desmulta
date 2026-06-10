@@ -35,9 +35,13 @@ export function getSdks(firebaseApp: FirebaseApp) {
   let firestore;
   try {
     if (typeof window !== 'undefined') {
-      const { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } = require('firebase/firestore');
+      const {
+        initializeFirestore,
+        persistentLocalCache,
+        persistentMultipleTabManager,
+      } = require('firebase/firestore');
       firestore = initializeFirestore(firebaseApp, {
-        localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
+        localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
       });
     } else {
       firestore = getFirestore(firebaseApp);
