@@ -310,31 +310,62 @@ async function notifyTelegramStatusChange(
         bodyPayload.link_preview_options = { is_disabled: true };
       }
 
-      const editRes = await fetch(`https://api.telegram.org/bot${botToken}/${endpoint}`, {
+      let editRes = await fetch(`https://api.telegram.org/bot${botToken}/${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(bodyPayload),
       });
+
       if (!editRes.ok) {
-        // Si falla la edición, enviar nuevo como fallback y actualizar el ID
-        const newRes = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: chatId,
-            text: msg,
-            parse_mode: 'HTML',
-            reply_markup: replyMarkup,
-            link_preview_options: { is_disabled: true },
-          }),
-        });
-        if (newRes.ok) {
-          const newResult = await newRes.json() as { ok: boolean; result?: { message_id: number } };
-          if (newResult.result?.message_id) {
-            await admin.firestore().collection('consultations').doc(consultationId).update({
-              telegramMessageId: newResult.result.message_id,
-            });
+        const errorData = await editRes.json().catch(() => ({ description: '' }));
+        const desc = errorData.description || '';
+
+        if (desc.includes('message is not modified')) {
+          // Todo bien, el mensaje ya tenía este texto.
+          logger.info(`[notifyTelegram] Mensaje ya actualizado para ${consultationId}`);
+        } else if (desc.includes('there is no text in the message to edit')) {
+          // Era una foto, reintentar con caption
+          bodyPayload.caption = msg;
+          delete bodyPayload.text;
+          delete bodyPayload.link_preview_options;
+          await fetch(`https://api.telegram.org/bot${botToken}/editMessageCaption`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(bodyPayload),
+          });
+        } else if (desc.includes('there is no caption in the message to edit')) {
+          // Era texto, reintentar con text
+          bodyPayload.text = msg;
+          delete bodyPayload.caption;
+          bodyPayload.link_preview_options = { is_disabled: true };
+          await fetch(`https://api.telegram.org/bot${botToken}/editMessageText`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(bodyPayload),
+          });
+        } else if (desc.includes('message to edit not found')) {
+          // Solo si el mensaje original fue borrado por el usuario, enviamos uno nuevo (fallback real)
+          const newRes = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chat_id: chatId,
+              text: msg,
+              parse_mode: 'HTML',
+              reply_markup: replyMarkup,
+              link_preview_options: { is_disabled: true },
+            }),
+          });
+          if (newRes.ok) {
+            const newResult = await newRes.json() as { ok: boolean; result?: { message_id: number } };
+            if (newResult.result?.message_id) {
+              await admin.firestore().collection('consultations').doc(consultationId).update({
+                telegramMessageId: newResult.result.message_id,
+              });
+            }
           }
+        } else {
+          logger.warn(`[notifyTelegram] Error no manejado al editar: ${desc}`);
         }
       }
     } else {

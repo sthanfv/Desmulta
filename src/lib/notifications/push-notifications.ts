@@ -9,62 +9,62 @@ export interface PushMessage {
 
 const formatId = (rawId: string) => rawId.replace(/^(CASE|LEAD)-/i, '');
 
-export const STATUS_TEMPLATES: Record<string, (caseId: string) => PushMessage> = {
-  pendiente: (id) => ({
+export const STATUS_TEMPLATES: Record<string, (caseId: string, operatorNote?: string) => PushMessage> = {
+  pendiente: (id, note) => ({
     title: '⏳ Solicitud Recibida',
-    body: `Hemos recibido tu solicitud y pronto un asesor la revisará. Expediente: ${formatId(id)}`,
+    body: `Hemos recibido tu solicitud y pronto un asesor la revisará. Expediente: ${formatId(id)}${note ? `\n\n💬 Nota: ${note}` : ''}`,
   }),
-  nuevo: (id) => ({
+  nuevo: (id, note) => ({
     title: '⏳ Solicitud Recibida',
-    body: `Hemos recibido tu solicitud y pronto un asesor la revisará. Expediente: ${formatId(id)}`,
+    body: `Hemos recibido tu solicitud y pronto un asesor la revisará. Expediente: ${formatId(id)}${note ? `\n\n💬 Nota: ${note}` : ''}`,
   }),
-  contactado: (id) => ({
+  contactado: (id, note) => ({
     title: '📞 Contacto Establecido',
-    body: `Hemos iniciado la comunicación para avanzar con el estudio de tu expediente ${formatId(id)}.`,
+    body: `Hemos iniciado la comunicación para avanzar con el estudio de tu expediente ${formatId(id)}.${note ? `\n\n💬 Nota: ${note}` : ''}`,
   }),
-  estudio: (id) => ({
+  estudio: (id, note) => ({
     title: '🔍 En Estudio de Viabilidad',
-    body: `Estamos analizando las pruebas y fundamentos legales para tu expediente ${formatId(id)}.`,
+    body: `Estamos analizando las pruebas y fundamentos legales para tu expediente ${formatId(id)}.${note ? `\n\n💬 Nota: ${note}` : ''}`,
   }),
-  en_proceso: (id) => ({
+  en_proceso: (id, note) => ({
     title: '⚙️ Expediente En Proceso',
-    body: `Tu expediente ${formatId(id)} está siendo preparado por nuestro equipo legal.`,
+    body: `Tu expediente ${formatId(id)} está siendo preparado por nuestro equipo legal.${note ? `\n\n💬 Nota: ${note}` : ''}`,
   }),
-  documentacion: (id) => ({
+  documentacion: (id, note) => ({
     title: '📄 Solicitud de Documentos',
-    body: `Necesitamos documentación adicional para avanzar con tu expediente ${formatId(id)}.`,
+    body: `Necesitamos documentación adicional para avanzar con tu expediente ${formatId(id)}.${note ? `\n\n💬 Nota: ${note}` : ''}`,
   }),
-  apertura: (id) => ({
+  apertura: (id, note) => ({
     title: '🟢 Expediente Iniciado',
-    body: `Tu expediente ${formatId(id)} ha sido aceptado y ya está formalmente abierto en el sistema.`,
+    body: `Tu expediente ${formatId(id)} ha sido aceptado y ya está formalmente abierto en el sistema.${note ? `\n\n💬 Nota: ${note}` : ''}`,
   }),
-  radicado: (id) => ({
+  radicado: (id, note) => ({
     title: '✉️ Documento Radicado',
-    body: `Hemos radicado legalmente la petición para tu expediente ${formatId(id)}. Te informaremos apenas haya respuesta.`,
+    body: `Hemos radicado legalmente la petición para tu expediente ${formatId(id)}. Te informaremos apenas haya respuesta.${note ? `\n\n💬 Nota: ${note}` : ''}`,
   }),
-  tramite: (id) => ({
+  tramite: (id, note) => ({
     title: '⚖️ En Trámite Legal',
-    body: `Tu expediente ${formatId(id)} se encuentra actualmente en gestión ante la autoridad de tránsito.`,
+    body: `Tu expediente ${formatId(id)} se encuentra actualmente en gestión ante la autoridad de tránsito.${note ? `\n\n💬 Nota: ${note}` : ''}`,
   }),
-  resolucion: (id) => ({
+  resolucion: (id, note) => ({
     title: '🏛️ En Resolución',
-    body: `Estamos esperando el fallo de la autoridad sobre tu expediente ${formatId(id)}.`,
+    body: `Estamos esperando el fallo de la autoridad sobre tu expediente ${formatId(id)}.${note ? `\n\n💬 Nota: ${note}` : ''}`,
   }),
-  en_espera: (id) => ({
+  en_espera: (id, note) => ({
     title: '⏳ En Espera',
-    body: `Tu expediente ${formatId(id)} está en pausa esperando una acción externa.`,
+    body: `Tu expediente ${formatId(id)} está en pausa esperando una acción externa.${note ? `\n\n💬 Nota: ${note}` : ''}`,
   }),
-  descartado: (id) => ({
+  descartado: (id, note) => ({
     title: '❌ Expediente Descartado',
-    body: `Tu solicitud para el expediente ${formatId(id)} ha sido descartada tras el análisis técnico.`,
+    body: `Tu solicitud para el expediente ${formatId(id)} ha sido descartada tras el análisis técnico.${note ? `\n\n💬 Nota: ${note}` : ''}`,
   }),
-  finalizado: (id) => ({
+  finalizado: (id, note) => ({
     title: '✅ Expediente Finalizado',
-    body: `El proceso de tu expediente ${formatId(id)} ha concluido. Revisa los detalles en el portal de seguimiento.`,
+    body: `El proceso de tu expediente ${formatId(id)} ha concluido. Ingresa para ver el dictamen final.${note ? `\n\n💬 Nota: ${note}` : ''}`,
   }),
-  terminado: (id) => ({
-    title: '✅ Expediente Finalizado',
-    body: `El proceso de tu expediente ${formatId(id)} ha concluido exitosamente.`,
+  archivo: (id, note) => ({
+    title: '📁 Expediente Archivado',
+    body: `Tu expediente ${formatId(id)} ha sido movido al archivo general.${note ? `\n\n💬 Nota: ${note}` : ''}`,
   }),
 };
 

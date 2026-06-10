@@ -742,7 +742,7 @@ export async function updateConsultationStatus(
       const templateFn = STATUS_TEMPLATES[newStatus.toLowerCase() as keyof typeof STATUS_TEMPLATES];
       if (templateFn) {
         const leadId = id;
-        const { title, body } = templateFn(leadId);
+        const { title, body } = templateFn(leadId, operatorNote);
         // Fire-and-forget: no bloquea la respuesta al admin
         dispatchPush(leadId, { title, body }, 'consultations').catch((e) =>
           logger.warn('[updateConsultationStatus] Fallo al despachar push (no crítico)', {
