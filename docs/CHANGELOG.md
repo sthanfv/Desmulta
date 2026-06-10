@@ -4,6 +4,7 @@ Todas las versiones y cambios significativos del proyecto.
 
 ## [v1.0.0] - Junio 2026
 ### ✨ Features & UX
+- **El Toque Humano (Expansión):** La "Nota del Operador" ingresada al cambiar de estado ahora se inyecta automáticamente en las plantillas de correo electrónico y notificaciones Web Push, garantizando una comunicación omnicanal más personalizada y empática.
 - **Kanban Cinético:** Implementación de un motor de *edge-scroll* basado en `requestAnimationFrame` para la versión móvil del Tablero Flujo de Trabajo, mejorando radicalmente la usabilidad al arrastrar tarjetas hacia los bordes.
 - **Loading Skeletons (SSR):** Incorporados estados de carga (`loading.tsx`) nativos de Next.js en las rutas de mayor impacto (Blog, Multas por ciudad y Portal VIP) evitando destellos visuales durante la hidratación y revalidación SSG.
 - **Auditoría Forense Avanzada:** `TouchDebugger` evolucionó a la **v1.0.0**, integrando intercepción global de red y consola, auto-heal (Botón NUCLEAR) perfeccionado sin bloqueos en Android (sin `window.confirm`), y correcciones de fugas de memoria al desmontar.
@@ -16,6 +17,9 @@ Todas las versiones y cambios significativos del proyecto.
 - **Índices Firestore Strict:** Creado índice compuesto (`event` ASC, `ts` DESC) en `edge_telemetry` para asegurar la velocidad extrema de las consultas de analíticas sin desbordar el consumo.
 
 ### 🐛 Fixes
+- **Animación WhatsApp Inmortal:** Eliminado el timeout de 30 segundos en el widget de WhatsApp (`magic-rings.tsx`). La animación WebGL ahora corre indefinidamente para evitar la sensación de página "congelada", pausándose únicamente cuando la pestaña está oculta (`document.hidden`) para ahorrar batería.
+- **Telegram CRM Sincronización Inteligente:** Refactorizada la alerta en `onCaseStatusChange.ts` para evitar la duplicación de mensajes y los "fallbacks" que enviaban mensajes nuevos al final del chat. Se implementó una lógica de reintentos inteligente (`editMessageCaption` vs `editMessageText`) que intercepta errores de la API de Telegram y garantiza que el mensaje original se edite siempre.
+- **Notificaciones Push Duplicadas:** Eliminado el envío de notificaciones Web Push desde Firebase Functions, delegando esta responsabilidad exclusivamente al motor Next.js (`actions.ts`) para evitar alertas dobles en el dispositivo del usuario.
 - **Vercel PDF Export Fix:** Configuración de `outputFileTracingIncludes` en `next.config.ts` para forzar la inclusión de los binarios de `@sparticuz/chromium`, solucionando el error 500 al generar PDFs en el entorno de producción.
 - **Traducción Modo Dios:** Renombramiento de toda la interfaz administrativa de "God Mode" a "Modo Dios" para mejorar la experiencia UX del operador local.
 

@@ -9,6 +9,20 @@
 
 ---
 
+## 📝 SESIÓN: OPTIMIZACIÓN DE NOTIFICACIONES OMNICANAL Y WIDGETS (Junio 2026)
+**Objetivo:** Reparar la lógica de notificaciones duplicadas en Telegram, asegurar la propagación de la "Nota del Operador" en Push y Email, y evitar la detención de la animación de WhatsApp.
+
+**Acciones Realizadas:**
+1. **Sincronización Inteligente de Telegram:** Se reescribió el manejador en `onCaseStatusChange.ts`. Ahora la función reintenta dinámicamente (`editMessageCaption` vs `editMessageText`) analizando la respuesta de error de la API de Telegram, previniendo la creación de mensajes "nuevos" innecesarios como fallback.
+2. **Propagación del "Toque Humano":** La "Nota del Operador" capturada en el Kanban ahora viaja íntegra hacia las plantillas de notificaciones Push (`push-notifications.ts`) y se renderiza en un bloque distintivo dentro de las plantillas de correo (`onCaseStatusChange.ts`), garantizando omnicanalidad.
+3. **Animación WhatsApp Inmortal:** Se removió el timeout artificial de 30 segundos en `magic-rings.tsx`. La animación WebGL continuará infinitamente, deteniéndose únicamente por ahorro de batería cuando `document.hidden` sea `true`.
+4. **Validación Exhaustiva (Vitest):** Creada la suite `operator-note-notifications.test.ts` que itera sobre los 14 estados del Kanban exigiendo matemáticamente que la firma del mensaje y la nota del operador se inyecten correctamente en las plantillas sin mutaciones.
+
+**Estado Arquitectónico:**
+El sistema omnicanal de Desmulta (Email, Push, Telegram) opera de forma cohesiva y libre de duplicados, blindado por pruebas automatizadas (100% pass) contra futuras regresiones.
+
+---
+
 ## 📝 SESIÓN: INICIALIZACIÓN EQUIPO ÉLITE Y EJECUCIÓN FASE 0 (Junio 2026)
 **Objetivo:** Reasignación del rol de Equipo de Desarrollo Élite (Principal Engineer, DevSecOps, Privacy Officer, DBA, QA). Ejecución de la Fase 0 y confirmación de protocolos.
 
