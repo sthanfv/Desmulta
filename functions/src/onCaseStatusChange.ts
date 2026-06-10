@@ -143,29 +143,10 @@ async function processCaseEmail(caseId: string, after: CaseAfterData, isNew: boo
     };
 
     // ─── Push notification automático al cliente ──────────────────────────
-    // Intentar leer token desde subcolección privada, fallback al root si es legacy
-    let fcmToken = leadData?.fcmToken;
-    if (!fcmToken) {
-      const pushSnap = await db.collection('consultations').doc(consultationId).collection('private').doc('push').get();
-      if (pushSnap.exists) {
-        fcmToken = pushSnap.data()?.fcmToken;
-      }
-    }
-
-    if (fcmToken) {
-      try {
-        await sendCaseUpdateNotification(
-          fcmToken,
-          status,
-          shortId,
-          trackingUuid ? `https://desmulta.online/seguir/${trackingUuid}` : undefined,
-          consultationId
-        );
-        logger.info(`[processCaseEmail] Push enviado correctamente a ${consultationId}.`);
-      } catch (pushErr) {
-        logger.warn(`[processCaseEmail] Push fallido (no crítico):`, pushErr);
-      }
-    }
+    // [DEPRECADO] El envío de notificaciones Push ahora se maneja en el Motor 
+    // de Despacho (notification-dispatcher.ts) directamente desde actions.ts
+    // cuando el operador mueve la tarjeta en el Kanban. Mantener esto aquí 
+    // generaba notificaciones duplicadas (visto en producción).
 
     if (!emailCiudadano) {
       logger.info(`[processCaseEmail] El caso ${caseId} no tiene email de contacto. Solo Push fue enviado.`);
