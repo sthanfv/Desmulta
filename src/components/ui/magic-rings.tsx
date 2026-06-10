@@ -261,7 +261,8 @@ export function MagicRings({
     let frameId: number;
     const animate = (t: number) => {
       frameId = requestAnimationFrame(animate);
-      if (document.hidden || Date.now() - lastInteraction > 30000) return;
+      // Solo pausar la animación si el usuario cambia de pestaña para ahorrar batería.
+      if (document.hidden) return;
 
       const p = propsRef.current!;
 
