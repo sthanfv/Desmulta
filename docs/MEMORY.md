@@ -9,6 +9,30 @@
 
 ---
 
+## 📝 SESIÓN: CORRECCIONES DE AUDITORÍA DE SEGURIDAD — PLAN ENTERPRISE (Junio 2026)
+**Objetivo:** Resolver los 4 hallazgos identificados en la auditoría técnica integral del repositorio Desmulta, que incluyó lectura directa de todo el código fuente.
+
+**Hallazgos Corregidos:**
+1. **🔴 [CRÍTICO] Hashing Inconsistente en `validar-consulta`:** `src/app/api/validar-consulta/route.ts` usaba `crypto.subtle.digest('SHA-256')` puro. `create-consultation` guarda el índice usando `hashPII()` (HMAC-SHA256 con `PII_HMAC_SECRET`). La detección de duplicados era completamente ciega. **Corrección:** importar y usar `hashPII()` en `validar-consulta`.
+2. **🟠 [ALTO] FAIL-OPEN en Rate Limit:** `validar-consulta` continuaba la ejecución cuando el rate-limiter fallaba por infraestructura. Dado que Turnstile fue desactivado en esta ruta (para evitar `timeout-or-duplicate`), el rate-limit era la ÚNICA defensa activa. **Corrección:** convertido a FAIL-CLOSED retornando HTTP 503.
+3. **🟠 [ALTO] Header `x-author-uid` Spoofeable:** `/api/upload/route.ts` leía el UID del autor desde un header del cliente — spoofeable con `curl`. El rate-limit de uploads podía agotarse para cualquier usuario objetivo. **Corrección:** eliminado `x-author-uid`, el rate-limit ahora usa solo la IP (inyectada por Vercel, no falsificable por el cliente).
+4. **🔴 [CRÍTICO] CircuitBreaker In-Memory:** Las instancias globales del CircuitBreaker se perdían en cada cold start de Vercel Serverless. **Corrección:** creado `circuit-breaker-firestore.ts` con estado persistido en Firestore (`circuit_breakers/{serviceName}`). Las instancias `OcrCircuitBreakerFs` y `FirebaseCircuitBreakerFs` están listas para usarse en API Routes del servidor.
+
+**Decisiones Arquitectónicas:**
+- El `CircuitBreaker` original (en-memoria) se mantiene para el `SystemHealthProvider` (componente cliente visual). No puede reemplazarse por la versión Firestore porque usa métodos síncronos (`getState()`, `subscribe()`).
+- `CircuitBreakerFs` es exclusivamente para uso en API Routes del servidor (async).
+- La colección `circuit_breakers` en Firestore requiere una regla de seguridad: denegada desde el cliente (solo Admin SDK).
+
+**Archivos Modificados:**
+- `src/app/api/validar-consulta/route.ts` — 3 correcciones (import, fail-closed, hashPII)
+- `src/app/api/upload/route.ts` — Eliminación de header spoofeable
+- `src/lib/security/circuit-breaker-firestore.ts` — NUEVO módulo con persistencia
+
+**Estado Arquitectónico:**
+Las 4 vulnerabilidades de la auditoría han sido neutralizadas. TypeScript: sin errores. Tests: 2/2 passing.
+
+---
+
 ## 📝 SESIÓN: OPTIMIZACIÓN DE NOTIFICACIONES OMNICANAL Y WIDGETS (Junio 2026)
 **Objetivo:** Reparar la lógica de notificaciones duplicadas en Telegram, asegurar la propagación de la "Nota del Operador" en Push y Email, y evitar la detención de la animación de WhatsApp.
 

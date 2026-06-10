@@ -36,9 +36,11 @@ function extraerIpConfiable(request: NextRequest): string {
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     const clienteIp = extraerIpConfiable(request);
-    const authorUid = request.headers.get('x-author-uid') || clienteIp;
+    // 🛡️ SEGURIDAD: No se acepta el header 'x-author-uid' del cliente porque es spoofeable.
+    // El rate-limit se basa exclusivamente en la IP, que Vercel inyecta y el cliente no puede falsificar.
+    // Si en el futuro se requiere autenticación real, usar Admin SDK: getAuth().verifyIdToken(token).
     const hoy = new Date().toISOString().split('T')[0];
-    const docId = `${authorUid}_${hoy}`.replace(/[.:]/g, '_');
+    const docId = `${clienteIp}_${hoy}`.replace(/[.:]/g, '_');
 
     logger.info('[upload] Paso 1: Iniciando para IP:', { clienteIp, docId });
 

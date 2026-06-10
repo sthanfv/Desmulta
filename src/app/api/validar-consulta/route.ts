@@ -4,6 +4,7 @@ import { logger } from '@/lib/logger/security-logger';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getAdminApp } from '@/lib/firebase-admin';
 import { rateLimit } from '@/lib/security/rate-limit';
+import { hashPII } from '@/lib/security/server-crypto';
 
 /**
  * Motor de Validación — Desmulta v1.9.2
@@ -43,11 +44,15 @@ export async function POST(request: Request) {
 
     if (!success) {
       if (isError) {
-        // FAIL-OPEN: si el rate-limiter falla por infraestructura (cold start de Firestore,
-        // credenciales no disponibles, etc.), permitimos la petición en lugar de retornar 500.
-        // Las otras capas de seguridad (Turnstile, Zod, verificación de duplicados) siguen activas.
-        logger.warn(`[SECURITY] Rate Limit falló por infraestructura — fail-open para IP: ${ip}`);
-        // Continuamos con la ejecución normal (no retornamos aquí)
+        // FAIL-CLOSED: si el motor de rate-limit falla por infraestructura, bloqueamos la
+        // petición. Turnstile fue desactivado en esta ruta para evitar 'timeout-or-duplicate',
+        // por lo que el rate-limit es la ÚNICA defensa activa contra enumeración de cédulas.
+        // Un atacante podría provocar este error deliberadamente para bypassear la protección.
+        logger.warn(`[SECURITY] Rate Limit falló por infraestructura — fail-closed para IP: ${ip}`);
+        return NextResponse.json(
+          { error: 'Servicio temporalmente no disponible. Por favor, intenta de nuevo en un momento.' },
+          { status: 503 }
+        );
       } else {
         logger.warn(`[SECURITY] Rate Limit excedido para IP: ${ip}`);
 
@@ -117,14 +122,13 @@ export async function POST(request: Request) {
 
     // ✅ FIN VERIFICACIÓN CLOUDFLARE
 
-    // ⚡ 2. Hash O(1) vía Web Crypto API
-    const encoder = new TextEncoder();
-    const dataBuf = encoder.encode(cedula);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuf);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+    // ⚡ 2. Hash HMAC-SHA256 — MANDATO CRÍTICO: debe ser idéntico al usado en create-consultation.
+    // Se usa hashPII() (HMAC-SHA256 con PII_HMAC_SECRET) para garantizar que el hash resultante
+    // coincida con el índice escrito por create-consultation en 'consultas_index'.
+    // NUNCA usar crypto.subtle.digest('SHA-256') aquí — produce un hash diferente e incompatible.
+    const hashHex = hashPII(cedula);
 
-    // ⚡ 2. Consulta O(1) al índice vía Admin SDK (sin API key en URL, sin red extra)
+    // ⚡ Consulta O(1) al índice vía Admin SDK (sin API key en URL, sin red extra)
     // MANDATO-FILTRO: No se usan variables NEXT_PUBLIC en URLs de servidor.
     const docSnap = await db.collection('consultas_index').doc(hashHex).get();
 
