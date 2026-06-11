@@ -61,3 +61,70 @@ export function decryptE2EPayload<T = unknown>(encryptedBase64: string): T {
 
   return JSON.parse(decrypted.toString('utf8')) as T;
 }
+
+/**
+ * 🛡️ ENCRIPTACIÓN SIMÉTRICA (AES-256-GCM)
+ * Se usa para guardar PII (cédula) en Firestore de forma que solo el backend
+ * pueda leerla para el panel de administración.
+ */
+const SYMMETRIC_ALGO = 'aes-256-gcm';
+const ENC_PREFIX = 'ENC:';
+
+function getSymmetricKey(): Buffer {
+  const keyBase = process.env.PII_ENCRYPTION_KEY || process.env.PII_HMAC_SECRET;
+  if (!keyBase) {
+    throw new Error('🛡️ [DevSecOps] PII_ENCRYPTION_KEY o PII_HMAC_SECRET no configurada.');
+  }
+  // SHA-256 genera exactamente 32 bytes (256 bits) garantizados, sin importar
+  // la longitud del secreto original. Ideal para AES-256.
+  return crypto.createHash('sha256').update(keyBase).digest();
+}
+
+/**
+ * Encripta texto plano y devuelve un string seguro formateado.
+ * @param text Texto plano a encriptar
+ * @returns String con formato `ENC:iv:authTag:cifrado`
+ */
+export function encryptSymmetric(text: string): string {
+  if (!text) return text;
+  
+  const iv = crypto.randomBytes(12); // IV estándar de 12 bytes para GCM
+  const key = getSymmetricKey();
+  const cipher = crypto.createCipheriv(SYMMETRIC_ALGO, key, iv);
+  
+  let encrypted = cipher.update(text, 'utf8', 'hex');
+  encrypted += cipher.final('hex');
+  const authTag = cipher.getAuthTag().toString('hex');
+  
+  return `${ENC_PREFIX}${iv.toString('hex')}:${authTag}:${encrypted}`;
+}
+
+/**
+ * Desencripta texto cifrado. Si el texto no está cifrado (no tiene el prefijo ENC:),
+ * lo devuelve intacto para mantener compatibilidad con casos antiguos.
+ * @param encryptedString String generado por encryptSymmetric
+ * @returns Texto plano desencriptado
+ */
+export function decryptSymmetric(encryptedString: string): string {
+  if (!encryptedString || !encryptedString.startsWith(ENC_PREFIX)) {
+    return encryptedString;
+  }
+  
+  const parts = encryptedString.substring(ENC_PREFIX.length).split(':');
+  if (parts.length !== 3) {
+    throw new Error('Formato de encriptación simétrica inválido.');
+  }
+  
+  const [ivHex, authTagHex, encryptedHex] = parts;
+  const iv = Buffer.from(ivHex, 'hex');
+  const authTag = Buffer.from(authTagHex, 'hex');
+  const key = getSymmetricKey();
+  
+  const decipher = crypto.createDecipheriv(SYMMETRIC_ALGO, key, iv);
+  decipher.setAuthTag(authTag);
+  
+  let decrypted = decipher.update(encryptedHex, 'hex', 'utf8');
+  decrypted += decipher.final('utf8');
+  
+  return decrypted;
+}

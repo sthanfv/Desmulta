@@ -5,6 +5,7 @@ import { requireAdminSession } from '@/lib/auth/require-admin-session';
 import { getAdminApp } from '@/lib/firebase-admin';
 import { getFirestore, Timestamp, FieldValue } from 'firebase-admin/firestore';
 import type { DecodedIdToken } from 'firebase-admin/auth';
+import { decryptSymmetric, encryptSymmetric } from '@/lib/security/server-crypto';
 import { Consultation } from '@/lib/definitions';
 import { DocumentType } from '@/lib/legal/document-templates';
 import { ShowcaseConfig, FooterConfig } from '@/lib/site-config';
@@ -223,9 +224,12 @@ export async function getConsultations(
 
     const consultations = snapshot.docs.map((doc) => {
       const data = doc.data();
+      const rawCedula = data.cedula || '';
+      const cedula = rawCedula.startsWith('ENC:') ? decryptSymmetric(rawCedula) : rawCedula;
       return {
         ...data,
         id: doc.id,
+        cedula,
         // Serialización segura para Next.js Plain Objects - v5.13.0
         createdAt: data.createdAt?.toDate?.().toISOString() || null,
         updatedAt: data.updatedAt?.toDate?.().toISOString() || null,
@@ -294,7 +298,7 @@ export async function convertToCase(
       id: caseId,
       consultationId: lead.id || 'N/A',
       authorUid: safeAuthorUid,
-      cedula: safeCedula,
+      cedula: encryptSymmetric(safeCedula),
       nombre: safeNombre,
       contacto: safeContacto,
       placa: safePlaca,
@@ -801,6 +805,9 @@ export async function generarPoderLegal(
     }
 
     let data = docSnap.data()!;
+    if (data.cedula && data.cedula.startsWith('ENC:')) {
+      data.cedula = decryptSymmetric(data.cedula);
+    }
 
     // Si hay edición manual Pre-PDF, persistimos la corrección en DB instantáneamente
     if (
@@ -815,7 +822,7 @@ export async function generarPoderLegal(
         updatedAt: FieldValue.serverTimestamp(),
       };
       if (overrideData.nombre) updatePayload.nombre = overrideData.nombre;
-      if (overrideData.cedula) updatePayload.cedula = overrideData.cedula;
+      if (overrideData.cedula) updatePayload.cedula = encryptSymmetric(overrideData.cedula);
       if (overrideData.email) updatePayload.email = overrideData.email;
       if (overrideData.ticketNumber) updatePayload.ticketNumber = overrideData.ticketNumber;
       if (overrideData.placa) updatePayload.placa = overrideData.placa;

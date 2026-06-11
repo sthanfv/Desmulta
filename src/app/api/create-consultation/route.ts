@@ -4,7 +4,7 @@ import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 import { getAdminApp } from '@/lib/firebase-admin';
 import { ConsultationSchema, SimitCaptureSchema } from '@/lib/definitions';
 import { logger } from '@/lib/logger/security-logger';
-import { decryptE2EPayload, hashPII } from '@/lib/security/server-crypto';
+import { decryptE2EPayload, hashPII, encryptSymmetric } from '@/lib/security/server-crypto';
 import { z } from 'zod';
 import { rateLimit } from '@/lib/security/rate-limit';
 
@@ -273,7 +273,7 @@ export async function POST(request: NextRequest) {
           // Permiten búsqueda estable en el portal de seguimiento sin exponer PII.
           cedulaHash,
           contactoHash,
-          cedula: (validatedData as ConsultationData).cedula,
+          cedula: (validatedData as ConsultationData).cedula ? encryptSymmetric((validatedData as ConsultationData).cedula) : '',
           placa: (validatedData as ConsultationData).placa || '',
           nombre: (validatedData as ConsultationData).nombre,
           contacto: validatedData.contacto,

@@ -17,16 +17,21 @@
 2. **🟠 [ALTO] FAIL-OPEN en Rate Limit:** `validar-consulta` continuaba la ejecución cuando el rate-limiter fallaba por infraestructura. Dado que Turnstile fue desactivado en esta ruta (para evitar `timeout-or-duplicate`), el rate-limit era la ÚNICA defensa activa. **Corrección:** convertido a FAIL-CLOSED retornando HTTP 503.
 3. **🟠 [ALTO] Header `x-author-uid` Spoofeable:** `/api/upload/route.ts` leía el UID del autor desde un header del cliente — spoofeable con `curl`. El rate-limit de uploads podía agotarse para cualquier usuario objetivo. **Corrección:** eliminado `x-author-uid`, el rate-limit ahora usa solo la IP (inyectada por Vercel, no falsificable por el cliente).
 4. **🔴 [CRÍTICO] CircuitBreaker In-Memory:** Las instancias globales del CircuitBreaker se perdían en cada cold start de Vercel Serverless. **Corrección:** creado `circuit-breaker-firestore.ts` con estado persistido en Firestore (`circuit_breakers/{serviceName}`). Las instancias `OcrCircuitBreakerFs` y `FirebaseCircuitBreakerFs` están listas para usarse en API Routes del servidor.
+5. **🟠 [ALTO] PII (Cédula) en texto plano:** `create-consultation` guardaba la cédula en texto plano en la colección `consultations`, rompiendo la filosofía Zero-PII frente a brechas de datos. **Corrección:** Implementada encriptación simétrica (AES-256-GCM) en reposo. Se guarda como `ENC:iv:authTag:encrypted`. El panel de administración (`admin/actions.ts`) desencripta automáticamente al vuelo si detecta el prefijo `ENC:`, manteniendo intacta la operatividad (consulta de SIMIT).
 
 **Decisiones Arquitectónicas:**
 - El `CircuitBreaker` original (en-memoria) se mantiene para el `SystemHealthProvider` (componente cliente visual). No puede reemplazarse por la versión Firestore porque usa métodos síncronos (`getState()`, `subscribe()`).
 - `CircuitBreakerFs` es exclusivamente para uso en API Routes del servidor (async).
 - La colección `circuit_breakers` en Firestore requiere una regla de seguridad: denegada desde el cliente (solo Admin SDK).
+- Para la encriptación simétrica, se usa un formato con prefijo (`ENC:`) para asegurar compatibilidad hacia atrás con los casos antiguos que están en texto plano.
 
 **Archivos Modificados:**
 - `src/app/api/validar-consulta/route.ts` — 3 correcciones (import, fail-closed, hashPII)
 - `src/app/api/upload/route.ts` — Eliminación de header spoofeable
 - `src/lib/security/circuit-breaker-firestore.ts` — NUEVO módulo con persistencia
+- `src/lib/security/server-crypto.ts` — Añadidos `encryptSymmetric` y `decryptSymmetric`
+- `src/app/api/create-consultation/route.ts` — Encripta la cédula al crear (AES-256)
+- `src/app/admin/actions.ts` — Desencripta la cédula al consultar para el panel administrativo
 
 **Estado Arquitectónico:**
 Las 4 vulnerabilidades de la auditoría han sido neutralizadas. TypeScript: sin errores. Tests: 2/2 passing.
