@@ -19,6 +19,8 @@ import { apiError } from '@/lib/types/api-response';
  * - El payload se limita a 4MB (límite razonable para OCR)
  */
 
+export const maxDuration = 60; // Permitir hasta 60 segundos en Vercel para dar espacio al fallback OCR
+
 function getGeminiModel() {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
@@ -62,9 +64,9 @@ export async function POST(request: NextRequest) {
 
     const { imageBase64, mimeType } = parsedBody.data;
 
-    // 4. Llamar a Google Gemini con Timeout de 25s para evitar Vercel 504 Timeout
+    // 4. Llamar a Google Gemini con Timeout de 15s para evitar Vercel 504 Timeout y dar tiempo a Tesseract
     const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error('OCR_TIMEOUT_25S')), 25000);
+      setTimeout(() => reject(new Error('OCR_TIMEOUT_15S')), 15000);
     });
 
     try {
@@ -119,9 +121,10 @@ If it is a valid document, extract all text from this image exactly as it appear
         error: gMsg,
       });
 
-      // Si el error fue por timeout de Vercel, no vale la pena intentar Tesseract (es muy lento)
-      if (gMsg.includes('OCR_TIMEOUT_25S')) {
-        throw new Error('Timeout de 25s alcanzado. Gemini tardó demasiado (Alta Demanda 503).');
+      // Si el error fue por timeout, no vale la pena intentar Tesseract si Vercel está a punto de matarnos
+      // Pero como aumentamos maxDuration a 60s, si el timeout fue de 15s, Tesseract (que toma 10s) sí alcanza a correr.
+      if (gMsg.includes('OCR_TIMEOUT_15S')) {
+        logger.warn('[OCR] Timeout de 15s alcanzado. Pasando a Tesseract...');
       }
 
       try {
