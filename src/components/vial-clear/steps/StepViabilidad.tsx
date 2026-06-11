@@ -51,7 +51,8 @@ export default function StepViabilidad({ form, handleNextStep }: StepViabilidadP
                           'flex items-center justify-center h-14 rounded-2xl border-2 transition-all font-bold text-sm pwa-native-feel',
                           field.value === option
                             ? 'border-primary bg-primary/5 text-primary shadow-lg shadow-primary/10'
-                            : 'border-border/40 hover:border-border text-muted-foreground'
+                            : 'border-border/40 hover:border-border text-muted-foreground',
+                          form.formState.errors.tipoInfraccion && !field.value && 'border-destructive text-destructive ring-1 ring-destructive'
                         )}
                         aria-label={`Seleccionar tipo de captura: ${option}`}
                         aria-pressed={field.value === option}
@@ -86,7 +87,8 @@ export default function StepViabilidad({ form, handleNextStep }: StepViabilidadP
                         'h-12 md:h-14 rounded-xl md:rounded-2xl font-bold transition-all px-2 text-xs md:text-sm pwa-native-feel',
                         field.value === option
                           ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-[1.02]'
-                          : 'hover:border-primary/50'
+                          : 'hover:border-primary/50',
+                        form.formState.errors.estadoCoactivo && !field.value && 'border-destructive text-destructive ring-1 ring-destructive'
                       )}
                       onClick={() => {
                         Haptics.tap();

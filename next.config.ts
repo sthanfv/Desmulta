@@ -103,5 +103,7 @@ const nextConfig: NextConfig = {
   },
 };
 
-export { nextConfig };
+// Solo para inspección y testing. Next.js utiliza el export default (con wrapper PWA).
+// Importar este export NO incluye la configuración de PWA.
+export { nextConfig as nextConfigBase };
 export default withPWA(nextConfig);

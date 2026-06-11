@@ -2,6 +2,22 @@
 
 Este documento clarifica las estrategias técnicas adoptadas en la versión 8.x de Desmulta, especialmente en lo referente a la integración continua (CI), el aseguramiento de calidad (QA) y la seguridad de la infraestructura.
 
+## ADR-001 Zero-PII: Política de Encriptación de Datos Sensibles
+
+**Contexto:**
+Durante la creación de consultas (`create-consultation`), Desmulta procesa información sensible (PII) de los usuarios, específicamente números de cédula y teléfonos. Almacenar estos datos en texto plano en la base de datos supone un riesgo significativo en caso de fuga de datos. El portal de administración (`admin/page.tsx`) requiere visualizar esta información para su operación manual.
+
+**Decisión:**
+Se ha decidido implementar una arquitectura Zero-PII:
+1. **Identificación (Búsqueda):** Los datos PII (cédula y contacto) se indexan utilizando un hash unidireccional y determinista basado en HMAC-SHA256 (`hashPII`), empleando una sal de servidor (`PII_HMAC_SECRET`).
+2. **Almacenamiento (Persistencia):** El dato original (texto plano) nunca se almacena en las colecciones transaccionales. En su lugar, se cifra usando criptografía simétrica (AES-256-GCM) a través de `encryptSymmetric` antes de ser guardado en Firestore. La clave de cifrado maestro (`SERVER_PII_SECRET`) se mantiene inyectada como variable de entorno solo en el servidor seguro.
+3. **Lectura (Operación Admin):** El panel de administración realiza la desencriptación al vuelo (`decryptSymmetric`) utilizando una Server Action. Ningún dato PII desencriptado descansa de forma persistente.
+
+**Consecuencias:**
+- La base de datos, en reposo o si es comprometida, solo contiene "basura criptográfica" y firmas inmutables.
+- Se ha añadido complejidad al panel de administración y a los reportes exportables, requiriendo descifrado en tiempo de ejecución.
+- Garantiza un cumplimiento riguroso de las leyes de privacidad de datos (Ley 1581 de Colombia).
+
 ## 1. Estrategia de Pruebas y el Uso de "Mocks"
 
 En el entorno de desarrollo y pruebas automatizadas de Desmulta, utilizamos una técnica estándar de la industria conocida como **"Mocking"** (Simulación). 

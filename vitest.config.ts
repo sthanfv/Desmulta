@@ -14,9 +14,9 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'html'],
       thresholds: {
-        lines: 70,
-        functions: 70,
-        branches: 65,
+        lines: 75,
+        functions: 75,
+        branches: 70,
       },
       include: [
         'src/lib/security/**',

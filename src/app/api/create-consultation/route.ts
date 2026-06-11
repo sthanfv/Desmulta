@@ -7,6 +7,7 @@ import { logger } from '@/lib/logger/security-logger';
 import { decryptE2EPayload, hashPII, encryptSymmetric } from '@/lib/security/server-crypto';
 import { z } from 'zod';
 import { rateLimit } from '@/lib/security/rate-limit';
+import { apiError } from '@/lib/types/api-response';
 
 /**
  * ⚠️ FIX CRÍTICO v8.11.0:
@@ -89,14 +90,14 @@ export async function POST(request: NextRequest) {
   try {
     const rawBody = await request.text();
     if (!rawBody) {
-      return NextResponse.json({ error: 'Cuerpo de la petición vacío.' }, { status: 400 });
+      return NextResponse.json(apiError('VALIDATION_ERROR', 'Cuerpo de la petición vacío.'), { status: 400 });
     }
 
     let body: unknown;
     try {
       body = JSON.parse(rawBody);
     } catch {
-      return NextResponse.json({ error: 'Formato JSON inválido.' }, { status: 400 });
+      return NextResponse.json(apiError('VALIDATION_ERROR', 'Formato JSON inválido.'), { status: 400 });
     }
 
     const bodyAsRecord =
@@ -126,7 +127,7 @@ export async function POST(request: NextRequest) {
           error: String(_e),
         });
         return NextResponse.json(
-          { error: 'Carga cifrada corrompida. Intento bloqueado por protocolo de seguridad.' },
+          apiError('ENCRYPTION_ERROR', 'Carga cifrada corrompida. Intento bloqueado por protocolo de seguridad.'),
           { status: 400 }
         );
       }
@@ -138,7 +139,7 @@ export async function POST(request: NextRequest) {
     const validation = schema.safeParse(body);
     if (!validation.success) {
       return NextResponse.json(
-        { error: 'Datos de entrada no válidos.', details: validation.error.flatten() },
+        apiError('VALIDATION_ERROR', 'Datos de entrada no válidos.', validation.error.flatten()),
         { status: 400 }
       );
     }
@@ -164,7 +165,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (!authorUid) {
-      return NextResponse.json({ error: 'Falta el UID del autor.' }, { status: 400 });
+      return NextResponse.json(apiError('VALIDATION_ERROR', 'Falta el UID del autor.'), { status: 400 });
     }
 
     // 🛡️ Rate Limit: máximo 5 intentos cada 5 minutos por usuario + IP
@@ -181,11 +182,7 @@ export async function POST(request: NextRequest) {
       if (isError) {
         logger.error(`[SECURITY] Rate Limit falló por error de infraestructura para: ${authorUid}`);
         return NextResponse.json(
-          {
-            error:
-              'Servicio temporalmente no disponible por mantenimiento de seguridad. Por favor, intente de nuevo en un momento.',
-            tokenConsumed,
-          },
+          { ...apiError('SERVICE_UNAVAILABLE', 'Servicio temporalmente no disponible por mantenimiento de seguridad. Por favor, intente de nuevo en un momento.'), tokenConsumed },
           { status: 500 }
         );
       }
@@ -205,10 +202,7 @@ export async function POST(request: NextRequest) {
       }
 
       return NextResponse.json(
-        {
-          error: `¡Pausa de seguridad! Para proteger tu información, por favor espera ${timeStr} antes de enviar otra consulta.`,
-          tokenConsumed,
-        },
+        { ...apiError('RATE_LIMITED', `¡Pausa de seguridad! Para proteger tu información, por favor espera ${timeStr} antes de enviar otra consulta.`), tokenConsumed },
         {
           status: 429,
           headers: { 'Retry-After': String(Math.ceil(remainingMs / 1000)) },
@@ -220,11 +214,7 @@ export async function POST(request: NextRequest) {
     if (!turnstileValid) {
       logger.security('[create-consultation] Token Turnstile inválido o ausente.', { authorUid });
       return NextResponse.json(
-        {
-          error:
-            'Tu seguridad es lo primero. Por favor, asegúrate de que el escudo de protección esté activo y vuelve a intentarlo.',
-          tokenConsumed: false,
-        },
+        { ...apiError('TURNSTILE_FAILED', 'Tu seguridad es lo primero. Por favor, asegúrate de que el escudo de protección esté activo y vuelve a intentarlo.'), tokenConsumed: false },
         { status: 403 }
       );
     }
@@ -361,11 +351,7 @@ export async function POST(request: NextRequest) {
     const message = error instanceof Error ? error.message : 'Error desconocido';
     logger.error('[create-consultation] Error crítico:', { error: message });
     return NextResponse.json(
-      {
-        error:
-          'Lo sentimos, tuvimos un pequeño tropiezo técnico. Por favor, verifica tu conexión e intenta de nuevo en unos momentos.',
-        tokenConsumed,
-      },
+      { ...apiError('INTERNAL_ERROR', 'Lo sentimos, tuvimos un pequeño tropiezo técnico. Por favor, verifica tu conexión e intenta de nuevo en unos momentos.'), tokenConsumed },
       { status: 500 }
     );
   }

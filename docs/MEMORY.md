@@ -9,6 +9,50 @@
 
 ---
 
+## 📝 SESIÓN: VALIDACIÓN FAIL-FAST DE ENTORNO (Junio 2026)
+**Objetivo:** Crear un validador de variables de entorno estricto que blinde el arranque (boot) de la aplicación y prevenga ejecuciones vulnerables.
+
+**Implementado:**
+- **`env-validator.ts`:** Se desarrolló un esquema Zod integral que evalúa variables criptográficas (RSA, HMAC), credenciales de Firebase Admin SDK y secretos de JWT. Se clasificaron en CRÍTICAS, ALTAS y MEDIAS (estas últimas degradan silenciosamente).
+- **Inyección en Boot (`instrumentation.ts`):** Se interceptó el hook `register()` del entorno Node.js de Next.js. Si las variables CRÍTICAS fallan en modo producción (y no bajo un proceso CI puramente compilatorio), el servidor lanza un `FATAL ERROR` y detiene el arranque. En desarrollo, emite advertencias sonoras en consola (`SecurityLogger.warn`).
+
+---
+
+## 📝 SESIÓN: FASE 3 — CALIDAD Y MANTENIBILIDAD (Junio 2026)
+**Objetivo:** Culminar la Fase 3 completando el feedback visual en formularios y confirmando el estatus de las tareas ya refactorizadas.
+
+**Implementado:**
+- **Mantenibilidad Integral Verificada:** Se confirmó la implementación previa y activa de las validaciones cruzadas para `cronCleanup`, la estandarización `VALIDATION_ERROR` mediante Zod en OCR, el guard de seguridad de entorno en criptografía cliente (`typeof window`), y la cobertura de tests exhaustiva para notificaciones (`cronRetryNotifications`) y umbrales globales de Vitest (75%).
+- **Feedback Visual (Tailwind):** Se completó la inyección de clases reactivas de error (`border-destructive focus-visible:ring-destructive`) para todos los `<Input />` y selectores dinámicos en `StepPreAnalisis.tsx`, `StepViabilidad.tsx` y `StepContacto.tsx`, asegurando que además del `scrollIntoView` introducido previamente, el usuario tenga claridad visual inmediata sobre los campos defectuosos.
+
+---
+
+## 📝 SESIÓN: FASE 2 — SEGURIDAD Y DATOS (Junio 2026)
+**Objetivo:** Consolidación de políticas Zero-PII, resiliencia Serverless y estandarización de respuestas API.
+
+**Implementado:**
+- **Tarea 2.1 (Decisión PII):** Se validó que el código ya usa `encryptSymmetric` (AES-256-GCM) para guardar PII en `create-consultation`. Documentada la política oficialmente en `docs/architecture_v8.md` como **ADR-001 Zero-PII**.
+- **Tarea 2.2 (CircuitBreaker):** Se adaptó `circuit-breaker-firestore.ts` añadiendo métodos de compatibilidad `loadState` y `saveState`, operando sobre la colección exclusiva `circuit_breaker_state`. Se protegió dicha colección en `firestore.rules` (solo Admin SDK).
+- **Tarea 2.3 (Estandarización API):** Consolidado mediante el módulo `api-response.ts` creado en la sesión anterior, aplicándose a las 4 rutas principales.
+
+---
+
+## 📝 SESIÓN: HALLAZGOS MEDIOS Y BAJOS — AUDITORÍA ENTERPRISE (Junio 2026)
+**Objetivo:** Implementar los 9 hallazgos de nivel Medio (🟡) y Bajo (🔵) de la auditoría técnica integral.
+
+**Implementado:**
+- **M1:** `api-response.ts` — Módulo de errores estándar. Las 4 rutas API usan `apiError(code, message)`.
+- **M2:** `useExpedienteStore.ts` — TTL 24h en multas con `onRehydrateStorage` y campo `multasCachedAt`.
+- **M3:** `ocr/route.ts` — Validación Zod del body (integrado con M1).
+- **M4:** `ConsultationForm.tsx` — Scroll al primer campo con error tras el toast.
+- **M5:** `cronCleanup.ts` — Purga diferenciada: abandonados≥14d, finalizados≥30d. Activos NUNCA se borran.
+- **B1:** `client-crypto.ts` — Guardia de entorno en `hashSHA256`.
+- **B2:** `vitest.config.ts` — Umbrales 75/75/70.
+- **B3:** `next.config.ts` — Export renombrado a `nextConfigBase`.
+- **B4:** `cronRetryNotifications.test.ts` — 2 nuevos casos: límite reintentos y fail-safe Telegram.
+
+---
+
 ## 📝 SESIÓN: CORRECCIONES DE AUDITORÍA DE SEGURIDAD — PLAN ENTERPRISE (Junio 2026)
 **Objetivo:** Resolver los 4 hallazgos identificados en la auditoría técnica integral del repositorio Desmulta, que incluyó lectura directa de todo el código fuente.
 

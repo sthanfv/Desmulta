@@ -12,6 +12,7 @@ import { getAdminApp } from '@/lib/firebase-admin';
 import { getFirestore } from 'firebase-admin/firestore';
 import { logger } from '@/lib/logger/security-logger';
 import type { NextRequest } from 'next/server';
+import { apiError } from '@/lib/types/api-response';
 
 const MIMES_PERMITIDOS = new Set(['image/jpeg', 'image/png', 'image/webp']);
 
@@ -36,11 +37,28 @@ function extraerIpConfiable(request: NextRequest): string {
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     const clienteIp = extraerIpConfiable(request);
-    // 🛡️ SEGURIDAD: No se acepta el header 'x-author-uid' del cliente porque es spoofeable.
-    // El rate-limit se basa exclusivamente en la IP, que Vercel inyecta y el cliente no puede falsificar.
-    // Si en el futuro se requiere autenticación real, usar Admin SDK: getAuth().verifyIdToken(token).
+
+    // 🛡️ SEGURIDAD: Verificar Firebase ID Token si está presente en Authorization header
+    // No confiamos en headers arbitrarios como 'x-author-uid'
+    const authHeader = request.headers.get('Authorization');
+    let verifiedUid: string | null = null;
+
+    if (authHeader?.startsWith('Bearer ')) {
+      try {
+        const { getAuth } = await import('firebase-admin/auth');
+        getAdminApp();
+        const decoded = await getAuth().verifyIdToken(authHeader.slice(7));
+        verifiedUid = decoded.uid;
+      } catch {
+        // Token inválido — ignorar, usar solo IP
+        logger.warn('[upload] Token de autorización inválido o expirado.', { ip: clienteIp });
+      }
+    }
+
+    // Usar UID verificado o IP como fallback (nunca el header no verificado)
+    const authorUid = verifiedUid || clienteIp;
     const hoy = new Date().toISOString().split('T')[0];
-    const docId = `${clienteIp}_${hoy}`.replace(/[.:]/g, '_');
+    const docId = `${authorUid}_${hoy}`.replace(/[.:]/g, '_');
 
     logger.info('[upload] Paso 1: Iniciando para IP:', { clienteIp, docId });
 
@@ -82,9 +100,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         }
 
         return NextResponse.json(
-          {
-            error: `¡Has alcanzado el límite de seguridad diario! Solo permitimos ${limite} cargas por día para proteger el sistema. Por favor, intenta de nuevo en ${tiempoEspera}.`,
-          },
+          apiError('RATE_LIMITED', `¡Has alcanzado el límite de seguridad diario! Solo permitimos ${limite} cargas por día para proteger el sistema. Por favor, intenta de nuevo en ${tiempoEspera}.`),
           { status: 429 }
         );
       }
@@ -96,9 +112,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     if (!MIMES_PERMITIDOS.has(mimePrincipal)) {
       logger.warn('[upload] MIME no permitido:', { mimePrincipal });
       return NextResponse.json(
-        {
-          error: `Ups, el formato de tu archivo no es una imagen válida. Por favor, usa una foto en formato JPG, PNG o WebP.`,
-        },
+        apiError('INVALID_MIME', `Ups, el formato de tu archivo no es una imagen válida. Por favor, usa una foto en formato JPG, PNG o WebP.`),
         { status: 415 }
       );
     }
@@ -112,7 +126,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         bytes: bodyBuffer.byteLength,
       });
       return NextResponse.json(
-        { error: 'La imagen no puede superar 10 MB. Por favor usa una foto más pequeña.' },
+        apiError('PAYLOAD_TOO_LARGE', 'La imagen no puede superar 10 MB. Por favor usa una foto más pequeña.'),
         { status: 413 }
       );
     }
@@ -127,7 +141,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     if (!isJpeg && !isPng && !isWebp) {
       logger.warn('[upload] Magic bytes inválidos — archivo no es imagen real:', { mimePrincipal });
       return NextResponse.json(
-        { error: 'El archivo no es una imagen válida. Por favor usa JPG, PNG o WebP.' },
+        apiError('INVALID_MIME', 'El archivo no es una imagen válida. Por favor usa JPG, PNG o WebP.'),
         { status: 415 }
       );
     }
@@ -160,10 +174,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       error: mensaje,
     });
     return NextResponse.json(
-      {
-        error:
-          'No pudimos subir tu captura en este momento. Por favor, verifica que tu internet funcione bien e intenta de nuevo.',
-      },
+      apiError('INTERNAL_ERROR', 'No pudimos subir tu captura en este momento. Por favor, verifica que tu internet funcione bien e intenta de nuevo.'),
       { status: 500 }
     );
   }

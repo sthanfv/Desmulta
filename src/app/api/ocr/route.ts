@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { createWorker } from 'tesseract.js';
 import { rateLimit } from '@/lib/security/rate-limit';
 import { logger } from '@/lib/logger/security-logger';
+import { apiError } from '@/lib/types/api-response';
 
 /**
  * API Route: /api/ocr
@@ -37,36 +39,28 @@ export async function POST(request: NextRequest) {
     const rl = await rateLimit(`ocr:${ip}`, 3, 10 * 60 * 1000, 'ocrRateLimits');
     if (!rl.success) {
       return NextResponse.json(
-        { error: 'Demasiadas solicitudes. Espera 10 minutos.' },
+        apiError('RATE_LIMITED', 'Demasiadas solicitudes. Espera 10 minutos.'),
         { status: 429 }
       );
     }
 
-    // 2. Leer el body
-    const body = await request.json();
-    const { imageBase64, mimeType } = body as {
-      imageBase64: string;
-      mimeType: string;
-    };
+    // 2. Validar el body con Zod (estructura + tipos)
+    const OcrBodySchema = z.object({
+      imageBase64: z.string({ required_error: 'imageBase64 es requerido.' }).max(8_388_608, 'La imagen excede el límite de 4MB en base64.'),
+      mimeType: z.enum(['image/jpeg', 'image/png', 'image/webp'], {
+        errorMap: () => ({ message: 'Tipo de imagen no permitido. Usar JPG, PNG o WebP.' }),
+      }),
+    });
 
-    // 3. Validaciones básicas
-    if (!imageBase64 || typeof imageBase64 !== 'string') {
-      return NextResponse.json({ error: 'Imagen requerida en base64' }, { status: 400 });
-    }
-
-    const mimePermitidos = ['image/jpeg', 'image/png', 'image/webp'];
-    if (!mimePermitidos.includes(mimeType)) {
+    const parsedBody = OcrBodySchema.safeParse(await request.json());
+    if (!parsedBody.success) {
       return NextResponse.json(
-        { error: `Tipo de imagen no permitido: ${mimeType}` },
+        apiError('VALIDATION_ERROR', 'Datos de entrada inválidos.', parsedBody.error.flatten()),
         { status: 400 }
       );
     }
 
-    // Verificar tamaño (base64 ~= 4/3 del binario)
-    const estimatedBytes = Math.ceil(imageBase64.length * 0.75);
-    if (estimatedBytes > MAX_BYTES) {
-      return NextResponse.json({ error: 'La imagen excede el límite de 4MB' }, { status: 400 });
-    }
+    const { imageBase64, mimeType } = parsedBody.data;
 
     // 4. Llamar a Google Gemini con Timeout de 25s para evitar Vercel 504 Timeout
     const timeoutPromise = new Promise<never>((_, reject) => {
@@ -100,10 +94,7 @@ If it is a valid document, extract all text from this image exactly as it appear
       if (textoCompleto.trim() === 'NO_VALID_DOCUMENT') {
         logger.warn('[OCR] Imagen rechazada: no parece un documento de tránsito válido', { ip });
         return NextResponse.json(
-          {
-            error:
-              'La imagen no parece ser una multa o resolución válida. Intenta con otra foto más clara.',
-          },
+          apiError('INVALID_DOCUMENT', 'La imagen no parece ser una multa o resolución válida. Intenta con otra foto más clara.'),
           { status: 422 }
         );
       }
@@ -199,11 +190,9 @@ If it is a valid document, extract all text from this image exactly as it appear
 
     // Retornamos 503 para que el cliente sepa que es saturación temporal
     const statusCode = errorMsg.includes('Timeout') || errorMsg.includes('503') ? 503 : 500;
+    const errorCode = statusCode === 503 ? 'OCR_TIMEOUT' : 'INTERNAL_ERROR';
     return NextResponse.json(
-      {
-        error:
-          'Nuestros servidores de IA están temporalmente saturados por alta demanda. Por favor, intenta de nuevo en unos minutos.',
-      },
+      apiError(errorCode, 'Nuestros servidores de IA están temporalmente saturados por alta demanda. Por favor, intenta de nuevo en unos minutos.'),
       { status: statusCode }
     );
   }

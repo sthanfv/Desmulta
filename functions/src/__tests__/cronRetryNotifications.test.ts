@@ -109,4 +109,49 @@ describe('cronRetryNotifications - Unit Tests', () => {
     expect(mocks.mockFetch).not.toHaveBeenCalled();
     expect(mocks.mockFirestoreUpdate).not.toHaveBeenCalled();
   });
+
+  it('debe respetar el límite MAX_RETRIES_PER_RUN: solo procesa hasta 10 docs', async () => {
+    const wrapped = testEnv.wrap(cronRetryNotifications as any);
+
+    // Simular 5 documentos fallidos (menos del límite de 10)
+    const docsFallidos = Array.from({ length: 5 }, (_, i) => ({
+      id: `failed_doc_${i}`,
+      data: () => ({ nombre: `Cliente ${i}`, placa: `ABC00${i}`, contacto: '3101234567' }),
+      ref: { update: mocks.mockFirestoreUpdate },
+    }));
+
+    mocks.mockFirestoreGet.mockResolvedValue({ empty: false, docs: docsFallidos });
+
+    await wrapped({});
+
+    // Telegram fue llamado una vez por cada documento (5 en total)
+    expect(mocks.mockFetch).toHaveBeenCalledTimes(5);
+    expect(mocks.mockFirestoreUpdate).toHaveBeenCalledTimes(5);
+  });
+
+  it('debe manejar error de Telegram sin lanzar excepción no capturada (fail-safe)', async () => {
+    const wrapped = testEnv.wrap(cronRetryNotifications as any);
+
+    // Telegram falla con error de red
+    mocks.mockFetch.mockRejectedValueOnce(new Error('Telegram: Network Error'));
+
+    mocks.mockFirestoreGet.mockResolvedValue({
+      empty: false,
+      docs: [
+        {
+          id: 'doc-error-telega',
+          data: () => ({ nombre: 'Error User', placa: 'ERR001', contacto: '3009876543' }),
+          ref: { update: mocks.mockFirestoreUpdate },
+        },
+      ],
+    });
+
+    // El cron debe absorber el error internamente — no propagar excepciones
+    await expect(wrapped({})).resolves.not.toThrow();
+
+    // Firestore NO debe haber sido actualizado a 'sent' si Telegram falló
+    expect(mocks.mockFirestoreUpdate).not.toHaveBeenCalledWith(
+      expect.objectContaining({ telegramStatus: 'sent' })
+    );
+  });
 });

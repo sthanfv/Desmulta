@@ -428,7 +428,7 @@ export function ConsultationForm({ onSuccess, mode = 'full', nonce }: Consultati
         }
 
         // ── Otros errores del servidor ────────────────────────────────────────
-        let errorMsg = result.error || 'Ocurrió un error en el servidor.';
+        let errorMsg = result.message || result.error || 'Ocurrió un error en el servidor.';
         if (result.details?.fieldErrors) {
           const firstField = Object.keys(result.details.fieldErrors)[0];
           const fieldLabel =
@@ -633,6 +633,8 @@ export function ConsultationForm({ onSuccess, mode = 'full', nonce }: Consultati
                   title: 'Formulario Incompleto',
                   description: `El campo "${label}" tiene un problema: ${firstError?.message || 'Revisa el formato.'}`,
                 });
+                // Desplazar suavemente al campo con error para mejorar UX en móviles
+                document.getElementById(firstFieldName)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
               }
             )(e);
           }}

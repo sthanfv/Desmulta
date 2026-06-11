@@ -108,26 +108,40 @@ export const cronLimpieza = onSchedule({
       logger.warn('[cronLimpieza] BLOB_READ_WRITE_TOKEN no configurado — omitiendo purga de blobs.');
     }
 
-    // ── 6. Purgar leads (consultas) mayores a 7 días ────────────────────────
-    // Cumplimiento de política de retención de datos (Privacy-first)
-    const sevenDaysAgoDate = new Date(ahora - 7 * 24 * 60 * 60 * 1000);
-    const oldConsultations = await db.collection('consultations')
-      .where('createdAt', '<', admin.firestore.Timestamp.fromDate(sevenDaysAgoDate))
-      .limit(200).get();
+    // ── 6. Purgar leads (consultas) por estado y edad ────────────────────────
+    // Política de retención de datos diferenciada (Privacy-first + negocio protegido):
+    //   - Abandonados (pendiente/descartado) ≥ 14 días: ELIMINAR
+    //   - Finalizados (finalizado/terminado) ≥ 30 días: ELIMINAR
+    //   - Activos (contactado/estudio/en_proceso/radicado): NUNCA ELIMINAR
+    const catorce = admin.firestore.Timestamp.fromDate(new Date(ahora - 14 * 24 * 60 * 60 * 1000));
+    const treinta = admin.firestore.Timestamp.fromDate(new Date(ahora - 30 * 24 * 60 * 60 * 1000));
 
-    if (!oldConsultations.empty) {
+    const [abandonados, finalizados] = await Promise.all([
+      db.collection('consultations')
+        .where('status', 'in', ['pendiente', 'descartado', 'nuevo'])
+        .where('createdAt', '<', catorce)
+        .limit(200).get(),
+      db.collection('consultations')
+        .where('status', 'in', ['finalizado', 'terminado'])
+        .where('createdAt', '<', treinta)
+        .limit(200).get(),
+    ]);
+
+    const docsParaBorrar = [...abandonados.docs, ...finalizados.docs];
+
+    if (docsParaBorrar.length > 0) {
       const batch5 = db.batch();
-      oldConsultations.docs.forEach(doc => {
+      docsParaBorrar.forEach(doc => {
         batch5.delete(doc.ref);
-        // Intentar borrar también su registro de tracking si existe usando el trackingUuid
         const data = doc.data();
         if (data.trackingUuid) {
-          const trackingRef = db.collection('public_tracking').doc(data.trackingUuid);
-          batch5.delete(trackingRef);
+          batch5.delete(db.collection('public_tracking').doc(data.trackingUuid));
         }
       });
       await batch5.commit();
-      logger.info(`[cronLimpieza] Purgados ${oldConsultations.size} leads (consultations) antiguos.`);
+      logger.info(`[cronLimpieza] Purgados ${docsParaBorrar.length} leads: ${abandonados.size} abandonados (−14d) + ${finalizados.size} finalizados (−30d).`);
+    } else {
+      logger.info('[cronLimpieza] Sin leads elegibles para purga hoy.');
     }
 
     // ── 7. Purgar tokens push inactivos (> 45 días) ────────────────────────

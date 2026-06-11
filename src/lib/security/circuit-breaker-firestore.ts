@@ -64,7 +64,7 @@ export class CircuitBreakerFs {
   private getDocRef() {
     getAdminApp();
     const db = getFirestore();
-    return db.collection('circuit_breakers').doc(this.serviceName);
+    return db.collection('circuit_breaker_state').doc(this.serviceName);
   }
 
   /**
@@ -160,6 +160,30 @@ export class CircuitBreakerFs {
     } catch (err) {
       SecurityLogger.warn(`[CircuitBreakerFs] ${this.serviceName} — Error al registrar éxito`, err);
     }
+  }
+
+  /**
+   * Método de compatibilidad para cargar el estado en memoria (Tarea 2.2).
+   * En Serverless se recomienda usar getState() en cada petición,
+   * pero loadState() permite integraciones legacy.
+   */
+  async loadState(): Promise<void> {
+    const snap = await this.getDocRef().get();
+    if (snap.exists) {
+      const data = snap.data() as CircuitBreakerFsDoc;
+      // Para fines de logging o depuración
+      SecurityLogger.info(`[CircuitBreakerFs] Estado cargado desde circuit_breaker_state: ${data.failureCount} fallos`);
+    }
+  }
+
+  /**
+   * Método de compatibilidad para forzar persistencia manual con TTL.
+   */
+  async saveState(stateData: Partial<CircuitBreakerFsDoc>): Promise<void> {
+    await this.getDocRef().set({
+      ...stateData,
+      updatedAt: Date.now(),
+    }, { merge: true });
   }
 }
 

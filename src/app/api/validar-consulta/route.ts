@@ -5,6 +5,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { getAdminApp } from '@/lib/firebase-admin';
 import { rateLimit } from '@/lib/security/rate-limit';
 import { hashPII } from '@/lib/security/server-crypto';
+import { apiError } from '@/lib/types/api-response';
 
 /**
  * Motor de Validación — Desmulta v1.9.2
@@ -50,7 +51,7 @@ export async function POST(request: Request) {
         // Un atacante podría provocar este error deliberadamente para bypassear la protección.
         logger.warn(`[SECURITY] Rate Limit falló por infraestructura — fail-closed para IP: ${ip}`);
         return NextResponse.json(
-          { error: 'Servicio temporalmente no disponible. Por favor, intenta de nuevo en un momento.' },
+          apiError('SERVICE_UNAVAILABLE', 'Servicio temporalmente no disponible. Por favor, intenta de nuevo en un momento.'),
           { status: 503 }
         );
       } else {
@@ -71,9 +72,7 @@ export async function POST(request: Request) {
         }
 
         return NextResponse.json(
-          {
-            error: `Ha excedido el límite de solicitudes permitidas. Por favor, intente de nuevo en ${tiempoEspera}.`,
-          },
+          apiError('RATE_LIMITED', `Ha excedido el límite de solicitudes permitidas. Por favor, intente de nuevo en ${tiempoEspera}.`),
           { status: 429, headers: { 'Retry-After': String(Math.ceil(remainingMs / 1000)) } }
         );
       }
@@ -88,7 +87,7 @@ export async function POST(request: Request) {
     const resultado = EsquemaValidacion.safeParse(body);
     if (!resultado.success) {
       return NextResponse.json(
-        { error: 'Datos inválidos', detalles: resultado.error.flatten() },
+        apiError('VALIDATION_ERROR', 'Datos inválidos.', resultado.error.flatten()),
         { status: 400 }
       );
     }
@@ -158,10 +157,7 @@ export async function POST(request: Request) {
     logger.error('[VALIDATION Error] Fallo en la validación:', { error: mensaje });
 
     return NextResponse.json(
-      {
-        error:
-          'Hubo un inconveniente al validar tus datos. Por favor, intenta de nuevo en un momento.',
-      },
+      apiError('INTERNAL_ERROR', 'Hubo un inconveniente al validar tus datos. Por favor, intenta de nuevo en un momento.'),
       { status: 500 }
     );
   }

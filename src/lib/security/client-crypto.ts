@@ -59,8 +59,16 @@ export async function encryptE2EPayload(payload: object): Promise<string> {
 
 /**
  * Genera un hash SHA-256 de una cadena para identificación Zero-PII.
+ *
+ * ⚠️ EXCLUSIVA DEL NAVEGADOR: Utiliza `window.crypto.subtle` (Web Crypto API).
+ * No importar desde Server Components ni rutas de API — usar `hashPII` de server-crypto en su lugar.
  */
 export async function hashSHA256(text: string): Promise<string> {
+  if (typeof window === 'undefined') {
+    throw new Error(
+      'hashSHA256 es exclusiva de entornos de navegador (Client Components). En el servidor usar hashPII() de server-crypto.'
+    );
+  }
   const encoder = new TextEncoder();
   const data = encoder.encode(text);
   const hashBuffer = await window.crypto.subtle.digest('SHA-256', data);
