@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    return new NextResponse(buffer, {
+    return new NextResponse(buffer as unknown as BodyInit, {
       status: 200,
       headers: {
         'Content-Type': 'image/png',
