@@ -153,13 +153,10 @@ async function processCaseEmail(caseId: string, after: CaseAfterData, isNew: boo
       return;
     }
 
-    let qrDataUri = '';
+    let qrImageUrl = '';
     if (trackingUuid) {
-      try {
-        qrDataUri = await QRCode.toDataURL(`https://desmulta.online/seguir/${trackingUuid}`, { width: 150, margin: 1 });
-      } catch (err) {
-        logger.warn('[processCaseEmail] Error generando QR', err);
-      }
+      // En lugar de enviar un base64 que es bloqueado por Gmail, usamos la ruta API pública.
+      qrImageUrl = `https://desmulta.online/api/qr?data=${encodeURIComponent(`https://desmulta.online/seguir/${trackingUuid}`)}`;
     }
 
     const { data, error } = await resend.emails.send({
@@ -191,7 +188,7 @@ async function processCaseEmail(caseId: string, after: CaseAfterData, isNew: boo
               ${trackingUuid ? `
               <div style="text-align: center; margin-top: 35px;">
                 <p style="font-size: 14px; color: #4a5568; margin-bottom: 15px;">Guarde este código QR para hacer seguimiento rápido desde cualquier dispositivo:</p>
-                <img src="${qrDataUri}" alt="QR de Seguimiento" style="width: 150px; height: 150px; border-radius: 8px; border: 2px solid #e2e8f0; padding: 5px; background: white; margin-bottom: 20px;" />
+                <img src="${qrImageUrl}" alt="QR de Seguimiento" style="width: 150px; height: 150px; border-radius: 8px; border: 2px solid #e2e8f0; padding: 5px; background: white; margin-bottom: 20px;" />
                 <br />
                 <a href="https://desmulta.online/seguir/${trackingUuid}" style="display: inline-block; padding: 14px 30px; background-color: #D4AF37; color: #000000; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 15px; border-bottom: 3px solid #b38f1d;">Ver Estado del Caso</a>
               </div>
