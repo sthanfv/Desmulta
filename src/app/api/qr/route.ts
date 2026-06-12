@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import QRCode from 'qrcode';
 import { logger } from '@/lib/logger/security-logger';
+import { rateLimit } from '@/lib/security/rate-limit';
 
 /**
  * API Route: /api/qr
@@ -13,8 +14,14 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const data = searchParams.get('data');
 
-  if (!data) {
-    return new NextResponse('Missing data parameter', { status: 400 });
+  if (!data || data.length > 500) {
+    return new NextResponse('Missing or invalid data parameter', { status: 400 });
+  }
+
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const rl = await rateLimit(`qr:${ip}`, 30, 60 * 1000, 'qrRateLimits');
+  if (!rl.success) {
+    return new NextResponse('Too many requests', { status: 429 });
   }
 
   try {

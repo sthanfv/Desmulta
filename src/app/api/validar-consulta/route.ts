@@ -51,7 +51,10 @@ export async function POST(request: Request) {
         // Un atacante podría provocar este error deliberadamente para bypassear la protección.
         logger.warn(`[SECURITY] Rate Limit falló por infraestructura — fail-closed para IP: ${ip}`);
         return NextResponse.json(
-          apiError('SERVICE_UNAVAILABLE', 'Servicio temporalmente no disponible. Por favor, intenta de nuevo en un momento.'),
+          apiError(
+            'SERVICE_UNAVAILABLE',
+            'Servicio temporalmente no disponible. Por favor, intenta de nuevo en un momento.'
+          ),
           { status: 503 }
         );
       } else {
@@ -72,7 +75,10 @@ export async function POST(request: Request) {
         }
 
         return NextResponse.json(
-          apiError('RATE_LIMITED', `Ha excedido el límite de solicitudes permitidas. Por favor, intente de nuevo en ${tiempoEspera}.`),
+          apiError(
+            'RATE_LIMITED',
+            `Ha excedido el límite de solicitudes permitidas. Por favor, intente de nuevo en ${tiempoEspera}.`
+          ),
           { status: 429, headers: { 'Retry-After': String(Math.ceil(remainingMs / 1000)) } }
         );
       }
@@ -157,7 +163,10 @@ export async function POST(request: Request) {
     logger.error('[VALIDATION Error] Fallo en la validación:', { error: mensaje });
 
     return NextResponse.json(
-      apiError('INTERNAL_ERROR', 'Hubo un inconveniente al validar tus datos. Por favor, intenta de nuevo en un momento.'),
+      apiError(
+        'INTERNAL_ERROR',
+        'Hubo un inconveniente al validar tus datos. Por favor, intenta de nuevo en un momento.'
+      ),
       { status: 500 }
     );
   }

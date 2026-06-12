@@ -3,7 +3,13 @@
 import { firebaseConfig } from '@/firebase/config';
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore, connectFirestoreEmulator, initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore';
+import {
+  getFirestore,
+  connectFirestoreEmulator,
+  initializeFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
+} from 'firebase/firestore';
 import { logger } from '@/lib/logger/security-logger';
 
 // IMPORTANT: DO NOT MODIFY THIS FUNCTION
@@ -41,7 +47,7 @@ export function getSdks(firebaseApp: FirebaseApp) {
     } else {
       firestore = getFirestore(firebaseApp);
     }
-  } catch (e) {
+  } catch (_e) {
     firestore = getFirestore(firebaseApp);
   }
 

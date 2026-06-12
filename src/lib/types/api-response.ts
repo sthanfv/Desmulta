@@ -85,11 +85,7 @@ export interface ApiErrorBody {
  *   { status: 429 }
  * );
  */
-export function apiError(
-  code: ApiErrorCode,
-  message: string,
-  details?: unknown
-): ApiErrorBody {
+export function apiError(code: ApiErrorCode, message: string, details?: unknown): ApiErrorBody {
   return {
     code,
     message,

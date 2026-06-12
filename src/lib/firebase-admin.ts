@@ -11,6 +11,7 @@
 
 import { getApps, initializeApp, cert, type App } from 'firebase-admin/app';
 import { logger } from './logger/security-logger';
+import { FirebaseCircuitBreaker } from '@/lib/security/circuit-breaker';
 
 /**
  * Sanitiza, reformatea y reconstruye la llave privada RSA/PKCS8 al formato
@@ -81,6 +82,10 @@ export function getAdminApp(): App {
     return appsActivas[0];
   }
 
+  if (FirebaseCircuitBreaker.isOpen()) {
+    throw new Error('FIREBASE_CIRCUIT_OPEN: Firebase service is currently unavailable.');
+  }
+
   const projectId = process.env.FIREBASE_PROJECT_ID ?? process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
 
@@ -108,8 +113,10 @@ export function getAdminApp(): App {
     });
 
     logger.info('[firebase-admin] Inicialización exitosa v7.5.11');
+    FirebaseCircuitBreaker.recordSuccess();
     return app;
   } catch (error) {
+    FirebaseCircuitBreaker.recordFailure(error);
     const errorMsg = error instanceof Error ? error.message : 'Fallo desconocido';
     logger.error('[firebase-admin] Error fatal de inicialización v7.5.11:', { detalle: errorMsg });
     throw error;

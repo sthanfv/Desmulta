@@ -9,6 +9,27 @@
 
 ---
 
+## 📝 SESIÓN: RESOLUCIÓN AUDITORÍA TÉCNICA v2 (Junio 2026)
+**Objetivo:** Abordar hallazgos del reporte de auditoría v2, corrigiendo la regresión criptográfica e implementando mejoras de seguridad.
+
+**Implementado:**
+- **Corrección de Regresión PII:** Se reparó el bug crítico en `create-consultation/route.ts` que guardaba el hash de la cédula encriptada en lugar de la original. Ahora utiliza el `cedulaHash` calculado previamente, restaurando la funcionalidad del portal de seguimiento y el control de duplicados.
+- **Protección con Circuit Breaker:** Se integró `OcrCircuitBreakerFs` en el flujo de `ocr/route.ts` para proteger las llamadas a Google Gemini AI. Adicionalmente, se protegió la conexión raíz `getAdminApp()` en `firebase-admin.ts` con el `FirebaseCircuitBreaker` *en memoria*, respetando el estándar de la industria para entornos serverless (evitando la paradoja de usar Firestore para validar Firestore).
+- **Validación de Entorno Fail-Fast:** Se eliminó el archivo redundante `env-check.ts` y su llamada en `layout.tsx`. Las validaciones de `CRON_SECRET`, `COOKIE_SIGNATURE_SECRET`, `OPERATOR_PIN` y `TELEGRAM_WEBHOOK_SECRET` se unificaron en `env-validator.ts`, consolidando la validación en el startup del servidor (`instrumentation.ts`).
+- **Defensa en API QR:** Se inyectó rate limiting por IP (30/min) y se limitó la longitud del payload a 500 caracteres en `/api/qr/route.ts`, previniendo ataques de amplificación. Adicionalmente, se actualizaron las reglas de `firestore.rules` denegando acceso cliente a la nueva colección `qrRateLimits`.
+- **Testing Suite y QA:** Se creó una suite de pruebas para evitar futuras regresiones, incluyendo: Unit Tests con Vitest para `env-validator.ts` y `firebase-admin.ts`, un test de validación criptográfica en `create-consultation` y un test de Integración E2E en Playwright para el rate limit del QR. Todo validado con `--max-warnings 0` en ESLint y Typescript Check completo (0 errores).
+
+---
+
+## 📝 SESIÓN: INICIALIZACIÓN EQUIPO ÉLITE Y EJECUCIÓN FASE 0 (Junio 2026)
+**Objetivo:** Inicialización como Equipo de Desarrollo Élite (Principal Engineer, DevSecOps, Privacy Officer, DBA, QA).
+
+**Implementado:**
+- **Fase 0 (Auditoría):** Stack verificado: Next.js 15.1.0, React 19, Firebase v13/v11, Tailwind, Radix UI.
+- **Asimilación de Reglas:** Directivas de comunicación 100% en español establecidas, protección Zero-PII ratificada y ciclo inmutable de documentación sincronizada activado.
+
+---
+
 ## 📝 SESIÓN: VALIDACIÓN FAIL-FAST DE ENTORNO (Junio 2026)
 **Objetivo:** Crear un validador de variables de entorno estricto que blinde el arranque (boot) de la aplicación y prevenga ejecuciones vulnerables.
 

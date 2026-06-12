@@ -13,7 +13,6 @@ import { Toaster as ShadcnToaster } from '@/components/ui/toaster';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import Script from 'next/script';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
-import { validateEnv } from '@/lib/env-check';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Analytics } from '@vercel/analytics/react';
@@ -108,9 +107,6 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  // Verificación reactiva de variables de entorno críticas (solo logs)
-  validateEnv();
-
   const nonce = (await headers()).get('x-nonce') || '';
 
   return (

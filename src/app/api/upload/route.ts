@@ -100,7 +100,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         }
 
         return NextResponse.json(
-          apiError('RATE_LIMITED', `¡Has alcanzado el límite de seguridad diario! Solo permitimos ${limite} cargas por día para proteger el sistema. Por favor, intenta de nuevo en ${tiempoEspera}.`),
+          apiError(
+            'RATE_LIMITED',
+            `¡Has alcanzado el límite de seguridad diario! Solo permitimos ${limite} cargas por día para proteger el sistema. Por favor, intenta de nuevo en ${tiempoEspera}.`
+          ),
           { status: 429 }
         );
       }
@@ -112,7 +115,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     if (!MIMES_PERMITIDOS.has(mimePrincipal)) {
       logger.warn('[upload] MIME no permitido:', { mimePrincipal });
       return NextResponse.json(
-        apiError('INVALID_MIME', `Ups, el formato de tu archivo no es una imagen válida. Por favor, usa una foto en formato JPG, PNG o WebP.`),
+        apiError(
+          'INVALID_MIME',
+          `Ups, el formato de tu archivo no es una imagen válida. Por favor, usa una foto en formato JPG, PNG o WebP.`
+        ),
         { status: 415 }
       );
     }
@@ -126,7 +132,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         bytes: bodyBuffer.byteLength,
       });
       return NextResponse.json(
-        apiError('PAYLOAD_TOO_LARGE', 'La imagen no puede superar 10 MB. Por favor usa una foto más pequeña.'),
+        apiError(
+          'PAYLOAD_TOO_LARGE',
+          'La imagen no puede superar 10 MB. Por favor usa una foto más pequeña.'
+        ),
         { status: 413 }
       );
     }
@@ -141,7 +150,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     if (!isJpeg && !isPng && !isWebp) {
       logger.warn('[upload] Magic bytes inválidos — archivo no es imagen real:', { mimePrincipal });
       return NextResponse.json(
-        apiError('INVALID_MIME', 'El archivo no es una imagen válida. Por favor usa JPG, PNG o WebP.'),
+        apiError(
+          'INVALID_MIME',
+          'El archivo no es una imagen válida. Por favor usa JPG, PNG o WebP.'
+        ),
         { status: 415 }
       );
     }
@@ -174,7 +186,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       error: mensaje,
     });
     return NextResponse.json(
-      apiError('INTERNAL_ERROR', 'No pudimos subir tu captura en este momento. Por favor, verifica que tu internet funcione bien e intenta de nuevo.'),
+      apiError(
+        'INTERNAL_ERROR',
+        'No pudimos subir tu captura en este momento. Por favor, verifica que tu internet funcione bien e intenta de nuevo.'
+      ),
       { status: 500 }
     );
   }

@@ -61,7 +61,9 @@ export default function StepPreAnalisis({ form, setStep }: StepPreAnalisisProps)
             className={cn(
               'p-6 rounded-[2rem] border-2 border-border/40 transition-all text-left flex flex-col gap-1 active:scale-95 pwa-native-feel',
               opt.bg,
-              form.formState.errors.antiguedad && form.getValues('antiguedad') !== opt.id && 'border-destructive ring-1 ring-destructive'
+              form.formState.errors.antiguedad &&
+                form.getValues('antiguedad') !== opt.id &&
+                'border-destructive ring-1 ring-destructive'
             )}
             aria-label={`Seleccionar antigüedad: ${opt.label}`}
             aria-pressed={form.getValues('antiguedad') === opt.id}

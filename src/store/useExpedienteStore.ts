@@ -53,7 +53,13 @@ export const useExpedienteStore = create<ExpedienteState>()(
       removeMulta: (id) => set((state) => ({ multas: state.multas.filter((m) => m.id !== id) })),
       getTotalDeuda: () => get().multas.reduce((total, multa) => total + multa.valor, 0),
       clearExpediente: () =>
-        set({ cedula: null, multas: [], ocrRawText: null, capturedImage: null, multasCachedAt: null }),
+        set({
+          cedula: null,
+          multas: [],
+          ocrRawText: null,
+          capturedImage: null,
+          multasCachedAt: null,
+        }),
     }),
     {
       name: 'desmulta-expediente-storage',

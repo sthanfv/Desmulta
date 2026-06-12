@@ -137,6 +137,10 @@ service cloud.firestore {
       allow read, write: if false; // Solo Admin SDK
     }
 
+    match /qrRateLimits/{docId} {
+      allow read, write: if false; // Solo Admin SDK
+    }
+
     match /circuit_breaker_state/{docId} {
       allow read, write: if false; // Solo Admin SDK (server-side)
     }

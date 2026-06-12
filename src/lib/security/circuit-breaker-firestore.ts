@@ -87,7 +87,9 @@ export class CircuitBreakerFs {
       if (data.openedAt !== null && data.openedAt !== undefined) {
         const tiempoAbierto = Date.now() - data.openedAt;
         if (tiempoAbierto >= this.resetTimeoutMs) {
-          SecurityLogger.info(`[CircuitBreakerFs] ${this.serviceName} transiciona a HALF_OPEN tras ${tiempoAbierto}ms`);
+          SecurityLogger.info(
+            `[CircuitBreakerFs] ${this.serviceName} transiciona a HALF_OPEN tras ${tiempoAbierto}ms`
+          );
           return 'HALF_OPEN';
         }
         return 'OPEN';
@@ -96,7 +98,10 @@ export class CircuitBreakerFs {
       return 'CLOSED';
     } catch (err) {
       // Si no podemos leer el estado, asumimos CLOSED para no bloquear el servicio
-      SecurityLogger.warn(`[CircuitBreakerFs] ${this.serviceName} — Error al leer estado, asumiendo CLOSED`, err);
+      SecurityLogger.warn(
+        `[CircuitBreakerFs] ${this.serviceName} — Error al leer estado, asumiendo CLOSED`,
+        err
+      );
       return 'CLOSED';
     }
   }
@@ -116,7 +121,9 @@ export class CircuitBreakerFs {
     try {
       const ref = this.getDocRef();
       const snap = await ref.get();
-      const data = snap.exists ? (snap.data() as CircuitBreakerFsDoc) : { failureCount: 0, openedAt: null, updatedAt: Date.now() };
+      const data = snap.exists
+        ? (snap.data() as CircuitBreakerFsDoc)
+        : { failureCount: 0, openedAt: null, updatedAt: Date.now() };
       const nuevoConteo = (data.failureCount ?? 0) + 1;
 
       SecurityLogger.warn(
@@ -153,7 +160,9 @@ export class CircuitBreakerFs {
     try {
       const currentState = await this.getState();
       if (currentState === 'HALF_OPEN' || currentState === 'OPEN') {
-        SecurityLogger.info(`[CircuitBreakerFs] ${this.serviceName} recuperado. Transiciona a CLOSED.`);
+        SecurityLogger.info(
+          `[CircuitBreakerFs] ${this.serviceName} recuperado. Transiciona a CLOSED.`
+        );
       }
       // Eliminar el documento es el equivalente a "CLOSED con 0 fallos"
       await this.getDocRef().delete();
@@ -172,7 +181,9 @@ export class CircuitBreakerFs {
     if (snap.exists) {
       const data = snap.data() as CircuitBreakerFsDoc;
       // Para fines de logging o depuración
-      SecurityLogger.info(`[CircuitBreakerFs] Estado cargado desde circuit_breaker_state: ${data.failureCount} fallos`);
+      SecurityLogger.info(
+        `[CircuitBreakerFs] Estado cargado desde circuit_breaker_state: ${data.failureCount} fallos`
+      );
     }
   }
 
@@ -180,10 +191,13 @@ export class CircuitBreakerFs {
    * Método de compatibilidad para forzar persistencia manual con TTL.
    */
   async saveState(stateData: Partial<CircuitBreakerFsDoc>): Promise<void> {
-    await this.getDocRef().set({
-      ...stateData,
-      updatedAt: Date.now(),
-    }, { merge: true });
+    await this.getDocRef().set(
+      {
+        ...stateData,
+        updatedAt: Date.now(),
+      },
+      { merge: true }
+    );
   }
 }
 

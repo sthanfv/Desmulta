@@ -87,15 +87,15 @@ function getSymmetricKey(): Buffer {
  */
 export function encryptSymmetric(text: string): string {
   if (!text) return text;
-  
+
   const iv = crypto.randomBytes(12); // IV estándar de 12 bytes para GCM
   const key = getSymmetricKey();
   const cipher = crypto.createCipheriv(SYMMETRIC_ALGO, key, iv);
-  
+
   let encrypted = cipher.update(text, 'utf8', 'hex');
   encrypted += cipher.final('hex');
   const authTag = cipher.getAuthTag().toString('hex');
-  
+
   return `${ENC_PREFIX}${iv.toString('hex')}:${authTag}:${encrypted}`;
 }
 
@@ -109,22 +109,22 @@ export function decryptSymmetric(encryptedString: string): string {
   if (!encryptedString || !encryptedString.startsWith(ENC_PREFIX)) {
     return encryptedString;
   }
-  
+
   const parts = encryptedString.substring(ENC_PREFIX.length).split(':');
   if (parts.length !== 3) {
     throw new Error('Formato de encriptación simétrica inválido.');
   }
-  
+
   const [ivHex, authTagHex, encryptedHex] = parts;
   const iv = Buffer.from(ivHex, 'hex');
   const authTag = Buffer.from(authTagHex, 'hex');
   const key = getSymmetricKey();
-  
+
   const decipher = crypto.createDecipheriv(SYMMETRIC_ALGO, key, iv);
   decipher.setAuthTag(authTag);
-  
+
   let decrypted = decipher.update(encryptedHex, 'hex', 'utf8');
   decrypted += decipher.final('utf8');
-  
+
   return decrypted;
 }

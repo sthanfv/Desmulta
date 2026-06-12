@@ -5,6 +5,7 @@ import { createWorker } from 'tesseract.js';
 import { rateLimit } from '@/lib/security/rate-limit';
 import { logger } from '@/lib/logger/security-logger';
 import { apiError } from '@/lib/types/api-response';
+import { OcrCircuitBreakerFs } from '@/lib/security/circuit-breaker-firestore';
 
 /**
  * API Route: /api/ocr
@@ -32,8 +33,6 @@ function getGeminiModel() {
   return genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 }
 
-const MAX_BYTES = 4 * 1024 * 1024; // 4MB
-
 export async function POST(request: NextRequest) {
   try {
     // 1. Rate limit por IP
@@ -48,7 +47,9 @@ export async function POST(request: NextRequest) {
 
     // 2. Validar el body con Zod (estructura + tipos)
     const OcrBodySchema = z.object({
-      imageBase64: z.string({ required_error: 'imageBase64 es requerido.' }).max(8_388_608, 'La imagen excede el límite de 4MB en base64.'),
+      imageBase64: z
+        .string({ required_error: 'imageBase64 es requerido.' })
+        .max(8_388_608, 'La imagen excede el límite de 4MB en base64.'),
       mimeType: z.enum(['image/jpeg', 'image/png', 'image/webp'], {
         errorMap: () => ({ message: 'Tipo de imagen no permitido. Usar JPG, PNG o WebP.' }),
       }),
@@ -70,6 +71,10 @@ export async function POST(request: NextRequest) {
     });
 
     try {
+      if (await OcrCircuitBreakerFs.isOpen()) {
+        throw new Error('OCR_CIRCUIT_OPEN');
+      }
+
       const model = getGeminiModel();
       const prompt = `First, check if this image appears to be a traffic ticket or legal document by looking for words like: "COMPARENDO", "INFRACCION", "SIMIT", "REPUBLICA DE COLOMBIA", "SECRETARIA", "TRANSITO", "RESOLUCION", or "MULTA". 
 If you do not find any of these words, immediately stop and return EXACTLY the string "NO_VALID_DOCUMENT". 
@@ -85,6 +90,7 @@ If it is a valid document, extract all text from this image exactly as it appear
       ];
 
       // Compite Gemini contra el reloj de 25 segundos
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = (await Promise.race([
         model.generateContent([prompt, ...imageParts]),
         timeoutPromise,
@@ -96,7 +102,10 @@ If it is a valid document, extract all text from this image exactly as it appear
       if (textoCompleto.trim() === 'NO_VALID_DOCUMENT') {
         logger.warn('[OCR] Imagen rechazada: no parece un documento de tránsito válido', { ip });
         return NextResponse.json(
-          apiError('INVALID_DOCUMENT', 'La imagen no parece ser una multa o resolución válida. Intenta con otra foto más clara.'),
+          apiError(
+            'INVALID_DOCUMENT',
+            'La imagen no parece ser una multa o resolución válida. Intenta con otra foto más clara.'
+          ),
           { status: 422 }
         );
       }
@@ -110,12 +119,15 @@ If it is a valid document, extract all text from this image exactly as it appear
         caracteres: textoCompleto.length,
       });
 
+      await OcrCircuitBreakerFs.recordSuccess();
+
       return NextResponse.json({
         texto: textoCompleto,
         palabras: [], // Gemini no devuelve bounding boxes fácilmente, retornamos vacío para no romper la app
         proveedor: 'google-gemini-2.5-flash',
       });
     } catch (geminiError) {
+      await OcrCircuitBreakerFs.recordFailure(geminiError);
       const gMsg = geminiError instanceof Error ? geminiError.message : 'Error desconocido';
       logger.error('[OCR] Error al procesar imagen con Gemini, intentando fallback con Tesseract', {
         error: gMsg,
@@ -138,6 +150,7 @@ If it is a valid document, extract all text from this image exactly as it appear
 
         const dataUri = `data:${mimeType};base64,${imageBase64}`;
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const recognizeResult = (await Promise.race([
           worker.recognize(dataUri),
           tesseractTimeout,
@@ -195,7 +208,10 @@ If it is a valid document, extract all text from this image exactly as it appear
     const statusCode = errorMsg.includes('Timeout') || errorMsg.includes('503') ? 503 : 500;
     const errorCode = statusCode === 503 ? 'OCR_TIMEOUT' : 'INTERNAL_ERROR';
     return NextResponse.json(
-      apiError(errorCode, 'Nuestros servidores de IA están temporalmente saturados por alta demanda. Por favor, intenta de nuevo en unos minutos.'),
+      apiError(
+        errorCode,
+        'Nuestros servidores de IA están temporalmente saturados por alta demanda. Por favor, intenta de nuevo en unos minutos.'
+      ),
       { status: statusCode }
     );
   }

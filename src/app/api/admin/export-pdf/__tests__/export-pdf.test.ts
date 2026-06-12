@@ -35,6 +35,7 @@ vi.mock('@/lib/pdf/template', () => ({
 // Mock del Rate Limiter
 vi.mock('@/lib/security/rate-limit', () => ({
   checkRateLimit: vi.fn(async () => ({ allowed: true })),
+  rateLimit: vi.fn(async () => ({ success: true, pendingTokens: 10 })),
 }));
 
 // Mock Puppeteer & Sparticuz

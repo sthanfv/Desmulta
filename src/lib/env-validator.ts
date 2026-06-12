@@ -4,14 +4,14 @@ import { SecurityLogger } from '@/lib/logger/security-logger';
 // Esquema de validación estricto para variables de entorno críticas y altas
 const envSchema = z.object({
   // CRÍTICAS - Criptografía y Firebase Admin
-  PII_HMAC_SECRET: z.string().min(16, "Mínimo 16 caracteres para seguridad"),
-  RSA_PRIVATE_KEY: z.string().min(100, "Debe ser una llave RSA válida en formato PEM"),
-  NEXT_PUBLIC_RSA_KEY: z.string().min(100, "Debe ser una llave pública RSA válida en formato PEM"),
-  AUTH_COOKIE_SIGNATURE_KEY_CURRENT: z.string().min(16, "Mínimo 16 caracteres para seguridad"),
-  
-  FIREBASE_PROJECT_ID: z.string().min(1, "Requerido para Firebase Admin"),
-  FIREBASE_CLIENT_EMAIL: z.string().email("Debe ser el email de la Service Account"),
-  FIREBASE_PRIVATE_KEY: z.string().min(100, "Debe ser la llave privada de la Service Account"),
+  PII_HMAC_SECRET: z.string().min(16, 'Mínimo 16 caracteres para seguridad'),
+  RSA_PRIVATE_KEY: z.string().min(100, 'Debe ser una llave RSA válida en formato PEM'),
+  NEXT_PUBLIC_RSA_KEY: z.string().min(100, 'Debe ser una llave pública RSA válida en formato PEM'),
+  AUTH_COOKIE_SIGNATURE_KEY_CURRENT: z.string().min(16, 'Mínimo 16 caracteres para seguridad'),
+
+  FIREBASE_PROJECT_ID: z.string().min(1, 'Requerido para Firebase Admin'),
+  FIREBASE_CLIENT_EMAIL: z.string().email('Debe ser el email de la Service Account'),
+  FIREBASE_PRIVATE_KEY: z.string().min(100, 'Debe ser la llave privada de la Service Account'),
 
   // ALTAS - Operatividad de Cliente y API
   NEXT_PUBLIC_FIREBASE_API_KEY: z.string().min(1),
@@ -21,6 +21,10 @@ const envSchema = z.object({
   VIP_JWT_SECRET: z.string().min(16),
   BLOB_READ_WRITE_TOKEN: z.string().min(1),
   INTERNAL_API_SECRET: z.string().min(16),
+  COOKIE_SIGNATURE_SECRET: z.string().min(32, 'Debe tener mínimo 32 caracteres'),
+  CRON_SECRET: z.string().min(20),
+  OPERATOR_PIN: z.string().min(4, 'OPERATOR_PIN debe tener al menos 4 caracteres'),
+  TELEGRAM_WEBHOOK_SECRET: z.string().min(20),
 
   // Estas son opcionales según el caso (e.g. rotación de cookies)
   AUTH_COOKIE_SIGNATURE_KEY_PREVIOUS: z.string().optional(),
@@ -53,7 +57,9 @@ export function validateEnvVariables() {
 
     // En producción (y no en CI puro sin entorno runtime) rompemos el arranque
     if (isProductionMode && !isCI) {
-      console.error('💥 STARTUP ABORTADO: Faltan secretos criptográficos o credenciales requeridas.');
+      console.error(
+        '💥 STARTUP ABORTADO: Faltan secretos criptográficos o credenciales requeridas.'
+      );
       throw new Error(
         'El servidor no puede arrancar en producción sin las variables de entorno críticas configuradas correctamente.'
       );

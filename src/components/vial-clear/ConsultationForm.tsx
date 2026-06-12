@@ -633,8 +633,10 @@ export function ConsultationForm({ onSuccess, mode = 'full', nonce }: Consultati
                   title: 'Formulario Incompleto',
                   description: `El campo "${label}" tiene un problema: ${firstError?.message || 'Revisa el formato.'}`,
                 });
-                // Desplazar suavemente al campo con error para mejorar UX en móviles
-                document.getElementById(firstFieldName)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // Desplazar suavemente al campo con error y enfocarlo
+                const el = document.querySelector(`[name="${firstFieldName}"]`);
+                el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                (el as HTMLElement)?.focus();
               }
             )(e);
           }}
