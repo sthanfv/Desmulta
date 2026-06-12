@@ -82,7 +82,18 @@ export async function POST(req: NextRequest) {
 
       if (botToken && chatId && (contacto || email)) {
         const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
-        const text = `⚠️ *Lead Parcial Capturado* ⚠️\n\nEl usuario ingresó datos pero no ha finalizado:\n- 📞 *Contacto:* ${contacto || 'N/A'}\n- 📧 *Email:* ${email || 'N/A'}\n\n_Atención: si no recibes el form completo en unos minutos, es un abandono._`;
+
+        // 🛡️ ZERO-PII: Enmascarar datos personales antes de transmitir a Telegram.
+        // ADR-001: Contactos de usuarios que no completaron el formulario NO deben
+        // transmitirse en texto plano a canales externos (posible interceptación).
+        const contactoMask = contacto
+          ? `${contacto.slice(0, 3)}****${contacto.slice(-2)}`
+          : 'N/A';
+        const emailMask = email
+          ? `${email.split('@')[0].slice(0, 2)}***@${email.split('@')[1]}`
+          : 'N/A';
+
+        const text = `⚠️ *Lead Parcial Capturado* ⚠️\n\nEl usuario ingresó datos pero no ha finalizado:\n- 📞 *Contacto:* ${contactoMask}\n- 📧 *Email:* ${emailMask}\n\n_Atención: si no recibes el form completo en unos minutos, es un abandono._`;
 
         fetch(url, {
           method: 'POST',

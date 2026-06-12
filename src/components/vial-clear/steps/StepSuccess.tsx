@@ -4,7 +4,7 @@ import { CheckCircle2, BellRing, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import WatermarkedEvidence from '@/components/security/WatermarkedEvidence';
 import { useToast } from '@/hooks/use-toast';
-import { QRCodeCanvas } from 'qrcode.react';
+
 
 interface StepSuccessProps {
   successData: { docId: string; trackingUuid?: string };
@@ -117,20 +117,25 @@ export default function StepSuccess({
               Código QR de Respaldo
             </p>
             <div className="bg-white p-2 rounded-xl shadow-sm border border-slate-100">
-              <QRCodeCanvas
+              <img
                 id={`qr-client-${successData.trackingUuid}`}
-                value={`https://desmulta.online/seguir/${successData.trackingUuid}`}
-                size={120}
-                level="M"
-                includeMargin={false}
+                src={`/api/qr?data=${encodeURIComponent(`https://desmulta.online/seguir/${successData.trackingUuid}`)}&size=320`}
+                alt="QR de Respaldo"
+                width={120}
+                height={120}
+                crossOrigin="anonymous"
+                className="block"
               />
             </div>
             <Button
               onClick={() => {
-                const qrCanvas = document.getElementById(
+                const imgElement = document.getElementById(
                   `qr-client-${successData.trackingUuid}`
-                ) as HTMLCanvasElement;
-                if (!qrCanvas) return;
+                ) as HTMLImageElement;
+                if (!imgElement || !imgElement.complete) {
+                  toast({ title: 'Cargando', description: 'Por favor, espera a que el QR termine de cargar.' });
+                  return;
+                }
 
                 const targetSize = 320;
                 const HEADER_H = 60;
@@ -158,11 +163,11 @@ export default function StepSuccess({
 
                 // Dibujar el QR centrado
                 ctx.drawImage(
-                  qrCanvas,
+                  imgElement,
                   0,
                   0,
-                  qrCanvas.width,
-                  qrCanvas.height,
+                  imgElement.naturalWidth,
+                  imgElement.naturalHeight,
                   PADDING,
                   HEADER_H + PADDING,
                   targetSize,

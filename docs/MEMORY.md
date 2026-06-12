@@ -565,3 +565,46 @@ No hay fixes menores pendientes reportados.
 
 **Estado de la Arquitectura:**
 - 🟢 Estable. El modelo de permisos de Firestore ahora está unificado y el sistema ha pasado los controles más estrictos de tipo y linting.
+# Memoria del Sistema (MEMORY.md)
+
+## Estado Actual
+El sistema acaba de pasar por la **Auditoría Enterprise v3 (Fase de limpieza técnica y seguridad)**.
+Se han implementado correcciones críticas a nivel de seguridad, integridad de datos, limpieza de dependencias y estandarización del código fuente.
+
+## Cambios Realizados y Por Qué
+1. **Filtro de Estados en `deleteExpiredConsultations`**: Corregido bug crítico. Anteriormente borraba consultas finalizadas si pasaban de 30 días independientemente del estado. Ahora solo aplica a consultas descartadas/abandonadas.
+2. **Corrección de `followup-cron`**: Se modificó la query a Firestore porque apuntaba a `email`, campo inexistente. Se cambió a `emailContacto`.
+3. **Idempotencia en `convertToCase`**: Evita la concatenación infinita de prefijos `ENC:` al crear casos a partir de leads.
+4. **Seguridad en Auth VIP**: Se reemplazó el fallback en texto plano a comparación segura (timing-safe) mediante hashing, garantizando Zero-PII en base de datos para VIP.
+5. **Zero-PII en Canal de Telegram**: Se enmascaran correos y teléfonos (ej. `a***@gmail.com`) en las alertas de abandono (`/api/abandonment`) porque Telegram no es medio de almacenamiento, mitigando fugas de PII.
+6. **Validación de Entorno (`env-validator.ts`)**: Se añadió obligatoriedad a `TELEGRAM_SECURITY_CHAT_ID` para evitar crasheos silenciosos en producción.
+7. **Limpieza del Repositorio (Git Hygiene)**: Eliminados del índice de git y añadidos a `.gitignore` múltiples archivos residuales (`dump.txt`, `recovery.txt`, `eslint_output.txt`).
+8. **Unificación de Sistema de Notificaciones (Toaster)**: Se desinstaló `sonner` y se migró todo el sistema a `shadcn/ui use-toast`. Esto afecta a `feedback.ts`, `PushProvider.tsx` y `layout.tsx`, reduciendo el tamaño del bundle.
+9. **Eliminación de Generador QR duplicado**: Se desinstaló la librería de cliente `qrcode.react`. Los componentes (`StepSuccess.tsx`, `ModalDetalleExpediente.tsx`, `TrackingClientUI.tsx`) ahora consumen directamente `/api/qr?data=...&size=...` mediante la etiqueta `<img>` y lo pintan en `canvas` nativo para descargas.
+
+## Decisiones Técnicas
+- **PDF (jspdf vs pdf-lib)**: Se mantiene la dualidad. `jspdf` y `jspdf-autotable` son imprescindibles para la generación de reportes tabulares complejos en el panel de auditoría (exportación masiva). `pdf-lib` es indispensable para la manipulación y llenado de las plantillas jurídicas complejas de la aplicación.
+- Se delegó la creación de imágenes QR a la API nativa de Node.js en `/api/qr` reduciendo la huella de código entregada al navegador (cliente).
+
+## Archivos Afectados
+- `src/app/admin/actions.ts`
+- `src/app/api/internal/followup-cron/route.ts`
+- `src/app/api/vip/auth/route.ts`
+- `src/app/api/abandonment/route.ts`
+- `src/lib/env-validator.ts`
+- `src/app/layout.tsx`
+- `src/lib/ui/feedback.ts`
+- `src/components/providers/PushProvider.tsx`
+- `src/app/api/qr/route.ts`
+- `src/components/vial-clear/ModalDetalleExpediente.tsx`
+- `src/components/vial-clear/steps/StepSuccess.tsx`
+- `src/app/seguir/[id]/TrackingClientUI.tsx`
+- `.gitignore` y package.json
+  
+## Auditor�a v3 - Correcciones Pendientes (Telegram, Admin, Env)  
+- **getAnalyticsStats**: Optimizado para limitar lecturas a 2000 documentos recientes, evitando el desbordamiento de facturaci�n y lecturas ilimitadas de Firebase.  
+- **.env.example**: Se documentaron las variables faltantes NEXT_PUBLIC_BASE_API_KEY y TELEGRAM_SECURITY_CHAT_ID.  
+- **telegramWebhook**: Implementada la idempotencia en cambiarEstado mediante la verificaci�n del lastBotMessageId, previniendo que un doble tap en un bot�n ejecute la acci�n dos veces. 
+  
+## Auditor�a v3 - UI/UX Toasts  
+- **Toaster**: Se corrigi� el desbordamiento de notificaciones muy largas en m�vil a�adiendo lex-1 y truncamiento en 	oaster.tsx. Se agreg� margen superior considerando safe-area-inset-top en 	oast.tsx para evitar cruce con el Notch en iPhones o la barra superior nativa. 

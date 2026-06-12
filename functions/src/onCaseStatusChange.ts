@@ -314,7 +314,7 @@ async function notifyTelegramStatusChange(
       });
 
       if (!editRes.ok) {
-        const errorData = await editRes.json().catch(() => ({ description: '' }));
+        const errorData = (await editRes.json().catch(() => ({ description: '' }))) as { description?: string };
         const desc = errorData.description || '';
 
         if (desc.includes('message is not modified')) {

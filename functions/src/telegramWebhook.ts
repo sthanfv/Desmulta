@@ -70,7 +70,8 @@ async function cambiarEstado(
   db: admin.firestore.Firestore,
   consultationId: string,
   nuevoEstado: string,
-  operador: string
+  operador: string,
+  messageId?: number
 ): Promise<boolean> {
   try {
     const consultationRef = db.collection('consultations').doc(consultationId);
@@ -81,11 +82,18 @@ async function cambiarEstado(
     const estadoAnterior = data.status || 'pendiente';
     const estadoInfo = ESTADOS[nuevoEstado];
 
+    // ── 0. Verificación de Idempotencia por messageId ─────────────────────────
+    if (messageId && data.lastBotMessageId === messageId) {
+      logger.warn(`[CRM] Idempotencia: el mensaje ${messageId} ya procesó un cambio de estado para ${consultationId}. Ignorando.`);
+      return false; // Evita reprocesamiento en caso de doble tap
+    }
+
     // ── 1. Actualizar la consulta principal ───────────────────────────────────
     await consultationRef.update({
       status: nuevoEstado,
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       lastOperator: operador,
+      ...(messageId ? { lastBotMessageId: messageId } : {})
     });
 
     // ── 2. Actualizar public_tracking con el evento ───────────────────────────
@@ -314,7 +322,7 @@ export const telegramWebhook = onRequest(
 
           await answerCallbackQuery(token, callbackId, '⏳ Actualizando...');
 
-          const ok = await cambiarEstado(db, consultationId, nuevoEstado, operador);
+          const ok = await cambiarEstado(db, consultationId, nuevoEstado, operador, messageId);
 
           if (ok) {
             const docSnap = await db.collection('consultations').doc(consultationId).get();

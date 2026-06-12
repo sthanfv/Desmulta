@@ -80,3 +80,17 @@ test-pdf.ts
 test-pdf2.ts
 test-strings.js
 scratch/
+
+# Archivos de debug y recuperación — NUNCA deben subirse al repositorio
+# (pueden contener datos de Firestore, tokens, o estructuras internas sensibles)
+dump.txt
+recovery.txt
+recovery_writes.txt
+starcode.txt
+compiled_calc.txt
+fix-logs.js
+eslint_output.txt
+eslint_output2.txt
+eslint_output3.txt
+lint_output.txt
+test_output.txt

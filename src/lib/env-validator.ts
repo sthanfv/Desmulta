@@ -77,6 +77,9 @@ export function validateEnvVariables() {
     if (!process.env.TELEGRAM_CHAT_ID) missingMedias.push('TELEGRAM_CHAT_ID');
     if (!process.env.RESEND_API_KEY) missingMedias.push('RESEND_API_KEY');
     if (!process.env.NEXT_PUBLIC_SENTRY_DSN) missingMedias.push('NEXT_PUBLIC_SENTRY_DSN');
+    // TELEGRAM_SECURITY_CHAT_ID: Chat separado para alertas de seguridad (exportaciones masivas).
+    // Si no está configurado, logExportAction() fallará silenciosamente sin emitir alerta.
+    if (!process.env.TELEGRAM_SECURITY_CHAT_ID) missingMedias.push('TELEGRAM_SECURITY_CHAT_ID');
 
     if (missingMedias.length > 0) {
       SecurityLogger.warn(

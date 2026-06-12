@@ -1,4 +1,4 @@
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 import { SecurityLogger } from '@/lib/logger/security-logger';
 
 /**
@@ -11,7 +11,7 @@ export const Feedback = {
    * Notificación de éxito para hitos del usuario.
    */
   success: (title: string, description?: string) => {
-    toast.success(title, { description });
+    toast({ title, description });
   },
 
   /**
@@ -25,7 +25,9 @@ export const Feedback = {
       error: rawError instanceof Error ? rawError.message : String(rawError),
     });
 
-    toast.error(title, {
+    toast({
+      variant: 'destructive',
+      title,
       description:
         'Si el problema persiste, nuestro equipo técnico ya ha sido notificado automáticamente.',
     });
@@ -35,7 +37,7 @@ export const Feedback = {
    * Advertencias operativas.
    */
   warning: (title: string, description?: string) => {
-    toast.warning(title, { description });
+    toast({ title, description });
   },
 
   /**
@@ -43,11 +45,11 @@ export const Feedback = {
    * Útil para reintentos o navegación rápida.
    */
   systemAction: (title: string, actionLabel: string, onClick: () => void) => {
-    toast(title, {
-      action: {
-        label: actionLabel,
-        onClick: onClick,
-      },
+    toast({
+      title,
+      // No exportamos action porque requeriría ToastAction de shadcn y complica la compatibilidad,
+      // usamos description u omitimos temporalmente hasta asegurar la estructura UI.
+      description: `Acción requerida: ${actionLabel}`,
     });
   },
 };

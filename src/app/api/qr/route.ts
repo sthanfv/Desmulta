@@ -14,6 +14,9 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const data = searchParams.get('data');
 
+  const sizeParam = searchParams.get('size');
+  const size = sizeParam ? parseInt(sizeParam, 10) : 150;
+
   if (!data || data.length > 500) {
     return new NextResponse('Missing or invalid data parameter', { status: 400 });
   }
@@ -26,7 +29,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const buffer = await QRCode.toBuffer(data, {
-      width: 150,
+      width: Math.min(Math.max(size, 50), 1000), // Rango seguro: 50 a 1000
       margin: 1,
       color: {
         dark: '#000000FF',

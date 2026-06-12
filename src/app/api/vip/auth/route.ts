@@ -66,11 +66,11 @@ export async function POST(request: Request) {
     const checkCelular = (doc: QueryDocumentSnapshot) => {
       const data = doc.data();
       if (!data.contacto) return false;
-      // Compatibilidad con Zero-PII (Hashed)
-      if (data.contacto === hashedCelular) return true;
-      // Fallback para registros antiguos no hasheados
-      const contactoPlain = data.contacto.replace(/\D/g, '');
-      return contactoPlain.includes(normalizedCelular) || normalizedCelular.includes(contactoPlain);
+      // \ud83d\udee1\ufe0f SOLO comparaci\u00f3n por hash HMAC — Zero-PII estricto.
+      // El fallback en texto plano fue eliminado porque permit\u00eda enumeraci\u00f3n
+      // por timing side-channel y anulaba la protecci\u00f3n Zero-PII del campo contacto.
+      // Los documentos anteriores a la migraci\u00f3n deben procesarse con el script de migraci\u00f3n.
+      return data.contactoHash === hashedCelular;
     };
 
     casesSnapshot.forEach((doc) => {

@@ -64,11 +64,13 @@ export async function GET(req: NextRequest) {
     //    - updatedAt menor a hace 72 horas
     //    - sin campo followUpSentAt (no enviados aún)
     //    - con email registrado
+    // BUG-FIX: El campo en Firestore es 'emailContacto', no 'email'.
+    // La query anterior devolvía siempre 0 resultados y ningún correo se enviaba.
     const snapshot = await db
       .collection('consultations')
       .where('status', 'in', ELIGIBLE_STATUSES)
       .where('updatedAt', '<=', cutoffTimestamp)
-      .where('email', '!=', null)
+      .where('emailContacto', '!=', null)
       .limit(MAX_EMAILS_PER_RUN)
       .get();
 
@@ -91,8 +93,8 @@ export async function GET(req: NextRequest) {
         return;
       }
 
-      // Si no tiene email, no podemos enviar
-      if (!data.email || typeof data.email !== 'string' || !data.email.includes('@')) {
+      // BUG-FIX: El campo correcto es 'emailContacto', no 'email'
+      if (!data.emailContacto || typeof data.emailContacto !== 'string' || !data.emailContacto.includes('@')) {
         skipped++;
         return;
       }
@@ -107,7 +109,7 @@ export async function GET(req: NextRequest) {
       emailPromises.push(
         resend.emails.send({
           from: 'Desmulta <no-reply@desmulta.online>',
-          to: [data.email],
+          to: [data.emailContacto],
           subject: `${nombre}, tu caso con Desmulta está listo para continuar`,
           html: buildFollowUpEmail(nombre, trackingUrl),
         })

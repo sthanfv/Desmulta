@@ -19,7 +19,7 @@ import {
   Eye,
 } from 'lucide-react';
 import Image from 'next/image';
-import { QRCodeSVG, QRCodeCanvas } from 'qrcode.react';
+
 import { KanbanItem } from './TableroFlujoTrabajo';
 import { useAuth } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
@@ -408,11 +408,12 @@ export function ModalDetalleExpediente({
                 <div className="flex items-start gap-4">
                   {/* QR visible — pequeño, solo para mostrar */}
                   <div className="bg-white p-2 rounded-xl border border-slate-200 shadow-sm flex-shrink-0">
-                    <QRCodeSVG
-                      value={`${process.env.NEXT_PUBLIC_APP_URL || 'https://desmulta.online'}/seguir/${data.trackingUuid}`}
-                      size={72}
-                      level="M"
-                      includeMargin={false}
+                    <img
+                      src={`/api/qr?data=${encodeURIComponent(`${process.env.NEXT_PUBLIC_APP_URL || 'https://desmulta.online'}/seguir/${data.trackingUuid}`)}&size=150`}
+                      alt="QR Seguimiento"
+                      width={72}
+                      height={72}
+                      className="block"
                     />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -423,23 +424,24 @@ export function ModalDetalleExpediente({
                       El cliente puede escanear este QR para ver el estado en tiempo real. Sin
                       iniciar sesión.
                     </p>
-                    {/* Canvas oculto en alta resolución para la descarga */}
-                    <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
-                      <QRCodeCanvas
-                        id={`qr-hd-${data.trackingUuid}`}
-                        value={`${process.env.NEXT_PUBLIC_APP_URL || 'https://desmulta.online'}/seguir/${data.trackingUuid}`}
-                        size={320}
-                        level="H"
-                        includeMargin
-                      />
-                    </div>
+                    {/* Imagen oculta en alta resolución para la descarga */}
+                    <img
+                      id={`qr-hd-${data.trackingUuid}`}
+                      src={`/api/qr?data=${encodeURIComponent(`${process.env.NEXT_PUBLIC_APP_URL || 'https://desmulta.online'}/seguir/${data.trackingUuid}`)}&size=320`}
+                      alt="QR HD"
+                      crossOrigin="anonymous"
+                      style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}
+                    />
                     <button
                       onClick={() => {
                         const trackingId = data.trackingUuid || 'NA';
-                        const qrCanvas = document.getElementById(
+                        const imgElement = document.getElementById(
                           `qr-hd-${trackingId}`
-                        ) as HTMLCanvasElement;
-                        if (!qrCanvas) return;
+                        ) as HTMLImageElement;
+                        if (!imgElement || !imgElement.complete) {
+                          toast({ title: 'Cargando', description: 'El código QR todavía se está generando...', variant: 'default' });
+                          return;
+                        }
 
                         // Crear canvas final con marca
                         const PADDING = 28;
@@ -470,7 +472,7 @@ export function ModalDetalleExpediente({
                         ctx.fillText('DESMULTA', TOTAL_W / 2, HEADER_H / 2);
 
                         // QR centrado
-                        ctx.drawImage(qrCanvas, PADDING, HEADER_H + PADDING, QR_SIZE, QR_SIZE);
+                        ctx.drawImage(imgElement, PADDING, HEADER_H + PADDING, QR_SIZE, QR_SIZE);
 
                         // ID del expediente bajo el QR
                         ctx.fillStyle = '#6b7280';

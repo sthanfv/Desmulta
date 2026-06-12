@@ -8,7 +8,6 @@ const geistSans = Geist({
 });
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
-import { Toaster } from 'sonner';
 import { Toaster as ShadcnToaster } from '@/components/ui/toaster';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import Script from 'next/script';
@@ -164,26 +163,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 </PushProvider>
               </SystemHealthProvider>
 
-              <Toaster
-                theme="system"
-                richColors={false}
-                position="top-center"
-                className="md:!bottom-4 md:!right-4 md:!top-auto md:!left-auto"
-                toastOptions={{
-                  className:
-                    'bg-white text-zinc-950 border border-zinc-200 shadow-lg rounded-xl dark:bg-zinc-900 dark:text-zinc-50 dark:border-zinc-800',
-                  classNames: {
-                    title: 'font-semibold text-sm',
-                    description: 'text-xs text-zinc-500 dark:text-zinc-400',
-                    actionButton:
-                      'bg-zinc-900 text-white rounded-lg px-3 py-1 text-xs dark:bg-zinc-50 dark:text-zinc-950',
-                    error:
-                      'border-red-200 bg-red-50 text-red-700 dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-400',
-                    success:
-                      'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/20 dark:text-emerald-400',
-                  },
-                }}
-              />
+
               <ShadcnToaster />
             </ThemeProvider>
           </FirebaseClientProvider>

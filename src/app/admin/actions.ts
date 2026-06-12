@@ -146,8 +146,11 @@ export async function deleteExpiredConsultations(idToken: string): Promise<{
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
+    // 🛡️ PROTECCIÓN DE CASOS ACTIVOS: Solo borra leads descartados/pendientes/nuevos.
+    // Jamás se deben eliminar casos en estado activo (estudio, en_proceso, radicado, etc.).
     const snapshot = await db
       .collection('consultations')
+      .where('status', 'in', ['pendiente', 'nuevo', 'descartado'])
       .where('createdAt', '<=', Timestamp.fromDate(sevenDaysAgo))
       .limit(500)
       .get();
@@ -284,7 +287,10 @@ export async function convertToCase(
 
     // 🛡️ HARDENING: Asegurar que ningún campo sea undefined para Firestore
     const safeAuthorUid = lead.authorUid || 'SYSTEM';
-    const safeCedula = lead.cedula || 'N/A';
+    // 🛡️ IDEMPOTENCIA: Si la cédula ya viene cifrada (ENC:...) de getConsultations(),
+    // NO volver a cifrar. Esto previene doble encriptación ENC:ENC:...
+    const rawCedula = lead.cedula || 'N/A';
+    const safeCedula = rawCedula.startsWith('ENC:') ? rawCedula : encryptSymmetric(rawCedula);
     const safeNombre = lead.nombre || 'Sin Nombre';
     const safeContacto = lead.contacto || 'N/A';
     const safePlaca = lead.placa || 'N/A';
@@ -934,8 +940,8 @@ const getCachedAnalyticsStats = unstable_cache(
     // ── Lecturas en paralelo ──────────────────────────────────────────────────
     const [rawLeadsSnap, consultationsSnap, casesSnap] = await Promise.all([
       db.collection('leads').count().get(),
-      db.collection('consultations').get(),
-      db.collection('cases').get(),
+      db.collection('consultations').orderBy('createdAt', 'desc').limit(2000).get(),
+      db.collection('cases').orderBy('createdAt', 'desc').limit(1000).get(),
     ]);
 
     const prospectosTotales = rawLeadsSnap.data().count;

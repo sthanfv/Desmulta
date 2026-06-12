@@ -4,7 +4,7 @@ import { logger } from '@/lib/logger/security-logger';
 import { useEffect } from 'react';
 import { getMessaging, onMessage, isSupported } from 'firebase/messaging';
 import { app } from '@/lib/firebase-client';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 
 /**
  * PushProvider — Capa Global de Notificaciones en Primer Plano.
@@ -35,10 +35,10 @@ export function PushProvider({ children }: { children: React.ReactNode }) {
           const cuerpo = payload.notification?.body ?? 'Tu expediente tiene novedades.';
 
           // Mostrar Toast global visible desde cualquier página
-          toast(titulo, {
+          toast({
+            title: titulo,
             description: cuerpo,
             duration: 12000,
-            position: 'top-center',
           });
         });
       } catch (err) {

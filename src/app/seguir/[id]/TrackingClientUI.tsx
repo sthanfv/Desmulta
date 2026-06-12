@@ -29,12 +29,13 @@ import {
   QrCode,
 } from 'lucide-react';
 import Link from 'next/link';
-import { QRCodeSVG, QRCodeCanvas } from 'qrcode.react';
+
 
 import { TrackingCase, EventoTracking } from '@/lib/definitions';
 import { useWebPush } from '@/hooks/useWebPush';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase-client';
+import { useToast } from '@/hooks/use-toast';
 
 // Mapa de pasos del proceso (orden visual)
 const PASOS = [
@@ -144,6 +145,7 @@ export default function TrackingClientUI({
   const [caseData, setCaseData] = useState<TrackingCase>(initialCaseData);
   const [windowUrl, setWindowUrl] = useState('');
   const [visibleEventsCount, setVisibleEventsCount] = useState(5);
+  const { toast } = useToast();
 
   useEffect(() => {
     // Limpieza de localStorage (TTL Absoluto y LRU)
@@ -655,25 +657,22 @@ export default function TrackingClientUI({
             transition={{ delay: 0.5 }}
             className="flex flex-col sm:flex-row items-center gap-6 bg-card border border-border rounded-2xl p-6 mb-8 shadow-sm"
           >
-            {/* Canvas oculto alta resolución */}
-            <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
-              <QRCodeCanvas
-                id="qr-cliente-hd"
-                value={windowUrl}
-                size={320}
-                level="H"
-                includeMargin
-              />
-            </div>
+            {/* Imagen oculta alta resolución */}
+            <img
+              id="qr-cliente-hd"
+              src={`/api/qr?data=${encodeURIComponent(windowUrl)}&size=320`}
+              alt="QR HD"
+              crossOrigin="anonymous"
+              style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}
+            />
 
             <div className="p-3 bg-white rounded-xl shadow-sm border border-slate-100 flex-shrink-0">
-              <QRCodeSVG
-                value={windowUrl}
-                size={100}
-                bgColor="#ffffff"
-                fgColor="#000000"
-                level="Q"
-                includeMargin={false}
+              <img
+                src={`/api/qr?data=${encodeURIComponent(windowUrl)}&size=100`}
+                alt="QR Tracking"
+                width={100}
+                height={100}
+                className="block"
               />
             </div>
 
@@ -688,8 +687,11 @@ export default function TrackingClientUI({
               </p>
               <button
                 onClick={() => {
-                  const qrCanvas = document.getElementById('qr-cliente-hd') as HTMLCanvasElement;
-                  if (!qrCanvas) return;
+                  const imgElement = document.getElementById('qr-cliente-hd') as HTMLImageElement;
+                  if (!imgElement || !imgElement.complete) {
+                    toast({ title: 'Cargando', description: 'Por favor, espera a que el QR termine de cargar.' });
+                    return;
+                  }
 
                   const PADDING = 24;
                   const QR_SIZE = 320;
@@ -715,7 +717,7 @@ export default function TrackingClientUI({
                   ctx.textBaseline = 'middle';
                   ctx.fillText('DESMULTA', TOTAL_W / 2, HEADER_H / 2);
 
-                  ctx.drawImage(qrCanvas, PADDING, HEADER_H + PADDING, QR_SIZE, QR_SIZE);
+                  ctx.drawImage(imgElement, PADDING, HEADER_H + PADDING, QR_SIZE, QR_SIZE);
 
                   ctx.fillStyle = '#6b7280';
                   ctx.font = '13px system-ui, -apple-system, sans-serif';
