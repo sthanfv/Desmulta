@@ -123,7 +123,7 @@ export async function sendTelegramNotification(
 
 👤 <b>Cliente:</b> ${escapeHtml(data?.nombre)}
 🆔 <b>Ref:</b> <code>${escapeHtml(shortId)}</code>
-🪪 <b>Cédula:</b> <code>${escapeHtml(data?.cedula)}</code>
+🪪 <b>Cédula:</b> 🔒 [Protegida por E2EE]
 🚗 <b>Placa:</b> <code>${escapeHtml(data?.placa || 'N/A')}</code>
 📱 <b>WhatsApp:</b> <a href="${urlWhatsApp}">${escapeHtml(data?.contacto)}</a>
 ${dictamenHtml}${evidenceSection}
@@ -139,7 +139,10 @@ ${dictamenHtml}${evidenceSection}
 
 📅 <b>Recibido:</b> ${escapeHtml(new Date().toLocaleString('es-CO', { timeZone: 'America/Bogota' }))}
 ━━━━━━━━━━━━━━━━━━━━
-💡 <i>Usa el botón de abajo para responder instantáneamente.</i>`;
+💡 <i>Usa los botones para gestionar este caso.</i>`;
+
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://desmulta.vercel.app';
+    const adminUrl = `${baseUrl}/admin?search=${encodeURIComponent(docId)}`;
 
     const replyMarkup = {
       inline_keyboard: [
@@ -147,6 +150,12 @@ ${dictamenHtml}${evidenceSection}
           {
             text: '🟢 Responder por WhatsApp',
             url: urlWhatsApp,
+          },
+        ],
+        [
+          {
+            text: '🔓 Ver Datos Sensibles (PII)',
+            url: adminUrl,
           },
         ],
       ],

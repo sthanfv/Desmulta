@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 import {
   AlertCircle,
@@ -84,8 +85,16 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
 }) {
   const { toast } = useToast();
   const auth = useAuth();
+  const searchParams = useSearchParams();
 
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Enlace mágico desde Telegram: Auto-rellenar búsqueda
+  useEffect(() => {
+    const s = searchParams?.get('search');
+    if (s) setSearchQuery(s);
+  }, [searchParams]);
+
   const [filterCiudad, setFilterCiudad] = useState('');
   const [filterEstado, setFilterEstado] = useState('');
 
