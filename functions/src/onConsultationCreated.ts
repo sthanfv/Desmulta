@@ -27,7 +27,7 @@ export const onConsultationCreated = onDocumentCreated({
   document: 'consultations/{id}',
   region: 'us-central1',
   timeoutSeconds: 120,
-  secrets: ['RESEND_API_KEY', 'TELEGRAM_BOT_TOKEN', 'TELEGRAM_CHAT_ID', 'INTERNAL_API_SECRET']
+  secrets: ['RESEND_API_KEY', 'TELEGRAM_BOT_TOKEN', 'TELEGRAM_CHAT_ID', 'INTERNAL_API_SECRET', 'PII_ENCRYPTION_KEY', 'PII_HMAC_SECRET']
 }, async (event) => {
   const data = event.data?.data();
   if (!data) return;
@@ -191,7 +191,7 @@ export const onConsultationCreated = onDocumentCreated({
       let message = `<b>${headerTitle}</b>\n━━━━━━━━━━━━━━━━━━━━\n\n`;
       message += `👤 <b>Cliente:</b> ${escapeHtml(data.nombre)}\n`;
       if (data.cedula && data.cedula !== 'SIMIT-CAPTURA') {
-        message += `🪪 <b>Cédula:</b> <code>${escapeHtml(String(data.cedula))}</code>\n`;
+        message += `🪪 <b>Cédula:</b> <i>[Cifrada - Usa el botón Ver Cédula]</i>\n`;
       }
       message += `🆔 <b>Ref:</b> <code>${shortId}</code>\n`;
       message += `🚗 <b>Placa:</b> <code>${data.placa || 'N/A'}</code>\n`;

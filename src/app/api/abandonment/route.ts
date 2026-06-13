@@ -86,9 +86,7 @@ export async function POST(req: NextRequest) {
         // 🛡️ ZERO-PII: Enmascarar datos personales antes de transmitir a Telegram.
         // ADR-001: Contactos de usuarios que no completaron el formulario NO deben
         // transmitirse en texto plano a canales externos (posible interceptación).
-        const contactoMask = contacto
-          ? `${contacto.slice(0, 3)}****${contacto.slice(-2)}`
-          : 'N/A';
+        const contactoMask = contacto ? `${contacto.slice(0, 3)}****${contacto.slice(-2)}` : 'N/A';
         const emailMask = email
           ? `${email.split('@')[0].slice(0, 2)}***@${email.split('@')[1]}`
           : 'N/A';

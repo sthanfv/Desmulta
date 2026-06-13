@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import WatermarkedEvidence from '@/components/security/WatermarkedEvidence';
 import { useToast } from '@/hooks/use-toast';
 
-
 interface StepSuccessProps {
   successData: { docId: string; trackingUuid?: string };
   evidenceUrl: string | undefined;
@@ -133,7 +132,10 @@ export default function StepSuccess({
                   `qr-client-${successData.trackingUuid}`
                 ) as HTMLImageElement;
                 if (!imgElement || !imgElement.complete) {
-                  toast({ title: 'Cargando', description: 'Por favor, espera a que el QR termine de cargar.' });
+                  toast({
+                    title: 'Cargando',
+                    description: 'Por favor, espera a que el QR termine de cargar.',
+                  });
                   return;
                 }
 

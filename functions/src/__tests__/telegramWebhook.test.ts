@@ -52,6 +52,7 @@ vi.mock('firebase-functions', async (importOriginal) => {
 
 import { buildCaseReplyMarkup } from '../telegramWebhook';
 import { telegramWebhook } from '../telegramWebhook';
+import { encryptSymmetric } from '../crypto-utils';
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Tests de buildCaseReplyMarkup (la función pura exportada)
@@ -124,8 +125,14 @@ describe('telegramWebhook — Seguridad y comandos', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.mockFirestoreGet.mockReset();
+    mocks.mockFetch.mockReset();
+    mocks.mockMessagingSend.mockReset();
+
     process.env.TELEGRAM_WEBHOOK_SECRET = 'secret_test';
     process.env.TELEGRAM_BOT_TOKEN = 'token_test';
+    process.env.PII_ENCRYPTION_KEY = 'test_encryption_key_32_bytes_long!!';
+    process.env.PII_HMAC_SECRET = 'test_hmac_secret_value_for_testing';
 
     req = {
       headers: { 'x-telegram-bot-api-secret-token': 'secret_test' },
@@ -246,6 +253,105 @@ describe('telegramWebhook — Seguridad y comandos', () => {
     const fetchUrls = mocks.mockFetch.mock.calls.map((callArgs: any[]) => callArgs[0]);
     expect(fetchUrls.some((u: string) => u.includes('answerCallbackQuery'))).toBe(true);
     expect(res.status).toHaveBeenCalledWith(200);
+  });
+
+  describe('Callback vercedula_ (Revelado seguro de cédula)', () => {
+    it('debe procesar vercedula_ descifrando la cédula correctamente y respondiendo con show_alert', async () => {
+      const cedulaReal = '1090123456';
+      const cedulaCifrada = encryptSymmetric(cedulaReal);
+
+      req.body = {
+        callback_query: {
+          id: 'cb_ced',
+          from: { id: 111, first_name: 'Bob' },
+          data: 'vercedula_doc123_cedula',
+          message: { chat: { id: 999 }, message_id: 888 },
+        },
+      };
+
+      // 1. processed_callbacks.get() → no existe
+      mocks.mockFirestoreGet.mockResolvedValueOnce({ exists: false });
+      // 2. consultations.doc('doc123_cedula').get() → tiene la cédula cifrada
+      mocks.mockFirestoreGet.mockResolvedValueOnce({
+        exists: true,
+        data: () => ({ cedula: cedulaCifrada }),
+      });
+
+      await (telegramWebhook as any)(req, res);
+
+      // Debe haber llamado a answerCallbackQuery con la cédula desencriptada
+      const answerCall = mocks.mockFetch.mock.calls.find((callArgs: any[]) =>
+        callArgs[0].includes('answerCallbackQuery')
+      );
+      expect(answerCall).toBeDefined();
+
+      const payload = JSON.parse(answerCall![1].body);
+      expect(payload.callback_query_id).toBe('cb_ced');
+      expect(payload.text).toBe(`🪪 Cédula del Cliente:\n\n${cedulaReal}`);
+      expect(payload.show_alert).toBe(true);
+      expect(res.status).toHaveBeenCalledWith(200);
+    });
+
+    it('debe responder con advertencia si la cédula no existe o es de captura SIMIT', async () => {
+      req.body = {
+        callback_query: {
+          id: 'cb_ced_err',
+          from: { id: 111 },
+          data: 'vercedula_doc_simit',
+          message: { chat: { id: 999 }, message_id: 888 },
+        },
+      };
+
+      mocks.mockFirestoreGet.mockResolvedValueOnce({ exists: false });
+      mocks.mockFirestoreGet.mockResolvedValueOnce({
+        exists: true,
+        data: () => ({ cedula: 'SIMIT-CAPTURA' }),
+      });
+
+      await (telegramWebhook as any)(req, res);
+
+      const answerCall = mocks.mockFetch.mock.calls.find((callArgs: any[]) =>
+        callArgs[0].includes('answerCallbackQuery')
+      );
+      expect(answerCall).toBeDefined();
+
+      const payload = JSON.parse(answerCall![1].body);
+      expect(payload.callback_query_id).toBe('cb_ced_err');
+      expect(payload.text).toBe('⚠️ Sin cédula registrada');
+      expect(payload.show_alert).toBe(true);
+      expect(res.status).toHaveBeenCalledWith(200);
+    });
+
+    it('debe responder con error de seguridad genérico si falla el descifrado', async () => {
+      req.body = {
+        callback_query: {
+          id: 'cb_ced_fail',
+          from: { id: 111 },
+          data: 'vercedula_doc_bad',
+          message: { chat: { id: 999 }, message_id: 888 },
+        },
+      };
+
+      mocks.mockFirestoreGet.mockResolvedValueOnce({ exists: false });
+      // Formato cifrado inválido para provocar error en decryptSymmetric
+      mocks.mockFirestoreGet.mockResolvedValueOnce({
+        exists: true,
+        data: () => ({ cedula: 'ENC:invalid_parts' }),
+      });
+
+      await (telegramWebhook as any)(req, res);
+
+      const answerCall = mocks.mockFetch.mock.calls.find((callArgs: any[]) =>
+        callArgs[0].includes('answerCallbackQuery')
+      );
+      expect(answerCall).toBeDefined();
+
+      const payload = JSON.parse(answerCall![1].body);
+      expect(payload.callback_query_id).toBe('cb_ced_fail');
+      expect(payload.text).toBe('❌ Error de seguridad al descifrar cédula');
+      expect(payload.show_alert).toBe(true);
+      expect(res.status).toHaveBeenCalledWith(200);
+    });
   });
 
 });

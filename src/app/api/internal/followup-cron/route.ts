@@ -94,7 +94,11 @@ export async function GET(req: NextRequest) {
       }
 
       // BUG-FIX: El campo correcto es 'emailContacto', no 'email'
-      if (!data.emailContacto || typeof data.emailContacto !== 'string' || !data.emailContacto.includes('@')) {
+      if (
+        !data.emailContacto ||
+        typeof data.emailContacto !== 'string' ||
+        !data.emailContacto.includes('@')
+      ) {
         skipped++;
         return;
       }

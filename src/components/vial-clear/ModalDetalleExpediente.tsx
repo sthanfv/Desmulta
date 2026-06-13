@@ -439,7 +439,11 @@ export function ModalDetalleExpediente({
                           `qr-hd-${trackingId}`
                         ) as HTMLImageElement;
                         if (!imgElement || !imgElement.complete) {
-                          toast({ title: 'Cargando', description: 'El código QR todavía se está generando...', variant: 'default' });
+                          toast({
+                            title: 'Cargando',
+                            description: 'El código QR todavía se está generando...',
+                            variant: 'default',
+                          });
                           return;
                         }
 

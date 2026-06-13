@@ -601,10 +601,30 @@ Se han implementado correcciones críticas a nivel de seguridad, integridad de d
 - `src/app/seguir/[id]/TrackingClientUI.tsx`
 - `.gitignore` y package.json
   
-## Auditor�a v3 - Correcciones Pendientes (Telegram, Admin, Env)  
-- **getAnalyticsStats**: Optimizado para limitar lecturas a 2000 documentos recientes, evitando el desbordamiento de facturaci�n y lecturas ilimitadas de Firebase.  
+## Auditor�a v3 - Correcciones Pendientes (Telegram, Admin, Env)  
+- **getAnalyticsStats**: Optimizado para limitar lecturas a 2000 documentos recientes, evitando el desbordamiento de facturaci�n y lecturas ilimitadas de Firebase.  
 - **.env.example**: Se documentaron las variables faltantes NEXT_PUBLIC_BASE_API_KEY y TELEGRAM_SECURITY_CHAT_ID.  
-- **telegramWebhook**: Implementada la idempotencia en cambiarEstado mediante la verificaci�n del lastBotMessageId, previniendo que un doble tap en un bot�n ejecute la acci�n dos veces. 
+- **telegramWebhook**: Implementada la idempotencia en cambiarEstado mediante la verificaci�n del lastBotMessageId, previniendo que un doble tap en un bot�n ejecute la acci�n dos veces. 
   
-## Auditor�a v3 - UI/UX Toasts  
-- **Toaster**: Se corrigi� el desbordamiento de notificaciones muy largas en m�vil a�adiendo lex-1 y truncamiento en 	oaster.tsx. Se agreg� margen superior considerando safe-area-inset-top en 	oast.tsx para evitar cruce con el Notch en iPhones o la barra superior nativa. 
+## Auditor�a v3 - UI/UX Toasts  
+- **Toaster**: Se corrigi� el desbordamiento de notificaciones muy largas en m�vil a�adiendo lex-1 y truncamiento en 	oaster.tsx. Se agreg� margen superior considerando safe-area-inset-top en 	oast.tsx para evitar cruce con el Notch en iPhones o la barra superior nativa.
+
+## 🚩 SESIÓN: AUDITORÍA v4 — REVELADO SEGURO DE CÉDULA EN TELEGRAM CRM (Junio 2026)
+**Objetivo:** Permitir a los analistas ver la cédula en Telegram de forma segura sin violar la directiva Zero-PII ni persistir datos personales en el historial del chat.
+
+**Implementado:**
+- **Botón Inline Efímero:** Se agregó el botón `🪪 Ver Cédula` al lado de WhatsApp en el markup inline de los casos enviados a Telegram.
+- **Handler Callback en Webhook:** Se implementó la interceptación de `vercedula_DOCID` en `telegramWebhook.ts`. Al pulsarlo, el bot descifra la cédula guardada en Firestore y responde mediante `answerCallbackQuery` con `show_alert: true`. El dato se muestra en una modal temporal nativa de Telegram que se destruye al cerrarse y no se registra en el historial del chat.
+- **Enmascaramiento Inicial:** Se removió la cédula encriptada larga del texto del mensaje inicial para evitar ruido visual e historial sucio, dejando un mensaje indicativo.
+- **Criptografía Aislada en Functions:** Se creó `crypto-utils.ts` en `/functions` implementando `encryptSymmetric` y `decryptSymmetric` usando AES-256-GCM para mantener la compatibilidad con el backend Next.js de forma autocontenida.
+- **Suite de Pruebas robusta:** Se agregaron 3 nuevos tests unitarios en `telegramWebhook.test.ts` con validación estricta de JSON, verificando los flujos exitosos, de error y de datos inexistentes.
+
+**Decisiones Técnicas:**
+- Se inyectaron los secretos `PII_ENCRYPTION_KEY` y `PII_HMAC_SECRET` en las funciones `telegramWebhook` y `onConsultationCreated`.
+- Se resetean los mocks de firestore y fetch antes de cada test en `telegramWebhook.test.ts` para evitar contaminación cruzada de llamadas.
+
+**Archivos Afectados:**
+- [crypto-utils.ts](file:///C:/Workspace/Desmulta/functions/src/crypto-utils.ts) (NUEVO)
+- [telegramWebhook.ts](file:///C:/Workspace/Desmulta/functions/src/telegramWebhook.ts)
+- [onConsultationCreated.ts](file:///C:/Workspace/Desmulta/functions/src/onConsultationCreated.ts)
+- [telegramWebhook.test.ts](file:///C:/Workspace/Desmulta/functions/src/__tests__/telegramWebhook.test.ts)

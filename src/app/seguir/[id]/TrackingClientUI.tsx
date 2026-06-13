@@ -30,7 +30,6 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
-
 import { TrackingCase, EventoTracking } from '@/lib/definitions';
 import { useWebPush } from '@/hooks/useWebPush';
 import { doc, onSnapshot } from 'firebase/firestore';
@@ -689,7 +688,10 @@ export default function TrackingClientUI({
                 onClick={() => {
                   const imgElement = document.getElementById('qr-cliente-hd') as HTMLImageElement;
                   if (!imgElement || !imgElement.complete) {
-                    toast({ title: 'Cargando', description: 'Por favor, espera a que el QR termine de cargar.' });
+                    toast({
+                      title: 'Cargando',
+                      description: 'Por favor, espera a que el QR termine de cargar.',
+                    });
                     return;
                   }
 

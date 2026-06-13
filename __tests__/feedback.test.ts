@@ -1,14 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { Feedback } from '@/lib/ui/feedback';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 
 // Mock estricto de la librería de UI para evitar dependencias de renderizado
-vi.mock('sonner', () => ({
-  toast: {
-    success: vi.fn(),
-    error: vi.fn(),
-    warning: vi.fn(),
-  },
+vi.mock('@/hooks/use-toast', () => ({
+  toast: vi.fn(),
 }));
 
 describe('QA DevSecOps: Controlador Central de Feedback (In-App Toasts)', () => {
@@ -24,7 +20,8 @@ describe('QA DevSecOps: Controlador Central de Feedback (In-App Toasts)', () => 
 
   it('debe renderizar notificaciones de éxito correctamente', () => {
     Feedback.success('Proceso completado', 'El UUID fue generado.');
-    expect(toast.success).toHaveBeenCalledWith('Proceso completado', {
+    expect(toast).toHaveBeenCalledWith({
+      title: 'Proceso completado',
       description: 'El UUID fue generado.',
     });
   });
@@ -41,14 +38,15 @@ describe('QA DevSecOps: Controlador Central de Feedback (In-App Toasts)', () => 
     );
 
     // 2. Verifica que el cliente (toast) reciba estrictamente el mensaje sanitizado, NUNCA el error crudo
-    expect(toast.error).toHaveBeenCalledWith('Fallo en la consulta', {
+    expect(toast).toHaveBeenCalledWith({
+      variant: 'destructive',
+      title: 'Fallo en la consulta',
       description:
         'Si el problema persiste, nuestro equipo técnico ya ha sido notificado automáticamente.',
     });
 
     // 3. Afirmación explícita de seguridad: la librería de UI no debe recibir los datos sensibles
-    expect(toast.error).not.toHaveBeenCalledWith(
-      expect.anything(),
+    expect(toast).not.toHaveBeenCalledWith(
       expect.objectContaining({ description: rawDatabaseError })
     );
   });

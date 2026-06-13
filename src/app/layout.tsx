@@ -163,7 +163,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 </PushProvider>
               </SystemHealthProvider>
 
-
               <ShadcnToaster />
             </ThemeProvider>
           </FirebaseClientProvider>

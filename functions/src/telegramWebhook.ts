@@ -1,6 +1,7 @@
 import { onRequest } from 'firebase-functions/v2/https';
 import * as admin from 'firebase-admin';
 import { logger } from 'firebase-functions';
+import { decryptSymmetric } from './crypto-utils';
 
 /**
  * telegramWebhook — CRM por Telegram v2.0
@@ -250,7 +251,7 @@ export const telegramWebhook = onRequest(
   {
     region: 'us-central1',
     minInstances: 0,
-    secrets: ['TELEGRAM_BOT_TOKEN', 'TELEGRAM_WEBHOOK_SECRET'],
+    secrets: ['TELEGRAM_BOT_TOKEN', 'TELEGRAM_WEBHOOK_SECRET', 'PII_ENCRYPTION_KEY', 'PII_HMAC_SECRET'],
   },
   async (req, res) => {
     const webhookSecret = process.env.TELEGRAM_WEBHOOK_SECRET?.trim();
@@ -349,6 +350,44 @@ export const telegramWebhook = onRequest(
             await answerCallbackQuery(token, callbackId, `${estadoInfo?.emoji} Listo — Estado: ${estadoInfo?.label}`);
           } else {
             await answerCallbackQuery(token, callbackId, '❌ Error al actualizar', true);
+          }
+
+          res.status(200).send({ ok: true });
+          return;
+        }
+
+        // ── Revelar Cédula: vercedula_DOCID ──────────────────────────────────
+        if (dataStr.startsWith('vercedula_')) {
+          const cbRef = db.collection('processed_callbacks').doc(callbackId);
+          if ((await cbRef.get()).exists) {
+            await answerCallbackQuery(token, callbackId, '✅ Ya procesado');
+            res.status(200).send({ ok: true });
+            return;
+          }
+          await cbRef.set({ ts: new Date().toISOString(), data: dataStr });
+
+          const consultationId = dataStr.replace('vercedula_', '');
+          
+          try {
+            const docSnap = await db.collection('consultations').doc(consultationId).get();
+            if (!docSnap.exists) {
+              await answerCallbackQuery(token, callbackId, '❌ Caso no encontrado', true);
+              res.status(200).send({ ok: true });
+              return;
+            }
+
+            const d = docSnap.data();
+            const encryptedCedula = d?.cedula;
+
+            if (!encryptedCedula || encryptedCedula === 'SIMIT-CAPTURA') {
+              await answerCallbackQuery(token, callbackId, '⚠️ Sin cédula registrada', true);
+            } else {
+              const decrypted = decryptSymmetric(encryptedCedula);
+              await answerCallbackQuery(token, callbackId, `🪪 Cédula del Cliente:\n\n${decrypted}`, true);
+            }
+          } catch (err) {
+            logger.error('[CRM] Error desencriptando cédula en Telegram callback:', err);
+            await answerCallbackQuery(token, callbackId, '❌ Error de seguridad al descifrar cédula', true);
           }
 
           res.status(200).send({ ok: true });
@@ -610,9 +649,10 @@ export function buildCaseReplyMarkup(consultationDocId: string, whatsappUrl: str
         getBtn('tramite', '⚙️ En Trámite'),
         getBtn('finalizado', '🏁 Finalizado'),
       ],
-      // ── Acciones de Contacto ───────────────────────────────────────────────
+      // ── Acciones de Contacto e Identidad ───────────────────────────────────
       [
         { text: '📱 WhatsApp', url: whatsappUrl },
+        { text: '🪪 Ver Cédula', callback_data: `vercedula_${consultationDocId}` },
       ],
     ],
   };
