@@ -19,6 +19,8 @@
   - En [circuit-breaker-firestore.test.ts](file:///c:/Workspace/Desmulta/__tests__/circuit-breaker-firestore.test.ts), se escribieron pruebas adicionales para cubrir al 100% los métodos de la clase `CircuitBreakerFs` (`isOpen`, `loadState`, `saveState`) y los bloques `catch` de fallo.
 - **Saneamiento de warnings de tipado any:**
   - En [ConsultationForm.tsx](file:///c:/Workspace/Desmulta/src/components/vial-clear/ConsultationForm.tsx), se eliminaron los cast a `any` en `form.setError` y en el bloque `catch` para cumplir estrictamente con el linter y no tener warnings.
+- **[UX] Ajuste de animación de WhatsApp:**
+  - En [HomeClient.tsx](file:///c:/Workspace/Desmulta/src/app/_components/HomeClient.tsx), se ralentizó la animación a 3 segundos de duración utilizando estilos inline React (`animationDuration` y `animationDelay`) para garantizar que la pulsación sea suave, fluida y no agresiva para el usuario final.
 
 **Estado Arquitectónico:**
 - La aplicación compila correctamente para producción con cero errores. ESLint y TypeScript en 0 warnings/errores. Los tests unitarios pasan 100% exitosamente.

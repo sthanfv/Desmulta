@@ -288,8 +288,14 @@ export default function HomeClient({
           aria-label="Abrir chat de WhatsApp para asesoría directa"
         >
           <MessageCircle size={36} fill="currentColor" aria-hidden="true" />
-          <span className="absolute inset-0 rounded-full animate-ping bg-[#25D366]/30 pointer-events-none" />
-          <span className="absolute inset-0 rounded-full animate-ping bg-[#25D366]/20 pointer-events-none [animation-delay:0.4s]" />
+          <span
+            className="absolute inset-0 rounded-full animate-ping bg-[#25D366]/30 pointer-events-none"
+            style={{ animationDuration: '3s' }}
+          />
+          <span
+            className="absolute inset-0 rounded-full animate-ping bg-[#25D366]/20 pointer-events-none"
+            style={{ animationDuration: '3s', animationDelay: '1.2s' }}
+          />
         </button>
 
         <button
