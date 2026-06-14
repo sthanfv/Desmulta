@@ -27,6 +27,9 @@ import {
   FileSpreadsheet,
 } from 'lucide-react';
 import Link from 'next/link';
+// jspdf se usa aquí para exportación PDF en el navegador (client-side).
+// No migrar a pdf-lib ya que pdf-lib no opera bien en el browser sin bundler custom.
+// Para exportación server-side usar pdf-engine.ts con pdf-lib.
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import ExcelJS from 'exceljs';

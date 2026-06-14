@@ -557,8 +557,7 @@ export async function updateCaseStatus(
     // private/push y en el campo raíz del documento (retrocompatibilidad).
     if (caseId) {
       try {
-        const { dispatchPush } = await import('@/lib/notifications/notification-dispatcher');
-        const { STATUS_TEMPLATES } = await import('@/lib/notifications/push-notifications');
+        const { dispatchPush, STATUS_TEMPLATES } = await import('@/lib/notifications/notification-dispatcher');
         const templateFn =
           STATUS_TEMPLATES[newStatus.toLowerCase() as keyof typeof STATUS_TEMPLATES];
         if (templateFn) {
@@ -747,8 +746,7 @@ export async function updateConsultationStatus(
 
     // DESPACHO DE NOTIFICACIÓN PUSH — Directo y verificado
     try {
-      const { dispatchPush } = await import('@/lib/notifications/notification-dispatcher');
-      const { STATUS_TEMPLATES } = await import('@/lib/notifications/push-notifications');
+      const { dispatchPush, STATUS_TEMPLATES } = await import('@/lib/notifications/notification-dispatcher');
       const templateFn = STATUS_TEMPLATES[newStatus.toLowerCase() as keyof typeof STATUS_TEMPLATES];
       if (templateFn) {
         const leadId = id;

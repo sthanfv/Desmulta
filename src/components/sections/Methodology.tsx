@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { ShieldCheck, CheckCircle2, Lock, FileText, Info } from 'lucide-react';
+import { ShieldCheck, CheckCircle2, Lock, FileText, Info, Search } from 'lucide-react';
 import { TarjetaPremium } from '@/components/ui/TarjetaPremium';
 import { cn } from '@/lib/utils';
 
@@ -31,7 +31,7 @@ export const Methodology = () => {
                     num: '01',
                     title: 'Diagnóstico técnico',
                     desc: 'Analizamos su historial para identificar si existen argumentos de caducidad, prescripción o vicios de notificación. Sin costo y sin compromiso.',
-                    icon: <ShieldCheck className="w-6 h-6" />,
+                    icon: <Search className="w-6 h-6" />,
                   },
                   {
                     num: '02',

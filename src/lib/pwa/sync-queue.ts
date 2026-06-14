@@ -68,11 +68,19 @@ export async function processSyncQueue(
   }
 }
 
+const MAX_RETRIES = 5;
+
 async function incrementRetryCount(id: string): Promise<void> {
   const queue = await getSyncQueue();
   const itemIndex = queue.findIndex((item) => item.id === id);
   if (itemIndex > -1) {
     queue[itemIndex].retryCount += 1;
+
+    if (queue[itemIndex].retryCount >= MAX_RETRIES) {
+      SecurityLogger.warn(`[SyncQueue] Ítem descartado tras ${MAX_RETRIES} intentos`, { id });
+      queue.splice(itemIndex, 1);
+    }
+
     await set(SYNC_QUEUE_KEY, queue);
   }
 }
