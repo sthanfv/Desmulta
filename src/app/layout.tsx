@@ -20,6 +20,7 @@ import { MotionProvider } from '@/components/providers/MotionProvider';
 import { OCRPrewarmer } from '@/components/providers/OCRPrewarmer';
 import { SystemHealthProvider } from '@/components/providers/SystemHealthProvider';
 import { PWAAutoUpdater } from '@/components/providers/PWAAutoUpdater';
+import { PageProgressBar } from '@/components/ui/PageProgressBar';
 
 // Directiva Mobile-First y Adaptive del Sistema Operativo
 export const viewport: Viewport = {
@@ -148,6 +149,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         >
           Saltar al contenido principal
         </a>
+        <PageProgressBar />
         <ErrorBoundary>
           <FirebaseClientProvider>
             <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>

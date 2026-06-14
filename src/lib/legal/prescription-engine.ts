@@ -71,7 +71,12 @@ export class PrescriptionEngine {
       };
     }
 
-    // Ordenar fechas para encontrar la más antigua (presunta fecha de infracción)
+    // NOTA JURÍDICA: El motor utiliza la fecha más antigua (que en las capturas del SIMIT corresponde
+    // a la fecha del comparendo/infracción). Conforme a la Ley 769/2002 y la Sentencia C-038/2020,
+    // el término de prescripción de la acción sancionatoria corre desde la ocurrencia de los hechos (infracción)
+    // cuando no hay notificación oportuna. Dado que la consulta de multas en el listado del SIMIT no provee
+    // un campo de 'Fecha de Notificación', se utiliza la fecha de comparendo como un límite conservador
+    // (fail-safe) para el dictamen automatizado de prescripción (3 años).
     const sortedDates = [...dates].sort((a, b) => {
       const [dayA, monthA, yearA] = a.split('/');
       const [dayB, monthB, yearB] = b.split('/');

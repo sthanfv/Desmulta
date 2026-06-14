@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback } from 'react';
-import { User, MessageCircle, EyeOff, Eye, ScanSearch, ShieldCheck } from 'lucide-react';
+import { User, MessageCircle, EyeOff, Eye, ScanSearch, ShieldCheck, AlertCircle } from 'lucide-react';
 import { UseFormReturn } from 'react-hook-form';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -174,7 +174,7 @@ export default function StepContacto({
                           (field.value?.length || 0) >= 6 &&
                             'border-green-500/30 bg-green-500/[0.02]',
                           form.formState.errors.cedula &&
-                            'border-destructive text-destructive focus-visible:ring-destructive'
+                            'border-red-500 bg-red-50/50 dark:bg-red-950/20 text-red-500 focus-visible:ring-red-400'
                         )}
                         {...field}
                         type={showCedula ? 'text' : 'password'}
@@ -199,7 +199,12 @@ export default function StepContacto({
                     Solo números (5 a 20 dígitos).
                   </p>
                   <div id="cedula-error">
-                    <FormMessage />
+                    {form.formState.errors.cedula && (
+                      <p className="text-xs text-red-500 mt-1 flex items-center gap-1 font-semibold">
+                        <AlertCircle className="w-3 h-3" />
+                        {form.formState.errors.cedula.message}
+                      </p>
+                    )}
                   </div>
                 </FormItem>
               )}
@@ -227,7 +232,7 @@ export default function StepContacto({
                         className={cn(
                           'w-full bg-background border-border/50 rounded-2xl px-6 h-16 text-lg font-black tracking-widest uppercase shadow-Inner',
                           form.formState.errors.placa &&
-                            'border-destructive text-destructive focus-visible:ring-destructive'
+                            'border-red-500 bg-red-50/50 dark:bg-red-950/20 text-red-500 focus-visible:ring-red-400'
                         )}
                       />
                     </FormControl>
@@ -235,7 +240,12 @@ export default function StepContacto({
                       Formato AAA123 o AAA12A (Opcional).
                     </p>
                     <div id="placa-error">
-                      <FormMessage />
+                      {form.formState.errors.placa && (
+                        <p className="text-xs text-red-500 mt-1 flex items-center gap-1 font-semibold">
+                          <AlertCircle className="w-3 h-3" />
+                          {form.formState.errors.placa.message}
+                        </p>
+                      )}
                     </div>
                   </FormItem>
                 )}
@@ -284,7 +294,7 @@ export default function StepContacto({
                           className={cn(
                             'w-full bg-background border-border/50 rounded-2xl pl-12 h-16 text-lg font-medium shadow-Inner',
                             form.formState.errors.contacto &&
-                              'border-destructive text-destructive focus-visible:ring-destructive'
+                              'border-red-500 bg-red-50/50 dark:bg-red-950/20 text-red-500 focus-visible:ring-red-400'
                           )}
                         />
                       </FormControl>
@@ -298,7 +308,12 @@ export default function StepContacto({
                       10 dígitos, debe empezar por 3.
                     </p>
                     <div id="whatsapp-error">
-                      <FormMessage />
+                      {form.formState.errors.contacto && (
+                        <p className="text-xs text-red-500 mt-1 flex items-center gap-1 font-semibold">
+                          <AlertCircle className="w-3 h-3" />
+                          {form.formState.errors.contacto.message}
+                        </p>
+                      )}
                     </div>
                   </FormItem>
                 )}
@@ -325,12 +340,17 @@ export default function StepContacto({
                       className={cn(
                         'w-full bg-background border-border/50 rounded-2xl px-6 h-16 text-lg font-medium shadow-Inner',
                         form.formState.errors.nombre &&
-                          'border-destructive text-destructive focus-visible:ring-destructive'
+                          'border-red-500 bg-red-50/50 dark:bg-red-950/20 text-red-500 focus-visible:ring-red-400'
                       )}
                     />
                   </FormControl>
                   <div id="nombre-error">
-                    <FormMessage />
+                    {form.formState.errors.nombre && (
+                      <p className="text-xs text-red-500 mt-1 flex items-center gap-1 font-semibold">
+                        <AlertCircle className="w-3 h-3" />
+                        {form.formState.errors.nombre.message}
+                      </p>
+                    )}
                   </div>
                 </FormItem>
               )}
@@ -406,7 +426,7 @@ export default function StepContacto({
                       className={cn(
                         'w-full bg-background border-border/50 rounded-2xl px-6 h-16 text-lg font-medium shadow-Inner',
                         form.formState.errors.email &&
-                          'border-destructive text-destructive focus-visible:ring-destructive'
+                          'border-red-500 bg-red-50/50 dark:bg-red-950/20 text-red-500 focus-visible:ring-red-400'
                       )}
                     />
                   </FormControl>
@@ -414,7 +434,12 @@ export default function StepContacto({
                     Ejemplo: usuario@correo.com {requiresOperator ? '(Requerido)' : '(Opcional)'}
                   </p>
                   <div id="email-error">
-                    <FormMessage />
+                    {form.formState.errors.email && (
+                      <p className="text-xs text-red-500 mt-1 flex items-center gap-1 font-semibold">
+                        <AlertCircle className="w-3 h-3" />
+                        {form.formState.errors.email.message}
+                      </p>
+                    )}
                   </div>
                 </FormItem>
               )}
@@ -468,7 +493,7 @@ export default function StepContacto({
                       className={cn(
                         'w-full bg-background border-border/50 rounded-2xl pl-12 h-16 text-lg font-medium shadow-Inner',
                         form.formState.errors.contacto &&
-                          'border-destructive text-destructive focus-visible:ring-destructive'
+                          'border-red-500 bg-red-50/50 dark:bg-red-950/20 text-red-500 focus-visible:ring-red-400'
                       )}
                     />
                   </FormControl>
@@ -477,7 +502,12 @@ export default function StepContacto({
                     size={20}
                   />
                 </div>
-                <FormMessage />
+                {form.formState.errors.contacto && (
+                  <p className="text-xs text-red-500 mt-1 flex items-center gap-1 font-semibold">
+                    <AlertCircle className="w-3 h-3" />
+                    {form.formState.errors.contacto.message}
+                  </p>
+                )}
               </FormItem>
             )}
           />

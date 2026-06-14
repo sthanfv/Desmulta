@@ -181,6 +181,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
               alt="Gestión de multas profesional - Desmulta"
               className="rounded-3xl object-cover aspect-[4/3] xl:aspect-[16/10] w-full shadow-xl"
               priority={true}
+              blurDataURL="data:image/avif;base64,AAAAHGZ0eXBhdmlmAAAAAG1pZjFhdmlmbWlhZgAAANZtZXRhAAAAAAAAACFoZGxyAAAAAAAAAABwaWN0AAAAAAAAAAAAAAAAAAAAAA5waXRtAAAAAAABAAAAImlsb2MAAAAAREAAAQABAAAAAAD6AAEAAAAAAAAAQAAAACNpaW5mAAAAAAABAAAAFWluZmUCAAAAAAEAAGF2MDEAAAAAVmlwcnAAAAA4aXBjbwAAAAxhdjFDgSACAAAAABRpc3BlAAAAAAAAAAoAAAAHAAAAEHBpeGkAAAAAAwgICAAAABZpcG1hAAAAAAAAAAEAAQOBAgMAAABIbWRhdBIACgg4DKcwgIaDSDIyGAAAAFDk2deQQylAHp7ST4ZDJ/xhxBmGNs6qXpyIgjdUiPVRLpr7v49vW3pjbgtn9oY="
             />
             <div className="absolute bottom-8 left-8 right-8 z-10 pointer-events-none animate-float">
               <div className="glass p-4 rounded-2xl flex items-center gap-4 border-white/20 shadow-xl backdrop-blur-xl bg-black/40">

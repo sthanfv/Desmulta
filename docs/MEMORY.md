@@ -792,3 +792,34 @@ Se han implementado correcciones críticas a nivel de seguridad, integridad de d
 - [WelcomeModal.tsx](file:///c:/Workspace/Desmulta/src/components/vial-clear/WelcomeModal.tsx)
 - [Hero.tsx](file:///c:/Workspace/Desmulta/src/components/sections/Hero.tsx)
 - [MEMORY.md](file:///c:/Workspace/Desmulta/docs/MEMORY.md)
+
+---
+
+## 🚩 SESIÓN: PLAN DE MEJORA FRENTE 1 — TRANSICIONES, ERRORES Y OPTIMIZACIÓN CLS (Junio 2026)
+**Objetivo:** Implementar los primeros 3 problemas del Frente 1 (Frontend/UX) para elevar la calificación UX a 9.0+, garantizando navegación con barra de progreso, estados visuales de error claros e imagen LCP optimizada anti-CLS.
+
+**Implementado:**
+- **[UX] Transición de Páginas con Progreso Visual:**
+  - Se instaló `next-nprogress-bar` y se configuró un componente centralizado [PageProgressBar.tsx](file:///c:/Workspace/Desmulta/src/components/ui/PageProgressBar.tsx) con altura de 3px y el color corporativo `#DC2626`.
+  - Se inyectó en [layout.tsx](file:///c:/Workspace/Desmulta/src/app/layout.tsx) garantizando feedback visual continuo durante cargas lentas (por ej. en conexiones 3G).
+- **[UX] Retroalimentación Visual de Errores:**
+  - Se rediseñaron los inputs del formulario en [StepContacto.tsx](file:///c:/Workspace/Desmulta/src/components/vial-clear/steps/StepContacto.tsx) (`cedula`, `placa`, `contacto`, `nombre`, `email`) para colorearse de rojo (`border-red-500 bg-red-50/50 dark:bg-red-950/20 text-red-500 focus-visible:ring-red-400`) y renderizar el icono `<AlertCircle />` de `lucide-react` al lado de los mensajes de error.
+- **[UX / Core Web Vitals] Optimización LCP anti-CLS:**
+  - Se generó el `blurDataURL` para `/hero-bg.avif` utilizando Sharp y se extendió el componente [lightbox.tsx](file:///c:/Workspace/Desmulta/src/components/ui/lightbox.tsx) para pasar el placeholder blur de forma modular.
+  - Se inyectó en [Hero.tsx](file:///c:/Workspace/Desmulta/src/components/sections/Hero.tsx) para reservar dinámicamente el espacio del Hero, reduciendo el CLS a 0.
+
+**Decisiones Técnicas:**
+- Se decidió extender la API de `LightboxProps` en `lightbox.tsx` en lugar de omitir el Lightbox en `Hero.tsx`, preservando así la funcionalidad premium de la ventana modal al tiempo que Next.js carga el LCP con difuminado.
+- Se adecuaron las clases de error de fondo (`bg-red-50/50` y `dark:bg-red-950/20`) para dar soporte nativo al esquema cromático adaptativo (claro/oscuro) del proyecto.
+
+**Archivos Afectados:**
+- [PageProgressBar.tsx](file:///c:/Workspace/Desmulta/src/components/ui/PageProgressBar.tsx) (NUEVO)
+- [layout.tsx](file:///c:/Workspace/Desmulta/src/app/layout.tsx)
+- [StepContacto.tsx](file:///c:/Workspace/Desmulta/src/components/vial-clear/steps/StepContacto.tsx)
+- [lightbox.tsx](file:///c:/Workspace/Desmulta/src/components/ui/lightbox.tsx)
+- [Hero.tsx](file:///c:/Workspace/Desmulta/src/components/sections/Hero.tsx)
+- [MEMORY.md](file:///c:/Workspace/Desmulta/docs/MEMORY.md)
+
+**Estado de la Arquitectura:**
+- 🟢 Estable. TypeScript check completo (0 errores). ESLint limpio (`--max-warnings 0`). Producción compila exitosamente (`npm run build` aprobado).
+
