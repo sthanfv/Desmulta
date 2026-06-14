@@ -685,3 +685,25 @@ Se han implementado correcciones críticas a nivel de seguridad, integridad de d
 - [telegram-bridge.ts](file:///c:/Workspace/Desmulta/src/actions/telegram-bridge.ts)
 - [route.tsx](file:///c:/Workspace/Desmulta/src/app/api/og/route.tsx)
 - [MEMORY.md](file:///c:/Workspace/Desmulta/docs/MEMORY.md)
+
+## 🚩 SESIÓN: OPTIMIZACIÓN KANBAN Y DETECCION DE SCROLL EN HEADER (Junio 2026)
+**Objetivo:** Integrar un efecto visual premium de colapso de la barra del encabezado en scroll, incluyendo un ancho de logo rígido (prevención total de CLS) y una animación de destello metálico ("shield glint") sobre el escudo para potenciar el diseño de marca.
+
+**Implementado:**
+- **Efecto de Scroll Colapsable en Header:**
+  - Se inyectó detección reactiva mediante `useEffect` en `Header.tsx` para agregar la clase `.header-collapsed` cuando el usuario hace scroll hacia abajo.
+  - Se disminuyó sutilmente el padding vertical de la barra de navegación para compactar el espacio y favorecer la lectura.
+- **Transición de Logo y Ancho Fijo Anti-CLS:**
+  - Se envolvió el contenedor del logo en una dimensión exacta (`w-[140px] sm:w-[170px]`) que previene de forma estricta cualquier Cumulative Layout Shift (CLS) en la interfaz.
+  - Al colapsar, el texto del logo "DESMULTA" reduce gradualmente su `max-width` y `opacity` a `0` bajo una transición CSS fluida (`.logo-text-transition`), ocultándolo suavemente para dejar visible únicamente el escudo de la marca.
+- **Destello Metálico Premium (Shield Glint):**
+  - Se diseñó y acopló la animación `@keyframes shield-glint` sobre el contenedor del escudo (`.shield-container::after`) usando gradientes lineales y un enmascaramiento asíncrono para generar destellos de brillo metálico cada 4 segundos cuando el header está colapsado.
+- **Validación QA:**
+  - `npm run lint` finalizó sin advertencias.
+  - `npm run typecheck` compila exitosamente.
+  - Vitest y la compilación del build completaron satisfactoriamente.
+
+**Archivos Afectados:**
+- [Header.tsx](file:///c:/Workspace/Desmulta/src/components/sections/Header.tsx)
+- [globals.css](file:///c:/Workspace/Desmulta/src/app/globals.css)
+- [MEMORY.md](file:///c:/Workspace/Desmulta/docs/MEMORY.md)
