@@ -707,3 +707,18 @@ Se han implementado correcciones críticas a nivel de seguridad, integridad de d
 - [Header.tsx](file:///c:/Workspace/Desmulta/src/components/sections/Header.tsx)
 - [globals.css](file:///c:/Workspace/Desmulta/src/app/globals.css)
 - [MEMORY.md](file:///c:/Workspace/Desmulta/docs/MEMORY.md)
+
+## 🚩 SESIÓN: UNIFICACIÓN DE NOMENCLATURA EN CALCULADORA (Junio 2026)
+**Objetivo:** Consolidar una experiencia de usuario (UX) coherente y libre de fricciones cognitivas unificando la nomenclatura de la calculadora en todo el flujo de inicio del portal.
+
+**Implementado:**
+- **Unificación de Título a "Calculadora Legal":**
+  - Se modificó el título del componente de simulación en [SavingsCalculator.tsx](file:///c:/Workspace/Desmulta/src/components/interactive/SavingsCalculator.tsx) para renombrarlo de "Simulador de Ahorro y Blindaje Legal" a "Calculadora Legal".
+  - Esto alinea la interfaz perfectamente con la tarjeta interactiva de bienvenida definida en [WelcomeModal.tsx](file:///c:/Workspace/Desmulta/src/components/vial-clear/WelcomeModal.tsx), eliminando discrepancias en la descripción de las funciones principales.
+- **Validación QA:**
+  - `npm run lint` finalizó exitosamente.
+  - `npm run typecheck` completó sin errores de tipos.
+
+**Archivos Afectados:**
+- [SavingsCalculator.tsx](file:///c:/Workspace/Desmulta/src/components/interactive/SavingsCalculator.tsx)
+- [MEMORY.md](file:///c:/Workspace/Desmulta/docs/MEMORY.md)
