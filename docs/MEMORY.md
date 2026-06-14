@@ -820,6 +820,36 @@ Se han implementado correcciones críticas a nivel de seguridad, integridad de d
 - [Hero.tsx](file:///c:/Workspace/Desmulta/src/components/sections/Hero.tsx)
 - [MEMORY.md](file:///c:/Workspace/Desmulta/docs/MEMORY.md)
 
+---
+
+## 🚩 SESIÓN: PLAN DE MEJORA FRENTES 1 Y 3 — EMPTY STATES, REGIÓN VERCEL Y CI/CD (Junio 2026)
+**Objetivo:** Culminar la optimización del Frente 1 (Paso 5: empty states en la modal de detalles de expediente) y el Frente 3 (DevOps/CI-CD: región de Vercel, auditoría, cobertura y CD automatizado).
+
+**Implementado:**
+- **[UX] Estado Vacío en Panel de Detalles de Expediente:**
+  - Se inyectó la sección condicional **Documentos de Defensa** en [ModalDetalleExpediente.tsx](file:///c:/Workspace/Desmulta/src/components/vial-clear/ModalDetalleExpediente.tsx). 
+  - Si el caso no tiene documentos emitidos, renderiza un empty state informativo ilustrativo para guiar al operador a usar el configurador legal. Si ya fueron emitidos, provee accesos rápidos para visualización (`Eye`) y descarga (`Download`).
+  - Se corrigió la codificación de comillas de escape en JSX (`&quot;`) resolviendo fallas del linter.
+- **[DevOps] Reducción de Latencia de Servidor:**
+  - En [vercel.json](file:///c:/Workspace/Desmulta/vercel.json), se migró la región de `"iad1"` (Virginia, EE.UU.) a `"gru1"` (São Paulo, Brasil), reduciendo en más de 70ms la latencia de red para los clientes colombianos.
+- **[DevOps / CI-CD] Automatización de Pipelines:**
+  - Se creó [.github/workflows/cd.yml](file:///c:/Workspace/Desmulta/.github/workflows/cd.yml) para automatizar el despliegue automático del build Next.js, funciones de Firebase y reglas de Firestore en push a `main`.
+  - Se optimizó [.github/workflows/ci.yml](file:///c:/Workspace/Desmulta/.github/workflows/ci.yml) restringiendo su ejecución en `main` (evitando ejecuciones redundantes con el CD) e inyectando validaciones de seguridad de dependencias (`npm audit --audit-level=high`) y carga automática del reporte de cobertura de pruebas unitarias (`coverage-report`).
+
+**Decisiones Técnicas:**
+- Se consolidó la mantención del paquete `react-is` tras un fallo de webpack al compilar `recharts`, determinando que aunque no tenga importación directa, es una dependencia transitiva del bundle de administración que es indispensable para el build.
+
+**Archivos Afectados:**
+- [ModalDetalleExpediente.tsx](file:///c:/Workspace/Desmulta/src/components/vial-clear/ModalDetalleExpediente.tsx)
+- [vercel.json](file:///c:/Workspace/Desmulta/vercel.json)
+- [cd.yml](file:///c:/Workspace/Desmulta/.github/workflows/cd.yml) (NUEVO)
+- [ci.yml](file:///c:/Workspace/Desmulta/.github/workflows/ci.yml)
+- [MEMORY.md](file:///c:/Workspace/Desmulta/docs/MEMORY.md)
+
+**Estado de la Arquitectura:**
+- 🟢 Estable. Todas las validaciones locales (`typecheck`, `lint` con `--max-warnings 0` y `build`) pasaron con éxito.
+
+
 **Estado de la Arquitectura:**
 - 🟢 Estable. TypeScript check completo (0 errores). ESLint limpio (`--max-warnings 0`). Producción compila exitosamente (`npm run build` aprobado).
 

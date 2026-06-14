@@ -6,9 +6,14 @@
 .text-type__cursor {
   margin-left: 0.25rem;
   display: inline-block;
-  opacity: 1;
+  animation: text-type-blink 1s step-end infinite;
 }
 
 .text-type__cursor--hidden {
   display: none;
+}
+
+@keyframes text-type-blink {
+  from, to { opacity: 1; }
+  50% { opacity: 0; }
 }

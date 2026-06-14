@@ -1,5 +1,5 @@
 {
-  "regions": ["iad1"],
+  "regions": ["gru1"],
   "functions": {
     "src/app/api/create-consultation/route.ts": {
       "maxDuration": 30

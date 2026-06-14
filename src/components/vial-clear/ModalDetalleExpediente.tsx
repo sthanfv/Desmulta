@@ -584,6 +584,69 @@ export function ModalDetalleExpediente({
             </div>
           )}
 
+          {esCaso && !isEditing && (
+            <div className="space-y-3">
+              <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] ml-1">
+                Documentos de Defensa
+              </h3>
+              {pdfPreviews.length === 0 ? (
+                <div className="bg-slate-100/50 dark:bg-slate-900/30 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl p-6 flex flex-col items-center justify-center text-center">
+                  <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800/60 flex items-center justify-center text-slate-400 dark:text-slate-500 mb-3 border border-slate-200 dark:border-slate-700">
+                    <FileText className="w-5 h-5" />
+                  </div>
+                  <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                    No se han generado documentos de defensa
+                  </p>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 max-w-sm leading-normal">
+                    Presiona el botón &quot;Configurar Acción Legal&quot; en la parte inferior para emitir los documentos del caso (Poder y Petición) con sus respectivas causales.
+                  </p>
+                </div>
+              ) : (
+                <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-4 shadow-sm space-y-2">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1 mb-2">
+                    Documentos Disponibles
+                  </p>
+                  <div className="space-y-2">
+                    {pdfPreviews.map((doc, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-[#0f1523] border border-slate-100 dark:border-slate-800/60"
+                      >
+                        <div className="flex items-center gap-3">
+                          <FileText className="w-4 h-4 text-amber-500" />
+                          <span className="text-xs font-semibold text-slate-900 dark:text-slate-200 truncate max-w-[280px]">
+                            {doc.filename}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setCurrentPreviewIndex(idx);
+                              setPdfPreviews([...pdfPreviews]);
+                            }}
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+                            title="Previsualizar"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                          <a
+                            href={`data:application/pdf;base64,${doc.base64}`}
+                            download={doc.filename}
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all flex items-center justify-center"
+                            title="Descargar"
+                          >
+                            <Download className="w-4 h-4" />
+                          </a>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="flex items-center justify-center gap-2 text-slate-400 dark:text-slate-500 pt-2 border-t border-slate-200/50 dark:border-slate-800/50 mt-8">
             <Calendar className="w-3.5 h-3.5" />
             <span className="text-[10px] font-bold tracking-[0.1em] uppercase">
