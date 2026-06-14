@@ -45,7 +45,7 @@ describe('Telegram Bridge Action (Network Mock)', () => {
       acceptedAt: new Date().toISOString(),
     };
 
-    const mockAuth = { method: 'WA_INVERTED', proof: 'PENDING_MANUAL_REVIEW' };
+    const mockAuth = { method: 'OTP_EMAIL', proof: 'VERIFIED' };
 
     const response = await dispatchToTelegram(mockData, mockAuth);
 

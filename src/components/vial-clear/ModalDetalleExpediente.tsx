@@ -408,6 +408,7 @@ export function ModalDetalleExpediente({
                 <div className="flex items-start gap-4">
                   {/* QR visible — pequeño, solo para mostrar */}
                   <div className="bg-white p-2 rounded-xl border border-slate-200 shadow-sm flex-shrink-0">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={`/api/qr?data=${encodeURIComponent(`${process.env.NEXT_PUBLIC_APP_URL || 'https://desmulta.online'}/seguir/${data.trackingUuid}`)}&size=150`}
                       alt="QR Seguimiento"
@@ -425,6 +426,7 @@ export function ModalDetalleExpediente({
                       iniciar sesión.
                     </p>
                     {/* Imagen oculta en alta resolución para la descarga */}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       id={`qr-hd-${data.trackingUuid}`}
                       src={`/api/qr?data=${encodeURIComponent(`${process.env.NEXT_PUBLIC_APP_URL || 'https://desmulta.online'}/seguir/${data.trackingUuid}`)}&size=320`}

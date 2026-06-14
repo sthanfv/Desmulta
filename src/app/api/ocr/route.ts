@@ -90,11 +90,10 @@ If it is a valid document, extract all text from this image exactly as it appear
       ];
 
       // Compite Gemini contra el reloj de 25 segundos
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const result = (await Promise.race([
+      const result = await Promise.race([
         model.generateContent([prompt, ...imageParts]),
         timeoutPromise,
-      ])) as any;
+      ]);
 
       const response = await result.response;
       const textoCompleto = response.text();
@@ -150,11 +149,10 @@ If it is a valid document, extract all text from this image exactly as it appear
 
         const dataUri = `data:${mimeType};base64,${imageBase64}`;
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const recognizeResult = (await Promise.race([
+        const recognizeResult = await Promise.race([
           worker.recognize(dataUri),
           tesseractTimeout,
-        ])) as any;
+        ]);
 
         const {
           data: { text },

@@ -657,6 +657,7 @@ export default function TrackingClientUI({
             className="flex flex-col sm:flex-row items-center gap-6 bg-card border border-border rounded-2xl p-6 mb-8 shadow-sm"
           >
             {/* Imagen oculta alta resolución */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               id="qr-cliente-hd"
               src={`/api/qr?data=${encodeURIComponent(windowUrl)}&size=320`}
@@ -666,6 +667,7 @@ export default function TrackingClientUI({
             />
 
             <div className="p-3 bg-white rounded-xl shadow-sm border border-slate-100 flex-shrink-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={`/api/qr?data=${encodeURIComponent(windowUrl)}&size=100`}
                 alt="QR Tracking"

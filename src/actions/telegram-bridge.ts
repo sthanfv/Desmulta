@@ -5,6 +5,7 @@ import { generateMandatePDF, MandatePayload } from '@/lib/legal/pdf-engine';
 import { logger } from '@/lib/logger/security-logger';
 import { getAdminApp } from '@/lib/firebase-admin';
 import { getFirestore } from 'firebase-admin/firestore';
+import { createHash } from 'crypto';
 
 export interface TelegramDispatchData {
   fullName?: string;
@@ -38,6 +39,14 @@ export async function dispatchToTelegram(
   data: TelegramDispatchData,
   authPayload: { method: string; proof: string }
 ) {
+  // ✅ Validar authPayload de forma estricta para evitar bypasses (Zero-PII compliant)
+  if (!authPayload || authPayload.method !== 'OTP_EMAIL' || authPayload.proof !== 'VERIFIED') {
+    logger.error('[telegram-bridge] Parámetros de autorización inválidos o intento de bypass', {
+      authPayload,
+    });
+    return { status: 401, error: 'UNAUTHORIZED_METHOD' };
+  }
+
   // ✅ Validar antes de tocar el motor PDF
   const validation = TelegramDispatchSchema.safeParse(data);
   if (!validation.success) {
@@ -57,7 +66,9 @@ export async function dispatchToTelegram(
       return { status: 400, error: 'MISSING_IDENTITY' };
     }
 
-    const mandateSnap = await db.collection('legal_mandates').doc(mandateId).get();
+    // Hashear el ID de identidad de forma idempotente para localizar el mandato cifrado
+    const mandateKey = createHash('sha256').update(mandateId).digest('hex').slice(0, 40);
+    const mandateSnap = await db.collection('legal_mandates').doc(mandateKey).get();
 
     if (!mandateSnap.exists) {
       logger.error('[telegram-bridge] Intento de despacho sin registro legal', { mandateId });

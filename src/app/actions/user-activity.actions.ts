@@ -2,7 +2,7 @@
 
 import { getAdminApp } from '@/lib/firebase-admin';
 import { getFirestore } from 'firebase-admin/firestore';
-import { createHash } from 'crypto';
+import { hashPII } from '@/lib/security/server-crypto';
 import { logger } from '@/lib/logger/security-logger';
 
 /**
@@ -19,13 +19,6 @@ import { logger } from '@/lib/logger/security-logger';
  * la hashea y busca por esa huella digital.
  */
 
-/**
- * Genera un SHA-256 de la cédula en el servidor (Zero-PII).
- */
-function hashCedulaServer(cedula: string): string {
-  return createHash('sha256').update(cedula.trim()).digest('hex');
-}
-
 export async function getConsultationActivity(cedula: string) {
   try {
     // Validación básica de entrada
@@ -39,7 +32,9 @@ export async function getConsultationActivity(cedula: string) {
       return { success: false, error: 'Formato de cédula inválido.' };
     }
 
-    const cedulaHash = hashCedulaServer(cedulaLimpia);
+    // ✅ CORRECCIÓN ENTERPRISE v4: Se usa hashPII (HMAC-SHA256 con PII_HMAC_SECRET)
+    // para buscar la cédula en Firestore, ya que las consultas se persisten usando ese hash.
+    const cedulaHash = hashPII(cedulaLimpia);
 
     getAdminApp();
     const db = getFirestore();

@@ -12,6 +12,10 @@ vi.mock('../lib/firebase-admin', () => ({
   getAdminApp: vi.fn(),
 }));
 
+vi.mock('../lib/security/server-crypto', () => ({
+  hashPII: vi.fn((val) => `HASH:${val}`),
+}));
+
 vi.mock('../lib/logger/security-logger', () => ({
   logger: {
     info: vi.fn(),

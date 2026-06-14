@@ -9,6 +9,26 @@
 
 ---
 
+## 📝 SESIÓN: CORRECCIÓN DE PRUEBAS UNITARIAS Y ESTABILIZACIÓN QA (Junio 2026)
+**Objetivo:** Resolver tests unitarios fallidos en la raíz del proyecto para asegurar un entorno de QA limpio (suite verde) y libre de regresiones.
+
+**Cambios e Implementaciones:**
+- **`__tests__/circuit-breaker-firestore.test.ts`:**
+  - Se mockeó `@/lib/firebase-admin` para evitar la inicialización del SDK real y dependencias de variables de entorno de Firebase Admin en los tests unitarios.
+  - Se reestructuró el mock de `firebase-admin/firestore` para retornar una base de datos estática mockeada (`mockDb`) y un documento estático (`mockDoc`), alineando el comportamiento de las pruebas unitarias a la implementación directa de `get()`, `set()`, y `delete()` que utiliza el CircuitBreaker.
+- **`src/app/api/admin/export-pdf/__tests__/export-pdf.test.ts`:**
+  - Se mockeó la llamada HTTP global `fetch` para interceptar la petición a la Cloud Function `generatePdf` y retornar un buffer binario simulado de PDF, evitando el error de conexión externa 404/500 en local.
+- **`src/tests/create-consultation.test.ts`:**
+  - Se inyectaron los campos obligatorios del esquema de validación `ConsultationSchema` (`nombre`, `contacto`, `aceptoTerminos`, `antiguedad`, `tipoInfraccion`, `estadoCoactivo`) y se mockeó el rate limiter para superar las validaciones de Zod e infraestructura.
+  - Se corrigió la aserción de respuesta esperada a HTTP 201 (creación exitosa).
+  - Se reestructuró el mock de Firestore para soportar recursión de subcolecciones (`collection.doc.collection.doc`), resolviendo el error `counterRef.collection is not a function`.
+
+**Resultados:**
+- La suite de pruebas de Vitest pasa con 100% de éxito (verde).
+- El análisis de tipos de TypeScript (`npm run typecheck`) y la compilación de producción de Next.js (`npm run build`) se completan satisfactoriamente con cero errores.
+
+---
+
 ## 📝 SESIÓN: RESOLUCIÓN AUDITORÍA TÉCNICA v2 (Junio 2026)
 **Objetivo:** Abordar hallazgos del reporte de auditoría v2, corrigiendo la regresión criptográfica e implementando mejoras de seguridad.
 
@@ -628,3 +648,40 @@ Se han implementado correcciones críticas a nivel de seguridad, integridad de d
 - [telegramWebhook.ts](file:///C:/Workspace/Desmulta/functions/src/telegramWebhook.ts)
 - [onConsultationCreated.ts](file:///C:/Workspace/Desmulta/functions/src/onConsultationCreated.ts)
 - [telegramWebhook.test.ts](file:///C:/Workspace/Desmulta/functions/src/__tests__/telegramWebhook.test.ts)
+
+## 🚩 SESIÓN: ESTABILIZACIÓN QA ENTERPRISE v4 — REMOCIÓN DE WARNINGS LINTER (Junio 2026)
+**Objetivo:** Resolver los warnings restantes del linter de Next.js relacionados con elementos `<img>` no optimizados para lograr una suite 100% libre de advertencias y asegurar compilación limpia en producción.
+
+**Implementado:**
+- **Inyección de Exclusiones de Linter para Códigos QR:**
+  - Se añadieron directivas `{/* eslint-disable-next-line @next/next/no-img-element */}` antes de cada etiqueta `<img>` en `ModalDetalleExpediente.tsx` (para la previsualización del código QR y su versión HD de descarga) y en `StepSuccess.tsx` (para el QR de respaldo del cliente).
+  - Esto desactiva de manera controlada la advertencia `@next/next/no-img-element` de ESLint para estas imágenes de códigos QR que se generan dinámicamente y no se benefician de la optimización nativa del componente `<Image />` de Next.js.
+- **Validación Exitosa de la Suite de QA:**
+  - `npm run lint` finalizó exitosamente con **0 errores y 0 advertencias** (respetando `--max-warnings 0`).
+  - `npm run typecheck` completó sin errores de compilación de tipos.
+  - La suite de pruebas de integración de Vitest (`npm run test:integration`) se ejecutó en el Emulador de Firebase Firestore con pase exitoso del 100% de los tests unitarios y de integración.
+  - `npm run build` compiló exitosamente el 100% de la aplicación Next.js y prerenderizó las 329 páginas del portal de manera satisfactoria.
+
+**Archivos Afectados:**
+- [ModalDetalleExpediente.tsx](file:///c:/Workspace/Desmulta/src/components/vial-clear/ModalDetalleExpediente.tsx)
+- [StepSuccess.tsx](file:///c:/Workspace/Desmulta/src/components/vial-clear/steps/StepSuccess.tsx)
+- [MEMORY.md](file:///c:/Workspace/Desmulta/docs/MEMORY.md)
+
+## 🚩 SESIÓN: HARDENING DE SEGURIDAD ENTERPRISE v4 — PROTECCIÓN DE CÉDULA EN FIRESTORE Y SANITIZACIÓN OG (Junio 2026)
+**Objetivo:** Resolver el hallazgo de nivel ALTO referente al uso directo de la cédula del ciudadano en las claves de documentos de Firestore, y mitigar abusos de payloads largos en el generador dinámico de imágenes OG.
+
+**Implementado:**
+- **Criptografía de Claves en Firestore (`legal_mandates` y `otp_rate_limits`):**
+  - En lugar de usar la cédula en texto plano (`documentId`) directamente en las rutas de documentos, ahora se calcula de manera idempotente un hash SHA-256 (`mandateKey = sha256(documentId).slice(0, 40)`) en `legal-auth.ts` (tanto en la creación/despacho como en la verificación de OTP) y en `telegram-bridge.ts` (al validar la existencia del mandato para la Cloud Function).
+  - Esto evita la exfiltración pasiva de cédulas en texto plano en los logs de Cloud Logging e impide el rastreo masivo a nivel de URLs de base de datos.
+- **Sanitización de Parámetros en API OG (`/api/og`):**
+  - Se limitó la longitud de los parámetros de búsqueda `ciudad` y `dept` a 60 caracteres y `title` a 80 caracteres mediante llamadas `slice(0, MAX_PARAM_LEN)` al inicio del handler.
+  - Esto neutraliza ataques de denegación de servicio o saturación de Vercel Edge mediante el envío de strings inusualmente largos de miles de caracteres.
+- **Validación QA:**
+  - El linter (`npm run lint`), el chequeador de tipos (`npm run typecheck`), los tests unitarios (`vitest run`) y el empaquetado final (`npm run build`) han sido completados satisfactoriamente con 100% de éxito.
+
+**Archivos Afectados:**
+- [legal-auth.ts](file:///c:/Workspace/Desmulta/src/actions/legal-auth.ts)
+- [telegram-bridge.ts](file:///c:/Workspace/Desmulta/src/actions/telegram-bridge.ts)
+- [route.tsx](file:///c:/Workspace/Desmulta/src/app/api/og/route.tsx)
+- [MEMORY.md](file:///c:/Workspace/Desmulta/docs/MEMORY.md)

@@ -44,7 +44,7 @@ export const Feedback = {
    * Acción de sistema con callback interactivo.
    * Útil para reintentos o navegación rápida.
    */
-  systemAction: (title: string, actionLabel: string, onClick: () => void) => {
+  systemAction: (title: string, actionLabel: string, _onClick: () => void) => {
     toast({
       title,
       // No exportamos action porque requeriría ToastAction de shadcn y complica la compatibilidad,

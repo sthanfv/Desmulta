@@ -4,6 +4,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { POST } from '../route';
 
+// Mock del fetch global
+const mockFetch = vi.fn();
+global.fetch = mockFetch;
+
 // Mocks
 vi.mock('next/headers', () => ({
   cookies: vi.fn(async () => ({
@@ -65,6 +69,7 @@ vi.mock('@sparticuz/chromium', () => ({
 describe('Export PDF API - Smoke Test & Anti-Leak Validation', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockFetch.mockReset();
   });
 
   const generateRequest = (body: unknown) => {
@@ -97,6 +102,12 @@ describe('Export PDF API - Smoke Test & Anti-Leak Validation', () => {
   });
 
   it('Debe procesar la solicitud, generar hash, inyectar email y retornar el PDF con PIN correcto', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      arrayBuffer: async () => Buffer.from('PDF_CONTENT').buffer,
+    });
+
     const req = generateRequest({
       pin: 'correct_pin',
       data: {

@@ -2,11 +2,17 @@
 
 import { z } from 'zod';
 import { resend } from '@/lib/resend';
-import { randomInt } from 'crypto';
+import { randomInt, createHash } from 'crypto';
 import { getAdminApp } from '@/lib/firebase-admin';
 import { getFirestore } from 'firebase-admin/firestore';
 import { headers } from 'next/headers';
 import { logger } from '@/lib/logger/security-logger';
+import bcrypt from 'bcryptjs';
+
+// Hashea el documentId (cédula) para evitar exponer PII en IDs de Firestore y Cloud Logging
+function getMandateKey(documentId: string): string {
+  return createHash('sha256').update(documentId).digest('hex').slice(0, 40);
+}
 
 // ✅ Esquemas de validación de entrada
 const EmailSchema = z.string().email().max(254);
@@ -35,8 +41,10 @@ export async function dispatchOTP(email: string, documentId: string) {
     getAdminApp();
     const db = getFirestore();
 
+    const mandateKey = getMandateKey(documentId);
+
     // ✅ 3. Rate limit: máximo 3 OTPs por documentId en 10 minutos
-    const rateLimitRef = db.collection('otp_rate_limits').doc(documentId);
+    const rateLimitRef = db.collection('otp_rate_limits').doc(mandateKey);
     const rateLimitSnap = await rateLimitRef.get();
 
     if (rateLimitSnap.exists) {
@@ -74,8 +82,12 @@ export async function dispatchOTP(email: string, documentId: string) {
       headersList.get('x-forwarded-for') || headersList.get('x-real-ip') || 'IP_NOT_FOUND';
     const userAgent = headersList.get('user-agent') || 'UNKNOWN_AGENT';
 
-    await db.collection('legal_mandates').doc(documentId).set({
-      otpCode,
+    // Hashear el OTP usando bcryptjs antes de almacenarlo en la base de datos (Zero-PII)
+    const salt = await bcrypt.genSalt(10);
+    const otpHash = await bcrypt.hash(otpCode, salt);
+
+    await db.collection('legal_mandates').doc(mandateKey).set({
+      otpHash,
       expiresAt,
       status: 'PENDING',
       failedAttempts: 0,
@@ -113,7 +125,8 @@ export async function verifyOTP(documentId: string, inputCode: string) {
   try {
     getAdminApp();
     const db = getFirestore();
-    const docRef = db.collection('legal_mandates').doc(documentId);
+    const mandateKey = getMandateKey(documentId);
+    const docRef = db.collection('legal_mandates').doc(mandateKey);
     const snapshot = await docRef.get();
 
     if (!snapshot.exists) return { status: 404, error: 'MANDATE_NOT_FOUND' };
@@ -133,14 +146,16 @@ export async function verifyOTP(documentId: string, inputCode: string) {
 
     if (Date.now() > data.expiresAt) return { status: 403, error: 'OTP_EXPIRED' };
 
-    if (data.otpCode !== inputCode) {
+    // Comparación segura del hash usando bcryptjs (previene rainbow tables en OTPs de 6 dígitos)
+    const isOtpValid = await bcrypt.compare(inputCode, data.otpHash);
+    if (!isOtpValid) {
       // ✅ Incrementar contador de fallos
       await docRef.update({ failedAttempts: failedAttempts + 1 });
       return { status: 401, error: 'INVALID_CODE' };
     }
 
     // ✅ Purga completa al verificar exitosamente (Zero-PII config)
-    await docRef.update({ status: 'VERIFIED', otpCode: null, failedAttempts: 0 });
+    await docRef.update({ status: 'VERIFIED', otpHash: null, failedAttempts: 0 });
     return { status: 200, message: 'SIGNATURE_VALIDATED' };
   } catch (error) {
     logger.error('[legal-auth] VERIFY_ERROR', { error: String(error) });

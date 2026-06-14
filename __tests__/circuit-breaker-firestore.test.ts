@@ -1,24 +1,30 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CircuitBreakerFs } from '../src/lib/security/circuit-breaker-firestore';
 
-// Mock the getFirestore and runTransaction from firebase-admin
+// Mock del inicializador de Firebase Admin para evitar llamadas reales en la suite de pruebas
+vi.mock('@/lib/firebase-admin', () => ({
+  getAdminApp: vi.fn(() => ({})),
+}));
+
+// Estructura de mocks para Firestore Document
+const mockDoc = {
+  get: vi.fn(),
+  set: vi.fn(),
+  update: vi.fn(),
+  delete: vi.fn(),
+};
+
+const mockCollection = {
+  doc: vi.fn(() => mockDoc),
+};
+
+const mockDb = {
+  collection: vi.fn(() => mockCollection),
+};
+
 vi.mock('firebase-admin/firestore', () => {
   return {
-    getFirestore: vi.fn(() => ({
-      collection: vi.fn(() => ({
-        doc: vi.fn(() => ({})),
-      })),
-      runTransaction: vi.fn(async (cb) => {
-        // Mocking the transaction context
-        const mockTransaction = {
-          get: vi.fn(),
-          set: vi.fn(),
-          update: vi.fn(),
-          delete: vi.fn(),
-        };
-        return cb(mockTransaction);
-      }),
-    })),
+    getFirestore: vi.fn(() => mockDb),
     FieldValue: {
       serverTimestamp: vi.fn(() => Date.now()),
     },
@@ -39,29 +45,24 @@ describe('CircuitBreakerFs (Firestore implementation)', () => {
   });
 
   it('(1) getState() retorna CLOSED cuando no hay documento', async () => {
-    // Override runTransaction mock specifically for this test
-    vi.spyOn(require('firebase-admin/firestore').getFirestore(), 'runTransaction').mockImplementationOnce(async (cb: any) => {
-      const mockTransaction = {
-        get: vi.fn().mockResolvedValue({ exists: false, data: () => undefined }),
-        set: vi.fn(),
-      };
-      return cb(mockTransaction);
+    mockDoc.get.mockResolvedValueOnce({
+      exists: false,
+      data: () => undefined,
     });
 
     const state = await circuitBreaker.getState();
     expect(state).toBe('CLOSED');
+    expect(mockCollection.doc).toHaveBeenCalledWith(serviceName);
   });
 
   it('(2) getState() retorna OPEN cuando openedAt es reciente', async () => {
     const now = Date.now();
-    vi.spyOn(require('firebase-admin/firestore').getFirestore(), 'runTransaction').mockImplementationOnce(async (cb: any) => {
-      const mockTransaction = {
-        get: vi.fn().mockResolvedValue({ 
-          exists: true, 
-          data: () => ({ state: 'OPEN', openedAt: now - 1000 }) // 1 segundo atrás, sigue OPEN
-        }),
-      };
-      return cb(mockTransaction);
+    mockDoc.get.mockResolvedValueOnce({
+      exists: true,
+      data: () => ({
+        failureCount: 3,
+        openedAt: now - 1000, // Hace 1 segundo, circuito abierto (30s timeout)
+      }),
     });
 
     const state = await circuitBreaker.getState();
@@ -70,15 +71,12 @@ describe('CircuitBreakerFs (Firestore implementation)', () => {
 
   it('(3) getState() retorna HALF_OPEN cuando openedAt superó resetTimeoutMs', async () => {
     const now = Date.now();
-    vi.spyOn(require('firebase-admin/firestore').getFirestore(), 'runTransaction').mockImplementationOnce(async (cb: any) => {
-      const mockTransaction = {
-        get: vi.fn().mockResolvedValue({ 
-          exists: true, 
-          data: () => ({ state: 'OPEN', openedAt: now - 35000 }) // 35 segundos atrás, umbral es 30s
-        }),
-        update: vi.fn(),
-      };
-      return cb(mockTransaction);
+    mockDoc.get.mockResolvedValueOnce({
+      exists: true,
+      data: () => ({
+        failureCount: 3,
+        openedAt: now - 35000, // Hace 35 segundos (superó el timeout de 30s)
+      }),
     });
 
     const state = await circuitBreaker.getState();
@@ -86,44 +84,42 @@ describe('CircuitBreakerFs (Firestore implementation)', () => {
   });
 
   it('(4) recordFailure() abre el circuito al alcanzar el umbral', async () => {
-    vi.spyOn(require('firebase-admin/firestore').getFirestore(), 'runTransaction').mockImplementationOnce(async (cb: any) => {
-      const mockTransaction = {
-        get: vi.fn().mockResolvedValue({ 
-          exists: true, 
-          data: () => ({ state: 'CLOSED', failureCount: 3 }) // Llegó al umbral
-        }),
-        set: vi.fn(),
-        update: vi.fn(),
-      };
-      return cb(mockTransaction);
+    mockDoc.get.mockResolvedValueOnce({
+      exists: true,
+      data: () => ({
+        failureCount: 2, // Con este fallo llegaremos a 3 (umbral = 3)
+        openedAt: null,
+      }),
     });
 
     await circuitBreaker.recordFailure();
-    // Verification would ideally check if transaction.set was called with state: 'OPEN'
-    // But since we are returning void, we assume the runTransaction logic handled it.
-    expect(true).toBe(true);
+
+    expect(mockDoc.set).toHaveBeenCalledWith(
+      expect.objectContaining({
+        failureCount: 3,
+        openedAt: expect.any(Number),
+      }),
+      { merge: true }
+    );
   });
 
   it('(5) recordSuccess() elimina el documento (cierra el circuito)', async () => {
-    let deleted = false;
-    vi.spyOn(require('firebase-admin/firestore').getFirestore(), 'runTransaction').mockImplementationOnce(async (cb: any) => {
-      const mockTransaction = {
-        get: vi.fn().mockResolvedValue({ 
-          exists: true, 
-        }),
-        delete: vi.fn(() => { deleted = true; }),
-      };
-      return cb(mockTransaction);
+    mockDoc.get.mockResolvedValueOnce({
+      exists: true,
+      data: () => ({
+        failureCount: 1,
+        openedAt: null,
+      }),
     });
 
     await circuitBreaker.recordSuccess();
-    expect(deleted).toBe(true);
+
+    expect(mockDoc.delete).toHaveBeenCalled();
   });
 
   it('(6) getState() retorna CLOSED si Firestore falla (fail-open en lectura de estado)', async () => {
-    vi.spyOn(require('firebase-admin/firestore').getFirestore(), 'runTransaction').mockRejectedValue(new Error('Firestore unavailable'));
-    
-    // As per the requirement, if firestore fails, we fail-open the circuit (return CLOSED so we don't block requests due to logging system failure)
+    mockDoc.get.mockRejectedValueOnce(new Error('Firestore unavailable'));
+
     const state = await circuitBreaker.getState();
     expect(state).toBe('CLOSED');
   });

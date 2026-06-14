@@ -25,11 +25,12 @@ const OG_HEIGHT = 630;
 
 export function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const ciudad = searchParams.get('ciudad') || 'Colombia';
-  const dept = searchParams.get('dept') || '';
+  const MAX_PARAM_LEN = 60;
+  const ciudad = (searchParams.get('ciudad') || 'Colombia').slice(0, MAX_PARAM_LEN);
+  const dept = (searchParams.get('dept') || '').slice(0, MAX_PARAM_LEN);
 
   const type = searchParams.get('type') || 'city';
-  const title = searchParams.get('title') || '';
+  const title = (searchParams.get('title') || '').slice(0, 80);
 
   if (type === 'blog') {
     return new ImageResponse(

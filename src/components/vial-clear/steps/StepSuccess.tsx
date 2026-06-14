@@ -116,6 +116,7 @@ export default function StepSuccess({
               Código QR de Respaldo
             </p>
             <div className="bg-white p-2 rounded-xl shadow-sm border border-slate-100">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 id={`qr-client-${successData.trackingUuid}`}
                 src={`/api/qr?data=${encodeURIComponent(`https://desmulta.online/seguir/${successData.trackingUuid}`)}&size=320`}

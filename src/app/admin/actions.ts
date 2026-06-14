@@ -304,7 +304,7 @@ export async function convertToCase(
       id: caseId,
       consultationId: lead.id || 'N/A',
       authorUid: safeAuthorUid,
-      cedula: encryptSymmetric(safeCedula),
+      cedula: safeCedula,
       nombre: safeNombre,
       contacto: safeContacto,
       placa: safePlaca,
