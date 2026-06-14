@@ -1,4 +1,6 @@
 /**
+ * piiScrubber.ts: USO EN TELEMETRÍA — para sanitizar datos antes de enviarlos a Sentry/logs
+ * NO usar para mostrar datos al usuario (reemplaza datos con tokens genéricos como [DOC_OCULTO]).
  * Motor de sanitización de PII (Información Personal Identificable).
  * Intercepta telemetría antes de enviarla a servicios de terceros.
  * @param {string} payload - Cadena JSON a sanitizar.

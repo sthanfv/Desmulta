@@ -9,6 +9,7 @@ const mocks = vi.hoisted(() => ({
   mockMessagingSend: vi.fn(),
   mockFirestoreSet: vi.fn(),
   mockFirestoreGet: vi.fn(),
+  mockFirestoreCreate: vi.fn(),
 }));
 
 global.fetch = mocks.mockFetch;
@@ -16,7 +17,8 @@ global.fetch = mocks.mockFetch;
 vi.mock('firebase-admin', () => {
   const get = mocks.mockFirestoreGet;
   const set = mocks.mockFirestoreSet;
-  const doc = vi.fn(() => ({ get, set }));
+  const create = mocks.mockFirestoreCreate;
+  const doc = vi.fn(() => ({ get, set, create }));
   const collection = vi.fn(() => ({
     doc,
     count: vi.fn(() => ({
@@ -126,6 +128,8 @@ describe('telegramWebhook — Seguridad y comandos', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.mockFirestoreGet.mockReset();
+    mocks.mockFirestoreCreate.mockReset();
+    mocks.mockFirestoreCreate.mockResolvedValue(undefined);
     mocks.mockFetch.mockReset();
     mocks.mockMessagingSend.mockReset();
 
@@ -215,8 +219,8 @@ describe('telegramWebhook — Seguridad y comandos', () => {
       },
     };
 
-    // processed_callbacks.get() → ya existe
-    mocks.mockFirestoreGet.mockResolvedValueOnce({ exists: true });
+    // processed_callbacks.create() → lanza error por duplicado
+    mocks.mockFirestoreCreate.mockRejectedValueOnce(new Error('Document already exists'));
 
     await (telegramWebhook as any)(req, res);
 

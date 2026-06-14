@@ -149,10 +149,7 @@ If it is a valid document, extract all text from this image exactly as it appear
 
         const dataUri = `data:${mimeType};base64,${imageBase64}`;
 
-        const recognizeResult = await Promise.race([
-          worker.recognize(dataUri),
-          tesseractTimeout,
-        ]);
+        const recognizeResult = await Promise.race([worker.recognize(dataUri), tesseractTimeout]);
 
         const {
           data: { text },

@@ -309,12 +309,13 @@ export const telegramWebhook = onRequest(
         // ── Cambio de estado: estado_ESTADO_DOCID ──────────────────────────
         if (dataStr.startsWith('estado_')) {
           const cbRef = db.collection('processed_callbacks').doc(callbackId);
-          if ((await cbRef.get()).exists) {
+          try {
+            await cbRef.create({ ts: new Date().toISOString(), data: dataStr });
+          } catch (e) {
             await answerCallbackQuery(token, callbackId, '✅ Ya procesado');
             res.status(200).send({ ok: true });
             return;
           }
-          await cbRef.set({ ts: new Date().toISOString(), data: dataStr });
 
           // Parsear: "estado_contactado_ABC123" (soporta estados compuestos como en_proceso)
           const parts = dataStr.split('_');
@@ -359,12 +360,13 @@ export const telegramWebhook = onRequest(
         // ── Revelar Cédula: vercedula_DOCID ──────────────────────────────────
         if (dataStr.startsWith('vercedula_')) {
           const cbRef = db.collection('processed_callbacks').doc(callbackId);
-          if ((await cbRef.get()).exists) {
+          try {
+            await cbRef.create({ ts: new Date().toISOString(), data: dataStr });
+          } catch (e) {
             await answerCallbackQuery(token, callbackId, '✅ Ya procesado');
             res.status(200).send({ ok: true });
             return;
           }
-          await cbRef.set({ ts: new Date().toISOString(), data: dataStr });
 
           const consultationId = dataStr.replace('vercedula_', '');
           
@@ -397,12 +399,13 @@ export const telegramWebhook = onRequest(
         // ── Push legacy (compatibilidad con botones anteriores) ─────────────
         if (dataStr.startsWith('push_')) {
           const cbRef = db.collection('processed_callbacks').doc(callbackId);
-          if ((await cbRef.get()).exists) {
+          try {
+            await cbRef.create({ ts: new Date().toISOString(), data: dataStr });
+          } catch (e) {
             await answerCallbackQuery(token, callbackId, '✅ Ya procesado');
             res.status(200).send({ ok: true });
             return;
           }
-          await cbRef.set({ ts: new Date().toISOString(), data: dataStr });
 
           const isViable = dataStr.startsWith('push_viable_');
           const docId = dataStr.replace(isViable ? 'push_viable_' : 'push_inviable_', '');

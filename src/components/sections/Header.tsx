@@ -45,9 +45,11 @@ export const Header = ({ onOpenModal }: HeaderProps) => {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 px-2 sm:px-4 py-4 sm:py-8 pointer-events-none">
       {/* Contenedor Principal (Píldora Glassmorphism iOS-17) */}
-      <div className={`max-w-6xl mx-auto glass overflow-visible rounded-[2rem] px-4 sm:px-6 flex justify-between items-center shadow-2xl border-white/5 pointer-events-auto relative z-50 transition-all duration-500 ${
-        isCollapsed ? 'py-2 sm:py-2.5 header-collapsed' : 'py-3 sm:py-4'
-      }`}>
+      <div
+        className={`max-w-6xl mx-auto glass overflow-visible rounded-[2rem] px-4 sm:px-6 flex justify-between items-center shadow-2xl border-white/5 pointer-events-auto relative z-50 transition-all duration-500 ${
+          isCollapsed ? 'py-2 sm:py-2.5 header-collapsed' : 'py-3 sm:py-4'
+        }`}
+      >
         {/* Logo de Desmulta */}
         <div className="flex items-center w-[140px] sm:w-[170px] transition-all duration-500">
           <div className="bg-primary p-1.5 sm:p-2 rounded-xl shadow-lg shadow-primary/20 flex-shrink-0 shield-container">
@@ -56,7 +58,9 @@ export const Header = ({ onOpenModal }: HeaderProps) => {
           <Link
             href="/"
             className={`text-lg sm:text-xl font-black tracking-tight text-foreground transition-all duration-500 logo-text-transition ${
-              isCollapsed ? 'max-w-0 opacity-0 ml-0 scale-75' : 'max-w-[120px] opacity-100 ml-1.5 sm:ml-2'
+              isCollapsed
+                ? 'max-w-0 opacity-0 ml-0 scale-75'
+                : 'max-w-[120px] opacity-100 ml-1.5 sm:ml-2'
             }`}
             onClick={closeMenu}
           >

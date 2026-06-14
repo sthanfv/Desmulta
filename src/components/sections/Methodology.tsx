@@ -37,7 +37,7 @@ export const Methodology = () => {
                     num: '02',
                     title: 'Gestión administrativa',
                     desc: 'Presentamos los argumentos ante el organismo de tránsito correspondiente, dentro de los términos y canales que establece la norma.',
-                    icon: <ShieldCheck className="w-6 h-6" />,
+                    icon: <FileText className="w-6 h-6" />,
                   },
                   {
                     num: '03',

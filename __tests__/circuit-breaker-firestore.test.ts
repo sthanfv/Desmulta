@@ -123,4 +123,67 @@ describe('CircuitBreakerFs (Firestore implementation)', () => {
     const state = await circuitBreaker.getState();
     expect(state).toBe('CLOSED');
   });
+
+  it('(7) isOpen() retorna true cuando el circuito está OPEN', async () => {
+    mockDoc.get.mockResolvedValueOnce({
+      exists: true,
+      data: () => ({
+        failureCount: 3,
+        openedAt: Date.now() - 1000,
+      }),
+    });
+    const open = await circuitBreaker.isOpen();
+    expect(open).toBe(true);
+  });
+
+  it('(8) isOpen() retorna false cuando el circuito está CLOSED', async () => {
+    mockDoc.get.mockResolvedValueOnce({
+      exists: false,
+      data: () => undefined,
+    });
+    const open = await circuitBreaker.isOpen();
+    expect(open).toBe(false);
+  });
+
+  it('(9) loadState() carga el estado del circuito desde Firestore', async () => {
+    mockDoc.get.mockResolvedValueOnce({
+      exists: true,
+      data: () => ({
+        failureCount: 2,
+        openedAt: null,
+      }),
+    });
+    await expect(circuitBreaker.loadState()).resolves.not.toThrow();
+    expect(mockDoc.get).toHaveBeenCalled();
+  });
+
+  it('(10) loadState() no falla si el documento no existe', async () => {
+    mockDoc.get.mockResolvedValueOnce({
+      exists: false,
+      data: () => undefined,
+    });
+    await expect(circuitBreaker.loadState()).resolves.not.toThrow();
+  });
+
+  it('(11) saveState() escribe el estado en Firestore', async () => {
+    await circuitBreaker.saveState({ failureCount: 1, openedAt: null });
+    expect(mockDoc.set).toHaveBeenCalledWith(
+      expect.objectContaining({
+        failureCount: 1,
+        openedAt: null,
+        updatedAt: expect.any(Number),
+      }),
+      { merge: true }
+    );
+  });
+
+  it('(12) recordFailure() maneja errores de Firestore de manera segura (fail-safe)', async () => {
+    mockDoc.get.mockRejectedValueOnce(new Error('Firestore error'));
+    await expect(circuitBreaker.recordFailure()).resolves.not.toThrow();
+  });
+
+  it('(13) recordSuccess() maneja errores de Firestore de manera segura (fail-safe)', async () => {
+    mockDoc.get.mockRejectedValueOnce(new Error('Firestore error'));
+    await expect(circuitBreaker.recordSuccess()).resolves.not.toThrow();
+  });
 });

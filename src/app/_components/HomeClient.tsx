@@ -81,11 +81,8 @@ import { SuccessCases } from '@/components/sections/SuccessCases';
 import { FAQ } from '@/components/sections/FAQ';
 import { CTA } from '@/components/sections/CTA';
 import { Footer } from '@/components/sections/Footer';
-import { BentoDesmulta } from '@/components/sections/BentoDesmulta';
-import { JurisprudenciaScroll } from '@/components/sections/JurisprudenciaScroll';
 
 import { WelcomeModal } from '@/components/vial-clear/WelcomeModal';
-import { MagicRings } from '@/components/ui/magic-rings';
 
 import type { ShowcaseConfig, FooterConfig } from '@/lib/site-config';
 
@@ -194,7 +191,7 @@ export default function HomeClient({
       />
 
       <div>
-        <Pillars showcaseData={showcaseData} />
+        <Pillars />
       </div>
 
       <div>
@@ -205,10 +202,7 @@ export default function HomeClient({
         <SuccessCases showcaseData={showcaseData} />
       </div>
 
-      <div className="defer-render">
-        <BentoDesmulta />
-        <JurisprudenciaScroll />
-      </div>
+
 
       <div className="defer-render">
         <FAQ mounted={mounted} />
@@ -294,24 +288,8 @@ export default function HomeClient({
           aria-label="Abrir chat de WhatsApp para asesoría directa"
         >
           <MessageCircle size={36} fill="currentColor" aria-hidden="true" />
-          {/* Animated Magic Rings Background */}
-          {/* CORRECCIÓN: canvas 3x el tamaño del botón para que los anillos */}
-          {/* nunca choquen contra el borde del quad WebGL (eliminando el corte cuadrado) */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] sm:w-[320px] sm:h-[320px] pointer-events-none -z-10">
-            <MagicRings
-              color="#25D366"
-              colorTwo="#25D366"
-              ringCount={2}
-              baseRadius={0.12}
-              radiusStep={0.1}
-              scaleRate={0.28}
-              attenuation={14}
-              lineThickness={1.8}
-              opacity={0.85}
-              fadeIn={0.3}
-              fadeOut={0.55}
-            />
-          </div>
+          <span className="absolute inset-0 rounded-full animate-ping bg-[#25D366]/30 pointer-events-none" />
+          <span className="absolute inset-0 rounded-full animate-ping bg-[#25D366]/20 pointer-events-none [animation-delay:0.4s]" />
         </button>
 
         <button

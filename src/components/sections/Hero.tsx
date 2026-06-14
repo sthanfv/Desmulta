@@ -4,8 +4,16 @@ import React from 'react';
 import { ArrowUp, FileText, ChevronRight, Shield } from 'lucide-react';
 import { m } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { SavingsCalculator } from '@/components/interactive/SavingsCalculator';
+import dynamic from 'next/dynamic';
 import { TarjetaPremium } from '@/components/ui/TarjetaPremium';
+
+const SavingsCalculator = dynamic(
+  () => import('@/components/interactive/SavingsCalculator').then((mod) => mod.SavingsCalculator),
+  {
+    ssr: false,
+    loading: () => <div className="h-[360px] sm:h-[400px] rounded-3xl bg-muted/10 border border-white/5 animate-pulse" />,
+  }
+);
 import { Lightbox } from '@/components/ui/lightbox';
 import { useExpedienteStore } from '@/store/useExpedienteStore';
 import { ReturningUserBanner } from '@/components/vial-clear/ReturningUserBanner';

@@ -2,7 +2,7 @@
 import { logger } from '@/lib/logger/security-logger';
 
 import { useState, useEffect, Suspense } from 'react';
-import { type SubmitHandler, type UseFormReturn } from 'react-hook-form';
+import { type SubmitHandler, type UseFormReturn, type Path } from 'react-hook-form';
 import { z } from 'zod';
 import { Progress } from '../ui/progress';
 import { ShieldCheck, AlertTriangle, X, RefreshCw, Activity } from 'lucide-react';
@@ -268,6 +268,14 @@ export function ConsultationForm({ onSuccess, mode = 'full', nonce }: Consultati
       Haptics.tap();
       setStep(2);
     } else {
+      Haptics.error();
+      const currentErrors = form.formState.errors;
+      const firstInvalidField = fieldsToValidate.find((field) => currentErrors[field]);
+      if (firstInvalidField) {
+        const el = document.querySelector(`[name="${firstInvalidField}"]`);
+        el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        (el as HTMLElement)?.focus();
+      }
       toast({
         variant: 'destructive',
         title: 'Complete el análisis',
@@ -429,17 +437,32 @@ export function ConsultationForm({ onSuccess, mode = 'full', nonce }: Consultati
 
         // ── Otros errores del servidor ────────────────────────────────────────
         let errorMsg = result.message || result.error || 'Ocurrió un error en el servidor.';
+        let firstField: string | undefined;
         if (result.details?.fieldErrors) {
-          const firstField = Object.keys(result.details.fieldErrors)[0];
+          firstField = Object.keys(result.details.fieldErrors)[0];
           const fieldLabel =
             firstField in FIELD_LABELS
               ? FIELD_LABELS[firstField as keyof typeof FIELD_LABELS]
               : firstField;
           const fieldError = result.details.fieldErrors[firstField]?.[0];
           errorMsg = `Campo "${fieldLabel}": ${fieldError || 'Valor inválido.'}`;
+
+          // Sincronizar todos los errores de validación del backend con react-hook-form
+          Object.keys(result.details.fieldErrors).forEach((key) => {
+            const fieldMsgs = result.details.fieldErrors[key];
+            if (fieldMsgs && fieldMsgs.length > 0) {
+              form.setError(key as Path<ConsultationFormData>, {
+                type: 'server',
+                message: fieldMsgs[0],
+              });
+            }
+          });
         }
-        const error = new Error(errorMsg) as Error & { tokenConsumed?: boolean };
+        const error = new Error(errorMsg) as Error & { tokenConsumed?: boolean; firstField?: string };
         error.tokenConsumed = result.tokenConsumed;
+        if (firstField) {
+          error.firstField = firstField;
+        }
         throw error;
       }
 
@@ -555,6 +578,14 @@ export function ConsultationForm({ onSuccess, mode = 'full', nonce }: Consultati
         title: tokenConsumed ? 'Transacción Consumida' : 'Revisa estos detalles',
         description: message,
       });
+
+      // Desplazar suavemente y enfocar al primer campo con error de validación del backend
+      if (e instanceof Error && 'firstField' in e && e.firstField) {
+        const fieldName = (e as Error & { firstField?: string }).firstField;
+        const el = document.querySelector(`[name="${fieldName}"]`);
+        el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        (el as HTMLElement)?.focus();
+      }
 
       // 🛡️ DEVSECOPS (Blindaje v8.9.9)
       // Si el servidor falla la petición por un error de seguridad (403, token inválido),

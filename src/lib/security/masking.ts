@@ -1,5 +1,7 @@
 /**
  * src/lib/security/masking.ts
+ * USO EN PRESENTACIÓN — para mostrar datos parciales al usuario en la UI
+ * NO usar para logs, Sentry, o cualquier sistema de telemetría (ya que conserva fragmentos legibles de PII).
  * Utilidades para ofuscar (enmascarar) Información de Identificación Personal (PII)
  * en la capa de presentación, previniendo visualización no autorizada.
  */

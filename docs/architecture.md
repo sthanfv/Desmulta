@@ -113,6 +113,9 @@ onCaseStatusChange          onConsultationStatusChange
 | Anti-bot | Cloudflare Turnstile server-side | `src/lib/turnstile.ts` |
 | Cifrado | RSA E2EE formulario + SHA-256 PII | `src/lib/encryption.ts` |
 
+### Excepciones de Seguridad Conocidas
+*   **style-src unsafe-inline (CSP):** Se permite la directiva `'unsafe-inline'` en `style-src` debido a los requerimientos de hidratación dinámica de Framer Motion y Tailwind CSS en Next.js. Es una excepción aceptada en beneficio del dinamismo visual de la interfaz de usuario de cara al cliente y en ausencia de un motor de hashes/nonces dinámicos a tiempo de compilación.
+
 ---
 
 ## 5. Cloud Functions — Descripción

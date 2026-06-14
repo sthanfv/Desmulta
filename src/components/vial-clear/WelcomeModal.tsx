@@ -3,7 +3,6 @@ import { m } from 'framer-motion';
 import { ShieldCheck, ArrowRight, Calculator } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ResponsiveModal } from '@/components/ui/responsive-modal';
-import { cn } from '@/lib/utils';
 
 interface WelcomeModalProps {
   onAcknowledge: () => void;
@@ -15,8 +14,9 @@ export function WelcomeModal({ onAcknowledge }: WelcomeModalProps) {
   useEffect(() => {
     const lastSeen = localStorage.getItem('desmulta_welcome_time');
     const now = Date.now();
-    // Reaparece si no se ha visto nunca, o si pasaron más de 5 minutos (300,000 ms)
-    if (!lastSeen || now - parseInt(lastSeen) > 1000 * 60 * 5) {
+    // Reaparece si no se ha visto nunca, o si pasaron más de 7 días
+    const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+    if (!lastSeen || now - parseInt(lastSeen) > SEVEN_DAYS_MS) {
       const timer = setTimeout(() => setIsOpen(true), 800);
       return () => clearTimeout(timer);
     }
@@ -26,22 +26,6 @@ export function WelcomeModal({ onAcknowledge }: WelcomeModalProps) {
     localStorage.setItem('desmulta_welcome_time', Date.now().toString());
     setIsOpen(false);
     setTimeout(onAcknowledge, 300);
-  };
-
-  const scrollToCalculadora = () => {
-    handleClose();
-    // 600ms asegura que Radix UI haya devuelto el control del scroll al body por completo
-    setTimeout(() => {
-      const element = document.getElementById('calculadora');
-      if (element) {
-        // block: 'start' ancla el inicio de la sección, evitando saltos cuando la calculadora carga
-        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        // Segundo intento para compensar el "layout shift" después de que el lazy-load termine
-        setTimeout(() => {
-          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 800);
-      }
-    }, 600);
   };
 
   return (
@@ -93,7 +77,6 @@ export function WelcomeModal({ onAcknowledge }: WelcomeModalProps) {
               title: 'Calculadora Legal',
               desc: 'Calcula la prescripción de tus multas según la ley actual.',
               tag: 'Nuevo',
-              action: scrollToCalculadora,
             },
             {
               icon: <ShieldCheck className="w-5 h-5 text-blue-500" />,
@@ -106,11 +89,7 @@ export function WelcomeModal({ onAcknowledge }: WelcomeModalProps) {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 + idx * 0.1 }}
-              onClick={item.action}
-              className={cn(
-                'flex gap-4 items-start bg-muted/30 p-4 rounded-3xl border border-border/50 hover:bg-muted/50 transition-all duration-300 group relative overflow-hidden active:scale-[0.98]',
-                item.action && 'cursor-pointer border-primary/20 bg-primary/5'
-              )}
+              className="flex gap-4 items-start bg-muted/30 p-4 rounded-3xl border border-border/50 hover:bg-muted/50 transition-all duration-300 group relative overflow-hidden active:scale-[0.98]"
             >
               <div className="bg-background p-2.5 rounded-2xl shadow-sm border border-border/50 shrink-0 group-hover:scale-110 transition-transform">
                 {item.icon}
