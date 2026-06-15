@@ -2,11 +2,26 @@
 
 | Versión | Estado     | Hitos Principales |
 | :---    | :---       | :---              |
+| v1.0.0  | 🟢 Estable | Corrección en validación de formulario SIMIT (Filtro Cédula) + Hardening contra DoS + Estabilización QA |
 | v1.0.0  | 🟢 Estable | Hardening contra DoS + Reubicación de Rate Limit al inicio de API Lifecycle + Estabilización QA |
 | v1.0.0  | 🟢 Estable | VIP Portal + Push Notifications + Toque Humano + Telegram sin duplicados |
 | v1.0.0 | 🟢 Estable | Auditoría PDF + Previsualización Premium |
 | v1.0.0 | 🟢 Estable | Reingeniería PDF + Word-wrap + Saneamiento Linter |
 | v8.8.0  | 🟢 Estable | Motor OCR Tesseract 5.0 Integration |
+
+## 📝 SESIÓN: CORRECCIÓN EN VALIDACIÓN DE FORMULARIO SIMIT (Junio 2026)
+**Objetivo:** Corregir un bug de validación en el frontend donde el formulario simplificado "Subir Captura" (modo SIMIT) exigía el campo "Cédula" (oculto en la interfaz) al enviar los datos, impidiendo que los usuarios completen su registro.
+
+**Cambios e Implementaciones:**
+- **Resolución Condicional del Esquema en el Frontend**:
+  - En [useConsultationForm.ts](file:///c:/Workspace/Desmulta/src/hooks/useConsultationForm.ts), se actualizó el `zodResolver` para usar dinámicamente `SimitCaptureSchema` si `mode === 'simit'` y `ConsultationSchema` en el modo completo.
+  - Esto evita que react-hook-form exija la presencia de la cédula o campos de análisis completo en el flujo simplificado SIMIT, manteniendo la coherencia con los campos visibles en pantalla.
+  - Se homogeneizó la indexación del objeto `errors` en [ConsultationForm.tsx](file:///c:/Workspace/Desmulta/src/components/vial-clear/ConsultationForm.tsx) para evitar la advertencia TS2538 y warnings de tipo `any` en ESLint.
+
+**Estado Arquitectónico:**
+- 🟢 Completamente estable. Compilación y linter limpios (0 warnings, 0 errores).
+
+---
 
 ## 📝 SESIÓN: HARDENING CONTRA DOS Y REUBICACIÓN DE RATE LIMIT (Junio 2026)
 **Objetivo:** Reubicar el rate limiter (Capa 4) basado en Upstash Redis al inicio absoluto del ciclo de vida de las peticiones en los endpoints `/api/create-consultation` y `/api/ocr` para mitigar ataques DoS, evitando procesamiento innecesario de payloads JSON abusivos y CPU bound (Zod). Además, estabilizar la suite de pruebas unitarias (Vitest).

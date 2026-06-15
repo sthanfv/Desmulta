@@ -654,13 +654,13 @@ export function ConsultationForm({ onSuccess, mode = 'full', nonce }: Consultati
                 if (Object.keys(errors).length > 0) {
                   Haptics.error();
                 }
-                const errorKeys = Object.keys(errors);
-                const firstFieldName = errorKeys[0];
-                const firstError = errors[firstFieldName as keyof typeof errors];
-                const label =
-                  firstFieldName in FIELD_LABELS
-                    ? FIELD_LABELS[firstFieldName as keyof typeof FIELD_LABELS]
-                    : firstFieldName;
+                 const errorKeys = Object.keys(errors);
+                 const firstFieldName = errorKeys[0];
+                 const firstError = (errors as Record<string, { message?: string }>)[firstFieldName];
+                 const label =
+                   firstFieldName in FIELD_LABELS
+                     ? FIELD_LABELS[firstFieldName as keyof typeof FIELD_LABELS]
+                     : firstFieldName;
 
                 toast({
                   variant: 'destructive',

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { ConsultationSchema } from '@/lib/definitions';
+import { ConsultationSchema, SimitCaptureSchema } from '@/lib/definitions';
 import { useToast } from '@/hooks/use-toast';
 import { useRateLimit } from '@/components/ui/RateLimitBanner';
 import { useSystemHealth } from '@/components/providers/SystemHealthProvider';
@@ -31,8 +31,10 @@ export function useConsultationForm(mode: 'full' | 'simit' = 'full') {
   const { rateLimitState, handleRateLimitResponse, clearRateLimit } = useRateLimit();
   const webPush = useWebPush();
 
+  const resolverSchema = isSimitMode ? SimitCaptureSchema : ConsultationSchema;
+
   const form = useForm<ConsultationFormData>({
-    resolver: zodResolver(ConsultationSchema),
+    resolver: zodResolver(resolverSchema),
     defaultValues: {
       cedula: '',
       placa: '',
