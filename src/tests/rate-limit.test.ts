@@ -14,7 +14,7 @@ describe('🛡️ Escudo Anti-DDoS y Rate Limiting', () => {
     antiguedad: 'Más de 3 años',
     tipoInfraccion: 'Foto-Multa (Cámara)',
     estadoCoactivo: 'NO',
-    turnstileToken: 'mock-token-test',
+    cfToken: 'mock-token-test',
   };
 
   it('🚫 Debe bloquear peticiones masivas y devolver Error 429', async () => {
