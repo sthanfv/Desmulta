@@ -7,6 +7,15 @@
 | v1.0.0 | 🟢 Estable | Reingeniería PDF + Word-wrap + Saneamiento Linter |
 | v8.8.0  | 🟢 Estable | Motor OCR Tesseract 5.0 Integration |
 
+## 📝 SESIÓN: INTEGRACIÓN DE UPSTASH REDIS EN VARIABLES DE ENTORNO (Junio 2026)
+**Objetivo:** Añadir las credenciales de Upstash Redis al archivo de configuración local `.env` como paso preliminar de integración para la optimización de los sistemas de limitación de tasa y caché.
+
+**Cambios e Implementaciones:**
+- Se agregaron las variables `UPSTASH_REDIS_REST_URL` y `UPSTASH_REDIS_REST_TOKEN` al archivo local `.env`.
+
+**Estado Arquitectónico:**
+- 🟢 Estable. El proyecto mantiene su compilación limpia y tests en verde.
+
 ---
 
 ## 📝 SESIÓN: ANÁLISIS Y CORRECCIÓN DE INCIDENCIAS EN PRODUCCIÓN — VISUALIZACIÓN PDF Y DATOS ENCRIPTADOS (Junio 2026)
