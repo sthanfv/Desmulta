@@ -25,6 +25,10 @@
   - Se añadieron nuevas aserciones para validar el endpoint `GET` (headers de cache, etc.) y robustecer la seguridad mediante validaciones de autorización (HTTP 401 y 403).
 - **Cumplimiento de Directiva de Idioma Bilingüe**:
   - Se tradujo al español el mensaje de error de telemetría interna en [gallery.actions.ts](file:///c:/Workspace/Desmulta/src/app/actions/gallery.actions.ts), eliminando el log huérfano en inglés para asegurar que toda la observabilidad del servidor sea 100% castellana.
+- **Transición Cinética Dinámica en Casos de Éxito**:
+  - En [SuccessCases.tsx](file:///c:/Workspace/Desmulta/src/components/sections/SuccessCases.tsx), se envolvió el componente del carrusel principal en `<AnimatePresence mode="wait">` y un `<m.div>` animado con Framer Motion (variantes de escala `0.98 -> 1`, opacidad y difuminado suave `filter: blur(4px) -> blur(0px)`).
+  - Se reestructuró el componente moviendo el contenedor `<LazyMotion features={domAnimation}>` a la raíz del `return` del componente. Esto permite aplicar animaciones tanto en el carrusel principal como en el Portal sin redundancias ni errores del proveedor.
+  - Esto soluciona la rigidez visual reportada al cambiar de caso, proporcionando una retroalimentación cinemática fluida, premium e inmersiva que enriquece la experiencia del usuario.
 
 **Estado Arquitectónico:**
 - 🟢 Completamente estable. Compilación de Next.js (`typecheck`) limpia, tests unitarios en verde (226/226 tests passed) y linter (`lint`) impecable con 0 errores/warnings.
