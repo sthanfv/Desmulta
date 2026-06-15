@@ -2,12 +2,34 @@
 
 | Versión | Estado     | Hitos Principales |
 | :---    | :---       | :---              |
+| v1.0.0  | 🟢 Estable | Claves reactivas en carrusel de casos de éxito + Eliminación de actions obsoletas + Test API Route |
 | v1.0.0  | 🟢 Estable | Corrección en validación de formulario SIMIT (Filtro Cédula) + Hardening contra DoS + Estabilización QA |
 | v1.0.0  | 🟢 Estable | Hardening contra DoS + Reubicación de Rate Limit al inicio de API Lifecycle + Estabilización QA |
 | v1.0.0  | 🟢 Estable | VIP Portal + Push Notifications + Toque Humano + Telegram sin duplicados |
 | v1.0.0 | 🟢 Estable | Auditoría PDF + Previsualización Premium |
 | v1.0.0 | 🟢 Estable | Reingeniería PDF + Word-wrap + Saneamiento Linter |
 | v8.8.0  | 🟢 Estable | Motor OCR Tesseract 5.0 Integration |
+
+## 📝 SESIÓN: ELIMINACIÓN DE SERVER ACTIONS DE LA GALERÍA Y AJUSTE DE KEYS REACTIVAS (Junio 2026)
+**Objetivo:** Eliminar el archivo de Server Actions obsoleto `src/app/admin/gallery/actions.ts` de la galería, inyectar claves reactivas en el carrusel de casos de éxito para evitar sobreposiciones de imágenes, y actualizar el test de integración de galería.
+
+**Cambios e Implementaciones:**
+- **Eliminación de Deuda Técnica (actions.ts)**:
+  - Se eliminó físicamente el archivo `src/app/admin/gallery/actions.ts` dado que el panel de administración hace uso directo de peticiones HTTP a la API Route de la galería (`/api/gallery`).
+- **Inyección de Keys Reactivas en carrusel de Casos de Éxito**:
+  - En [SuccessCases.tsx](file:///c:/Workspace/Desmulta/src/components/sections/SuccessCases.tsx), se añadieron claves dinámicas basadas en `id` al componente `<ImageSlider />` en la galería principal (`key={dynamicCases[activeIndex]?.id || activeIndex}`) y en el portal de pantalla completa (`key={`fullscreen-${dynamicCases[activeIndex]?.id || activeIndex}`}`).
+  - Esto soluciona de forma definitiva el problema donde React reutilizaba el mismo componente y causaba la sobreposición de imágenes antiguas de otros casos o dejaba estancada la posición del slider táctil.
+- **Refactorización Completa del Test de Integración**:
+  - En [gallery.test.ts](file:///c:/Workspace/Desmulta/tests/integration/gallery.test.ts), se reescribieron las pruebas para testear directamente los métodos `POST`, `GET` y `DELETE` expuestos por la API Route en `src/app/api/gallery/route.ts` en lugar de las Server Actions borradas.
+  - Se implementó un helper para inyectar mocks del método `formData` en `NextRequest`, evitando que los constructores internos tiren errores de validación de WebIDL en el entorno de Node.js de Vitest.
+  - Se añadieron nuevas aserciones para validar el endpoint `GET` (headers de cache, etc.) y robustecer la seguridad mediante validaciones de autorización (HTTP 401 y 403).
+- **Cumplimiento de Directiva de Idioma Bilingüe**:
+  - Se tradujo al español el mensaje de error de telemetría interna en [gallery.actions.ts](file:///c:/Workspace/Desmulta/src/app/actions/gallery.actions.ts), eliminando el log huérfano en inglés para asegurar que toda la observabilidad del servidor sea 100% castellana.
+
+**Estado Arquitectónico:**
+- 🟢 Completamente estable. Compilación de Next.js (`typecheck`) limpia, tests unitarios en verde (226/226 tests passed) y linter (`lint`) impecable con 0 errores/warnings.
+
+---
 
 ## 📝 SESIÓN: CORRECCIÓN EN VALIDACIÓN DE FORMULARIO SIMIT (Junio 2026)
 **Objetivo:** Corregir un bug de validación en el frontend donde el formulario simplificado "Subir Captura" (modo SIMIT) exigía el campo "Cédula" (oculto en la interfaz) al enviar los datos, impidiendo que los usuarios completen su registro.

@@ -2,7 +2,14 @@
 
 import { getAdminApp } from '@/lib/firebase-admin';
 import { getFirestore } from 'firebase-admin/firestore';
-import { SuccessCase } from '@/app/admin/gallery/actions';
+export interface SuccessCase {
+  id: string;
+  title: string;
+  beforeImageUrl: string;
+  afterImageUrl: string;
+  createdAt: string;
+  watermarked?: boolean;
+}
 import { logger } from '@/lib/logger/security-logger';
 
 export async function getPublicSuccessCases(): Promise<SuccessCase[]> {
@@ -20,7 +27,7 @@ export async function getPublicSuccessCases(): Promise<SuccessCase[]> {
       ...(doc.data() as Omit<SuccessCase, 'id'>),
     }));
   } catch (error) {
-    logger.error('[getPublicSuccessCases] Error fetching success cases', {
+    logger.error('[getPublicSuccessCases] Error al obtener los casos de éxito', {
       error: error instanceof Error ? error.message : String(error),
     });
     return [];

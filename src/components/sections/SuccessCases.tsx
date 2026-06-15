@@ -415,6 +415,7 @@ export const SuccessCases = ({ showcaseData }: SuccessCasesProps) => {
                   </div>
                 )}
                 <ImageSlider
+                  key={dynamicCases[activeIndex]?.id || activeIndex}
                   beforeSrc={currentBefore}
                   afterSrc={currentAfter}
                   onExpand={() => {
@@ -541,6 +542,7 @@ export const SuccessCases = ({ showcaseData }: SuccessCasesProps) => {
                       transition={{ type: 'spring', stiffness: 300, damping: 25 }}
                     >
                       <ImageSlider
+                        key={`fullscreen-${dynamicCases[activeIndex]?.id || activeIndex}`}
                         beforeSrc={currentBefore}
                         afterSrc={currentAfter}
                         isExpanded={true}
