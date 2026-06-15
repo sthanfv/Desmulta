@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { AppProgressBar } from "next-nprogress-bar";
+import { AppProgressBar } from 'next-nprogress-bar';
 
 export function PageProgressBar() {
   return (

@@ -76,10 +76,20 @@ export const ConsultationSchemaBase = z.object({
   }),
   websiteHoneypot: z.string().optional(),
   authorUid: z.string().optional(),
-  antiguedad: z.string({ required_error: 'Seleccione la antigüedad de la multa.' }).min(1, { message: 'Seleccione la antigüedad de la multa.' }),
-  tipoInfraccion: z.string({ required_error: 'Seleccione el tipo de infracción.' }).min(1, { message: 'Seleccione el tipo de infracción.' }),
-  estadoCoactivo: z.string({ required_error: 'Seleccione si el caso está en cobro coactivo.' }).min(1, { message: 'Seleccione si el caso está en cobro coactivo.' }),
-  evidenceUrl: z.string().url({ message: 'Enlace de evidencia inválido.' }).optional().or(z.literal('')),
+  antiguedad: z
+    .string({ required_error: 'Seleccione la antigüedad de la multa.' })
+    .min(1, { message: 'Seleccione la antigüedad de la multa.' }),
+  tipoInfraccion: z
+    .string({ required_error: 'Seleccione el tipo de infracción.' })
+    .min(1, { message: 'Seleccione el tipo de infracción.' }),
+  estadoCoactivo: z
+    .string({ required_error: 'Seleccione si el caso está en cobro coactivo.' })
+    .min(1, { message: 'Seleccione si el caso está en cobro coactivo.' }),
+  evidenceUrl: z
+    .string()
+    .url({ message: 'Enlace de evidencia inválido.' })
+    .optional()
+    .or(z.literal('')),
   ciudad: z.string().optional().or(z.literal('')),
   cfToken: z.string().optional(),
   ocrData: OCRAnalysisSchema.optional(),

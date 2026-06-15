@@ -3,7 +3,7 @@ import { logger } from '@/lib/logger/security-logger';
 
 import React, { useEffect, useState, useCallback } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
-import { Download, FileText, CheckCircle2, AlertCircle, X, AlertTriangle } from 'lucide-react';
+import { Download, FileText, CheckCircle2, AlertCircle, X, AlertTriangle, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface PDFPreviewModalProps {
@@ -151,12 +151,36 @@ export function PDFPreviewModal({ isOpen, onClose, base64, filename }: PDFPrevie
 
               {/* Estado: PDF listo */}
               {!isLoading && !decodeError && url && (
-                <iframe
-                  src={`${url}#view=FitH&toolbar=0&navpanes=0`}
-                  className="w-full h-full border-none"
-                  title="Vista Previa del Documento Legal"
-                  loading="eager"
-                />
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-8 text-center animate-in fade-in duration-200">
+                  <div className="relative mb-6">
+                    <div className="absolute inset-0 bg-amber-500/20 blur-xl rounded-full scale-125 animate-pulse" />
+                    <div className="relative w-20 h-20 bg-amber-500/10 rounded-2xl flex items-center justify-center border border-amber-500/30 shadow-2xl">
+                      <FileText className="w-10 h-10 text-amber-500" />
+                    </div>
+                  </div>
+                  <h3 className="text-sm font-black text-white uppercase tracking-widest mb-2">
+                    Escudo de Seguridad CSP Activo
+                  </h3>
+                  <p className="text-xs text-slate-400 max-w-sm leading-relaxed mb-6">
+                    Para blindar la plataforma contra inyecciones XSS y fugas de PII, las directivas de seguridad restringen la previsualización incrustada. Abra el visor seguro.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-3 w-full max-w-xs justify-center">
+                    <button
+                      onClick={() => window.open(url, '_blank')}
+                      className="flex items-center justify-center gap-2 px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-black font-black text-[10px] uppercase tracking-widest rounded-xl transition-all active:scale-95 shadow-lg shadow-amber-500/10"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      Visor en Nueva Pestaña
+                    </button>
+                    <button
+                      onClick={handleDownload}
+                      className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white/5 hover:bg-white/10 text-white font-bold text-[10px] uppercase tracking-widest rounded-xl transition-all active:scale-95 border border-white/5"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      Descargar PDF
+                    </button>
+                  </div>
+                </div>
               )}
 
               {/* Etiqueta de control */}

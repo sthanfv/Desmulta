@@ -458,7 +458,10 @@ export function ConsultationForm({ onSuccess, mode = 'full', nonce }: Consultati
             }
           });
         }
-        const error = new Error(errorMsg) as Error & { tokenConsumed?: boolean; firstField?: string };
+        const error = new Error(errorMsg) as Error & {
+          tokenConsumed?: boolean;
+          firstField?: string;
+        };
         error.tokenConsumed = result.tokenConsumed;
         if (firstField) {
           error.firstField = firstField;

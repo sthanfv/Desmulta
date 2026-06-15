@@ -9,6 +9,22 @@
 
 ---
 
+## 📝 SESIÓN: ANÁLISIS DE INCIDENCIAS EN PRODUCCIÓN — VISUALIZACIÓN PDF Y DATOS ENCRIPTADOS (Junio 2026)
+**Objetivo:** Diagnosticar y proponer soluciones técnicas sin modificar código para los dos errores reportados por el operador: el bloqueo de la previsualización del PDF en el panel de administración, y la exportación de la cédula encriptada en la petición general.
+
+**Hallazgos y Diagnóstico Técnico:**
+- **Bloqueo del Visor PDF (Iframe):**
+  - La directiva `object-src 'none'` en la cabecera CSP (`src/lib/security-headers.ts`) combinada con `X-Frame-Options: DENY` (`src/middleware.ts`) previene la renderización del visor integrado del navegador dentro del `<iframe>` por motivos de seguridad Chromium. El plugin interno del navegador (visor nativo de PDF) es bloqueado por las cabeceras restrictivas para impedir inyecciones de plugins/objetos.
+  - Se proponen alternativas como la apertura en pestaña externa (`window.open`) o la renderización por Canvas con librerías tipo `pdfjs-dist`.
+- **Cédula Cifrada (`ENC:...`) en el PDF de Petición General:**
+  - Existe una inconsistencia en `src/app/admin/actions.ts`. Mientras que `getConsultations` (leads) desencripta el campo `cedula` con `decryptSymmetric()` antes de enviarlo al cliente, `getCases` (expedientes activos) no realiza esta acción, haciendo que la cédula cifrada en reposo viaje en texto encriptado al cliente.
+  - En la edición del expediente (`isEditing === true`), el cliente envía `overrideData` con `cedula: "ENC:..."`. Esto provoca una doble encriptación en Firestore al guardar el documento y una inyección corrupta en la compilación del PDF por Puppeteer en el servidor.
+
+**Estado Arquitectónico:**
+- La base de código de producción no se altera en esta sesión para respetar la indicación explícita del operador de no modificar código. Se elabora un informe técnico completo.
+
+---
+
 ## 📝 SESIÓN: FINALIZACIÓN AUDITORÍA ENTERPRISE v5 — SCROLL DE ERRORES Y COBERTURA DE PRUEBAS (Junio 2026)
 **Objetivo:** Completar los hallazgos restantes de la Auditoría Enterprise v5, implementando la redirección visual suave (scroll suave y focus) al primer campo inválido del formulario, y elevando la cobertura de pruebas de `CircuitBreakerFs` con mock de Firestore.
 

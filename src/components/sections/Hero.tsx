@@ -11,7 +11,9 @@ const SavingsCalculator = dynamic(
   () => import('@/components/interactive/SavingsCalculator').then((mod) => mod.SavingsCalculator),
   {
     ssr: false,
-    loading: () => <div className="h-[360px] sm:h-[400px] rounded-3xl bg-muted/10 border border-white/5 animate-pulse" />,
+    loading: () => (
+      <div className="h-[360px] sm:h-[400px] rounded-3xl bg-muted/10 border border-white/5 animate-pulse" />
+    ),
   }
 );
 import { Lightbox } from '@/components/ui/lightbox';

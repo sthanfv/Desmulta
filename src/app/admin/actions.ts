@@ -408,9 +408,12 @@ export async function getCases(idToken: string, pageSize: number = 20, lastDocId
 
     const cases = snapshot.docs.map((doc) => {
       const data = doc.data();
+      const rawCedula = data.cedula || '';
+      const cedula = rawCedula.startsWith('ENC:') ? decryptSymmetric(rawCedula) : rawCedula;
       return {
         ...data,
         id: doc.id,
+        cedula,
         // Serialización segura de fechas raíz
         createdAt: data.createdAt?.toDate?.().toISOString() || null,
         updatedAt: data.updatedAt?.toDate?.().toISOString() || null,
@@ -557,7 +560,8 @@ export async function updateCaseStatus(
     // private/push y en el campo raíz del documento (retrocompatibilidad).
     if (caseId) {
       try {
-        const { dispatchPush, STATUS_TEMPLATES } = await import('@/lib/notifications/notification-dispatcher');
+        const { dispatchPush, STATUS_TEMPLATES } =
+          await import('@/lib/notifications/notification-dispatcher');
         const templateFn =
           STATUS_TEMPLATES[newStatus.toLowerCase() as keyof typeof STATUS_TEMPLATES];
         if (templateFn) {
@@ -746,7 +750,8 @@ export async function updateConsultationStatus(
 
     // DESPACHO DE NOTIFICACIÓN PUSH — Directo y verificado
     try {
-      const { dispatchPush, STATUS_TEMPLATES } = await import('@/lib/notifications/notification-dispatcher');
+      const { dispatchPush, STATUS_TEMPLATES } =
+        await import('@/lib/notifications/notification-dispatcher');
       const templateFn = STATUS_TEMPLATES[newStatus.toLowerCase() as keyof typeof STATUS_TEMPLATES];
       if (templateFn) {
         const leadId = id;
@@ -826,13 +831,26 @@ export async function generarPoderLegal(
         updatedAt: FieldValue.serverTimestamp(),
       };
       if (overrideData.nombre) updatePayload.nombre = overrideData.nombre;
-      if (overrideData.cedula) updatePayload.cedula = encryptSymmetric(overrideData.cedula);
+      if (overrideData.cedula) {
+        const cleanCedula = overrideData.cedula.startsWith('ENC:')
+          ? decryptSymmetric(overrideData.cedula)
+          : overrideData.cedula;
+        updatePayload.cedula = encryptSymmetric(cleanCedula);
+      }
       if (overrideData.email) updatePayload.email = overrideData.email;
       if (overrideData.ticketNumber) updatePayload.ticketNumber = overrideData.ticketNumber;
       if (overrideData.placa) updatePayload.placa = overrideData.placa;
 
       await docRef.update(updatePayload);
-      data = { ...data, ...updatePayload }; // Reflejar en memoria
+      data = {
+        ...data,
+        ...updatePayload,
+        cedula: overrideData.cedula
+          ? (overrideData.cedula.startsWith('ENC:')
+              ? decryptSymmetric(overrideData.cedula)
+              : overrideData.cedula)
+          : data.cedula
+      }; // Reflejar en memoria
 
       // Sincronizar Caché de la plataforma
       revalidatePath('/admin');

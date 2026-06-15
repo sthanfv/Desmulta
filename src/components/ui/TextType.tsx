@@ -83,8 +83,6 @@ const TextType = ({
     return () => observer.disconnect();
   }, [startOnVisible]);
 
-
-
   useEffect(() => {
     if (!isVisible) return;
 

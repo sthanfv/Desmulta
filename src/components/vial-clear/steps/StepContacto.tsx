@@ -1,7 +1,15 @@
 'use client';
 
 import React, { useCallback } from 'react';
-import { User, MessageCircle, EyeOff, Eye, ScanSearch, ShieldCheck, AlertCircle } from 'lucide-react';
+import {
+  User,
+  MessageCircle,
+  EyeOff,
+  Eye,
+  ScanSearch,
+  ShieldCheck,
+  AlertCircle,
+} from 'lucide-react';
 import { UseFormReturn } from 'react-hook-form';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';

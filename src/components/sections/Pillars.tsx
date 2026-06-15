@@ -49,9 +49,9 @@ export const Pillars = () => {
                   OCR Forense Client-Side
                 </h3>
                 <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
-                  Analizamos tu captura de pantalla del SIMIT de forma local en tu navegador utilizando 
-                  visión artificial. Tu imagen nunca viaja a servidores externos, garantizando privacidad 
-                  absoluta desde el primer segundo.
+                  Analizamos tu captura de pantalla del SIMIT de forma local en tu navegador
+                  utilizando visión artificial. Tu imagen nunca viaja a servidores externos,
+                  garantizando privacidad absoluta desde el primer segundo.
                 </p>
               </div>
             </div>

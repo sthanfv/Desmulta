@@ -202,8 +202,6 @@ export default function HomeClient({
         <SuccessCases showcaseData={showcaseData} />
       </div>
 
-
-
       <div className="defer-render">
         <FAQ mounted={mounted} />
       </div>

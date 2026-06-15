@@ -598,7 +598,8 @@ export function ModalDetalleExpediente({
                     No se han generado documentos de defensa
                   </p>
                   <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 max-w-sm leading-normal">
-                    Presiona el botón &quot;Configurar Acción Legal&quot; en la parte inferior para emitir los documentos del caso (Poder y Petición) con sus respectivas causales.
+                    Presiona el botón &quot;Configurar Acción Legal&quot; en la parte inferior para
+                    emitir los documentos del caso (Poder y Petición) con sus respectivas causales.
                   </p>
                 </div>
               ) : (

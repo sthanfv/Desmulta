@@ -14,7 +14,13 @@ interface LightboxProps {
   blurDataURL?: string;
 }
 
-export function Lightbox({ src, alt, className = '', priority = false, blurDataURL }: LightboxProps) {
+export function Lightbox({
+  src,
+  alt,
+  className = '',
+  priority = false,
+  blurDataURL,
+}: LightboxProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
