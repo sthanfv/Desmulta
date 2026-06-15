@@ -409,7 +409,7 @@ export const SuccessCases = ({ showcaseData }: SuccessCasesProps) => {
               <div className="bg-card/40 shadow-2xl rounded-[2rem] overflow-hidden border border-white/5 relative group flex items-center justify-center">
                 {/* Texto de marca de agua en el fondo (visible durante la transición) */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0">
-                  <span className="text-4xl md:text-7xl font-black uppercase tracking-[0.25em] text-foreground/[0.04] dark:text-white/[0.04] animate-pulse">
+                  <span className="text-4xl md:text-7xl font-black uppercase tracking-[0.25em] text-foreground/5 dark:text-white/5 animate-pulse">
                     Desmulta
                   </span>
                 </div>
