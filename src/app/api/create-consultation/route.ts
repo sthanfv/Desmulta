@@ -6,7 +6,7 @@ import { ConsultationSchema, SimitCaptureSchema } from '@/lib/definitions';
 import { logger } from '@/lib/logger/security-logger';
 import { decryptE2EPayload, hashPII, encryptSymmetric } from '@/lib/security/server-crypto';
 import { z } from 'zod';
-import { rateLimit } from '@/lib/security/rate-limit';
+import { checkRateLimit } from '@/lib/security/rate-limit';
 import { apiError } from '@/lib/types/api-response';
 
 /**
@@ -83,6 +83,24 @@ try {
 }
 
 export async function POST(request: NextRequest) {
+  // ------------------------------------------------------------------
+  // 1. CAPA 4 REUBICADA: ESCUDO ANTI-ATAQUES INMEDIATO (Upstash Redis)
+  // ------------------------------------------------------------------
+  const ip = request.headers.get("x-forwarded-for") ?? "127.0.0.1";
+  
+  // Usando tu wrapper actual que conecta a Upstash
+  const rateLimitStatus = await checkRateLimit("consultation", ip); 
+  
+  if (!rateLimitStatus.success) {
+    return NextResponse.json(
+      { error: 'TOO_MANY_REQUESTS', message: 'Demasiadas peticiones. Intenta en unos minutos.' }, 
+      { status: 429 }
+    );
+  }
+
+  // ------------------------------------------------------------------
+  // 2. INICIALIZACIÓN Y LECTURA (Solo se ejecuta si la IP es legítima)
+  // ------------------------------------------------------------------
   let tokenConsumed = false;
   getAdminApp();
   const db = getFirestore();
@@ -175,60 +193,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(apiError('VALIDATION_ERROR', 'Falta el UID del autor.'), {
         status: 400,
       });
-    }
-
-    // 🛡️ Rate Limit: máximo 5 intentos cada 5 minutos por usuario + IP
-    const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown-ip';
-    const rateLimitIdentifier = `${authorUid}_${ip}`;
-    const { success, reset, isError } = await rateLimit(
-      rateLimitIdentifier,
-      5,
-      5 * 60 * 1000,
-      'consultationCooldowns'
-    );
-
-    if (!success) {
-      if (isError) {
-        logger.error(`[SECURITY] Rate Limit falló por error de infraestructura para: ${authorUid}`);
-        return NextResponse.json(
-          {
-            ...apiError(
-              'SERVICE_UNAVAILABLE',
-              'Servicio temporalmente no disponible por mantenimiento de seguridad. Por favor, intente de nuevo en un momento.'
-            ),
-            tokenConsumed,
-          },
-          { status: 500 }
-        );
-      }
-
-      const remainingMs = reset;
-      const remainingMinutes = Math.floor(remainingMs / 60000);
-      const remainingSeconds = Math.ceil((remainingMs % 60000) / 1000);
-
-      let timeStr = '';
-      if (remainingMinutes > 0) {
-        timeStr = `${remainingMinutes} ${remainingMinutes === 1 ? 'minuto' : 'minutos'}`;
-        if (remainingSeconds > 0) {
-          timeStr += ` y ${remainingSeconds} ${remainingSeconds === 1 ? 'segundo' : 'segundos'}`;
-        }
-      } else {
-        timeStr = `${remainingSeconds} ${remainingSeconds === 1 ? 'segundo' : 'segundos'}`;
-      }
-
-      return NextResponse.json(
-        {
-          ...apiError(
-            'RATE_LIMITED',
-            `¡Pausa de seguridad! Para proteger tu información, por favor espera ${timeStr} antes de enviar otra consulta.`
-          ),
-          tokenConsumed,
-        },
-        {
-          status: 429,
-          headers: { 'Retry-After': String(Math.ceil(remainingMs / 1000)) },
-        }
-      );
     }
 
     const turnstileValid = await verifyTurnstileToken(validatedData.cfToken);

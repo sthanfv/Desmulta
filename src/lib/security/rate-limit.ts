@@ -56,7 +56,8 @@ export async function checkRateLimit(type: RateLimitType, identifier: string) {
       blocked: !result.success,
       limit: result.limit,
       remaining: result.remaining,
-      resetTime: result.reset 
+      resetTime: result.reset,
+      isError: false
     };
   } catch (error) {
     // Fail-Closed: Si Upstash cae, bloqueamos el acceso por seguridad
@@ -66,7 +67,8 @@ export async function checkRateLimit(type: RateLimitType, identifier: string) {
       blocked: true, 
       limit: 0, 
       remaining: 0, 
-      resetTime: Date.now() 
+      resetTime: Date.now(),
+      isError: true
     };
   }
 }
@@ -107,6 +109,6 @@ export async function rateLimit(
     remaining: res.remaining,
     reset: res.resetTime - Date.now(),
     totalRequests: res.limit - res.remaining,
-    isError: false
+    isError: res.isError || false
   };
 }

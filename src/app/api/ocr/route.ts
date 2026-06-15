@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { createWorker } from 'tesseract.js';
-import { rateLimit } from '@/lib/security/rate-limit';
+import { checkRateLimit } from '@/lib/security/rate-limit';
 import { logger } from '@/lib/logger/security-logger';
 import { apiError } from '@/lib/types/api-response';
 import { OcrCircuitBreakerFs } from '@/lib/security/circuit-breaker-firestore';
@@ -37,8 +37,8 @@ export async function POST(request: NextRequest) {
   try {
     // 1. Rate limit por IP
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-    const rl = await rateLimit(`ocr:${ip}`, 3, 10 * 60 * 1000, 'ocrRateLimits');
-    if (!rl.success) {
+    const rateLimitStatus = await checkRateLimit('ocr', ip);
+    if (!rateLimitStatus.success) {
       return NextResponse.json(
         apiError('RATE_LIMITED', 'Demasiadas solicitudes. Espera 10 minutos.'),
         { status: 429 }

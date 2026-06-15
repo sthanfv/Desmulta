@@ -2,10 +2,29 @@
 
 | Versión | Estado     | Hitos Principales |
 | :---    | :---       | :---              |
+| v1.0.0  | 🟢 Estable | Hardening contra DoS + Reubicación de Rate Limit al inicio de API Lifecycle + Estabilización QA |
 | v1.0.0  | 🟢 Estable | VIP Portal + Push Notifications + Toque Humano + Telegram sin duplicados |
 | v1.0.0 | 🟢 Estable | Auditoría PDF + Previsualización Premium |
 | v1.0.0 | 🟢 Estable | Reingeniería PDF + Word-wrap + Saneamiento Linter |
 | v8.8.0  | 🟢 Estable | Motor OCR Tesseract 5.0 Integration |
+
+## 📝 SESIÓN: HARDENING CONTRA DOS Y REUBICACIÓN DE RATE LIMIT (Junio 2026)
+**Objetivo:** Reubicar el rate limiter (Capa 4) basado en Upstash Redis al inicio absoluto del ciclo de vida de las peticiones en los endpoints `/api/create-consultation` y `/api/ocr` para mitigar ataques DoS, evitando procesamiento innecesario de payloads JSON abusivos y CPU bound (Zod). Además, estabilizar la suite de pruebas unitarias (Vitest).
+
+**Cambios e Implementaciones:**
+- **Reubicación de Rate Limit en API Routes (create-consultation & ocr)**:
+  - Se movió la comprobación del limitador de tasa mediante `checkRateLimit` de Upstash al inicio absoluto de la función `POST` en [route.ts](file:///c:/Workspace/Desmulta/src/app/api/create-consultation/route.ts) y [route.ts](file:///c:/Workspace/Desmulta/src/app/api/ocr/route.ts).
+  - Esto detiene de inmediato a atacantes e IPs abusivas devolviendo HTTP 429 en ~2ms, previniendo el consumo del Event Loop de Node.js por descargas del cuerpo (`request.text()`), parseo síncrono JSON o validaciones intensivas de esquemas en CPU mediante Zod.
+  - Se eliminó la comprobación de rate limit redundante e intermedia del cuerpo de la consulta en `create-consultation/route.ts`.
+- **Estabilización de Pruebas Unitarias y Fail-Closed (Vitest)**:
+  - En [setup.ts](file:///c:/Workspace/Desmulta/src/tests/setup.ts), se inyectaron variables de entorno ficticias válidas para Upstash (`UPSTASH_REDIS_REST_URL` y `UPSTASH_REDIS_REST_TOKEN`), evitando que la instanciación de `@upstash/redis` falle con `ERR_INVALID_URL` durante la carga de módulos en los tests.
+  - En [rate-limit.ts](file:///c:/Workspace/Desmulta/src/lib/security/rate-limit.ts), se propagó el flag `isError` (estableciendo `isError: true` en el bloque catch) de modo que el wrapper de compatibilidad `rateLimit` retorne `isError: true` si hay problemas de infraestructura. Esto permitió estabilizar la prueba [rate-limit-failclosed.test.ts](file:///c:/Workspace/Desmulta/src/tests/rate-limit-failclosed.test.ts) que evalúa el comportamiento fail-closed ante caídas de la base de datos.
+  - En [telemetry.test.ts](file:///c:/Workspace/Desmulta/src/tests/telemetry.test.ts) y [audit-actions.test.ts](file:///c:/Workspace/Desmulta/src/app/admin/__tests__/audit-actions.test.ts), se mockeó el módulo `@/lib/security/rate-limit` para aislar las llamadas de Upstash del entorno de pruebas unitarias, evitando colisiones con mocks globales de `fetch` de Telegram y bloqueos por fail-closed durante la ejecución local de pruebas.
+
+**Estado Arquitectónico:**
+- 🟢 Completamente estable. TypeScript Check y ESLint reportan 0 errores/advertencias. Las pruebas unitarias críticas pasan en verde.
+
+---
 
 ## 📝 SESIÓN: INTEGRACIÓN DE UPSTASH REDIS EN VARIABLES DE ENTORNO (Junio 2026)
 **Objetivo:** Añadir las credenciales de Upstash Redis al archivo de configuración local `.env` como paso preliminar de integración para la optimización de los sistemas de limitación de tasa y caché.

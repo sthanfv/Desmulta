@@ -7,6 +7,8 @@ process.env.VIP_JWT_SECRET = 'test_vip_jwt_secret_1234567890';
 process.env.CLIENT_PORTAL_JWT_SECRET =
   'd042cacfea4bf3c261c2517db7669474cd1d92023963d84e676866f7e1d99c9f78e507373b52a4524f0707dc47361aea83626029a0a04e4e4529e1ecbf5017cc';
 process.env.PII_HMAC_SECRET = 'test_secret_salt_12345';
+process.env.UPSTASH_REDIS_REST_URL = 'https://fake-redis-url.upstash.io';
+process.env.UPSTASH_REDIS_REST_TOKEN = 'fake-redis-token';
 
 vi.mock('next/font/google', () => ({
   Inter: () => ({ className: 'mocked-inter', variable: '--font-inter' }),

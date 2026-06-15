@@ -9,8 +9,50 @@ process.env.TELEGRAM_CHAT_ID = 'mock-chat-id';
 // Mock del fetch global
 global.fetch = vi.fn();
 
-// Mock de Firestore para probar Rate Limit sin depender del emulador o credenciales reales
+// Mock de Firestore / Cooldowns para probar Rate Limit sin depender de Upstash real ni Firestore real en este test
 const mockCooldowns = new Map<string, unknown>();
+
+vi.mock('@/lib/security/rate-limit', () => ({
+  rateLimit: vi.fn(async (identifier, limit, windowMs) => {
+    const data = mockCooldowns.get(identifier) as { count: number; expiresAt: number } | undefined;
+    const now = Date.now();
+    
+    if (data && data.expiresAt > now) {
+      if (data.count >= limit) {
+        return {
+          success: false,
+          blocked: true,
+          remaining: 0,
+          reset: data.expiresAt - now,
+          totalRequests: data.count,
+          isError: false,
+        };
+      }
+      const newCount = data.count + 1;
+      mockCooldowns.set(identifier, { count: newCount, expiresAt: data.expiresAt });
+      return {
+        success: true,
+        blocked: false,
+        remaining: limit - newCount,
+        reset: data.expiresAt - now,
+        totalRequests: newCount,
+        isError: false,
+      };
+    } else {
+      const expiresAt = now + windowMs;
+      mockCooldowns.set(identifier, { count: 1, expiresAt });
+      return {
+        success: true,
+        blocked: false,
+        remaining: limit - 1,
+        reset: windowMs,
+        totalRequests: 1,
+        isError: false,
+      };
+    }
+  }),
+  checkRateLimit: vi.fn(() => Promise.resolve({ success: true, blocked: false, limit: 5, remaining: 5, resetTime: 0, isError: false })),
+}));
 
 vi.mock('firebase-admin/firestore', () => ({
   getFirestore: vi.fn(() => ({
@@ -85,6 +127,7 @@ function createMockRequest(body: Record<string, unknown>, ip: string = '127.0.0.
 describe('📡 Endpoint de Telemetría (Lead Capture)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockCooldowns.clear();
     (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
       ok: true,
       text: async () => 'OK',
