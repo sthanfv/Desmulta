@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
   // ------------------------------------------------------------------
   // 1. CAPA 4 REUBICADA: ESCUDO ANTI-ATAQUES INMEDIATO (Upstash Redis)
   // ------------------------------------------------------------------
-  const ip = request.headers.get("x-forwarded-for") ?? "127.0.0.1";
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || '127.0.0.1';
   
   // Usando tu wrapper actual que conecta a Upstash
   const rateLimitStatus = await checkRateLimit("consultation", ip); 
