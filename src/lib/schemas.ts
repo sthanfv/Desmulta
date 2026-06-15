@@ -39,7 +39,8 @@ export const OCRAnalysisSchema = z.object({
  */
 export const ConsultationSchemaBase = z.object({
   cedula: z
-    .string()
+    .string({ required_error: 'La cédula es requerida.' })
+    .min(1, { message: 'La cédula es requerida.' })
     .min(5, { message: 'La cédula debe tener al menos 5 caracteres.' })
     .max(20, { message: 'La cédula no puede tener más de 20 caracteres.' })
     .regex(/^[0-9]+$/, { message: 'La cédula solo debe contener números.' })
@@ -53,13 +54,15 @@ export const ConsultationSchemaBase = z.object({
     })
     .optional(),
   nombre: z
-    .string()
+    .string({ required_error: 'El nombre es requerido.' })
     .trim()
-    .min(3, { message: 'El nombre es requerido.' })
+    .min(1, { message: 'El nombre es requerido.' })
+    .min(3, { message: 'El nombre es requerido y debe tener al menos 3 caracteres.' })
     .max(60, { message: 'El nombre no puede tener más de 60 caracteres.' })
     .transform((val) => val.replace(/[<>]/g, '')),
   contacto: z
-    .string()
+    .string({ required_error: 'El celular de contacto es requerido.' })
+    .min(1, { message: 'El celular de contacto es requerido.' })
     .transform((v) => v.replace(/\D/g, ''))
     .pipe(
       z.string().regex(/^3[0-9]{9}$/, {
@@ -73,10 +76,10 @@ export const ConsultationSchemaBase = z.object({
   }),
   websiteHoneypot: z.string().optional(),
   authorUid: z.string().optional(),
-  antiguedad: z.string().min(1, { message: 'Seleccione la antigüedad de la multa.' }),
-  tipoInfraccion: z.string().min(1, { message: 'Seleccione el tipo de infracción.' }),
-  estadoCoactivo: z.string().min(1, { message: 'Seleccione si el caso está en cobro coactivo.' }),
-  evidenceUrl: z.string().url().optional().or(z.literal('')),
+  antiguedad: z.string({ required_error: 'Seleccione la antigüedad de la multa.' }).min(1, { message: 'Seleccione la antigüedad de la multa.' }),
+  tipoInfraccion: z.string({ required_error: 'Seleccione el tipo de infracción.' }).min(1, { message: 'Seleccione el tipo de infracción.' }),
+  estadoCoactivo: z.string({ required_error: 'Seleccione si el caso está en cobro coactivo.' }).min(1, { message: 'Seleccione si el caso está en cobro coactivo.' }),
+  evidenceUrl: z.string().url({ message: 'Enlace de evidencia inválido.' }).optional().or(z.literal('')),
   ciudad: z.string().optional().or(z.literal('')),
   cfToken: z.string().optional(),
   ocrData: OCRAnalysisSchema.optional(),
@@ -99,14 +102,18 @@ export const ConsultationSchema = ConsultationSchemaBase.superRefine((val, ctx) 
 // Schema simplificado para flujo SIMIT Tutorial
 export const SimitCaptureSchema = z.object({
   contacto: z
-    .string()
+    .string({ required_error: 'El celular de contacto es requerido.' })
+    .min(1, { message: 'El celular de contacto es requerido.' })
     .transform((v) => v.replace(/\s+/g, ''))
     .pipe(
       z.string().regex(/^3[0-9]{9}$/, {
         message: 'Debe ser un número de celular colombiano válido (10 dígitos, ej: 300 123 4567).',
       })
     ),
-  evidenceUrl: z.string().url({ message: 'Debe subir una captura de pantalla del SIMIT.' }),
+  evidenceUrl: z
+    .string({ required_error: 'Debe subir una captura de pantalla del SIMIT.' })
+    .min(1, { message: 'Debe subir una captura de pantalla del SIMIT.' })
+    .url({ message: 'Debe ser una URL de evidencia válida.' }),
   aceptoTerminos: z.boolean().refine((value) => value === true, {
     message: 'Debe aceptar los términos y condiciones.',
   }),
@@ -126,8 +133,14 @@ export const SimitCaptureSchema = z.object({
  */
 export const MandateSchema = z
   .object({
-    citizenName: z.string().min(3, 'El nombre debe ser válido'),
-    citizenId: z.string().min(5, 'El documento de identidad es inválido'),
+    citizenName: z
+      .string({ required_error: 'El nombre es requerido' })
+      .min(1, 'El nombre es requerido')
+      .min(3, 'El nombre debe tener al menos 3 caracteres'),
+    citizenId: z
+      .string({ required_error: 'El documento de identidad es requerido' })
+      .min(1, 'El documento de identidad es requerido')
+      .min(5, 'El documento de identidad debe tener al menos 5 caracteres'),
     requiresOperatorFiling: z.boolean(),
     email: z.string().email('Correo electrónico inválido').or(z.literal('')),
     caseId: z.string().min(1, 'El ID del caso es obligatorio'),
@@ -154,7 +167,8 @@ export const SimitLeadSchema = z.object({
   tipo: z.literal('SIMIT_LEAD').optional(),
   probability: z.string().optional(),
   contacto: z
-    .string()
+    .string({ required_error: 'El celular de contacto es requerido.' })
+    .min(1, { message: 'El celular de contacto es requerido.' })
     .transform((v) => v.replace(/\D/g, ''))
     .pipe(
       z.string().regex(/^3[0-9]{9}$/, {

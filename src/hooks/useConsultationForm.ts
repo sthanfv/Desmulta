@@ -33,7 +33,20 @@ export function useConsultationForm(mode: 'full' | 'simit' = 'full') {
 
   const form = useForm<ConsultationFormData>({
     resolver: zodResolver(ConsultationSchema),
-    defaultValues: { aceptoTerminos: false, requiresOperatorFiling: false },
+    defaultValues: {
+      cedula: '',
+      placa: '',
+      nombre: '',
+      contacto: '',
+      email: '',
+      requiresOperatorFiling: false,
+      aceptoTerminos: false,
+      antiguedad: '',
+      tipoInfraccion: '',
+      estadoCoactivo: '',
+      evidenceUrl: '',
+      ciudad: '',
+    },
   });
 
   // Sistema degradado → skip al paso de contacto

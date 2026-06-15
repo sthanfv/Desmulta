@@ -853,3 +853,51 @@ Se han implementado correcciones críticas a nivel de seguridad, integridad de d
 **Estado de la Arquitectura:**
 - 🟢 Estable. TypeScript check completo (0 errores). ESLint limpio (`--max-warnings 0`). Producción compila exitosamente (`npm run build` aprobado).
 
+---
+
+## 📝 SESIÓN: ESTABILIZACIÓN DE QA Y CORRECCIÓN DE PRUEBAS UNITARIAS (Junio 2026)
+**Objetivo:** Reparar las pruebas unitarias y de integración que presentaban fallas tras las optimizaciones del portal, resolviendo regresiones en la suite de notificaciones y el webhook de Telegram.
+
+**Implementado:**
+- **[QA] Corrección del Test de Notificaciones (`case-notifications.test.ts`):**
+  - Se modificó la prueba `NO debe enviar una notificación push directamente` a `Debe despachar la notificación push directamente al cambiar de estado` para alinearse con la arquitectura de despacho unificada en `actions.ts`.
+  - Se actualizó el mock de `@/lib/notifications/notification-dispatcher` para proveer un mock básico del objeto `STATUS_TEMPLATES` (clave `contactado`), eliminando advertencias por importaciones nulas en consola.
+- **[QA] Corrección del Test de Webhook de Telegram (`telegramWebhook.test.ts`):**
+  - Se identificó un desajuste en el mock de Firestore en las tres pruebas del flujo `vercedula_` (revelado de cédula). Tras la migración al modelo atómico `.create()` en `processed_callbacks`, el test seguía simulando un primer paso `.get()`.
+  - Se reemplazó el mock del primer `.get()` (`mockFirestoreGet.mockResolvedValueOnce({ exists: false })`) por un mock para el `.create()` atómico (`mockFirestoreCreate.mockResolvedValueOnce(undefined)`), lo que permitió que las llamadas subsiguientes a `get` de `consultations` recuperaran correctamente los datos simulados de la consulta (desencriptando la cédula y previniendo la respuesta por defecto `❌ Caso no encontrado`).
+  - La suite de pruebas de `functions/src/__tests__` quedó 100% en verde (36/36 tests pasados).
+
+**Archivos Afectados:**
+- [case-notifications.test.ts](file:///c:/Workspace/Desmulta/src/tests/case-notifications.test.ts)
+- [telegramWebhook.test.ts](file:///c:/Workspace/Desmulta/functions/src/__tests__/telegramWebhook.test.ts)
+- [MEMORY.md](file:///c:/Workspace/Desmulta/docs/MEMORY.md)
+
+**Estado de la Arquitectura:**
+- 🟢 Estable. Todas las pruebas unitarias locales e integración en `functions` y en la raíz del proyecto pasan con éxito (verde). Tipados estricto y linter limpios.
+
+---
+
+## 📝 SESIÓN: SANEAMIENTO DE IDIOMAS Y INTERNACIONALIZACIÓN COMPLETA A ESPAÑOL (Junio 2026)
+**Objetivo:** Erradicar cualquier filtración de textos en inglés en validaciones y flujos del cliente, enfocándose en evitar el error "Required" de Zod y asegurar mensajes 100% en español.
+
+**Implementado:**
+- **[UX / Validación] Blindaje de esquemas Zod en `src/lib/schemas.ts`:**
+  - Se añadieron opciones explícitas de `required_error` y validación `.min(1)` con mensajes personalizados en español para todos los campos obligatorios del formulario (`cedula`, `nombre`, `contacto`, `antiguedad`, `tipoInfraccion`, `estadoCoactivo`).
+  - Se tradujeron los mensajes de error por defecto de Zod que antes causaban respuestas de tipo `"Required"` en inglés.
+  - Se configuraron los mensajes de error de URL inválida en español para los cargadores de captura (`evidenceUrl`).
+- **[UX / Formulario] Inicialización de defaultValues en `src/hooks/useConsultationForm.ts`:**
+  - Se definieron de forma explícita todos los campos string del formulario de consulta con valor por defecto vacío (`""`) en lugar de omitirlos. Esto previene que react-hook-form los inicialice como `undefined` y dispare errores de tipo crudos (`invalid_type`) en inglés antes de que el usuario interactúe.
+- **[QA / Backend] Traducción en `functions/src/generatePdf.ts`:**
+  - Se tradujo la respuesta del error HTTP 405 de `"Method Not Allowed"` a `"Método no permitido"` para mantener uniformidad en el idioma.
+
+**Archivos Afectados:**
+- [schemas.ts](file:///c:/Workspace/Desmulta/src/lib/schemas.ts)
+- [useConsultationForm.ts](file:///c:/Workspace/Desmulta/src/hooks/useConsultationForm.ts)
+- [generatePdf.ts](file:///c:/Workspace/Desmulta/functions/src/generatePdf.ts)
+- [MEMORY.md](file:///c:/Workspace/Desmulta/docs/MEMORY.md)
+
+**Estado de la Arquitectura:**
+- 🟢 Estable. Todas las pruebas unitarias locales e integración en `functions` y en la raíz del proyecto pasan exitosamente (verde). Linter y compilación estricta limpios con 0 warnings/errores.
+
+
+

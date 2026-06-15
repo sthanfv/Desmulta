@@ -273,8 +273,8 @@ describe('telegramWebhook — Seguridad y comandos', () => {
         },
       };
 
-      // 1. processed_callbacks.get() → no existe
-      mocks.mockFirestoreGet.mockResolvedValueOnce({ exists: false });
+      // 1. processed_callbacks.create() → éxito
+      mocks.mockFirestoreCreate.mockResolvedValueOnce(undefined);
       // 2. consultations.doc('doc123_cedula').get() → tiene la cédula cifrada
       mocks.mockFirestoreGet.mockResolvedValueOnce({
         exists: true,
@@ -306,7 +306,7 @@ describe('telegramWebhook — Seguridad y comandos', () => {
         },
       };
 
-      mocks.mockFirestoreGet.mockResolvedValueOnce({ exists: false });
+      mocks.mockFirestoreCreate.mockResolvedValueOnce(undefined);
       mocks.mockFirestoreGet.mockResolvedValueOnce({
         exists: true,
         data: () => ({ cedula: 'SIMIT-CAPTURA' }),
@@ -336,7 +336,7 @@ describe('telegramWebhook — Seguridad y comandos', () => {
         },
       };
 
-      mocks.mockFirestoreGet.mockResolvedValueOnce({ exists: false });
+      mocks.mockFirestoreCreate.mockResolvedValueOnce(undefined);
       // Formato cifrado inválido para provocar error en decryptSymmetric
       mocks.mockFirestoreGet.mockResolvedValueOnce({
         exists: true,

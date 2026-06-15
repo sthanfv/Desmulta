@@ -68,8 +68,11 @@ vi.mock('@/lib/resend', () => ({
   },
 }));
 
-vi.mock('@/lib/notifications/push-notifications', () => ({
-  sendCaseUpdateNotification: vi.fn().mockResolvedValue({ success: true }),
+vi.mock('@/lib/notifications/notification-dispatcher', () => ({
+  dispatchPush: vi.fn().mockResolvedValue({ success: true }),
+  STATUS_TEMPLATES: {
+    contactado: vi.fn(() => ({ title: 'Mock Title', body: 'Mock Body' })),
+  },
 }));
 
 describe('updateCaseStatus — Notificaciones Delegadas', () => {
@@ -87,13 +90,13 @@ describe('updateCaseStatus — Notificaciones Delegadas', () => {
     expect(resend.emails.send).not.toHaveBeenCalled();
   });
 
-  it('NO debe enviar una notificación push directamente (Responsabilidad de Cloud Functions)', async () => {
-    const { sendCaseUpdateNotification } = await import('@/lib/notifications/push-notifications');
+  it('Debe despachar la notificación push directamente al cambiar de estado (Motor de Despacho en actions.ts)', async () => {
+    const { dispatchPush } = await import('@/lib/notifications/notification-dispatcher');
 
     // Ejecutar la función
     await updateCaseStatus('fake-token', 'case-123', 'CONTACTADO', 'Prueba de estado');
 
-    // Verificar que no se invoca push directo
-    expect(sendCaseUpdateNotification).not.toHaveBeenCalled();
+    // Verificar que se invoca push directo
+    expect(dispatchPush).toHaveBeenCalled();
   });
 });
