@@ -312,6 +312,14 @@ export const SuccessCases = ({ showcaseData }: SuccessCasesProps) => {
             .then(({ cases }) => {
               if (Array.isArray(cases) && cases.length > 0) {
                 setDynamicCases(cases);
+              } else if (showcaseData.beforeImageUrl && showcaseData.afterImageUrl) {
+                setDynamicCases([{
+                  id: 'static-0',
+                  title: 'Caso de Demostración (Simulado)',
+                  beforeImageUrl: showcaseData.beforeImageUrl,
+                  afterImageUrl: showcaseData.afterImageUrl,
+                  createdAt: new Date().toISOString(),
+                }]);
               }
             })
             .catch((err) => Sentry.captureException(err))
@@ -323,7 +331,7 @@ export const SuccessCases = ({ showcaseData }: SuccessCasesProps) => {
 
     observer.observe(section);
     return () => observer.disconnect();
-  }, []);
+  }, [showcaseData.beforeImageUrl, showcaseData.afterImageUrl]);
 
   const currentBefore =
     dynamicCases.length > 0
@@ -391,7 +399,7 @@ export const SuccessCases = ({ showcaseData }: SuccessCasesProps) => {
               {dynamicCases.length > 1 && (
                 <button
                   onClick={irAlAnterior}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-20 w-10 h-10 rounded-full bg-background/90 border border-border shadow-lg flex items-center justify-center hover:bg-primary/10 hover:border-primary/30 transition-all active:scale-90 md:-translate-x-6"
+                  className="absolute left-2 md:left-0 top-1/2 -translate-y-1/2 md:-translate-x-6 z-20 w-10 h-10 rounded-full bg-background/90 border border-border shadow-lg flex items-center justify-center hover:bg-primary/10 hover:border-primary/30 transition-all active:scale-90"
                   aria-label="Caso anterior"
                 >
                   <svg
@@ -447,7 +455,7 @@ export const SuccessCases = ({ showcaseData }: SuccessCasesProps) => {
               {dynamicCases.length > 1 && (
                 <button
                   onClick={irAlSiguiente}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-20 w-10 h-10 rounded-full bg-background/90 border border-border shadow-lg flex items-center justify-center hover:bg-primary/10 hover:border-primary/30 transition-all active:scale-90 md:translate-x-6"
+                  className="absolute right-2 md:right-0 top-1/2 -translate-y-1/2 md:translate-x-6 z-20 w-10 h-10 rounded-full bg-background/90 border border-border shadow-lg flex items-center justify-center hover:bg-primary/10 hover:border-primary/30 transition-all active:scale-90"
                   aria-label="Caso siguiente"
                 >
                   <svg
@@ -483,6 +491,10 @@ export const SuccessCases = ({ showcaseData }: SuccessCasesProps) => {
                 ))}
               </div>
             )}
+
+            <p className="text-[10px] md:text-[11px] text-muted-foreground/60 italic mt-4 max-w-md mx-auto text-center leading-relaxed">
+              * Nota: Las imágenes y montos presentados son recreaciones ilustrativas y simuladas para garantizar la estricta confidencialidad y protección de datos personales de los ciudadanos (cumplimiento Zero-PII).
+            </p>
           </div>
         ) : (
           /* Sin imágenes ni en Firestore ni en los valores por defecto */

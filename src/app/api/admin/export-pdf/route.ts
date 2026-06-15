@@ -18,6 +18,16 @@ export async function POST(request: Request) {
       );
     }
 
+    // 1.5. Validar cabecera Origin (Mitigación CSRF)
+    const origin = request.headers.get('origin') || request.headers.get('Origin');
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+    if (siteUrl && origin && origin !== siteUrl) {
+      return NextResponse.json(
+        { error: 'Acceso prohibido: Origen no permitido (CSRF).' },
+        { status: 403 }
+      );
+    }
+
     const body = await request.json();
     const { pin, data } = body as { pin: string; data: PDFTemplateData };
 

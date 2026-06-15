@@ -24,6 +24,8 @@ export const rateLimiters = {
   qr: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(30, "1 m") }),
 
   // --- B. Panel de Administración y Operadores ---
+  galleryUpload: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(20, "1 h") }),
+  galleryDelete: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(10, "1 h") }),
   godMode: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(3, "30 m") }),
   operatorPin: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(5, "15 m") }),
   exportPdf: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(10, "30 m") }),
@@ -90,6 +92,7 @@ export async function rateLimit(
   else if (collectionName === 'consultationCooldowns') type = 'consultation';
   else if (collectionName === 'validar_consulta_rl') type = 'validarOtp';
   else if (collectionName === 'qrRateLimits') type = 'qr';
+  else if (collectionName === 'galleryRateLimits') type = 'galleryUpload';
   else if (collectionName === 'exportPdfLimits') type = 'exportPdf';
   else if (collectionName === 'telemetryCooldowns') type = 'telemetry';
   else if (collectionName === 'referidosCooldowns') type = 'leads';

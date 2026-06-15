@@ -29,6 +29,7 @@ const {
   mockPut,
   mockDel,
   mockVerifyIdToken,
+  mockCheckRateLimit,
 } = vi.hoisted(() => {
   const mockAdd = vi.fn().mockResolvedValue({ id: 'nuevo-id-generado' });
   const mockDelete = vi.fn().mockResolvedValue(undefined);
@@ -58,6 +59,7 @@ const {
   const mockPut = vi.fn();
   const mockDel = vi.fn().mockResolvedValue(undefined);
   const mockVerifyIdToken = vi.fn().mockResolvedValue({ uid: 'mock-admin-uid' });
+  const mockCheckRateLimit = vi.fn().mockResolvedValue({ success: true });
 
   return {
     mockAdd,
@@ -72,6 +74,7 @@ const {
     mockPut,
     mockDel,
     mockVerifyIdToken,
+    mockCheckRateLimit,
   };
 });
 
@@ -112,6 +115,10 @@ vi.mock('@/lib/logger/security-logger', () => ({
     info: vi.fn(),
     warn: vi.fn(),
   },
+}));
+
+vi.mock('@/lib/security/rate-limit', () => ({
+  checkRateLimit: mockCheckRateLimit,
 }));
 
 // ─── Importar después de los mocks ────────────────────────────────────────────
@@ -159,6 +166,7 @@ describe('Gallery API Route — Integración CRUD de Casos de Éxito', () => {
 
     mockDocGet.mockResolvedValue({ exists: true, data: () => ({}) });
     mockVerifyIdToken.mockResolvedValue({ uid: 'mock-admin-uid' });
+    mockCheckRateLimit.mockResolvedValue({ success: true });
   });
 
   // ─── POST ──────────────────────────────────────────────────────────
@@ -256,6 +264,16 @@ describe('Gallery API Route — Integración CRUD de Casos de Éxito', () => {
       const response = await POST(req);
       expect(response.status).toBe(500);
       expect(await response.json()).toEqual({ error: 'Error interno del servidor' });
+    });
+
+    it('debe retornar status 429 cuando se excede el rate limit en POST', async () => {
+      mockCheckRateLimit.mockResolvedValueOnce({ success: false });
+      const req = crearRequestPost({ Authorization: TOKEN_DUMMY });
+      const response = await POST(req);
+      expect(response.status).toBe(429);
+      expect(await response.json()).toEqual({
+        error: 'Demasiadas solicitudes de subida. Por favor, intente de nuevo más tarde.',
+      });
     });
   });
 
@@ -388,6 +406,20 @@ describe('Gallery API Route — Integración CRUD de Casos de Éxito', () => {
       const response = await DELETE(req);
       expect(response.status).toBe(500);
       expect(await response.json()).toEqual({ error: 'Error interno del servidor' });
+    });
+
+    it('debe retornar status 429 cuando se excede el rate limit en DELETE', async () => {
+      mockCheckRateLimit.mockResolvedValueOnce({ success: false });
+      const req = new NextRequest('http://localhost/api/gallery', {
+        method: 'DELETE',
+        headers: { Authorization: TOKEN_DUMMY },
+        body: JSON.stringify({ id: CASO_ID, beforeImageUrl: BEFORE_URL, afterImageUrl: AFTER_URL }),
+      });
+      const response = await DELETE(req);
+      expect(response.status).toBe(429);
+      expect(await response.json()).toEqual({
+        error: 'Demasiadas solicitudes de eliminación. Por favor, intente de nuevo más tarde.',
+      });
     });
   });
 });

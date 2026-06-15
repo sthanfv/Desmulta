@@ -2,6 +2,7 @@
 
 | Versión | Estado     | Hitos Principales |
 | :---    | :---       | :---              |
+| v1.0.0  | 🟢 Estable | Remediación de Auditoría Técnica (Rate Limit Galería, CSRF Origin, edge_telemetry rules, UX móvil, Leyendas) |
 | v1.0.0  | 🟢 Estable | Claves reactivas en carrusel de casos de éxito + Eliminación de actions obsoletas + Test API Route |
 | v1.0.0  | 🟢 Estable | Corrección en validación de formulario SIMIT (Filtro Cédula) + Hardening contra DoS + Estabilización QA |
 | v1.0.0  | 🟢 Estable | Hardening contra DoS + Reubicación de Rate Limit al inicio de API Lifecycle + Estabilización QA |
@@ -9,6 +10,32 @@
 | v1.0.0 | 🟢 Estable | Auditoría PDF + Previsualización Premium |
 | v1.0.0 | 🟢 Estable | Reingeniería PDF + Word-wrap + Saneamiento Linter |
 | v8.8.0  | 🟢 Estable | Motor OCR Tesseract 5.0 Integration |
+
+## 📝 SESIÓN: REMEDIACIÓN DE AUDITORÍA TÉCNICA E INCREMENTO DE SEGURIDAD (Junio 2026)
+**Objetivo:** Resolver los hallazgos de la auditoría técnica y matriz de riesgos para dotar al sistema de madurez frente a inversionistas, abarcando rate-limiting granular, mitigación CSRF con validación de Origin, blindaje de Firestore en telemetría, instalabilidad PWA y UX móvil.
+
+**Cambios e Implementaciones:**
+- **[REC-001] Rate-Limiting Granular en Galería**:
+  - En [rate-limit.ts](file:///c:/Workspace/Desmulta/src/lib/security/rate-limit.ts), se crearon dos limitadores separados de Upstash Redis en `rateLimiters`: `galleryUpload` (20 subidas por hora) y `galleryDelete` (10 eliminaciones por hora).
+  - En [route.ts de galería](file:///c:/Workspace/Desmulta/src/app/api/gallery/route.ts), se integró la llamada a `checkRateLimit('galleryUpload', ip)` en `POST` y `checkRateLimit('galleryDelete', ip)` en `DELETE` al inicio de cada handler para mitigar abusos de almacenamiento Vercel Blob.
+- **[REC-002] Mitigación de CSRF mediante Origin Check**:
+  - En [route.ts de galería](file:///c:/Workspace/Desmulta/src/app/api/gallery/route.ts) y en [route.ts de exportación de PDF](file:///c:/Workspace/Desmulta/src/app/api/admin/export-pdf/route.ts), se inyectó la validación del header `Origin` contra `NEXT_PUBLIC_SITE_URL` para rechazar con HTTP 403 (Origen no permitido) peticiones sospechosas cross-origin.
+- **[REC-003] Protección contra Spam en Telemetría**:
+  - En [firestore.rules](file:///c:/Workspace/Desmulta/firestore.rules), se denegó la escritura y lectura pública directa desde el cliente a la colección `edge_telemetry` (`allow read, write: if false;`). Esto previene el spam directo de eventos que infle cuotas, delegando los registros al backend.
+- **[Alta] Criterios de Instalabilidad PWA**:
+  - En [manifest.ts](file:///c:/Workspace/Desmulta/src/app/manifest.ts), se actualizó la propiedad `icons` incorporando resoluciones de 192x192 píxeles y estableciendo el propósito `'any'` y `'maskable'` (referenciando `maskable_icon.png`), satisfaciendo los criterios de instalabilidad de Chrome y Android.
+- **[Medio / Alto] UX de Galería y Leyendas Ilustrativas**:
+  - En [SuccessCases.tsx](file:///c:/Workspace/Desmulta/src/components/sections/SuccessCases.tsx), se ajustó el posicionamiento de las flechas del carrusel en móviles (`left-2` y `right-2` que pasan a `md:-translate-x-6` y `md:translate-x-6` en PC) erradicando su desbordamiento en pantallas pequeñas (< 360px).
+  - Se inyectó una leyenda informativa al pie del carrusel que clarifica que las imágenes y montos son simulados con fines ilustrativos por confidencialidad (Zero-PII). Si la base de datos de Firestore está vacía, el componente inyecta el caso por defecto `showcaseData` dentro de `dynamicCases` con el título descriptivo de "Caso de Demostración (Simulado)" evitando layouts vacíos y errores de interfaz.
+- **[Despliegue] Publicación de Reglas**:
+  - Se ejecutó con éxito `firebase deploy --only firestore:rules` para propagar de inmediato las nuevas reglas restrictivas a la consola en la nube de Firebase.
+- **[QA] Estabilización de la Suite**:
+  - Se actualizaron las pruebas unitarias y de integración en [gallery.test.ts](file:///c:/Workspace/Desmulta/tests/integration/gallery.test.ts) mockeando el rate limiter de Upstash para POST/DELETE y verificando el control de HTTP 429. La suite completa pasa en verde y Next.js compila al 100% sin advertencias.
+
+**Estado Arquitectónico:**
+- 🟢 Completamente estable. Reglas en producción actualizadas. Compilación Next.js, linter y tests de Vitest en verde.
+
+---
 
 ## 📝 SESIÓN: ELIMINACIÓN DE SERVER ACTIONS DE LA GALERÍA Y AJUSTE DE KEYS REACTIVAS (Junio 2026)
 **Objetivo:** Eliminar el archivo de Server Actions obsoleto `src/app/admin/gallery/actions.ts` de la galería, inyectar claves reactivas en el carrusel de casos de éxito para evitar sobreposiciones de imágenes, y actualizar el test de integración de galería.

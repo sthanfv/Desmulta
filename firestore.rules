@@ -87,14 +87,7 @@ service cloud.firestore {
     }
 
     match /edge_telemetry/{document} {
-      allow write: if request.resource.data.keys().hasAll(['event', 'ts'])
-                   && request.resource.data.keys().hasOnly(['event','ts','ciudad','path'])
-                   && request.resource.data.event is string
-                   && request.resource.data.event.size() < 100
-                   && request.resource.data.ts is number
-                   && request.resource.data.ts > (request.time.toMillis() - 300000)
-                   && request.resource.data.ts < (request.time.toMillis() + 300000);
-      allow read: if false;
+      allow read, write: if false;
     }
 
     match /cases/{caseId} {

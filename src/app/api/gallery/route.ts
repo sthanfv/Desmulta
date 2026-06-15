@@ -5,6 +5,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
 import { logger } from '@/lib/logger/security-logger';
 import { applyWatermark, fileToBuffer, buildWatermarkedFilename } from '@/lib/image-watermark';
+import { checkRateLimit } from '@/lib/security/rate-limit';
 
 /**
  * POST /api/gallery
@@ -13,7 +14,27 @@ import { applyWatermark, fileToBuffer, buildWatermarkedFilename } from '@/lib/im
  */
 export async function POST(req: NextRequest) {
   try {
-    // 1. Verificar autenticación
+    // 1. Rate Limit
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    const rateLimitStatus = await checkRateLimit('galleryUpload', ip);
+    if (!rateLimitStatus.success) {
+      return NextResponse.json(
+        { error: 'Demasiadas solicitudes de subida. Por favor, intente de nuevo más tarde.' },
+        { status: 429 }
+      );
+    }
+
+    // 1.5. Validar cabecera Origin (Mitigación CSRF)
+    const origin = req.headers.get('origin') || req.headers.get('Origin');
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+    if (siteUrl && origin && origin !== siteUrl) {
+      return NextResponse.json(
+        { error: 'Acceso prohibido: Origen no permitido (CSRF).' },
+        { status: 403 }
+      );
+    }
+
+    // 2. Verificar autenticación
     const authHeader = req.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
@@ -166,6 +187,26 @@ export async function GET() {
  */
 export async function DELETE(req: NextRequest) {
   try {
+    // 1. Rate Limit
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    const rateLimitStatus = await checkRateLimit('galleryDelete', ip);
+    if (!rateLimitStatus.success) {
+      return NextResponse.json(
+        { error: 'Demasiadas solicitudes de eliminación. Por favor, intente de nuevo más tarde.' },
+        { status: 429 }
+      );
+    }
+
+    // 1.5. Validar cabecera Origin (Mitigación CSRF)
+    const origin = req.headers.get('origin') || req.headers.get('Origin');
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+    if (siteUrl && origin && origin !== siteUrl) {
+      return NextResponse.json(
+        { error: 'Acceso prohibido: Origen no permitido (CSRF).' },
+        { status: 403 }
+      );
+    }
+
     const authHeader = req.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });

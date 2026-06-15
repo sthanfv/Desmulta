@@ -64,7 +64,7 @@ graph TD
 | `leads/` | Datos OCR previos al formulario | ❌ | ✅ |
 | `processed_callbacks/` | Idempotencia Telegram | ❌ | ✅ |
 | `referidos/` | Sistema de referidos | Solo admin auth | ✅ |
-| `edge_telemetry/` | Métricas anónimas | `write` (schema validado) | ✅ |
+| `edge_telemetry/` | Métricas anónimas | ❌ | ✅ |
 | `legal_mandates/` | Mandatos verificados OTP | ❌ | ✅ |
 | `otp_rate_limits/` | Rate limit OTP | ❌ | ✅ |
 | `upload_rate_limits/` | Rate limit uploads por IP | ❌ | ✅ |
@@ -100,14 +100,15 @@ onCaseStatusChange          onConsultationStatusChange
 
 ---
 
-## 4. Seguridad — 8 Capas
+## 4. Seguridad — 9 Capas
 
 | Capa | Mecanismo | Archivo clave |
 |---|---|---|
 | Red | HSTS + CSP nonce + X-Frame-Options | `src/middleware.ts` |
+| CSRF / Origin | Validación de cabecera Origin contra SITE_URL en endpoints admin | `/api/gallery` y `/api/admin/export-pdf` |
 | Auth Admin | JWT ECDSA + httpOnly cookie | `src/lib/require-admin-session.ts` |
 | Auth VIP | JWT HS256 + httpOnly + sameSite:lax (Zero-PII: Solo Hashes) | `src/lib/security/vip-jwt.ts` |
-| Rate limit | Firestore-backed, Fail-CLOSED | `src/lib/security/rate-limit.ts` |
+| Rate limit | Upstash Redis en memoria (Fail-CLOSED), granularidad en galería | `src/lib/security/rate-limit.ts` |
 | Validación | Zod en todos los endpoints | Cada `route.ts` |
 | Upload | Magic bytes + MIME whitelist + 10MB | `src/app/api/upload/route.ts` |
 | Anti-bot | Cloudflare Turnstile server-side | `src/lib/turnstile.ts` |
