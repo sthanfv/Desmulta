@@ -31,6 +31,7 @@ export default function StoryProgressModal({
   const [activeStepIdx, setActiveStepIdx] = useState(0);
   const [progress, setProgress] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [showCopiedText, setShowCopiedText] = useState(false);
   const progressInterval = useRef<NodeJS.Timeout | null>(null);
   const startTime = useRef<number>(Date.now());
   const elapsedBeforePause = useRef<number>(0);
@@ -142,7 +143,9 @@ export default function StoryProgressModal({
     const title = `Progreso de mi Caso - Radicado ${caseData.shortId}`;
     const text = `¡Mi trámite con Desmulta.online va en el paso: ${activeStep.name}! Escanea o entra al enlace para ver el progreso real.`;
 
-    if (navigator.share) {
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    if (isMobile && navigator.share) {
       try {
         await navigator.share({ title, text, url: shareUrl });
         Haptics.impact();
@@ -153,9 +156,11 @@ export default function StoryProgressModal({
       try {
         await navigator.clipboard.writeText(shareUrl);
         Haptics.impact();
-        alert('¡Enlace de seguimiento copiado al portapapeles!');
+        setShowCopiedText(true);
+        setTimeout(() => setShowCopiedText(false), 2500);
       } catch (_e) {
-        alert('No se pudo copiar el enlace automáticamente.');
+        // Fallback si falla el portapapeles
+        alert('Enlace: ' + shareUrl);
       }
     }
   };
@@ -281,6 +286,19 @@ export default function StoryProgressModal({
 
         {/* Zona inferior: Botón Compartir Logro y CTA */}
         <div className="relative z-10 shrink-0 flex flex-col gap-3">
+          <AnimatePresence>
+            {showCopiedText && (
+              <m.div
+                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="w-full py-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 rounded-xl text-center text-[10px] font-black uppercase tracking-wider shadow-sm"
+              >
+                ¡Enlace copiado al portapapeles! 📋
+              </m.div>
+            )}
+          </AnimatePresence>
+
           {/* Botón de Compartir con Efecto de Resplandor */}
           <button
             onClick={(e) => {

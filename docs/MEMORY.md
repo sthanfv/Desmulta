@@ -2,6 +2,7 @@
 
 | Versión | Estado     | Hitos Principales |
 | :---    | :---       | :---              |
+| v1.0.0  | 🟢 Estable | Depuración de Source Maps (Resolución de errores 404 en Vercel) |
 | v1.0.0  | 🟢 Estable | Integración de Stories (Timeline Público con Glassmorphism) + Conexión Dashboard VIP + Estabilización QA |
 | v1.0.0  | 🟢 Estable | Remediación de Auditoría Técnica (Rate Limit Galería, CSRF Origin, edge_telemetry rules, UX móvil, Leyendas) |
 | v1.0.0  | 🟢 Estable | Claves reactivas en carrusel de casos de éxito + Eliminación de actions obsoletas + Test API Route |
@@ -11,6 +12,22 @@
 | v1.0.0 | 🟢 Estable | Auditoría PDF + Previsualización Premium |
 | v1.0.0 | 🟢 Estable | Reingeniería PDF + Word-wrap + Saneamiento Linter |
 | v8.8.0  | 🟢 Estable | Motor OCR Tesseract 5.0 Integration |
+
+## 📝 SESIÓN: DEPURACIÓN DE SOURCE MAPS Y REDUCCIÓN DE ALERTAS 404 (Junio 2026)
+**Objetivo:** Erradicar los errores HTTP 404 reportados en la consola de Vercel y Chrome DevTools relacionados con la búsqueda automática de archivos de mapeo de origen (`.map`) de dependencias estáticas cargadas localmente.
+
+**Cambios e Implementaciones:**
+- **Remoción de directivas `sourceMappingURL`**: Se identificó que las herramientas del desarrollador en el navegador solicitaban archivos `.map` inexistentes debido a la presencia de directivas `//# sourceMappingURL=...` al final de los archivos minificados locales. Se removieron de forma segura de las dependencias estáticas servidas en la carpeta `public/`:
+  - En [worker.min.js](file:///c:/Workspace/Desmulta/public/tesseract/worker.min.js): se eliminó `//# sourceMappingURL=worker.min.js.map`.
+  - En [firebase-app-compat.js](file:///c:/Workspace/Desmulta/public/firebase-app-compat.js): se eliminó `//# sourceMappingURL=firebase-app-compat.js.map`.
+  - En [firebase-messaging-compat.js](file:///c:/Workspace/Desmulta/public/firebase-messaging-compat.js): se eliminó `//# sourceMappingURL=firebase-messaging-compat.js.map`.
+- **Automatización**: Se creó y ejecutó un script en la carpeta de scratch para realizar la remoción sin riesgo de alterar el código funcional minificado.
+- **QA e Integración**:
+  - Se corrieron con éxito `typecheck` y el linter de ESLint con 0 warnings.
+  - Se confirmó el push a la rama `main` en GitHub, disparando el redespliegue automático y limpio en Vercel.
+
+**Estado Arquitectónico:**
+- 🟢 Completamente estable. Errores 404 de mapeo corregidos de raíz en producción.
 
 ## 📝 SESIÓN: INTEGRACIÓN DE STORIES - TIMELINE PÚBLICO COMPARTIBLE CON GLASSMORPHISM (Junio 2026)
 **Objetivo:** Diseñar y construir un componente premium e interactivo tipo historias de Instagram/WhatsApp para visualizar el progreso del expediente jurídico (Zero-PII) y permitir a los clientes compartir su logro fácilmente en redes sociales, conectándolo directamente con el panel VIP del usuario.
