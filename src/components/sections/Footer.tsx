@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import type { FooterConfig } from '@/lib/site-config';
 import colombiaCities from '@/lib/data/ciudades.json';
+import codigosInfraccion from '@/lib/data/codigos-infraccion.json';
 
 interface FooterProps {
   footerData: FooterConfig;
@@ -185,6 +186,25 @@ export const Footer = ({ footerData, onOpenWhatsAppWarning }: FooterProps) => {
                 title={`Impugnar multas y fotomultas en ${city.nombre}`}
               >
                 {city.nombre}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* SEO Siloing: Códigos de Infracción */}
+        <div className="pt-8 pb-8 border-t border-border/10">
+          <h3 className="text-sm font-black uppercase tracking-[0.2em] text-foreground/50 mb-6 text-center lg:text-left">
+            Defensa por Código de Infracción (CNT)
+          </h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-x-4 gap-y-3">
+            {codigosInfraccion.map((infraccion) => (
+              <Link
+                key={infraccion.codigo}
+                href={`/multas/codigo/${infraccion.codigo}`}
+                className="text-xs font-medium text-muted-foreground hover:text-primary transition-colors truncate font-mono"
+                title={`Cómo impugnar la multa código ${infraccion.codigo} - ${infraccion.nombre}`}
+              >
+                {infraccion.codigo} - {infraccion.nombre}
               </Link>
             ))}
           </div>

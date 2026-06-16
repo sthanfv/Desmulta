@@ -29,11 +29,14 @@
   - Incorporado un CTA principal ("Escanear Multa Gratis") que redirige al ancla `#escaner` de la página de inicio, incentivando la conversión del tráfico web.
 - **Sitemap Dinámico (`sitemap.ts`)**:
   - Modificado [sitemap.ts](file:///c:/Workspace/Desmulta/src/app/sitemap.ts) para importar la base de datos de códigos e inyectar dinámicamente las nuevas rutas de códigos (`/multas/codigo/[codigo]`) con prioridad `0.85` y frecuencia de cambio semanal.
+- **Interlinking de SEO en Footer (`Footer.tsx`)**:
+  - Se implementó una sección de siloing de enlaces en el componente de pie de página global [Footer.tsx](file:///c:/Workspace/Desmulta/src/components/sections/Footer.tsx) titulada *"Defensa por Código de Infracción (CNT)"*.
+  - Esto interconecta las nuevas landing pages de códigos internamente en todo el sitio, permitiendo que tanto los usuarios reales como los bots e inteligencias artificiales de búsqueda los descubran y rastreen orgánicamente desde cualquier parte de la web.
 - **QA e Integración**:
   - Ejecutadas exitosamente las validaciones de TypeScript (`typecheck`), linter (`lint`) y compilación en modo producción (`build`), garantizando 0 advertencias, 0 errores de compilación y la generación correcta del HTML estático.
 
 **Estado Arquitectónico:**
-- 🟢 Completamente estable. Páginas estáticas y sitemap dinámico 100% integrados en Next.js 15 y optimizados para SEO orgánico nacional.
+- 🟢 Completamente estable. Landing pages de códigos, sitemap e interlinking en Footer 100% integrados y optimizados para SEO orgánico e indexación por IAs.
 
 ## 📝 SESIÓN: COMPARTICIÓN HÍBRIDA EN STORIES Y CORRECCIÓN DE WEB SHARE EN ESCRITORIO (Junio 2026)
 **Objetivo:** Solucionar el bloqueo o retraso indefinido (spinner infinito de Brave/Chrome) al presionar "Compartir en mis redes" en computadoras y navegadores de escritorio, garantizando un flujo fluido mediante copia directa al portapapeles y retroalimentación visual en pantalla.
