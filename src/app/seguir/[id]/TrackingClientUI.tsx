@@ -35,6 +35,7 @@ import { useWebPush } from '@/hooks/useWebPush';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase-client';
 import { useToast } from '@/hooks/use-toast';
+import StoryProgressModal from '@/components/interactive/StoryProgressModal';
 
 // Mapa de pasos del proceso (orden visual)
 const PASOS = [
@@ -144,6 +145,7 @@ export default function TrackingClientUI({
   const [caseData, setCaseData] = useState<TrackingCase>(initialCaseData);
   const [windowUrl, setWindowUrl] = useState('');
   const [visibleEventsCount, setVisibleEventsCount] = useState(5);
+  const [isStoryOpen, setIsStoryOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -310,6 +312,16 @@ export default function TrackingClientUI({
               </>
             )}
           </p>
+
+          <div className="mt-5 flex justify-center">
+            <button
+              onClick={() => setIsStoryOpen(true)}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-primary text-xs font-black uppercase tracking-widest transition-all duration-300 transform hover:scale-[1.03] shadow-[0_4px_20px_rgba(245,158,11,0.1)]"
+            >
+              <Sparkles className="w-4 h-4 animate-pulse" />
+              Ver en Modo Historia (Stories)
+            </button>
+          </div>
         </m.div>
 
         {/* Barra de progreso de pasos */}
@@ -802,6 +814,13 @@ export default function TrackingClientUI({
           </Link>
         </div>
       </div>
+
+      <StoryProgressModal
+        isOpen={isStoryOpen}
+        onClose={() => setIsStoryOpen(false)}
+        caseData={caseData}
+        currentStep={currentStep}
+      />
     </div>
   );
 }

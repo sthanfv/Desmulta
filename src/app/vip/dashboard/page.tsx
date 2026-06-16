@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import { jwtVerify } from 'jose';
 import { getAdminApp } from '@/lib/firebase-admin';
 import { getFirestore } from 'firebase-admin/firestore';
-import { ShieldCheck, LogOut, Clock, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, LogOut, Clock, CheckCircle2, Share2 } from 'lucide-react';
 import { TimelineEventVip } from '@/components/vip/TimelineEventVip';
 import { VipPushNotification } from '@/components/vip/VipPushNotification';
 
@@ -106,6 +106,15 @@ export default async function VipDashboardPage() {
         <div className="mt-4">
           <VipPushNotification expedienteId={expediente.id} />
         </div>
+
+        {/* Botón de Compartir Progreso en Historias Públicas */}
+        <a
+          href={`/seguir/${data.shortId || expediente.id}`}
+          className="mt-4 w-full py-3 px-4 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-black font-black text-xs uppercase tracking-widest rounded-xl text-center shadow-lg transition-all duration-300 hover:scale-[1.02] flex items-center justify-center gap-2"
+        >
+          <Share2 className="w-4 h-4" />
+          Compartir mi Progreso (Stories)
+        </a>
       </div>
 
       {/* Timeline Section */}
