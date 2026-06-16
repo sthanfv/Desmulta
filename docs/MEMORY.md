@@ -22,21 +22,23 @@
 - **Base de Datos de Infracciones (`codigos-infraccion.json`)**:
   - Creado el archivo [codigos-infraccion.json](file:///c:/Workspace/Desmulta/src/lib/data/codigos-infraccion.json) conteniendo los 10 códigos de infracción más buscados en Colombia (C02, C29, C35, D02, D04, C14, D01, B01, C03, A01).
   - Cada código de infracción incluye: nombre, gravedad, valor de la sanción proyectado a 2026, si aplica inmovilización o no, títulos y descripciones optimizados para SEO, contexto legal explicativo del vicio o error común de la secretaría de tránsito, y la defensa legal clave aplicable.
+  - **Refinamiento de Localización y Negocio:** Se reemplazó el término internacional `COP` por `pesos` y el acrónimo técnico `SMLDV` por `salarios mínimos diarios` para garantizar una lectura perfectamente comprensible por cualquier conductor colombiano. Se formatearon los miles con punto (`.`). Asimismo, se reestructuraron las descripciones legales y la defensa clave para ser persuasivas e invitar a usar el escáner del sitio sin exponer en detalle la estrategia técnica exacta (protegiendo el modelo de negocio de la plataforma).
 - **Ruta Estática Dinámica (`/multas/codigo/[codigo]`)**:
   - Creada la ruta dinámica [page.tsx](file:///c:/Workspace/Desmulta/src/app/multas/codigo/%5Bcodigo%5D/page.tsx) con soporte completo para la carga asíncrona de `params` en Next.js 15.
   - Implementado `generateStaticParams()` para pre-renderizar estáticamente todas las páginas a tiempo de compilación (SSG), eliminando llamadas a bases de datos o APIs en runtime.
   - Diseñado un layout premium con fondo negro (`bg-black`), acentos dorados (`text-primary`), un spec card (ficha técnica) con iconos interactivos de Lucide, y una sección destacada detallando el error común del tránsito y la defensa clave.
   - Incorporado un CTA principal ("Escanear Multa Gratis") que redirige al ancla `#escaner` de la página de inicio, incentivando la conversión del tráfico web.
+  - **Header de Navegación Premium:** Se integró el Header flotante de vidrio (`glass rounded-3xl h-16 shadow-2xl backdrop-blur-md bg-black/40`) con el botón de retroceso hacia el Inicio en las landing pages de códigos y de ciudades ([page.tsx de multas/ciudad](file:///c:/Workspace/Desmulta/src/app/multas/%5Bciudad%5D/page.tsx)) para enriquecer la experiencia de usuario y facilitar el retorno a la landing principal.
 - **Sitemap Dinámico (`sitemap.ts`)**:
   - Modificado [sitemap.ts](file:///c:/Workspace/Desmulta/src/app/sitemap.ts) para importar la base de datos de códigos e inyectar dinámicamente las nuevas rutas de códigos (`/multas/codigo/[codigo]`) con prioridad `0.85` y frecuencia de cambio semanal.
 - **Interlinking de SEO en Footer (`Footer.tsx`)**:
-  - Se implementó una sección de siloing de enlaces en el componente de pie de página global [Footer.tsx](file:///c:/Workspace/Desmulta/src/components/sections/Footer.tsx) titulada *"Defensa por Código de Infracción (CNT)"*.
-  - Esto interconecta las nuevas landing pages de códigos internamente en todo el sitio, permitiendo que tanto los usuarios reales como los bots e inteligencias artificiales de búsqueda los descubran y rastreen orgánicamente desde cualquier parte de la web.
+  - Se implementó una sección de siloing de enlaces en el componente de pie de página global [Footer.tsx](file:///c:/Workspace/Desmulta/src/components/sections/Footer.tsx) titulada *"Defensa por Código de Multa"*.
+  - Esto interconecta las nuevas landing pages de códigos internamente en todo el sitio de forma fluida. Se optimizó el diseño utilizando badges de códigos compactos y puntos decorativos, previniendo recortes toscos y asegurando una presentación impecable.
 - **QA e Integración**:
   - Ejecutadas exitosamente las validaciones de TypeScript (`typecheck`), linter (`lint`) y compilación en modo producción (`build`), garantizando 0 advertencias, 0 errores de compilación y la generación correcta del HTML estático.
 
 **Estado Arquitectónico:**
-- 🟢 Completamente estable. Landing pages de códigos, sitemap e interlinking en Footer 100% integrados y optimizados para SEO orgánico e indexación por IAs.
+- 🟢 Completamente estable. Landing pages de códigos, sitemap, interlinking en Footer y botones de retorno premium 100% integrados y optimizados para SEO orgánico e indexación por IAs.
 
 ## 📝 SESIÓN: COMPARTICIÓN HÍBRIDA EN STORIES Y CORRECCIÓN DE WEB SHARE EN ESCRITORIO (Junio 2026)
 **Objetivo:** Solucionar el bloqueo o retraso indefinido (spinner infinito de Brave/Chrome) al presionar "Compartir en mis redes" en computadoras y navegadores de escritorio, garantizando un flujo fluido mediante copia directa al portapapeles y retroalimentación visual en pantalla.
