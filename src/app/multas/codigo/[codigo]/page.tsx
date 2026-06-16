@@ -10,7 +10,8 @@ import {
   Scale, 
   DollarSign, 
   CarFront,
-  ShieldAlert
+  ShieldAlert,
+  ArrowLeft
 } from 'lucide-react';
 import codigosInfraccionData from '@/lib/data/codigos-infraccion.json';
 
@@ -55,25 +56,31 @@ export default async function CodigoInfraccionPage(props: Props) {
 
   return (
     <div className="min-h-screen bg-black text-white selection:bg-brand-500/30 selection:text-white relative overflow-hidden">
+      {/* Header flotante para navegación fácil */}
+      <header className="fixed top-0 w-full z-50 p-6">
+        <div className="max-w-4xl mx-auto glass rounded-3xl px-8 h-16 flex items-center justify-between shadow-2xl border-white/10 bg-black/40 backdrop-blur-md">
+          <Link
+            href="/"
+            className="flex items-center gap-2 text-muted-foreground hover:text-white transition-all group active:scale-95"
+          >
+            <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+            <span className="font-bold text-sm">Inicio</span>
+          </Link>
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="text-primary" size={20} />
+            <span className="font-black tracking-tighter text-lg uppercase text-white font-mono">
+              Código {infraccion.codigo}
+            </span>
+          </div>
+        </div>
+      </header>
+
       {/* Fondo con luces difusas premium */}
       <div className="absolute top-0 left-0 w-full h-[500px] bg-[radial-gradient(circle_at_50%_-20%,rgba(212,175,55,0.06)_0%,transparent_50%)] pointer-events-none" />
       <div className="absolute top-[400px] right-[-10%] w-[300px] h-[300px] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
 
-      {/* Breadcrumbs */}
-      <div className="relative z-10 pt-28 px-6 md:px-12 max-w-4xl mx-auto flex items-center gap-2 text-xs text-white/40 font-semibold tracking-wider uppercase">
-        <Link href="/" className="hover:text-primary transition-colors">
-          Inicio
-        </Link>
-        <span>/</span>
-        <Link href="/multas" className="hover:text-primary transition-colors">
-          Multas
-        </Link>
-        <span>/</span>
-        <span className="text-primary font-bold">Código {infraccion.codigo}</span>
-      </div>
-
       {/* Hero Section */}
-      <section className="relative z-10 py-12 px-6 md:px-12">
+      <section className="relative z-10 pt-36 pb-12 px-6 md:px-12">
         <div className="max-w-4xl mx-auto">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-[1.5rem] bg-primary/10 mb-8 border border-primary/20 shadow-inner">
             <ShieldAlert size={30} className="text-primary" />

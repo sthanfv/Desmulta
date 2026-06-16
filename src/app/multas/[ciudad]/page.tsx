@@ -2,7 +2,7 @@ import React from 'react';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { ShieldAlert, ArrowRight, Scale, MapPin } from 'lucide-react';
+import { ShieldAlert, ArrowRight, Scale, MapPin, ArrowLeft, ShieldCheck } from 'lucide-react';
 import ciudadesData from '@/lib/data/ciudades.json';
 import infraccionesData from '@/lib/data/infracciones.json';
 
@@ -81,9 +81,28 @@ export default async function MultasCiudadPage(props: Props) {
           }),
         }}
       />
-      <div className="min-h-screen bg-black text-white selection:bg-brand-500/30 selection:text-white">
+      <div className="min-h-screen bg-black text-white selection:bg-brand-500/30 selection:text-white relative">
+        {/* Header flotante para navegación fácil */}
+        <header className="fixed top-0 w-full z-50 p-6">
+          <div className="max-w-4xl mx-auto glass rounded-3xl px-8 h-16 flex items-center justify-between shadow-2xl border-white/10 bg-black/40 backdrop-blur-md">
+            <Link
+              href="/"
+              className="flex items-center gap-2 text-muted-foreground hover:text-white transition-all group active:scale-95"
+            >
+              <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+              <span className="font-bold text-sm">Inicio</span>
+            </Link>
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="text-brand-500" size={20} />
+              <span className="font-black tracking-tighter text-lg uppercase text-white">
+                Defensa Local
+              </span>
+            </div>
+          </div>
+        </header>
+
         {/* Hero Section */}
-        <section className="relative pt-32 pb-20 px-6 md:px-12 overflow-hidden">
+        <section className="relative pt-44 pb-20 px-6 md:px-12 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-brand-900/20 to-black/90 pointer-events-none" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand-500/10 blur-[120px] rounded-full pointer-events-none" />
 

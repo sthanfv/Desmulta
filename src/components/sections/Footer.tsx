@@ -194,17 +194,23 @@ export const Footer = ({ footerData, onOpenWhatsAppWarning }: FooterProps) => {
         {/* SEO Siloing: Códigos de Infracción */}
         <div className="pt-8 pb-8 border-t border-border/10">
           <h3 className="text-sm font-black uppercase tracking-[0.2em] text-foreground/50 mb-6 text-center lg:text-left">
-            Defensa por Código de Infracción (CNT)
+            Defensa por Código de Multa
           </h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-x-4 gap-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-3.5">
             {codigosInfraccion.map((infraccion) => (
               <Link
                 key={infraccion.codigo}
                 href={`/multas/codigo/${infraccion.codigo}`}
-                className="text-xs font-medium text-muted-foreground hover:text-primary transition-colors truncate font-mono"
-                title={`Cómo impugnar la multa código ${infraccion.codigo} - ${infraccion.nombre}`}
+                className="text-xs font-bold text-muted-foreground hover:text-primary transition-all active:scale-95 flex items-center gap-2 group/code"
+                title={`Cómo impugnar el comparendo código ${infraccion.codigo} - ${infraccion.nombre}`}
               >
-                {infraccion.codigo} - {infraccion.nombre}
+                <div className="w-1 h-1 rounded-full bg-primary/20 group-hover/code:bg-primary transition-colors shrink-0" />
+                <span className="font-mono bg-white/5 px-1.5 py-0.5 rounded border border-white/5 group-hover/code:border-primary/20 shrink-0">
+                  {infraccion.codigo}
+                </span>
+                <span className="truncate text-muted-foreground/80 hover:text-primary transition-colors">
+                  {infraccion.nombre}
+                </span>
               </Link>
             ))}
           </div>
