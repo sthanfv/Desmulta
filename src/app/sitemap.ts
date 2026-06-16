@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next';
 import ciudades from '@/lib/data/ciudades.json';
 import infracciones from '@/lib/data/infracciones.json';
+import codigosInfraccion from '@/lib/data/codigos-infraccion.json';
 import { getBlogPosts } from '@/lib/mdx';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://desmulta.online';
@@ -90,5 +91,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return routes;
   });
 
-  return [...staticRoutes, ...blogRoutes, ...cityRoutes];
+  // Rutas por código de infracción (Idea #09 - SEO)
+  const codigoRoutes: MetadataRoute.Sitemap = codigosInfraccion.map((infraccion) => ({
+    url: `${SITE_URL}/multas/codigo/${infraccion.codigo}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly',
+    priority: 0.85,
+  }));
+
+  return [...staticRoutes, ...blogRoutes, ...cityRoutes, ...codigoRoutes];
 }

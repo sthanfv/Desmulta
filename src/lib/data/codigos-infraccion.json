@@ -1,0 +1,112 @@
+[
+  {
+    "codigo": "C02",
+    "nombre": "Estacionar en Sitio Prohibido",
+    "gravedad": "Categoría C (15 SMLDV)",
+    "sancion_cop": "$650,000 COP (Valor 2026 aprox.)",
+    "inmoviliza": true,
+    "titulo_seo": "Comparendo C02 de Tránsito: Precio, Inmovilización y Defensa",
+    "descripcion_seo": "¿Te impusieron una multa C02 por estacionar en sitio prohibido? Descubre cuánto cuesta en 2026, si da inmovilización y cómo impugnarla.",
+    "contexto_legal": "La infracción C02 sanciona estacionar en zonas prohibidas. Sin embargo, para que sea legal, debe existir señalización vial clara (placas de prohibido parquear) reglamentada por la autoridad de tránsito. Si la multa fue impuesta mediante fotodetección, la Corte Constitucional exige identificar plenamente al conductor, lo que hace al comparendo altamente impugnable.",
+    "defensa_clave": "Falta de señalización reglamentaria en la vía o indebida identificación del infractor en fotomultas."
+  },
+  {
+    "codigo": "C29",
+    "nombre": "Exceso de Velocidad",
+    "gravedad": "Categoría C (15 SMLDV)",
+    "sancion_cop": "$650,000 COP (Valor 2026 aprox.)",
+    "inmoviliza": false,
+    "titulo_seo": "Multa C29 de Tránsito por Velocidad: Precio y Cómo Apelar",
+    "descripcion_seo": "Guía legal completa sobre la infracción C29 por exceso de velocidad detectada por radar en Colombia. Conoce tus derechos y cómo tumbarla.",
+    "contexto_legal": "Todo radar o cámara de velocidad utilizado para la multa C29 debe contar con un certificado de calibración vigente de la ONAC y estar señalizado visiblemente 500 metros antes. Adicionalmente, el comparendo debe ser notificado al propietario dentro de los 3 días hábiles del envío por correspondencia, de lo contrario viola el debido proceso.",
+    "defensa_clave": "Falta de certificado de calibración del radar o indebida notificación física fuera de términos legales."
+  },
+  {
+    "codigo": "C35",
+    "nombre": "Revisión Tecnicomecánica Vencida",
+    "gravedad": "Categoría C (15 SMLDV)",
+    "sancion_cop": "$650,000 COP (Valor 2026 aprox.)",
+    "inmoviliza": true,
+    "titulo_seo": "Infracción C35 de Tecnicomecánica: Precio, Fotomulta y Defensa",
+    "descripcion_seo": "¿Recibiste una multa C35 por tecnicomecánica vencida detectada por cámara? Conoce tus opciones legales para apelarla y evitar el cobro.",
+    "contexto_legal": "Aunque transitar sin la revisión tecnicomecánica vigente da lugar a multa e inmovilización, cuando se detecta por cámaras automáticas (fotomultas) el comparendo debe respetar el principio de responsabilidad subjetiva. No se puede sancionar de forma automática al propietario sin identificar plenamente al infractor al volante.",
+    "defensa_clave": "Principio de responsabilidad subjetiva (Corte Constitucional Sentencia C-038/20) en fotomultas."
+  },
+  {
+    "codigo": "D02",
+    "nombre": "Conducir sin SOAT Vigente",
+    "gravedad": "Categoría D (30 SMLDV)",
+    "sancion_cop": "$1,300,000 COP (Valor 2026 aprox.)",
+    "inmoviliza": true,
+    "titulo_seo": "Multa D02 por SOAT Vencido: Valor, Inmovilización e Impugnación",
+    "descripcion_seo": "Todo sobre la infracción D02 por no tener el SOAT al día en Colombia. Descubre el valor de la sanción, si da patio y cómo defenderte legalmente.",
+    "contexto_legal": "La multa D02 es una de las sanciones más costosas del Código de Tránsito y conlleva la inmovilización del vehículo. Si es impuesta por medios electrónicos, las autoridades tienen la obligación estricta de realizar la notificación por correspondencia al domicilio registrado en el RUNT en 3 días hábiles. El incumplimiento de este término invalida la multa.",
+    "defensa_clave": "Falta de notificación personal o guías de correspondencia fuera de término legal (caducidad)."
+  },
+  {
+    "codigo": "D04",
+    "nombre": "Pasarse un Semáforo en Rojo",
+    "gravedad": "Categoría D (30 SMLDV)",
+    "sancion_cop": "$1,300,000 COP (Valor 2026 aprox.)",
+    "inmoviliza": true,
+    "titulo_seo": "Infracción D04 por Semáforo en Rojo: Multa y Opciones de Defensa",
+    "descripcion_seo": "Qué hacer si te imponen un comparendo D04 por omitir luz roja de semáforo. Conoce el valor en 2026 y cómo apelar la fotomulta.",
+    "contexto_legal": "La infracción D04 por pasarse un semáforo en rojo o señal de PARE implica un riesgo alto y acarrea inmovilización si es impuesta por agente. No obstante, si es detectada por cámaras de fotodetención, aplica la jurisprudencia de no trasladar la culpabilidad automáticamente al dueño del carro, requiriendo pruebas directas de su identidad.",
+    "defensa_clave": "Indebida identificación del conductor y vulneración al debido proceso en fotodetcciones."
+  },
+  {
+    "codigo": "C14",
+    "nombre": "Transitar en Pico y Placa",
+    "gravedad": "Categoría C (15 SMLDV)",
+    "sancion_cop": "$650,000 COP (Valor 2026 aprox.)",
+    "inmoviliza": true,
+    "titulo_seo": "Comparendo C14 por Pico y Placa: Costo y Cómo Impugnarlo",
+    "descripcion_seo": "¿Recibiste una fotomulta o comparendo C14 por Pico y Placa? Conoce el valor de la infracción en 2026 y cómo apelar legalmente.",
+    "contexto_legal": "La infracción C14 prohíbe transitar por sitios o en horas restringidas por la autoridad. En muchas ciudades, los decretos locales de Pico y Placa cambian constantemente y no se divulgan con la suficiente antelación, lo que permite argumentar error de prohibición involuntario, además del debido proceso en fotomultas.",
+    "defensa_clave": "Falta de claridad en decretos locales de restricción o indebida notificación en fotodetcciones."
+  },
+  {
+    "codigo": "D01",
+    "nombre": "Conducir sin haber obtenido Licencia",
+    "gravedad": "Categoría D (30 SMLDV)",
+    "sancion_cop": "$1,300,000 COP (Valor 2026 aprox.)",
+    "inmoviliza": true,
+    "titulo_seo": "Infracción D01 por Conducir sin Licencia (Pase): Consecuencias",
+    "descripcion_seo": "Guía sobre la multa D01 por manejar sin pase en Colombia. Descubre si da cárcel, valor del comparendo y cómo levantar la inmovilización.",
+    "contexto_legal": "La multa D01 sanciona guiar un vehículo sin haber obtenido jamás la licencia de conducción. Es una falta grave que requiere inmovilización del vehículo en el acto hasta que un conductor autorizado con pase vigente lo retire de los patios. En caso de errores en el cargue del RUNT, se puede solicitar la exoneración presentando la licencia vigente.",
+    "defensa_clave": "Inconsistencias en el cargue de información en el sistema RUNT al momento de la orden de comparendo."
+  },
+  {
+    "codigo": "B01",
+    "nombre": "Conducir sin llevar Licencia Física",
+    "gravedad": "Categoría B (8 SMLDV)",
+    "sancion_cop": "$350,000 COP (Valor 2026 aprox.)",
+    "inmoviliza": false,
+    "titulo_seo": "Multa B01 por no portar la Licencia de Conducción | Soluciones",
+    "descripcion_seo": "¿Te impusieron el comparendo B01 por no llevar el pase físico? Conoce la circular oficial del Ministerio y cómo apelar la sanción.",
+    "contexto_legal": "La infracción B01 sanciona no portar la licencia de conducción. Sin embargo, mediante la Circular 20223040000375 del Ministerio de Transporte, los conductores pueden presentar su licencia de conducción en formato digital (consulta en tiempo real del RUNT) y el agente está obligado a aceptarla sin imponer la multa.",
+    "defensa_clave": "Validez del pase digital del RUNT según la Circular Oficial del Ministerio de Transporte."
+  },
+  {
+    "codigo": "C03",
+    "nombre": "Bloquear Calzada o Intersección",
+    "gravedad": "Categoría C (15 SMLDV)",
+    "sancion_cop": "$650,000 COP (Valor 2026 aprox.)",
+    "inmoviliza": false,
+    "titulo_seo": "Infracción C03 por Bloqueo de Intersección: Costo y Apelación",
+    "descripcion_seo": "¿Te multaron con el código C03 por bloquear una calzada o intersección? Conoce qué dice la ley y cómo impugnar la sanción en Colombia.",
+    "contexto_legal": "La multa C03 penaliza bloquear calzadas o intersecciones. Se requiere demostrar que el conductor obstruyó deliberadamente el paso y no por circunstancias ajenas (tales como trancones masivos, accidentes adelante o fallas de semaforización). Si el bloqueo se dio de forma involuntaria por congestión, la multa es apelable.",
+    "defensa_clave": "Fuerza mayor o caso fortuito debido a congestión vehicular extrema o fallas de semáforos."
+  },
+  {
+    "codigo": "A01",
+    "nombre": "Transitar en Sentido Contrario o Zona Prohibida",
+    "gravedad": "Categoría A (4 SMLDV)",
+    "sancion_cop": "$175,000 COP (Valor 2026 aprox.)",
+    "inmoviliza": false,
+    "titulo_seo": "Comparendo A01 por Sentido Contrario: Valor e Impugnación",
+    "descripcion_seo": "Conoce los detalles de la multa A01 por transitar en contravía o zona prohibida en Colombia. Cuánto cuesta y cómo apelar la infracción.",
+    "contexto_legal": "La infracción A01 es de Categoría A (la más leve en costo). Se aplica por transitar en contravía o zonas peatonales. Para su validez, la vía debe contar con señalización vial reflectiva visible que indique el sentido único de circulación. Si la señalización está deteriorada o es inexistente, el comparendo es nulo.",
+    "defensa_clave": "Señalización vial de sentido único deteriorada, inexistente o no reglamentaria."
+  }
+]
