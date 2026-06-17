@@ -109,95 +109,97 @@ async function notifyTelegram(newPosts: { title: string; slug: string }[]) {
 }
 
 async function syncBlogFromRss() {
-  console.log(`[RSS-SYNC] Consultando novedades viales en: ${RSS_URL}`);
+  const rssUrls = RSS_URL.split(',').map(url => url.trim());
+  console.log(`[RSS-SYNC] Iniciando sincronización de ${rssUrls.length} feeds...`);
 
-  try {
-    const response = await fetch(RSS_URL);
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status} - No se pudo descargar el feed.`);
-    }
+  let creados = 0;
+  let omitidos = 0;
+  const creadosList: { title: string; slug: string }[] = [];
 
-    const xmlText = await response.text();
+  for (const url of rssUrls) {
+    if (!url) continue;
+    console.log(`[RSS-SYNC] Consultando novedades viales en: ${url}`);
     
-    // Detectar si el feed es Atom (ej. Google Alerts) o RSS tradicional
-    const isAtom = xmlText.toLowerCase().includes('<feed') && xmlText.toLowerCase().includes('<entry');
-    
-    let matches: string[] = [];
-    if (isAtom) {
-      console.log('[RSS-SYNC] Formato detectado: Atom (Google Alerts)');
-      const entryRegex = /<entry>([\s\S]*?)<\/entry>/gi;
-      matches = xmlText.match(entryRegex) || [];
-    } else {
-      console.log('[RSS-SYNC] Formato detectado: RSS tradicional');
-      const itemRegex = /<item>([\s\S]*?)<\/item>/gi;
-      matches = xmlText.match(itemRegex) || [];
-    }
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        console.error(`[RSS-SYNC-WARN] HTTP ${response.status} - No se pudo descargar el feed: ${url}`);
+        continue;
+      }
 
-    if (matches.length === 0) {
-      console.log('[RSS-SYNC] No se encontraron noticias o formato XML no reconocido.');
-      return;
-    }
-
-    console.log(`[RSS-SYNC] Procesando ${matches.length} noticias...`);
-
-    if (!fs.existsSync(BLOG_DIR)) {
-      fs.mkdirSync(BLOG_DIR, { recursive: true });
-    }
-
-    let creados = 0;
-    let omitidos = 0;
-    const creadosList: { title: string; slug: string }[] = [];
-
-    for (const itemXml of matches) {
-      let title = extractTagContent(itemXml, 'title');
-      let pubDate = extractTagContent(itemXml, 'pubDate') || extractTagContent(itemXml, 'published') || extractTagContent(itemXml, 'updated');
-      let description = extractTagContent(itemXml, 'description') || extractTagContent(itemXml, 'summary') || extractTagContent(itemXml, 'content') || extractTagContent(itemXml, 'content:encoded');
-      let link = '';
-
+      const xmlText = await response.text();
+      
+      // Detectar si el feed es Atom (ej. Google Alerts) o RSS tradicional
+      const isAtom = xmlText.toLowerCase().includes('<feed') && xmlText.toLowerCase().includes('<entry');
+      
+      let matches: string[] = [];
       if (isAtom) {
-        // En Atom el link se encuentra como atributo href
-        const linkMatch = itemXml.match(/<link\s+(?:[^>]*?\s+)?href="([^"]*)"/i);
-        if (linkMatch && linkMatch[1]) {
-          link = linkMatch[1].trim();
-          // Limpiar redirecciones de Google Alerts
-          if (link.includes('google.com/url?')) {
-            try {
-              const urlObj = new URL(link);
-              const realUrl = urlObj.searchParams.get('url');
-              if (realUrl) {
-                link = realUrl;
+        console.log('[RSS-SYNC] Formato detectado: Atom (Google Alerts)');
+        const entryRegex = /<entry>([\s\S]*?)<\/entry>/gi;
+        matches = xmlText.match(entryRegex) || [];
+      } else {
+        console.log('[RSS-SYNC] Formato detectado: RSS tradicional');
+        const itemRegex = /<item>([\s\S]*?)<\/item>/gi;
+        matches = xmlText.match(itemRegex) || [];
+      }
+
+      if (matches.length === 0) {
+        console.log('[RSS-SYNC] No se encontraron noticias o formato XML no reconocido para este feed.');
+        continue;
+      }
+
+      console.log(`[RSS-SYNC] Procesando ${matches.length} noticias de este feed...`);
+
+      for (const itemXml of matches) {
+        let title = extractTagContent(itemXml, 'title');
+        let pubDate = extractTagContent(itemXml, 'pubDate') || extractTagContent(itemXml, 'published') || extractTagContent(itemXml, 'updated');
+        let description = extractTagContent(itemXml, 'description') || extractTagContent(itemXml, 'summary') || extractTagContent(itemXml, 'content') || extractTagContent(itemXml, 'content:encoded');
+        let link = '';
+
+        if (isAtom) {
+          // En Atom el link se encuentra como atributo href
+          const linkMatch = itemXml.match(/<link\s+(?:[^>]*?\s+)?href="([^"]*)"/i);
+          if (linkMatch && linkMatch[1]) {
+            link = linkMatch[1].trim();
+            // Limpiar redirecciones de Google Alerts
+            if (link.includes('google.com/url?')) {
+              try {
+                const urlObj = new URL(link);
+                const realUrl = urlObj.searchParams.get('url');
+                if (realUrl) {
+                  link = realUrl;
+                }
+              } catch {
+                // Si falla el parseo, se conserva el original
               }
-            } catch {
-              // Si falla el parseo, se conserva el original
             }
           }
+        } else {
+          link = extractTagContent(itemXml, 'link');
         }
-      } else {
-        link = extractTagContent(itemXml, 'link');
-      }
 
-      if (!title || !pubDate) {
-        continue;
-      }
+        if (!title || !pubDate) {
+          continue;
+        }
 
-      // Limpiar CDATA y entidades HTML del título
-      title = title.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/i, '$1').trim();
+        // Limpiar CDATA y entidades HTML del título
+        title = title.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/i, '$1').trim();
 
-      const slug = generateSlug(title);
-      const filePath = path.join(BLOG_DIR, `${slug}.mdx`);
+        const slug = generateSlug(title);
+        const filePath = path.join(BLOG_DIR, `${slug}.mdx`);
 
-      // Si el borrador o el post ya existe, se omite para no pisar ediciones del administrador
-      if (fs.existsSync(filePath)) {
-        omitidos++;
-        continue;
-      }
+        // Si el borrador o el post ya existe, se omite para no pisar ediciones del administrador
+        if (fs.existsSync(filePath)) {
+          omitidos++;
+          continue;
+        }
 
-      const dateStr = parseDate(pubDate);
-      const cleanDescription = htmlToMarkdown(description).slice(0, 160).replace(/\n/g, ' ') + '...';
-      const cleanContent = htmlToMarkdown(description);
+        const dateStr = parseDate(pubDate);
+        const cleanDescription = htmlToMarkdown(description).slice(0, 160).replace(/\n/g, ' ') + '...';
+        const cleanContent = htmlToMarkdown(description);
 
-      // Contenido MDX con cabecera frontmatter configurada en modo borrador (draft: true)
-      const mdxContent = `---
+        // Contenido MDX con cabecera frontmatter configurada en modo borrador (draft: true)
+        const mdxContent = `---
 title: "${title.replace(/"/g, '\\"')}"
 excerpt: "${cleanDescription.replace(/"/g, '\\"')}"
 date: "${dateStr}"
@@ -212,24 +214,23 @@ ${cleanContent}
 *Nota: Este artículo es un borrador importado de forma automática desde las novedades legales del sector transporte. Para más detalles, puedes consultar la fuente original en [este enlace](${link}).*
 `;
 
-      fs.writeFileSync(filePath, mdxContent, 'utf8');
-      console.log(`[+] Borrador creado: src/content/blog/${slug}.mdx`);
-      creadosList.push({ title, slug });
-      creados++;
+        fs.writeFileSync(filePath, mdxContent, 'utf8');
+        console.log(`[+] Borrador creado: src/content/blog/${slug}.mdx`);
+        creadosList.push({ title, slug });
+        creados++;
+      }
+    } catch (err: any) {
+      console.error(`[ERROR-RSS] Falló la sincronización de la URL: ${url}. Motivo: ${err.message}`);
     }
+  }
 
-    console.log(`[RSS-SYNC] Sincronización finalizada.`);
-    console.log(`- Nuevos borradores creados: ${creados}`);
-    console.log(`- Noticias existentes omitidas: ${omitidos}`);
+  console.log(`[RSS-SYNC] Sincronización general finalizada.`);
+  console.log(`- Total de nuevos borradores creados: ${creados}`);
+  console.log(`- Total de noticias existentes omitidas: ${omitidos}`);
 
-    // Si hay creados y están configuradas las notificaciones de Telegram, notificar al admin
-    if (creadosList.length > 0) {
-      await notifyTelegram(creadosList);
-    }
-
-  } catch (error: any) {
-    console.error(`[ERROR-RSS] Ocurrió un fallo durante la sincronización: ${error.message}`);
-    process.exit(1);
+  // Si hay creados y están configuradas las notificaciones de Telegram, notificar al admin
+  if (creadosList.length > 0) {
+    await notifyTelegram(creadosList);
   }
 }
 
