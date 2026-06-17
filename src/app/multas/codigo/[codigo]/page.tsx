@@ -30,6 +30,22 @@ export async function generateStaticParams() {
   }));
 }
 
+// Función para parsear texto con formato de negritas **texto** en elementos React estilizados
+function parseBoldText(text: string) {
+  if (!text) return null;
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return parts.map((part, index) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return (
+        <strong key={index} className="text-white font-extrabold underline decoration-primary/30 underline-offset-2">
+          {part.slice(2, -2)}
+        </strong>
+      );
+    }
+    return part;
+  });
+}
+
 // Generar metadatos SEO dinámicos
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const params = await props.params;
@@ -153,13 +169,13 @@ export default async function CodigoInfraccionPage(props: Props) {
                   El Error de la Secretaría de Tránsito
                 </h2>
                 <p className="text-slate-300 leading-relaxed mb-6 font-medium">
-                  {infraccion.contexto_legal}
+                  {parseBoldText(infraccion.contexto_legal)}
                 </p>
 
                 <div className="flex items-start gap-3 p-4 bg-primary/10 border border-primary/20 rounded-2xl text-xs text-primary font-bold uppercase tracking-wider">
                   <ShieldCheck size={18} className="shrink-0 mt-0.5" />
                   <span>
-                    Defensa clave: {infraccion.defensa_clave}
+                    Defensa clave: {parseBoldText(infraccion.defensa_clave)}
                   </span>
                 </div>
               </div>
