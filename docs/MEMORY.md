@@ -1136,12 +1136,15 @@ Se han implementado correcciones críticas a nivel de seguridad, integridad de d
 - **[Filtro de Relevancia Heurístico]:** Incorporada una lista negra de exclusión en [sync-blog-rss.ts](file:///c:/Workspace/Desmulta/scripts/sync-blog-rss.ts) (palabras como *"choque"*, *"fallecido"*, *"herido"*, *"accidente"*) para descartar de forma automática reportes trágicos o colisiones viales comunes que suelen contaminar los feeds de transporte, manteniendo el blog enfocado en regulaciones y multas.
 - **[DevOps / Automatización] Workflow en GitHub Actions:** Creado [.github/workflows/blog-sync.yml](file:///c:/Workspace/Desmulta/.github/workflows/blog-sync.yml) para ejecutar la sincronización de manera programada (cron diario) y realizar commit/push automático de borradores detectados a la rama principal (`main`), disparando el CD en Vercel.
 - **[Integración / Alertas] Notificaciones en Telegram:** Inyectada lógica en el script de sincronización para notificar al administrador en su canal privado con los títulos de los borradores creados y un enlace directo a GitHub para publicación rápida.
+- **[Documentación / Manual del Admin]:** Creada la guía paso a paso en [admin-manual.md](file:///c:/Workspace/Desmulta/docs/admin-manual.md) para instruir al administrador sobre el flujo de revisión y aprobación manual de borradores, y subido un borrador de prueba (`prueba-borrador-manual.mdx`) para ensayos reales en vivo.
 - **[QA] Validación General:** Verificado el linter (`eslint`) y tipado estricto (`tsc`) con 0 advertencias, y compilado el bundle de producción Next.js (`build`) con total éxito.
 
 
 **Archivos Afectados:**
 - [sync-blog-rss.ts](file:///c:/Workspace/Desmulta/scripts/sync-blog-rss.ts)
 - [blog-sync.yml](file:///c:/Workspace/Desmulta/.github/workflows/blog-sync.yml) (NUEVO)
+- [admin-manual.md](file:///c:/Workspace/Desmulta/docs/admin-manual.md)
+- [prueba-borrador-manual.mdx](file:///c:/Workspace/Desmulta/src/content/blog/prueba-borrador-manual.mdx) (NUEVO)
 - [MEMORY.md](file:///c:/Workspace/Desmulta/docs/MEMORY.md)
 - [CHANGELOG.md](file:///c:/Workspace/Desmulta/docs/CHANGELOG.md)
 
