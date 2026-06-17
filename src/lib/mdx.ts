@@ -62,6 +62,13 @@ export async function getBlogPosts(): Promise<BlogPostMeta[]> {
         slug: archivo.replace('.mdx', ''),
       } as BlogPostMeta;
     })
+    .filter((meta) => {
+      // Filtrar borradores en producción
+      if (process.env.NODE_ENV === 'production') {
+        return !meta.draft;
+      }
+      return true;
+    })
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   return articulos;
@@ -88,6 +95,11 @@ export async function getBlogPostBySlug(slug: string) {
     source: contenido,
     options: { parseFrontmatter: true },
   });
+
+  // Bloquear acceso a borradores en producción
+  if (process.env.NODE_ENV === 'production' && frontmatter.draft) {
+    return null;
+  }
 
   return {
     content,

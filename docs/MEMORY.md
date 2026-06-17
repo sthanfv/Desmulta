@@ -2,6 +2,7 @@
 
 | Versión | Estado     | Hitos Principales |
 | :---    | :---       | :---              |
+| v1.0.0  | 🟢 Estable | Sincronización Automática de Blog RSS-to-MDX (Idea #10 - Script CLI Local y Filtrado de Borradores) |
 | v1.0.0  | 🟢 Estable | Páginas de Infracción Específica por Código (Idea #09 - Landing Pages SEO y Sitemap Dinámico) |
 | v1.0.0  | 🟢 Estable | Compartición Híbrida en Stories (Corrección de Web Share en computadoras y navegadores de escritorio) |
 | v1.0.0  | 🟢 Estable | Depuración de Source Maps (Resolución de errores 404 en Vercel) |
@@ -14,6 +15,27 @@
 | v1.0.0 | 🟢 Estable | Auditoría PDF + Previsualización Premium |
 | v1.0.0 | 🟢 Estable | Reingeniería PDF + Word-wrap + Saneamiento Linter |
 | v8.8.0  | 🟢 Estable | Motor OCR Tesseract 5.0 Integration |
+
+## 📝 SESIÓN: SINCRONIZACIÓN AUTOMÁTICA DE BLOG RSS-TO-MDX (IDEA #10) (Junio 2026)
+**Objetivo:** Desarrollar un script automatizado local en Node.js para consumir y parsear feeds RSS oficiales de noticias de transporte, convirtiéndolas automáticamente a borradores `.mdx` locales con el estado de borrador activo (`draft: true`) en el frontmatter, con el fin de agilizar la creación de posts relevantes de SEO sin requerir APIs ni servicios de pago.
+
+**Cambios e Implementaciones:**
+- **Filtrado de Borradores en el Core del Blog (`mdx.ts` y `mdx-types.ts`)**:
+  - Se modificó [mdx-types.ts](file:///c:/Workspace/Desmulta/src/lib/mdx-types.ts) incorporando el campo opcional `draft?: boolean;` a la metadata de los artículos de blog (`BlogPostMeta`).
+  - Se reescribió la lógica en [mdx.ts](file:///c:/Workspace/Desmulta/src/lib/mdx.ts) para filtrar activamente y excluir de la previsualización del blog y del sitemap XML todos los artículos que posean la propiedad `draft: true` en producción (`process.env.NODE_ENV === 'production'`). Esto previene que borradores incompletos se expongan en Google antes de ser editados y aprobados por el administrador, permitiendo previsualizarlos únicamente en el entorno local de desarrollo.
+- **Script Local de Sincronización RSS (`sync-blog-rss.ts`)**:
+  - Creado el script [sync-blog-rss.ts](file:///c:/Workspace/Desmulta/scripts/sync-blog-rss.ts) en TypeScript.
+  - Implementa descarga nativa (`fetch`) de la URL del feed RSS, parseo XML robusto mediante expresiones regulares (utilizando la secuencia `[\s\S]` conforme a la directiva de arquitectura para evadir banderas `/s` incompatibles), e inyección en archivos locales estáticos `.mdx` en `src/content/blog/`.
+  - Convierte y limpia el formato HTML del feed a sintaxis Markdown limpia (párrafos, negritas, enlaces).
+  - Incluye control de duplicados (idempotencia) omitiendo la escritura si el archivo del slug ya existe, previniendo sobreescribir ediciones o aprobaciones previas del administrador.
+- **Script y Comando en package.json**:
+  - Modificado [package.json](file:///c:/Workspace/Desmulta/package.json) agregando el comando `"blog:sync"` con directivas de transpilación locales (`ts-node --skip-project -O "{\"module\":\"commonjs\"}"`) para ejecutar de forma correcta y fluida en Node ignorando la configuración web de TypeScript.
+- **QA e Integración**:
+  - Se ejecutaron pruebas locales de descarga en el feed RSS público obteniendo la generación exitosa de 18 borradores estáticos MDX de prueba.
+  - Se validó el linter (`eslint`) y el analizador de tipos (`tsc`) obteniendo 0 warnings y 0 errores.
+
+**Estado Arquitectónico:**
+- 🟢 Completamente estable. Script local e inyección de borradores seguros integrados con éxito en la arquitectura estática del Blog de Next.js.
 
 ## 📝 SESIÓN: PÁGINAS DE INFRACCIÓN ESPECÍFICA POR CÓDIGO (IDEA #09) (Junio 2026)
 **Objetivo:** Desarrollar páginas de destino (landing pages) estáticas optimizadas para SEO, correspondientes a los códigos del Código Nacional de Tránsito de Colombia más buscados, con el fin de captar tráfico orgánico masivo y redirigir a los usuarios al escáner gratuito de multas.
@@ -1103,6 +1125,27 @@ Se han implementado correcciones críticas a nivel de seguridad, integridad de d
 
 **Estado de la Arquitectura:**
 - 🟢 Estable. Todas las pruebas unitarias locales e integración en `functions` y en la raíz del proyecto pasan exitosamente (verde). Linter y compilación estricta limpios con 0 warnings/errores.
+
+---
+
+## 📝 SESIÓN: OPTIMIZACIÓN DE SINCRONIZACIÓN DE BLOG (RSS/ATOM-TO-MDX) (Junio 2026)
+**Objetivo:** Optimizar e implementar el parser dual para feeds RSS y feeds Atom (Google Alerts) de manera autónoma y serverless en la nube, permitiendo al administrador recibir notificaciones instantáneas de nuevos borradores vía Telegram y publicarlos en un clic.
+
+**Implementado:**
+- **[Backend / CLI] Parser de Formato Dual:** Robustecido [sync-blog-rss.ts](file:///c:/Workspace/Desmulta/scripts/sync-blog-rss.ts) para soportar de forma nativa estructuras XML de feeds RSS y Atom. Se incluyó la extracción y decodificación de URLs originales desde redirecciones de Google.
+- **[DevOps / Automatización] Workflow en GitHub Actions:** Creado [.github/workflows/blog-sync.yml](file:///c:/Workspace/Desmulta/.github/workflows/blog-sync.yml) para ejecutar la sincronización de manera programada (cron diario) y realizar commit/push automático de borradores detectados a la rama principal (`main`), disparando el CD en Vercel.
+- **[Integración / Alertas] Notificaciones en Telegram:** Inyectada lógica en el script de sincronización para notificar al administrador en su canal privado con los títulos de los borradores creados y un enlace directo a GitHub para publicación rápida.
+- **[QA] Validación General:** Verificado el linter (`eslint`) y tipado estricto (`tsc`) con 0 advertencias, y compilado el bundle de producción Next.js (`build`) con total éxito.
+
+**Archivos Afectados:**
+- [sync-blog-rss.ts](file:///c:/Workspace/Desmulta/scripts/sync-blog-rss.ts)
+- [blog-sync.yml](file:///c:/Workspace/Desmulta/.github/workflows/blog-sync.yml) (NUEVO)
+- [MEMORY.md](file:///c:/Workspace/Desmulta/docs/MEMORY.md)
+- [CHANGELOG.md](file:///c:/Workspace/Desmulta/docs/CHANGELOG.md)
+
+**Estado de la Arquitectura:**
+- 🟢 Estable. Compilación de Next.js (`typecheck`) limpia, tests unitarios en verde y linter (`lint`) impecable con 0 errores/warnings.
+
 
 
 

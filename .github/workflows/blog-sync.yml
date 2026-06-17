@@ -1,0 +1,51 @@
+name: Sincronización Automática de Blog
+
+on:
+  schedule:
+    # Se ejecuta todos los días a las 06:00 UTC (01:00 AM hora de Colombia)
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    # Permite ejecutar de forma manual desde la interfaz de GitHub Actions
+
+permissions:
+  contents: write
+
+jobs:
+  sync-blog:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del Repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Instalar Dependencias
+        run: npm ci
+
+      - name: Ejecutar Sincronización de Feed
+        run: npm run blog:sync
+        env:
+          BLOG_RSS_URL: ${{ secrets.BLOG_RSS_URL }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          NEXT_PUBLIC_SITE_URL: "https://desmulta.online"
+
+      - name: Verificar Cambios y Hacer Commit
+        run: |
+          git status
+          # Verificar si hay archivos nuevos o modificados en la carpeta del blog
+          if [ -n "$(git status --porcelain src/content/blog)" ]; then
+            echo "Nuevos borradores detectados. Confirmando cambios en la rama principal..."
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@users.noreply.github.com"
+            git add src/content/blog/
+            git commit -m "automatización: importar nuevos borradores de blog [skip ci]"
+            git push origin main
+          else
+            echo "Sin novedades. El blog ya se encuentra al día."
+          fi

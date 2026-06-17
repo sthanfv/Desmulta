@@ -4,6 +4,10 @@ Todas las versiones y cambios significativos del proyecto.
 
 ## [v1.0.0] - Junio 2026
 ### ✨ Features & UX
+- **Sincronización Automática de Blog RSS-to-MDX (Idea #10):** Implementación de script robusto `sync-blog-rss.ts` con soporte dual para feeds RSS y Atom (Google Alerts), extracción y decodificación de URLs de destino reales, notificaciones automáticas a Telegram de nuevos artículos y workflow en GitHub Actions para ejecución cron diaria con commits automáticos a `main`.
+- **Páginas de Infracción Específica por Código (Idea #09):** Rutas estáticas generadas a tiempo de compilación (SSG) `/multas/codigo/[codigo]` que detallan los 10 códigos de tránsito más buscados en Colombia a partir de `codigos-infraccion.json`, interconectadas mediante el Footer e integradas dinámicamente en `sitemap.ts`.
+- **Compartición Híbrida en Historias (Stories):** Detección inteligente de agente de usuario en `StoryProgressModal.tsx` para delegar a la Web Share API en móviles y realizar copias directas al portapapeles con avisos animados en escritorios, evitando spinner infinito y bloqueos de seguridad.
+- **Depuración de Mapeo de Origen (Source Maps):** Eliminación de las directivas `sourceMappingURL` en dependencias estáticas locales en `public/` (`worker.min.js`, `firebase-app-compat.js`, `firebase-messaging-compat.js`) erradicando de raíz las alertas 404 en el servidor de producción.
 - **El Toque Humano (Expansión):** La "Nota del Operador" ingresada al cambiar de estado ahora se inyecta automáticamente en las plantillas de correo electrónico y notificaciones Web Push, garantizando una comunicación omnicanal más personalizada y empática.
 - **Kanban Cinético:** Implementación de un motor de *edge-scroll* basado en `requestAnimationFrame` para la versión móvil del Tablero Flujo de Trabajo, mejorando radicalmente la usabilidad al arrastrar tarjetas hacia los bordes.
 - **Loading Skeletons (SSR):** Incorporados estados de carga (`loading.tsx`) nativos de Next.js en las rutas de mayor impacto (Blog, Multas por ciudad y Portal VIP) evitando destellos visuales durante la hidratación y revalidación SSG.

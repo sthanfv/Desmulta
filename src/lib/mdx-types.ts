@@ -5,4 +5,5 @@ export interface BlogPostMeta {
   date: string;
   author?: string;
   tags?: string[];
+  draft?: boolean;
 }

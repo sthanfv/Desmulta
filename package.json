@@ -23,6 +23,7 @@
     "test:e2e": "firebase emulators:exec \"cross-env NEXT_PUBLIC_USE_FIREBASE_EMULATOR=true playwright test\" --only firestore --config firebase.test.json",
     "validate": "npm run format && npm run typecheck && npm run test:integration && npm run test:e2e && npm run build && npm run lint",
     "test:smoke": "firebase emulators:exec \"cross-env NEXT_PUBLIC_USE_FIREBASE_EMULATOR=true playwright test tests/e2e/smoke.test.ts\" --only firestore --config firebase.test.json",
+    "blog:sync": "ts-node --skip-project -O \"{\\\"module\\\":\\\"commonjs\\\"}\" scripts/sync-blog-rss.ts",
     "docs:lint": "markdownlint README.md CONTRIBUTING.md CHANGELOG.md docs/*.md"
   },
   "dependencies": {
