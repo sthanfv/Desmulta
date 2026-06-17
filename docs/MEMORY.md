@@ -2,6 +2,7 @@
 
 | Versión | Estado     | Hitos Principales |
 | :---    | :---       | :---              |
+| v1.0.0  | 🟢 Estable | Soporte e inducción al Administrador sobre el Blog RSS-to-MDX y Manual de Operaciones |
 | v1.0.0  | 🟢 Estable | Sincronización Automática de Blog RSS-to-MDX (Idea #10 - Script CLI Local y Filtrado de Borradores) |
 | v1.0.0  | 🟢 Estable | Páginas de Infracción Específica por Código (Idea #09 - Landing Pages SEO y Sitemap Dinámico) |
 | v1.0.0  | 🟢 Estable | Compartición Híbrida en Stories (Corrección de Web Share en computadoras y navegadores de escritorio) |
@@ -15,6 +16,18 @@
 | v1.0.0 | 🟢 Estable | Auditoría PDF + Previsualización Premium |
 | v1.0.0 | 🟢 Estable | Reingeniería PDF + Word-wrap + Saneamiento Linter |
 | v8.8.0  | 🟢 Estable | Motor OCR Tesseract 5.0 Integration |
+
+## 📝 SESIÓN: INDUCCIÓN Y SOPORTE DE BLOG AUTOMÁTICO (RSS-TO-MDX) (Junio 2026)
+**Objetivo:** Brindar soporte al administrador aclarando dudas respecto a la obtención de los enlaces de origen de las noticias, el manual de operaciones y la naturaleza de la generación de borradores individuales del blog.
+
+**Aclaraciones y Decisiones:**
+- **Ubicación de Enlaces de Origen:** Se detalló que cada borrador de blog generado en formato `.mdx` local contiene de forma nativa al final del archivo el enlace directo de la noticia original en la nota de pie de página (`[este enlace](${link})`), facilitando la validación del contenido.
+- **Origen del feed por defecto:** Se aclaró que en ausencia de la variable `BLOG_RSS_URL` en el entorno de ejecución, el script utiliza como fallback de seguridad el feed de `https://diariodetransporte.com/feed/` (explicando la aparición de noticias sobre transporte en España). El archivo `.env` local ya tiene configurado el feed enfocado a alertas de tránsito colombianas.
+- **Generación de Archivos Individuales:** Se confirmó que el script genera archivos `.mdx` individuales para cada noticia detectada en lugar de consolidarlas en un solo archivo, lo que permite que el administrador edite, publique (`draft: false`) o descarte cada noticia por separado.
+- **Manual del Administrador:** Se confirmó la existencia de la guía completa en [docs/admin-manual.md](file:///c:/Workspace/Desmulta/docs/admin-manual.md) que contiene todas las directrices operativas.
+
+**Estado Arquitectónico:**
+- 🟢 Completamente estable.
 
 ## 📝 SESIÓN: SINCRONIZACIÓN AUTOMÁTICA DE BLOG RSS-TO-MDX (IDEA #10) (Junio 2026)
 **Objetivo:** Desarrollar un script automatizado local en Node.js para consumir y parsear feeds RSS oficiales de noticias de transporte, convirtiéndolas automáticamente a borradores `.mdx` locales con el estado de borrador activo (`draft: true`) en el frontmatter, con el fin de agilizar la creación de posts relevantes de SEO sin requerir APIs ni servicios de pago.
