@@ -209,6 +209,15 @@ async function syncBlogFromRss() {
         // Limpiar CDATA y entidades HTML del título
         title = title.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/i, '$1').trim();
 
+        // Filtro de relevancia: ignorar noticias de accidentes, choques o tragedias viales
+        const titleLower = title.toLowerCase();
+        const blacklist = ['fallece', 'fallecido', 'muerto', 'herido', 'choque', 'colision', 'accidente', 'tragedia', 'volcamiento', 'lesionado'];
+        const contieneBasura = blacklist.some(palabra => titleLower.includes(palabra));
+        if (contieneBasura) {
+          console.log(`[-] Omitido por filtro de relevancia: "${title}"`);
+          continue;
+        }
+
         const slug = generateSlug(title);
         const filePath = path.join(BLOG_DIR, `${slug}.mdx`);
 
