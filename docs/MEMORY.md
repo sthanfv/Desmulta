@@ -1132,10 +1132,12 @@ Se han implementado correcciones críticas a nivel de seguridad, integridad de d
 **Objetivo:** Optimizar e implementar el parser dual para feeds RSS y feeds Atom (Google Alerts) de manera autónoma y serverless en la nube, permitiendo al administrador recibir notificaciones instantáneas de nuevos borradores vía Telegram y publicarlos en un clic.
 
 **Implementado:**
-- **[Backend / CLI] Parser de Formato Dual:** Robustecido [sync-blog-rss.ts](file:///c:/Workspace/Desmulta/scripts/sync-blog-rss.ts) para soportar de forma nativa estructuras XML de feeds RSS y Atom. Se incluyó la extracción y decodificación de URLs originales desde redirecciones de Google.
+- **[Backend / CLI] Parser de Formato Dual:** Robustecido [sync-blog-rss.ts](file:///c:/Workspace/Desmulta/scripts/sync-blog-rss.ts) para soportar de forma nativa estructuras XML de feeds RSS y Atom. Se incluyó la extracción y decodificación de URLs originales desde redirecciones de Google y soporte multi-feed separado por comas.
+- **[Filtro de Relevancia Heurístico]:** Incorporada una lista negra de exclusión en [sync-blog-rss.ts](file:///c:/Workspace/Desmulta/scripts/sync-blog-rss.ts) (palabras como *"choque"*, *"fallecido"*, *"herido"*, *"accidente"*) para descartar de forma automática reportes trágicos o colisiones viales comunes que suelen contaminar los feeds de transporte, manteniendo el blog enfocado en regulaciones y multas.
 - **[DevOps / Automatización] Workflow en GitHub Actions:** Creado [.github/workflows/blog-sync.yml](file:///c:/Workspace/Desmulta/.github/workflows/blog-sync.yml) para ejecutar la sincronización de manera programada (cron diario) y realizar commit/push automático de borradores detectados a la rama principal (`main`), disparando el CD en Vercel.
 - **[Integración / Alertas] Notificaciones en Telegram:** Inyectada lógica en el script de sincronización para notificar al administrador en su canal privado con los títulos de los borradores creados y un enlace directo a GitHub para publicación rápida.
 - **[QA] Validación General:** Verificado el linter (`eslint`) y tipado estricto (`tsc`) con 0 advertencias, y compilado el bundle de producción Next.js (`build`) con total éxito.
+
 
 **Archivos Afectados:**
 - [sync-blog-rss.ts](file:///c:/Workspace/Desmulta/scripts/sync-blog-rss.ts)
