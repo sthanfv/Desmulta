@@ -97,3 +97,39 @@ Si por accidente eliminas, vacías o bloqueas el chat con el Bot en tu aplicaci�
 2. **Busca tu Bot:** En la barra de búsqueda superior, escribe el nombre o el `@usuario` de tu bot. *(Si no lo recuerdas, busca el chat con **@BotFather**, escribe el comando `/mybots`, selecciona tu bot y haz clic en su enlace).*
 3. **Inicia el chat:** Una vez abras la ventana del chat con tu bot, verás un botón en la parte inferior que dice **"Iniciar"** (o "Start"). Haz clic en él.
 4. ¡Listo! Al darle a Iniciar, le devuelves el permiso de escritura al Bot y los nuevos leads volverán a llegar de inmediato.
+
+---
+
+## 9. Blog Automático de Noticias Legales (RSS/Atom-to-MDX)
+
+Esta herramienta permite captar tráfico orgánico de Google en automático importando novedades legales de tránsito y convirtiéndolas en borradores de blog listos para SEO.
+
+### ¿Cómo funciona el flujo de importación?
+1. **Google Alerts:** El sistema lee feeds RSS/Atom de alertas configuradas en tu cuenta de Google (bajo palabras clave de leyes viales de Colombia).
+2. **Ejecución diaria en la nube:** GitHub Actions corre a diario de manera automática el script de importación a la **1:00 AM (hora Colombia)**.
+3. **Filtro de accidentes y colisiones:** El script tiene un filtro automático (lista negra de palabras) que descarta noticias de accidentes, choques, heridos o muertes cotidianas, asegurando que solo se generen borradores de carácter legal y de tránsito relevante.
+4. **Borradores seguros:** Los artículos nuevos se guardan en la carpeta `src/content/blog/` con el campo `draft: true` en el encabezado. **Ningún borrador se publica solo en internet.**
+5. **Alerta en Telegram:** El bot te enviará un mensaje al chat de Telegram listando los títulos de los borradores nuevos y un enlace directo a GitHub para su aprobación.
+
+### Paso a Paso para la Aprobación y Publicación Manual:
+
+Si recibes una alerta de Telegram de noticias que deseas publicar, sigue estos sencillos pasos:
+
+1. **Abre el archivo en GitHub:** En el mensaje de Telegram, haz clic en el enlace que dice **"Ver contenido en GitHub"** (también puedes ingresar a tu cuenta de GitHub, ir a tu repositorio `Desmulta` y navegar a la carpeta `src/content/blog/`).
+2. **Selecciona la noticia:** Haz clic sobre el archivo `.mdx` correspondiente a la noticia que quieres publicar.
+3. **Edita el archivo:** En la esquina superior derecha del archivo en GitHub, haz clic en el icono del **lápiz (Edit this file)** para abrir el editor web.
+4. **Publica el artículo:** En las primeras líneas de la cabecera (frontmatter), cambia el estado de borrador:
+   * Busca la línea: `draft: true`
+   * Reemplázala por: `draft: false`
+   * *(Opcional)*: Puedes corregir el título, pulir el texto o agregar tus propias palabras clave directamente en el cuerpo del artículo.
+5. **Guarda los cambios (Commit):** Haz clic en el botón verde arriba a la derecha que dice **"Commit changes..."**, escribe una breve nota si lo deseas, y confirma haciendo clic en el botón verde **"Commit changes"**.
+
+**¡Listo!** En unos 60 segundos Vercel detectará el commit, compilará el sitio en segundo plano y la noticia estará publicada y visible para todo el público y motores de búsqueda en `https://desmulta.online/blog`.
+
+### Ejecución Manual (Sin esperar a la noche)
+Si no deseas esperar a que el proceso corra de manera automática por la noche, puedes forzar la sincronización en cualquier momento desde tu terminal local ejecutando el comando:
+```bash
+npm run blog:sync
+```
+El script leerá tus feeds de Google Alerts y enviará las novedades correspondientes de inmediato a tu bot de Telegram.
+
