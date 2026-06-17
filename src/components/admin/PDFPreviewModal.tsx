@@ -3,7 +3,15 @@ import { logger } from '@/lib/logger/security-logger';
 
 import React, { useEffect, useState, useCallback } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
-import { Download, FileText, CheckCircle2, AlertCircle, X, AlertTriangle, ExternalLink } from 'lucide-react';
+import {
+  Download,
+  FileText,
+  CheckCircle2,
+  AlertCircle,
+  X,
+  AlertTriangle,
+  ExternalLink,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface PDFPreviewModalProps {
@@ -162,7 +170,8 @@ export function PDFPreviewModal({ isOpen, onClose, base64, filename }: PDFPrevie
                     Escudo de Seguridad CSP Activo
                   </h3>
                   <p className="text-xs text-slate-400 max-w-sm leading-relaxed mb-6">
-                    Para blindar la plataforma contra inyecciones XSS y fugas de PII, las directivas de seguridad restringen la previsualización incrustada. Abra el visor seguro.
+                    Para blindar la plataforma contra inyecciones XSS y fugas de PII, las directivas
+                    de seguridad restringen la previsualización incrustada. Abra el visor seguro.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3 w-full max-w-xs justify-center">
                     <button

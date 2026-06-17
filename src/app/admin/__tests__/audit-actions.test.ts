@@ -4,8 +4,26 @@ import { verifyGodMode } from '../audit-actions';
 
 // Mock del Rate Limiter para pruebas
 vi.mock('@/lib/security/rate-limit', () => ({
-  rateLimit: vi.fn(() => Promise.resolve({ success: true, blocked: false, remaining: 5, reset: 0, totalRequests: 0, isError: false })),
-  checkRateLimit: vi.fn(() => Promise.resolve({ success: true, blocked: false, limit: 5, remaining: 5, resetTime: 0, isError: false })),
+  rateLimit: vi.fn(() =>
+    Promise.resolve({
+      success: true,
+      blocked: false,
+      remaining: 5,
+      reset: 0,
+      totalRequests: 0,
+      isError: false,
+    })
+  ),
+  checkRateLimit: vi.fn(() =>
+    Promise.resolve({
+      success: true,
+      blocked: false,
+      limit: 5,
+      remaining: 5,
+      resetTime: 0,
+      isError: false,
+    })
+  ),
 }));
 
 // Mock de las cookies de Next.js

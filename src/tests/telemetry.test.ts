@@ -16,7 +16,7 @@ vi.mock('@/lib/security/rate-limit', () => ({
   rateLimit: vi.fn(async (identifier, limit, windowMs) => {
     const data = mockCooldowns.get(identifier) as { count: number; expiresAt: number } | undefined;
     const now = Date.now();
-    
+
     if (data && data.expiresAt > now) {
       if (data.count >= limit) {
         return {
@@ -51,7 +51,16 @@ vi.mock('@/lib/security/rate-limit', () => ({
       };
     }
   }),
-  checkRateLimit: vi.fn(() => Promise.resolve({ success: true, blocked: false, limit: 5, remaining: 5, resetTime: 0, isError: false })),
+  checkRateLimit: vi.fn(() =>
+    Promise.resolve({
+      success: true,
+      blocked: false,
+      limit: 5,
+      remaining: 5,
+      resetTime: 0,
+      isError: false,
+    })
+  ),
 }));
 
 vi.mock('firebase-admin/firestore', () => ({

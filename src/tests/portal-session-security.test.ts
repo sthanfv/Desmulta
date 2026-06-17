@@ -17,7 +17,16 @@ vi.mock('next/headers', () => ({
 
 vi.mock('@/lib/security/rate-limit', () => ({
   rateLimit: vi.fn(() => Promise.resolve({ success: true, reset: 0, isError: false })),
-  checkRateLimit: vi.fn(() => Promise.resolve({ success: true, blocked: false, limit: 5, remaining: 5, resetTime: 0, isError: false })),
+  checkRateLimit: vi.fn(() =>
+    Promise.resolve({
+      success: true,
+      blocked: false,
+      limit: 5,
+      remaining: 5,
+      resetTime: 0,
+      isError: false,
+    })
+  ),
 }));
 
 vi.mock('@/lib/firebase-admin', () => ({

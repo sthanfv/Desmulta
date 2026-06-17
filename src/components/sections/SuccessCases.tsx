@@ -313,13 +313,15 @@ export const SuccessCases = ({ showcaseData }: SuccessCasesProps) => {
               if (Array.isArray(cases) && cases.length > 0) {
                 setDynamicCases(cases);
               } else if (showcaseData.beforeImageUrl && showcaseData.afterImageUrl) {
-                setDynamicCases([{
-                  id: 'static-0',
-                  title: 'Caso de Demostración (Simulado)',
-                  beforeImageUrl: showcaseData.beforeImageUrl,
-                  afterImageUrl: showcaseData.afterImageUrl,
-                  createdAt: new Date().toISOString(),
-                }]);
+                setDynamicCases([
+                  {
+                    id: 'static-0',
+                    title: 'Caso de Demostración (Simulado)',
+                    beforeImageUrl: showcaseData.beforeImageUrl,
+                    afterImageUrl: showcaseData.afterImageUrl,
+                    createdAt: new Date().toISOString(),
+                  },
+                ]);
               }
             })
             .catch((err) => Sentry.captureException(err))
@@ -353,244 +355,246 @@ export const SuccessCases = ({ showcaseData }: SuccessCasesProps) => {
         className="py-24 px-4 relative"
         aria-label="Casos de éxito verificados"
       >
-      <div className="max-w-4xl mx-auto text-center space-y-16">
-        {/* Encabezado */}
-        <div className="space-y-4">
-          <h2 className="text-2xl md:text-5xl font-black text-foreground tracking-tight">
-            Nuestros <span className="text-primary italic">Casos de Éxito</span>
-          </h2>
-          <div className="flex flex-col items-center gap-2">
-            <div className="text-4xl md:text-7xl font-black text-foreground tracking-tighter drop-shadow-sm">
-              {showcaseData.counterValue || '1800+'}
-            </div>
-            <div className="text-sm md:text-base font-black uppercase tracking-[0.3em] text-primary">
-              {showcaseData.counterLabel || 'Sanciones Eliminadas'}
-            </div>
-          </div>
-          <p className="text-lg md:text-xl text-muted-foreground font-medium max-w-2xl mx-auto reveal reveal-delay-1">
-            Transparencia total. Desliza la barra para comparar la reducción de las deudas en SIMIT
-            reales procesados por nosotros.
-          </p>
-        </div>
-
-        {/* Galería Premium */}
-        {isLoading ? (
-          /* Skeleton — se muestra mientras el IntersectionObserver aún no disparó
-           * o mientras el fetch está en vuelo. */
-          <SkeletonSlider />
-        ) : hayImagenes ? (
+        <div className="max-w-4xl mx-auto text-center space-y-16">
+          {/* Encabezado */}
           <div className="space-y-4">
-            {/* Contador de casos */}
-            {dynamicCases.length > 1 && (
-              <div className="flex items-center justify-center gap-3">
-                <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-                  Caso {activeIndex + 1} de {dynamicCases.length}
-                </span>
+            <h2 className="text-2xl md:text-5xl font-black text-foreground tracking-tight">
+              Nuestros <span className="text-primary italic">Casos de Éxito</span>
+            </h2>
+            <div className="flex flex-col items-center gap-2">
+              <div className="text-4xl md:text-7xl font-black text-foreground tracking-tighter drop-shadow-sm">
+                {showcaseData.counterValue || '1800+'}
               </div>
-            )}
-
-            {/* Slider con flechas y swipe */}
-            <div
-              className="relative p-2 md:p-3 rounded-[2.5rem] bg-gradient-to-br from-primary/10 via-background to-background shadow-inner border border-primary/10"
-              onTouchStart={handleSwipeStart}
-              onTouchEnd={handleSwipeEnd}
-            >
-              {/* Flecha izquierda */}
-              {dynamicCases.length > 1 && (
-                <button
-                  onClick={irAlAnterior}
-                  className="absolute left-2 md:left-0 top-1/2 -translate-y-1/2 md:-translate-x-6 z-20 w-10 h-10 rounded-full bg-background/90 border border-border shadow-lg flex items-center justify-center hover:bg-primary/10 hover:border-primary/30 transition-all active:scale-90"
-                  aria-label="Caso anterior"
-                >
-                  <svg
-                    className="w-4 h-4"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2.5}
-                  >
-                    <path d="M15 18l-6-6 6-6" />
-                  </svg>
-                </button>
-              )}
-
-              <div className="bg-card/40 shadow-2xl rounded-[2rem] overflow-hidden border border-white/5 relative group flex items-center justify-center">
-                {/* Texto de marca de agua en el fondo (visible durante la transición) */}
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0">
-                  <span className="text-4xl md:text-7xl font-black uppercase tracking-[0.25em] text-foreground/5 dark:text-white/5 animate-pulse">
-                    Desmulta
-                  </span>
-                </div>
-
-                {/* Título del caso activo */}
-                {dynamicCases[activeIndex]?.title && (
-                  <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 px-4 py-1.5 bg-black/60 backdrop-blur-md border border-white/10 rounded-full pointer-events-none">
-                    <span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-white/90">
-                      {dynamicCases[activeIndex].title}
-                    </span>
-                  </div>
-                )}
-                <AnimatePresence mode="wait">
-                  <m.div
-                    key={dynamicCases[activeIndex]?.id || activeIndex}
-                    initial={{ opacity: 0, scale: 0.98, filter: 'blur(4px)' }}
-                    animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-                    exit={{ opacity: 0, scale: 1.02, filter: 'blur(4px)' }}
-                    transition={{ duration: 0.25, ease: 'easeInOut' }}
-                    className="w-full h-full z-10 relative"
-                  >
-                    <ImageSlider
-                      beforeSrc={currentBefore}
-                      afterSrc={currentAfter}
-                      onExpand={() => {
-                        setEscalaZoom(1);
-                        setVisorAbierto(true);
-                      }}
-                    />
-                  </m.div>
-                </AnimatePresence>
+              <div className="text-sm md:text-base font-black uppercase tracking-[0.3em] text-primary">
+                {showcaseData.counterLabel || 'Sanciones Eliminadas'}
               </div>
-
-              {/* Flecha derecha */}
-              {dynamicCases.length > 1 && (
-                <button
-                  onClick={irAlSiguiente}
-                  className="absolute right-2 md:right-0 top-1/2 -translate-y-1/2 md:translate-x-6 z-20 w-10 h-10 rounded-full bg-background/90 border border-border shadow-lg flex items-center justify-center hover:bg-primary/10 hover:border-primary/30 transition-all active:scale-90"
-                  aria-label="Caso siguiente"
-                >
-                  <svg
-                    className="w-4 h-4"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2.5}
-                  >
-                    <path d="M9 18l6-6-6-6" />
-                  </svg>
-                </button>
-              )}
             </div>
-
-            {/* Puntos indicadores (más limpios que los botones de texto) */}
-            {dynamicCases.length > 1 && (
-              <div className="flex justify-center gap-2 mt-2">
-                {dynamicCases.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => {
-                      setActiveIndex(idx);
-                      Haptics.impact();
-                    }}
-                    className={`rounded-full transition-all duration-300 ${
-                      idx === activeIndex
-                        ? 'w-6 h-2 bg-primary'
-                        : 'w-2 h-2 bg-muted-foreground/30 hover:bg-muted-foreground/60'
-                    }`}
-                    aria-label={`Ir al caso ${idx + 1}`}
-                  />
-                ))}
-              </div>
-            )}
-
-            <p className="text-[10px] md:text-[11px] text-muted-foreground/60 italic mt-4 max-w-md mx-auto text-center leading-relaxed">
-              * Nota: Las imágenes y montos presentados son recreaciones ilustrativas y simuladas para garantizar la estricta confidencialidad y protección de datos personales de los ciudadanos (cumplimiento Zero-PII).
+            <p className="text-lg md:text-xl text-muted-foreground font-medium max-w-2xl mx-auto reveal reveal-delay-1">
+              Transparencia total. Desliza la barra para comparar la reducción de las deudas en
+              SIMIT reales procesados por nosotros.
             </p>
           </div>
-        ) : (
-          /* Sin imágenes ni en Firestore ni en los valores por defecto */
-          <div className="relative group p-4 rounded-[4rem] bg-gradient-to-br from-primary/30 via-primary/5 to-transparent shadow-inner opacity-50">
-            <div className="bg-card/80 backdrop-blur-md overflow-hidden p-3 shadow-2xl border-white/10 rounded-[3.5rem]">
-              <div className="aspect-[16/9] relative rounded-[3rem] overflow-hidden flex items-center justify-center bg-muted/20">
-                <p className="font-bold text-muted-foreground p-12 text-center">
-                  Los casos de éxito estarán disponibles próximamente.
-                </p>
+
+          {/* Galería Premium */}
+          {isLoading ? (
+            /* Skeleton — se muestra mientras el IntersectionObserver aún no disparó
+             * o mientras el fetch está en vuelo. */
+            <SkeletonSlider />
+          ) : hayImagenes ? (
+            <div className="space-y-4">
+              {/* Contador de casos */}
+              {dynamicCases.length > 1 && (
+                <div className="flex items-center justify-center gap-3">
+                  <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                    Caso {activeIndex + 1} de {dynamicCases.length}
+                  </span>
+                </div>
+              )}
+
+              {/* Slider con flechas y swipe */}
+              <div
+                className="relative p-2 md:p-3 rounded-[2.5rem] bg-gradient-to-br from-primary/10 via-background to-background shadow-inner border border-primary/10"
+                onTouchStart={handleSwipeStart}
+                onTouchEnd={handleSwipeEnd}
+              >
+                {/* Flecha izquierda */}
+                {dynamicCases.length > 1 && (
+                  <button
+                    onClick={irAlAnterior}
+                    className="absolute left-2 md:left-0 top-1/2 -translate-y-1/2 md:-translate-x-6 z-20 w-10 h-10 rounded-full bg-background/90 border border-border shadow-lg flex items-center justify-center hover:bg-primary/10 hover:border-primary/30 transition-all active:scale-90"
+                    aria-label="Caso anterior"
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2.5}
+                    >
+                      <path d="M15 18l-6-6 6-6" />
+                    </svg>
+                  </button>
+                )}
+
+                <div className="bg-card/40 shadow-2xl rounded-[2rem] overflow-hidden border border-white/5 relative group flex items-center justify-center">
+                  {/* Texto de marca de agua en el fondo (visible durante la transición) */}
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0">
+                    <span className="text-4xl md:text-7xl font-black uppercase tracking-[0.25em] text-foreground/5 dark:text-white/5 animate-pulse">
+                      Desmulta
+                    </span>
+                  </div>
+
+                  {/* Título del caso activo */}
+                  {dynamicCases[activeIndex]?.title && (
+                    <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 px-4 py-1.5 bg-black/60 backdrop-blur-md border border-white/10 rounded-full pointer-events-none">
+                      <span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-white/90">
+                        {dynamicCases[activeIndex].title}
+                      </span>
+                    </div>
+                  )}
+                  <AnimatePresence mode="wait">
+                    <m.div
+                      key={dynamicCases[activeIndex]?.id || activeIndex}
+                      initial={{ opacity: 0, scale: 0.98, filter: 'blur(4px)' }}
+                      animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+                      exit={{ opacity: 0, scale: 1.02, filter: 'blur(4px)' }}
+                      transition={{ duration: 0.25, ease: 'easeInOut' }}
+                      className="w-full h-full z-10 relative"
+                    >
+                      <ImageSlider
+                        beforeSrc={currentBefore}
+                        afterSrc={currentAfter}
+                        onExpand={() => {
+                          setEscalaZoom(1);
+                          setVisorAbierto(true);
+                        }}
+                      />
+                    </m.div>
+                  </AnimatePresence>
+                </div>
+
+                {/* Flecha derecha */}
+                {dynamicCases.length > 1 && (
+                  <button
+                    onClick={irAlSiguiente}
+                    className="absolute right-2 md:right-0 top-1/2 -translate-y-1/2 md:translate-x-6 z-20 w-10 h-10 rounded-full bg-background/90 border border-border shadow-lg flex items-center justify-center hover:bg-primary/10 hover:border-primary/30 transition-all active:scale-90"
+                    aria-label="Caso siguiente"
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2.5}
+                    >
+                      <path d="M9 18l6-6-6-6" />
+                    </svg>
+                  </button>
+                )}
+              </div>
+
+              {/* Puntos indicadores (más limpios que los botones de texto) */}
+              {dynamicCases.length > 1 && (
+                <div className="flex justify-center gap-2 mt-2">
+                  {dynamicCases.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => {
+                        setActiveIndex(idx);
+                        Haptics.impact();
+                      }}
+                      className={`rounded-full transition-all duration-300 ${
+                        idx === activeIndex
+                          ? 'w-6 h-2 bg-primary'
+                          : 'w-2 h-2 bg-muted-foreground/30 hover:bg-muted-foreground/60'
+                      }`}
+                      aria-label={`Ir al caso ${idx + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
+
+              <p className="text-[10px] md:text-[11px] text-muted-foreground/60 italic mt-4 max-w-md mx-auto text-center leading-relaxed">
+                * Nota: Las imágenes y montos presentados son recreaciones ilustrativas y simuladas
+                para garantizar la estricta confidencialidad y protección de datos personales de los
+                ciudadanos (cumplimiento Zero-PII).
+              </p>
+            </div>
+          ) : (
+            /* Sin imágenes ni en Firestore ni en los valores por defecto */
+            <div className="relative group p-4 rounded-[4rem] bg-gradient-to-br from-primary/30 via-primary/5 to-transparent shadow-inner opacity-50">
+              <div className="bg-card/80 backdrop-blur-md overflow-hidden p-3 shadow-2xl border-white/10 rounded-[3.5rem]">
+                <div className="aspect-[16/9] relative rounded-[3rem] overflow-hidden flex items-center justify-center bg-muted/20">
+                  <p className="font-bold text-muted-foreground p-12 text-center">
+                    Los casos de éxito estarán disponibles próximamente.
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
 
-      {/* ═══════════════════════════════════════════════════════════════════
-       * MODAL GLASSMORPHISM: VISOR PANTALLA COMPLETA v7.4.3
-       * React Portal: Evita quedar atrapado en Stacking Contexts (Z-Index)
-       * para flotar nativamente sobre el Header y los botones flotantes.
-       * ═══════════════════════════════════════════════════════════════════ */}
-      {typeof document !== 'undefined' &&
-        createPortal(
-          <AnimatePresence>
-            {visorAbierto && (
-              <m.div
-                initial={{ opacity: 0, backdropFilter: 'blur(0px)' }}
-                animate={{ opacity: 1, backdropFilter: 'blur(24px)' }}
-                exit={{ opacity: 0, backdropFilter: 'blur(0px)' }}
-                transition={{ duration: 0.3 }}
-                className="fixed inset-0 z-[999999] bg-black/80 flex flex-col"
-                role="dialog"
-                aria-modal="true"
-              >
-                {/* Toolbar Superior Glass */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-black/40 shrink-0 z-50">
-                  <span className="text-[10px] md:text-xs font-black tracking-[0.2em] uppercase text-white/70">
-                    Evidencia de Condonación
-                  </span>
-
-                  <div className="flex gap-2 items-center">
-                    <button
-                      onClick={() => ajustarZoom(-0.5)}
-                      disabled={escalaZoom <= 1}
-                      className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 disabled:opacity-30 transition-all flex items-center justify-center text-white"
-                    >
-                      <ZoomOut className="w-5 h-5" />
-                    </button>
-                    <span className="text-xs font-bold text-white w-12 text-center tabular-nums">
-                      {Math.round(escalaZoom * 100)}%
+        {/* ═══════════════════════════════════════════════════════════════════
+         * MODAL GLASSMORPHISM: VISOR PANTALLA COMPLETA v7.4.3
+         * React Portal: Evita quedar atrapado en Stacking Contexts (Z-Index)
+         * para flotar nativamente sobre el Header y los botones flotantes.
+         * ═══════════════════════════════════════════════════════════════════ */}
+        {typeof document !== 'undefined' &&
+          createPortal(
+            <AnimatePresence>
+              {visorAbierto && (
+                <m.div
+                  initial={{ opacity: 0, backdropFilter: 'blur(0px)' }}
+                  animate={{ opacity: 1, backdropFilter: 'blur(24px)' }}
+                  exit={{ opacity: 0, backdropFilter: 'blur(0px)' }}
+                  transition={{ duration: 0.3 }}
+                  className="fixed inset-0 z-[999999] bg-black/80 flex flex-col"
+                  role="dialog"
+                  aria-modal="true"
+                >
+                  {/* Toolbar Superior Glass */}
+                  <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-black/40 shrink-0 z-50">
+                    <span className="text-[10px] md:text-xs font-black tracking-[0.2em] uppercase text-white/70">
+                      Evidencia de Condonación
                     </span>
-                    <button
-                      onClick={() => ajustarZoom(0.5)}
-                      disabled={escalaZoom >= 4}
-                      className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 disabled:opacity-30 transition-all flex items-center justify-center text-white mr-2"
-                    >
-                      <ZoomIn className="w-5 h-5" />
-                    </button>
 
-                    <button
-                      onClick={() => setVisorAbierto(false)}
-                      className="w-10 h-10 rounded-full bg-red-500/20 hover:bg-red-500/50 transition-all flex items-center justify-center text-white ml-2"
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
+                    <div className="flex gap-2 items-center">
+                      <button
+                        onClick={() => ajustarZoom(-0.5)}
+                        disabled={escalaZoom <= 1}
+                        className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 disabled:opacity-30 transition-all flex items-center justify-center text-white"
+                      >
+                        <ZoomOut className="w-5 h-5" />
+                      </button>
+                      <span className="text-xs font-bold text-white w-12 text-center tabular-nums">
+                        {Math.round(escalaZoom * 100)}%
+                      </span>
+                      <button
+                        onClick={() => ajustarZoom(0.5)}
+                        disabled={escalaZoom >= 4}
+                        className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 disabled:opacity-30 transition-all flex items-center justify-center text-white mr-2"
+                      >
+                        <ZoomIn className="w-5 h-5" />
+                      </button>
+
+                      <button
+                        onClick={() => setVisorAbierto(false)}
+                        className="w-10 h-10 rounded-full bg-red-500/20 hover:bg-red-500/50 transition-all flex items-center justify-center text-white ml-2"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
                   </div>
-                </div>
 
-                {/* Contenedor del Slider en FullScreen */}
-                <div className="flex-1 relative overflow-hidden flex items-center justify-center p-4">
-                  <m.div
-                    className="w-full max-w-5xl h-full relative"
-                    initial={{ scale: 0.9, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                  >
-                    <ImageSlider
-                      key={`fullscreen-${dynamicCases[activeIndex]?.id || activeIndex}`}
-                      beforeSrc={currentBefore}
-                      afterSrc={currentAfter}
-                      isExpanded={true}
-                      zoomScale={escalaZoom}
-                    />
-                  </m.div>
-                </div>
+                  {/* Contenedor del Slider en FullScreen */}
+                  <div className="flex-1 relative overflow-hidden flex items-center justify-center p-4">
+                    <m.div
+                      className="w-full max-w-5xl h-full relative"
+                      initial={{ scale: 0.9, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                    >
+                      <ImageSlider
+                        key={`fullscreen-${dynamicCases[activeIndex]?.id || activeIndex}`}
+                        beforeSrc={currentBefore}
+                        afterSrc={currentAfter}
+                        isExpanded={true}
+                        zoomScale={escalaZoom}
+                      />
+                    </m.div>
+                  </div>
 
-                {/* Helper footer */}
-                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 px-6 py-2 bg-black/60 backdrop-blur-xl border border-white/20 rounded-full pointer-events-none">
-                  <span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-emerald-400">
-                    Desliza la barra central
-                  </span>
-                </div>
-              </m.div>
-            )}
-          </AnimatePresence>,
-          document.body
-        )}
+                  {/* Helper footer */}
+                  <div className="absolute bottom-6 left-1/2 -translate-x-1/2 px-6 py-2 bg-black/60 backdrop-blur-xl border border-white/20 rounded-full pointer-events-none">
+                    <span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-emerald-400">
+                      Desliza la barra central
+                    </span>
+                  </div>
+                </m.div>
+              )}
+            </AnimatePresence>,
+            document.body
+          )}
       </section>
     </LazyMotion>
   );

@@ -2,16 +2,16 @@ import React from 'react';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { 
-  ShieldCheck, 
-  ArrowRight, 
-  BookOpen, 
-  AlertTriangle, 
-  Scale, 
-  DollarSign, 
+import {
+  ShieldCheck,
+  ArrowRight,
+  BookOpen,
+  AlertTriangle,
+  Scale,
+  DollarSign,
   CarFront,
   ShieldAlert,
-  ArrowLeft
+  ArrowLeft,
 } from 'lucide-react';
 import codigosInfraccionData from '@/lib/data/codigos-infraccion.json';
 
@@ -37,7 +37,10 @@ function parseBoldText(text: string) {
   return parts.map((part, index) => {
     if (part.startsWith('**') && part.endsWith('**')) {
       return (
-        <strong key={index} className="text-white font-extrabold underline decoration-primary/30 underline-offset-2">
+        <strong
+          key={index}
+          className="text-white font-extrabold underline decoration-primary/30 underline-offset-2"
+        >
           {part.slice(2, -2)}
         </strong>
       );
@@ -49,7 +52,9 @@ function parseBoldText(text: string) {
 // Generar metadatos SEO dinámicos
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const params = await props.params;
-  const infraccion = codigosInfraccionData.find((i) => i.codigo.toUpperCase() === params.codigo.toUpperCase());
+  const infraccion = codigosInfraccionData.find(
+    (i) => i.codigo.toUpperCase() === params.codigo.toUpperCase()
+  );
 
   if (!infraccion) {
     return { title: 'Infracción no encontrada | Desmulta' };
@@ -64,7 +69,9 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
 export default async function CodigoInfraccionPage(props: Props) {
   const params = await props.params;
-  const infraccion = codigosInfraccionData.find((i) => i.codigo.toUpperCase() === params.codigo.toUpperCase());
+  const infraccion = codigosInfraccionData.find(
+    (i) => i.codigo.toUpperCase() === params.codigo.toUpperCase()
+  );
 
   if (!infraccion) {
     notFound();
@@ -102,12 +109,15 @@ export default async function CodigoInfraccionPage(props: Props) {
             <ShieldAlert size={30} className="text-primary" />
           </div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight mb-6 leading-tight uppercase">
-            Infracción <span className="text-primary font-mono">{infraccion.codigo}</span>: <br className="hidden sm:inline" />
+            Infracción <span className="text-primary font-mono">{infraccion.codigo}</span>:{' '}
+            <br className="hidden sm:inline" />
             <span className="text-white/95">{infraccion.nombre}</span>
           </h1>
           <p className="text-lg md:text-xl text-slate-300 leading-relaxed font-medium">
-            ¿Te impusieron una orden de comparendo con el código <strong className="text-primary font-mono">{infraccion.codigo}</strong>? 
-            Esta falta clasifica dentro del Código Nacional de Tránsito y cuenta con especificaciones de precio y viabilidad de apelación.
+            ¿Te impusieron una orden de comparendo con el código{' '}
+            <strong className="text-primary font-mono">{infraccion.codigo}</strong>? Esta falta
+            clasifica dentro del Código Nacional de Tránsito y cuenta con especificaciones de precio
+            y viabilidad de apelación.
           </p>
         </div>
       </section>
@@ -122,7 +132,9 @@ export default async function CodigoInfraccionPage(props: Props) {
                 <AlertTriangle size={20} />
               </div>
               <div>
-                <p className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Gravedad</p>
+                <p className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">
+                  Gravedad
+                </p>
                 <p className="text-sm font-black text-white">{infraccion.gravedad}</p>
               </div>
             </div>
@@ -133,19 +145,29 @@ export default async function CodigoInfraccionPage(props: Props) {
                 <DollarSign size={20} />
               </div>
               <div>
-                <p className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Valor Sanción (2026)</p>
-                <p className="text-sm font-black text-primary font-mono">{infraccion.sancion_cop}</p>
+                <p className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">
+                  Valor Sanción (2026)
+                </p>
+                <p className="text-sm font-black text-primary font-mono">
+                  {infraccion.sancion_cop}
+                </p>
               </div>
             </div>
 
             {/* Inmoviliza */}
             <div className="flex items-center gap-4 p-3">
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${infraccion.inmoviliza ? 'bg-red-500/10 text-red-500' : 'bg-emerald-500/10 text-emerald-500'}`}>
+              <div
+                className={`w-10 h-10 rounded-xl flex items-center justify-center ${infraccion.inmoviliza ? 'bg-red-500/10 text-red-500' : 'bg-emerald-500/10 text-emerald-500'}`}
+              >
                 <CarFront size={20} />
               </div>
               <div>
-                <p className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">¿Da Inmovilización?</p>
-                <p className={`text-sm font-black ${infraccion.inmoviliza ? 'text-red-500' : 'text-emerald-500'}`}>
+                <p className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">
+                  ¿Da Inmovilización?
+                </p>
+                <p
+                  className={`text-sm font-black ${infraccion.inmoviliza ? 'text-red-500' : 'text-emerald-500'}`}
+                >
                   {infraccion.inmoviliza ? 'SÍ (Patio)' : 'NO'}
                 </p>
               </div>
@@ -159,7 +181,7 @@ export default async function CodigoInfraccionPage(props: Props) {
         <div className="max-w-4xl mx-auto">
           <div className="bg-white/5 backdrop-blur-xl rounded-[2.5rem] border border-white/10 p-8 shadow-2xl relative overflow-hidden">
             <div className="absolute top-0 right-0 w-48 h-48 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
-            
+
             <div className="flex flex-col md:flex-row items-start gap-6 relative z-10">
               <div className="shrink-0 p-4 bg-white/5 border border-white/10 rounded-2xl">
                 <BookOpen size={28} className="text-primary" />
@@ -174,9 +196,7 @@ export default async function CodigoInfraccionPage(props: Props) {
 
                 <div className="flex items-start gap-3 p-4 bg-primary/10 border border-primary/20 rounded-2xl text-xs text-primary font-bold uppercase tracking-wider">
                   <ShieldCheck size={18} className="shrink-0 mt-0.5" />
-                  <span>
-                    Defensa clave: {parseBoldText(infraccion.defensa_clave)}
-                  </span>
+                  <span>Defensa clave: {parseBoldText(infraccion.defensa_clave)}</span>
                 </div>
               </div>
             </div>
@@ -192,8 +212,10 @@ export default async function CodigoInfraccionPage(props: Props) {
             Inicia tu defensa gratis ahora mismo
           </h2>
           <p className="text-slate-400 mb-10 text-sm md:text-base leading-relaxed max-w-xl mx-auto font-medium">
-            Sube la captura o el archivo PDF de tu comparendo del SIMIT. Nuestro escáner heurístico 
-            con OCR e inteligencia legal verificará de inmediato si el comparendo <strong className="text-primary font-mono">{infraccion.codigo}</strong> cumple con todos los requisitos del debido proceso.
+            Sube la captura o el archivo PDF de tu comparendo del SIMIT. Nuestro escáner heurístico
+            con OCR e inteligencia legal verificará de inmediato si el comparendo{' '}
+            <strong className="text-primary font-mono">{infraccion.codigo}</strong> cumple con todos
+            los requisitos del debido proceso.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link

@@ -1,6 +1,30 @@
 import fs from 'fs';
 import path from 'path';
 
+// Helper para cargar variables de entorno del archivo .env local de forma manual (sin dependencias)
+function loadEnv() {
+  const envPath = path.resolve(process.cwd(), '.env');
+  if (fs.existsSync(envPath)) {
+    const envContent = fs.readFileSync(envPath, 'utf8');
+    envContent.split(/\r?\n/).forEach((line) => {
+      // Ignorar líneas vacías o comentarios
+      if (line.trim().startsWith('#') || !line.includes('=')) return;
+      const match = line.match(/^\s*([\w.-]+)\s*=\s*(.*)$/);
+      if (match) {
+        const key = match[1];
+        let value = match[2].trim();
+        // Quitar comillas simples o dobles si existen
+        if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+          value = value.slice(1, -1);
+        }
+        process.env[key] = value;
+      }
+    });
+  }
+}
+
+loadEnv();
+
 const RSS_URL = process.env.BLOG_RSS_URL || 'https://diariodetransporte.com/feed/';
 const BLOG_DIR = path.resolve(process.cwd(), 'src/content/blog');
 

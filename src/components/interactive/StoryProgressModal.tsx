@@ -2,7 +2,17 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
-import { X, Share2, Play, Pause, Shield, Clock, FileCheck, CheckCircle2, MessageCircle } from 'lucide-react';
+import {
+  X,
+  Share2,
+  Play,
+  Pause,
+  Shield,
+  Clock,
+  FileCheck,
+  CheckCircle2,
+  MessageCircle,
+} from 'lucide-react';
 import { TrackingCase } from '@/lib/definitions';
 import { Haptics } from '@/lib/utils/haptics';
 
@@ -14,10 +24,38 @@ interface StoryProgressModalProps {
 }
 
 const PASOS_STORY = [
-  { id: 1, name: 'Recibido', key: 'pendiente', desc: 'Tu solicitud fue recibida y está en cola de revisión por nuestro equipo legal.', icon: Clock, color: 'from-blue-500 to-cyan-500' },
-  { id: 2, name: 'Contactado', key: 'contactado', desc: '¡Especialista asignado! Un asesor legal se ha puesto en contacto contigo para coordinar la defensa.', icon: MessageCircle, color: 'from-amber-500 to-orange-500' },
-  { id: 3, name: 'En Estudio', key: 'estudio', desc: 'Tu caso está en análisis técnico avanzado. Estudiamos las fallas del SIMIT para impugnar.', icon: Shield, color: 'from-purple-500 to-indigo-500' },
-  { id: 4, name: 'Resuelto', key: 'terminado', desc: '¡Gestión concluida con éxito! Verifica tu estado en la plataforma de tránsito.', icon: FileCheck, color: 'from-emerald-500 to-teal-500' },
+  {
+    id: 1,
+    name: 'Recibido',
+    key: 'pendiente',
+    desc: 'Tu solicitud fue recibida y está en cola de revisión por nuestro equipo legal.',
+    icon: Clock,
+    color: 'from-blue-500 to-cyan-500',
+  },
+  {
+    id: 2,
+    name: 'Contactado',
+    key: 'contactado',
+    desc: '¡Especialista asignado! Un asesor legal se ha puesto en contacto contigo para coordinar la defensa.',
+    icon: MessageCircle,
+    color: 'from-amber-500 to-orange-500',
+  },
+  {
+    id: 3,
+    name: 'En Estudio',
+    key: 'estudio',
+    desc: 'Tu caso está en análisis técnico avanzado. Estudiamos las fallas del SIMIT para impugnar.',
+    icon: Shield,
+    color: 'from-purple-500 to-indigo-500',
+  },
+  {
+    id: 4,
+    name: 'Resuelto',
+    key: 'terminado',
+    desc: '¡Gestión concluida con éxito! Verifica tu estado en la plataforma de tránsito.',
+    icon: FileCheck,
+    color: 'from-emerald-500 to-teal-500',
+  },
 ];
 
 const DURACION_PASO_MS = 4000; // 4 segundos por story
@@ -143,7 +181,9 @@ export default function StoryProgressModal({
     const title = `Progreso de mi Caso - Radicado ${caseData.shortId}`;
     const text = `¡Mi trámite con Desmulta.online va en el paso: ${activeStep.name}! Escanea o entra al enlace para ver el progreso real.`;
 
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    );
 
     if (isMobile && navigator.share) {
       try {
@@ -168,7 +208,7 @@ export default function StoryProgressModal({
   return (
     <div className="fixed inset-0 z-[999999] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4">
       {/* Contenedor tipo móvil con Glassmorphism */}
-      <div 
+      <div
         className="relative aspect-[9/16] w-full max-w-sm max-h-[85vh] md:max-h-[80vh] rounded-[2.5rem] overflow-hidden bg-zinc-950 border border-white/10 shadow-[0_0_80px_rgba(212,175,55,0.15)] flex flex-col justify-between p-6 select-none"
         onPointerDown={() => setIsPaused(true)}
         onPointerUp={() => setIsPaused(false)}
@@ -190,13 +230,16 @@ export default function StoryProgressModal({
               const isLocked = paso.id > maxReachedStep;
 
               return (
-                <div 
-                  key={paso.id} 
+                <div
+                  key={paso.id}
                   className={`h-1 flex-1 rounded-full overflow-hidden transition-all duration-300 ${isLocked ? 'bg-zinc-800/40' : 'bg-zinc-800'}`}
                 >
-                  <div 
-                    className="h-full bg-primary rounded-full" 
-                    style={{ width: `${pct}%`, transition: isPaused && idx === activeStepIdx ? 'none' : 'width 30ms linear' }}
+                  <div
+                    className="h-full bg-primary rounded-full"
+                    style={{
+                      width: `${pct}%`,
+                      transition: isPaused && idx === activeStepIdx ? 'none' : 'width 30ms linear',
+                    }}
                   />
                 </div>
               );
@@ -218,17 +261,17 @@ export default function StoryProgressModal({
             </div>
 
             <div className="flex items-center gap-1.5">
-              <button 
+              <button
                 onClick={(e) => {
                   e.stopPropagation();
                   setIsPaused(!isPaused);
                 }}
                 className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-white flex items-center justify-center transition-colors"
-                aria-label={isPaused ? "Reanudar" : "Pausar"}
+                aria-label={isPaused ? 'Reanudar' : 'Pausar'}
               >
                 {isPaused ? <Play size={14} className="fill-white" /> : <Pause size={14} />}
               </button>
-              <button 
+              <button
                 onClick={(e) => {
                   e.stopPropagation();
                   onClose();
@@ -243,7 +286,7 @@ export default function StoryProgressModal({
         </div>
 
         {/* Zona central interactiva (Pantalla táctil) */}
-        <div 
+        <div
           className="flex-1 w-full relative flex items-center justify-center cursor-pointer my-4"
           onClick={handleScreenTouch}
         >
@@ -257,7 +300,9 @@ export default function StoryProgressModal({
               className="w-full flex flex-col items-center justify-center text-center p-4 relative"
             >
               {/* Icono animado del paso actual */}
-              <div className={`w-28 h-28 rounded-[2rem] bg-gradient-to-tr ${activeStep.color} flex items-center justify-center mb-6 shadow-2xl relative border border-white/10`}>
+              <div
+                className={`w-28 h-28 rounded-[2rem] bg-gradient-to-tr ${activeStep.color} flex items-center justify-center mb-6 shadow-2xl relative border border-white/10`}
+              >
                 <div className="absolute inset-0 bg-white/10 rounded-[2rem] filter blur-xl animate-pulse pointer-events-none" />
                 <IconoPaso size={48} className="text-white relative z-10" />
               </div>

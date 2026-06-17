@@ -846,10 +846,10 @@ export async function generarPoderLegal(
         ...data,
         ...updatePayload,
         cedula: overrideData.cedula
-          ? (overrideData.cedula.startsWith('ENC:')
-              ? decryptSymmetric(overrideData.cedula)
-              : overrideData.cedula)
-          : data.cedula
+          ? overrideData.cedula.startsWith('ENC:')
+            ? decryptSymmetric(overrideData.cedula)
+            : overrideData.cedula
+          : data.cedula,
       }; // Reflejar en memoria
 
       // Sincronizar Caché de la plataforma

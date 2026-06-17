@@ -112,7 +112,8 @@ export function ModalDocumentos({
           Escudo de Seguridad CSP Activo
         </h3>
         <p className="text-[10px] text-slate-400 max-w-xs leading-relaxed mb-6">
-          Para blindar la plataforma contra inyecciones XSS y fugas de PII, las directivas de seguridad restringen la previsualización incrustada. Abra el visor seguro.
+          Para blindar la plataforma contra inyecciones XSS y fugas de PII, las directivas de
+          seguridad restringen la previsualización incrustada. Abra el visor seguro.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-2.5 w-full max-w-xs justify-center">
