@@ -154,7 +154,7 @@ async function syncBlogFromRss() {
       const xmlText = await response.text();
       
       // Detectar si el feed es Atom (ej. Google Alerts) o RSS tradicional
-      const isAtom = xmlText.toLowerCase().includes('<feed') && xmlText.toLowerCase().includes('<entry');
+      const isAtom = xmlText.toLowerCase().includes('<feed');
       
       let matches: string[] = [];
       if (isAtom) {
