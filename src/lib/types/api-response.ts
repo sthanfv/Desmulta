@@ -53,6 +53,16 @@ export const API_ERROR_CODES = {
   OCR_TIMEOUT: 'OCR_TIMEOUT',
   /** La imagen enviada no es un documento de tránsito válido. */
   INVALID_DOCUMENT: 'INVALID_DOCUMENT',
+  /** No se proporcionó el header X-Desmulta-Key en el request. */
+  API_KEY_MISSING: 'API_KEY_MISSING',
+  /** La API Key proporcionada no existe o tiene formato inválido. */
+  API_KEY_INVALID: 'API_KEY_INVALID',
+  /** La API Key fue revocada por el administrador. */
+  API_KEY_REVOKED: 'API_KEY_REVOKED',
+  /** La API Key superó su fecha de expiración. */
+  API_KEY_EXPIRED: 'API_KEY_EXPIRED',
+  /** El plan de la API Key superó la quota mensual de requests. */
+  API_KEY_QUOTA_EXCEEDED: 'API_KEY_QUOTA_EXCEEDED',
 } as const;
 
 /** Tipo inferido de los valores del catálogo de códigos. */

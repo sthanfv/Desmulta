@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { checkRateLimit } from '@/lib/security/rate-limit';
 import { logger } from '@/lib/logger/security-logger';
 import { apiError } from '@/lib/types/api-response';
 import {
   extraerComparendo,
   construirAnalisisCompleto,
 } from '@/lib/legal/comparendo-extractor';
+import { validateApiKey, API_KEY_HEADER } from '@/lib/security/api-key-guard';
 
 /**
  * API Route: POST /api/v1/analizar-comparendo
@@ -16,21 +16,17 @@ import {
  * sola llamada el análisis completo: OCR + datos del comparendo + dictamen
  * legal + cálculo financiero.
  *
- * Arquitectura del flujo:
- *   1. Recibe imagen en base64
- *   2. Envía a Gemini con prompt de extracción estructurada JSON
- *   3. Parsea el JSON del comparendo con Zod (ComparendoSchema)
- *   4. Ejecuta PrescriptionEngine con el texto completo extraído
- *   5. Calcula intereses y SMLMV
- *   6. Devuelve AnalisisComparendo completo
+ * Autenticación: Header obligatorio `X-Desmulta-Key: dm_live_...`
  *
- * Autenticación: Rate limit por IP. Fase 2 agrega API Key (X-Desmulta-Key).
+ * Planes:
+ * - Starter:     500 req/mes · 10 req/min
+ * - Growth:     5.000 req/mes · 30 req/min
+ * - Enterprise: 50.000 req/mes · 100 req/min
  *
  * Seguridad:
- * - Rate limit: 3 llamadas por 10 minutos por IP (igual que /api/ocr)
- * - Validación Zod del input
- * - Datos PII nunca se registran en logs
- * - Imagen se procesa en memoria, no se persiste
+ * - 9 capas de validación en api-key-guard.ts
+ * - Cabeceras X-RateLimit para gestión de quota por el cliente
+ * - Sin almacenamiento de imágenes: procesamiento 100% en memoria
  */
 
 export const maxDuration = 60;
@@ -46,9 +42,7 @@ const AnalizarComparendoSchema = z.object({
 
 function getGeminiModel() {
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    throw new Error('[analizar-comparendo] GEMINI_API_KEY no configurada.');
-  }
+  if (!apiKey) throw new Error('[analizar-comparendo] GEMINI_API_KEY no configurada.');
   const genAI = new GoogleGenerativeAI(apiKey);
   return genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 }
@@ -84,39 +78,66 @@ Si ES un documento válido, extrae TODOS los campos visibles y devuelve ÚNICAME
 REGLAS: Devuelve SOLO el JSON. Usa null para campos no visibles. valorMulta es número entero sin $ ni puntos.`;
 
 export async function POST(request: NextRequest) {
-  // 1. Rate limit por IP (usa el mismo límite que /api/ocr: 3 req / 10 min)
-  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-  const rateLimitStatus = await checkRateLimit('ocr', ip);
-  if (!rateLimitStatus.success) {
+  // ══════════════════════════════════════════════════════════════════════
+  // CAPA 1: Autenticación por API Key
+  // ══════════════════════════════════════════════════════════════════════
+  const rawKey = request.headers.get(API_KEY_HEADER);
+  const authResult = await validateApiKey(rawKey);
+
+  if (!authResult.valid) {
+    const statusMap: Record<string, number> = {
+      MISSING: 401,
+      INVALID: 401,
+      REVOKED: 403,
+      EXPIRED: 403,
+      QUOTA_EXCEEDED: 429,
+      RATE_LIMITED: 429,
+    };
+    const httpStatus = statusMap[authResult.errorCode ?? 'INVALID'] ?? 401;
+    const codeMap: Record<string, string> = {
+      MISSING: 'API_KEY_MISSING',
+      INVALID: 'API_KEY_INVALID',
+      REVOKED: 'API_KEY_REVOKED',
+      EXPIRED: 'API_KEY_EXPIRED',
+      QUOTA_EXCEEDED: 'API_KEY_QUOTA_EXCEEDED',
+      RATE_LIMITED: 'RATE_LIMITED',
+    };
+    const errorCode = codeMap[authResult.errorCode ?? 'INVALID'] ?? 'API_KEY_INVALID';
+
     return NextResponse.json(
-      apiError('RATE_LIMITED', 'Demasiadas solicitudes. Espera 10 minutos.'),
-      { status: 429 }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      apiError(errorCode as any, authResult.errorMessage ?? 'No autorizado.'),
+      { status: httpStatus }
     );
   }
 
+  // ══════════════════════════════════════════════════════════════════════
+  // CAPA 2: Validación de entrada
+  // ══════════════════════════════════════════════════════════════════════
+  let body: unknown;
   try {
-    // 2. Validar input
-    let body: unknown;
-    try {
-      body = await request.json();
-    } catch {
-      return NextResponse.json(
-        apiError('VALIDATION_ERROR', 'El cuerpo debe ser JSON válido.'),
-        { status: 400 }
-      );
-    }
+    body = await request.json();
+  } catch {
+    return NextResponse.json(
+      apiError('VALIDATION_ERROR', 'El cuerpo debe ser JSON válido.'),
+      { status: 400 }
+    );
+  }
 
-    const parsed = AnalizarComparendoSchema.safeParse(body);
-    if (!parsed.success) {
-      return NextResponse.json(
-        apiError('VALIDATION_ERROR', 'Datos de entrada inválidos.', parsed.error.flatten()),
-        { status: 400 }
-      );
-    }
+  const parsed = AnalizarComparendoSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json(
+      apiError('VALIDATION_ERROR', 'Datos de entrada inválidos.', parsed.error.flatten()),
+      { status: 400 }
+    );
+  }
 
-    const { imageBase64, mimeType } = parsed.data;
+  const { imageBase64, mimeType } = parsed.data;
 
-    // 3. Llamar a Gemini con el prompt de extracción estructurada
+  // ══════════════════════════════════════════════════════════════════════
+  // CAPA 3: OCR con Gemini
+  // ══════════════════════════════════════════════════════════════════════
+  try {
     const model = getGeminiModel();
 
     const timeoutPromise = new Promise<never>((_, reject) => {
@@ -133,12 +154,11 @@ export async function POST(request: NextRequest) {
 
     const rawRespuesta = result.response.text().trim();
 
-    // 4. Detectar rechazo de documento
+    // Detectar rechazo de documento
     if (
       rawRespuesta === 'NO_VALID_DOCUMENT' ||
       rawRespuesta.includes('"error":"NO_VALID_DOCUMENT"')
     ) {
-      logger.warn('[analizar-comparendo] Imagen rechazada: no es un documento de tránsito', { ip });
       return NextResponse.json(
         apiError(
           'INVALID_DOCUMENT',
@@ -148,7 +168,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 5. Parsear el JSON estructurado de Gemini
+    // Parsear el JSON estructurado de Gemini
     let parsedJSON: Record<string, unknown> | null = null;
     let textoCompleto = rawRespuesta;
 
@@ -161,31 +181,44 @@ export async function POST(request: NextRequest) {
       textoCompleto =
         typeof parsedJSON.textoCompleto === 'string' ? parsedJSON.textoCompleto : rawRespuesta;
     } catch {
-      logger.warn('[analizar-comparendo] Gemini no devolvió JSON estructurado, usando modo texto', {
+      logger.warn('[analizar-comparendo] Gemini devolvió texto crudo (modo legacy)', {
         inicio: rawRespuesta.slice(0, 80),
       });
     }
 
-    // 6. Tipar el comparendo extraído
     const comparendo = extraerComparendo(parsedJSON);
 
-    // 7. Construir el análisis completo (legal + financiero)
     const analisis = construirAnalisisCompleto(
       textoCompleto,
       comparendo,
       'google-gemini-2.5-flash',
-      // Si Gemini devolvió JSON estructurado, asumimos alta confianza
       parsedJSON !== null ? 95 : 60
     );
 
     logger.info('[analizar-comparendo] Análisis completo generado', {
+      plan: authResult.keyDoc?.plan,
       estadoLegal: analisis.analisisLegal.estado,
       isViable: analisis.analisisLegal.isViable,
       modoEstructurado: analisis.ocr.modoEstructurado,
-      tieneValorMulta: analisis.calculadora.valorOriginal !== null,
     });
 
-    return NextResponse.json({ success: true, ...analisis }, { status: 200 });
+    const response = NextResponse.json(
+      {
+        success: true,
+        ...analisis,
+        _meta: {
+          plan: authResult.keyDoc?.plan,
+          remainingMonth: authResult.remainingMonth,
+          remainingMinute: authResult.remainingMinute,
+        },
+      },
+      { status: 200 }
+    );
+
+    response.headers.set('X-RateLimit-Remaining-Month', String(authResult.remainingMonth ?? 0));
+    response.headers.set('X-RateLimit-Remaining-Minute', String(authResult.remainingMinute ?? 0));
+
+    return response;
   } catch (error: unknown) {
     const mensaje = error instanceof Error ? error.message : String(error);
     logger.error('[analizar-comparendo] Error general', { error: mensaje });
@@ -194,7 +227,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         apiError(
           'OCR_TIMEOUT',
-          'El análisis de la imagen tomó demasiado tiempo. Intenta con una imagen más clara o de menor tamaño.'
+          'El análisis tomó demasiado tiempo. Intenta con una imagen más clara o de menor tamaño.'
         ),
         { status: 503 }
       );
