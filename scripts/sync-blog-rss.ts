@@ -184,7 +184,7 @@ async function syncBlogFromRss() {
           // En Atom el link se encuentra como atributo href
           const linkMatch = itemXml.match(/<link\s+(?:[^>]*?\s+)?href="([^"]*)"/i);
           if (linkMatch && linkMatch[1]) {
-            link = linkMatch[1].trim();
+            link = linkMatch[1].trim().replace(/&amp;/g, '&');
             // Limpiar redirecciones de Google Alerts
             if (link.includes('google.com/url?')) {
               try {

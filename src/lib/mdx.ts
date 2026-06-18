@@ -13,6 +13,7 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import { compileMDX } from 'next-mdx-remote/rsc';
+import React from 'react';
 import { type BlogPostMeta } from './mdx-types';
 
 const BLOG_DIR = path.resolve(process.cwd(), 'src/content/blog');
@@ -94,6 +95,15 @@ export async function getBlogPostBySlug(slug: string) {
   const { content, frontmatter } = await compileMDX<BlogPostMeta>({
     source: contenido,
     options: { parseFrontmatter: true },
+    components: {
+      a: (props) =>
+        React.createElement('a', {
+          ...props,
+          target: '_blank',
+          rel: 'noopener noreferrer',
+          className: 'text-primary hover:text-primary/80 font-bold underline transition-colors',
+        }),
+    },
   });
 
   // Bloquear acceso a borradores en producción
