@@ -135,6 +135,14 @@ Si deseas que el sistema publique las noticias de inmediato en tu blog sin tener
 *(Asegúrate de agregar también esta variable en los secretos de tu repositorio de GitHub si tienes GitHub Actions activo, o en tu consola de administración de Vercel).*
 Al activar esta opción, cada noticia que descargue el bot se publicará de manera inmediata e indexará en el sitemap de forma autónoma.
 
+### 🧹 Limpieza Automática de Basura (Evitar acumulación excesiva)
+Para evitar que el blog acumule miles de archivos y llene el repositorio de código de basura a lo largo de los meses, el script incluye un **mecanismo de poda automático**:
+1. El script lee únicamente las noticias importadas automáticamente.
+2. Mantiene en tu repositorio solamente los artículos más recientes configurados en tu variable `MAX_BLOG_POSTS`.
+3. Por defecto, en tu [.env](file:///c:/Workspace/Desmulta/.env) está configurado en `MAX_BLOG_POSTS="30"`.
+4. Cada vez que el script se ejecute, si la cantidad de noticias auto-importadas supera las 30, el script **eliminará automáticamente las noticias más viejas**, dejando intactos los artículos que tú hayas redactado a mano o las noticias más recientes. Así, el blog siempre tiene contenido fresco sin sobrecargar el servidor ni requerir limpieza manual.
+
+
 ### Ejecución Manual (Sin esperar a la noche)
 Si no deseas esperar a que el proceso corra de manera automática por la noche, puedes forzar la sincronización en cualquier momento desde tu terminal local ejecutando el comando:
 ```bash

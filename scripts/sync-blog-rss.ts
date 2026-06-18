@@ -261,9 +261,56 @@ ${cleanContent}
   console.log(`- Total de nuevos borradores creados: ${creados}`);
   console.log(`- Total de noticias existentes omitidas: ${omitidos}`);
 
+  // Podar noticias antiguas para evitar la acumulación excesiva de archivos basura
+  const maxPosts = parseInt(process.env.MAX_BLOG_POSTS || '30', 10);
+  pruneOldPosts(maxPosts);
+
   // Si hay creados y están configuradas las notificaciones de Telegram, notificar al admin
   if (creadosList.length > 0) {
     await notifyTelegram(creadosList);
+  }
+}
+
+// Función para podar/eliminar noticias auto-importadas antiguas y mantener el repositorio limpio
+function pruneOldPosts(maxPosts: number) {
+  try {
+    const files = fs.readdirSync(BLOG_DIR);
+    const posts: { filePath: string; date: string }[] = [];
+
+    files.forEach((file) => {
+      if (!file.endsWith('.mdx')) return;
+      const filePath = path.join(BLOG_DIR, file);
+      const content = fs.readFileSync(filePath, 'utf8');
+
+      // Solo eliminamos posts que hayan sido importados automáticamente
+      if (
+        content.includes('author: "Supertransporte Colombia"') ||
+        content.includes('author: "Diario de Transporte"') ||
+        content.includes('tags: ["noticias", "regulación", "supertransporte"]')
+      ) {
+        const dateMatch = content.match(/date:\s*"([^"]+)"/);
+        const date = dateMatch ? dateMatch[1] : '1970-01-01';
+        posts.push({ filePath, date });
+      }
+    });
+
+    // Ordenar de más nuevo a más viejo
+    posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+    if (posts.length > maxPosts) {
+      const toDelete = posts.slice(maxPosts);
+      console.log(`[RSS-SYNC] Detectados ${posts.length} posts auto-importados. Límite máximo: ${maxPosts}. Iniciando poda de ${toDelete.length} posts antiguos...`);
+      toDelete.forEach((post) => {
+        try {
+          fs.unlinkSync(post.filePath);
+          console.log(`[-] Eliminado post antiguo por limpieza: ${path.basename(post.filePath)}`);
+        } catch (err: any) {
+          console.error(`[RSS-SYNC-ERROR] No se pudo borrar ${post.filePath}: ${err.message}`);
+        }
+      });
+    }
+  } catch (err: any) {
+    console.error(`[RSS-SYNC-ERROR] Error durante el proceso de poda: ${err.message}`);
   }
 }
 
