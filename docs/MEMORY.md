@@ -30,6 +30,7 @@
 - **Flujo de Acumulación e Inducción:** Se documentó y explicó al operador el comportamiento del script (las noticias se acumulan en archivos `.mdx` individuales dentro de `src/content/blog/`, se evitan duplicados comparando slugs y cada archivo contiene el enlace original a la fuente al pie del post).
 - **Limpieza Automática (Poda):** Se desarrolló la función `pruneOldPosts` en el script de sincronización. Esta función lee las noticias auto-importadas, las ordena de más nuevas a más viejas, y elimina de forma autónoma los archivos antiguos que excedan el límite definido en `MAX_BLOG_POSTS` (por defecto 30), previniendo que el repositorio se sature de contenido basura.
 - **Ejecución y Despliegue en Vercel:** Se validó la ejecución oficial del script en local y se indicó al operador las credenciales a subir a Vercel para sincronizar producción.
+- **Aclaración de Direcciones de Acceso y SEO:** Se entregaron los enlaces directos de navegación del blog tanto para desarrollo (`http://localhost:3000/blog`) como para producción (`https://desmulta.online/blog`), detallando que en el código fuente la ruta es `/src/app/blog/page.tsx`. Se especificaron los términos de búsqueda del motor SEO asociados a las alertas de la Supertransporte de Colombia.
 
 **Estado Arquitectónico:**
 - 🟢 Completamente estable. Se capacitó al operador en el flujo, se configuró la variable `AUTO_PUBLISH_BLOG="true"` y `MAX_BLOG_POSTS="30"` en el archivo `.env` real local, se reorganizaron las plantillas, se validó la ejecución limpia y se actualizó el manual administrativo.
