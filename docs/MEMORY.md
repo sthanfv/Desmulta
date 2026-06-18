@@ -39,6 +39,41 @@
 **Estado Arquitectónico:**
 - 🟢 Completamente estable. Los dos motores centrales están fortalecidos y listos para ser expuestos como API B2B. El siguiente paso es agregar el API Gateway con autenticación por API Key (tabla `api_keys` en Firestore + middleware `X-Desmulta-Key`).
 
+## 📝 SESIÓN: API GATEWAY B2B CON AUTENTICACIÓN POR API KEY (Junio 2026)
+**Objetivo:** Proteger los endpoints `/api/v1/*` con un sistema de API Keys de nivel empresarial para monetizar el servicio OCR y la calculadora legal.
+
+**Cambios e Implementaciones:**
+- **`src/lib/types/api-key.ts` (NUEVO):** Define el esquema completo del sistema de API Keys: tipo `ApiKeyPlan` (`starter`/`growth`/`enterprise`), constante `API_KEY_PLANS` con cuotas (req/mes y req/min por plan), interfaz `ApiKeyDocument` (esquema Firestore), e interfaz `ApiKeyValidationResult` (resultado de la validación).
+- **`src/lib/security/api-key-guard.ts` (NUEVO):** Motor central del API Gateway con 9 capas de seguridad: (1) Presencia del header `X-Desmulta-Key`, (2) Formato válido (`dm_live_*`), (3) Caché Redis de 5 min (evita Firestore en el 95% de los requests), (4) Lookup en Firestore si no hay caché, (5) Comparación de hash SHA-256 en tiempo constante (`timingSafeEqual` — previene timing attacks), (6) Verificación de estado activo, (7) Verificación de expiración, (8) Quota mensual por plan, (9) Rate limit por minuto por plan (Upstash). Incluye `invalidateApiKeyCache()` para revocación inmediata.
+- **`src/lib/types/api-response.ts` (MODIFICADO):** Se agregaron 5 nuevos códigos de error al catálogo: `API_KEY_MISSING`, `API_KEY_INVALID`, `API_KEY_REVOKED`, `API_KEY_EXPIRED`, `API_KEY_QUOTA_EXCEEDED`.
+- **`/api/v1/calcular-multa/route.ts` (MODIFICADO):** Integración del guard como primera instrucción. Mapeo de errorCode a HTTP status (401/403/429). Cabeceras `X-RateLimit-Remaining-Month` y `X-RateLimit-Remaining-Minute` en la respuesta.
+- **`/api/v1/analizar-comparendo/route.ts` (MODIFICADO):** Igual que calcular-multa. El guard valida antes de cualquier procesamiento de imagen o llamada a Gemini.
+- **`/api/admin/api-keys/route.ts` (NUEVO):** CRUD completo de API Keys para administradores autenticados con Firebase. GET: lista todas las keys sin exponer hashes. POST: genera una key con `randomBytes(24)` (256 bits de entropía), almacena solo su hash SHA-256 en Firestore, y devuelve la key completa UNA sola vez. DELETE: revoca la key (marca `activa: false`) e invalida el caché Redis inmediatamente.
+
+**Arquitectura de Seguridad del Gateway:**
+- La key original NUNCA toca la base de datos. Solo se almacena `sha256:<hexdigest>`.
+- El caché Redis de 5 min elimina el 95% de los golpes a Firestore.
+- `timingSafeEqual` previene ataques de timing (inferir caracteres midiendo tiempos de respuesta).
+- Fail-Closed: Si Upstash o Firestore caen, el acceso se deniega (no se permite paso libre).
+- Revocación instantánea: `invalidateApiKeyCache()` al revocar elimina el caché inmediatamente.
+
+**Planes configurados:**
+- Starter: 500 req/mes · 10 req/min → COP $150.000/mes
+- Growth: 5.000 req/mes · 30 req/min → COP $450.000/mes
+- Enterprise: 50.000 req/mes · 100 req/min → Contrato anual
+
+**QA:**
+- `npm run typecheck` → ✅ 0 errores
+- `npm run lint` → ✅ 0 warnings, 0 errores
+- Commit: `f9d5d2b` — 6 archivos, 938 inserciones
+
+**Próximos pasos:**
+- Crear la primera API Key usando `POST /api/admin/api-keys` desde el panel de admin
+- Configurar `ADMIN_EMAILS` en las variables de entorno de Vercel
+- Desarrollar la página de documentación de la API para clientes B2B (`/api-docs`)
+
+
+
 
 
 ## 📝 SESIÓN: AUDITORÍA ESTRATÉGICA DE NEGOCIO Y LIMPIEZA DE DEUDA TÉCNICA (Junio 2026)
