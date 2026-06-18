@@ -27,9 +27,10 @@
 - **Manual del Administrador:** Se confirmó la existencia de la guía completa en [docs/admin-manual.md](file:///c:/Workspace/Desmulta/docs/admin-manual.md) que contiene todas las directrices operativas.
 - **Publicación 100% Automática:** Se implementó soporte para la variable `AUTO_PUBLISH_BLOG` en el script de sincronización. Se activó con valor `"true"` en [.env](file:///c:/Workspace/Desmulta/.env) local, lo que permite la publicación autónoma e indexación de artículos nuevos en tiempo de compilación.
 - **Sincronización y Organización de Variables:** Se reestructuró de forma íntegra [.env.example](file:///c:/Workspace/Desmulta/.env.example) y [.env](file:///c:/Workspace/Desmulta/.env) local para agrupar todas las variables de entorno en secciones numeradas del 1 al 9, haciendo más clara la categorización (Turnstile, Resend, Telegram, Blog, Upstash, Gemini/OCR, Vercel Blob).
+- **Flujo de Acumulación e Inducción:** Se documentó y explicó al operador el comportamiento no destructivo del script (las noticias se acumulan en archivos `.mdx` individuales dentro de `src/content/blog/`, se evitan duplicados comparando slugs y cada archivo contiene el enlace original a la fuente al pie del post).
 
 **Estado Arquitectónico:**
-- 🟢 Completamente estable. Se configuró la variable a `"true"` en el archivo `.env` real local, se reorganizaron las plantillas y se actualizó el manual.
+- 🟢 Completamente estable. Se capacitó al operador en el flujo, se configuró la variable a `"true"` en el archivo `.env` real local y se reorganizaron las plantillas.
 
 ## 📝 SESIÓN: SINCRONIZACIÓN AUTOMÁTICA DE BLOG RSS-TO-MDX (IDEA #10) (Junio 2026)
 **Objetivo:** Desarrollar un script automatizado local en Node.js para consumir y parsear feeds RSS oficiales de noticias de transporte, convirtiéndolas automáticamente a borradores `.mdx` locales con el estado de borrador activo (`draft: true`) en el frontmatter, con el fin de agilizar la creación de posts relevantes de SEO sin requerir APIs ni servicios de pago.
