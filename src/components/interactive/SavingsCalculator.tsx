@@ -265,11 +265,19 @@ export function SavingsCalculator() {
                             ? 'Apta para Prescripción'
                             : 'Requiere Defensa Técnica'}
                         </h4>
+                        {/* Estado legal enriquecido — visible solo cuando difiere del estado visual */}
+                        {resultado.estadoLegal && resultado.estadoLegal !== 'VIGENTE' && resultado.estadoLegal !== 'REQUIERE_REVISION' && (
+                          <span className="inline-block mt-1 mb-1 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-foreground/10">
+                            {resultado.estadoLegal === 'PRESCRITO' && '⚖️ PRESCRITO (Art. 159 CNT)'}
+                            {resultado.estadoLegal === 'CADUCADO' && '⏱️ CADUCADO (Art. 161 CNT)'}
+                            {resultado.estadoLegal === 'IMPUGNABLE_C038' && '📷 IMPUGNABLE (C-038/2020)'}
+                          </span>
+                        )}
                         <p className="text-xs opacity-90 mt-1 leading-relaxed">
                           {resultado.disclaimerLegal}
                         </p>
                         <div className="mt-2 inline-block px-2 py-1 rounded bg-foreground/10 text-[10px] font-bold uppercase tracking-wider">
-                          Éxito Histórico: {resultado.probabilidadExito}%
+                          Éxito Histórico: {resultado.probabilidadExito.split('%')[0]}%
                         </div>
                       </div>
                     </div>

@@ -43,4 +43,33 @@ export const FOOTER_DEFAULTS: FooterConfig = {
 export const UMBRAL_CONFIANZA_OCR = 45;
 
 // ─── Financiero ───────────────────────────────────────────────────────────────
+
+/**
+ * Tasa de Usura / Interés Moratorio Efectiva Anual (EA) vigente.
+ * Fuente: Superintendencia Financiera de Colombia — Primer semestre 2026.
+ * Valor: 26.5% EA  (0.265)
+ * Actualizar cada semestre según el comunicado oficial de la Superfinanciera.
+ */
 export const TASA_EA_VIGENTE = 0.265;
+
+/**
+ * Salario Mínimo Mensual Legal Vigente (SMMLV) 2026.
+ * Fuente: Decreto de incremento salarial 2025 (proyectado ~+9.4%).
+ * ⚠️ Actualizar con el decreto oficial una vez publicado.
+ * Valor actual: COP $1.423.500
+ */
+export const SMMLV_2026 = 1_423_500;
+
+/**
+ * Salario Mínimo Diario Legal Vigente (SMDLV) 2026.
+ * Fórmula: SMMLV / 30 días.
+ * Usado por el Código Nacional de Tránsito para denominación de multas.
+ * Valor actual: COP $47.450
+ */
+export const SMDLV_2026 = Math.round(SMMLV_2026 / 30);
+
+/**
+ * Año de vigencia de las constantes financieras.
+ * Permite validar que las constantes no están desactualizadas en runtime.
+ */
+export const VIGENCIA_CONSTANTES_ANIO = 2026;

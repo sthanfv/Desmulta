@@ -76,9 +76,43 @@ export async function POST(request: NextRequest) {
       }
 
       const model = getGeminiModel();
-      const prompt = `First, check if this image appears to be a traffic ticket or legal document by looking for words like: "COMPARENDO", "INFRACCION", "SIMIT", "REPUBLICA DE COLOMBIA", "SECRETARIA", "TRANSITO", "RESOLUCION", or "MULTA". 
-If you do not find any of these words, immediately stop and return EXACTLY the string "NO_VALID_DOCUMENT". 
-If it is a valid document, extract all text from this image exactly as it appears. Do not add any conversational text, markdown, or explanations. Just return the raw text visible.`;
+
+      // Prompt de extracción estructurada: Gemini devuelve JSON tipado directamente,
+      // eliminando la dependencia del parser regex para el flujo principal.
+      const prompt = `Eres un sistema experto en análisis de documentos de tránsito colombianos.
+Analiza la imagen proporcionada y determina si es un comparendo, multa de tránsito, captura del SIMIT u otro documento oficial de tránsito colombiano.
+
+PALABRAS CLAVE que identifican un documento válido: COMPARENDO, INFRACCION, SIMIT, REPUBLICA DE COLOMBIA, SECRETARIA, TRANSITO, RESOLUCION, MULTA, MANDAMIENTO, COBRO COACTIVO.
+
+Si NO encuentras ninguna de estas palabras o el documento no es claramente de tránsito colombiano, devuelve EXACTAMENTE:
+{"error":"NO_VALID_DOCUMENT"}
+
+Si ES un documento válido, extrae TODOS los campos que puedas identificar y devuelve ÚNICAMENTE el siguiente JSON (sin texto adicional, sin markdown, sin explicaciones):
+{
+  "numeroComparendo": "número o código del comparendo (string o null)",
+  "fechaInfraccion": "fecha en formato DD/MM/YYYY o null",
+  "placa": "placa del vehículo en formato AAA123 o null",
+  "codigoInfraccion": "código tipo C02, D04, etc. o null",
+  "descripcionInfraccion": "descripción de la infracción o null",
+  "valorMulta": número en pesos colombianos sin puntos ni comas o null,
+  "nombreInfractor": "nombre completo o null",
+  "cedulaInfractor": "número de cédula o null",
+  "entidadEmisora": "nombre de la secretaría o entidad emisora o null",
+  "ciudad": "ciudad o municipio o null",
+  "esFotomulta": true o false,
+  "tieneCobroCoactivo": true o false,
+  "tieneMandamientoPago": true o false,
+  "tieneResolucionSancionatoria": true o false,
+  "fechaResolucion": "fecha de la resolución en DD/MM/YYYY o null",
+  "textoCompleto": "todo el texto visible en el documento sin formato"
+}
+
+REGLAS CRÍTICAS:
+- Devuelve SOLO el JSON, nada más.
+- Si un campo no es visible o no aplica, usa null (no uses string vacío ni "N/A").
+- El campo "textoCompleto" debe contener todo el texto visible sin omisiones.
+- Para "valorMulta" usa solo el número entero en pesos (ej: 482200), no incluyas el símbolo $ ni puntos.
+- Para "esFotomulta", "tieneCobroCoactivo", "tieneMandamientoPago", "tieneResolucionSancionatoria" usa true/false booleano.`;
 
       const imageParts = [
         {
@@ -96,9 +130,10 @@ If it is a valid document, extract all text from this image exactly as it appear
       ]);
 
       const response = await result.response;
-      const textoCompleto = response.text();
+      const rawRespuesta = response.text().trim();
 
-      if (textoCompleto.trim() === 'NO_VALID_DOCUMENT') {
+      // Detectar rechazo de documento (JSON de error de Gemini)
+      if (rawRespuesta === 'NO_VALID_DOCUMENT' || rawRespuesta.includes('"error":"NO_VALID_DOCUMENT"')) {
         logger.warn('[OCR] Imagen rechazada: no parece un documento de tránsito válido', { ip });
         return NextResponse.json(
           apiError(
@@ -109,21 +144,50 @@ If it is a valid document, extract all text from this image exactly as it appear
         );
       }
 
-      if (!textoCompleto) {
+      if (!rawRespuesta) {
         logger.warn('[OCR] Gemini no detectó texto en la imagen', { ip });
-        return NextResponse.json({ texto: '', palabras: [] });
+        return NextResponse.json({ texto: '', palabras: [], comparendo: null });
+      }
+
+      // Intentar parsear el JSON estructurado devuelto por Gemini
+      // El prompt pide JSON puro, pero por seguridad limpiamos posibles bloques markdown
+      let comparendo: Record<string, unknown> | null = null;
+      let textoCompleto = rawRespuesta;
+
+      try {
+        // Limpiar bloques markdown ``` si Gemini los incluye a pesar del prompt
+        const jsonLimpio = rawRespuesta
+          .replace(/^```(?:json)?\s*/i, '')
+          .replace(/\s*```$/i, '')
+          .trim();
+        const parsed = JSON.parse(jsonLimpio) as Record<string, unknown>;
+        comparendo = parsed;
+        // El campo textoCompleto del JSON es el texto para el motor legacy (PrescriptionEngine)
+        textoCompleto = typeof parsed.textoCompleto === 'string' ? parsed.textoCompleto : rawRespuesta;
+        logger.info('[OCR] Respuesta de Gemini parseada como JSON estructurado', {
+          campos: Object.keys(parsed).join(', '),
+        });
+      } catch {
+        // Si Gemini no devolvió JSON válido, tratamos la respuesta como texto crudo (modo legacy)
+        logger.warn('[OCR] Gemini no devolvió JSON estructurado, usando modo texto crudo', {
+          inicio: rawRespuesta.slice(0, 80),
+        });
       }
 
       logger.info('[OCR] Procesamiento con Gemini exitoso', {
         caracteres: textoCompleto.length,
+        modoEstructurado: comparendo !== null,
       });
 
       await OcrCircuitBreakerFs.recordSuccess();
 
       return NextResponse.json({
+        // Campo legacy: texto crudo para el flujo existente (simit-parser, PrescriptionEngine)
         texto: textoCompleto,
-        palabras: [], // Gemini no devuelve bounding boxes fácilmente, retornamos vacío para no romper la app
+        palabras: [],
         proveedor: 'google-gemini-2.5-flash',
+        // Campo nuevo: datos estructurados del comparendo (null si Gemini respondió en modo texto)
+        comparendo,
       });
     } catch (geminiError) {
       await OcrCircuitBreakerFs.recordFailure(geminiError);
