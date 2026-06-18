@@ -26,9 +26,10 @@
 - **Generación de Archivos Individuales:** Se confirmó que el script genera archivos `.mdx` individuales para cada noticia detectada en lugar de consolidarlas en un solo archivo, lo que permite que el administrador edite, publique (`draft: false`) o descarte cada noticia por separado.
 - **Manual del Administrador:** Se confirmó la existencia de la guía completa en [docs/admin-manual.md](file:///c:/Workspace/Desmulta/docs/admin-manual.md) que contiene todas las directrices operativas.
 - **Publicación 100% Automática:** Se implementó soporte para la variable `AUTO_PUBLISH_BLOG` en el script de sincronización. Si se establece en `"true"` en [.env](file:///c:/Workspace/Desmulta/.env), el script escribirá directamente `draft: false` en todos los archivos `.mdx` nuevos generados, lo que permite que las noticias se publiquen e indexen de manera inmediata en producción sin requerir ninguna acción manual del administrador.
+- **Sincronización de Variables de Ejemplo:** Se modificó y sincronizó [.env.example](file:///c:/Workspace/Desmulta/.env.example) inyectando todas las variables omitidas del Blog Automático, Upstash Redis y PDF Cloud Functions para asegurar la mantenibilidad del repositorio.
 
 **Estado Arquitectónico:**
-- 🟢 Completamente estable. Se añadió la variable al archivo `.env` y se actualizó el manual administrativo.
+- 🟢 Completamente estable. Se añadió la variable al archivo `.env` local, se sincronizó el archivo `.env.example` y se actualizó el manual administrativo.
 
 ## 📝 SESIÓN: SINCRONIZACIÓN AUTOMÁTICA DE BLOG RSS-TO-MDX (IDEA #10) (Junio 2026)
 **Objetivo:** Desarrollar un script automatizado local en Node.js para consumir y parsear feeds RSS oficiales de noticias de transporte, convirtiéndolas automáticamente a borradores `.mdx` locales con el estado de borrador activo (`draft: true`) en el frontmatter, con el fin de agilizar la creación de posts relevantes de SEO sin requerir APIs ni servicios de pago.
