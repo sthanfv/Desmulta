@@ -119,12 +119,21 @@ Si recibes una alerta de Telegram de noticias que deseas publicar, sigue estos s
 2. **Selecciona la noticia:** Haz clic sobre el archivo `.mdx` correspondiente a la noticia que quieres publicar.
 3. **Edita el archivo:** En la esquina superior derecha del archivo en GitHub, haz clic en el icono del **lápiz (Edit this file)** para abrir el editor web.
 4. **Publica el artículo:** En las primeras líneas de la cabecera (frontmatter), cambia el estado de borrador:
-   * Busca la línea: `draft: true`
+    * Busca la línea: `draft: true`
    * Reemplázala por: `draft: false`
    * *(Opcional)*: Puedes corregir el título, pulir el texto o agregar tus propias palabras clave directamente en el cuerpo del artículo.
 5. **Guarda los cambios (Commit):** Haz clic en el botón verde arriba a la derecha que dice **"Commit changes..."**, escribe una breve nota si lo deseas, y confirma haciendo clic en el botón verde **"Commit changes"**.
 
 **¡Listo!** En unos 60 segundos Vercel detectará el commit, compilará el sitio en segundo plano y la noticia estará publicada y visible para todo el público y motores de búsqueda en `https://desmulta.online/blog`.
+
+### 🚀 Publicación 100% Automática (Opcional - Sin Trabajo Manual)
+Si deseas que el sistema publique las noticias de inmediato en tu blog sin tener que abrir ningún archivo para cambiar el estado de borrador, puedes configurar la automatización absoluta:
+1. Abre tu archivo de configuración [.env](file:///c:/Workspace/Desmulta/.env).
+2. Localiza la variable: `AUTO_PUBLISH_BLOG="false"`
+3. Cámbiala a: `AUTO_PUBLISH_BLOG="true"`
+4. Guarda el archivo.
+*(Asegúrate de agregar también esta variable en los secretos de tu repositorio de GitHub si tienes GitHub Actions activo, o en tu consola de administración de Vercel).*
+Al activar esta opción, cada noticia que descargue el bot se publicará de manera inmediata e indexará en el sitemap de forma autónoma.
 
 ### Ejecución Manual (Sin esperar a la noche)
 Si no deseas esperar a que el proceso corra de manera automática por la noche, puedes forzar la sincronización en cualquier momento desde tu terminal local ejecutando el comando:
@@ -132,4 +141,5 @@ Si no deseas esperar a que el proceso corra de manera automática por la noche, 
 npm run blog:sync
 ```
 El script leerá tus feeds de Google Alerts y enviará las novedades correspondientes de inmediato a tu bot de Telegram.
+
 

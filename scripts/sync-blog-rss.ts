@@ -237,7 +237,7 @@ title: "${title.replace(/"/g, '\\"')}"
 excerpt: "${cleanDescription.replace(/"/g, '\\"')}"
 date: "${dateStr}"
 author: "Supertransporte Colombia"
-draft: true
+draft: ${process.env.AUTO_PUBLISH_BLOG === 'true' ? 'false' : 'true'}
 tags: ["noticias", "regulación", "supertransporte"]
 ---
 
