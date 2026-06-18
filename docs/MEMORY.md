@@ -2,6 +2,7 @@
 
 | Versión | Estado     | Hitos Principales |
 | :---    | :---       | :---              |
+| v1.0.0  | 🟢 Estable | Auditoría Estratégica de Negocio + Limpieza de Deuda Técnica (Archivos Temporales Raíz) |
 | v1.0.0  | 🟢 Estable | Soporte e inducción al Administrador sobre el Blog RSS-to-MDX y Manual de Operaciones |
 | v1.0.0  | 🟢 Estable | Sincronización Automática de Blog RSS-to-MDX (Idea #10 - Script CLI Local y Filtrado de Borradores) |
 | v1.0.0  | 🟢 Estable | Páginas de Infracción Específica por Código (Idea #09 - Landing Pages SEO y Sitemap Dinámico) |
@@ -16,6 +17,33 @@
 | v1.0.0 | 🟢 Estable | Auditoría PDF + Previsualización Premium |
 | v1.0.0 | 🟢 Estable | Reingeniería PDF + Word-wrap + Saneamiento Linter |
 | v8.8.0  | 🟢 Estable | Motor OCR Tesseract 5.0 Integration |
+
+## 📝 SESIÓN: AUDITORÍA ESTRATÉGICA DE NEGOCIO Y LIMPIEZA DE DEUDA TÉCNICA (Junio 2026)
+**Objetivo:** Realizar una auditoría completa del estado actual del producto para identificar oportunidades de monetización, APIs B2B, escalabilidad para 10k-50k clientes, y limpiar la deuda técnica acumulada (archivos de diagnóstico temporal en la raíz del repositorio).
+
+**Decisiones y Cambios:**
+- **Auditoría de Negocio (Ideas #11 al #15):** Se documentaron y analizaron 5 nuevas oportunidades de negocio y monetización:
+  - **#11 — SaaS B2C con Planes de Suscripción:** Tiers Gratis / Conductor Pro (COP $29k/mes) / Blindado (COP $79k/mes) con Wompi o Stripe.
+  - **#12 — API B2B "Desmulta API":** Exponer el motor OCR+Parser como API REST autenticada por API Key (planes Starter/Growth/Enterprise) para flotas, concesionarios, bufetes y fintechs.
+  - **#13 — Widget Embebible para Abogados:** Snippet de 3 líneas que pone el escáner en la web de terceros. COP $200k/mes por sitio.
+  - **#14 — Verificador por Placa (sin documento):** Scraping ético del SIMIT para consulta directa por placa, máximo impacto SEO.
+  - **#15 — Marketplace de Abogados de Tránsito:** Directorio pago (COP $99k/mes) con leads calificados del escáner.
+- **Análisis de Escalabilidad:** Se identificaron los cuellos de botella para 10k-50k usuarios:
+  - Crítico: índices compuestos en Firestore, upgrade de Gemini API a plan de pago, caché de OCR en Upstash.
+  - Importante: cola de trabajos para OCR (QStash), paginación en admin dashboard.
+  - Futuro: microservicio OCR en Cloud Functions Gen2, analytics de conversión (funnel).
+- **Limpieza de Deuda Técnica:** Se eliminaron físicamente 13 archivos de diagnóstico temporal de la raíz del proyecto:
+  - `dump.txt`, `eslint_output.txt`, `eslint_output2.txt`, `eslint_output3.txt`, `lint_output.txt`
+  - `compiled_calc.txt`, `recovery.txt`, `recovery_writes.txt`, `test_output.txt`, `starcode.txt`
+  - `firebase-debug.log`, `firestore-debug.log`, `fix-logs.js` (script de migración ad-hoc ya ejecutado)
+
+**Estado Arquitectónico:**
+- 🟢 Repositorio limpio. 13 archivos temporales eliminados. Hoja de ruta estratégica documentada. El equipo tiene claridad sobre los próximos pasos de negocio y las brechas técnicas a resolver antes de escalar.
+
+**Próximo Paso Recomendado:**
+- Implementar IDEA #12 (API Gateway con autenticación por API Key) + IDEA #11 (sistema de planes/suscripciones). Ambas se desarrollan en paralelo y tienen el mayor retorno sobre inversión de desarrollo.
+
+
 
 ## 📝 SESIÓN: INDUCCIÓN Y SOPORTE DE BLOG AUTOMÁTICO (RSS-TO-MDX) (Junio 2026)
 **Objetivo:** Brindar soporte al administrador aclarando dudas respecto a la obtención de los enlaces de origen de las noticias, el manual de operaciones y la naturaleza de la generación de borradores individuales del blog, además de automatizar al 100% la publicación para evitar tareas repetitivas.
