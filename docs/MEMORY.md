@@ -2,6 +2,7 @@
 
 | Versión | Estado     | Hitos Principales |
 | :---    | :---       | :---              |
+| v1.0.0  | 🟢 Estable | Mejora de Motores OCR y Calculadora Legal (Prompt JSON Gemini + SMMLV 2026 + Endpoints API v1) |
 | v1.0.0  | 🟢 Estable | Auditoría Estratégica de Negocio + Limpieza de Deuda Técnica (Archivos Temporales Raíz) |
 | v1.0.0  | 🟢 Estable | Soporte e inducción al Administrador sobre el Blog RSS-to-MDX y Manual de Operaciones |
 | v1.0.0  | 🟢 Estable | Sincronización Automática de Blog RSS-to-MDX (Idea #10 - Script CLI Local y Filtrado de Borradores) |
@@ -17,6 +18,28 @@
 | v1.0.0 | 🟢 Estable | Auditoría PDF + Previsualización Premium |
 | v1.0.0 | 🟢 Estable | Reingeniería PDF + Word-wrap + Saneamiento Linter |
 | v8.8.0  | 🟢 Estable | Motor OCR Tesseract 5.0 Integration |
+
+## 📝 SESIÓN: MEJORA DE MOTORES OCR Y CALCULADORA LEGAL PARA API B2B (Junio 2026)
+**Objetivo:** Fortalecer los dos motores centrales del producto (OCR y Calculadora Legal) antes de exponerlos como API B2B de pago, para garantizar que el servicio ofrezca valor real de mercado.
+
+**Cambios e Implementaciones:**
+- **Prompt Estructurado JSON en Gemini (`/api/ocr/route.ts`):** Se reemplazó el prompt de texto crudo por un prompt de extracción estructurada que instruye a Gemini 2.5 Flash para devolver un JSON tipado con todos los campos del comparendo: número de comparendo, fecha de infracción, placa, código de infracción, descripción, valor en pesos, nombre del infractor, cédula, entidad emisora, ciudad, indicadores booleanos (esFotomulta, tieneCobroCoactivo, tieneMandamientoPago, tieneResolucionSancionatoria) y texto completo. La respuesta JSON se parsea y valida; en modo legacy (si Gemini no devuelve JSON), se mantiene el flujo de texto crudo para compatibilidad.
+- **Constantes Financieras 2026 (`config-constants.ts`):** Se agregaron `SMMLV_2026 = 1.423.500`, `SMDLV_2026 = 47.450` y `VIGENCIA_CONSTANTES_ANIO = 2026`. Estas constantes permiten expresar las multas en salarios mínimos (que es el lenguaje que usan los abogados y tribunales de tránsito en Colombia).
+- **Extractor Tipado de Comparendos (`comparendo-extractor.ts` - NUEVO):** Se creó la función central `construirAnalisisCompleto()` que dado un texto OCR y un objeto comparendo opcional, produce el `AnalisisComparendo` completo: OCR + datos estructurados del comparendo + dictamen legal del PrescriptionEngine + cálculo financiero con SMLMV + causales legales aplicables. También contiene `determinarCausales()` que mapea cada estado legal a las causales jurídicas correspondientes del CNT.
+- **Calculadora Legal Unificada (`calculadora-legal.ts`):** Se refactorizó para integrar `PrescriptionEngine` internamente. La función `calcularViabilidadLegal()` ahora retorna un campo adicional `estadoLegal` con el estado enriquecido del engine (`PRESCRITO`, `CADUCADO`, `IMPUGNABLE_C038`) además del estado visual simplificado. Se agregó `calcularMultaCompleta()` como punto de entrada unificado para la API B2B que incluye el resultado financiero con SMLMV/SMDLV.
+- **UI Calculadora Enriquecida (`SavingsCalculator.tsx`):** Se actualizó la UI para mostrar el estado legal técnico correcto cuando el motor detecta prescripción o caducidad: badge `⚖️ PRESCRITO (Art. 159 CNT)`, `⏱️ CADUCADO (Art. 161 CNT)` o `📷 IMPUGNABLE (C-038/2020)`.
+- **Endpoint B2B `/api/v1/calcular-multa` (NUEVO):** Endpoint REST que acepta `valorMulta` + `fechaInfraccion` + `tieneCobroCoactivo` + `textoOCR` opcional, y devuelve el dictamen legal enriquecido + cálculo financiero completo en JSON. No requiere imagen.
+- **Endpoint B2B `/api/v1/analizar-comparendo` (NUEVO):** Endpoint unificado principal de la API B2B: recibe imagen en base64 → envía a Gemini con prompt estructurado → parsea el JSON → ejecuta PrescriptionEngine → calcula deuda financiera → devuelve `AnalisisComparendo` completo en una sola llamada.
+
+**QA:**
+- `npm run typecheck` → ✅ 0 errores
+- `npm run lint` → ✅ 0 warnings, 0 errores
+- Commit: `5b68eee` — 7 archivos modificados, 850 inserciones
+
+**Estado Arquitectónico:**
+- 🟢 Completamente estable. Los dos motores centrales están fortalecidos y listos para ser expuestos como API B2B. El siguiente paso es agregar el API Gateway con autenticación por API Key (tabla `api_keys` en Firestore + middleware `X-Desmulta-Key`).
+
+
 
 ## 📝 SESIÓN: AUDITORÍA ESTRATÉGICA DE NEGOCIO Y LIMPIEZA DE DEUDA TÉCNICA (Junio 2026)
 **Objetivo:** Realizar una auditoría completa del estado actual del producto para identificar oportunidades de monetización, APIs B2B, escalabilidad para 10k-50k clientes, y limpiar la deuda técnica acumulada (archivos de diagnóstico temporal en la raíz del repositorio).
