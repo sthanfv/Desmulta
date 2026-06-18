@@ -29,9 +29,10 @@
 - **Sincronización y Organización de Variables:** Se reestructuró de forma íntegra [.env.example](file:///c:/Workspace/Desmulta/.env.example) y [.env](file:///c:/Workspace/Desmulta/.env) local para agrupar todas las variables de entorno en secciones numeradas del 1 al 9, haciendo más clara la categorización (Turnstile, Resend, Telegram, Blog, Upstash, Gemini/OCR, Vercel Blob).
 - **Flujo de Acumulación e Inducción:** Se documentó y explicó al operador el comportamiento del script (las noticias se acumulan en archivos `.mdx` individuales dentro de `src/content/blog/`, se evitan duplicados comparando slugs y cada archivo contiene el enlace original a la fuente al pie del post).
 - **Limpieza Automática (Poda):** Se desarrolló la función `pruneOldPosts` en el script de sincronización. Esta función lee las noticias auto-importadas, las ordena de más nuevas a más viejas, y elimina de forma autónoma los archivos antiguos que excedan el límite definido en `MAX_BLOG_POSTS` (por defecto 30), previniendo que el repositorio se sature de contenido basura.
+- **Ejecución y Despliegue en Vercel:** Se validó la ejecución oficial del script en local y se indicó al operador las credenciales a subir a Vercel para sincronizar producción.
 
 **Estado Arquitectónico:**
-- 🟢 Completamente estable. Se capacitó al operador en el flujo, se configuró la variable `AUTO_PUBLISH_BLOG="true"` y `MAX_BLOG_POSTS="30"` en el archivo `.env` real local, se reorganizaron las plantillas y se actualizó el manual administrativo.
+- 🟢 Completamente estable. Se capacitó al operador en el flujo, se configuró la variable `AUTO_PUBLISH_BLOG="true"` y `MAX_BLOG_POSTS="30"` en el archivo `.env` real local, se reorganizaron las plantillas, se validó la ejecución limpia y se actualizó el manual administrativo.
 
 ## 📝 SESIÓN: SINCRONIZACIÓN AUTOMÁTICA DE BLOG RSS-TO-MDX (IDEA #10) (Junio 2026)
 **Objetivo:** Desarrollar un script automatizado local en Node.js para consumir y parsear feeds RSS oficiales de noticias de transporte, convirtiéndolas automáticamente a borradores `.mdx` locales con el estado de borrador activo (`draft: true`) en el frontmatter, con el fin de agilizar la creación de posts relevantes de SEO sin requerir APIs ni servicios de pago.
