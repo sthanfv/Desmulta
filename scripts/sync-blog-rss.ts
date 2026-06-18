@@ -74,7 +74,7 @@ function htmlToMarkdown(html: string): string {
 
 // Extrae el valor de una etiqueta XML mediante Regex
 function extractTagContent(itemXml: string, tagName: string): string {
-  const regex = new RegExp(`<${tagName}>([\\s\\S]*?)</${tagName}>`, 'i');
+  const regex = new RegExp(`<${tagName}(?:\\s+[^>]*)?>([\\s\\S]*?)</${tagName}>`, 'i');
   const match = itemXml.match(regex);
   if (match && match[1]) {
     // Si contiene CDATA, extraerlo
@@ -207,7 +207,16 @@ async function syncBlogFromRss() {
         }
 
         // Limpiar CDATA y entidades HTML del título
-        title = title.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/i, '$1').trim();
+        title = title
+          .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/i, '$1')
+          .replace(/&lt;b&gt;/gi, '')
+          .replace(/&lt;\/b&gt;/gi, '')
+          .replace(/<b>/gi, '')
+          .replace(/<\/b>/gi, '')
+          .replace(/&quot;/gi, '"')
+          .replace(/&amp;/gi, '&')
+          .replace(/<[^>]*>/g, '')
+          .trim();
 
         // Filtro de relevancia: ignorar noticias de accidentes, choques o tragedias viales
         const titleLower = title.toLowerCase();
