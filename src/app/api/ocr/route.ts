@@ -6,6 +6,9 @@ import { checkRateLimit } from '@/lib/security/rate-limit';
 import { logger } from '@/lib/logger/security-logger';
 import { apiError } from '@/lib/types/api-response';
 import { OcrCircuitBreakerFs } from '@/lib/security/circuit-breaker-firestore';
+import { Redis } from '@upstash/redis';
+
+const redis = Redis.fromEnv();
 
 /**
  * API Route: /api/ocr
@@ -35,14 +38,36 @@ function getGeminiModel() {
 
 export async function POST(request: NextRequest) {
   try {
-    // 1. Rate limit por IP
+    // 1. Rate limit por IP + Fingerprint (Canvas Hash) para evitar bypass con VPN rotativas
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-    const rateLimitStatus = await checkRateLimit('ocr', ip);
+    const fingerprint = request.headers.get('x-device-fingerprint') || 'no-fingerprint';
+    const rateLimitKey = `${ip}_${fingerprint}`;
+
+    const rateLimitStatus = await checkRateLimit('ocr', rateLimitKey);
     if (!rateLimitStatus.success) {
       return NextResponse.json(
         apiError('RATE_LIMITED', 'Demasiadas solicitudes. Espera 10 minutos.'),
         { status: 429 }
       );
+    }
+
+    // 1.5. Control de Costos FinOps: Cuota diaria global de procesamiento Gemini B2C
+    const hoy = new Date().toISOString().split('T')[0];
+    const redisDailyKey = `gemini:daily_usage:${hoy}`;
+
+    let currentDailyUsage = 0;
+    try {
+      currentDailyUsage = (await redis.get<number>(redisDailyKey)) || 0;
+    } catch (redisError) {
+      logger.warn('[OCR] Error al leer límite diario de Redis (Fail-Safe: abierto)', { error: String(redisError) });
+    }
+
+    const MAX_DAILY_GEMINI = parseInt(process.env.MAX_DAILY_GEMINI || '1000');
+    let usarTesseractDirectamente = false;
+
+    if (currentDailyUsage >= MAX_DAILY_GEMINI) {
+      logger.warn('[OCR] Cuota diaria de solicitudes Gemini excedida. Cayendo directamente a Tesseract.', { usage: currentDailyUsage, limite: MAX_DAILY_GEMINI });
+      usarTesseractDirectamente = true;
     }
 
     // 2. Validar el body con Zod (estructura + tipos)
@@ -71,12 +96,15 @@ export async function POST(request: NextRequest) {
     });
 
     try {
+      if (usarTesseractDirectamente) {
+        throw new Error('GEMINI_QUOTA_EXCEEDED');
+      }
+
       if (await OcrCircuitBreakerFs.isOpen()) {
         throw new Error('OCR_CIRCUIT_OPEN');
       }
 
       const model = getGeminiModel();
-
       // Prompt de extracción estructurada: Gemini devuelve JSON tipado directamente,
       // eliminando la dependencia del parser regex para el flujo principal.
       const prompt = `Eres un sistema experto en análisis de documentos de tránsito colombianos.
@@ -181,6 +209,16 @@ REGLAS CRÍTICAS:
 
       await OcrCircuitBreakerFs.recordSuccess();
 
+      // Incrementar el contador global diario de Gemini de forma atómica en Redis
+      try {
+        const pipeline = redis.pipeline();
+        pipeline.incr(redisDailyKey);
+        pipeline.expire(redisDailyKey, 129600); // 36 horas de TTL (1.5 días)
+        await pipeline.exec();
+      } catch (redisIncrError) {
+        logger.warn('[OCR] Error al incrementar límite diario de Gemini en Redis', { error: String(redisIncrError) });
+      }
+
       return NextResponse.json({
         // Campo legacy: texto crudo para el flujo existente (simit-parser, PrescriptionEngine)
         texto: textoCompleto,
@@ -190,11 +228,19 @@ REGLAS CRÍTICAS:
         comparendo,
       });
     } catch (geminiError) {
-      await OcrCircuitBreakerFs.recordFailure(geminiError);
       const gMsg = geminiError instanceof Error ? geminiError.message : 'Error desconocido';
-      logger.error('[OCR] Error al procesar imagen con Gemini, intentando fallback con Tesseract', {
-        error: gMsg,
-      });
+
+      // Si el error es por cuota de Gemini o circuito abierto, no registramos falla en el circuit breaker
+      if (gMsg !== 'GEMINI_QUOTA_EXCEEDED' && gMsg !== 'OCR_CIRCUIT_OPEN') {
+        await OcrCircuitBreakerFs.recordFailure(geminiError);
+        logger.error('[OCR] Error al procesar imagen con Gemini, intentando fallback con Tesseract', {
+          error: gMsg,
+        });
+      } else if (gMsg === 'GEMINI_QUOTA_EXCEEDED') {
+        logger.warn('[OCR] Cuota diaria de Gemini alcanzada. Cayendo directamente a Tesseract (Fallback)...');
+      } else {
+        logger.warn('[OCR] Circuit Breaker de Gemini está ABIERTO. Cayendo a Tesseract (Fallback)...');
+      }
 
       // Si el error fue por timeout, no vale la pena intentar Tesseract si Vercel está a punto de matarnos
       // Pero como aumentamos maxDuration a 60s, si el timeout fue de 15s, Tesseract (que toma 10s) sí alcanza a correr.

@@ -2,6 +2,12 @@
 
 | Versión | Estado     | Hitos Principales |
 | :---    | :---       | :---              |
+| v1.0.0  | 🟢 Estable | Corrección de Regresiones en Pruebas Unitarias (Desambiguación de Fechas en PrescriptionEngine y Valores en SIMIT Parser) |
+| v1.0.0  | 🟢 Estable | Remediación de Escalabilidad (Fase 3: Caché Redis para Firestore, Invalidación VIP en Transacciones, Caché Galería 300s, Fallback Tesseract OCR ante Límite Gemini) |
+| v1.0.0  | 🟢 Estable | Correcciones de Texto y UX en el Frontend (Remoción de Jerga Técnica y Referencias a PDF) |
+| v1.0.0  | 🟢 Estable | Remediación de Auditoría de Seguridad (Fase 1: Fingerprint OCR, Gemini Cost Limit, Middleware JWT VIP, CSRF Origin Admin) |
+| v1.0.0  | 🟢 Estable | Detalle de Facturación e Infraestructura para la Activación en Vivo de la API B2B (`docs/API_B2B.md`) |
+| v1.0.0  | 🟢 Estable | Documentación Completa de la API B2B (Guía de Referencia API_B2B.md y activación Go-Live) |
 | v1.0.0  | 🟢 Estable | Mejora de Motores OCR y Calculadora Legal (Prompt JSON Gemini + SMMLV 2026 + Endpoints API v1) |
 | v1.0.0  | 🟢 Estable | Auditoría Estratégica de Negocio + Limpieza de Deuda Técnica (Archivos Temporales Raíz) |
 | v1.0.0  | 🟢 Estable | Soporte e inducción al Administrador sobre el Blog RSS-to-MDX y Manual de Operaciones |
@@ -15,9 +21,96 @@
 | v1.0.0  | 🟢 Estable | Corrección en validación de formulario SIMIT (Filtro Cédula) + Hardening contra DoS + Estabilización QA |
 | v1.0.0  | 🟢 Estable | Hardening contra DoS + Reubicación de Rate Limit al inicio de API Lifecycle + Estabilización QA |
 | v1.0.0  | 🟢 Estable | VIP Portal + Push Notifications + Toque Humano + Telegram sin duplicados |
-| v1.0.0 | 🟢 Estable | Auditoría PDF + Previsualización Premium |
-| v1.0.0 | 🟢 Estable | Reingeniería PDF + Word-wrap + Saneamiento Linter |
+| v1.0.0  | 🟢 Estable | Auditoría PDF + Previsualización Premium |
+| v1.0.0  | 🟢 Estable | Reingeniería PDF + Word-wrap + Saneamiento Linter |
 | v8.8.0  | 🟢 Estable | Motor OCR Tesseract 5.0 Integration |
+
+## 📝 SESIÓN: CORRECCIÓN DE REGRESIONES EN PRUEBAS UNITARIAS (Junio 2026)
+**Objetivo:** Solventar las fallas introducidas en la suite de pruebas locales tras las optimizaciones del parser de SIMIT y el motor de prescripción legal.
+
+**Cambios e Implementaciones:**
+- **Saneamiento del SIMIT Parser (`src/lib/simit-parser.ts`):** Se implementó la exclusión del número de comparendo (`comp`) del bloque de contexto de búsqueda antes de ejecutar la extracción del valor monetario (`regexValor`). Esto previene que partes del número de comparendo (generalmente de 15 dígitos) sean confundidas con valores monetarios de 6-8 dígitos.
+- **Precisión de Contexto en PrescriptionEngine (`src/lib/legal/prescription-engine.ts` y SIMIT Parser):** Se ajustó la ventana de contexto simétrica para palabras excluidas (como `'RESOL'` o `'NOTIF'`) a una ventana asimétrica más precisa (30 caracteres a la izquierda, 5 caracteres a la derecha). Esto evita que fechas legítimas de comparendo sean marcadas falsamente como excluidas si hay una palabra de resolución cerca en textos compactados y aplanados por el OCR.
+- **Validación QA Integrada:** Ejecución exitosa de `typecheck` (0 errores), `lint` (0 advertencias, 0 errores), la suite de pruebas unitarias aisladas (`13/13 pasadas en verde`) y compilación de producción Next.js (`npm run build`) limpia.
+
+## 📝 SESIÓN: REMEDIACIÓN DE ESCALABILIDAD - FASE 3 (Junio 2026)
+**Objetivo:** Mitigar los cuellos de botella de infraestructura y costos del motor serverless (Firestore, Vercel Blob y Gemini API) para soportar de manera fluida entre 10k y 50k usuarios concurrentes.
+
+**Cambios e Implementaciones:**
+- **Wrapper de Caché Redis (`src/lib/cache/redis-cache.ts`):** Creación del helper `getCachedDoc` y `invalidateCache` sobre Upstash Redis. Aplica una política *fail-safe*: si Redis falla o no responde, cae de forma segura a Firestore sin lanzar errores al cliente final.
+- **Caché en Portal VIP (`src/app/vip/dashboard/page.tsx`):** Se integró el caché Redis en `getVipData()` bajo la clave `vip_session:cedula:${hashedCedula}` con un TTL de 5 minutos (300 segundos). Se normalizaron todas las fechas dynamic del expediente a cadenas ISO para evitar fallos de renderizado en el timeline del frontend por pérdida de métodos Firestore.
+- **Invalidación en Tiempo Real (`src/app/admin/actions.ts`):** Se inyectó el borrado de caché (`invalidateCache`) en las Server Actions de actualización del operador (`updateCaseStatus` y `updateConsultationStatus`) utilizando el campo `cedulaHash` de las transacciones de Firestore, garantizando consistencia inmediata en UI.
+- **Caché SWR de Galería (`src/app/api/gallery/route.ts`):** Se incrementó el encabezado Cache-Control de la API Route GET a `'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600'` reduciendo drásticamente las llamadas redundantes por segundo.
+- **Control de Cuotas y Fallback OCR (`src/app/api/ocr/route.ts`):** Se configuró la API Route para verificar el uso diario global de Gemini contra `process.env.MAX_DAILY_GEMINI`. Si se excede, lanza una excepción `'GEMINI_QUOTA_EXCEEDED'` que desvía el flujo automáticamente al fallback de Tesseract OCR local. Se exceptuaron estas excepciones y fallas del circuit breaker de Gemini.
+
+**QA:**
+- `npm run lint` → ✅ 0 warnings, 0 errores (directivas eslint-disable agregadas).
+- `npm run typecheck` → ✅ 0 errores de compilación TypeScript.
+- `npx vitest run --maxWorkers=1` → ✅ 47/47 tests exitosos (test de integración de la galería actualizado).
+
+## 📝 SESIÓN: CORRECCIONES DE TEXTO Y UX EN EL FRONTEND (Junio 2026)
+**Objetivo:** Eliminar tecnicismos complejos (como "Zero-PII", "OCR", "escáner heurístico") y referencias incorrectas a la subida de archivos PDF, reemplazándolos por un lenguaje amigable y comprensible enfocado en el usuario final.
+
+**Cambios e Implementaciones:**
+- **Marca de agua en historias (`src/components/interactive/StoryProgressModal.tsx`):** Se reemplazó la etiqueta `"Protección Zero-PII Activa"` por un texto de seguridad claro para el conductor: `"Tus Datos están Seguros"`.
+- **Nota en carrusel de evidencias (`src/components/sections/SuccessCases.tsx`):** Se modificó la nota de pie de página para aclarar que las multas expuestas corresponden a casos y valores **reales** procesados por la plataforma (con los datos personales debidamente tapados por confidencialidad), removiendo la jerga `"cumplimiento Zero-PII"` y `"simuladas/recreadas"`.
+- **CTAs en Landings de Código (`src/app/multas/codigo/[codigo]/page.tsx`):** Se removió el texto que sugería subir un "archivo PDF" (ya que solo se analizan imágenes en el flujo de consulta B2C) y se reemplazó `"escáner heurístico con OCR e inteligencia legal"` por `"lector inteligente"`.
+- **CTAs en Landings de Ciudad (`src/app/multas/[ciudad]/[infraccion]/page.tsx`):** Se simplificó el llamado a la acción eliminando el término `"escáner heurístico"`.
+
+**QA:**
+- `npm run lint` → ✅ 0 warnings, 0 errores.
+- `npm run typecheck` → ✅ 0 errores de compilación TypeScript.
+- `npx vitest run` → ✅ 47/47 tests pasados con éxito.
+
+## 📝 SESIÓN: REMEDIACIÓN DE AUDITORÍA DE SEGURIDAD - FASE 1 (Junio 2026)
+**Objetivo:** Mitigar los hallazgos y vectores de riesgo identificados en la primera fase de la auditoría de seguridad del proyecto en los módulos de OCR, control de costos de Gemini, verificación del portal VIP y protección CSRF administrativa.
+
+**Cambios e Implementaciones:**
+- **Fingerprint de Dispositivo en OCR (`src/app/api/ocr/route.ts`):** Se modificó el rate limiter del endpoint `/api/ocr` (B2C) para capturar el fingerprint de dispositivo (Canvas Hash) mediante la cabecera `X-Device-Fingerprint`. Se combinó con la IP del cliente (`ocr:ip_fingerprint:${ip}_${fingerprint}`) como clave única en Upstash Redis, previniendo la evasión de tasas a través de VPNs rotativas.
+- **Límite de Costo de Gemini (`src/app/api/ocr/route.ts`):** Se integró una cuota de uso diario global para llamadas a la API de Gemini B2C. Utiliza la clave `gemini:daily_usage:${fecha}` en Redis para registrar de forma atómica el conteo agregándolo y bloqueando solicitudes con HTTP 429 cuando excede el límite máximo diario preestablecido (1,000 solicitudes), previniendo cargos inesperados en facturación por ataques de spam.
+- **Validación JWT VIP en Middleware (`src/middleware.ts`):** Se trasladó de manera centralizada la verificación de expiración y firma del token de sesión `_vip_session` (JWT) para todo el namespace de APIs `/api/vip/*` (exceptuando auth y logout) directamente al middleware de Next.js (`verifyVipSession`), aplicando cortocircuito Fail-Closed e impidiendo la ejecución de handlers ante peticiones inválidas.
+- **CSRF Origin en Admin (`src/app/api/admin/api-keys/route.ts`):** Se añadió la verificación obligatoria del header `Origin` contra `NEXT_PUBLIC_SITE_URL` en las peticiones de creación (`POST`) y revocación (`DELETE`) de API Keys B2B del panel administrativo, mitigando vectores de ataque de falsificación de solicitudes cross-site.
+
+**QA:**
+- `npm run lint` → ✅ 0 warnings, 0 errores.
+- `npm run typecheck` → ✅ 0 errores de compilación TypeScript.
+- `npx vitest run` → ✅ 47/47 tests pasados con éxito (cero regresiones en lógica core, middleware, tokens e integración).
+
+## 📝 SESIÓN: DETALLE DE FACTURACIÓN E INFRAESTRUCTURA DE API B2B (Junio 2026)
+**Objetivo:** Complementar la Guía de Activación en Vivo (Go-Live) de la API B2B detallando los requisitos comerciales y técnicos de facturación/cuotas para Google AI Studio (Gemini API) y Upstash Redis, previniendo bloqueos o caídas bajo la filosofía Fail-Closed del API Gateway.
+
+**Cambios e Implementaciones:**
+- **`docs/API_B2B.md` (MODIFICADO):** Se expandió la sección `## 6. Guía de Activación en Vivo (Go-Live)` en las subsecciones `6.1`, `6.2` y `6.3`. Se documentó de manera pormenorizada:
+  - El límite de la capa gratuita de Google AI Studio (Gemini 2.5 Flash) y los pasos para habilitar el plan de pago por uso (Pay-as-you-go) mediante vinculación de cuenta a Google Cloud Console.
+  - El límite diario de 10,000 comandos de la base de datos de Upstash Redis en su capa gratuita y la vulnerabilidad de denegación de acceso debida al diseño Fail-Closed del limitador de tasa/caché. Se documentaron las instrucciones paso a paso para tarjetizar y pasar a un plan de producción sin restricciones de volumen.
+  - La sincronización requerida de variables de entorno de producción en Vercel.
+  - La secuencia operacional para la emisión de claves usando el endpoint `/api/admin/api-keys` (o panel administrativo) y cURL, incluyendo advertencias sobre la visualización única del token en texto plano por motivos de seguridad Zero-Knowledge en Firestore.
+
+**Estado Arquitectónico:**
+- 🟢 Completamente estable. La documentación operativa y de infraestructura B2B está al día, permitiendo una puesta en marcha rápida por parte del operador o de cualquier ingeniero sin recurrir a ingeniería inversa.
+
+## 📝 SESIÓN: INTERFACES DEL API GATEWAY B2B Y DOCUMENTACIÓN PÚBLICA (Junio 2026)
+**Objetivo:** Culminar la implementación de la IDEA #12 (API Gateway B2B) desarrollando el Panel de Administración de API Keys y la página pública de documentación técnica `/api-docs` para habilitar la comercialización directa del motor OCR y Legal.
+
+**Cambios e Implementaciones:**
+- **`src/app/admin/api-keys/page.tsx` y `src/components/admin/ApiKeysTable.tsx` (NUEVO):** Se desarrolló la interfaz del panel de administración. Permite listar las API keys (mostrando el uso mensual vs cuota de cada plan), revocar llaves activas (invocando la invalidación de caché Redis en el backend), y generar nuevas credenciales. La credencial generada se presenta en texto plano una única vez, garantizando el cumplimiento de la política de seguridad Zero-Knowledge en la base de datos (donde solo persiste el hash SHA-256).
+- **Enlace de Navegación del Panel (`AdminDashboard.tsx`):** Se integró un acceso directo a la gestión de API Keys en el header del panel de administración utilizando el ícono `Key`.
+- **`src/app/api-docs/page.tsx` (NUEVO):** Se creó la landing page de documentación oficial de la API B2B. Incluye un diseño premium (Glassmorphism oscuro, tipografía estructurada), destacando los beneficios Enterprise (autenticación segura, escalabilidad, respuesta JSON determinista) y exponiendo la especificación cURL de los endpoints `/api/v1/analizar-comparendo` y `/api/v1/calcular-multa`.
+- **Interlinking (`Footer.tsx`):** Se agregó un enlace permanente hacia "API para Empresas" en la sección de navegación táctica del pie de página para generar tráfico orgánico de clientes potenciales hacia la documentación comercial.
+
+**Estado Arquitectónico:**
+- 🟢 Estable. Las interfaces del API Gateway B2B están completas y conectadas al backend. El producto ya posee la infraestructura completa (backend + UI + docs) para ser vendido a empresas.
+
+## 📝 SESIÓN: DOCUMENTACIÓN COMPLETA DE LA API B2B (Junio 2026)
+**Objetivo:** Crear un manual de referencia técnica y operativa completo sobre la API B2B de Desmulta y sus componentes de seguridad/Gateway, permitiendo al operador y a futuros ingenieros reactivarla comercialmente con facilidad.
+
+**Cambios e Implementaciones:**
+- **Creación de `docs/API_B2B.md` (NUEVO):** Redacción del manual completo en español detallando la arquitectura técnica (con diagrama Mermaid), el funcionamiento interno del `api-key-guard.ts` (9 capas de seguridad, hashing SHA-256 de claves y caché Redis), la tabla de planes preconfigurados y sus cuotas, las especificaciones JSON de los endpoints `/api/v1/calcular-multa` y `/api/v1/analizar-comparendo`, y el catálogo estandarizado de respuestas de error.
+- **Manual de Operaciones y Activación en Vivo:** Documentación de la guía paso a paso para el Go-Live de la API, detallando las variables de entorno necesarias en Vercel/Firebase, la autenticación administrativa mediante tokens de Firebase, la generación de API Keys a través de `/api/admin/api-keys` y ejemplos concretos de comandos `cURL` para administración y consumo.
+- **Sincronización de Documentación:** Actualización de los índices y referencias en el `README.md` de la raíz del repositorio y en `docs/README.md` para integrar de forma coherente el nuevo archivo `API_B2B.md`.
+
+**Estado Arquitectónico:**
+- 🟢 Completamente estable. La documentación de la API B2B está 100% al día y estructurada de acuerdo con los estándares enterprise del proyecto. Toda la observabilidad y guías se encuentran sincronizadas.
 
 ## 📝 SESIÓN: MEJORA DE MOTORES OCR Y CALCULADORA LEGAL PARA API B2B (Junio 2026)
 **Objetivo:** Fortalecer los dos motores centrales del producto (OCR y Calculadora Legal) antes de exponerlos como API B2B de pago, para garantizar que el servicio ofrezca valor real de mercado.

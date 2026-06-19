@@ -118,8 +118,8 @@ export default async function MultaEspecificaPage(props: Props) {
           <Scale size={48} className="text-white/20 mx-auto mb-8" />
           <h2 className="text-3xl font-bold mb-6">Inicia tu defensa ahora mismo</h2>
           <p className="text-white/60 mb-10 text-lg">
-            Sube el pantallazo del SIMIT. Nuestro escáner heurístico verificará en segundos si la
-            multa por {infraccion.nombre} en {ciudad.nombre} es legalmente exigible.
+            Sube la foto o captura de pantalla del SIMIT. Nuestro sistema analizará en segundos si la
+            multa por {infraccion.nombre} en {ciudad.nombre} es legalmente válida.
           </p>
           <Link
             href="/#escaner"

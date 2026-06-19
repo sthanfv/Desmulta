@@ -9,6 +9,58 @@ import { TimelineEventVip } from '@/components/vip/TimelineEventVip';
 import { VipPushNotification } from '@/components/vip/VipPushNotification';
 
 import { getVipSecret } from '@/lib/security/vip-jwt';
+import { getCachedDoc } from '@/lib/cache/redis-cache';
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+function serializeVipExpediente(data: any) {
+  if (!data) return data;
+  const serialized = { ...data };
+
+  if (serialized.createdAt?.toDate) {
+    serialized.createdAt = serialized.createdAt.toDate().toISOString();
+  } else if (serialized.createdAt instanceof Date) {
+    serialized.createdAt = serialized.createdAt.toISOString();
+  }
+
+  if (serialized.updatedAt?.toDate) {
+    serialized.updatedAt = serialized.updatedAt.toDate().toISOString();
+  } else if (serialized.updatedAt instanceof Date) {
+    serialized.updatedAt = serialized.updatedAt.toISOString();
+  }
+
+  if (Array.isArray(serialized.history)) {
+    serialized.history = serialized.history.map((h: any) => {
+      let dateVal = h.date;
+      if (dateVal?.toDate) {
+        dateVal = dateVal.toDate().toISOString();
+      } else if (dateVal instanceof Date) {
+        dateVal = dateVal.toISOString();
+      } else if (dateVal && typeof dateVal === 'object' && ('seconds' in dateVal || '_seconds' in dateVal)) {
+        const secs = dateVal.seconds ?? dateVal._seconds;
+        dateVal = new Date(secs * 1000).toISOString();
+      }
+      return { ...h, date: dateVal };
+    });
+  }
+
+  if (Array.isArray(serialized.timeline_updates)) {
+    serialized.timeline_updates = serialized.timeline_updates.map((tu: any) => {
+      let dateVal = tu.date;
+      if (dateVal?.toDate) {
+        dateVal = dateVal.toDate().toISOString();
+      } else if (dateVal instanceof Date) {
+        dateVal = dateVal.toISOString();
+      } else if (dateVal && typeof dateVal === 'object' && ('seconds' in dateVal || '_seconds' in dateVal)) {
+        const secs = dateVal.seconds ?? dateVal._seconds;
+        dateVal = new Date(secs * 1000).toISOString();
+      }
+      return { ...tu, date: dateVal };
+    });
+  }
+
+  return serialized;
+}
+/* eslint-enable @typescript-eslint/no-explicit-any */
 
 async function getVipData() {
   const cookieStore = await cookies();
@@ -23,34 +75,44 @@ async function getVipData() {
     redirect('/vip');
   }
 
-  getAdminApp();
-  const db = getFirestore();
+  const cacheKey = `vip_session:cedula:${payload.hashedCedula}`;
 
-  // Buscar en casos
-  const casesSnapshot = await db
-    .collection('cases')
-    .where('cedulaHash', '==', payload.hashedCedula)
-    .limit(1)
-    .get();
+  const expediente = await getCachedDoc(cacheKey, async () => {
+    getAdminApp();
+    const db = getFirestore();
 
-  if (!casesSnapshot.empty) {
-    const doc = casesSnapshot.docs[0];
-    return { id: doc.id, tipo: 'caso', data: doc.data() };
+    // Buscar en casos
+    const casesSnapshot = await db
+      .collection('cases')
+      .where('cedulaHash', '==', payload.hashedCedula)
+      .limit(1)
+      .get();
+
+    if (!casesSnapshot.empty) {
+      const doc = casesSnapshot.docs[0];
+      return { id: doc.id, tipo: 'caso', data: serializeVipExpediente(doc.data()) };
+    }
+
+    // Si no hay caso, buscar en leads
+    const leadsSnapshot = await db
+      .collection('consultations')
+      .where('cedulaHash', '==', payload.hashedCedula)
+      .limit(1)
+      .get();
+
+    if (!leadsSnapshot.empty) {
+      const doc = leadsSnapshot.docs[0];
+      return { id: doc.id, tipo: 'lead', data: serializeVipExpediente(doc.data()) };
+    }
+
+    return null;
+  }, 300);
+
+  if (!expediente) {
+    redirect('/vip');
   }
 
-  // Si no hay caso, buscar en leads
-  const leadsSnapshot = await db
-    .collection('consultations')
-    .where('cedulaHash', '==', payload.hashedCedula)
-    .limit(1)
-    .get();
-
-  if (!leadsSnapshot.empty) {
-    const doc = leadsSnapshot.docs[0];
-    return { id: doc.id, tipo: 'lead', data: doc.data() };
-  }
-
-  redirect('/vip');
+  return expediente;
 }
 
 export default async function VipDashboardPage() {

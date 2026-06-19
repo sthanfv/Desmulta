@@ -212,10 +212,10 @@ export default async function CodigoInfraccionPage(props: Props) {
             Inicia tu defensa gratis ahora mismo
           </h2>
           <p className="text-slate-400 mb-10 text-sm md:text-base leading-relaxed max-w-xl mx-auto font-medium">
-            Sube la captura o el archivo PDF de tu comparendo del SIMIT. Nuestro escáner heurístico
-            con OCR e inteligencia legal verificará de inmediato si el comparendo{' '}
-            <strong className="text-primary font-mono">{infraccion.codigo}</strong> cumple con todos
-            los requisitos del debido proceso.
+            Sube la foto o captura de pantalla de tu comparendo del SIMIT. Nuestro lector inteligente
+            analizará de inmediato si el comparendo{' '}
+            <strong className="text-primary font-mono">{infraccion.codigo}</strong> cumple con las
+            condiciones de ley para ser eliminado.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link

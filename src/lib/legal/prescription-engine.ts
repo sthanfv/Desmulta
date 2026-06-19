@@ -32,6 +32,31 @@ export const OCRSanitizer = {
     const matches = normalized.match(dateRegex);
     return matches ? Array.from(new Set(matches)) : [];
   },
+
+  /**
+   * Excluye fechas que el OCR identifica cerca de palabras clave de resolución o notificación.
+   * Si tras el filtro no quedan fechas, revierte a la lista original (fail-safe).
+   */
+  filtrarFechasContexto: (normalizedText: string, dates: string[]): string[] => {
+    const palabrasExcluidas = ['RESOL', 'NOTIF'];
+    const filtered = dates.filter((dateStr) => {
+      let index = normalizedText.indexOf(dateStr);
+      while (index !== -1) {
+        const windowStart = Math.max(0, index - 30);
+        const windowEnd = Math.min(normalizedText.length, index + dateStr.length + 5);
+        const context = normalizedText.substring(windowStart, windowEnd);
+
+        const tienePalabraExcluida = palabrasExcluidas.some((p) => context.includes(p));
+        if (tienePalabraExcluida) {
+          return false;
+        }
+        index = normalizedText.indexOf(dateStr, index + 1);
+      }
+      return true;
+    });
+
+    return filtered.length > 0 ? filtered : dates;
+  },
 };
 
 import type { OCRAnalysisResult } from '@/lib/definitions';
@@ -77,7 +102,8 @@ export class PrescriptionEngine {
     // cuando no hay notificación oportuna. Dado que la consulta de multas en el listado del SIMIT no provee
     // un campo de 'Fecha de Notificación', se utiliza la fecha de comparendo como un límite conservador
     // (fail-safe) para el dictamen automatizado de prescripción (3 años).
-    const sortedDates = [...dates].sort((a, b) => {
+    const filteredDates = OCRSanitizer.filtrarFechasContexto(normalizedText, dates);
+    const sortedDates = [...filteredDates].sort((a, b) => {
       const [dayA, monthA, yearA] = a.split('/');
       const [dayB, monthB, yearB] = b.split('/');
       return (

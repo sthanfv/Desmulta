@@ -318,11 +318,11 @@ export default function StoryProgressModal({
                 {activeStep.desc}
               </p>
 
-              {/* Marca de agua Zero-PII */}
+              {/* Marca de agua de seguridad amigable */}
               <div className="absolute bottom-2 left-0 right-0 flex items-center justify-center gap-1.5 opacity-30">
                 <CheckCircle2 size={10} className="text-emerald-500" />
                 <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400">
-                  Protección Zero-PII Activa
+                  Tus Datos están Seguros
                 </span>
               </div>
             </m.div>

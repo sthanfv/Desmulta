@@ -10,6 +10,7 @@
 
 - 📘 [**Documentación Principal (README)**](docs/README.md)
 - 🏗️ [**Arquitectura Técnica**](docs/ARCHITECTURE.md)
+- 🔌 [**Referencia de API B2B (API_B2B.md)**](docs/API_B2B.md)
 - ⚖️ [**Marco Legal y Privacidad**](docs/LEGAL.md)
 - 🧠 [**Memoria de Sesiones (MEMORY.md)**](docs/MEMORY.md)
 

@@ -35,6 +35,7 @@ import {
   LayoutGrid,
   RotateCcw,
   Gift,
+  Key,
 } from 'lucide-react';
 import { TableroFlujoTrabajo } from '@/components/vial-clear/TableroFlujoTrabajo';
 import { AnalyticsView } from '@/components/vial-clear/AnalyticsView';
@@ -448,6 +449,13 @@ export function AdminDashboard() {
             </span>
           </div>
           <div className="flex items-center gap-2">
+            <a
+              href="/admin/api-keys"
+              className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              title="Gestión de API Keys B2B"
+            >
+              <Key size={16} />
+            </a>
             <a
               href="/admin/gallery"
               className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"

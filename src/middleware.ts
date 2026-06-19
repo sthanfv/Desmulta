@@ -92,6 +92,21 @@ export async function middleware(request: NextRequest) {
   // Headers básicos sin CSP completa (evita overhead). El rate-limit y auth
   // son responsabilidad de cada handler individual.
   if (pathname.startsWith('/api')) {
+    // 🛡️ API VIP Protection (Fail-Closed)
+    if (pathname.startsWith('/api/vip') && !pathname.startsWith('/api/vip/auth') && !pathname.startsWith('/api/vip/logout')) {
+      const sessionToken = request.cookies.get('_vip_session')?.value;
+      const isVip = sessionToken ? !!(await verifyVipSession(sessionToken)) : false;
+
+      if (!isVip) {
+        const response = NextResponse.json({ error: 'Sesión inválida o expirada' }, { status: 401 });
+        if (sessionToken) {
+          response.cookies.delete('_vip_session');
+        }
+        applyCommonSecurityHeaders(response, isProduction);
+        return response;
+      }
+    }
+
     const response = NextResponse.next({
       request: { headers: requestHeaders },
     });

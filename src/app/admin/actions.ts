@@ -468,7 +468,7 @@ export async function updateCaseStatus(
     const db = getFirestore();
     const caseRef = db.collection('cases').doc(caseId);
 
-    const _leadData = await db.runTransaction(async (transaction) => {
+    const transactionResult = await db.runTransaction(async (transaction) => {
       // ==========================================
       // FASE 1: LECTURA AISLADA (SOLO GETs)
       // ==========================================
@@ -480,7 +480,7 @@ export async function updateCaseStatus(
 
       let leadRef = null;
       let publicRef = null;
-      let currentLeadData: { fcmToken?: string; trackingUuid?: string } | undefined = undefined;
+      let currentLeadData: { fcmToken?: string; trackingUuid?: string; cedulaHash?: string } | undefined = undefined;
 
       // Si el caso tiene una consulta vinculada, la leemos ahora
       if (caseData?.consultationId) {
@@ -491,6 +491,7 @@ export async function updateCaseStatus(
           trackingUuid?: string;
           email?: string;
           nombre?: string;
+          cedulaHash?: string;
         };
 
         // Si la consulta tiene un UUID de seguimiento, preparamos la referencia pública
@@ -550,8 +551,26 @@ export async function updateCaseStatus(
         );
       }
 
-      return currentLeadData;
+      return {
+        leadData: currentLeadData,
+        cedulaHash: caseData?.cedulaHash || currentLeadData?.cedulaHash,
+      };
     });
+
+    const _leadData = transactionResult.leadData;
+    const cedulaHash = transactionResult.cedulaHash;
+
+    // Invalidar caché de Redis para el portal VIP de este usuario
+    if (cedulaHash) {
+      try {
+        const { invalidateCache } = await import('@/lib/cache/redis-cache');
+        await invalidateCache(`vip_session:cedula:${cedulaHash}`);
+      } catch (cacheErr) {
+        logger.warn('[updateCaseStatus] Error al invalidar caché VIP en Redis', {
+          error: String(cacheErr),
+        });
+      }
+    }
 
     revalidateTag('tracking'); // ⚡ Destruye el caché de la CDN instantáneamente
 
@@ -743,6 +762,18 @@ export async function updateConsultationStatus(
 
       return leadData;
     });
+
+    // Invalidar caché de Redis para el portal VIP de este usuario
+    if (_leadData?.cedulaHash) {
+      try {
+        const { invalidateCache } = await import('@/lib/cache/redis-cache');
+        await invalidateCache(`vip_session:cedula:${_leadData.cedulaHash}`);
+      } catch (cacheErr) {
+        logger.warn('[updateConsultationStatus] Error al invalidar caché VIP en Redis', {
+          error: String(cacheErr),
+        });
+      }
+    }
 
     // Esto hace que la tabla se refresque sola sin F5
     revalidatePath('/admin');

@@ -89,6 +89,19 @@ async function verifyAdminAuth(request: NextRequest): Promise<boolean> {
   }
 }
 
+/**
+ * Valida que el header Origin coincida con la URL oficial del sitio.
+ * Mitiga ataques de Cross-Site Request Forgery (CSRF).
+ */
+function verifyOrigin(request: NextRequest): boolean {
+  const origin = request.headers.get('origin') || request.headers.get('Origin');
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  if (siteUrl && origin && origin !== siteUrl) {
+    return false;
+  }
+  return true;
+}
+
 // ─── GET: Listar API Keys ──────────────────────────────────────────────────────
 
 export async function GET(request: NextRequest) {
@@ -146,6 +159,11 @@ const CrearKeySchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  // 🛡️ Validación de cabecera Origin (Mitigación CSRF)
+  if (!verifyOrigin(request)) {
+    return NextResponse.json(apiError('AUTH_FAILED', 'Acceso prohibido: Origen no permitido (CSRF).'), { status: 403 });
+  }
+
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
 
   const rl = await checkRateLimit('galleryUpload', `admin-api-keys-create:${ip}`);
@@ -237,6 +255,11 @@ export async function POST(request: NextRequest) {
 // ─── DELETE: Revocar API Key ───────────────────────────────────────────────────
 
 export async function DELETE(request: NextRequest) {
+  // 🛡️ Validación de cabecera Origin (Mitigación CSRF)
+  if (!verifyOrigin(request)) {
+    return NextResponse.json(apiError('AUTH_FAILED', 'Acceso prohibido: Origen no permitido (CSRF).'), { status: 403 });
+  }
+
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
 
   const rl = await checkRateLimit('galleryDelete', `admin-api-keys-delete:${ip}`);

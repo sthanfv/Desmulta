@@ -103,6 +103,19 @@ describe('QA Motor Heurístico Legal (Ley 769 & C-038)', () => {
       expect(result.isViable).toBe(false);
       expect(result.lowConfidence).toBe(true);
     });
+
+    it('Caso 9: Desambiguación de fechas por contexto (evita falsos positivos con fechas de resolución)', () => {
+      // Se tienen dos fechas: '15/05/2024' e '10/10/2018'.
+      // Pero '10/10/2018' está precedida por la palabra 'RESOLUCION'.
+      // El motor debe descartar '10/10/2018' por contexto de resolución y tomar '15/05/2024' como la fecha de infracción principal.
+      const result = PrescriptionEngine.evaluate(
+        'INFRACCION EL 15/05/2024 SIMIT RESOLUCION Nro 45 del 10/10/2018',
+        ['15/05/2024', '10/10/2018']
+      );
+      // '10/10/2018' debe descartarse, resultando solo en ['15/05/2024']
+      expect(result.detectedDates).not.toContain('10/10/2018');
+      expect(result.detectedDates).toContain('15/05/2024');
+    });
   });
 });
 

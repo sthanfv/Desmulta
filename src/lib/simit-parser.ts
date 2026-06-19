@@ -29,9 +29,30 @@ export function extraerMultasDeTexto(texto: string): Multa[] {
         const bloqueContexto = lineas.slice(index, index + 8).join(' ');
 
         const fechas = bloqueContexto.match(regexFecha);
-        const valores = bloqueContexto.match(regexValor);
+        // 🛡️ DEVSECOPS: Excluir el número de comparendo del bloque de valores para evitar falsos positivos
+        const bloqueSinComparendo = bloqueContexto.replace(comp, '');
+        const valores = bloqueSinComparendo.match(regexValor);
 
-        const fecha = fechas ? fechas[0] : new Date().toLocaleDateString('es-CO');
+        let fecha = new Date().toLocaleDateString('es-CO');
+        if (fechas && fechas.length > 0) {
+          const bloqueUpper = bloqueContexto.toUpperCase();
+          const palabrasExcluidas = ['RESOL', 'NOTIF'];
+          const fechasLimpias = fechas.filter((fStr) => {
+            let idx = bloqueUpper.indexOf(fStr);
+            while (idx !== -1) {
+              const start = Math.max(0, idx - 30);
+              const end = Math.min(bloqueUpper.length, idx + fStr.length + 5);
+              const context = bloqueUpper.substring(start, end);
+              const tienePalabraExcluida = palabrasExcluidas.some((p) => context.includes(p));
+              if (tienePalabraExcluida) {
+                return false;
+              }
+              idx = bloqueUpper.indexOf(fStr, idx + 1);
+            }
+            return true;
+          });
+          fecha = fechasLimpias.length > 0 ? fechasLimpias[0] : fechas[0];
+        }
         let valor = 0;
 
         if (valores) {

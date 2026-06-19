@@ -297,7 +297,7 @@ describe('Gallery API Route — Integración CRUD de Casos de Éxito', () => {
     it('debe incluir los headers de Cache-Control configurados', async () => {
       const response = await GET();
       expect(response.headers.get('Cache-Control')).toBe(
-        'public, s-maxage=60, stale-while-revalidate=300'
+        'public, s-maxage=300, stale-while-revalidate=600'
       );
     });
 

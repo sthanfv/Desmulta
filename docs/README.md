@@ -39,6 +39,7 @@ npm run dev # -> http://localhost:9005
 Toda la documentación técnica se encuentra centralizada en la carpeta `/docs`:
 
 - [**Arquitectura y API**](ARCHITECTURE.md): Topología, diagramas Mermaid, guía de setup y referencia de endpoints.
+- [**Referencia de API B2B**](API_B2B.md): Arquitectura del gateway, 9 capas de validación, planes, rate limits, especificaciones de endpoints y guía de activación comercial en vivo.
 - [**Legal y Cumplimiento**](LEGAL.md): Marco jurídico, política de privacidad Zero-PII y reporte de vulnerabilidades.
 - [**Memoria del Proyecto**](MEMORY.md): Log histórico de sesiones, decisiones técnicas y deuda técnica.
 - [**Cambios (Changelog)**](CHANGELOG.md): Registro histórico de versiones y mejoras.
