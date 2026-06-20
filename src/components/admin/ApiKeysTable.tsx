@@ -180,12 +180,13 @@ export function ApiKeysTable() {
                     Copia esta clave ahora. Por seguridad, no volverá a mostrarse.
                   </p>
                   <div className="flex items-center gap-2 mt-2">
-                    <code className="flex-1 p-2 bg-background rounded border text-xs font-mono truncate">
+                    <code className="flex-1 min-w-0 block p-2 bg-background rounded border text-[11px] sm:text-xs font-mono truncate" title={newKey}>
                       {newKey}
                     </code>
                     <Button
                       size="icon"
                       variant="outline"
+                      className="shrink-0"
                       onClick={() => {
                         navigator.clipboard.writeText(newKey);
                         toast({ title: 'Copiado al portapapeles' });
@@ -241,9 +242,9 @@ export function ApiKeysTable() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="starter">Starter (500 req/mes)</SelectItem>
-                            <SelectItem value="growth">Growth (5,000 req/mes)</SelectItem>
-                            <SelectItem value="enterprise">Enterprise (50,000 req/mes)</SelectItem>
+                            <SelectItem value="starter">Starter (500 peticiones/mes)</SelectItem>
+                            <SelectItem value="growth">Growth (5.000 peticiones/mes)</SelectItem>
+                            <SelectItem value="enterprise">Enterprise (50.000 peticiones/mes)</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />

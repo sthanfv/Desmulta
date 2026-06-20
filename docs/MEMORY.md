@@ -2,6 +2,8 @@
 
 | Versión | Estado     | Hitos Principales |
 | :---    | :---       | :---              |
+| v1.0.0  | 🟢 Estable | Reparación UI del Panel API Keys: Traducción a español (peticiones/mes) y corrección de desbordamiento (overflow) de claves largas en el modal. |
+| v1.0.0  | 🟢 Estable | Auditoría Completa del Proyecto + Corrección Crítica vercel.json (maxDuration OCR 30→60s) + Incidente Seguridad: API Key `dm_live_...` expuesta en chat → REVOCAR INMEDIATAMENTE |
 | v1.0.0  | 🟢 Estable | Corrección de Regresiones en Pruebas Unitarias (Desambiguación de Fechas en PrescriptionEngine y Valores en SIMIT Parser) |
 | v1.0.0  | 🟢 Estable | Remediación de Escalabilidad (Fase 3: Caché Redis para Firestore, Invalidación VIP en Transacciones, Caché Galería 300s, Fallback Tesseract OCR ante Límite Gemini) |
 | v1.0.0  | 🟢 Estable | Correcciones de Texto y UX en el Frontend (Remoción de Jerga Técnica y Referencias a PDF) |
