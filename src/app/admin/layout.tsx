@@ -54,6 +54,37 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     };
   }, [user, isUserLoading]);
 
+  // 🛡️ MANDATO-FILTRO: Vigía de Inactividad (Cierra sesión a los 30 min)
+  useEffect(() => {
+    if (!user || !isAdmin) return;
+
+    let timeoutId: NodeJS.Timeout;
+    const INACTIVITY_TIME = 30 * 60 * 1000; // 30 minutos
+
+    const logout = async () => {
+      logger.warn('Cerrando sesión por inactividad');
+      await fetch('/api/auth/session', { method: 'DELETE' });
+      if (auth) await auth.signOut();
+      window.location.href = '/acceso-panel?reason=inactividad';
+    };
+
+    const resetTimer = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(logout, INACTIVITY_TIME);
+    };
+
+    // Eventos que reinician el contador
+    const events = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart'];
+    
+    events.forEach((event) => document.addEventListener(event, resetTimer, { passive: true }));
+    resetTimer(); // Iniciar cronómetro por primera vez
+
+    return () => {
+      clearTimeout(timeoutId);
+      events.forEach((event) => document.removeEventListener(event, resetTimer));
+    };
+  }, [user, isAdmin, auth]);
+
   const handleRefreshPermissions = async () => {
     if (!user) return;
     setIsRefreshing(true);

@@ -16,7 +16,6 @@ export function Toaster() {
   return (
     <ToastProvider>
       {toasts.map(function ({ id, title, description, action, ...props }) {
-        // @ts-expect-error - variant usually exists but TypeScript might complain
         const isDestructive = props.variant === 'destructive';
         
         return (
