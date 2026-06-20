@@ -21,15 +21,27 @@ interface ModalNotaOperadorProps {
 const QUICK_REPLIES = [
   {
     label: '✅ Todo en orden',
-    texto: 'Hola, acabo de revisar tu caso y veo que todo está en orden.',
+    texto: 'Hola, acabo de revisar tu caso y veo que todo está en orden. Seguimos avanzando según lo planeado.',
   },
   {
     label: '📄 Falta documentación',
-    texto: 'Falta documentación en tu expediente, por favor revisa tu correo.',
+    texto: 'Hola, nos hacen falta algunos documentos clave para tu expediente. Por favor, revisa tu correo electrónico.',
+  },
+  {
+    label: '⚖️ En análisis legal',
+    texto: 'Nuestro equipo jurídico está evaluando detalladamente los argumentos de tu caso para asegurar la mejor defensa.',
+  },
+  {
+    label: '🏛️ En espera de respuesta',
+    texto: 'Ya presentamos los documentos. Ahora dependemos de los tiempos legales de la entidad de tránsito para obtener respuesta.',
+  },
+  {
+    label: '📞 Llamada pendiente',
+    texto: 'Por favor, mantente atento a tu celular. Un especialista se comunicará contigo muy pronto para darte novedades.',
   },
   {
     label: '🎉 Caso resuelto',
-    texto: '¡Felicidades! Hemos resuelto tus comparendos exitosamente.',
+    texto: '¡Felicidades! Hemos resuelto tu caso exitosamente. Revisa el SIMIT/RUNT en las próximas horas.',
   },
 ];
 

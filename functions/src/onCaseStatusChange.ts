@@ -143,10 +143,14 @@ async function processCaseEmail(caseId: string, after: CaseAfterData, isNew: boo
     };
 
     // ─── Push notification automático al cliente ──────────────────────────
-    // [DEPRECADO] El envío de notificaciones Push ahora se maneja en el Motor 
-    // de Despacho (notification-dispatcher.ts) directamente desde actions.ts
-    // cuando el operador mueve la tarjeta en el Kanban. Mantener esto aquí 
-    // generaba notificaciones duplicadas (visto en producción).
+    // Restaurado en Cloud Functions para atrapar cambios desde Telegram y Web.
+    const pushSnap = await db.collection('consultations').doc(consultationId).collection('private').doc('push').get();
+    const fcmToken = pushSnap.data()?.fcmToken || leadData?.fcmToken;
+
+    if (fcmToken) {
+      const trackingUrl = trackingUuid ? `https://desmulta.online/seguir/${trackingUuid}` : undefined;
+      await sendCaseUpdateNotification(fcmToken, status, caseId, trackingUrl, consultationId, operatorNote);
+    }
 
     if (!emailCiudadano) {
       logger.info(`[processCaseEmail] El caso ${caseId} no tiene email de contacto. Solo Push fue enviado.`);
@@ -443,10 +447,10 @@ export const onConsultationStatusChange = onDocumentUpdated({
   const consultationId = event.params.consultationId;
 
   // Evitar notificaciones duplicadas:
-  // Si el estado pertenece a un Caso Legal (ej: apertura, en_proceso, radicado, terminado...)
+  // Si el estado pertenece a un Caso Legal o si crea un caso (ej: contactado, estudio, apertura, en_proceso...)
   // ignoramos el trigger aquí porque onCaseStatusChange enviará la notificación
   // Solo disparamos en etapas tempranas exclusivas del Lead.
-  const leadOnlyStatuses = ['pendiente', 'nuevo', 'contactado', 'estudio', 'descartado'];
+  const leadOnlyStatuses = ['pendiente', 'nuevo', 'descartado'];
   if (!leadOnlyStatuses.includes(after.status.toLowerCase())) {
     logger.info(`[onConsultationStatusChange] Ignorando status '${after.status}' para evitar duplicados. Se maneja en onCaseStatusChange.`);
     return;

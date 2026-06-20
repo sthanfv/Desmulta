@@ -83,9 +83,9 @@ async function cambiarEstado(
     const estadoAnterior = data.status || 'pendiente';
     const estadoInfo = ESTADOS[nuevoEstado];
 
-    // ── 0. Verificación de Idempotencia por messageId ─────────────────────────
-    if (messageId && data.lastBotMessageId === messageId) {
-      logger.warn(`[CRM] Idempotencia: el mensaje ${messageId} ya procesó un cambio de estado para ${consultationId}. Ignorando.`);
+    // ── 0. Verificación de Idempotencia por Estado ────────────────────────────
+    if (estadoAnterior === nuevoEstado) {
+      logger.warn(`[CRM] Idempotencia: El caso ya está en estado ${nuevoEstado}. Ignorando.`);
       return false; // Evita reprocesamiento en caso de doble tap
     }
 
@@ -93,8 +93,7 @@ async function cambiarEstado(
     await consultationRef.update({
       status: nuevoEstado,
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      lastOperator: operador,
-      ...(messageId ? { lastBotMessageId: messageId } : {})
+      lastOperator: operador
     });
 
     // ── 2. Actualizar public_tracking con el evento ───────────────────────────

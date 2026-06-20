@@ -77,7 +77,8 @@ export async function sendCaseUpdateNotification(
   newStatus: string,
   caseId: string,
   trackingUrl?: string,
-  consultationId?: string
+  consultationId?: string,
+  operatorNote?: string
 ) {
   try {
     const templateFn = STATUS_TEMPLATES[newStatus.toLowerCase()];
@@ -87,10 +88,11 @@ export async function sendCaseUpdateNotification(
     }
 
     const { title, body } = templateFn(caseId);
+    const finalBody = operatorNote ? `${body}\n\n🧑‍💼 Nota del asesor: "${operatorNote}"` : body;
 
     const message = {
       token: fcmToken,
-      notification: { title, body },
+      notification: { title, body: finalBody },
       data: {
         caseId,
         type: 'status_update',
