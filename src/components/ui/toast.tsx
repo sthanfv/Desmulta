@@ -50,13 +50,27 @@ const Toast = React.forwardRef<
       className={cn(toastVariants({ variant }), className)}
       {...props}
     >
-      {/* Animación: Dos líneas de láser recorriendo el borde */}
-      <div className={cn(
-        "absolute inset-[-150%] animate-[spin_4s_linear_infinite]",
-        variant === 'destructive' 
-          ? "bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,#f43f5e_25%,transparent_50%,transparent_50%,#f43f5e_75%,transparent_100%)]" 
-          : "bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,theme(colors.primary.DEFAULT)_25%,transparent_50%,transparent_50%,theme(colors.primary.DEFAULT)_75%,transparent_100%)]"
-      )} />
+      {/* Animación: Rayos de luz diagonales (StarBorder style) */}
+      <div
+        className="absolute bottom-[-20%] right-[-250%] w-[300%] h-[50%] opacity-80 rounded-full z-0 pointer-events-none"
+        style={{
+          background: variant === 'destructive' 
+            ? `radial-gradient(circle, #f43f5e 0%, transparent 10%)`
+            : `radial-gradient(circle, hsl(var(--primary)) 0%, transparent 10%)`,
+          animation: `star-movement-bottom 6s linear infinite alternate`,
+          willChange: 'transform',
+        }}
+      />
+      <div
+        className="absolute top-[-20%] left-[-250%] w-[300%] h-[50%] opacity-80 rounded-full z-0 pointer-events-none"
+        style={{
+          background: variant === 'destructive' 
+            ? `radial-gradient(circle, #f43f5e 0%, transparent 10%)`
+            : `radial-gradient(circle, hsl(var(--primary)) 0%, transparent 10%)`,
+          animation: `star-movement-top 6s linear infinite alternate`,
+          willChange: 'transform',
+        }}
+      />
       
       {/* Contenedor Glass Interno */}
       <div className={cn(

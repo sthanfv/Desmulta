@@ -150,4 +150,12 @@ npm run blog:sync
 ```
 El script leerá tus feeds de Google Alerts y enviará las novedades correspondientes de inmediato a tu bot de Telegram.
 
+---
 
+## 10. Galería Visual de Notificaciones (Sandbox)
+
+Esta herramienta oculta está diseñada exclusivamente para que los administradores puedan auditar la estética y los textos de las alertas del sistema (Toasts) en tiempo real, sin afectar la base de datos ni tener que forzar errores reales.
+
+- **Ruta Oculta de Acceso:** `https://desmulta.online/admin/toasts-sandbox` *(Requiere haber iniciado sesión en el administrador)*.
+- **Uso:** Al ingresar a esta ruta secreta, encontrarás un panel de control con botones para disparar cada tipo de notificación (Éxito, Error de Validación, Bloqueo de Seguridad por Abuso/Rate Limit, Informativos y Alertas de Acción).
+- **Importante:** Esta ruta no tiene ningún enlace o botón en el menú de navegación para evitar que operadores no técnicos o clientes la encuentren por accidente.
