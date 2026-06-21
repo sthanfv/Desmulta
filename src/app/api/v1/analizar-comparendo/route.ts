@@ -1,13 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { Redis } from '@upstash/redis';
+
+const redis = Redis.fromEnv();
+const MAX_GEMINI_DAILY = 500; // Límite de seguridad
+
 import { logger } from '@/lib/logger/security-logger';
 import { apiError } from '@/lib/types/api-response';
 import {
   extraerComparendo,
   construirAnalisisCompleto,
 } from '@/lib/legal/comparendo-extractor';
-import { validateApiKey, API_KEY_HEADER } from '@/lib/security/api-key-guard';
+import { validateApiKey, API_KEY_HEADER, handleApiKeyError } from '@/lib/security/api-key-guard';
 
 /**
  * API Route: POST /api/v1/analizar-comparendo
@@ -84,32 +89,7 @@ export async function POST(request: NextRequest) {
   const rawKey = request.headers.get(API_KEY_HEADER);
   const authResult = await validateApiKey(rawKey);
 
-  if (!authResult.valid) {
-    const statusMap: Record<string, number> = {
-      MISSING: 401,
-      INVALID: 401,
-      REVOKED: 403,
-      EXPIRED: 403,
-      QUOTA_EXCEEDED: 429,
-      RATE_LIMITED: 429,
-    };
-    const httpStatus = statusMap[authResult.errorCode ?? 'INVALID'] ?? 401;
-    const codeMap: Record<string, string> = {
-      MISSING: 'API_KEY_MISSING',
-      INVALID: 'API_KEY_INVALID',
-      REVOKED: 'API_KEY_REVOKED',
-      EXPIRED: 'API_KEY_EXPIRED',
-      QUOTA_EXCEEDED: 'API_KEY_QUOTA_EXCEEDED',
-      RATE_LIMITED: 'RATE_LIMITED',
-    };
-    const errorCode = codeMap[authResult.errorCode ?? 'INVALID'] ?? 'API_KEY_INVALID';
-
-    return NextResponse.json(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      apiError(errorCode as any, authResult.errorMessage ?? 'No autorizado.'),
-      { status: httpStatus }
-    );
-  }
+  if (!authResult.valid) return handleApiKeyError(authResult);
 
   // ══════════════════════════════════════════════════════════════════════
   // CAPA 2: Validación de entrada
@@ -138,6 +118,18 @@ export async function POST(request: NextRequest) {
   // CAPA 3: OCR con Gemini
   // ══════════════════════════════════════════════════════════════════════
   try {
+    const dateStr = new Date().toISOString().split('T')[0];
+    const dailyCount = await redis.incr(`gemini:daily:${dateStr}`);
+    if (dailyCount === 1) await redis.expire(`gemini:daily:${dateStr}`, 86400);
+
+    if (dailyCount > MAX_GEMINI_DAILY) {
+      logger.error('[analizar-comparendo] CUOTA DIARIA DE GEMINI EXCEDIDA', { dailyCount });
+      return NextResponse.json(
+        apiError('INTERNAL_ERROR', 'Servicio temporalmente saturado. Intenta de nuevo más tarde o mañana.'),
+        { status: 503 }
+      );
+    }
+
     const model = getGeminiModel();
 
     const timeoutPromise = new Promise<never>((_, reject) => {

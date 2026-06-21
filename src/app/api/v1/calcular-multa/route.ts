@@ -4,7 +4,7 @@ import { logger } from '@/lib/logger/security-logger';
 import { apiError } from '@/lib/types/api-response';
 import { calcularMultaCompleta } from '@/lib/calculadora-legal';
 import { determinarCausales } from '@/lib/legal/comparendo-extractor';
-import { validateApiKey, API_KEY_HEADER } from '@/lib/security/api-key-guard';
+import { validateApiKey, API_KEY_HEADER, handleApiKeyError } from '@/lib/security/api-key-guard';
 
 /**
  * API Route: POST /api/v1/calcular-multa
@@ -69,32 +69,7 @@ export async function POST(request: NextRequest) {
   const rawKey = request.headers.get(API_KEY_HEADER);
   const authResult = await validateApiKey(rawKey);
 
-  if (!authResult.valid) {
-    const statusMap: Record<string, number> = {
-      MISSING: 401,
-      INVALID: 401,
-      REVOKED: 403,
-      EXPIRED: 403,
-      QUOTA_EXCEEDED: 429,
-      RATE_LIMITED: 429,
-    };
-    const httpStatus = statusMap[authResult.errorCode ?? 'INVALID'] ?? 401;
-    const codeMap: Record<string, string> = {
-      MISSING: 'API_KEY_MISSING',
-      INVALID: 'API_KEY_INVALID',
-      REVOKED: 'API_KEY_REVOKED',
-      EXPIRED: 'API_KEY_EXPIRED',
-      QUOTA_EXCEEDED: 'API_KEY_QUOTA_EXCEEDED',
-      RATE_LIMITED: 'RATE_LIMITED',
-    };
-    const errorCode = codeMap[authResult.errorCode ?? 'INVALID'] ?? 'API_KEY_INVALID';
-
-    return NextResponse.json(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      apiError(errorCode as any, authResult.errorMessage ?? 'No autorizado.'),
-      { status: httpStatus }
-    );
-  }
+  if (!authResult.valid) return handleApiKeyError(authResult);
 
   // ══════════════════════════════════════════════════════════════════════
   // CAPA 2: Validación de entrada

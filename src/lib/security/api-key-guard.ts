@@ -326,3 +326,24 @@ export async function validateApiKey(rawKey: string | null): Promise<ApiKeyValid
     remainingMinute: rlResult.remaining,
   };
 }
+
+// ─── Manejo Centralizado de Errores (DRY) ─────────────────────────────────────
+import { NextResponse } from 'next/server';
+import { apiError } from '@/lib/types/api-response';
+
+const STATUS_MAP: Record<string, number> = {
+  MISSING: 401, INVALID: 401, REVOKED: 403, EXPIRED: 403,
+  QUOTA_EXCEEDED: 429, RATE_LIMITED: 429,
+};
+const CODE_MAP: Record<string, string> = {
+  MISSING: 'API_KEY_MISSING', INVALID: 'API_KEY_INVALID',
+  REVOKED: 'API_KEY_REVOKED', EXPIRED: 'API_KEY_EXPIRED',
+  QUOTA_EXCEEDED: 'API_KEY_QUOTA_EXCEEDED', RATE_LIMITED: 'RATE_LIMITED',
+};
+
+export function handleApiKeyError(r: ApiKeyValidationResult): NextResponse {
+  const status = STATUS_MAP[r.errorCode ?? 'INVALID'] ?? 401;
+  const code = CODE_MAP[r.errorCode ?? 'INVALID'] ?? 'API_KEY_INVALID';
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return NextResponse.json(apiError(code as any, r.errorMessage ?? ''), { status });
+}
