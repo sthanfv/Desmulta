@@ -10,20 +10,11 @@ export const metadata: Metadata = {
   description: 'Integra nuestro potente motor OCR y calculadora legal en tu propio software. API RESTful de grado empresarial para firmas de abogados, fintechs y flotas.',
 };
 
-export default function ApiDocsPage() {
-  // Footer data dummy para la documentación
-  const footerData = {
-    whatsapp: '573005648309',
-    email: 'contacto@desmulta.online',
-    address: 'Colombia, Nacional',
-    instagramUrl: '',
-    facebookUrl: ''
-  };
+import { ClientLayout } from './ClientLayout';
 
+export default function ApiDocsPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground selection:bg-primary/30 selection:text-primary-foreground">
-      <Header onOpenModal={() => {}} />
-      
+    <ClientLayout>
       <main className="pt-32 pb-24 px-6 max-w-5xl mx-auto space-y-24">
         
         {/* HERO SECTION */}
@@ -89,7 +80,7 @@ export default function ApiDocsPage() {
             <p className="text-muted-foreground">Endpoint unificado que recibe la imagen, ejecuta OCR estructurado con IA y evalúa el dictamen jurídico de caducidad y prescripción.</p>
             
             <div className="flex items-center gap-4">
-              <span className="px-3 py-1 rounded bg-green-500/20 text-green-500 font-bold text-sm">POST</span>
+               <span className="px-3 py-1 rounded bg-green-500/20 text-green-500 font-bold text-sm">POST</span>
               <code className="text-sm">https://desmulta.online/api/v1/analizar-comparendo</code>
             </div>
 
@@ -141,15 +132,13 @@ export default function ApiDocsPage() {
             Nuestros planes B2B comienzan desde 500 consultas al mes. Contáctanos para emitir tu API Key comercial.
           </p>
           <div className="flex justify-center gap-4 pt-4">
-            <Button size="lg" className="bg-primary text-primary-foreground font-bold rounded-xl" onClick={() => window.location.href = '#contacto'}>
-              Contactar a Ventas
+            <Button size="lg" className="bg-primary text-primary-foreground font-bold rounded-xl" asChild>
+              <a href="https://wa.me/573005648309" target="_blank" rel="noopener noreferrer">Contactar a Ventas</a>
             </Button>
           </div>
         </section>
 
       </main>
-
-      <Footer footerData={footerData} onOpenWhatsAppWarning={() => { window.location.href = '#contacto'; }} />
-    </div>
+    </ClientLayout>
   );
 }
