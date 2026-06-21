@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Outfit } from 'next/font/google';
 import { AlertTriangle, Loader2, Wrench } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,26 @@ export default function GlobalError({
   reset: () => void;
 }) {
   const [isHealing, setIsHealing] = useState(false);
+
+  useEffect(() => {
+    console.error('GLOBAL_CRITICAL_ERROR:', error);
+    
+    // Telemetría pasiva de Crash Reporting
+    try {
+      fetch('/api/internal/crash-report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: error.message,
+          digest: error.digest,
+          path: window.location.pathname + window.location.search,
+        }),
+        keepalive: true,
+      }).catch(() => { /* Fallo silencioso */ });
+    } catch (e) {
+      // Ignorar
+    }
+  }, [error]);
 
   /**
    * En un fallo de RootLayout, el reset() de React rara vez funciona.

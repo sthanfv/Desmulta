@@ -16,8 +16,24 @@ export default function Error({
   const [isHealing, setIsHealing] = useState(false);
 
   useEffect(() => {
-    // Registro de error para auditoría proactiva
+    // Registro de error para auditoría proactiva en consola
     console.error('CRITICAL_SYSTEM_ERROR:', error);
+    
+    // Telemetría pasiva de Crash Reporting
+    try {
+      fetch('/api/internal/crash-report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: error.message,
+          digest: error.digest,
+          path: window.location.pathname + window.location.search,
+        }),
+        keepalive: true,
+      }).catch(() => { /* Fallo silencioso */ });
+    } catch (e) {
+      // Ignorar errores del propio sistema de telemetría
+    }
   }, [error]);
 
   /**
