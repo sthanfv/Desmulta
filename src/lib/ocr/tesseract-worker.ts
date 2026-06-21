@@ -19,6 +19,7 @@ class TesseractWorkerManager {
   private worker: Worker | null = null;
   public isBusy = false;
   private initializing: Promise<Worker> | null = null;
+  private currentOnProgress: ((m: LoggerMessage) => void) | null = null;
 
   /**
    * Inicializa el worker con un logger opcional en la fase de creación.
@@ -27,6 +28,10 @@ class TesseractWorkerManager {
   async init(onProgress?: (m: LoggerMessage) => void): Promise<Worker> {
     if (typeof window === 'undefined') {
       return Promise.reject(new Error('[OCR] Intento de inicialización en el servidor bloqueado.'));
+    }
+
+    if (onProgress) {
+      this.currentOnProgress = onProgress;
     }
 
     if (this.worker) return this.worker;
@@ -39,13 +44,13 @@ class TesseractWorkerManager {
           workerPath: '/tesseract/worker.min.js',
           langPath: '/tesseract/lang',
           corePath: '/tesseract/tesseract-core.wasm.js',
-          logger: onProgress
-            ? onProgress
-            : (m) => {
-                if (process.env.NODE_ENV === 'development' && m.status === 'recognizing text') {
-                  // Log silencioso de progreso
-                }
-              },
+          logger: (m) => {
+            if (this.currentOnProgress) {
+              this.currentOnProgress(m);
+            } else if (process.env.NODE_ENV === 'development' && m.status === 'recognizing text') {
+              // Log silencioso de progreso
+            }
+          },
         });
 
         this.worker = worker;

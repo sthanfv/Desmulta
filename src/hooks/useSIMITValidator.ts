@@ -158,81 +158,55 @@ export const useSIMITValidator = () => {
 
       let resultRaw: { data: { text: string; words?: TesseractWord[]; confidence?: number } };
       try {
-        try {
-          const iaTask = async () => {
-            mediaLogger.log('OCR', 'Enviando a API de IA (Gemini)...');
-            const res = await reconocerTextoConIA(archivoProcesar, (p) => {
-              setCargandoModelo(p < 100);
-              setProgresoOCR(p);
-            });
-            return {
-              data: {
-                text: res.texto,
-                words: res.palabras,
-                confidence: 99, // IA tiene alta confianza general
-              },
-            };
-          };
-
-          resultRaw = await Promise.race([iaTask(), timeoutPromise]);
-          mediaLogger.log('OCR', 'Escaneo con IA completado con éxito', {
-            textLength: resultRaw.data.text.length,
+        const ocrTask = async () => {
+          mediaLogger.log('OCR', 'Inicializando motor Tesseract local (IA desactivada)...');
+          await tesseractManager.init((m: { status: string; progress: number }) => {
+            switch (m.status) {
+              case 'loading tesseract core':
+                setCargandoModelo(true);
+                setProgresoOCR((prev) => Math.max(prev, 10));
+                break;
+              case 'loaded tesseract core':
+                setProgresoOCR((prev) => Math.max(prev, 15));
+                break;
+              case 'loading language traineddata':
+                setProgresoOCR((prev) => Math.max(prev, 25));
+                break;
+              case 'loaded language traineddata':
+                setProgresoOCR((prev) => Math.max(prev, 30));
+                break;
+              case 'initializing tesseract':
+                setProgresoOCR((prev) => Math.max(prev, 40));
+                break;
+              case 'initialized tesseract':
+                setProgresoOCR((prev) => Math.max(prev, 45));
+                break;
+              case 'recognizing text':
+                setCargandoModelo(false);
+                const progress = 45 + Math.round(m.progress * 55);
+                setProgresoOCR((prev) => Math.max(prev, progress));
+                break;
+            }
           });
-        } catch (iaError) {
-          mediaLogger.log('OCR', 'Fallo en IA, haciendo fallback a Tesseract local', {
-            err: String(iaError),
-          });
 
-          const ocrTask = async () => {
-            mediaLogger.log('OCR', 'Inicializando motor Tesseract...');
-            await tesseractManager.init((m: { status: string; progress: number }) => {
-              switch (m.status) {
-                case 'loading tesseract core':
-                  setCargandoModelo(true);
-                  setProgresoOCR((prev) => Math.max(prev, 10));
-                  break;
-                case 'loaded tesseract core':
-                  setProgresoOCR((prev) => Math.max(prev, 15));
-                  break;
-                case 'loading language traineddata':
-                  setProgresoOCR((prev) => Math.max(prev, 25));
-                  break;
-                case 'loaded language traineddata':
-                  setProgresoOCR((prev) => Math.max(prev, 30));
-                  break;
-                case 'initializing tesseract':
-                  setProgresoOCR((prev) => Math.max(prev, 40));
-                  break;
-                case 'initialized tesseract':
-                  setProgresoOCR((prev) => Math.max(prev, 45));
-                  break;
-                case 'recognizing text':
-                  setCargandoModelo(false);
-                  const progress = 45 + Math.round(m.progress * 55);
-                  setProgresoOCR((prev) => Math.max(prev, progress));
-                  break;
-              }
-            });
+          mediaLogger.log('OCR', 'Iniciando escaneo de patrones...');
+          return await tesseractManager.recognize(objectUrl);
+        };
 
-            mediaLogger.log('OCR', 'Iniciando escaneo de patrones...');
-            return await tesseractManager.recognize(objectUrl);
-          };
+        resultRaw = (await Promise.race([ocrTask(), timeoutPromise])) as typeof resultRaw;
 
-          resultRaw = (await Promise.race([ocrTask(), timeoutPromise])) as typeof resultRaw;
-
-          const palabrasRaw = resultRaw.data.words || [];
-          const avgConf =
-            palabrasRaw.length > 0
-              ? Math.round(
-                  palabrasRaw.reduce((acc, w) => acc + w.confidence, 0) / palabrasRaw.length
-                )
-              : 0;
-          mediaLogger.log('OCR', 'Escaneo local completado con éxito', {
-            wordCount: palabrasRaw.length,
-            avgConfidence: `${avgConf}%`,
-            textLength: resultRaw.data.text.length,
-          });
-        }
+        const palabrasRaw = resultRaw.data.words || [];
+        const avgConf =
+          palabrasRaw.length > 0
+            ? Math.round(
+                palabrasRaw.reduce((acc, w) => acc + w.confidence, 0) / palabrasRaw.length
+              )
+            : 0;
+        mediaLogger.log('OCR', 'Escaneo local completado con éxito', {
+          wordCount: palabrasRaw.length,
+          avgConfidence: `${avgConf}%`,
+          textLength: resultRaw.data.text.length,
+        });
       } catch (ocrError) {
         const esTimeout = ocrError instanceof Error && ocrError.message === 'TIMEOUT_OCR';
         mediaLogger.log('ERROR', esTimeout ? 'Timeout en OCR' : 'Fallo crítico en motor OCR', {
