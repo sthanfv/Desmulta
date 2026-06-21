@@ -1,13 +1,8 @@
 import { Metadata } from 'next';
-import dynamic from 'next/dynamic';
 import { ShieldAlert, FileText, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
-// Carga perezosa de la calculadora para rendimiento óptimo
-const SavingsCalculator = dynamic(
-  () => import('@/components/interactive/SavingsCalculator').then((mod) => mod.SavingsCalculator),
-  { ssr: false, loading: () => <div className="h-[400px] bg-zinc-900 animate-pulse rounded-3xl" /> }
-);
+import { SavingsCalculator } from '@/components/interactive/SavingsCalculator';
 
 // Metadatos SEO Hiper-Optimizados
 export const metadata: Metadata = {
