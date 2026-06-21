@@ -197,7 +197,7 @@ export function ImageUpload({
     'Descargando paquetes de reconocimiento óptico...',
     'Configurando motor de análisis avanzado...',
     'Optimizando modelos para tu dispositivo...',
-    'Casi listo, preparando escáner...',
+    'Escaneando documento...',
     '', // desaparece
   ];
 
