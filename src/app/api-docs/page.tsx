@@ -1,7 +1,5 @@
 import React from 'react';
 import { Metadata } from 'next';
-import { Header } from '@/components/sections/Header';
-import { Footer } from '@/components/sections/Footer';
 import { Terminal, ShieldCheck, Zap, Database, Key } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { AlertTriangle, RefreshCcw, Loader2, Home, MessageCircle, Wrench } from 'lucide-react';
+import { AlertTriangle, RefreshCcw, Loader2, Home,  Wrench } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { healPwaCache } from '@/lib/utils/pwa-heal';
@@ -37,7 +37,7 @@ export default function Error({
       }).catch(() => {
         /* Fallo silencioso */
       });
-    } catch (e) {
+    } catch (_e) {
       // Ignorar errores del propio sistema de telemetría
     }
   }, [error]);

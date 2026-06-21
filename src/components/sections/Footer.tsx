@@ -15,7 +15,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import type { FooterConfig } from '@/lib/site-config';
-import colombiaCities from '@/lib/data/ciudades.json';
+import _colombiaCities from '@/lib/data/ciudades.json';
 
 interface FooterProps {
   footerData: FooterConfig;

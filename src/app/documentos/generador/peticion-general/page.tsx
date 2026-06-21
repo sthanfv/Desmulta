@@ -5,7 +5,7 @@ import { ShieldCheck, Edit3, Lock, CheckCircle2, FileText, Loader2 } from 'lucid
 import { useRouter } from 'next/navigation';
 
 export default function GeneradorPeticion() {
-  const router = useRouter();
+  useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -72,7 +72,7 @@ export default function GeneradorPeticion() {
 
       // Función para inicializar el widget una vez cargado el script
       const initWompiWidget = () => {
-        const checkout = new (window as any).WidgetCheckout({
+        const checkout = new (window as unknown).WidgetCheckout({
           currency: 'COP',
           amountInCents: data.amountCop,
           reference: data.wompiReference,
@@ -81,7 +81,7 @@ export default function GeneradorPeticion() {
           // redirectUrl no es necesario aquí porque controlamos el callback en React
         });
 
-        checkout.open((result: any) => {
+        checkout.open((result: unknown) => {
           const transaction = result.transaction;
           if (transaction.status === 'APPROVED') {
             window.location.href = `/documentos/confirmacion?ref=${data.wompiReference}`;
@@ -93,7 +93,7 @@ export default function GeneradorPeticion() {
       };
 
       // Cargar dinámicamente el script de Wompi si no existe
-      if (!(window as any).WidgetCheckout) {
+      if (!(window as unknown).WidgetCheckout) {
         const script = document.createElement('script');
         script.src = 'https://checkout.wompi.co/widget.js';
         script.async = true;
@@ -106,7 +106,7 @@ export default function GeneradorPeticion() {
       } else {
         initWompiWidget();
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
       setError(err.message || 'Error de conexión. Intenta de nuevo.');
       setLoading(false);

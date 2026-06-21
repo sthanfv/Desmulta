@@ -20,8 +20,8 @@ interface Purchase {
   correo?: string;
   celular?: string;
   status: string;
-  createdAt?: any;
-  paidAt?: any;
+  createdAt?: unknown;
+  paidAt?: unknown;
   wompiTransactionId?: string;
   caseData?: {
     infractorName?: string;
@@ -113,7 +113,7 @@ export function SalesAdminView() {
     }).format(amount / 100);
   };
 
-  const formatDate = (timestamp: any) => {
+  const formatDate = (timestamp: unknown) => {
     if (!timestamp?.toDate) return 'Fecha desconocida';
     return new Intl.DateTimeFormat('es-CO', {
       day: '2-digit',

@@ -1,4 +1,4 @@
-import { PDFDocument, StandardFonts, rgb, degrees } from 'pdf-lib';
+import { PDFDocument, StandardFonts, rgb, _degrees } from 'pdf-lib';
 import {
   DocumentType,
   CaseDataForPDF,
@@ -203,7 +203,7 @@ function addGap(c: Ctx, px: number): Ctx {
   return next.y < MB ? newPage(c) : next;
 }
 
-function hline(c: Ctx, col = rgb(0.7, 0.7, 0.7), th = 0.5): Ctx {
+function _hline(c: Ctx, col = rgb(0.7, 0.7, 0.7), th = 0.5): Ctx {
   const cc = ensureSpace(c, 4);
   cc.page.drawLine({
     start: { x: ML, y: cc.y },
@@ -245,7 +245,7 @@ function textBlock(
  * Estima cuántos puntos Y necesita un bloque de líneas.
  * Usado para decidir si crear nueva página antes de secciones grandes.
  */
-function estimateHeight(lines: string[], fontSize: number, gap: number): number {
+function _estimateHeight(lines: string[], fontSize: number, gap: number): number {
   let total = 0;
   for (const line of lines) {
     const wrapped = wrapText(n(line), fontSize, TW);

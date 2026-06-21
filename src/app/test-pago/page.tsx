@@ -53,7 +53,7 @@ export default function TestPagoPage() {
         customerEmail: payload.customerEmail,
         redirectUrl: data.redirectUrl,
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(err.message);
     } finally {
       setLoading(false);

@@ -39,7 +39,7 @@ export default function GlobalError({
       }).catch(() => {
         /* Fallo silencioso */
       });
-    } catch (e) {
+    } catch (_e) {
       // Ignorar
     }
   }, [error]);

@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
 
     const filename = `Peticion_${purchase?.caseData?.licensePlate || 'General'}_${purchase?.caseData?.infractorId || ''}.pdf`;
 
-    return new NextResponse(pdfBytes as any, {
+    return new NextResponse(pdfBytes as unknown as BodyInit, {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
