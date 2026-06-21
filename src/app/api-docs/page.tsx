@@ -96,6 +96,26 @@ export default function ApiDocsPage() {
   }'`}
               </pre>
             </div>
+
+            <div className="p-6 rounded-2xl bg-zinc-950 border border-zinc-800 font-mono text-sm overflow-x-auto mt-4">
+              <div className="text-green-500 mb-2"># Respuesta Exitosa (200 OK)</div>
+              <pre className="text-zinc-300">
+{`{
+  "success": true,
+  "data": {
+    "placa": "XYZ123",
+    "fechaInfraccion": "2020-05-10T00:00:00.000Z",
+    "valorOriginal": 1500000,
+    "analisisLegal": {
+      "prescrito": true,
+      "caducado": false,
+      "impugnable": true,
+      "mensaje": "La infracción supera los 3 años de prescripción (Ley 769/2002)."
+    }
+  }
+}`}
+              </pre>
+            </div>
           </div>
 
           {/* Endpoint 2 */}
@@ -119,6 +139,25 @@ export default function ApiDocsPage() {
     "fechaInfraccion": "2020-05-10T00:00:00.000Z",
     "tieneCobroCoactivo": false
   }'`}
+              </pre>
+            </div>
+
+            <div className="p-6 rounded-2xl bg-zinc-950 border border-zinc-800 font-mono text-sm overflow-x-auto mt-4">
+              <div className="text-green-500 mb-2"># Respuesta Exitosa (200 OK)</div>
+              <pre className="text-zinc-300">
+{`{
+  "success": true,
+  "data": {
+    "valorIngresado": 1500000,
+    "valorSMLMV_calculado": 1.15,
+    "interesesEstimados": 350000,
+    "analisisLegal": {
+      "prescrito": true,
+      "caducado": false,
+      "mensaje": "La deuda es exigible pero los intereses superan el tope legal."
+    }
+  }
+}`}
               </pre>
             </div>
           </div>
