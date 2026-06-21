@@ -192,28 +192,24 @@ export const Footer = ({ footerData, onOpenWhatsAppWarning }: FooterProps) => {
           </div>
         </div>
 
-        {/* SEO Siloing: Códigos de Infracción */}
+        {/* SEO Siloing: Códigos de Infracción (Enlace a Directorio) */}
         <div className="pt-8 pb-8 border-t border-border/10">
           <h3 className="text-sm font-black uppercase tracking-[0.2em] text-foreground/50 mb-6 text-center lg:text-left">
             Defensa por Código de Multa
           </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-3.5">
-            {codigosInfraccion.map((infraccion) => (
-              <Link
-                key={infraccion.codigo}
-                href={`/multas/codigo/${infraccion.codigo}`}
-                className="text-xs font-bold text-muted-foreground hover:text-primary transition-all active:scale-95 flex items-center gap-2 group/code"
-                title={`Cómo impugnar el comparendo código ${infraccion.codigo} - ${infraccion.nombre}`}
-              >
-                <div className="w-1 h-1 rounded-full bg-primary/20 group-hover/code:bg-primary transition-colors shrink-0" />
-                <span className="font-mono bg-white/5 px-1.5 py-0.5 rounded border border-white/5 group-hover/code:border-primary/20 shrink-0">
-                  {infraccion.codigo}
-                </span>
-                <span className="truncate text-muted-foreground/80 hover:text-primary transition-colors">
-                  {infraccion.nombre}
-                </span>
-              </Link>
-            ))}
+          <div className="flex justify-center lg:justify-start">
+            <Link
+              href="/multas/codigo"
+              className="inline-flex items-center gap-3 px-6 py-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-primary/30 transition-all group active:scale-95 text-muted-foreground hover:text-white"
+            >
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-black transition-colors">
+                <BookOpen size={20} />
+              </div>
+              <div className="flex flex-col text-left">
+                <span className="text-sm font-black uppercase tracking-widest text-white">Directorio de Códigos</span>
+                <span className="text-xs font-medium">Explora todas las infracciones defendibles</span>
+              </div>
+            </Link>
           </div>
         </div>
 
