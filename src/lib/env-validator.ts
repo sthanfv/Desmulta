@@ -26,6 +26,12 @@ const envSchema = z.object({
   OPERATOR_PIN: z.string().min(4, 'OPERATOR_PIN debe tener al menos 4 caracteres'),
   TELEGRAM_WEBHOOK_SECRET: z.string().min(20),
 
+  // PAGOS - Wompi
+  WOMPI_PRIVATE_KEY: z.string().min(20, 'Clave privada Wompi requerida'),
+  WOMPI_EVENTS_SECRET: z.string().min(10, 'Secret de eventos Wompi requerido'),
+  WOMPI_INTEGRITY_SECRET: z.string().min(10, 'Integrity secret Wompi requerido'),
+  NEXT_PUBLIC_WOMPI_PUBLIC_KEY: z.string().min(10, 'Clave pública Wompi requerida'),
+
   // Estas son opcionales según el caso (e.g. rotación de cookies)
   AUTH_COOKIE_SIGNATURE_KEY_PREVIOUS: z.string().optional(),
 });

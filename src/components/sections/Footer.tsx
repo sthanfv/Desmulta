@@ -2,7 +2,16 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ShieldCheck, MessageCircle, Mail, MapPin, Instagram, Facebook, Copy, BookOpen } from 'lucide-react';
+import {
+  ShieldCheck,
+  MessageCircle,
+  Mail,
+  MapPin,
+  Instagram,
+  Facebook,
+  Copy,
+  BookOpen,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import type { FooterConfig } from '@/lib/site-config';
@@ -175,7 +184,6 @@ export const Footer = ({ footerData, onOpenWhatsAppWarning }: FooterProps) => {
         {/* SEO Siloing: Directorios (Ciudades y Códigos) */}
         <div className="pt-16 pb-8 border-t border-border/10">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            
             {/* Directorio de Códigos */}
             <div className="flex flex-col items-center md:items-start text-center md:text-left">
               <h3 className="text-sm font-black uppercase tracking-[0.2em] text-foreground/50 mb-4">
@@ -189,7 +197,9 @@ export const Footer = ({ footerData, onOpenWhatsAppWarning }: FooterProps) => {
                   <BookOpen size={20} />
                 </div>
                 <div className="flex flex-col text-left">
-                  <span className="text-sm font-black uppercase tracking-widest text-white">Directorio de Códigos</span>
+                  <span className="text-sm font-black uppercase tracking-widest text-white">
+                    Directorio de Códigos
+                  </span>
                   <span className="text-xs font-medium">Explora las infracciones defendibles</span>
                 </div>
               </Link>
@@ -205,7 +215,9 @@ export const Footer = ({ footerData, onOpenWhatsAppWarning }: FooterProps) => {
                 className="w-full md:w-auto inline-flex items-center gap-3 px-6 py-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-green-500/30 transition-all group active:scale-95 text-muted-foreground hover:text-white"
               >
                 <div className="flex flex-col text-right order-2 md:order-1">
-                  <span className="text-sm font-black uppercase tracking-widest text-white">Directorio de Cobertura</span>
+                  <span className="text-sm font-black uppercase tracking-widest text-white">
+                    Directorio de Cobertura
+                  </span>
                   <span className="text-xs font-medium">Encuentra tu ciudad o municipio</span>
                 </div>
                 <div className="w-10 h-10 shrink-0 rounded-xl bg-green-500/10 flex items-center justify-center text-green-500 group-hover:bg-green-500 group-hover:text-black transition-colors order-1 md:order-2">
@@ -213,7 +225,6 @@ export const Footer = ({ footerData, onOpenWhatsAppWarning }: FooterProps) => {
                 </div>
               </Link>
             </div>
-
           </div>
         </div>
 

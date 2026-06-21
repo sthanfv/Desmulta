@@ -198,9 +198,7 @@ export const useSIMITValidator = () => {
         const palabrasRaw = resultRaw.data.words || [];
         const avgConf =
           palabrasRaw.length > 0
-            ? Math.round(
-                palabrasRaw.reduce((acc, w) => acc + w.confidence, 0) / palabrasRaw.length
-              )
+            ? Math.round(palabrasRaw.reduce((acc, w) => acc + w.confidence, 0) / palabrasRaw.length)
             : 0;
         mediaLogger.log('OCR', 'Escaneo local completado con éxito', {
           wordCount: palabrasRaw.length,

@@ -480,7 +480,9 @@ export async function updateCaseStatus(
 
       let leadRef = null;
       let publicRef = null;
-      let currentLeadData: { fcmToken?: string; trackingUuid?: string; cedulaHash?: string } | undefined = undefined;
+      let currentLeadData:
+        | { fcmToken?: string; trackingUuid?: string; cedulaHash?: string }
+        | undefined = undefined;
 
       // Si el caso tiene una consulta vinculada, la leemos ahora
       if (caseData?.consultationId) {

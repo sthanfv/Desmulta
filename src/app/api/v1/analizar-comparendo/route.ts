@@ -8,10 +8,7 @@ const MAX_GEMINI_DAILY = 500; // Límite de seguridad
 
 import { logger } from '@/lib/logger/security-logger';
 import { apiError } from '@/lib/types/api-response';
-import {
-  extraerComparendo,
-  construirAnalisisCompleto,
-} from '@/lib/legal/comparendo-extractor';
+import { extraerComparendo, construirAnalisisCompleto } from '@/lib/legal/comparendo-extractor';
 import { validateApiKey, API_KEY_HEADER, handleApiKeyError } from '@/lib/security/api-key-guard';
 
 /**
@@ -98,10 +95,9 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json(
-      apiError('VALIDATION_ERROR', 'El cuerpo debe ser JSON válido.'),
-      { status: 400 }
-    );
+    return NextResponse.json(apiError('VALIDATION_ERROR', 'El cuerpo debe ser JSON válido.'), {
+      status: 400,
+    });
   }
 
   const parsed = AnalizarComparendoSchema.safeParse(body);
@@ -125,7 +121,10 @@ export async function POST(request: NextRequest) {
     if (dailyCount > MAX_GEMINI_DAILY) {
       logger.error('[analizar-comparendo] CUOTA DIARIA DE GEMINI EXCEDIDA', { dailyCount });
       return NextResponse.json(
-        apiError('INTERNAL_ERROR', 'Servicio temporalmente saturado. Intenta de nuevo más tarde o mañana.'),
+        apiError(
+          'INTERNAL_ERROR',
+          'Servicio temporalmente saturado. Intenta de nuevo más tarde o mañana.'
+        ),
         { status: 503 }
       );
     }

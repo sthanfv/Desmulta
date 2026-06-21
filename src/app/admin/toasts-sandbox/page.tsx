@@ -57,12 +57,16 @@ export default function ToastsSandboxPage() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Galería de Notificaciones (Toasts)</h1>
         <p className="text-muted-foreground mt-2">
-          Esta es una página de pruebas interna para visualizar la estética de todos los estados de error y éxito del sistema.
+          Esta es una página de pruebas interna para visualizar la estética de todos los estados de
+          error y éxito del sistema.
         </p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Button onClick={triggerSuccess} className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 h-14">
+        <Button
+          onClick={triggerSuccess}
+          className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 h-14"
+        >
           <CheckCircle2 size={18} />
           Ver Toast de Éxito
         </Button>
@@ -72,7 +76,11 @@ export default function ToastsSandboxPage() {
           Ver Toast de Error Común
         </Button>
 
-        <Button onClick={triggerRateLimit} variant="destructive" className="gap-2 h-14 bg-red-800 hover:bg-red-900">
+        <Button
+          onClick={triggerRateLimit}
+          variant="destructive"
+          className="gap-2 h-14 bg-red-800 hover:bg-red-900"
+        >
           <ShieldAlert size={18} />
           Ver Toast de Rate Limit (Abuso)
         </Button>

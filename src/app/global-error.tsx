@@ -24,7 +24,7 @@ export default function GlobalError({
 
   useEffect(() => {
     console.error('GLOBAL_CRITICAL_ERROR:', error);
-    
+
     // Telemetría pasiva de Crash Reporting
     try {
       fetch('/api/internal/crash-report', {
@@ -36,7 +36,9 @@ export default function GlobalError({
           path: window.location.pathname + window.location.search,
         }),
         keepalive: true,
-      }).catch(() => { /* Fallo silencioso */ });
+      }).catch(() => {
+        /* Fallo silencioso */
+      });
     } catch (e) {
       // Ignorar
     }

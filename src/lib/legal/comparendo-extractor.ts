@@ -1,6 +1,11 @@
 import { z } from 'zod';
 import { CAUSALES_TRANSITO, CausalTransitoId } from '@/lib/legal/legal-types';
-import { SMDLV_2026, SMMLV_2026, TASA_EA_VIGENTE, VIGENCIA_CONSTANTES_ANIO } from '@/lib/config-constants';
+import {
+  SMDLV_2026,
+  SMMLV_2026,
+  TASA_EA_VIGENTE,
+  VIGENCIA_CONSTANTES_ANIO,
+} from '@/lib/config-constants';
 import { PrescriptionEngine, OCRSanitizer } from '@/lib/legal/prescription-engine';
 
 /**
@@ -95,10 +100,7 @@ export function extraerComparendo(rawGeminiResponse: unknown): Comparendo | null
  * @param estado - Estado legal retornado por PrescriptionEngine
  * @param comparendo - Datos del comparendo extraído (puede ser null)
  */
-export function determinarCausales(
-  estado: string,
-  comparendo: Comparendo | null
-): CausalResumen[] {
+export function determinarCausales(estado: string, comparendo: Comparendo | null): CausalResumen[] {
   const causales: CausalResumen[] = [];
 
   if (estado === 'PRESCRITO') {
@@ -145,10 +147,7 @@ export function determinarCausales(
   }
 
   // Si el comparendo tiene fotomulta y no fue detectada por el engine, agregar causal de señalización
-  if (
-    comparendo?.esFotomulta &&
-    !causales.find((c) => c.id === 'causal_5_falta_senalizacion')
-  ) {
+  if (comparendo?.esFotomulta && !causales.find((c) => c.id === 'causal_5_falta_senalizacion')) {
     causales.push({
       id: 'causal_5_falta_senalizacion',
       titulo: CAUSALES_TRANSITO.causal_5_falta_senalizacion.titulo,
@@ -218,7 +217,7 @@ export function construirAnalisisCompleto(
   const causalesAplicables = determinarCausales(estado, comparendo);
 
   // 4. Calcular la antigüedad en días y años
-  const fechaPrincipal = comparendo?.fechaInfraccion ?? (fechasDetectadas[0] ?? null);
+  const fechaPrincipal = comparendo?.fechaInfraccion ?? fechasDetectadas[0] ?? null;
   let diasTranscurridos: number | null = null;
   let añosTranscurridos: number | null = null;
   let fechaISO: string | null = null;

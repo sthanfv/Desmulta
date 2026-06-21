@@ -59,14 +59,19 @@ export async function POST(request: NextRequest) {
     try {
       currentDailyUsage = (await redis.get<number>(redisDailyKey)) || 0;
     } catch (redisError) {
-      logger.warn('[OCR] Error al leer límite diario de Redis (Fail-Safe: abierto)', { error: String(redisError) });
+      logger.warn('[OCR] Error al leer límite diario de Redis (Fail-Safe: abierto)', {
+        error: String(redisError),
+      });
     }
 
     const MAX_DAILY_GEMINI = parseInt(process.env.MAX_DAILY_GEMINI || '1000');
     let usarTesseractDirectamente = false;
 
     if (currentDailyUsage >= MAX_DAILY_GEMINI) {
-      logger.warn('[OCR] Cuota diaria de solicitudes Gemini excedida. Cayendo directamente a Tesseract.', { usage: currentDailyUsage, limite: MAX_DAILY_GEMINI });
+      logger.warn(
+        '[OCR] Cuota diaria de solicitudes Gemini excedida. Cayendo directamente a Tesseract.',
+        { usage: currentDailyUsage, limite: MAX_DAILY_GEMINI }
+      );
       usarTesseractDirectamente = true;
     }
 
@@ -161,7 +166,10 @@ REGLAS CRÍTICAS:
       const rawRespuesta = response.text().trim();
 
       // Detectar rechazo de documento (JSON de error de Gemini)
-      if (rawRespuesta === 'NO_VALID_DOCUMENT' || rawRespuesta.includes('"error":"NO_VALID_DOCUMENT"')) {
+      if (
+        rawRespuesta === 'NO_VALID_DOCUMENT' ||
+        rawRespuesta.includes('"error":"NO_VALID_DOCUMENT"')
+      ) {
         logger.warn('[OCR] Imagen rechazada: no parece un documento de tránsito válido', { ip });
         return NextResponse.json(
           apiError(
@@ -191,7 +199,8 @@ REGLAS CRÍTICAS:
         const parsed = JSON.parse(jsonLimpio) as Record<string, unknown>;
         comparendo = parsed;
         // El campo textoCompleto del JSON es el texto para el motor legacy (PrescriptionEngine)
-        textoCompleto = typeof parsed.textoCompleto === 'string' ? parsed.textoCompleto : rawRespuesta;
+        textoCompleto =
+          typeof parsed.textoCompleto === 'string' ? parsed.textoCompleto : rawRespuesta;
         logger.info('[OCR] Respuesta de Gemini parseada como JSON estructurado', {
           campos: Object.keys(parsed).join(', '),
         });
@@ -216,7 +225,9 @@ REGLAS CRÍTICAS:
         pipeline.expire(redisDailyKey, 129600); // 36 horas de TTL (1.5 días)
         await pipeline.exec();
       } catch (redisIncrError) {
-        logger.warn('[OCR] Error al incrementar límite diario de Gemini en Redis', { error: String(redisIncrError) });
+        logger.warn('[OCR] Error al incrementar límite diario de Gemini en Redis', {
+          error: String(redisIncrError),
+        });
       }
 
       return NextResponse.json({
@@ -233,13 +244,20 @@ REGLAS CRÍTICAS:
       // Si el error es por cuota de Gemini o circuito abierto, no registramos falla en el circuit breaker
       if (gMsg !== 'GEMINI_QUOTA_EXCEEDED' && gMsg !== 'OCR_CIRCUIT_OPEN') {
         await OcrCircuitBreakerFs.recordFailure(geminiError);
-        logger.error('[OCR] Error al procesar imagen con Gemini, intentando fallback con Tesseract', {
-          error: gMsg,
-        });
+        logger.error(
+          '[OCR] Error al procesar imagen con Gemini, intentando fallback con Tesseract',
+          {
+            error: gMsg,
+          }
+        );
       } else if (gMsg === 'GEMINI_QUOTA_EXCEEDED') {
-        logger.warn('[OCR] Cuota diaria de Gemini alcanzada. Cayendo directamente a Tesseract (Fallback)...');
+        logger.warn(
+          '[OCR] Cuota diaria de Gemini alcanzada. Cayendo directamente a Tesseract (Fallback)...'
+        );
       } else {
-        logger.warn('[OCR] Circuit Breaker de Gemini está ABIERTO. Cayendo a Tesseract (Fallback)...');
+        logger.warn(
+          '[OCR] Circuit Breaker de Gemini está ABIERTO. Cayendo a Tesseract (Fallback)...'
+        );
       }
 
       // Si el error fue por timeout, no vale la pena intentar Tesseract si Vercel está a punto de matarnos

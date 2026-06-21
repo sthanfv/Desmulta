@@ -11,14 +11,23 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     email: 'contacto@desmulta.online',
     address: 'Colombia, Nacional',
     instagramUrl: '',
-    facebookUrl: ''
+    facebookUrl: '',
   };
 
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary/30 selection:text-primary-foreground">
-      <Header onOpenModal={() => { window.location.href = '#contacto'; }} />
+      <Header
+        onOpenModal={() => {
+          window.location.href = '#contacto';
+        }}
+      />
       {children}
-      <Footer footerData={footerData} onOpenWhatsAppWarning={() => { window.location.href = '#contacto'; }} />
+      <Footer
+        footerData={footerData}
+        onOpenWhatsAppWarning={() => {
+          window.location.href = '#contacto';
+        }}
+      />
     </div>
   );
 }

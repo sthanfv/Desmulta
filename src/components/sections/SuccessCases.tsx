@@ -495,9 +495,9 @@ export const SuccessCases = ({ showcaseData }: SuccessCasesProps) => {
               )}
 
               <p className="text-[10px] md:text-[11px] text-muted-foreground/60 italic mt-4 max-w-md mx-auto text-center leading-relaxed">
-                * Nota: Las imágenes y valores presentados corresponden a casos reales procesados por nuestra plataforma,
-                con la información personal debidamente protegida y oculta para garantizar la estricta confidencialidad
-                de los ciudadanos.
+                * Nota: Las imágenes y valores presentados corresponden a casos reales procesados
+                por nuestra plataforma, con la información personal debidamente protegida y oculta
+                para garantizar la estricta confidencialidad de los ciudadanos.
               </p>
             </div>
           ) : (

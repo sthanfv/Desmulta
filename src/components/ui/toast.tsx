@@ -30,8 +30,7 @@ const toastVariants = cva(
     variants: {
       variant: {
         default: 'bg-white/10 dark:bg-white/5',
-        destructive:
-          'destructive group bg-red-500/20 shadow-[0_0_30px_rgba(225,29,72,0.2)]',
+        destructive: 'destructive group bg-red-500/20 shadow-[0_0_30px_rgba(225,29,72,0.2)]',
       },
     },
     defaultVariants: {
@@ -54,9 +53,10 @@ const Toast = React.forwardRef<
       <div
         className="absolute bottom-[-20%] right-[-250%] w-[300%] h-[50%] opacity-80 rounded-full z-0 pointer-events-none"
         style={{
-          background: variant === 'destructive' 
-            ? `radial-gradient(circle, #f43f5e 0%, transparent 10%)`
-            : `radial-gradient(circle, hsl(var(--primary)) 0%, transparent 10%)`,
+          background:
+            variant === 'destructive'
+              ? `radial-gradient(circle, #f43f5e 0%, transparent 10%)`
+              : `radial-gradient(circle, hsl(var(--primary)) 0%, transparent 10%)`,
           animation: `star-movement-bottom 6s linear infinite alternate`,
           willChange: 'transform',
         }}
@@ -64,19 +64,24 @@ const Toast = React.forwardRef<
       <div
         className="absolute top-[-20%] left-[-250%] w-[300%] h-[50%] opacity-80 rounded-full z-0 pointer-events-none"
         style={{
-          background: variant === 'destructive' 
-            ? `radial-gradient(circle, #f43f5e 0%, transparent 10%)`
-            : `radial-gradient(circle, hsl(var(--primary)) 0%, transparent 10%)`,
+          background:
+            variant === 'destructive'
+              ? `radial-gradient(circle, #f43f5e 0%, transparent 10%)`
+              : `radial-gradient(circle, hsl(var(--primary)) 0%, transparent 10%)`,
           animation: `star-movement-top 6s linear infinite alternate`,
           willChange: 'transform',
         }}
       />
-      
+
       {/* Contenedor Glass Interno */}
-      <div className={cn(
-        "relative flex w-full items-center justify-between space-x-4 overflow-hidden rounded-[calc(1.5rem-1.5px)] p-4 pr-8 z-10",
-        variant === 'destructive' ? 'bg-red-50 dark:bg-[#1f0a0e] backdrop-blur-2xl' : 'bg-white/90 dark:bg-[#09090b]/90 backdrop-blur-2xl'
-      )}>
+      <div
+        className={cn(
+          'relative flex w-full items-center justify-between space-x-4 overflow-hidden rounded-[calc(1.5rem-1.5px)] p-4 pr-8 z-10',
+          variant === 'destructive'
+            ? 'bg-red-50 dark:bg-[#1f0a0e] backdrop-blur-2xl'
+            : 'bg-white/90 dark:bg-[#09090b]/90 backdrop-blur-2xl'
+        )}
+      >
         {children}
       </div>
     </ToastPrimitives.Root>

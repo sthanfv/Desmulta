@@ -22,7 +22,7 @@ export default function Error({
 
     // Registro de error para auditoría proactiva en consola
     console.error('CRITICAL_SYSTEM_ERROR:', error);
-    
+
     // Telemetría pasiva de Crash Reporting
     try {
       fetch('/api/internal/crash-report', {
@@ -34,7 +34,9 @@ export default function Error({
           path: window.location.pathname + window.location.search,
         }),
         keepalive: true,
-      }).catch(() => { /* Fallo silencioso */ });
+      }).catch(() => {
+        /* Fallo silencioso */
+      });
     } catch (e) {
       // Ignorar errores del propio sistema de telemetría
     }
@@ -106,7 +108,6 @@ export default function Error({
             Volver al inicio
           </Link>
         </div>
-
       </div>
     </div>
   );

@@ -1,29 +1,28 @@
-# Memoria del Sistema (Desmulta)
+# MEMORY.md - Historial del Sistema
 
-## Estado Actual
-El sistema tiene integrado el registro y envío de notificaciones Push y envío de correos, coordinado mediante Firebase Cloud Functions para atrapar cambios hechos desde el Panel Web y desde Telegram de manera uniforme.
-
-## Últimos Cambios Realizados
-- **Centralización de Notificaciones Push**: Se eliminó el envío de notificaciones desde el cliente (`actions.ts`) y se movió a las Cloud Functions (`onCaseStatusChange.ts` y `onConsultationStatusChange.ts`). 
-- **Corrección de Correos Duplicados**: Se ajustó la matriz de estados en `onConsultationStatusChange.ts` para ignorar los estados que crean/modifican un caso legal (como "Contactado" y "En Estudio"), los cuales ya son atendidos por `onCaseStatusChange.ts`.
-- **Enriquecimiento del Push (Toque Humano)**: Se modificó la plantilla de Push (`push-notifications.ts`) para incluir la `operatorNote` (nota del asesor) al final del cuerpo de la notificación si existe, agregando estética y separación clara.
-- **Unificación Arquitectónica (Telegram vs Web)**: Se corrigió un bug donde los estados tempranos (Contactado/Estudio) no notificaban al moverse desde la web. Ahora Telegram respeta las fases y no crea un Caso Legal hasta que el estado llegue a "Apertura" o superior, permitiendo que `onConsultationStatusChange` procese los estados iniciales sin duplicar notificaciones.
-- **Limpieza UI Footer / Directorio de Códigos**: Se eliminó la inmensa lista de códigos de infracción visibles directamente en el `Footer.tsx` (que parecía una biblioteca) y se migró todo a una página dedicada `/multas/codigo/page.tsx` (Directorio Nacional de Códigos). El footer ahora cuenta con un único enlace elegante hacia dicho directorio, mejorando dramáticamente la estética corporativa y manteniendo el Silo SEO.
-- **Mejora UX en Panel Web**: Se expandieron de 3 a 6 las opciones predeterminadas de respuestas rápidas (Toque Humano) en el componente `ModalNotaOperador.tsx` para cubrir más escenarios legales de manera profesional.
-- **Corrección de Idempotencia Telegram**: Se corrigió el webhook de Telegram (`telegramWebhook.ts`) cambiando la verificación de idempotencia de un simple ID de mensaje a una validación de estado anterior vs nuevo, previniendo dobles toques que bloqueaban el teclado.
-- **Sistema de Telemetría de Errores Críticos**: Se implementó una solución de *Crash Reporting* y telemetría pasiva para la captura de errores `500` provenientes de componentes de React/Next.js. 
-  - Se configuró la ruta `/api/internal/crash-report` para captar el payload y guardarlo silenciosamente en Firestore (`crash_reports`).
-  - Se configuró la API de Telegram con modo de parseo `HTML` para notificar al desarrollador a través del `TELEGRAM_DEV_CHAT_ID` (un Supergrupo administrado por el bot), garantizando la separación entre métricas de error y los leads comerciales regulares.
-  - Se fortificó la ruta con el motor anti-DDoS Serverless Upstash Redis limitando hasta 20 errores por minuto (`crashReport`) para evitar el abuso o los reinicios cíclicos de React Strict Mode.
-  - Se eliminó la interacción de WhatsApp del componente `error.tsx` garantizando reportes silentes y sin fricción del lado del usuario.
-
-## Archivos Afectados
-- `functions/src/onCaseStatusChange.ts`
-- `functions/src/push-notifications.ts`
-- `functions/src/telegramWebhook.ts`
-- `src/app/admin/actions.ts`
-- `src/components/vial-clear/ModalNotaOperador.tsx`
-
-## Decisiones Técnicas
-- Todo lo relacionado a disparar Push notifications (FCM) debe ocurrir de lado del servidor usando Firestore Triggers (Cloud Functions) para garantizar que los cambios provenientes de Telegram u otras fuentes externas también notifiquen al cliente final sin depender de la UI.
-- No depender de variables "front" para la gestión de las colas de push.
+## 2026-06-21: Implementación de Pagos Wompi (Fases 1 a 4 completadas)
+- **Qué cambió:** 
+  - Se añadieron variables de entorno Sandbox de Wompi.
+  - Se modificó `firestore.rules` para asegurar las transacciones.
+  - Se crearon rutas API para generar órdenes de pago (`create-order`) y recibir notificaciones (`webhook-wompi`).
+  - Se diseñó la UI de pago incrustando el widget Wompi en `WompiCheckout.tsx` y la página de confirmación en tiempo real.
+  - Se implementó la lógica de entrega en `pdf-delivery.ts` para enviar el PDF generado al correo del cliente tras un pago aprobado.
+  - Se creó un script de Cloud Functions `retryFailedDeliveries.ts` para tolerar caídas de la red en la entrega del correo.
+  - Se agregó una UI dedicada en `src/app/test-pago/page.tsx` para probar el flujo completo localmente.
+  - Se refactorizó `WompiCheckout.tsx` para usar Web Checkout mediante redirección en lugar de inyección de script DOM.
+- **Por qué cambió:** 
+  - Para implementar un checkout integral y nativo en Colombia.
+  - La inyección dinámica del script `widget.js` de Wompi fallaba de manera silenciosa en Next.js (comportamiento documentado debido a que los widgets legacy dependen de `document.currentScript`).
+- **Archivos afectados:** 
+  - `.env`, `src/lib/env-validator.ts`, `firestore.rules`
+  - `src/app/api/payments/create-order/route.ts`
+  - `src/components/payments/WompiCheckout.tsx`
+  - `src/app/documentos/confirmacion/page.tsx`
+  - `src/app/api/payments/webhook-wompi/route.ts`
+  - `src/lib/payments/pdf-delivery.ts`
+  - `functions/src/retryFailedDeliveries.ts`
+  - `src/app/test-pago/page.tsx`
+- **Decisiones técnicas:**
+  - Uso de **Hash HMAC-SHA256** (`hashPII`) para guardar PII.
+  - Uso del **Web Checkout nativo de Wompi** mediante construcción de URL y botón estándar de React, evitando manipulaciones imperativas del DOM (`appendChild`).
+- **Estado actual:** ✅ Listo y desplegado en modo Sandbox.

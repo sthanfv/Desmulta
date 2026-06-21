@@ -4,7 +4,7 @@ import { jwtVerify } from 'jose';
 
 export async function GET(request: NextRequest) {
   const token = request.cookies.get('_vip_session')?.value;
-  
+
   if (token) {
     try {
       const { payload } = await jwtVerify(token, getVipSecret());

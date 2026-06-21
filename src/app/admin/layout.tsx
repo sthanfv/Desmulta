@@ -75,7 +75,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
     // Eventos que reinician el contador
     const events = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart'];
-    
+
     events.forEach((event) => document.addEventListener(event, resetTimer, { passive: true }));
     resetTimer(); // Iniciar cronómetro por primera vez
 

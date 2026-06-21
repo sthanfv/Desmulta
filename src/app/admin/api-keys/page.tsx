@@ -16,7 +16,10 @@ export default function ApiKeysPage() {
       <header className="sticky top-0 z-30 border-b border-border/50 bg-background/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3 select-none">
-            <a href="/admin" className="font-semibold text-sm tracking-tight hover:text-primary transition-colors">
+            <a
+              href="/admin"
+              className="font-semibold text-sm tracking-tight hover:text-primary transition-colors"
+            >
               Panel Desmulta
             </a>
             <span className="text-muted-foreground">/</span>

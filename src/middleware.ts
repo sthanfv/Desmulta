@@ -93,12 +93,19 @@ export async function middleware(request: NextRequest) {
   // son responsabilidad de cada handler individual.
   if (pathname.startsWith('/api')) {
     // 🛡️ API VIP Protection (Fail-Closed)
-    if (pathname.startsWith('/api/vip') && !pathname.startsWith('/api/vip/auth') && !pathname.startsWith('/api/vip/logout')) {
+    if (
+      pathname.startsWith('/api/vip') &&
+      !pathname.startsWith('/api/vip/auth') &&
+      !pathname.startsWith('/api/vip/logout')
+    ) {
       const sessionToken = request.cookies.get('_vip_session')?.value;
       const isVip = sessionToken ? !!(await verifyVipSession(sessionToken)) : false;
 
       if (!isVip) {
-        const response = NextResponse.json({ error: 'Sesión inválida o expirada' }, { status: 401 });
+        const response = NextResponse.json(
+          { error: 'Sesión inválida o expirada' },
+          { status: 401 }
+        );
         if (sessionToken) {
           response.cookies.delete('_vip_session');
         }
@@ -216,7 +223,10 @@ export async function middleware(request: NextRequest) {
 
   // 🛡️ Prevenir cacheo en rutas de administración (Soluciona el bug del botón "Atrás")
   if (pathname.startsWith('/admin')) {
-    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+    response.headers.set(
+      'Cache-Control',
+      'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0'
+    );
     response.headers.set('Pragma', 'no-cache');
     response.headers.set('Expires', '0');
   }

@@ -118,13 +118,7 @@ export interface ApiKeyValidationResult {
    * - QUOTA_EXCEEDED: Superó el límite mensual del plan
    * - RATE_LIMITED: Superó el límite de requests por minuto
    */
-  errorCode?:
-    | 'MISSING'
-    | 'INVALID'
-    | 'REVOKED'
-    | 'EXPIRED'
-    | 'QUOTA_EXCEEDED'
-    | 'RATE_LIMITED';
+  errorCode?: 'MISSING' | 'INVALID' | 'REVOKED' | 'EXPIRED' | 'QUOTA_EXCEEDED' | 'RATE_LIMITED';
 
   /** Mensaje legible para el cliente */
   errorMessage?: string;

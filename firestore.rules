@@ -110,6 +110,18 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // ─── PAGOS Y PDF (Wompi) ───
+    match /purchases/{purchaseId} {
+      allow get: if true;          // El cliente con la URL exacta puede leer su estado
+      allow list, write: if false; // Prohibido listar todos o modificarlos desde frontend
+    }
+
+    match /pdf_tokens/{tokenId} {
+      allow get: if true;          // El cliente puede verificar si el token existe
+      allow list: if false;
+      allow write: if false;       // Solo Admin SDK (server-side)
+    }
+
     match /processed_callbacks/{docId} {
       allow read, write: if false;
     }

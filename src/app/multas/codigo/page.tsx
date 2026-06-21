@@ -6,8 +6,10 @@ import codigosInfraccionData from '@/lib/data/codigos-infraccion.json';
 
 export const metadata: Metadata = {
   title: 'Directorio de Códigos de Multa | Desmulta',
-  description: 'Conoce el significado, valor y opciones de defensa para todos los códigos de infracción de tránsito en Colombia. Consulta si tu comparendo es impugnable.',
-  keywords: 'codigos infraccion transito colombia, significado codigos multas, directorio comparendos simit',
+  description:
+    'Conoce el significado, valor y opciones de defensa para todos los códigos de infracción de tránsito en Colombia. Consulta si tu comparendo es impugnable.',
+  keywords:
+    'codigos infraccion transito colombia, significado codigos multas, directorio comparendos simit',
 };
 
 export default function DirectorioCodigosPage() {
@@ -46,7 +48,9 @@ export default function DirectorioCodigosPage() {
             <span className="text-primary">Códigos de Infracción</span>
           </h1>
           <p className="text-lg md:text-xl text-slate-300 leading-relaxed font-medium max-w-2xl mx-auto">
-            Explora nuestra biblioteca legal. Conoce el significado, valor de sanción y nuestras estrategias técnicas de defensa para cada código de multa establecido en el Código Nacional de Tránsito.
+            Explora nuestra biblioteca legal. Conoce el significado, valor de sanción y nuestras
+            estrategias técnicas de defensa para cada código de multa establecido en el Código
+            Nacional de Tránsito.
           </p>
         </div>
       </section>

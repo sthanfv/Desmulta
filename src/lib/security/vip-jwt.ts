@@ -16,7 +16,7 @@ export async function signVipSession(payload: {
 }): Promise<string> {
   const iat = Math.floor(Date.now() / 1000);
   const exp = iat + 60 * 60 * 48; // 48h en lugar de 7 días
-  const jti = crypto.randomUUID();  // ID único del token
+  const jti = crypto.randomUUID(); // ID único del token
 
   return new SignJWT({ ...payload, jti })
     .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })

@@ -6,8 +6,10 @@ import colombiaCities from '@/lib/data/ciudades.json';
 
 export const metadata: Metadata = {
   title: 'Directorio de Cobertura Nacional por Ciudad | Desmulta',
-  description: 'Conoce todas las ciudades y municipios en Colombia donde ofrecemos cobertura legal para defensa de multas y fotomultas de tránsito.',
-  keywords: 'cobertura nacional desmulta, impugnar fotomultas ciudades colombia, secretarias de transito colombia',
+  description:
+    'Conoce todas las ciudades y municipios en Colombia donde ofrecemos cobertura legal para defensa de multas y fotomultas de tránsito.',
+  keywords:
+    'cobertura nacional desmulta, impugnar fotomultas ciudades colombia, secretarias de transito colombia',
 };
 
 export default function DirectorioCiudadesPage() {
@@ -46,7 +48,8 @@ export default function DirectorioCiudadesPage() {
             <span className="text-green-500">Cobertura Nacional</span>
           </h1>
           <p className="text-lg md:text-xl text-slate-300 leading-relaxed font-medium max-w-2xl mx-auto">
-            Ofrecemos representación legal y técnica en todo el territorio colombiano. Selecciona tu ciudad o municipio para conocer cómo te protegemos ante la Secretaría de Tránsito local.
+            Ofrecemos representación legal y técnica en todo el territorio colombiano. Selecciona tu
+            ciudad o municipio para conocer cómo te protegemos ante la Secretaría de Tránsito local.
           </p>
         </div>
       </section>
@@ -63,7 +66,10 @@ export default function DirectorioCiudadesPage() {
                 title={`Impugnar multas y fotomultas en ${city.nombre}`}
               >
                 <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-green-500/20 transition-colors shrink-0">
-                  <MapPin size={14} className="text-muted-foreground group-hover:text-green-500 transition-colors" />
+                  <MapPin
+                    size={14}
+                    className="text-muted-foreground group-hover:text-green-500 transition-colors"
+                  />
                 </div>
                 <span className="text-sm font-bold text-white/80 group-hover:text-white transition-colors truncate">
                   {city.nombre}

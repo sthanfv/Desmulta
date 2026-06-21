@@ -71,11 +71,13 @@ async function verifyAdminAuth(request: NextRequest): Promise<boolean> {
         process.env.AUTH_COOKIE_SIGNATURE_KEY_PREVIOUS || '',
       ],
       serviceAccount: {
-        projectId: process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || '',
+        projectId:
+          process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || '',
         clientEmail: process.env.FIREBASE_CLIENT_EMAIL || '',
         privateKey: (process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
       },
-      apiKey: process.env.NEXT_PUBLIC_BASE_API_KEY || process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '',
+      apiKey:
+        process.env.NEXT_PUBLIC_BASE_API_KEY || process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '',
     });
 
     if (!tokens) return false;
@@ -144,7 +146,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: true, total: keys.length, keys }, { status: 200 });
   } catch (error) {
     logger.error('[admin/api-keys] Error al listar keys', { error: String(error) });
-    return NextResponse.json(apiError('INTERNAL_ERROR', 'Error al obtener las keys.'), { status: 500 });
+    return NextResponse.json(apiError('INTERNAL_ERROR', 'Error al obtener las keys.'), {
+      status: 500,
+    });
   }
 }
 
@@ -161,7 +165,10 @@ const CrearKeySchema = z.object({
 export async function POST(request: NextRequest) {
   // 🛡️ Validación de cabecera Origin (Mitigación CSRF)
   if (!verifyOrigin(request)) {
-    return NextResponse.json(apiError('AUTH_FAILED', 'Acceso prohibido: Origen no permitido (CSRF).'), { status: 403 });
+    return NextResponse.json(
+      apiError('AUTH_FAILED', 'Acceso prohibido: Origen no permitido (CSRF).'),
+      { status: 403 }
+    );
   }
 
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
@@ -248,7 +255,9 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     logger.error('[admin/api-keys] Error al crear key', { error: String(error) });
-    return NextResponse.json(apiError('INTERNAL_ERROR', 'Error al crear la API Key.'), { status: 500 });
+    return NextResponse.json(apiError('INTERNAL_ERROR', 'Error al crear la API Key.'), {
+      status: 500,
+    });
   }
 }
 
@@ -257,7 +266,10 @@ export async function POST(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   // 🛡️ Validación de cabecera Origin (Mitigación CSRF)
   if (!verifyOrigin(request)) {
-    return NextResponse.json(apiError('AUTH_FAILED', 'Acceso prohibido: Origen no permitido (CSRF).'), { status: 403 });
+    return NextResponse.json(
+      apiError('AUTH_FAILED', 'Acceso prohibido: Origen no permitido (CSRF).'),
+      { status: 403 }
+    );
   }
 
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
@@ -305,11 +317,16 @@ export async function DELETE(request: NextRequest) {
     logger.info('[admin/api-keys] API Key revocada', { keyId });
 
     return NextResponse.json(
-      { success: true, mensaje: 'API Key revocada correctamente. El acceso queda bloqueado de forma inmediata.' },
+      {
+        success: true,
+        mensaje: 'API Key revocada correctamente. El acceso queda bloqueado de forma inmediata.',
+      },
       { status: 200 }
     );
   } catch (error) {
     logger.error('[admin/api-keys] Error al revocar key', { error: String(error) });
-    return NextResponse.json(apiError('INTERNAL_ERROR', 'Error al revocar la API Key.'), { status: 500 });
+    return NextResponse.json(apiError('INTERNAL_ERROR', 'Error al revocar la API Key.'), {
+      status: 500,
+    });
   }
 }

@@ -279,22 +279,8 @@ export async function generateMandatePDF(payload: MandatePayload): Promise<Uint8
   };
 
   // ── CABECERA ──────────────────────────────────────────────────────
-  c = text(c, 'DESMULTA — SERVICIO JURIDICO VIAL', {
-    size: 10,
-    bold: true,
-    color: rgb(1, 0.75, 0),
-    gap: 14,
-  });
-  const safeId = (payload.caseId ?? payload.shortId).replace(/CASE/gi, 'EXP');
-  c = text(c, `Referencia: ${safeId}`, { size: 8.5, color: rgb(0.5, 0.5, 0.5), gap: 11 });
-  c = text(c, `Generado: ${new Date().toLocaleDateString('es-CO', { dateStyle: 'long' })}`, {
-    size: 8.5,
-    color: rgb(0.5, 0.5, 0.5),
-    gap: 12,
-  });
-  c = addGap(c, 6);
-  c = hline(c, rgb(1, 0.75, 0), 1.5);
-  c = addGap(c, 14);
+  // Omitimos la cabecera publicitaria para que el documento se vea nativo
+  c = addGap(c, 20);
 
   // ── TÍTULO ────────────────────────────────────────────────────────
   c = text(c, tmpl.titulo, { size: 12.5, bold: true, gap: 16 });
@@ -347,71 +333,20 @@ export async function generateMandatePDF(payload: MandatePayload): Promise<Uint8
     });
     c = addGap(c, 20);
   } else {
-    c = hline(c, rgb(0.6, 0.6, 0.6), 0.5);
-    c = addGap(c, 10);
-    c = text(c, tmpl.firmaTexto || 'FIRMA DEL PODERDANTE', { size: 9.5, bold: true, gap: 30 });
-
-    // Línea de firma
-    c.page.drawLine({
-      start: { x: ML, y: c.y },
-      end: { x: ML + 240, y: c.y },
-      thickness: 0.8,
-      color: rgb(0.2, 0.2, 0.2),
-    });
-    c = addGap(c, 10);
-    c = text(c, `Nombre: ${payload.infractorName}`, { size: 8.5, gap: 11 });
-    c = text(c, `C.C. No.: ${payload.infractorId}`, { size: 8.5, gap: 11 });
-
-    // Huella dactilar: texto + cuadro al lado
-    c = ensureSpace(c, 70);
-    c.page.drawText(n('Huella dactilar:'), {
-      x: ML,
-      y: c.y,
-      size: 8.5,
-      font: reg,
-      color: rgb(0, 0, 0),
-    });
-    c.page.drawRectangle({
-      x: ML + 120,
-      y: c.y - 46,
-      width: 50,
-      height: 52,
-      borderColor: rgb(0.6, 0.6, 0.6),
-      borderWidth: 0.5,
-    });
-    c = addGap(c, 60);
+    c = text(c, 'Atentamente,', { size: 10, gap: 30 });
+    c = text(c, payload.infractorName, { size: 10, bold: true, gap: 12 });
+    c = text(c, `C.C. No.: ${payload.infractorId}`, { size: 10, gap: 12 });
+    if (payload.citizenEmail) {
+      c = text(c, `Email: ${payload.citizenEmail}`, { size: 10, gap: 12 });
+    }
+    c = addGap(c, 20);
   }
 
   // ── PROTOCOLO LEY 2213 ───────────────────────────────────────────
-  // El protocolo SIEMPRE debe quedar junto, sin partirse entre páginas
-  const protLines = tmpl.protocolo2213(data);
-  const protH = estimateHeight(protLines, 8, 11) + 55; // header + gap
-  c = ensureSpace(c, protH);
-
-  c = addGap(c, 8);
-  c = hline(c, rgb(0.5, 0.5, 0.5), 0.8);
-  c = addGap(c, 8);
-  c = text(c, 'PROTOCOLO DE PERFECCIONAMIENTO — LEY 2213 DE 2022', {
-    size: 8.5,
-    bold: true,
-    color: rgb(0.3, 0.3, 0.3),
-    gap: 12,
-  });
-  c = addGap(c, 3);
-  c = textBlock(c, protLines, { size: 8, color: rgb(0.35, 0.35, 0.35), gap: 11 });
+  // Omitido a petición del cliente para mayor limpieza
 
   // ── MARCA DE AGUA en TODAS las páginas ───────────────────────────
-  for (let i = 0; i < doc.getPageCount(); i++) {
-    doc.getPage(i).drawText(n('DESMULTA CONFIDENCIAL'), {
-      x: 80,
-      y: 260,
-      size: 40,
-      font: bold,
-      color: rgb(0.88, 0.88, 0.88),
-      opacity: 0.07,
-      rotate: degrees(40),
-    });
-  }
+  // Omitida a petición del cliente para que no parezca publicidad
 
   return await doc.save();
 }

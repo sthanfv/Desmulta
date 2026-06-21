@@ -212,7 +212,8 @@ export function calcularMultaCompleta(
     if (fechasDetectadas.length > 0) {
       const dictamenEnriquecido = PrescriptionEngine.evaluate(textoOCR, fechasDetectadas);
       if (dictamenEnriquecido.status) {
-        prescripcion.estadoLegal = dictamenEnriquecido.status as ResultadoPrescripcion['estadoLegal'];
+        prescripcion.estadoLegal =
+          dictamenEnriquecido.status as ResultadoPrescripcion['estadoLegal'];
         prescripcion.isViable = dictamenEnriquecido.isViable ?? false;
       }
     }

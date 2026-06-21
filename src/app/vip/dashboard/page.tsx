@@ -35,7 +35,11 @@ function serializeVipExpediente(data: any) {
         dateVal = dateVal.toDate().toISOString();
       } else if (dateVal instanceof Date) {
         dateVal = dateVal.toISOString();
-      } else if (dateVal && typeof dateVal === 'object' && ('seconds' in dateVal || '_seconds' in dateVal)) {
+      } else if (
+        dateVal &&
+        typeof dateVal === 'object' &&
+        ('seconds' in dateVal || '_seconds' in dateVal)
+      ) {
         const secs = dateVal.seconds ?? dateVal._seconds;
         dateVal = new Date(secs * 1000).toISOString();
       }
@@ -50,7 +54,11 @@ function serializeVipExpediente(data: any) {
         dateVal = dateVal.toDate().toISOString();
       } else if (dateVal instanceof Date) {
         dateVal = dateVal.toISOString();
-      } else if (dateVal && typeof dateVal === 'object' && ('seconds' in dateVal || '_seconds' in dateVal)) {
+      } else if (
+        dateVal &&
+        typeof dateVal === 'object' &&
+        ('seconds' in dateVal || '_seconds' in dateVal)
+      ) {
         const secs = dateVal.seconds ?? dateVal._seconds;
         dateVal = new Date(secs * 1000).toISOString();
       }
@@ -77,36 +85,40 @@ async function getVipData() {
 
   const cacheKey = `vip_session:cedula:${payload.hashedCedula}`;
 
-  const expediente = await getCachedDoc(cacheKey, async () => {
-    getAdminApp();
-    const db = getFirestore();
+  const expediente = await getCachedDoc(
+    cacheKey,
+    async () => {
+      getAdminApp();
+      const db = getFirestore();
 
-    // Buscar en casos
-    const casesSnapshot = await db
-      .collection('cases')
-      .where('cedulaHash', '==', payload.hashedCedula)
-      .limit(1)
-      .get();
+      // Buscar en casos
+      const casesSnapshot = await db
+        .collection('cases')
+        .where('cedulaHash', '==', payload.hashedCedula)
+        .limit(1)
+        .get();
 
-    if (!casesSnapshot.empty) {
-      const doc = casesSnapshot.docs[0];
-      return { id: doc.id, tipo: 'caso', data: serializeVipExpediente(doc.data()) };
-    }
+      if (!casesSnapshot.empty) {
+        const doc = casesSnapshot.docs[0];
+        return { id: doc.id, tipo: 'caso', data: serializeVipExpediente(doc.data()) };
+      }
 
-    // Si no hay caso, buscar en leads
-    const leadsSnapshot = await db
-      .collection('consultations')
-      .where('cedulaHash', '==', payload.hashedCedula)
-      .limit(1)
-      .get();
+      // Si no hay caso, buscar en leads
+      const leadsSnapshot = await db
+        .collection('consultations')
+        .where('cedulaHash', '==', payload.hashedCedula)
+        .limit(1)
+        .get();
 
-    if (!leadsSnapshot.empty) {
-      const doc = leadsSnapshot.docs[0];
-      return { id: doc.id, tipo: 'lead', data: serializeVipExpediente(doc.data()) };
-    }
+      if (!leadsSnapshot.empty) {
+        const doc = leadsSnapshot.docs[0];
+        return { id: doc.id, tipo: 'lead', data: serializeVipExpediente(doc.data()) };
+      }
 
-    return null;
-  }, 300);
+      return null;
+    },
+    300
+  );
 
   if (!expediente) {
     redirect('/vip');

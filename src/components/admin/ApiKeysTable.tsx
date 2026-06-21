@@ -95,7 +95,11 @@ export function ApiKeysTable() {
         toast({ title: 'Error', description: data.error?.message, variant: 'destructive' });
       }
     } catch (_error) {
-      toast({ title: 'Error de red', description: 'No se pudo cargar la lista.', variant: 'destructive' });
+      toast({
+        title: 'Error de red',
+        description: 'No se pudo cargar la lista.',
+        variant: 'destructive',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -123,14 +127,21 @@ export function ApiKeysTable() {
         toast({ title: 'Error', description: data.error?.message, variant: 'destructive' });
       }
     } catch (_error) {
-      toast({ title: 'Error', description: 'Ocurrió un error al crear la llave.', variant: 'destructive' });
+      toast({
+        title: 'Error',
+        description: 'Ocurrió un error al crear la llave.',
+        variant: 'destructive',
+      });
     } finally {
       setIsCreating(false);
     }
   };
 
   const handleRevoke = async (keyId: string) => {
-    if (!confirm('¿Seguro que deseas revocar esta API Key? Esta acción es inmediata e irreversible.')) return;
+    if (
+      !confirm('¿Seguro que deseas revocar esta API Key? Esta acción es inmediata e irreversible.')
+    )
+      return;
     setIsRevoking(keyId);
     try {
       const res = await fetch('/api/admin/api-keys', {
@@ -146,7 +157,11 @@ export function ApiKeysTable() {
         toast({ title: 'Error', description: data.error?.message, variant: 'destructive' });
       }
     } catch (_error) {
-      toast({ title: 'Error', description: 'No se pudo revocar la llave.', variant: 'destructive' });
+      toast({
+        title: 'Error',
+        description: 'No se pudo revocar la llave.',
+        variant: 'destructive',
+      });
     } finally {
       setIsRevoking(null);
     }
@@ -166,7 +181,8 @@ export function ApiKeysTable() {
             <DialogHeader>
               <DialogTitle>Crear API Key B2B</DialogTitle>
               <DialogDescription>
-                Genera una nueva credencial para clientes comerciales. La clave solo se mostrará una vez.
+                Genera una nueva credencial para clientes comerciales. La clave solo se mostrará una
+                vez.
               </DialogDescription>
             </DialogHeader>
 
@@ -180,7 +196,10 @@ export function ApiKeysTable() {
                     Copia esta clave ahora. Por seguridad, no volverá a mostrarse.
                   </p>
                   <div className="flex items-center gap-2 mt-2">
-                    <code className="flex-1 min-w-0 block p-2 bg-background rounded border text-[11px] sm:text-xs font-mono truncate" title={newKey}>
+                    <code
+                      className="flex-1 min-w-0 block p-2 bg-background rounded border text-[11px] sm:text-xs font-mono truncate"
+                      title={newKey}
+                    >
                       {newKey}
                     </code>
                     <Button
@@ -196,7 +215,13 @@ export function ApiKeysTable() {
                     </Button>
                   </div>
                 </div>
-                <Button className="w-full" onClick={() => { setNewKey(null); setIsModalOpen(false); }}>
+                <Button
+                  className="w-full"
+                  onClick={() => {
+                    setNewKey(null);
+                    setIsModalOpen(false);
+                  }}
+                >
                   Cerrar
                 </Button>
               </div>
@@ -244,7 +269,9 @@ export function ApiKeysTable() {
                           <SelectContent>
                             <SelectItem value="starter">Starter (500 peticiones/mes)</SelectItem>
                             <SelectItem value="growth">Growth (5.000 peticiones/mes)</SelectItem>
-                            <SelectItem value="enterprise">Enterprise (50.000 peticiones/mes)</SelectItem>
+                            <SelectItem value="enterprise">
+                              Enterprise (50.000 peticiones/mes)
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -315,7 +342,7 @@ export function ApiKeysTable() {
                       {k.keyId.substring(0, 16)}...
                     </code>
                     <div className="text-[10px] text-muted-foreground mt-1">
-                      Creada: {format(new Date(k.creadaEn), "d MMM yyyy", { locale: es })}
+                      Creada: {format(new Date(k.creadaEn), 'd MMM yyyy', { locale: es })}
                     </div>
                   </TableCell>
                   <TableCell>
@@ -323,7 +350,9 @@ export function ApiKeysTable() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="font-medium text-sm">{k.usoMesActual}</div>
-                    <div className="text-[10px] text-muted-foreground">/ {k.quotaDelPlan.requestsPerMonth}</div>
+                    <div className="text-[10px] text-muted-foreground">
+                      / {k.quotaDelPlan.requestsPerMonth}
+                    </div>
                   </TableCell>
                   <TableCell className="text-right">
                     <Button
@@ -333,7 +362,11 @@ export function ApiKeysTable() {
                       disabled={!k.activa || isRevoking === k.keyId}
                       className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8"
                     >
-                      {isRevoking === k.keyId ? <Loader2 size={14} className="animate-spin mr-1" /> : <Ban size={14} className="mr-1" />}
+                      {isRevoking === k.keyId ? (
+                        <Loader2 size={14} className="animate-spin mr-1" />
+                      ) : (
+                        <Ban size={14} className="mr-1" />
+                      )}
                       Revocar
                     </Button>
                   </TableCell>

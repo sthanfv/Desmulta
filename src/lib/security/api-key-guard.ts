@@ -262,7 +262,8 @@ export async function validateApiKey(rawKey: string | null): Promise<ApiKeyValid
     return {
       valid: false,
       errorCode: 'REVOKED',
-      errorMessage: 'Tu API Key ha sido desactivada. Contacta soporte en contactodesmulta@protonmail.com.',
+      errorMessage:
+        'Tu API Key ha sido desactivada. Contacta soporte en contactodesmulta@protonmail.com.',
     };
   }
 
@@ -281,8 +282,7 @@ export async function validateApiKey(rawKey: string | null): Promise<ApiKeyValid
   // 8. Verificar quota mensual
   const planConfig = API_KEY_PLANS[keyDoc.plan];
   const mesActual = new Date().toISOString().substring(0, 7);
-  const usoMes =
-    keyDoc.mesActual === mesActual ? (keyDoc.usoMesActual ?? 0) : 0;
+  const usoMes = keyDoc.mesActual === mesActual ? (keyDoc.usoMesActual ?? 0) : 0;
   const remainingMonth = planConfig.requestsPerMonth - usoMes;
 
   if (remainingMonth <= 0) {
@@ -332,13 +332,20 @@ import { NextResponse } from 'next/server';
 import { apiError } from '@/lib/types/api-response';
 
 const STATUS_MAP: Record<string, number> = {
-  MISSING: 401, INVALID: 401, REVOKED: 403, EXPIRED: 403,
-  QUOTA_EXCEEDED: 429, RATE_LIMITED: 429,
+  MISSING: 401,
+  INVALID: 401,
+  REVOKED: 403,
+  EXPIRED: 403,
+  QUOTA_EXCEEDED: 429,
+  RATE_LIMITED: 429,
 };
 const CODE_MAP: Record<string, string> = {
-  MISSING: 'API_KEY_MISSING', INVALID: 'API_KEY_INVALID',
-  REVOKED: 'API_KEY_REVOKED', EXPIRED: 'API_KEY_EXPIRED',
-  QUOTA_EXCEEDED: 'API_KEY_QUOTA_EXCEEDED', RATE_LIMITED: 'RATE_LIMITED',
+  MISSING: 'API_KEY_MISSING',
+  INVALID: 'API_KEY_INVALID',
+  REVOKED: 'API_KEY_REVOKED',
+  EXPIRED: 'API_KEY_EXPIRED',
+  QUOTA_EXCEEDED: 'API_KEY_QUOTA_EXCEEDED',
+  RATE_LIMITED: 'RATE_LIMITED',
 };
 
 export function handleApiKeyError(r: ApiKeyValidationResult): NextResponse {

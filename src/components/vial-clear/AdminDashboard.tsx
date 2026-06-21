@@ -36,10 +36,12 @@ import {
   RotateCcw,
   Gift,
   Key,
+  CreditCard,
 } from 'lucide-react';
 import { TableroFlujoTrabajo } from '@/components/vial-clear/TableroFlujoTrabajo';
 import { AnalyticsView } from '@/components/vial-clear/AnalyticsView';
 import { ReferralsAdminView } from '@/components/vial-clear/ReferralsAdminView';
+import { SalesAdminView } from '@/components/vial-clear/SalesAdminView';
 import { useAdminAnalytics } from '@/hooks/useAdminAnalytics';
 import { ThemeToggle } from '@/components/vial-clear/ThemeToggle';
 import { ModalAuthPin } from '@/components/vial-clear/ModalAuthPin';
@@ -522,6 +524,13 @@ export function AdminDashboard() {
               <Gift size={14} />
               Referidos VIP
             </TabsTrigger>
+            <TabsTrigger
+              value="sales"
+              className="rounded-lg px-5 text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all gap-2"
+            >
+              <CreditCard size={14} />
+              Ventas
+            </TabsTrigger>
           </TabsList>
 
           {/* ── Kanban ── */}
@@ -566,6 +575,11 @@ export function AdminDashboard() {
           {/* ── Referidos VIP ── */}
           <TabsContent value="referrals" className="outline-none">
             <ReferralsAdminView auth={auth} />
+          </TabsContent>
+
+          {/* ── Ventas y Pagos ── */}
+          <TabsContent value="sales" className="outline-none">
+            <SalesAdminView />
           </TabsContent>
         </Tabs>
 

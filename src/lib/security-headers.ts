@@ -14,15 +14,15 @@ const devHashes = isDev ? '' : " 'sha256-osMMQj3FsFuFoINhDY6u/ERO7gP52tI8DTruJmD
 
 export const cspHeader =
   `default-src 'self' https://*.mixkit.co https://mixkit.co https://assets.mixkit.co https://*.vercel.live https://vercel.live https://challenges.cloudflare.com;
-  script-src 'self'${unsafeEval}${scriptUnsafeInline} 'unsafe-hashes'${devHashes} 'wasm-unsafe-eval' blob: https://*.vercel.live https://vercel.live https://www.googletagmanager.com https://connect.facebook.net https://challenges.cloudflare.com https://va.vercel-scripts.com https://apis.google.com https://cdn.jsdelivr.net https://www.google-analytics.com https://www.gstatic.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/;
+  script-src 'self'${unsafeEval}${scriptUnsafeInline} 'unsafe-hashes'${devHashes} 'wasm-unsafe-eval' blob: https://*.vercel.live https://vercel.live https://www.googletagmanager.com https://connect.facebook.net https://challenges.cloudflare.com https://va.vercel-scripts.com https://apis.google.com https://cdn.jsdelivr.net https://www.google-analytics.com https://www.gstatic.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://checkout.wompi.co;
   style-src 'self'${styleUnsafe} https://fonts.googleapis.com https://challenges.cloudflare.com;
   font-src 'self' https://fonts.gstatic.com data:;
   img-src 'self' data: blob: https://desmulta.online https://*.public.blob.vercel-storage.com https://*.vercel-storage.com https://firebasestorage.googleapis.com https://images.unsplash.com https://grainy-gradients.vercel.app https://vercel.com https://challenges.cloudflare.com;
   media-src 'self' blob: https://*.mixkit.co https://mixkit.co https://assets.mixkit.co;
-  form-action 'self' https://wa.me;
-  connect-src 'self' data: blob: https://*.googleapis.com https://*.firebaseio.com https://tessdata.projectnaptha.com https://cdn.jsdelivr.net https://grainy-gradients.vercel.app https://challenges.cloudflare.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://api.telegram.org https://va.vercel-scripts.com https://vercel.live https://*.vercel.live https://*.vercel-storage.com https://*.resend.com https://*.sentry.io https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/;
+  form-action 'self' https://wa.me https://checkout.wompi.co;
+  connect-src 'self' data: blob: https://*.googleapis.com https://*.firebaseio.com https://tessdata.projectnaptha.com https://cdn.jsdelivr.net https://grainy-gradients.vercel.app https://challenges.cloudflare.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://api.telegram.org https://va.vercel-scripts.com https://vercel.live https://*.vercel.live https://*.vercel-storage.com https://*.resend.com https://*.sentry.io https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://checkout.wompi.co;
   worker-src 'self' blob: https://cdn.jsdelivr.net https://www.gstatic.com;
-  frame-src 'self' blob: https://challenges.cloudflare.com https://*.cloudflare.com https://vercel.live https://www.facebook.com https://apis.google.com https://*.firebaseapp.com https://www.google.com/recaptcha/ https://recaptcha.google.com/;
+  frame-src 'self' blob: https://challenges.cloudflare.com https://*.cloudflare.com https://vercel.live https://www.facebook.com https://apis.google.com https://*.firebaseapp.com https://www.google.com/recaptcha/ https://recaptcha.google.com/ https://checkout.wompi.co;
   frame-ancestors 'none';
   object-src 'none';
   base-uri 'self';
