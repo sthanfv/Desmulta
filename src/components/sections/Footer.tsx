@@ -2,12 +2,11 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ShieldCheck, MessageCircle, Mail, MapPin, Instagram, Facebook, Copy } from 'lucide-react';
+import { ShieldCheck, MessageCircle, Mail, MapPin, Instagram, Facebook, Copy, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import type { FooterConfig } from '@/lib/site-config';
 import colombiaCities from '@/lib/data/ciudades.json';
-import codigosInfraccion from '@/lib/data/codigos-infraccion.json';
 
 interface FooterProps {
   footerData: FooterConfig;
