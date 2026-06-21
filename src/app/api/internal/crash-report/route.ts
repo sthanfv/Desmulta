@@ -17,12 +17,15 @@ const CrashPayloadSchema = z.object({
   path: z.string(),
 });
 
-const MAX_REQUESTS_PER_WINDOW = 5;
+const MAX_REQUESTS_PER_WINDOW = 50;
 const WINDOW_MS = 60 * 1000; // 1 minuto por IP
 
-function escapeMarkdownV2(text: string): string {
+function escapeHTML(text: string): string {
   if (!text) return '';
-  return text.replace(/([_*\[\]()~`>#\+\-=|{}\.!])/g, '\\$1');
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
 }
 
 export async function POST(req: Request) {
@@ -34,7 +37,7 @@ export async function POST(req: Request) {
       `crash_report:${safeIpId}`,
       MAX_REQUESTS_PER_WINDOW,
       WINDOW_MS,
-      'telemetryCooldowns'
+      'crash_reports_cooldown'
     );
     if (!rl.success) {
       return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
@@ -75,31 +78,34 @@ export async function POST(req: Request) {
     const devChatId = process.env.TELEGRAM_DEV_CHAT_ID || process.env.TELEGRAM_CHAT_ID;
 
     if (botToken && devChatId) {
-      const safeMessage = escapeMarkdownV2(data.message.substring(0, 500));
-      const safePath = escapeMarkdownV2(data.path);
-      const safeDigest = escapeMarkdownV2(data.digest || 'N/A');
+      const safeMessage = escapeHTML(data.message.substring(0, 500));
+      const safePath = escapeHTML(data.path);
+      const safeDigest = escapeHTML(data.digest || 'N/A');
 
       const textMessage = `
-🚨 *CRÍTICO: ERROR DE RENDERIZADO 500* 🚨
+🚨 <b>CRÍTICO: ERROR DE RENDERIZADO 500</b> 🚨
 
-📍 *Ruta:* \`${safePath}\`
-💥 *Mensaje:*
-\`\`\`
-${safeMessage}
-\`\`\`
-🔑 *Digest ID:* \`${safeDigest}\`
+📍 <b>Ruta:</b> <code>${safePath}</code>
+💥 <b>Mensaje:</b>
+<pre>${safeMessage}</pre>
+🔑 <b>Digest ID:</b> <code>${safeDigest}</code>
 
-_Un usuario se ha topado con la pantalla de interrupción._`;
+<i>Un usuario se ha topado con la pantalla de interrupción.</i>`;
 
-      await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      const telegramRes = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           chat_id: devChatId,
           text: textMessage,
-          parse_mode: 'MarkdownV2',
+          parse_mode: 'HTML',
         }),
-      }).catch(() => { /* Fallo silencioso */ });
+      });
+      if (!telegramRes.ok) {
+        const errText = await telegramRes.text();
+        logger.error('[crash-report] Fallo al enviar a Telegram', { error: errText, devChatId });
+        console.error('TELEGRAM ERROR:', errText);
+      }
     }
 
     return NextResponse.json({ success: true }, { status: 200 });

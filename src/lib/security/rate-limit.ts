@@ -34,6 +34,7 @@ export const rateLimiters = {
   loginCedula: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(5, '1 h') }),
   vipAuth: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(5, '15 m') }),
   telemetry: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(3, '24 h') }),
+  crashReport: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(20, '1 m') }),
 };
 
 export type RateLimitType = keyof typeof rateLimiters;
@@ -89,6 +90,7 @@ export async function rateLimit(
   let type: RateLimitType = 'leads';
 
   if (collectionName === 'ocrRateLimits') type = 'ocr';
+  else if (collectionName === 'crash_reports_cooldown') type = 'crashReport';
   else if (collectionName === 'consultationCooldowns') type = 'consultation';
   else if (collectionName === 'validar_consulta_rl') type = 'validarOtp';
   else if (collectionName === 'qrRateLimits') type = 'qr';

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { AlertTriangle, RefreshCcw, Loader2, Home, MessageCircle, Wrench } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -14,8 +14,12 @@ export default function Error({
   reset: () => void;
 }) {
   const [isHealing, setIsHealing] = useState(false);
+  const reportedRef = useRef(false);
 
   useEffect(() => {
+    if (reportedRef.current) return;
+    reportedRef.current = true;
+
     // Registro de error para auditoría proactiva en consola
     console.error('CRITICAL_SYSTEM_ERROR:', error);
     
@@ -103,20 +107,6 @@ export default function Error({
           </Link>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-border/10">
-          <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest mb-4">
-            Desmulta v1.0.0 — ¿El problema persiste? Soporte SOS:
-          </p>
-          <a
-            href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '573005648309'}?text=Hola, tengo un error técnico en la web de Desmulta y necesito ayuda.`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-green-500 hover:text-green-400 font-bold text-sm transition-colors"
-          >
-            <MessageCircle size={18} />
-            REPORTAR POR WHATSAPP
-          </a>
-        </div>
       </div>
     </div>
   );
