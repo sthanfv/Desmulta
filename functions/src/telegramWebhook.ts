@@ -136,8 +136,8 @@ async function cambiarEstado(
         }),
       });
       logger.info(`[CRM] Case sincronizado → ${nuevoEstado}`, { consultationId });
-    } else if (nuevoEstado !== 'descartado' && nuevoEstado !== 'pendiente' && nuevoEstado !== 'nuevo') {
-      // ── 4. PRIMER CONTACTO/AVANCE → Crear case unificado ───────────────────
+    } else if (['apertura', 'en_proceso', 'radicado', 'tramite', 'resolucion', 'en_espera', 'finalizado', 'terminado'].includes(nuevoEstado)) {
+      // ── 4. AVANCE A FASE LEGAL → Crear case unificado ───────────────────
       //
       // Buscar el lead correspondiente por cédula (si existe).
       // El lead tiene los números de comparendo y la deuda total extraídos por el OCR.

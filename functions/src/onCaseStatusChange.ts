@@ -447,10 +447,14 @@ export const onConsultationStatusChange = onDocumentUpdated({
   const consultationId = event.params.consultationId;
 
   // Evitar notificaciones duplicadas:
-  // Si el estado pertenece a un Caso Legal o si crea un caso (ej: contactado, estudio, apertura, en_proceso...)
-  // ignoramos el trigger aquí porque onCaseStatusChange enviará la notificación
+  // Si el lead ya fue convertido a caso (tiene caseId), ignoramos este trigger porque onCaseStatusChange se encargará.
+  if (after.caseId) {
+    logger.info(`[onConsultationStatusChange] Ignorando status '${after.status}' porque el lead ya es un Caso Legal (${after.caseId}).`);
+    return;
+  }
+
   // Solo disparamos en etapas tempranas exclusivas del Lead.
-  const leadOnlyStatuses = ['pendiente', 'nuevo', 'descartado'];
+  const leadOnlyStatuses = ['pendiente', 'nuevo', 'contactado', 'estudio', 'descartado'];
   if (!leadOnlyStatuses.includes(after.status.toLowerCase())) {
     logger.info(`[onConsultationStatusChange] Ignorando status '${after.status}' para evitar duplicados. Se maneja en onCaseStatusChange.`);
     return;
