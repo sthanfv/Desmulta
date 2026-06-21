@@ -76,11 +76,7 @@ export const onConsultationCreated = onDocumentCreated({
         ? `¡Hola! 👋 Te damos la bienvenida a Desmulta.` 
         : `¡Hola, ${nombreUsuario}! 👋 Te damos la bienvenida a Desmulta.`;
 
-      let qrImageUrl = '';
-      if (trackingUuid) {
-        // En lugar de enviar un base64 que es bloqueado por Gmail, usamos la ruta API pública.
-        qrImageUrl = `https://desmulta.online/api/qr?data=${encodeURIComponent(`https://desmulta.online/seguir/${trackingUuid}`)}`;
-      }
+
 
       await resend.emails.send({
         from: 'Desmulta Gestión <gestion@desmulta.online>',
@@ -132,7 +128,6 @@ export const onConsultationCreated = onDocumentCreated({
                   <p style="font-size: 24px; font-family: monospace; color: #000000; margin: 10px 0; letter-spacing: 2px;"><b>${shortId}</b></p>
                   
                   ${trackingUuid ? `<div style="margin-top: 20px;">
-                    ${qrImageUrl ? `<div style="text-align:center;margin:20px 0"><img src="${qrImageUrl}" alt="QR Seguimiento" style="width:150px;height:150px;border-radius:8px;border:2px solid #e2e8f0;background:white;padding:5px;" /></div>` : ''}
                     <a href="https://desmulta.online/seguir/${trackingUuid}" style="background: #000000; color: #D4AF37; padding: 14px 32px; border-radius: 8px; text-decoration: none; display: inline-block; font-weight: bold; text-transform: uppercase; font-size: 13px; letter-spacing: 0.05em; border: 1px solid #D4AF37;">Ver Estado en Vivo</a>
                   </div>` : ''}
 
