@@ -172,43 +172,48 @@ export const Footer = ({ footerData, onOpenWhatsAppWarning }: FooterProps) => {
           </div>
         </div>
 
-        {/* SEO Siloing: Cobertura Nacional */}
+        {/* SEO Siloing: Directorios (Ciudades y Códigos) */}
         <div className="pt-16 pb-8 border-t border-border/10">
-          <h3 className="text-sm font-black uppercase tracking-[0.2em] text-foreground/50 mb-6 text-center lg:text-left">
-            Cobertura Nacional por Ciudad
-          </h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-x-4 gap-y-3">
-            {colombiaCities.map((city) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            {/* Directorio de Códigos */}
+            <div className="flex flex-col items-center md:items-start text-center md:text-left">
+              <h3 className="text-sm font-black uppercase tracking-[0.2em] text-foreground/50 mb-4">
+                Defensa por Código de Multa
+              </h3>
               <Link
-                key={city.slug}
-                href={`/multas/${city.slug}`}
-                className="text-xs font-medium text-muted-foreground hover:text-primary transition-colors truncate"
-                title={`Impugnar multas y fotomultas en ${city.nombre}`}
+                href="/multas/codigo"
+                className="w-full md:w-auto inline-flex items-center gap-3 px-6 py-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-primary/30 transition-all group active:scale-95 text-muted-foreground hover:text-white"
               >
-                {city.nombre}
+                <div className="w-10 h-10 shrink-0 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-black transition-colors">
+                  <BookOpen size={20} />
+                </div>
+                <div className="flex flex-col text-left">
+                  <span className="text-sm font-black uppercase tracking-widest text-white">Directorio de Códigos</span>
+                  <span className="text-xs font-medium">Explora las infracciones defendibles</span>
+                </div>
               </Link>
-            ))}
-          </div>
-        </div>
+            </div>
 
-        {/* SEO Siloing: Códigos de Infracción (Enlace a Directorio) */}
-        <div className="pt-8 pb-8 border-t border-border/10">
-          <h3 className="text-sm font-black uppercase tracking-[0.2em] text-foreground/50 mb-6 text-center lg:text-left">
-            Defensa por Código de Multa
-          </h3>
-          <div className="flex justify-center lg:justify-start">
-            <Link
-              href="/multas/codigo"
-              className="inline-flex items-center gap-3 px-6 py-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-primary/30 transition-all group active:scale-95 text-muted-foreground hover:text-white"
-            >
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-black transition-colors">
-                <BookOpen size={20} />
-              </div>
-              <div className="flex flex-col text-left">
-                <span className="text-sm font-black uppercase tracking-widest text-white">Directorio de Códigos</span>
-                <span className="text-xs font-medium">Explora todas las infracciones defendibles</span>
-              </div>
-            </Link>
+            {/* Cobertura Nacional */}
+            <div className="flex flex-col items-center md:items-end text-center md:text-right mt-8 md:mt-0">
+              <h3 className="text-sm font-black uppercase tracking-[0.2em] text-foreground/50 mb-4">
+                Cobertura Nacional por Ciudad
+              </h3>
+              <Link
+                href="/multas/ciudades"
+                className="w-full md:w-auto inline-flex items-center gap-3 px-6 py-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-green-500/30 transition-all group active:scale-95 text-muted-foreground hover:text-white"
+              >
+                <div className="flex flex-col text-right order-2 md:order-1">
+                  <span className="text-sm font-black uppercase tracking-widest text-white">Directorio de Cobertura</span>
+                  <span className="text-xs font-medium">Encuentra tu ciudad o municipio</span>
+                </div>
+                <div className="w-10 h-10 shrink-0 rounded-xl bg-green-500/10 flex items-center justify-center text-green-500 group-hover:bg-green-500 group-hover:text-black transition-colors order-1 md:order-2">
+                  <MapPin size={20} />
+                </div>
+              </Link>
+            </div>
+
           </div>
         </div>
 
