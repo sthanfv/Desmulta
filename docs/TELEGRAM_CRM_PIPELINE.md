@@ -34,5 +34,12 @@ Dado que el Dashboard consume lecturas de Firestore que pueden ser costosas a es
 
 ## 3. Seguridad Perimetral
 - **Honeypot:** Campos ocultos en los formularios para capturar bots (`websiteHoneypot`).
-- **Rate Limiting:** Bloqueo por IP en base de datos (`telemetryCooldowns` y `consultationCooldowns`) con máximo 3 intentos cada 24h / 5 min de espera.
+- **Rate Limiting:** Bloqueo por IP mediante Upstash Redis Edge (ej. `telemetry: 3/24h`, `crashReport: 20/1m`).
 - **E2EE:** Desencriptación en tránsito (`decryptE2EPayload`) para Cédulas y Teléfonos.
+
+## 4. Telemetría y Crash Reporting (Sistema NOC)
+Además de funcionar como CRM, Telegram actúa como el **Network Operations Center (NOC)** de la plataforma:
+- **Captura de Excepciones Críticas:** Cualquier error 500 no controlado de React (Server o Client Components) es capturado por las *Error Boundaries* (`error.tsx` / `global-error.tsx`).
+- **Almacenamiento Redundante:** El payload del error se envía a la colección `crash_reports` en Firestore, garantizando que haya un registro persistente incluso si la API de Telegram falla.
+- **Notificación Push a Telegram:** Se envía una alerta roja a un canal secundario (Supergrupo de Alertas Técnicas, configurado vía `TELEGRAM_DEV_CHAT_ID`) utilizando un parseador `HTML` seguro, adjuntando el *Stack Trace* seguro (digest ID) y la URL afectada.
+- **Tolerancia a Fallos:** La ruta interna `/api/internal/crash-report` está fortificada por *Upstash Redis* limitando agresivamente los envíos (20/min) para evitar saturación durante reinicios en bucle, y el frontend cuenta con filtros anti-duplicados para el React Strict Mode.

@@ -11,6 +11,11 @@ El sistema tiene integrado el registro y envío de notificaciones Push y envío 
 - **Limpieza UI Footer / Directorio de Códigos**: Se eliminó la inmensa lista de códigos de infracción visibles directamente en el `Footer.tsx` (que parecía una biblioteca) y se migró todo a una página dedicada `/multas/codigo/page.tsx` (Directorio Nacional de Códigos). El footer ahora cuenta con un único enlace elegante hacia dicho directorio, mejorando dramáticamente la estética corporativa y manteniendo el Silo SEO.
 - **Mejora UX en Panel Web**: Se expandieron de 3 a 6 las opciones predeterminadas de respuestas rápidas (Toque Humano) en el componente `ModalNotaOperador.tsx` para cubrir más escenarios legales de manera profesional.
 - **Corrección de Idempotencia Telegram**: Se corrigió el webhook de Telegram (`telegramWebhook.ts`) cambiando la verificación de idempotencia de un simple ID de mensaje a una validación de estado anterior vs nuevo, previniendo dobles toques que bloqueaban el teclado.
+- **Sistema de Telemetría de Errores Críticos**: Se implementó una solución de *Crash Reporting* y telemetría pasiva para la captura de errores `500` provenientes de componentes de React/Next.js. 
+  - Se configuró la ruta `/api/internal/crash-report` para captar el payload y guardarlo silenciosamente en Firestore (`crash_reports`).
+  - Se configuró la API de Telegram con modo de parseo `HTML` para notificar al desarrollador a través del `TELEGRAM_DEV_CHAT_ID` (un Supergrupo administrado por el bot), garantizando la separación entre métricas de error y los leads comerciales regulares.
+  - Se fortificó la ruta con el motor anti-DDoS Serverless Upstash Redis limitando hasta 20 errores por minuto (`crashReport`) para evitar el abuso o los reinicios cíclicos de React Strict Mode.
+  - Se eliminó la interacción de WhatsApp del componente `error.tsx` garantizando reportes silentes y sin fricción del lado del usuario.
 
 ## Archivos Afectados
 - `functions/src/onCaseStatusChange.ts`
