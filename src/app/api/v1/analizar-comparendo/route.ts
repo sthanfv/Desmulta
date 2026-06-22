@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { Redis } from '@upstash/redis';
+import { Client as QStashClient } from '@upstash/qstash';
 
 const redis = Redis.fromEnv();
 const MAX_GEMINI_DAILY = 500; // Límite de seguridad
@@ -40,6 +41,7 @@ const AnalizarComparendoSchema = z.object({
   mimeType: z.enum(['image/jpeg', 'image/png', 'image/webp'], {
     errorMap: () => ({ message: 'Tipo de imagen no permitido. Usar JPG, PNG o WebP.' }),
   }),
+  webhookUrl: z.string().url('El webhook debe ser una URL válida.').optional(),
 });
 
 function getGeminiModel() {
@@ -108,10 +110,47 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { imageBase64, mimeType } = parsed.data;
+  const { imageBase64, mimeType, webhookUrl } = parsed.data;
 
   // ══════════════════════════════════════════════════════════════════════
-  // CAPA 3: OCR con Gemini
+  // CAPA 2.5: Enrutamiento Asíncrono (QStash)
+  // ══════════════════════════════════════════════════════════════════════
+  if (webhookUrl) {
+    try {
+      const qstash = new QStashClient({ token: process.env.QSTASH_TOKEN || '' });
+      const currentHost = request.headers.get('host') || 'desmulta.online';
+      const protocol = currentHost.includes('localhost') ? 'http' : 'https';
+      
+      const message = await qstash.publishJSON({
+        url: `${protocol}://${currentHost}/api/qstash/ocr-worker`,
+        body: {
+          imageBase64,
+          mimeType,
+          webhookUrl,
+          plan: authResult.keyDoc?.plan
+        }
+      });
+      
+      const response = NextResponse.json({
+        success: true,
+        message: 'Análisis encolado exitosamente. Se notificará al webhookUrl proporcionado.',
+        jobId: message.messageId,
+        status: 'processing'
+      }, { status: 202 });
+
+      response.headers.set('X-RateLimit-Remaining-Month', String(authResult.remainingMonth ?? 0));
+      response.headers.set('X-RateLimit-Remaining-Minute', String(authResult.remainingMinute ?? 0));
+      
+      return response;
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      logger.error('[analizar-comparendo] Error al encolar en QStash', { error: msg });
+      // Si falla QStash, intentamos fallback sincrónico o retornamos error
+    }
+  }
+
+  // ══════════════════════════════════════════════════════════════════════
+  // CAPA 3: OCR con Gemini (Modo Sincrónico Legacy)
   // ══════════════════════════════════════════════════════════════════════
   try {
     const dateStr = new Date().toISOString().split('T')[0];

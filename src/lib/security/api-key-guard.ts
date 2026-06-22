@@ -34,7 +34,7 @@ import { createHash, timingSafeEqual } from 'crypto';
 export const API_KEY_HEADER = 'x-desmulta-key';
 
 /** Colección en Firestore donde se almacenan las API Keys */
-const FIRESTORE_COLLECTION = 'api_keys';
+export const FIRESTORE_COLLECTION = 'api_keys';
 
 /** TTL del caché Redis para datos de la key (5 minutos) */
 const CACHE_TTL_SECONDS = 300;
@@ -146,37 +146,24 @@ async function getFromFirestore(keyId: string): Promise<ApiKeyDocument | null> {
 // ─── Incremento de Uso (Fire-and-Forget) ──────────────────────────────────────
 
 /**
- * Incrementa los contadores de uso en Firestore de forma asíncrona.
- * No bloquea el response al cliente. Resetea el contador mensual si cambió el mes.
+ * Incrementa los contadores de uso en Redis de forma asíncrona (O(1)).
+ * El CRON en background (/api/cron/sync-usage) sincronizará esto a Firestore periódicamente.
  */
 async function incrementUsage(keyId: string, plan: ApiKeyPlan): Promise<void> {
   try {
-    const adminApp = getAdminApp();
-    const db = getFirestore(adminApp);
-    const docRef = db.collection(FIRESTORE_COLLECTION).doc(keyId);
     const mesActual = new Date().toISOString().substring(0, 7); // "YYYY-MM"
-
-    // Usamos una transacción para manejar el reset mensual atómicamente
-    await db.runTransaction(async (tx) => {
-      const snap = await tx.get(docRef);
-      if (!snap.exists) return;
-
-      const data = snap.data() as ApiKeyDocument;
-      const esMesNuevo = data.mesActual !== mesActual;
-
-      tx.update(docRef, {
-        usoTotal: (data.usoTotal ?? 0) + 1,
-        usoMesActual: esMesNuevo ? 1 : (data.usoMesActual ?? 0) + 1,
-        mesActual: mesActual,
-        ultimoUso: new Date().toISOString(),
-      });
-    });
-
-    // Invalidar caché para que el próximo request lea los datos actualizados
-    await invalidateApiKeyCache(keyId);
+    
+    // Ejecutar atómicamente en un pipeline
+    const pipeline = redis.pipeline();
+    pipeline.incr(`apikey:usoTotal:${keyId}`);
+    pipeline.incr(`apikey:usoMes:${mesActual}:${keyId}`);
+    pipeline.set(`apikey:ultimoUso:${keyId}`, new Date().toISOString());
+    // Añadir el keyId a la cola de sincronización para que el CRON sepa qué keys actualizar
+    pipeline.sadd(`apikey:sync_queue`, keyId);
+    
+    await pipeline.exec();
   } catch (error) {
-    // No interrumpir el flujo del request si falla el contador
-    logger.warn('[api-key-guard] Fallo al incrementar contador de uso', {
+    logger.warn('[api-key-guard] Fallo al incrementar contador de uso en Redis', {
       keyId,
       plan,
       error: String(error),
@@ -282,7 +269,14 @@ export async function validateApiKey(rawKey: string | null): Promise<ApiKeyValid
   // 8. Verificar quota mensual
   const planConfig = API_KEY_PLANS[keyDoc.plan];
   const mesActual = new Date().toISOString().substring(0, 7);
-  const usoMes = keyDoc.mesActual === mesActual ? (keyDoc.usoMesActual ?? 0) : 0;
+  
+  // Leer el uso del mes en tiempo real desde Redis. Si no está en caché (por ejemplo, primer request del mes o cache flush), 
+  // hacemos fallback al dato de Firestore y el de Firestore solo será válido si el mes coincide.
+  const usoMesRedis = await redis.get<number>(`apikey:usoMes:${mesActual}:${keyId}`);
+  const usoMes = usoMesRedis !== null 
+      ? Number(usoMesRedis) 
+      : (keyDoc.mesActual === mesActual ? (keyDoc.usoMesActual ?? 0) : 0);
+
   const remainingMonth = planConfig.requestsPerMonth - usoMes;
 
   if (remainingMonth <= 0) {

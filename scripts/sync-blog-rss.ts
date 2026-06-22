@@ -153,62 +153,36 @@ async function syncBlogFromRss() {
 
       const xmlText = await response.text();
       
-      // Detectar si el feed es Atom (ej. Google Alerts) o RSS tradicional
-      const isAtom = xmlText.toLowerCase().includes('<feed');
+      // Inicializar el parser en cada iteración
+      const Parser = require('rss-parser');
+      const parser = new Parser({
+        customFields: {
+          item: ['description', 'summary', 'content', 'content:encoded', 'published', 'updated']
+        }
+      });
       
-      let matches: string[] = [];
-      if (isAtom) {
-        console.log('[RSS-SYNC] Formato detectado: Atom (Google Alerts)');
-        const entryRegex = /<entry>([\s\S]*?)<\/entry>/gi;
-        matches = xmlText.match(entryRegex) || [];
-      } else {
-        console.log('[RSS-SYNC] Formato detectado: RSS tradicional');
-        const itemRegex = /<item>([\s\S]*?)<\/item>/gi;
-        matches = xmlText.match(itemRegex) || [];
-      }
+      const feed = await parser.parseString(xmlText);
+      const items = feed.items || [];
 
-      if (matches.length === 0) {
+      if (items.length === 0) {
         console.log('[RSS-SYNC] No se encontraron noticias o formato XML no reconocido para este feed.');
         continue;
       }
 
-      console.log(`[RSS-SYNC] Procesando ${matches.length} noticias de este feed...`);
+      console.log(`[RSS-SYNC] Procesando ${items.length} noticias de este feed...`);
 
-      for (const itemXml of matches) {
-        let title = extractTagContent(itemXml, 'title');
-        let pubDate = extractTagContent(itemXml, 'pubDate') || extractTagContent(itemXml, 'published') || extractTagContent(itemXml, 'updated');
-        let description = extractTagContent(itemXml, 'description') || extractTagContent(itemXml, 'summary') || extractTagContent(itemXml, 'content') || extractTagContent(itemXml, 'content:encoded');
-        let link = '';
-
-        if (isAtom) {
-          // En Atom el link se encuentra como atributo href
-          const linkMatch = itemXml.match(/<link\s+(?:[^>]*?\s+)?href="([^"]*)"/i);
-          if (linkMatch && linkMatch[1]) {
-            link = linkMatch[1].trim().replace(/&amp;/g, '&');
-            // Limpiar redirecciones de Google Alerts
-            if (link.includes('google.com/url?')) {
-              try {
-                const urlObj = new URL(link);
-                const realUrl = urlObj.searchParams.get('url');
-                if (realUrl) {
-                  link = realUrl;
-                }
-              } catch {
-                // Si falla el parseo, se conserva el original
-              }
-            }
-          }
-        } else {
-          link = extractTagContent(itemXml, 'link');
-        }
+      for (const item of items) {
+        let title = item.title;
+        let pubDate = item.pubDate || item.published || item.updated;
+        let description = item.description || item.summary || item.content || item['content:encoded'] || '';
+        let link = item.link || '';
 
         if (!title || !pubDate) {
           continue;
         }
 
-        // Limpiar CDATA y entidades HTML del título
+        // Limpiar entidades HTML del título (el CDATA usualmente ya viene limpio por rss-parser)
         title = title
-          .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/i, '$1')
           .replace(/&lt;b&gt;/gi, '')
           .replace(/&lt;\/b&gt;/gi, '')
           .replace(/<b>/gi, '')
