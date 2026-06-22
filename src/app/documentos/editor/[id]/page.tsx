@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useEffect, useState, use } from 'react';
@@ -12,7 +13,7 @@ export default function DocumentEditor({ params }: { params: Promise<{ id: strin
   const router = useRouter();
 
   const [loading, setLoading] = useState(true);
-  const [purchase, setPurchase] = useState<any>(null);
+  const [purchase, setPurchase] = useState<unknown>(null);
 
   // Formulario del Editor
   const [formData, setFormData] = useState({

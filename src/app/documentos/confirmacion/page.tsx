@@ -12,7 +12,7 @@ function ConfirmacionContent() {
   const [status, setStatus] = useState<
     'loading' | 'APPROVED' | 'DECLINED' | 'PENDING' | 'ERROR' | 'VOIDED'
   >('loading');
-  const [purchaseData, setPurchaseData] = useState<any>(null);
+  const [purchaseData, setPurchaseData] = useState<unknown>(null);
 
   useEffect(() => {
     if (!ref) return;

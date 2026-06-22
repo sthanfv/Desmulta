@@ -6,7 +6,7 @@ import { Loader2, ShieldCheck, AlertCircle } from 'lucide-react';
 
 export default function TestPagoPage() {
   const [loading, setLoading] = useState(false);
-  const [checkoutData, setCheckoutData] = useState<any>(null);
+  const [checkoutData, setCheckoutData] = useState<unknown>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleCreateOrder = async (e: React.FormEvent<HTMLFormElement>) => {
