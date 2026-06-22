@@ -37,7 +37,7 @@ function ConfirmacionContent() {
 
     const unsub = onSnapshot(doc(db, 'purchases', ref), (snap) => {
       if (!snap.exists()) return;
-      const purchase = snap.data();
+      const purchase = snap.data() as PurchaseData;
       setPurchaseData(purchase);
       setStatus(purchase.status ?? 'PENDING');
     });
