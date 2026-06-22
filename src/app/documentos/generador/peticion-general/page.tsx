@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
 import { useState } from 'react';
@@ -73,8 +73,7 @@ export default function GeneradorPeticion() {
 
       // Función para inicializar el widget una vez cargado el script
       const initWompiWidget = () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const checkout = new (window as any).WidgetCheckout({
+        const checkout = new (window as unknown).WidgetCheckout({
           currency: 'COP',
           amountInCents: data.amountCop,
           reference: data.wompiReference,
@@ -83,8 +82,7 @@ export default function GeneradorPeticion() {
           // redirectUrl no es necesario aquí porque controlamos el callback en React
         });
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        checkout.open((result: any) => {
+        checkout.open((result: unknown) => {
           const transaction = result.transaction;
           if (transaction.status === 'APPROVED') {
             window.location.href = `/documentos/confirmacion?ref=${data.wompiReference}`;
@@ -96,8 +94,7 @@ export default function GeneradorPeticion() {
       };
 
       // Cargar dinámicamente el script de Wompi si no existe
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      if (!(window as any).WidgetCheckout) {
+      if (!(window as unknown).WidgetCheckout) {
         const script = document.createElement('script');
         script.src = 'https://checkout.wompi.co/widget.js';
         script.async = true;
@@ -110,7 +107,7 @@ export default function GeneradorPeticion() {
       } else {
         initWompiWidget();
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
       setError(err.message || 'Error de conexión. Intenta de nuevo.');
       setLoading(false);
