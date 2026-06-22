@@ -120,9 +120,9 @@ export default function CalculadoraPage() {
             </h4>
             <p className="text-zinc-400">
               Por regla general, si la Secretaría de Movilidad no te ha cobrado mediante un proceso
-              de &quot;Cobro Coactivo&quot; en un plazo de 3 años, la multa prescribe. Si tienen cobro
-              coactivo, el plazo puede extenderse a 6 años totales, pero existen vacíos legales que
-              permiten tumbarlas antes.
+              de &quot;Cobro Coactivo&quot; en un plazo de 3 años, la multa prescribe. Si tienen
+              cobro coactivo, el plazo puede extenderse a 6 años totales, pero existen vacíos
+              legales que permiten tumbarlas antes.
             </p>
           </article>
           <article>

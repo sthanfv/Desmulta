@@ -224,7 +224,7 @@ export async function validateApiKey(rawKey: string | null): Promise<ApiKeyValid
     };
   }
 
-  const keyId = key; // El keyId = la key completa (es el doc ID en Firestore)
+  const keyId = key.substring(0, 16); // El keyId es solo el prefijo pÃºblico (ej: dm_live_12345678)
   const candidateHash = hashApiKey(key);
 
   // 3. Buscar en caché Redis (optimización: evita consultar Firestore cada request)

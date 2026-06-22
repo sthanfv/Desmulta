@@ -9,21 +9,50 @@ import { logger } from '@/lib/logger/security-logger';
 // https://desmulta.online/api/payments/webhook-wompi
 
 export async function POST(req: NextRequest) {
-  // 1. Verificar firma del webhook (CRÍTICO — sin esto cualquiera puede llamar este endpoint)
-  const body = await req.text(); // Leer como texto plano primero
-  const wompiSignature = req.headers.get('x-event-checksum') ?? '';
+  // 1. Parsear el evento y verificar firma dinámica
+  const body = await req.text();
+  let event;
+  try {
+    event = JSON.parse(body);
+  } catch (_err) {
+    return NextResponse.json({ error: 'JSON malformado' }, { status: 400 });
+  }
 
-  const expectedSignature = createHash('sha256')
-    .update(body + process.env.WOMPI_EVENTS_SECRET)
-    .digest('hex');
-
-  if (wompiSignature !== expectedSignature) {
-    logger.warn('[webhook-wompi] Firma inválida — posible ataque', { wompiSignature });
+  if (!event || !event.signature || !Array.isArray(event.signature.properties) || !event.signature.checksum || !event.timestamp) {
+    logger.warn('[webhook-wompi] Evento malformado o sin propiedades de firma');
     return NextResponse.json({ error: 'Firma inválida' }, { status: 401 });
   }
 
-  // 2. Parsear el evento
-  const event = JSON.parse(body);
+  // 2. Wompi Docs: concatenar los valores en el orden exacto de signature.properties
+  let concatenatedValues = '';
+  for (const prop of event.signature.properties) {
+    const parts = prop.split('.');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let val: any = event.data;
+    for (const part of parts) {
+      if (val === undefined || val === null) break;
+      val = val[part];
+    }
+    if (val !== undefined && val !== null) {
+      concatenatedValues += String(val);
+    }
+  }
+
+  // Agregar timestamp y el secreto al final de la cadena
+  concatenatedValues += String(event.timestamp) + (process.env.WOMPI_EVENTS_SECRET || '');
+
+  const expectedSignature = createHash('sha256')
+    .update(concatenatedValues)
+    .digest('hex');
+
+  if (event.signature.checksum !== expectedSignature) {
+    logger.warn('[webhook-wompi] Firma inválida — checksum no coincide', { 
+      recibido: event.signature.checksum, 
+      esperado: expectedSignature 
+    });
+    return NextResponse.json({ error: 'Firma inválida' }, { status: 401 });
+  }
+
   const { event: eventType, data } = event;
 
   // Solo procesar eventos de transacciones completadas

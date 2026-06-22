@@ -150,6 +150,10 @@ service cloud.firestore {
       allow read, write: if false; // Solo Admin SDK (server-side)
     }
 
+    match /api_keys/{keyId} {
+      allow read, write: if false; // Solo Admin SDK (server-side)
+    }
+
     // Rate limits están denegados implícitamente por defecto en Firestore.
   }
 }

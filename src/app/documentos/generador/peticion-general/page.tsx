@@ -112,7 +112,8 @@ export default function GeneradorPeticion() {
       }
     } catch (err: unknown) {
       console.error(err);
-      const errorMessage = err instanceof Error ? err.message : 'Error de conexión. Intenta de nuevo.';
+      const errorMessage =
+        err instanceof Error ? err.message : 'Error de conexión. Intenta de nuevo.';
       setError(errorMessage);
       setLoading(false);
     }

@@ -257,6 +257,8 @@ function _estimateHeight(lines: string[], fontSize: number, gap: number): number
 // ── Función principal ──────────────────────────────────────────────
 export async function generateMandatePDF(payload: MandatePayload): Promise<Uint8Array> {
   const doc = await PDFDocument.create();
+  doc.setTitle(`Documento Legal ${payload.shortId}`);
+  doc.setSubject(`Referencia: ${payload.shortId}`);
   const reg = await doc.embedFont(StandardFonts.Helvetica);
   const bold = await doc.embedFont(StandardFonts.HelveticaBold);
 

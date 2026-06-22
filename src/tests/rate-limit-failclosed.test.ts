@@ -5,6 +5,18 @@ vi.mock('@/lib/firebase-admin', () => ({
   getAdminApp: vi.fn(),
 }));
 
+vi.mock('@upstash/redis', () => ({
+  Redis: {
+    fromEnv: vi.fn(() => ({})),
+  },
+}));
+
+vi.mock('@upstash/ratelimit', () => ({
+  Ratelimit: vi.fn().mockImplementation(() => ({
+    limit: vi.fn().mockRejectedValue(new Error('Redis down')),
+  })),
+}));
+
 vi.mock('firebase-admin/firestore', () => {
   const runTransactionMock = vi.fn().mockRejectedValue(new Error('Firestore down'));
   return {

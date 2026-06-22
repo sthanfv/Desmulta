@@ -240,13 +240,13 @@ async function syncBlogFromRss() {
         const cleanDescription = htmlToMarkdown(description).slice(0, 160).replace(/\n/g, ' ') + '...';
         const cleanContent = htmlToMarkdown(description);
 
-        // Contenido MDX con cabecera frontmatter configurada en modo borrador (draft: true)
+        // Contenido MDX con cabecera frontmatter configurada en modo borrador SIEMPRE
         const mdxContent = `---
 title: "${title.replace(/"/g, '\\"')}"
 excerpt: "${cleanDescription.replace(/"/g, '\\"')}"
 date: "${dateStr}"
-author: "Supertransporte Colombia"
-draft: ${process.env.AUTO_PUBLISH_BLOG === 'true' ? 'false' : 'true'}
+author: "Equipo Desmulta"
+draft: true
 tags: ["noticias", "regulación", "supertransporte"]
 ---
 

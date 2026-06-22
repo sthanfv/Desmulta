@@ -73,6 +73,8 @@ export async function middleware(request: NextRequest) {
   const paisUsuario = request.headers.get('x-vercel-ip-country');
   const esRutaInterna = pathname.startsWith('/api/internal');
   const esRutaAuth = pathname.startsWith('/api/auth');
+  const esRutaGatewayB2B = pathname.startsWith('/api/v1');
+  const esRutaWebhookWompi = pathname.startsWith('/api/payments/webhook-wompi');
   const esRutaAssets = pathname.startsWith('/_next');
   const esPaginaBloqueo = pathname.startsWith('/geo-bloqueado');
 
@@ -81,6 +83,8 @@ export async function middleware(request: NextRequest) {
     paisUsuario !== 'CO' &&
     !esRutaInterna &&
     !esRutaAuth &&
+    !esRutaGatewayB2B &&
+    !esRutaWebhookWompi &&
     !esRutaAssets &&
     !esPaginaBloqueo
   ) {

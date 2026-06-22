@@ -40,13 +40,15 @@ const PLANES_VALIDOS: ApiKeyPlan[] = ['starter', 'growth', 'enterprise'];
 // ─── Helpers de Seguridad ──────────────────────────────────────────────────────
 
 /**
- * Genera una API Key criptográficamente segura.
- * Formato: "dm_live_<32 bytes random en hex>"
- * Entropía: 256 bits (imposible de fuerza bruta).
+ * Genera una API Key criptográficamente segura y su ID público.
+ * Formato: "dm_live_<48 chars hex>"
+ * Entropía: 192 bits (imposible de fuerza bruta).
  */
-function generateApiKey(): string {
+function generateApiKey(): { rawKey: string; keyId: string } {
   const random = randomBytes(24).toString('hex');
-  return `dm_live_${random}`;
+  const rawKey = `dm_live_${random}`;
+  const keyId = `dm_live_${random.substring(0, 8)}`;
+  return { rawKey, keyId };
 }
 
 /**
@@ -206,9 +208,8 @@ export async function POST(request: NextRequest) {
 
   try {
     // 1. Generar la key y su hash
-    const rawKey = generateApiKey();
+    const { rawKey, keyId } = generateApiKey();
     const keyHash = hashApiKey(rawKey);
-    const keyId = rawKey; // La key completa es el ID del documento
 
     // 2. Construir el documento
     const ahora = new Date().toISOString();

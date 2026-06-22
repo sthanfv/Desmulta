@@ -6,7 +6,6 @@ import { db } from '@/lib/firebase-client';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { CheckCircle2, XCircle, Loader2, Clock, ShieldAlert } from 'lucide-react';
 
-
 // Interfaz que representa los datos de una compra almacenados en Firestore
 interface PurchaseData {
   status: 'APPROVED' | 'DECLINED' | 'PENDING' | 'ERROR' | 'VOIDED';
@@ -30,7 +29,6 @@ function ConfirmacionContent() {
     'loading' | 'APPROVED' | 'DECLINED' | 'PENDING' | 'ERROR' | 'VOIDED'
   >('loading');
   const [purchaseData, setPurchaseData] = useState<PurchaseData | null>(null);
-
 
   useEffect(() => {
     if (!ref) return;

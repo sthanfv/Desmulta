@@ -1,34 +1,54 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminApp } from '@/lib/firebase-admin';
-import { getFirestore } from 'firebase-admin/firestore';
+import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 import { generateMandatePDF, MandatePayload } from '@/lib/legal/pdf-engine';
 import { DocumentType } from '@/lib/legal/document-templates';
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const ref = searchParams.get('ref');
+    const tokenId = searchParams.get('token');
 
-    if (!ref) {
-      return new NextResponse('Falta el parametro ref', { status: 400 });
+    if (!tokenId) {
+      return new NextResponse('Falta el parametro token', { status: 400 });
     }
 
     const db = getFirestore(getAdminApp());
-    const purchaseSnap = await db.collection('purchases').doc(ref).get();
+    const tokenSnap = await db.collection('pdf_tokens').doc(tokenId).get();
 
-    if (!purchaseSnap.exists) {
-      return new NextResponse('Documento no encontrado', { status: 404 });
+    if (!tokenSnap.exists) {
+      return new NextResponse('Enlace inválido o documento no encontrado', { status: 404 });
     }
 
+    const tokenData = tokenSnap.data();
+
+    if (!tokenData) {
+      return new NextResponse('Datos de token no encontrados', { status: 404 });
+    }
+
+    // Verificar expiración
+    const expiresAt = tokenData.expiresAt?.toDate ? tokenData.expiresAt.toDate() : new Date(tokenData.expiresAt);
+    if (new Date() > expiresAt) {
+      return new NextResponse('El enlace de descarga ha expirado (límite 72 horas)', { status: 403 });
+    }
+
+    // Verificar límite de descargas
+    if (tokenData.downloadCount >= tokenData.maxDownloads) {
+      return new NextResponse('Se ha alcanzado el límite máximo de descargas para este documento', { status: 403 });
+    }
+
+    // Incrementar contador de descargas
+    await db.collection('pdf_tokens').doc(tokenId).update({
+      downloadCount: FieldValue.increment(1)
+    });
+
+    // Obtener info adicional de purchase
+    const purchaseSnap = await db.collection('purchases').doc(tokenData.purchaseId).get();
     const purchase = purchaseSnap.data();
 
-    if (purchase?.status !== 'APPROVED') {
-      return new NextResponse('El pago aún no ha sido aprobado', { status: 403 });
-    }
-
     const payload: MandatePayload = {
-      ...purchase?.caseData,
-      documentType: purchase?.productType as DocumentType,
+      ...tokenData.caseData,
+      documentType: tokenData.productType as DocumentType,
       operatorName: 'SISTEMA AUTOMATIZADO DESMULTA',
       operatorId: 'NIT 900.000.000-1',
       acceptedAt: purchase?.paidAt
@@ -38,7 +58,7 @@ export async function GET(req: NextRequest) {
 
     const pdfBytes = await generateMandatePDF(payload);
 
-    const filename = `Peticion_${purchase?.caseData?.licensePlate || 'General'}_${purchase?.caseData?.infractorId || ''}.pdf`;
+    const filename = `Peticion_${tokenData.caseData?.licensePlate || 'General'}_${tokenData.caseData?.infractorId || ''}.pdf`;
 
     return new NextResponse(pdfBytes as unknown as BodyInit, {
       status: 200,

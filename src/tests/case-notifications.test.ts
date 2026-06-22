@@ -90,13 +90,13 @@ describe('updateCaseStatus — Notificaciones Delegadas', () => {
     expect(resend.emails.send).not.toHaveBeenCalled();
   });
 
-  it('Debe despachar la notificación push directamente al cambiar de estado (Motor de Despacho en actions.ts)', async () => {
+  it('NO debe despachar la notificación push directamente al cambiar de estado (Responsabilidad de Cloud Functions)', async () => {
     const { dispatchPush } = await import('@/lib/notifications/notification-dispatcher');
 
     // Ejecutar la función
     await updateCaseStatus('fake-token', 'case-123', 'CONTACTADO', 'Prueba de estado');
 
-    // Verificar que se invoca push directo
-    expect(dispatchPush).toHaveBeenCalled();
+    // Verificar que NO se invoca push directo
+    expect(dispatchPush).not.toHaveBeenCalled();
   });
 });
