@@ -6,13 +6,31 @@ import { db } from '@/lib/firebase-client';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { CheckCircle2, XCircle, Loader2, Clock, ShieldAlert } from 'lucide-react';
 
+
+// Interfaz que representa los datos de una compra almacenados en Firestore
+interface PurchaseData {
+  status: string;
+  productType?: string;
+  productLabel?: string;
+  customerEmail?: string;
+  celular?: string;
+  caseData?: {
+    infractorName?: string;
+    infractorId?: string;
+    licensePlate?: string;
+    autoridadTransito?: string;
+    direccionNotificacion?: string;
+  };
+}
+
 function ConfirmacionContent() {
   const params = useSearchParams();
   const ref = params.get('ref');
   const [status, setStatus] = useState<
     'loading' | 'APPROVED' | 'DECLINED' | 'PENDING' | 'ERROR' | 'VOIDED'
   >('loading');
-  const [purchaseData, setPurchaseData] = useState<unknown>(null);
+  const [purchaseData, setPurchaseData] = useState<PurchaseData | null>(null);
+
 
   useEffect(() => {
     if (!ref) return;
