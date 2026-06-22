@@ -114,14 +114,15 @@ export function SalesAdminView() {
   };
 
   const formatDate = (timestamp: unknown) => {
-    if (!timestamp?.toDate) return 'Fecha desconocida';
+    const ts = timestamp as { toDate?: () => Date } | null | undefined;
+    if (!ts || typeof ts.toDate !== 'function') return 'Fecha desconocida';
     return new Intl.DateTimeFormat('es-CO', {
       day: '2-digit',
       month: 'short',
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
-    }).format(timestamp.toDate());
+    }).format(ts.toDate());
   };
 
   if (isLoading) {

@@ -4,9 +4,18 @@ import { useState } from 'react';
 import { WompiCheckout } from '@/components/payments/WompiCheckout';
 import { Loader2, ShieldCheck, AlertCircle } from 'lucide-react';
 
+interface CheckoutData {
+  wompiReference: string;
+  amountCop: number;
+  signature: string;
+  publicKey: string;
+  customerEmail: string;
+  redirectUrl: string;
+}
+
 export default function TestPagoPage() {
   const [loading, setLoading] = useState(false);
-  const [checkoutData, setCheckoutData] = useState<unknown>(null);
+  const [checkoutData, setCheckoutData] = useState<CheckoutData | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleCreateOrder = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -51,10 +60,10 @@ export default function TestPagoPage() {
         signature: data.signature,
         publicKey: data.publicKey,
         customerEmail: payload.customerEmail,
-        redirectUrl: data.redirectUrl,
+        redirectUrl: data.redirectUrl || '',
       });
     } catch (err: unknown) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'Error desconocido al crear la orden.');
     } finally {
       setLoading(false);
     }

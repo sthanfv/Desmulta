@@ -26,3 +26,25 @@
   - Uso de **Hash HMAC-SHA256** (`hashPII`) para guardar PII.
   - Uso del **Web Checkout nativo de Wompi** mediante construcción de URL y botón estándar de React, evitando manipulaciones imperativas del DOM (`appendChild`).
 - **Estado actual:** ✅ Listo y desplegado en modo Sandbox.
+
+## 2026-06-21: Corrección de Errores de Tipado de TypeScript para Producción
+- **Qué cambió:**
+  - Se corrigió el tipo de estado `status` en la interfaz `PurchaseData` en `confirmacion/page.tsx`.
+  - Se creó la interfaz `PurchaseData` en el editor `editor/[id]/page.tsx` para evitar el uso del tipo `unknown`.
+  - Se corrigieron los accesos a `window.WidgetCheckout` y el tipado del callback de checkout en `peticion-general/page.tsx`.
+  - Se definió la interfaz `CheckoutData` en `test-pago/page.tsx` para compatibilidad estricta con las props del componente `WompiCheckout`.
+  - Se ajustó la función `formatDate` en `SalesAdminView.tsx` para validar de forma Type-Safe la existencia de la función `.toDate()` de los Timestamps de Firestore.
+  - Se eliminó la importación no utilizada `_degrees` en `pdf-engine.ts`.
+- **Por qué cambió:**
+  - Para posibilitar la compilación exitosa del proyecto (`npm run build`) en el entorno de producción de Vercel y eliminar advertencias de TypeScript.
+- **Archivos afectados:**
+  - `src/app/documentos/confirmacion/page.tsx`
+  - `src/app/documentos/editor/[id]/page.tsx`
+  - `src/app/documentos/generador/peticion-general/page.tsx`
+  - `src/app/test-pago/page.tsx`
+  - `src/components/vial-clear/SalesAdminView.tsx`
+  - `src/lib/legal/pdf-engine.ts`
+- **Decisiones técnicas:**
+  - Uso de casteo explícito con interfaces locales e instanciación de tipos seguros sin recurrir a `any` genéricos siempre que fuera viable.
+  - Comprobación del tipo de error usando `instanceof Error` en bloques `catch`.
+- **Estado actual:** ✅ Proyecto compila 100% libre de errores de TypeScript en modo de producción.

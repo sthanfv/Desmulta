@@ -1,4 +1,4 @@
-import { PDFDocument, StandardFonts, rgb, _degrees } from 'pdf-lib';
+import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 import {
   DocumentType,
   CaseDataForPDF,

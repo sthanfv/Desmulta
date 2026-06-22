@@ -7,13 +7,24 @@ import { db } from '@/lib/firebase-client';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { Loader2, Download, ShieldCheck, Edit3, Save } from 'lucide-react';
 
+interface PurchaseData {
+  status: string;
+  productLabel?: string;
+  customerEmail?: string;
+  caseData?: {
+    infractorName?: string;
+    infractorId?: string;
+    licensePlate?: string;
+  };
+}
+
 export default function DocumentEditor({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const refId = resolvedParams.id;
   const router = useRouter();
 
   const [loading, setLoading] = useState(true);
-  const [purchase, setPurchase] = useState<unknown>(null);
+  const [purchase, setPurchase] = useState<PurchaseData | null>(null);
 
   // Formulario del Editor
   const [formData, setFormData] = useState({
@@ -33,7 +44,7 @@ export default function DocumentEditor({ params }: { params: Promise<{ id: strin
           return;
         }
 
-        const data = snap.data();
+        const data = snap.data() as PurchaseData;
         if (data.status !== 'APPROVED') {
           router.push(`/documentos/confirmacion?ref=${refId}`);
           return;

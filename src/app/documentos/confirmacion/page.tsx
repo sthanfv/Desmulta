@@ -9,7 +9,7 @@ import { CheckCircle2, XCircle, Loader2, Clock, ShieldAlert } from 'lucide-react
 
 // Interfaz que representa los datos de una compra almacenados en Firestore
 interface PurchaseData {
-  status: string;
+  status: 'APPROVED' | 'DECLINED' | 'PENDING' | 'ERROR' | 'VOIDED';
   productType?: string;
   productLabel?: string;
   customerEmail?: string;
