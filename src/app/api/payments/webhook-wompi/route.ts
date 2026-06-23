@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createHash } from 'crypto';
 import { getAdminApp } from '@/lib/firebase-admin';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
-import { generarYEnviarPDF } from '@/lib/payments/pdf-delivery';
+import { generarYEnviarPDF, PurchaseDocument } from '@/lib/payments/pdf-delivery';
 import { logger } from '@/lib/logger/security-logger';
+import { waitUntil } from '@vercel/functions';
 
 // IMPORTANTE: Registrar la URL del webhook en el Dashboard de Wompi:
 // https://desmulta.online/api/payments/webhook-wompi
@@ -33,13 +34,16 @@ export async function POST(req: NextRequest) {
       if (val === undefined || val === null) break;
       val = val[part];
     }
+    // FIX: Manejo robusto de valores numéricos como 0 (evitando falsy checks simples) y anidación
     if (val !== undefined && val !== null) {
       concatenatedValues += String(val);
     }
   }
 
-  // Agregar timestamp y el secreto al final de la cadena
-  concatenatedValues += String(event.timestamp) + (process.env.WOMPI_EVENTS_SECRET || '');
+  // Agregar timestamp y el secreto al final de la cadena (Manejo defensivo del timestamp)
+  const safeTimestamp = event.timestamp ? String(event.timestamp) : '';
+  const wompiSecret = process.env.WOMPI_EVENTS_SECRET || '';
+  concatenatedValues += safeTimestamp + wompiSecret;
 
   const expectedSignature = createHash('sha256')
     .update(concatenatedValues)
@@ -100,9 +104,11 @@ export async function POST(req: NextRequest) {
     if (purchase) {
       // Disparar la entrega en background — NO bloquear la respuesta a Wompi
       // Si esto falla, el sistema de reintentos lo recupera
-      void generarYEnviarPDF(purchase, db).catch((err) => {
-        logger.error('[webhook-wompi] Fallo en entrega PDF', { reference, err: String(err) });
-      });
+      waitUntil(
+        generarYEnviarPDF(purchase as PurchaseDocument, db).catch((err) => {
+          logger.error('[webhook-wompi] Fallo en entrega PDF', { reference, err: String(err) });
+        })
+      );
     }
   }
 

@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
   const ip = req.headers.get('x-forwarded-for') ?? 'unknown';
 
   // 1. Rate limiting — máx 5 órdenes por IP por hora
-  const rl = await checkRateLimit('consultation', ip);
+  const rl = await checkRateLimit('checkoutOrder', ip);
   if (!rl.success) {
     return NextResponse.json(
       { error: 'Demasiadas solicitudes. Intenta en unos minutos.' },

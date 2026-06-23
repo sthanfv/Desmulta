@@ -20,6 +20,7 @@ export const rateLimiters = {
   leads: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(10, '15 m') }),
   ocr: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(3, '10 m') }),
   consultation: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(5, '5 m') }),
+  checkoutOrder: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(5, '10 m') }),
   validarOtp: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(10, '1 m') }),
   qr: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(30, '1 m') }),
 

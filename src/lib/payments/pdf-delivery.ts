@@ -1,11 +1,31 @@
 import { generateMandatePDF, MandatePayload } from '@/lib/legal/pdf-engine';
-import { DOCUMENT_TEMPLATES, DocumentType } from '@/lib/legal/document-templates';
+import { DOCUMENT_TEMPLATES, DocumentType, CaseDataForPDF } from '@/lib/legal/document-templates';
 import { resend } from '@/lib/resend';
 import { FieldValue, Firestore } from 'firebase-admin/firestore';
 import { randomBytes } from 'crypto';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function generarYEnviarPDF(purchase: any, db: Firestore) {
+export interface PurchaseDocument {
+  id: string;
+  wompiReference?: string;
+  productType: string;
+  productLabel?: string;
+  amountCop?: number;
+  status?: string;
+  hashedCedula?: string;
+  hashedCelular?: string;
+  customerEmail: string;
+  caseData: CaseDataForPDF;
+  createdAt?: any;
+  idempotencyKey?: string;
+  ipAddress?: string;
+  wompiTransactionId?: string;
+  paidAt?: any;
+  pdfDeliveredAt?: any;
+  downloadToken?: string;
+}
+
+
+export async function generarYEnviarPDF(purchase: PurchaseDocument, db: Firestore) {
   const { productType, caseData, customerEmail, id: purchaseId } = purchase;
 
   // 1. Obtener la plantilla del documento
@@ -15,6 +35,8 @@ export async function generarYEnviarPDF(purchase: any, db: Firestore) {
   // 2. Generar el PDF en memoria
   const payload: MandatePayload = {
     ...caseData,
+    ticketNumber: caseData.ticketNumber || '',
+    licensePlate: caseData.licensePlate || '',
     documentType: productType as DocumentType,
     operatorName: 'SISTEMA AUTOMATIZADO DESMULTA',
     operatorId: 'NIT 900.000.000-1',
