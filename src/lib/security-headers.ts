@@ -7,10 +7,9 @@ const isDev = process.env.NODE_ENV === 'development';
 const unsafeEval = isDev ? " 'unsafe-eval'" : '';
 const scriptUnsafeInline = isDev ? " 'unsafe-inline'" : '';
 
-// En producción se elimina 'unsafe-inline' para estilo (remediación hallazgo CSP de auditoría Manus AI).
-// Framer Motion y Tailwind JIT se sirven como clases estáticas; los estilos inline residuales
-// quedan cubiertos por 'unsafe-hashes' con el hash SHA-256 del snippet conocido.
-const styleUnsafe = isDev ? " 'unsafe-inline'" : '';
+// En producción debemos permitir 'unsafe-inline' en style-src porque el widget de pagos (Wompi)
+// y Framer Motion inyectan estilos dinámicamente en el DOM y fallan de manera silenciosa si se bloquean.
+const styleUnsafe = " 'unsafe-inline'";
 
 const devHashes = isDev ? '' : " 'sha256-osMMQj3FsFuFoINhDY6u/ERO7gP52tI8DTruJmDXHD8='";
 
