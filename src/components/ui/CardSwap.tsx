@@ -31,14 +31,14 @@ export function CardSwap({
     if (isSwapping || cards.length < 2) return;
     setIsSwapping(true);
 
-    // La primera tarjeta se desliza hacia la izquierda de forma rápida (450ms)
+    // La primera tarjeta se desliza hacia la izquierda
     setTimeout(() => {
       setCards((prev) => {
         const [front, ...rest] = prev;
         return [...rest, front];
       });
       setIsSwapping(false);
-    }, 450);
+    }, 300);
   };
 
   useEffect(() => {
@@ -119,19 +119,19 @@ export function CardSwap({
               initial={
                 isFront
                   ? { opacity: 1, x: 0, y: 0, scale: 1 }
-                  : { opacity: 1 - depth * 0.15, x: targetX, y: targetY, scale: scale }
+                  : { opacity: 1, x: targetX, y: targetY, scale: scale }
               }
               animate={
                 isSwapping && isFront
                   ? {
-                      opacity: 0,
+                      opacity: 1,
                       x: '-120%',
                       y: 0,
-                      scale: 0.96,
-                      transition: { duration: 0.45, ease: 'easeInOut' }, // Transiciones simplificadas para evitar lag
+                      scale: 0.9,
+                      transition: { duration: 0.3, ease: 'easeOut' }, // Sale rápido sin volverse transparente
                     }
                   : {
-                      opacity: 1 - depth * 0.15,
+                      opacity: 1,
                       x: targetX,
                       y: targetY,
                       scale: scale,
@@ -146,6 +146,12 @@ export function CardSwap({
             >
               <div className="w-full h-full rounded-2xl bg-white dark:bg-[#120F17] border-zinc-200 dark:border-neutral-800 border-2 shadow-2xl p-6 flex flex-col justify-between relative overflow-hidden">
                 <div className="absolute -inset-px bg-gradient-to-tr from-primary/5 via-transparent to-black/5 dark:to-white/5 rounded-2xl opacity-40 pointer-events-none" />
+                {depth > 0 && (
+                  <div 
+                    className="absolute inset-0 bg-white/60 dark:bg-black/60 pointer-events-none" 
+                    style={{ opacity: depth * 0.4 }}
+                  />
+                )}
                 {card}
               </div>
             </m.div>

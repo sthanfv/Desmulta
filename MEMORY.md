@@ -17,6 +17,7 @@
 - **Qué cambió:**
   - **[CSS]**: Se eliminó la regla `::view-transition-group(*)` en `globals.css` que interfería con Framer Motion, causando que la animación de modo oscuro atrapara por error a las tarjetas de fondo.
   - **[UI]**: En `CardSwap.tsx`, se invirtió la dirección horizontal a `-depth * cardDistance` para que las tarjetas regresen a apuntar hacia la izquierda en vez de la derecha.
+  - **[UI - Animaciones]**: Se reescribió la animación de barajar del `CardSwap`. La opacidad transparente fue removida (para que las letras de atrás no se transparenten hacia adelante). En su lugar se usa un overlay negro/blanco interno para crear profundidad, y la tarjeta principal ahora sale con un *slide* sólido a la izquierda antes de entrar al final del maso.
 - **Archivos afectados:**
   - `src/app/globals.css` [MODIFICADO]
   - `src/components/ui/CardSwap.tsx` [MODIFICADO]
