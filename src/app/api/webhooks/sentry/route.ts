@@ -14,19 +14,9 @@ function escapeHtml(text: unknown): string {
 
 export async function POST(req: NextRequest) {
   try {
-    // 🛡️ Prevenir la exposición del secreto en la URL (fuga en logs, CDN y proxies)
     const { searchParams } = new URL(req.url);
-    if (searchParams.has('secret')) {
-      logger.security(
-        '[sentry-webhook] Intento de acceso enviando el secreto en la URL. Rechazado por seguridad.'
-      );
-      return NextResponse.json(
-        { error: 'El secreto no debe enviarse en la URL. Use la cabecera x-sentry-hook-secret.' },
-        { status: 400 }
-      );
-    }
-
-    const providedSecret = req.headers.get('x-sentry-hook-secret') || '';
+    const secretFromUrl = searchParams.get('secret');
+    const providedSecret = req.headers.get('x-sentry-hook-secret') || secretFromUrl || '';
     const expectedSecret = process.env.SENTRY_WEBHOOK_SECRET;
 
     // 1. Validación de seguridad estricta

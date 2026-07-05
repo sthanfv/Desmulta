@@ -96,7 +96,7 @@ export function CardSwap({
           const isFront = index === 0;
           const depth = index;
 
-          const targetX = depth * cardDistance;
+          const targetX = -depth * cardDistance; // Apuntar hacia la izquierda
           const targetY = depth * verticalDistance;
           const zIndex = cards.length - depth;
           const scale = 1 - depth * 0.02;

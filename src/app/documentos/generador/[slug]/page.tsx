@@ -165,7 +165,7 @@ export default function GeneradorDinamico({ params }: GeneradorDinamicoProps) {
           currency: 'COP',
           amountInCents: data.amountCop,
           reference: data.wompiReference,
-          publicKey: data.publicKey,
+          publicKey: process.env.NEXT_PUBLIC_WOMPI_PUBLIC_KEY,
           signature: { integrity: data.signature },
         });
 

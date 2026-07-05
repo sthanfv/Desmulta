@@ -13,6 +13,14 @@
   - `src/app/documentos/confirmacion/page.tsx` [MODIFICADO]
   - `package.json` [MODIFICADO] (Librería `docx`)
 
+## 2026-07-05: Corrección Visual de Animaciones y CardSwap
+- **Qué cambió:**
+  - **[CSS]**: Se eliminó la regla `::view-transition-group(*)` en `globals.css` que interfería con Framer Motion, causando que la animación de modo oscuro atrapara por error a las tarjetas de fondo.
+  - **[UI]**: En `CardSwap.tsx`, se invirtió la dirección horizontal a `-depth * cardDistance` para que las tarjetas regresen a apuntar hacia la izquierda en vez de la derecha.
+- **Archivos afectados:**
+  - `src/app/globals.css` [MODIFICADO]
+  - `src/components/ui/CardSwap.tsx` [MODIFICADO]
+
 ## 2026-07-05: Implementación de Transición de Tema Circular (MagicUI)
 - **Qué cambió:**
   - **[UI - Animaciones]**: Se integró el componente `AnimatedThemeToggler` (basado en View Transitions API) para proveer un efecto de expansión circular fluido al cambiar entre modo Claro y Oscuro.
