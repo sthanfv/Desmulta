@@ -1,5 +1,18 @@
 # MEMORY.md - Historial del Sistema
 
+## 2026-07-05: Implementación de Opción de Descarga en Word (.docx)
+- **Qué cambió:**
+  - **[Backend]**: Se integró la librería `docx` y se creó `src/lib/legal/docx-engine.ts`, un motor generador de documentos Word nativos que replica la estructura y legalidad del `pdf-engine.ts`.
+  - **[API]**: Se modificó `src/app/api/documentos/download/route.ts` para soportar un parámetro `format=docx`, devolviendo el archivo `.docx` con los headers MIME correctos.
+  - **[UI - Confirmación]**: Se rediseñó la sección de botones en `src/app/documentos/confirmacion/page.tsx`, ofreciendo la opción dual: "Descargar PDF" y "Descargar en Word", manteniendo la estética de la plataforma.
+- **Por qué cambió:**
+  - Decisión estratégica de producto (Opción 2): En lugar de construir un complejo editor WYSIWYG en la web, se permite al usuario exportar su documento a Microsoft Word para editar el texto libremente antes de imprimirlo, lo que ahorra recursos de infraestructura y resulta más familiar para los clientes legales.
+- **Archivos afectados:**
+  - `src/lib/legal/docx-engine.ts` [NUEVO]
+  - `src/app/api/documentos/download/route.ts` [MODIFICADO]
+  - `src/app/documentos/confirmacion/page.tsx` [MODIFICADO]
+  - `package.json` [MODIFICADO] (Librería `docx`)
+
 ## 2026-07-05: Implementación de Transición de Tema Circular (MagicUI)
 - **Qué cambió:**
   - **[UI - Animaciones]**: Se integró el componente `AnimatedThemeToggler` (basado en View Transitions API) para proveer un efecto de expansión circular fluido al cambiar entre modo Claro y Oscuro.

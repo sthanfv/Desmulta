@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAdminApp } from '@/lib/firebase-admin';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 import { generateMandatePDF, MandatePayload } from '@/lib/legal/pdf-engine';
+import { generateMandateDOCX } from '@/lib/legal/docx-engine';
 import { DocumentType } from '@/lib/legal/document-templates';
 import { logger } from '@/lib/logger/security-logger';
 import { timingSafeEqual } from 'crypto';
@@ -10,6 +11,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const tokenId = searchParams.get('token');
     const refId = searchParams.get('ref');
+    const format = searchParams.get('format') || 'pdf';
 
     if (!tokenId && !refId) {
       return new NextResponse('Falta el parametro token o ref', { status: 400 });
@@ -142,12 +144,23 @@ export async function GET(req: NextRequest) {
           ? purchase.paidAt.toDate().toISOString()
           : new Date().toISOString(),
       };
-      filename = `Documento_Desmulta_${purchase.caseData?.shortId || refId.slice(-8).toUpperCase()}.pdf`;
+      
+      const fileExt = format === 'docx' ? 'docx' : 'pdf';
+      filename = `Documento_Desmulta_${purchase.caseData?.shortId || refId.slice(-8).toUpperCase()}.${fileExt}`;
     } else {
       return new NextResponse('Bad request', { status: 400 });
     }
 
-    const pdfBytes = await generateMandatePDF(payload);
+    let fileBytes: Uint8Array;
+    let contentType: string;
+
+    if (format === 'docx') {
+      fileBytes = await generateMandateDOCX(payload);
+      contentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+    } else {
+      fileBytes = await generateMandatePDF(payload);
+      contentType = 'application/pdf';
+    }
 
     // 🛡️ F-03 DEVSECOPS: Registrar log de auditoría directamente en el servidor al descargar
     try {
@@ -155,6 +168,7 @@ export async function GET(req: NextRequest) {
       const userAgent = req.headers.get('user-agent') || 'Unknown User-Agent';
       await db.collection('audit_logs').add({
         type: 'DOWNLOAD',
+        format: format,
         purchaseId,
         documentType: productType,
         timestamp: FieldValue.serverTimestamp(),
@@ -167,10 +181,10 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    return new NextResponse(pdfBytes as unknown as BodyInit, {
+    return new NextResponse(fileBytes as unknown as BodyInit, {
       status: 200,
       headers: {
-        'Content-Type': 'application/pdf',
+        'Content-Type': contentType,
         'Content-Disposition': `attachment; filename="${filename}"`,
       },
     });

@@ -114,10 +114,24 @@ function ConfirmacionContent() {
               localStorage.getItem(`download_token_${ref}`))) ||
           '';
         // Usar el cerebro premium del servidor para descargar el archivo unificado
-        window.location.href = `/api/documentos/download?ref=${ref}&downloadToken=${downloadToken}`;
+        window.location.href = `/api/documentos/download?ref=${ref}&downloadToken=${downloadToken}&format=pdf`;
       } catch (err) {
-        console.error('Error iniciando descarga:', err);
+        console.error('Error iniciando descarga PDF:', err);
         alert('Ocurrió un error al descargar el PDF. Por favor, recarga la página.');
+      }
+    };
+
+    const handleDownloadWord = async () => {
+      try {
+        const downloadToken =
+          (typeof window !== 'undefined' &&
+            (sessionStorage.getItem(`download_token_${ref}`) ||
+              localStorage.getItem(`download_token_${ref}`))) ||
+          '';
+        window.location.href = `/api/documentos/download?ref=${ref}&downloadToken=${downloadToken}&format=docx`;
+      } catch (err) {
+        console.error('Error iniciando descarga Word:', err);
+        alert('Ocurrió un error al descargar el archivo de Word. Por favor, recarga la página.');
       }
     };
 
@@ -217,16 +231,24 @@ function ConfirmacionContent() {
           <div className="w-full space-y-8">
             {/* Botones - AMBOS AMARILLOS */}
             <div className="flex flex-col sm:flex-row gap-5 justify-center items-center mt-4">
-              <button
-                onClick={handleDownload}
-                className="w-full sm:w-auto bg-yellow-400 hover:bg-yellow-500 text-black font-extrabold py-4 px-8 rounded-full transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(250,204,21,0.4)] flex items-center justify-center gap-3 text-lg"
-              >
-                📄 Descargar Petición
-              </button>
+              <div className="flex flex-col gap-2 w-full sm:w-auto">
+                <button
+                  onClick={handleDownload}
+                  className="w-full sm:w-auto bg-yellow-400 hover:bg-yellow-500 text-black font-extrabold py-3 px-8 rounded-full transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(250,204,21,0.4)] flex items-center justify-center gap-3 text-lg"
+                >
+                  📄 Descargar PDF
+                </button>
+                <button
+                  onClick={handleDownloadWord}
+                  className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-extrabold py-3 px-8 rounded-full transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(37,99,235,0.4)] flex items-center justify-center gap-3 text-sm opacity-90"
+                >
+                  📝 Descargar en Word
+                </button>
+              </div>
 
               <button
                 onClick={handleDownloadInstructions}
-                className="w-full sm:w-auto bg-yellow-400 hover:bg-yellow-500 text-black font-extrabold py-4 px-8 rounded-full transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(250,204,21,0.4)] flex items-center justify-center gap-3 text-lg"
+                className="w-full sm:w-auto bg-zinc-800 hover:bg-zinc-700 text-white font-extrabold py-4 px-8 rounded-full transition-all hover:scale-105 flex items-center justify-center gap-3 text-lg h-full self-start sm:mt-0 mt-2"
               >
                 📋 Guía de Envío
               </button>
