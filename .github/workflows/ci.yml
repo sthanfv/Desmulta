@@ -1,0 +1,64 @@
+name: CI
+on:
+  push:
+    branches-ignore: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  certify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20', cache: 'npm' }
+      - run: npm ci
+      - name: Install Firebase Tools
+        run: npm install -g firebase-tools
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Security Audit
+        run: npm audit --audit-level=high
+
+      - name: Unit tests with coverage
+        run: npm run test:coverage
+        env:
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
+          NEXT_PUBLIC_SITE_URL: "https://desmulta.online"
+          NEXT_PUBLIC_BRAND_NAME: "Desmulta"
+          VIP_JWT_SECRET: ${{ secrets.VIP_JWT_SECRET }}
+          PII_HMAC_SECRET: ${{ secrets.PII_HMAC_SECRET }}
+          COOKIE_SIGNATURE_SECRET: ${{ secrets.COOKIE_SIGNATURE_SECRET }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          RSA_PRIVATE_KEY: ${{ secrets.RSA_PRIVATE_KEY }}
+
+      - name: Upload Coverage Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+
+      - name: Full Stack Validation (Unit, Integration, E2E, Build)
+        run: npm run validate
+        env:
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
+          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
+          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ secrets.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
+          NEXT_PUBLIC_SITE_URL: "https://desmulta.online"
+          NEXT_PUBLIC_BRAND_NAME: "Desmulta"
+          NEXT_PUBLIC_WHATSAPP_NUMBER: ${{ secrets.NEXT_PUBLIC_WHATSAPP_NUMBER }}
+          FIREBASE_CLIENT_EMAIL: ${{ secrets.FIREBASE_CLIENT_EMAIL }}
+          FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
+          COOKIE_SIGNATURE_SECRET: ${{ secrets.COOKIE_SIGNATURE_SECRET }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          RSA_PRIVATE_KEY: ${{ secrets.RSA_PRIVATE_KEY }}
+          TURNSTILE_SECRET_KEY: ${{ secrets.TURNSTILE_SECRET_KEY }}
+          VIP_JWT_SECRET: ${{ secrets.VIP_JWT_SECRET }}
+          PII_HMAC_SECRET: ${{ secrets.PII_HMAC_SECRET }}

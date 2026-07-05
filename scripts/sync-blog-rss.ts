@@ -1,0 +1,314 @@
+import fs from 'fs';
+import path from 'path';
+
+// Helper para cargar variables de entorno del archivo .env local de forma manual (sin dependencias)
+function loadEnv() {
+  const envPath = path.resolve(process.cwd(), '.env');
+  if (fs.existsSync(envPath)) {
+    const envContent = fs.readFileSync(envPath, 'utf8');
+    envContent.split(/\r?\n/).forEach((line) => {
+      // Ignorar líneas vacías o comentarios
+      if (line.trim().startsWith('#') || !line.includes('=')) return;
+      const match = line.match(/^\s*([\w.-]+)\s*=\s*(.*)$/);
+      if (match) {
+        const key = match[1];
+        let value = match[2].trim();
+        // Quitar comillas simples o dobles si existen
+        if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+          value = value.slice(1, -1);
+        }
+        process.env[key] = value;
+      }
+    });
+  }
+}
+
+loadEnv();
+
+const RSS_URL = process.env.BLOG_RSS_URL || 'https://diariodetransporte.com/feed/';
+const BLOG_DIR = path.resolve(process.cwd(), 'src/content/blog');
+
+// Función para sanitizar texto a slug seguro
+function generateSlug(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize('NFD') // Elimina tildes y acentos
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '') // Elimina caracteres especiales
+    .trim()
+    .replace(/\s+/g, '-'); // Reemplaza espacios por guiones
+}
+
+// Convierte fechas del formato RSS/Atom a YYYY-MM-DD
+function parseDate(rawDate: string): string {
+  try {
+    const d = new Date(rawDate);
+    if (isNaN(d.getTime())) {
+      return new Date().toISOString().split('T')[0];
+    }
+    return d.toISOString().split('T')[0];
+  } catch {
+    return new Date().toISOString().split('T')[0];
+  }
+}
+
+// Limpia tags HTML básicos para convertirlos a Markdown
+function htmlToMarkdown(html: string): string {
+  if (!html) return '';
+  return html
+    .replace(/<p>/gi, '')
+    .replace(/<\/p>/gi, '\n\n')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<strong>(.*?)<\/strong>/gi, '**$1**')
+    .replace(/<b>(.*?)<\/b>/gi, '**$1**')
+    .replace(/<a\s+(?:[^>]*?\s+)?href="([^"]*)"[^>]*>(.*?)<\/a>/gi, '[$2]($1)')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/<!\[CDATA\[(.*?)\]\]>/g, '$1') // CDATA wrapper
+    .replace(/<[^>]*>/g, '') // Elimina cualquier otro tag residual
+    .trim();
+}
+
+// Extrae el valor de una etiqueta XML mediante Regex
+function extractTagContent(itemXml: string, tagName: string): string {
+  const regex = new RegExp(`<${tagName}(?:\\s+[^>]*)?>([\\s\\S]*?)</${tagName}>`, 'i');
+  const match = itemXml.match(regex);
+  if (match && match[1]) {
+    // Si contiene CDATA, extraerlo
+    const cdataMatch = match[1].match(/<!\[CDATA\[([\s\S]*?)\]\]>/i);
+    return cdataMatch ? cdataMatch[1].trim() : match[1].trim();
+  }
+  return '';
+}
+
+// Envía una notificación por Telegram al administrador sobre los borradores creados
+async function notifyTelegram(newPosts: { title: string; slug: string }[]) {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID;
+
+  if (!token || !chatId) {
+    console.log('[TELEGRAM] Ignorado: TELEGRAM_BOT_TOKEN o TELEGRAM_CHAT_ID no configurados.');
+    return;
+  }
+
+  if (newPosts.length === 0) {
+    return;
+  }
+
+  const isAutoPublish = process.env.AUTO_PUBLISH_BLOG === 'true';
+
+  let message = isAutoPublish 
+    ? `📢 *Nuevos artículos publicados en el blog*\n\n`
+    : `📢 *Nuevos borradores de blog importados*\n\n`;
+    
+  message += isAutoPublish
+    ? `Se han importado y publicado automáticamente *${newPosts.length}* noticias desde el feed oficial:\n\n`
+    : `Se han importado automáticamente *${newPosts.length}* borradores de noticias desde el feed oficial:\n\n`;
+
+  newPosts.forEach((post, index) => {
+    message += `${index + 1}. *${post.title}*\n`;
+  });
+
+  if (!isAutoPublish) {
+    message += `\n✍️ *Para revisar y publicar (cambiar draft: false):*\n`;
+    message += `[Ver contenido en GitHub](https://github.com/sthanfv/Desmulta/tree/main/src/content/blog)\n\n`;
+  } else {
+    message += `\n✅ *Publicación automática activa.*\n\n`;
+  }
+
+  message += `_Desmulta Blog Automation Bot_`;
+
+  try {
+    const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: message,
+        parse_mode: 'Markdown',
+        disable_web_page_preview: true,
+      }),
+    });
+
+    if (response.ok) {
+      console.log('[TELEGRAM] Notificación enviada con éxito al administrador.');
+    } else {
+      const errText = await response.text();
+      console.error(`[TELEGRAM-ERROR] Error al enviar mensaje: HTTP ${response.status} - ${errText}`);
+    }
+  } catch (error: any) {
+    console.error(`[TELEGRAM-ERROR] Error de conexión: ${error.message}`);
+  }
+}
+
+async function syncBlogFromRss() {
+  const rssUrls = RSS_URL.split(',').map(url => url.trim());
+  console.log(`[RSS-SYNC] Iniciando sincronización de ${rssUrls.length} feeds...`);
+
+  let creados = 0;
+  let omitidos = 0;
+  const creadosList: { title: string; slug: string }[] = [];
+
+  for (const url of rssUrls) {
+    if (!url) continue;
+    console.log(`[RSS-SYNC] Consultando novedades viales en: ${url}`);
+    
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        console.error(`[RSS-SYNC-WARN] HTTP ${response.status} - No se pudo descargar el feed: ${url}`);
+        continue;
+      }
+
+      const xmlText = await response.text();
+      
+      // Inicializar el parser en cada iteración
+      const Parser = require('rss-parser');
+      const parser = new Parser({
+        customFields: {
+          item: ['description', 'summary', 'content', 'content:encoded', 'published', 'updated']
+        }
+      });
+      
+      const feed = await parser.parseString(xmlText);
+      const items = feed.items || [];
+
+      if (items.length === 0) {
+        console.log('[RSS-SYNC] No se encontraron noticias o formato XML no reconocido para este feed.');
+        continue;
+      }
+
+      console.log(`[RSS-SYNC] Procesando ${items.length} noticias de este feed...`);
+
+      for (const item of items) {
+        let title = item.title;
+        let pubDate = item.pubDate || item.published || item.updated;
+        let description = item.description || item.summary || item.content || item['content:encoded'] || '';
+        let link = item.link || '';
+
+        if (!title || !pubDate) {
+          continue;
+        }
+
+        // Limpiar entidades HTML del título (el CDATA usualmente ya viene limpio por rss-parser)
+        title = title
+          .replace(/&lt;b&gt;/gi, '')
+          .replace(/&lt;\/b&gt;/gi, '')
+          .replace(/<b>/gi, '')
+          .replace(/<\/b>/gi, '')
+          .replace(/&quot;/gi, '"')
+          .replace(/&amp;/gi, '&')
+          .replace(/<[^>]*>/g, '')
+          .trim();
+
+        // Filtro de relevancia: ignorar noticias de accidentes, choques o tragedias viales
+        const titleLower = title.toLowerCase();
+        const blacklist = ['fallece', 'fallecido', 'muerto', 'herido', 'choque', 'colision', 'accidente', 'tragedia', 'volcamiento', 'lesionado'];
+        const contieneBasura = blacklist.some(palabra => titleLower.includes(palabra));
+        if (contieneBasura) {
+          console.log(`[-] Omitido por filtro de relevancia: "${title}"`);
+          continue;
+        }
+
+        const slug = generateSlug(title);
+        const filePath = path.join(BLOG_DIR, `${slug}.mdx`);
+
+        // Si el borrador o el post ya existe, se omite para no pisar ediciones del administrador
+        if (fs.existsSync(filePath)) {
+          omitidos++;
+          continue;
+        }
+
+        const dateStr = parseDate(pubDate);
+        const cleanDescription = htmlToMarkdown(description).slice(0, 160).replace(/\n/g, ' ') + '...';
+        const cleanContent = htmlToMarkdown(description);
+
+        const isAutoPublish = process.env.AUTO_PUBLISH_BLOG === 'true';
+
+        // Contenido MDX con cabecera frontmatter
+        const mdxContent = `---
+title: "${title.replace(/"/g, '\\"')}"
+excerpt: "${cleanDescription.replace(/"/g, '\\"')}"
+date: "${dateStr}"
+author: "Equipo Desmulta"
+draft: ${!isAutoPublish}
+tags: ["noticias", "regulación", "supertransporte"]
+---
+
+${cleanContent}
+
+---
+*Nota: Este artículo es importado de forma automática desde las novedades legales del sector transporte. Para más detalles, puedes consultar la fuente original en [este enlace](${link}).*
+`;
+
+        fs.writeFileSync(filePath, mdxContent, 'utf8');
+        console.log(`[+] Borrador creado: src/content/blog/${slug}.mdx`);
+        creadosList.push({ title, slug });
+        creados++;
+      }
+    } catch (err: any) {
+      console.error(`[ERROR-RSS] Falló la sincronización de la URL: ${url}. Motivo: ${err.message}`);
+    }
+  }
+
+  console.log(`[RSS-SYNC] Sincronización general finalizada.`);
+  console.log(`- Total de nuevos borradores creados: ${creados}`);
+  console.log(`- Total de noticias existentes omitidas: ${omitidos}`);
+
+  // Podar noticias antiguas para evitar la acumulación excesiva de archivos basura
+  const maxPosts = parseInt(process.env.MAX_BLOG_POSTS || '30', 10);
+  pruneOldPosts(maxPosts);
+
+  // Si hay creados y están configuradas las notificaciones de Telegram, notificar al admin
+  if (creadosList.length > 0) {
+    await notifyTelegram(creadosList);
+  }
+}
+
+// Función para podar/eliminar noticias auto-importadas antiguas y mantener el repositorio limpio
+function pruneOldPosts(maxPosts: number) {
+  try {
+    const files = fs.readdirSync(BLOG_DIR);
+    const posts: { filePath: string; date: string }[] = [];
+
+    files.forEach((file) => {
+      if (!file.endsWith('.mdx')) return;
+      const filePath = path.join(BLOG_DIR, file);
+      const content = fs.readFileSync(filePath, 'utf8');
+
+      // Solo eliminamos posts que hayan sido importados automáticamente
+      if (
+        content.includes('author: "Supertransporte Colombia"') ||
+        content.includes('author: "Diario de Transporte"') ||
+        content.includes('tags: ["noticias", "regulación", "supertransporte"]')
+      ) {
+        const dateMatch = content.match(/date:\s*"([^"]+)"/);
+        const date = dateMatch ? dateMatch[1] : '1970-01-01';
+        posts.push({ filePath, date });
+      }
+    });
+
+    // Ordenar de más nuevo a más viejo
+    posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+    if (posts.length > maxPosts) {
+      const toDelete = posts.slice(maxPosts);
+      console.log(`[RSS-SYNC] Detectados ${posts.length} posts auto-importados. Límite máximo: ${maxPosts}. Iniciando poda de ${toDelete.length} posts antiguos...`);
+      toDelete.forEach((post) => {
+        try {
+          fs.unlinkSync(post.filePath);
+          console.log(`[-] Eliminado post antiguo por limpieza: ${path.basename(post.filePath)}`);
+        } catch (err: any) {
+          console.error(`[RSS-SYNC-ERROR] No se pudo borrar ${post.filePath}: ${err.message}`);
+        }
+      });
+    }
+  } catch (err: any) {
+    console.error(`[RSS-SYNC-ERROR] Error durante el proceso de poda: ${err.message}`);
+  }
+}
+
+syncBlogFromRss();

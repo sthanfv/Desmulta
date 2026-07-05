@@ -1,0 +1,35 @@
+config:
+  # Objetivo: La plataforma en producción
+  target: "https://desmulta.online"
+  
+  # Fases del ataque simulado
+  phases:
+    - duration: 15
+      arrivalRate: 5
+      name: "Fase 1: Calentamiento (5 usuarios nuevos por segundo)"
+    
+    - duration: 30
+      arrivalRate: 50
+      name: "Fase 2: Avalancha (50 usuarios por segundo)"
+      
+    - duration: 15
+      arrivalRate: 100
+      name: "Fase 3: Ataque Máximo (100 usuarios por segundo)"
+
+scenarios:
+  - name: "Usuario navegando intensamente (Simulación)"
+    flow:
+      # 1. Carga la página principal
+      - get:
+          url: "/"
+      - think: 1
+      
+      # 2. Intenta acceder al portal
+      - get:
+          url: "/api/webhooks/sentry" # Probamos el webhook también a ver cómo responde
+      
+      # 3. Refresca múltiples veces como un usuario desesperado
+      - loop:
+        - get:
+            url: "/"
+        count: 5

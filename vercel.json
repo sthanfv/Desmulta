@@ -1,0 +1,26 @@
+{
+  "regions": ["gru1"],
+  "functions": {
+    "src/app/api/create-consultation/route.ts": {
+      "maxDuration": 30
+    },
+    "src/app/api/upload/route.ts": {
+      "maxDuration": 30
+    },
+    "src/app/vip/dashboard/page.tsx": {
+      "maxDuration": 20
+    },
+    "src/app/api/internal/followup-cron/route.ts": {
+      "maxDuration": 60
+    },
+    "src/app/api/ocr/route.ts": {
+      "maxDuration": 60
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/internal/followup-cron",
+      "schedule": "0 13 * * *"
+    }
+  ]
+}

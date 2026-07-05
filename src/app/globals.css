@@ -1,0 +1,760 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 45 30% 98%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 96.5%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 45 100% 52%;
+    --primary-foreground: 222.2 84% 4.9%;
+    --secondary: 45 20% 90%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 45 20% 94%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 45 100% 52%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 45 15% 82%;
+    --input: 45 15% 82%;
+    --ring: 45 100% 52%;
+    --radius: 1.25rem;
+    scroll-behavior: smooth;
+  }
+
+  .dark {
+    --background: 0 0% 0%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 2%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 2%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 45 100% 52%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 0 0% 10%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 75%;
+    --accent: 45 100% 52%;
+    --accent-foreground: 0 0% 0%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 25%;
+    --input: 0 0% 25%;
+    --ring: 45 100% 52%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
+    user-select: auto;
+    scroll-behavior: smooth;
+    min-height: 100svh;
+  }
+
+  input,
+  textarea {
+    user-select: auto;
+  }
+
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  span:not(.no-select),
+  li,
+  td,
+  th {
+    user-select: text;
+    -webkit-user-select: text;
+  }
+
+  ::selection {
+    @apply bg-primary text-primary-foreground;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-primary/20 rounded-full transition-colors hover:bg-primary/40;
+  }
+}
+
+@layer components {
+  .floating-card {
+    @apply rounded-[2.5rem] bg-card/40 backdrop-blur-md border border-white/10 shadow-2xl transition-all duration-300;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
+  .glass {
+    @apply bg-white/10 dark:bg-black/20 border border-white/5 shadow-2xl;
+    @apply backdrop-blur-[32px] md:backdrop-blur-[40px];
+    -webkit-backdrop-filter: blur(32px);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .glass::after {
+    content: '';
+    @apply absolute inset-0 rounded-[inherit] border border-white/[0.08] pointer-events-none;
+    mask-image: linear-gradient(to bottom, black, transparent);
+  }
+
+  @media (max-width: 768px) {
+    .glass::after {
+      display: none;
+    }
+    .glass,
+    .floating-card {
+      @apply backdrop-blur-sm bg-white/60 dark:bg-neutral-900/60;
+      -webkit-backdrop-filter: blur(8px);
+    }
+  }
+
+  .shadow-Inner {
+    box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .glow-box {
+    @apply relative overflow-visible;
+  }
+
+  .glow-box::before {
+    content: '';
+    @apply absolute -inset-1 bg-gradient-to-r from-primary/20 to-primary/5 rounded-[2.6rem] blur-2xl opacity-0 transition-opacity duration-500 -z-10;
+  }
+
+  .glow-box:hover::before {
+    @apply opacity-100;
+  }
+
+  .animate-slow-fade {
+    animation: slow-fade 8s ease-in-out infinite alternate;
+  }
+
+  @keyframes slow-fade {
+    from {
+      opacity: 0.3;
+      transform: scale(1);
+    }
+    to {
+      opacity: 0.6;
+      transform: scale(1.1);
+    }
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-pulse-slow {
+    animation: pulse-slow 4s ease-in-out infinite;
+  }
+
+  @keyframes pulse-slow {
+    0%,
+    100% {
+      opacity: 0.8;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.02);
+    }
+  }
+
+  @keyframes float {
+    0% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
+  }
+
+  .animate-shimmer {
+    position: relative !important;
+    overflow: hidden !important;
+    isolation: isolate;
+  }
+
+  .animate-shimmer::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 20%,
+      rgba(255, 255, 255, 0) 30%,
+      rgba(255, 255, 255, 0.18) 50%,
+      rgba(255, 191, 0, 0.08) 60%,
+      transparent 70%
+    );
+    transform: translateX(-100%);
+    animation: shimmer-premium 8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    pointer-events: none;
+    will-change: transform;
+    z-index: 1;
+  }
+
+  @keyframes shimmer-premium {
+    0% {
+      transform: translateX(-100%);
+    }
+    60%,
+    100% {
+      transform: translateX(200%);
+    }
+  }
+
+  .shimmer-child {
+    animation: shimmer-premium 8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    will-change: transform;
+  }
+
+  @media (max-width: 768px) {
+    .shimmer-child {
+      animation-duration: 5s;
+    }
+    .animate-shimmer::after {
+      animation-duration: 5s;
+    }
+    .glass {
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+  }
+
+  .diamond-border {
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-clip: padding-box;
+  }
+
+  .diamond-border::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.2) 0%,
+      rgba(255, 255, 255, 0) 40%,
+      rgba(255, 255, 255, 0) 60%,
+      rgba(255, 255, 255, 0.2) 100%
+    );
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .card-elevated {
+    box-shadow:
+      0 1px 3px hsl(var(--foreground) / 0.06),
+      0 4px 12px hsl(var(--foreground) / 0.05),
+      0 0 0 1px hsl(var(--border) / 0.8);
+    transition: box-shadow 300ms ease;
+  }
+  .card-elevated:hover {
+    box-shadow:
+      0 2px 6px hsl(var(--foreground) / 0.08),
+      0 8px 20px hsl(var(--foreground) / 0.07),
+      0 0 0 1px hsl(var(--primary) / 0.25);
+  }
+  .dark .card-elevated {
+    box-shadow: none;
+  }
+  .dark .card-elevated:hover {
+    box-shadow: none;
+  }
+}
+
+/* Scroll Reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition:
+    opacity 1s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform, opacity;
+  contain: content;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-delay-1 {
+  transition-delay: 150ms;
+}
+.reveal-delay-2 {
+  transition-delay: 300ms;
+}
+.reveal-delay-3 {
+  transition-delay: 450ms;
+}
+
+.hero-video-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.7) 0%,
+    rgba(0, 0, 0, 0.4) 50%,
+    rgba(0, 0, 0, 0.8) 100%
+  );
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #334155;
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #475569;
+}
+
+/* Aurora UI */
+@keyframes aurora-liquid {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+  25% {
+    transform: translate(-5%, 8%) scale(1.05) rotate(5deg);
+  }
+  50% {
+    transform: translate(8%, -5%) scale(1.1) rotate(-5deg);
+  }
+  75% {
+    transform: translate(-8%, -10%) scale(0.95) rotate(2deg);
+  }
+}
+
+.aurora-bg {
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 50% 50%, #090d16 0%, #010308 100%);
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.aurora-blob {
+  position: absolute;
+  width: 700px;
+  height: 700px;
+  filter: blur(90px);
+  opacity: 0.18;
+  mix-blend-mode: screen;
+  animation: aurora-liquid 18s ease-in-out infinite alternate;
+  border-radius: 50%;
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.blob-primary {
+  background: radial-gradient(circle, #ffbf00 0%, #ff8800 100%);
+  top: 15%;
+  left: 25%;
+}
+.blob-secondary {
+  background: radial-gradient(circle, #0055ff 0%, #45a0f5 100%);
+  bottom: 15%;
+  right: 15%;
+  animation: aurora-liquid 24s ease-in-out 4s infinite alternate;
+  opacity: 0.15;
+}
+.blob-tertiary {
+  background: radial-gradient(circle, #7928ca 0%, #ff0080 100%);
+  top: 50%;
+  left: 60%;
+  animation: aurora-liquid 20s ease-in-out 8s infinite alternate;
+  opacity: 0.12;
+}
+
+.glass-ultra {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border-radius: 2.5rem;
+}
+
+/*
+ * MEJORA AUDITORÍA UI/UX — Blur adaptativo para Android de gama baja.
+ * Condición: pantalla ≤480px Y densidad ≤2dppx (indica dispositivo de bajo rendimiento).
+ * En iPhones y flagships Android (≥3dppx) esta regla NO aplica.
+ * Reduce el blur de 40px a 12px para evitar caída de FPS al hacer scroll.
+ */
+@media (max-width: 480px) and (max-resolution: 2dppx) {
+  .glass-ultra {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+}
+
+/* ─── ADN NATIVO PWA ─── */
+body {
+  overscroll-behavior-y: none;
+  background-color: hsl(var(--background));
+  @apply pwa-native-feel;
+}
+
+@layer utilities {
+  .pwa-native-feel {
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+    /*
+     * FIX ANDROID SCROLL:
+     * Cambiado de `manipulation` a `pan-y pinch-zoom`.
+     *
+     * `touch-action: manipulation` desactiva el double-tap-to-zoom pero también
+     * puede interferir con el scroll vertical dentro de drawers/modales en Chrome
+     * para Android, ya que el browser no distingue entre "el usuario quiere hacer
+     * scroll en el drawer" y "el usuario quiere cerrar el drawer con swipe".
+     *
+     * `pan-y pinch-zoom` mantiene:
+     *   - Scroll vertical nativo (pan-y)
+     *   - Pinch-to-zoom (pinch-zoom)
+     *   - Desactiva double-tap-to-zoom implícitamente (mismo efecto que manipulation)
+     *   - NO bloquea el scroll en contenedores hijos que lo necesiten
+     *
+     * Los elementos individuales (botones, inputs) siguen recibiendo taps correctos.
+     * El contenedor scrollable del drawer añade su propio touch-action: pan-y inline.
+     */
+    touch-action: pan-y pinch-zoom;
+    -webkit-touch-callout: none;
+  }
+}
+
+.defer-render {
+  will-change: auto;
+  content-visibility: auto;
+  contain-intrinsic-size: 0 500px;
+}
+
+/* Fix Scroll iOS Safari en Modales */
+.modal-scroll {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .animate-float,
+  .animate-pulse-slow,
+  .animate-slow-fade,
+  .aurora-blob,
+  .animate-shimmer::after,
+  .shimmer-child {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  button,
+  a,
+  [role='button'] {
+    transition-duration: 150ms !important;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes star-movement-bottom {
+    0% {
+      transform: translateX(50%) translateY(10%);
+    }
+    100% {
+      transform: translateX(-100%) translateY(10%);
+    }
+  }
+  @keyframes star-movement-top {
+    0% {
+      transform: translateX(-50%) translateY(-10%);
+    }
+    100% {
+      transform: translateX(100%) translateY(-10%);
+    }
+  }
+}
+
+/* View Transition API */
+::view-transition-group(*),
+::view-transition-old(*),
+::view-transition-new(*) {
+  animation-duration: 0.25s;
+  animation-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* --- ANIMACIONES DE CABECERA Y LOGO (DESMULTA) --- */
+.logo-text-transition {
+  transition:
+    max-width 0.5s cubic-bezier(0.25, 1, 0.5, 1),
+    opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+    transform 0.5s cubic-bezier(0.25, 1, 0.5, 1),
+    margin 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+  will-change: max-width, opacity, transform, margin;
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  transform-origin: left center;
+}
+
+@keyframes shield-glint {
+  0% {
+    transform: translateX(-150%) skewX(-25deg);
+  }
+  20%,
+  100% {
+    transform: translateX(250%) skewX(-25deg);
+  }
+}
+
+.shield-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.shield-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.7) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: translateX(-150%) skewX(-25deg);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  will-change: transform;
+  pointer-events: none;
+}
+
+/* Solo se activa la animación premium cuando el header colapsa */
+.header-collapsed .shield-container::after {
+  opacity: 1;
+  animation: shield-glint 4s infinite cubic-bezier(0.25, 1, 0.5, 1);
+  animation-delay: 0.5s;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * MEJORA AUDITORÍA UI/UX — Estilos de impresión (@media print)
+ *
+ * Problema: El modo oscuro forzado (dark) hace que Ctrl+P imprima fondo negro,
+ * lo cual consume toda la tinta del ciudadano. Esto es crítico en Desmulta
+ * porque los usuarios pueden necesitar imprimir sus Derechos de Petición.
+ *
+ * Solución: Forzar fondo blanco, texto negro y tipografía judicial colombiana
+ * (Times New Roman 12pt, márgenes 2cm, interlineado 1.5 — estándar judicial).
+ * Ocultar todos los elementos decorativos, de navegación y animaciones.
+ * ──────────────────────────────────────────────────────────────────────────── */
+@media print {
+  /* Restablecer el tema oscuro a blanco para impresión */
+  :root,
+  .dark {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 5%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 5%;
+    --muted-foreground: 0 0% 30%;
+    --border: 0 0% 80%;
+    color-scheme: light;
+  }
+
+  /* Base: fondo blanco, texto negro, tipografía judicial */
+  html,
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-family: 'Times New Roman', Times, serif !important;
+    font-size: 12pt !important;
+    line-height: 1.5 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Márgenes de página — estándar judicial colombiano (2cm) */
+  @page {
+    margin: 2cm;
+    size: letter portrait;
+  }
+
+  /* Ocultar elementos no imprimibles: navegación, botones, decoraciones */
+  header,
+  nav,
+  footer,
+  button,
+  [role='button'],
+  .aurora-bg,
+  .aurora-blob,
+  .animate-float,
+  .animate-shimmer,
+  .animate-pulse-slow,
+  .animate-slow-fade,
+  .shimmer-child,
+  .glass-ultra,
+  .glow-box::before,
+  .shield-container::after,
+  [data-radix-toast-viewport],
+  [aria-live],
+  .pwa-native-feel > nav,
+  [class*='backdrop-blur'],
+  [class*='aurora'],
+  [class*='blob'] {
+    display: none !important;
+  }
+
+  /* Eliminar efectos de fondo en tarjetas */
+  .glass,
+  .glass-ultra,
+  .floating-card {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: 1px solid #cccccc !important;
+    box-shadow: none !important;
+  }
+
+  /* Asegurar que los textos primarios se vean en negro */
+  .text-primary,
+  .text-foreground,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: #000000 !important;
+  }
+
+  /* Textos secundarios en gris oscuro legible */
+  .text-muted-foreground,
+  .text-foreground\/70,
+  .text-foreground\/80,
+  .text-foreground\/90 {
+    color: #444444 !important;
+  }
+
+  /* Evitar saltos de página dentro de párrafos y artículos */
+  p,
+  article,
+  section,
+  .legal-content {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Forzar salto de página antes de secciones mayores */
+  h2 {
+    page-break-before: auto;
+    break-before: auto;
+  }
+
+  /* URLs en enlaces — mostrarlas para referencia */
+  a[href]::after {
+    content: ' (' attr(href) ')';
+    font-size: 9pt;
+    color: #666666;
+  }
+
+  /* Excepción: no mostrar URL en iconos o elementos internos */
+  a[href^='#']::after,
+  a[href^='javascript']::after {
+    content: '';
+  }
+
+  /* Utilidad: elementos solo visibles al imprimir */
+  .print-only {
+    display: block !important;
+  }
+
+  /* Utilidad: elementos NO imprimibles */
+  .no-print {
+    display: none !important;
+  }
+
+  /* Animaciones desactivadas en impresión */
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+}
+
+/* Utilidad base: .print-only oculto en pantalla (solo visible al imprimir) */
+.print-only {
+  display: none;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* Scoped to AnimatedThemeToggler — the toggler sets the data-attribute and the variable only during a theme toggle. */
+html[data-magicui-theme-vt="active"]::view-transition-group(root) {
+  animation-duration: var(--magicui-theme-toggle-vt-duration);
+}

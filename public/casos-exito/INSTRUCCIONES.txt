@@ -1,0 +1,29 @@
+¡HOLA! GUÍA RÁPIDA PARA CAMBIAR LAS IMÁGENES DE CASOS DE ÉXITO 🛡️
+
+Si necesitas cambiar las imágenes estáticas del comparador "ANTES / DESPUÉS" (las que se ven por defecto al cargar la página sin iniciar sesión en el panel):
+
+1. PREPARA TUS IMÁGENES:
+   Crea o recorta 2 imágenes de evidencia. Se recomienda formato apaisado (horizontal) o cuadrado.
+   El tamaño recomendado es de menos de 1 MB por imagen para mantener la web rápida.
+
+2. NOMBRES ESTRICTOS (MANDATO-FILTRO):
+   El código "busca" las imágenes por estos nombres exactos de archivo. DEBES nombrar tus imágenes así (todo minúsculas y respetando el guión):
+
+   - La nueva imagen del ESTADO ANTERIOR debe llamarse:   caso-01-antes.webp
+   - La nueva imagen del RESULTADO FINAL debe llamarse:   caso-01-despues.webp
+
+   *Nota*: El sistema acepta PNG, JPG y WEBP. Los archivos actuales son .webp (formato recomendado
+   por su excelente compresión). Si subes imágenes en otro formato (p. ej. PNG), debes también
+   actualizar la referencia en src/lib/config-constants.ts (busca el objeto SHOWCASE_DEFAULTS)
+   para que apunte al nuevo nombre de archivo con la extensión correcta.
+   ¡IMPORTANTE! Renombrar un PNG como .webp NO funciona — el archivo debe ser genuinamente WEBP.
+
+3. REEMPLAZO DIRECTO:
+   Copia tus dos imágenes nuevas y pégalas dentro de esta misma carpeta (public/casos-exito/).
+   Tu computadora te preguntará si deseas "Reemplazar los archivos existentes en el destino". Dile que SÍ.
+
+4. ACTUALIZAR EL SERVIDOR:
+   Una vez reemplazadas, solo tienes que subir estos cambios al repositorio a GitHub (hacer un "Commit")
+   para que Vercel reconstruya la página y muestre los nuevos casos al mundo.
+
+¡Felicidades, la página se actualizará automáticamente!

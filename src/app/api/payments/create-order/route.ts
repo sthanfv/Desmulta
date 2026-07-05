@@ -1,0 +1,151 @@
+/**
+ * @file create-order/route.ts
+ * @description Endpoint de creación de órdenes de pago para el checkout de Wompi.
+ *
+ * FLUJO:
+ *   1. Rate limiting exclusivo para pagos (cubeta 'checkoutOrder' — 3/hora por IP).
+ *   2. Validación estricta del cuerpo con Zod.
+ *   3. Cálculo del monto desde el diccionario server-side (fuente de verdad).
+ *   4. Generación de referencia única y firma de integridad para Wompi.
+ *   5. Persistencia de la pre-orden en Firestore en estado PENDING.
+ *   6. Retorno de los datos para que el frontend abra el checkout de Wompi.
+ *
+ * PRECIOS:
+ *   Los precios se definen EXCLUSIVAMENTE en el diccionario `PRODUCT_PRICES`
+ *   de este archivo. El frontend NO debe tener precios hardcodeados; debe
+ *   consumir el endpoint `GET /api/payments/prices` para renderizarlos.
+ *
+ * HISTORIAL:
+ *   - v1.0.0 (2026-06-21): Implementación inicial.
+ *   - v1.1.0 (2026-06-22): Corrección auditoría — se migra el rate limit de
+ *     la cubeta compartida 'consultation' a la cubeta exclusiva 'checkoutOrder',
+ *     evitando bloqueos cruzados entre flujos de consulta y de pago.
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
+import { getAdminApp } from '@/lib/firebase-admin';
+import { getFirestore, FieldValue } from 'firebase-admin/firestore';
+import { checkRateLimit } from '@/lib/security/rate-limit';
+import { hashPII } from '@/lib/security/server-crypto';
+import { createHash } from 'crypto';
+
+// Precios en CENTAVOS COP (Ej: 2500000 = $25.000 COP)
+// NOTA DE DESARROLLO: Si modificas los precios aquí en el Backend, debes actualizar en concordancia los valores visuales del frontend en src/components/sections/Hero.tsx para evitar inconsistencias de cobro al usuario.
+const PRODUCT_PRICES: Record<string, number> = {
+  peticion_general: 2500000, // $25.000 COP
+  prescripcion_directa: 3500000, // $35.000 COP
+  doble_prescripcion: 4500000, // $45.000 COP
+  nulidad_notificacion: 3000000, // $30.000 COP
+  tutela_silencio: 5000000, // $50.000 COP
+  poder_especial: 2000000, // $20.000 COP
+};
+
+const schema = z.object({
+  productType: z.enum([
+    'peticion_general',
+    'prescripcion_directa',
+    'doble_prescripcion',
+    'nulidad_notificacion',
+    'tutela_silencio',
+    'poder_especial',
+  ]),
+  customerEmail: z.string().email(),
+  cedula: z.string().min(5).max(12),
+  celular: z.string().min(10).max(12),
+  caseData: z.object({
+    infractorName: z.string().min(1),
+    infractorId: z.string().min(1),
+    licensePlate: z.string().optional().default('N/A'),
+    ticketNumber: z.string().optional(),
+    antiguedad: z.string().optional(),
+    estadoCoactivo: z.string().optional(),
+    tipoInfraccion: z.string().optional(),
+    ciudadEmision: z.string().optional(),
+    autoridadTransito: z.string().optional(),
+    direccionNotificacion: z.string().optional(),
+    shortId: z.string().min(1),
+  }),
+});
+
+export async function POST(req: NextRequest) {
+  const ip = req.headers.get('x-forwarded-for') ?? 'unknown';
+
+  // 1. Rate limiting — cubeta EXCLUSIVA para pagos: máx 3 órdenes por IP por hora.
+  // Se usa 'checkoutOrder' (NO 'consultation') para evitar bloqueos cruzados:
+  // si un usuario ha usado la calculadora o el formulario de consulta, ese
+  // historial NO debe afectar su capacidad de realizar un pago.
+  const rl = await checkRateLimit('checkoutOrder', ip);
+  if (!rl.success) {
+    return NextResponse.json(
+      { error: 'Demasiadas solicitudes de pago. Intenta en unos minutos.' },
+      { status: 429 }
+    );
+  }
+
+  // 2. Validar body
+  const body = await req.json().catch(() => null);
+  const parsed = schema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: 'Datos inválidos', details: parsed.error.flatten() },
+      { status: 400 }
+    );
+  }
+
+  const { productType, customerEmail, cedula, celular, caseData } = parsed.data;
+  const amountCop = PRODUCT_PRICES[productType];
+
+  // 3. Generar referencia única para esta transacción
+  const timestamp = Date.now();
+  const shortId = caseData.shortId.replace('CASE', '').slice(0, 6);
+  const wompiReference = `DSM-${shortId}-${timestamp}`;
+
+  // 4. Crear firma de integridad para Wompi
+  // Fórmula Wompi: SHA256(reference + amountInCents + currency + integritySecret)
+  const integritySecret = process.env.WOMPI_INTEGRITY_SECRET;
+  if (!integritySecret) {
+    return NextResponse.json(
+      { error: 'Configuración de pagos incompleta (Integrity Secret faltante)' },
+      { status: 500 }
+    );
+  }
+  const integrityString = `${wompiReference}${amountCop}COP${integritySecret}`;
+  const signature = createHash('sha256').update(integrityString).digest('hex');
+
+  // 5. Guardar la compra PENDIENTE en Firestore ANTES de redirigir a Wompi
+  const db = getFirestore(getAdminApp());
+  const hashedCedula = hashPII(cedula);
+  const hashedCelular = hashPII(celular);
+  const downloadToken = crypto.randomUUID();
+
+  await db
+    .collection('purchases')
+    .doc(wompiReference)
+    .set({
+      id: wompiReference,
+      wompiReference,
+      productType,
+      productLabel: caseData.infractorName + ' — ' + productType,
+      amountCop,
+      status: 'PENDING',
+      hashedCedula,
+      hashedCelular,
+      customerEmail,
+      caseData: { ...caseData, citizenEmail: customerEmail },
+      createdAt: FieldValue.serverTimestamp(),
+      idempotencyKey: wompiReference,
+      ipAddress: ip,
+      downloadToken,
+    });
+
+  // 6. Devolver los datos para que el frontend abra el checkout de Wompi
+  return NextResponse.json({
+    wompiReference,
+    amountCop,
+    signature,
+    publicKey: process.env.NEXT_PUBLIC_WOMPI_PUBLIC_KEY,
+    redirectUrl: `${req.nextUrl.origin}/documentos/confirmacion?ref=${wompiReference}`,
+    downloadToken,
+  });
+}

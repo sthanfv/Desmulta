@@ -1,0 +1,20 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "08:00"
+      timezone: "America/Bogota"
+    open-pull-requests-limit: 5
+    groups:
+      radix-ui:
+        patterns: ["@radix-ui/*"]
+      firebase:
+        patterns: ["firebase", "firebase-admin", "next-firebase-auth-edge"]
+      vercel:
+        patterns: ["@vercel/*", "next"]
+    ignore:
+      - dependency-name: "framer-motion"
+        update-types: ["version-update:semver-major"] # cambios mayores manuales

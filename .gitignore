@@ -1,0 +1,96 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+node_modules/
+functions/lib/
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# next.js
+/.next/
+/out/
+/build
+
+# testing
+/coverage
+/playwright-report
+/test-results
+
+# misc
+.DS_Store
+*.pem
+*.tsbuildinfo
+next-env.d.ts
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+*.log
+
+# vercel
+.vercel
+
+# genkit
+.genkit/*
+
+# local env files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# firebase
+firebase-debug.log
+firestore-debug.log
+*-adminsdk-*.json
+
+# specific project junk
+/docs/old
+*.bak
+branding-colors.md
+*.png
+!public/**/*.png
+!src/**/*.png
+next-sitemap.config.js
+build_error.log
+build_log.txt
+lint_results.txt
+test-error-details.txt
+test-output.txt
+test-results.json
+
+# Sentry Config File
+.env.sentry-build-plugin
+
+# Artefactos de desarrollo — nunca en producción
+test_output.pdf
+test_output.txt
+test_poder.pdf
+test_viewer.html
+test-extract.js
+test-pdf.ts
+test-pdf2.ts
+test-strings.js
+scratch/
+
+# Archivos de debug y recuperación — NUNCA deben subirse al repositorio
+# (pueden contener datos de Firestore, tokens, o estructuras internas sensibles)
+dump.txt
+recovery.txt
+recovery_writes.txt
+starcode.txt
+compiled_calc.txt
+fix-logs.js
+eslint_output.txt
+eslint_output2.txt
+eslint_output3.txt
+lint_output.txt
+test_output.txt

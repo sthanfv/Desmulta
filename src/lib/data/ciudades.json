@@ -1,0 +1,603 @@
+[
+  {
+    "slug": "bogota",
+    "nombre": "Bogotá",
+    "departamento": "Cundinamarca",
+    "entidadTransito": "Secretaría Distrital de Movilidad de Bogotá",
+    "textoContexto": "Concentra el mayor volumen de fotomultas y cámaras salvavidas en corredores principales."
+  },
+  {
+    "slug": "medellin",
+    "nombre": "Medellín",
+    "departamento": "Antioquia",
+    "entidadTransito": "Secretaría de Movilidad de Medellín",
+    "textoContexto": "Alta densidad de fotodetecciones por velocidad y pico y placa en el Valle de Aburrá."
+  },
+  {
+    "slug": "cali",
+    "nombre": "Cali",
+    "departamento": "Valle del Cauca",
+    "entidadTransito": "Secretaría de Movilidad de Cali",
+    "textoContexto": "Controles viales estrictos y alto volumen de cobros coactivos por notificaciones desactualizadas."
+  },
+  {
+    "slug": "barranquilla",
+    "nombre": "Barranquilla",
+    "departamento": "Atlántico",
+    "entidadTransito": "Secretaría de Tránsito y Seguridad Vial de Barranquilla",
+    "textoContexto": "Radares activos en la Vía al Mar y avenidas clave propensos a prescripción legal."
+  },
+  {
+    "slug": "cartagena",
+    "nombre": "Cartagena",
+    "departamento": "Bolívar",
+    "entidadTransito": "Departamento Administrativo de Tránsito y Transporte (DATT)",
+    "textoContexto": "Evaluamos si los tiempos del DATT superan los tres años de prescripción reglamentaria."
+  },
+  {
+    "slug": "bucaramanga",
+    "nombre": "Bucaramanga",
+    "departamento": "Santander",
+    "entidadTransito": "Dirección de Tránsito de Bucaramanga",
+    "textoContexto": "Controles tecnológicos en el área metropolitana donde auditamos la notificación del debido proceso."
+  },
+  {
+    "slug": "pereira",
+    "nombre": "Pereira",
+    "departamento": "Risaralda",
+    "entidadTransito": "Instituto de Movilidad de Pereira",
+    "textoContexto": "Comparendos sin plena identificación del infractor, viables para impugnación por Sentencia C-038."
+  },
+  {
+    "slug": "manizales",
+    "nombre": "Manizales",
+    "departamento": "Caldas",
+    "entidadTransito": "Secretaría de Movilidad de Manizales",
+    "textoContexto": "Estrictos controles de velocidad en pendientes que deben respetar la jurisprudencia de solidaridad."
+  },
+  {
+    "slug": "armenia",
+    "nombre": "Armenia",
+    "departamento": "Quindío",
+    "entidadTransito": "Secretaría de Tránsito y Transporte de Armenia (SETTA)",
+    "textoContexto": "Regulación vial en el Eje Cafetero. Analizamos de inmediato vencimientos de términos del comparendo."
+  },
+  {
+    "slug": "cucuta",
+    "nombre": "Cúcuta",
+    "departamento": "Norte de Santander",
+    "entidadTransito": "Secretaría de Tránsito y Transporte de Cúcuta",
+    "textoContexto": "Controles fronterizos y miles de multas antiguas aptas para prescribir legalmente."
+  },
+  {
+    "slug": "ibague",
+    "nombre": "Ibagué",
+    "departamento": "Tolima",
+    "entidadTransito": "Secretaría de Movilidad de Ibagué",
+    "textoContexto": "Verificamos si las fotomultas en vías de acceso cumplen la entrega reglamentaria."
+  },
+  {
+    "slug": "santa-marta",
+    "nombre": "Santa Marta",
+    "departamento": "Magdalena",
+    "entidadTransito": "Secretaría de Movilidad Multimodal y Sostenible de Santa Marta",
+    "textoContexto": "Infracciones turísticas acumuladas que entran a cobro coactivo sin el debido proceso previo."
+  },
+  {
+    "slug": "villavicencio",
+    "nombre": "Villavicencio",
+    "departamento": "Meta",
+    "entidadTransito": "Secretaría de Movilidad de Villavicencio",
+    "textoContexto": "Sanciones automáticas en aumento en la puerta del Llano. Analizamos nulidades procesales."
+  },
+  {
+    "slug": "valledupar",
+    "nombre": "Valledupar",
+    "departamento": "Cesar",
+    "entidadTransito": "Secretaría de Tránsito y Transporte de Valledupar",
+    "textoContexto": "Aplicamos la exclusión de culpabilidad del propietario en comparendos electrónicos de esta zona."
+  },
+  {
+    "slug": "monteria",
+    "nombre": "Montería",
+    "departamento": "Córdoba",
+    "entidadTransito": "Secretaría de Tránsito de Montería",
+    "textoContexto": "Auditamos la falta de homologación y calibración de radares en zonas de fotodetección."
+  },
+  {
+    "slug": "pasto",
+    "nombre": "Pasto",
+    "departamento": "Nariño",
+    "entidadTransito": "Secretaría de Tránsito y Transporte de Pasto",
+    "textoContexto": "Garantizamos que el organismo local no exija cobros sobre multas legalmente prescritas."
+  },
+  {
+    "slug": "popayan",
+    "nombre": "Popayán",
+    "departamento": "Cauca",
+    "entidadTransito": "Secretaría de Tránsito y Transporte de Popayán",
+    "textoContexto": "Revisamos si los mandamientos de pago antiguos en Popayán conservan vigencia de cobro."
+  },
+  {
+    "slug": "floridablanca",
+    "nombre": "Floridablanca",
+    "departamento": "Santander",
+    "entidadTransito": "Dirección de Tránsito y Transporte de Floridablanca (DTTF)",
+    "textoContexto": "Foco masivo de fotomultas donde la notificación física suele fallar los plazos."
+  },
+  {
+    "slug": "palmira",
+    "nombre": "Palmira",
+    "departamento": "Valle del Cauca",
+    "entidadTransito": "Secretaría de Movilidad de Palmira",
+    "textoContexto": "Operatividad electrónica en vías nacionales que vulnera la responsabilidad subjetiva del conductor."
+  },
+  {
+    "slug": "envigado",
+    "nombre": "Envigado",
+    "departamento": "Antioquia",
+    "entidadTransito": "Secretaría de Movilidad de Envigado",
+    "textoContexto": "Sistemas de captación del sur del Valle de Aburrá sujetos a estrictos términos de prescripción."
+  },
+  {
+    "slug": "tunja",
+    "nombre": "Tunja",
+    "departamento": "Boyacá",
+    "entidadTransito": "Secretaría de Tránsito y Transporte de Tunja",
+    "textoContexto": "Comparendos locales que no superan el escrutinio de los tiempos legales de notificación."
+  },
+  {
+    "slug": "neiva",
+    "nombre": "Neiva",
+    "departamento": "Huila",
+    "entidadTransito": "Secretaría de Movilidad de Neiva",
+    "textoContexto": "Revisamos comparendos electrónicos para aplicar la prescripción de tres años correspondiente."
+  },
+  {
+    "slug": "riohacha",
+    "nombre": "Riohacha",
+    "departamento": "La Guajira",
+    "entidadTransito": "Instituto de Tránsito de Riohacha (INSTRAMD)",
+    "textoContexto": "Procedimiento de multas locales donde la falta de notificación personal invalida el cobro."
+  },
+  {
+    "slug": "sincelejo",
+    "nombre": "Sincelejo",
+    "departamento": "Sucre",
+    "entidadTransito": "Secretaría de Tránsito y Transporte de Sincelejo",
+    "textoContexto": "Fotomultas locales impugnables por falta de identificación del infractor."
+  },
+  {
+    "slug": "florencia",
+    "nombre": "Florencia",
+    "departamento": "Caquetá",
+    "entidadTransito": "Secretaría de Transporte y Movilidad de Florencia",
+    "textoContexto": "Analizamos cobros coactivos en Florencia para aplicar la exoneración de multas caducadas."
+  },
+  {
+    "slug": "quibdo",
+    "nombre": "Quibdó",
+    "departamento": "Chocó",
+    "entidadTransito": "Secretaría de Movilidad y Tránsito de Quibdó",
+    "textoContexto": "Asesoría para exigir el debido proceso en cada multa impuesta de manera irregular."
+  },
+  {
+    "slug": "yopal",
+    "nombre": "Yopal",
+    "departamento": "Casanare",
+    "entidadTransito": "Secretaría de Tránsito y Transporte de Yopal",
+    "textoContexto": "Notificaciones fuera de término en Casanare. Reclamamos la nulidad administrativa."
+  },
+  {
+    "slug": "arauca",
+    "nombre": "Arauca",
+    "departamento": "Arauca",
+    "entidadTransito": "Instituto de Tránsito y Transporte de Arauca (ITDAR)",
+    "textoContexto": "Defensa vial contra fotomultas que violan la presunción de inocencia del propietario."
+  },
+  {
+    "slug": "leticia",
+    "nombre": "Leticia",
+    "departamento": "Amazonas",
+    "entidadTransito": "Secretaría de Tránsito y Transporte de Leticia",
+    "textoContexto": "Nulidad de aquellas infracciones locales que no cumplen las normativas nacionales."
+  },
+  {
+    "slug": "san-jose-del-guaviare",
+    "nombre": "San José del Guaviare",
+    "departamento": "Guaviare",
+    "entidadTransito": "Secretaría de Tránsito y Transporte del Guaviare",
+    "textoContexto": "Frenamos cobros ilegales aplicando los mecanismos de caducidad y prescripción de ley."
+  },
+  {
+    "slug": "mocoa",
+    "nombre": "Mocoa",
+    "departamento": "Putumayo",
+    "entidadTransito": "Instituto de Tránsito del Putumayo",
+    "textoContexto": "Nulidad de fotomultas que carecen del soporte de calibración técnica obligatoria."
+  },
+  {
+    "slug": "puerto-carreno",
+    "nombre": "Puerto Carreño",
+    "departamento": "Vichada",
+    "entidadTransito": "Secretaría de Tránsito y Transporte de Vichada",
+    "textoContexto": "Limpieza de historial de tránsito local por vencimiento de términos procesales."
+  },
+  {
+    "slug": "inirida",
+    "nombre": "Inírida",
+    "departamento": "Guainía",
+    "entidadTransito": "Secretaría de Tránsito y Transporte de Inírida",
+    "textoContexto": "Defensa de derechos frente a sanciones que omiten identificar al conductor real."
+  },
+  {
+    "slug": "mitu",
+    "nombre": "Mitú",
+    "departamento": "Vaupés",
+    "entidadTransito": "Secretaría de Tránsito y Transporte de Mitú",
+    "textoContexto": "Apelación de comparendos que superan el límite de vigencia establecido por la ley."
+  },
+  {
+    "slug": "san-andres",
+    "nombre": "San Andrés",
+    "departamento": "San Andrés y Providencia",
+    "entidadTransito": "Secretaría de Movilidad de San Andrés Isla",
+    "textoContexto": "Saneamiento de multas para residentes y turistas. Exigimos el debido proceso coactivo."
+  },
+  {
+    "slug": "soledad",
+    "nombre": "Soledad",
+    "departamento": "Atlántico",
+    "entidadTransito": "Instituto de Tránsito y Transportes de Soledad",
+    "textoContexto": "Alta tasa de fotomultas por velocidad en este municipio vecino de Barranquilla."
+  },
+  {
+    "slug": "bello",
+    "nombre": "Bello",
+    "departamento": "Antioquia",
+    "entidadTransito": "Secretaría de Movilidad de Bello",
+    "textoContexto": "Fotomultas activas en la Autopista Norte. Evaluamos si el comparendo cumple la ley."
+  },
+  {
+    "slug": "itagui",
+    "nombre": "Itagüí",
+    "departamento": "Antioquia",
+    "entidadTransito": "Secretaría de Movilidad de Itagüí",
+    "textoContexto": "Cámaras de fotodetección en el sur del área metropolitana. Analizamos la caducidad."
+  },
+  {
+    "slug": "soacha",
+    "nombre": "Soacha",
+    "departamento": "Cundinamarca",
+    "entidadTransito": "Secretaría de Movilidad de Soacha",
+    "textoContexto": "Comparendos en la Autopista Sur que a menudo presentan fallas de notificación física."
+  },
+  {
+    "slug": "buenaventura",
+    "nombre": "Buenaventura",
+    "departamento": "Valle del Cauca",
+    "entidadTransito": "Secretaría de Tránsito y Transporte de Buenaventura",
+    "textoContexto": "Operativos viales en zona portuaria. Aplicamos prescripción sobre comparendos antiguos."
+  },
+  {
+    "slug": "tulua",
+    "nombre": "Tuluá",
+    "departamento": "Valle del Cauca",
+    "entidadTransito": "Departamento Administrativo de Movilidad y Seguridad Vial de Tuluá",
+    "textoContexto": "Análisis de comparendos locales con errores formales de registro en el RUNT."
+  },
+  {
+    "slug": "buga",
+    "nombre": "Buga",
+    "departamento": "Valle del Cauca",
+    "entidadTransito": "Secretaría de Movilidad de Guadalajara de Buga",
+    "textoContexto": "Verificación de plazos de ley para multas electrónicas en corredores intermunicipales."
+  },
+  {
+    "slug": "girardot",
+    "nombre": "Girardot",
+    "departamento": "Cundinamarca",
+    "entidadTransito": "Secretaría de Tránsito y Transporte de Girardot",
+    "textoContexto": "Infracciones turísticas los fines de semana que incumplen los requisitos de entrega física."
+  },
+  {
+    "slug": "duitama",
+    "nombre": "Duitama",
+    "departamento": "Boyacá",
+    "entidadTransito": "Secretaría de Tránsito y Transporte de Duitama",
+    "textoContexto": "Objeción legal de comparendos locales vencidos o caducados por inactividad administrativa."
+  },
+  {
+    "slug": "sogamoso",
+    "nombre": "Sogamoso",
+    "departamento": "Boyacá",
+    "entidadTransito": "Instituto de Tránsito y Transporte de Sogamoso (INTRASOG)",
+    "textoContexto": "Impugnación de multas del SIMIT por superación de plazos procesales obligatorios."
+  },
+  {
+    "slug": "barrancabermeja",
+    "nombre": "Barrancabermeja",
+    "departamento": "Santander",
+    "entidadTransito": "Inspectoría de Tránsito y Transporte de Barrancabermeja",
+    "textoContexto": "Controles estrictos que deben ajustarse a la jurisprudencia de responsabilidad subjetiva."
+  },
+  {
+    "slug": "giron",
+    "nombre": "Girón",
+    "departamento": "Santander",
+    "entidadTransito": "Secretaría de Tránsito y Transporte de Girón",
+    "textoContexto": "Fotomultas en zona metropolitana de Bucaramanga. Auditamos la homologación de los radares."
+  },
+  {
+    "slug": "piedecuesta",
+    "nombre": "Piedecuesta",
+    "departamento": "Santander",
+    "entidadTransito": "Secretaría de Tránsito de Piedecuesta",
+    "textoContexto": "Apelamos fotodetecciones que omiten la debida identificación plena del conductor."
+  },
+  {
+    "slug": "sabaneta",
+    "nombre": "Sabaneta",
+    "departamento": "Antioquia",
+    "entidadTransito": "Secretaría de Movilidad de Sabaneta",
+    "textoContexto": "Sistemas de captación electrónica en el Valle de Aburrá. Estudiamos nulidades."
+  },
+  {
+    "slug": "rionegro",
+    "nombre": "Rionegro",
+    "departamento": "Antioquia",
+    "entidadTransito": "Secretaría de Movilidad de Rionegro",
+    "textoContexto": "Operativos viales cerca al aeropuerto José María Córdova. Impugnamos irregularidades."
+  },
+  {
+    "slug": "copacabana",
+    "nombre": "Copacabana",
+    "departamento": "Antioquia",
+    "entidadTransito": "Secretaría de Movilidad de Copacabana",
+    "textoContexto": "Controles en la autopista Medellín-Bogotá. Apelamos fotomultas sin notificación oportuna."
+  },
+  {
+    "slug": "caldas-antioquia",
+    "nombre": "Caldas",
+    "departamento": "Antioquia",
+    "entidadTransito": "Secretaría de Movilidad de Caldas",
+    "textoContexto": "Revisión de comparendos de acceso sur por fallas de notificación a tiempo."
+  },
+  {
+    "slug": "la-estrella",
+    "nombre": "La Estrella",
+    "departamento": "Antioquia",
+    "entidadTransito": "Secretaría de Movilidad de La Estrella",
+    "textoContexto": "Operativos contundentes en La Estrella. Validamos el cumplimiento del debido proceso."
+  },
+  {
+    "slug": "chia",
+    "nombre": "Chía",
+    "departamento": "Cundinamarca",
+    "entidadTransito": "Secretaría de Movilidad de Chía",
+    "textoContexto": "Fotomultas en la variante de Chía. Evaluamos fallas de entrega física reglamentaria."
+  },
+  {
+    "slug": "zipaquira",
+    "nombre": "Zipaquirá",
+    "departamento": "Secretaría de Transporte y Movilidad de Zipaquirá",
+    "textoContexto": "Controles en zona norte de la sabana. Verificamos caducidad legal."
+  },
+  {
+    "slug": "facatativa",
+    "nombre": "Facatativá",
+    "departamento": "Cundinamarca",
+    "entidadTransito": "Secretaría de Tránsito y Transporte de Facatativá",
+    "textoContexto": "Impugnación de fotomultas por vicios de procedimiento y falta de tipicidad."
+  },
+  {
+    "slug": "fusagasuga",
+    "nombre": "Fusagasugá",
+    "departamento": "Cundinamarca",
+    "entidadTransito": "Secretaría de Movilidad de Fusagasugá",
+    "textoContexto": "Fotomultas en el corredor vial del Sumapaz. Verificamos nulidades."
+  },
+  {
+    "slug": "mosquera",
+    "nombre": "Mosquera",
+    "departamento": "Cundinamarca",
+    "entidadTransito": "Secretaría de Movilidad de Mosquera",
+    "textoContexto": "Controles de carga e infracciones locales. Aplicamos exclusión de cobros."
+  },
+  {
+    "slug": "funza",
+    "nombre": "Funza",
+    "departamento": "Cundinamarca",
+    "entidadTransito": "Secretaría de Movilidad de Funza",
+    "textoContexto": "Fotomultas en sabana occidente. Apelamos comparendos sin notificación."
+  },
+  {
+    "slug": "madrid",
+    "nombre": "Madrid",
+    "departamento": "Cundinamarca",
+    "entidadTransito": "Secretaría de Movilidad de Madrid",
+    "textoContexto": "Auditamos el historial del SIMIT para solicitar la nulidad de deudas antiguas."
+  },
+  {
+    "slug": "cajica",
+    "nombre": "Cajicá",
+    "departamento": "Cundinamarca",
+    "entidadTransito": "Secretaría de Movilidad de Cajicá",
+    "textoContexto": "Operativos viales residenciales. Analizamos la tipificación del comparendo."
+  },
+  {
+    "slug": "dosquebradas",
+    "nombre": "Dosquebradas",
+    "departamento": "Risaralda",
+    "entidadTransito": "Secretaría de Tránsito y Movilidad de Dosquebradas",
+    "textoContexto": "Conurbación con Pereira. Evaluamos la identificación de fotodetectores locales."
+  },
+  {
+    "slug": "santa-rosa-de-cabal",
+    "nombre": "Santa Rosa de Cabal",
+    "departamento": "Risaralda",
+    "entidadTransito": "Dirección de Tránsito y Transporte de Santa Rosa de Cabal",
+    "textoContexto": "Infracciones de paso turístico. Exigimos el debido proceso en notificaciones."
+  },
+  {
+    "slug": "cartago",
+    "nombre": "Cartago",
+    "departamento": "Valle del Cauca",
+    "entidadTransito": "Secretaría de Movilidad y Tránsito de Cartago",
+    "textoContexto": "Nodos de paso interdepartamental. Aplicamos prescripciones y caducidades oportunas."
+  },
+  {
+    "slug": "yumbo",
+    "nombre": "Yumbo",
+    "departamento": "Valle del Cauca",
+    "entidadTransito": "Secretaría de Tránsito y Transporte de Yumbo",
+    "textoContexto": "Controles de carga industrial. Apelamos comparendos mal impuestos."
+  },
+  {
+    "slug": "jamundi",
+    "nombre": "Jamundí",
+    "departamento": "Valle del Cauca",
+    "entidadTransito": "Secretaría de Movilidad de Jamundí",
+    "textoContexto": "Fotomultas al sur de Cali. Impugnamos infracciones que vulneran términos."
+  },
+  {
+    "slug": "maicao",
+    "nombre": "Maicao",
+    "departamento": "La Guajira",
+    "entidadTransito": "Dirección de Tránsito y Transporte de Maicao",
+    "textoContexto": "Cobros coactivos en zona de frontera sin debida notificación física previa."
+  },
+  {
+    "slug": "aguachica",
+    "nombre": "Aguachica",
+    "departamento": "Cesar",
+    "entidadTransito": "Instituto Municipal de Tránsito y Transporte de Aguachica (IMTTA)",
+    "textoContexto": "Auditamos comparendos físicos para detectar errores materiales insalvables."
+  },
+  {
+    "slug": "ocana",
+    "nombre": "Ocaña",
+    "departamento": "Norte de Santander",
+    "entidadTransito": "Secretaría de Movilidad y Tránsito de Ocaña",
+    "textoContexto": "Revisamos comparendos antiguos para anular cobros abusivos de intereses."
+  },
+  {
+    "slug": "villa-del-rosario",
+    "nombre": "Villa del Rosario",
+    "departamento": "Norte de Santander",
+    "entidadTransito": "Dirección de Tránsito y Transporte de Villa del Rosario",
+    "textoContexto": "Controles en eje de frontera. Anulamos cobros coactivos mal notificados."
+  },
+  {
+    "slug": "los-patios",
+    "nombre": "Los Patios",
+    "departamento": "Norte de Santander",
+    "entidadTransito": "Secretaría de Tránsito de Los Patios",
+    "textoContexto": "Fotomultas por velocidad en área metropolitana. Exigimos Sentencia C-038."
+  },
+  {
+    "slug": "magangue",
+    "nombre": "Magangué",
+    "departamento": "Bolívar",
+    "entidadTransito": "Fondo de Tránsito y Transporte de Magangué",
+    "textoContexto": "Nulidad de comparendos locales que carecen de notificación en dirección física."
+  },
+  {
+    "slug": "turbaco",
+    "nombre": "Turbaco",
+    "departamento": "Bolívar",
+    "entidadTransito": "Secretaría de Tránsito y Transporte de Turbaco",
+    "textoContexto": "Alta densidad de fotodetectores. Impugnamos infracciones sin notificación física."
+  },
+  {
+    "slug": "el-carmen-de-bolivar",
+    "nombre": "El Carmen de Bolívar",
+    "departamento": "Bolívar",
+    "entidadTransito": "Secretaría de Tránsito y Transporte de El Carmen de Bolívar",
+    "textoContexto": "Controles en vías nacionales de carga. Apelamos fotomultas por velocidad."
+  },
+  {
+    "slug": "cienaga",
+    "nombre": "Ciénaga",
+    "departamento": "Magdalena",
+    "entidadTransito": "Instituto de Tránsito y Transporte de Ciénaga (Intraciénaga)",
+    "textoContexto": "Vigilancia en la Troncal del Caribe. Auditamos fotomultas por velocidad."
+  },
+  {
+    "slug": "fundacion",
+    "nombre": "Fundación",
+    "departamento": "Magdalena",
+    "entidadTransito": "Secretaría de Tránsito de Fundación",
+    "textoContexto": "Infracciones de paso nacional. Analizamos caducidades por falta de resolución."
+  },
+  {
+    "slug": "lorica",
+    "nombre": "Lorica",
+    "departamento": "Córdoba",
+    "entidadTransito": "Secretaría de Tránsito de Lorica",
+    "textoContexto": "Eliminamos cobros antiguos sin debido proceso de notificación en Córdoba."
+  },
+  {
+    "slug": "cerete",
+    "nombre": "Cereté",
+    "departamento": "Córdoba",
+    "entidadTransito": "Secretaría de Tránsito de Cereté",
+    "textoContexto": "Operativos metropolitanos. Estudiamos viabilidad de exoneración de la multa."
+  },
+  {
+    "slug": "ipiales",
+    "nombre": "Ipiales",
+    "departamento": "Nariño",
+    "entidadTransito": "Secretaría de Movilidad de Ipiales",
+    "textoContexto": "Infracciones a turistas de paso en frontera sur. Garantizamos plazos de ley."
+  },
+  {
+    "slug": "tumaco",
+    "nombre": "Tumaco",
+    "departamento": "Nariño",
+    "entidadTransito": "Secretaría de Movilidad y Seguridad Vial de Tumaco",
+    "textoContexto": "Procesos contravencionales locales. Certificamos nulidad de multas sin soporte."
+  },
+  {
+    "slug": "santander-de-quilichao",
+    "nombre": "Santander de Quilichao",
+    "departamento": "Cauca",
+    "entidadTransito": "Secretaría de Movilidad de Santander de Quilichao",
+    "textoContexto": "Regulamos el debido proceso en fotodetectores y comparendos físicos locales."
+  },
+  {
+    "slug": "espinal",
+    "nombre": "Espinal",
+    "departamento": "Tolima",
+    "entidadTransito": "Dirección Administrativa de Tránsito y Transporte de El Espinal",
+    "textoContexto": "Nodo de conexión nacional. Limpiamos historial de multas viciadas."
+  },
+  {
+    "slug": "melgar",
+    "nombre": "Melgar",
+    "departamento": "Tolima",
+    "entidadTransito": "Secretaría de Tránsito de Melgar",
+    "textoContexto": "Congestión de fines de semana. Apelamos fallas en entrega de comparendos."
+  },
+  {
+    "slug": "pitalito",
+    "nombre": "Pitalito",
+    "departamento": "Huila",
+    "entidadTransito": "Secretaría de Tránsito y Transporte de Pitalito",
+    "textoContexto": "Operativos de comercio en sur de Huila. Auditamos vigencia y caducidad."
+  },
+  {
+    "slug": "san-gil",
+    "nombre": "San Gil",
+    "departamento": "Santander",
+    "entidadTransito": "Secretaría de Tránsito y Transporte de San Gil",
+    "textoContexto": "Infracciones en vía de paso nacional. Apelamos fallas de tipicidad."
+  },
+  {
+    "slug": "aguazul",
+    "nombre": "Aguazul",
+    "departamento": "Casanare",
+    "entidadTransito": "Secretaría de Tránsito y Transporte de Aguazul",
+    "textoContexto": "Control de transporte pesado. Verificamos el debido proceso legal en la región."
+  }
+]
