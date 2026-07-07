@@ -50,7 +50,10 @@ export async function processSyncQueue(
   const queue = await getSyncQueue();
   if (queue.length === 0) return;
 
-  SecurityLogger.info(`[SyncQueue] Procesando ${queue.length} elementos en cola.`);
+  // Jitter Anti-Estampida: Aleatoriza el inicio de la sincronización cuando vuelve el internet
+  const jitter = Math.floor(Math.random() * 2000);
+  SecurityLogger.info(`[SyncQueue] Procesando ${queue.length} elementos en cola. Aplicando Jitter de ${jitter}ms.`);
+  await new Promise((resolve) => setTimeout(resolve, jitter));
 
   for (const item of queue) {
     try {

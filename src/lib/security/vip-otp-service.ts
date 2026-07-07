@@ -13,23 +13,33 @@ function hashOtp(code: string): string {
   return createHash('sha256').update(code).digest('hex');
 }
 
-export async function storeOtpChallenge(hashedCedula: string, otpCode: string, hashedCelular: string): Promise<void> {
+export async function storeOtpChallenge(
+  hashedCedula: string,
+  otpCode: string,
+  hashedCelular: string
+): Promise<void> {
   getAdminApp();
   const db = getFirestore();
   const codeHash = hashOtp(otpCode);
   const now = new Date();
   const expiresAt = new Date(now.getTime() + OTP_EXPIRY_MINUTES * 60 * 1000);
 
-  await db.collection('vip_otps').doc(hashedCedula).set({
-    codeHash,
-    hashedCelular,
-    createdAt: Timestamp.fromDate(now),
-    expiresAt: Timestamp.fromDate(expiresAt),
-    attempts: 0,
-  });
+  await db
+    .collection('vip_otps')
+    .doc(hashedCedula)
+    .set({
+      codeHash,
+      hashedCelular,
+      createdAt: Timestamp.fromDate(now),
+      expiresAt: Timestamp.fromDate(expiresAt),
+      attempts: 0,
+    });
 }
 
-export async function verifyOtpChallenge(hashedCedula: string, code: string): Promise<{ success: boolean; hashedCelular?: string }> {
+export async function verifyOtpChallenge(
+  hashedCedula: string,
+  code: string
+): Promise<{ success: boolean; hashedCelular?: string }> {
   if (!code || !/^\d{6}$/.test(code)) return { success: false };
 
   getAdminApp();
@@ -54,7 +64,8 @@ export async function verifyOtpChallenge(hashedCedula: string, code: string): Pr
 
   const inputBuffer = Buffer.from(hashOtp(code));
   const expectedBuffer = Buffer.from(otpData.codeHash);
-  const isMatch = inputBuffer.length === expectedBuffer.length && timingSafeEqual(inputBuffer, expectedBuffer);
+  const isMatch =
+    inputBuffer.length === expectedBuffer.length && timingSafeEqual(inputBuffer, expectedBuffer);
 
   if (!isMatch) {
     await otpDocRef.update({ attempts: otpData.attempts + 1 });

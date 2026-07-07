@@ -103,15 +103,12 @@ export async function POST(request: Request) {
     // 3. Generar y enviar OTP (FIX: Hallazgo 7)
     const otp = generateOtp();
     await storeOtpChallenge(hashedCedula, otp, hashedCelular);
-    
+
     // El SMS se debe enviar al celular registrado, que coincide con el proporcionado.
     // Como normalizedCelular fue verificado, lo usamos.
     await sendOtpSms(normalizedCelular, otp);
 
-    return NextResponse.json(
-      { success: true, step: 'otp_required' },
-      { status: 200 }
-    );
+    return NextResponse.json({ success: true, step: 'otp_required' }, { status: 200 });
   } catch (error) {
     logger.error('Error en autenticación VIP', {
       error: error instanceof Error ? error.message : String(error),

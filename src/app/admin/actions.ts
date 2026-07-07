@@ -312,7 +312,7 @@ export async function getConsultations(
         updatedAt: (safeData.updatedAt as string) || null,
         notifiedAt: (safeData.notifiedAt as string) || null,
         retriedAt: (safeData.retriedAt as string) || null,
-        timeline_updates: (safeData.timeline_updates as any[]) || [],
+        timeline_updates: (safeData.timeline_updates as unknown[]) || [],
       };
     });
 
@@ -516,8 +516,8 @@ export async function getCases(idToken: string, pageSize: number = 20, lastDocId
         conteoRetornos: safeData.conteoRetornos || 0,
         createdAt: (safeData.createdAt as string) || null,
         updatedAt: (safeData.updatedAt as string) || null,
-        history: (safeData.history as any[]) || [],
-        documents: (safeData.documents as any[]) || [],
+        history: (safeData.history as unknown[]) || [],
+        documents: (safeData.documents as unknown[]) || [],
       };
     });
 

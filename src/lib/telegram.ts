@@ -31,12 +31,14 @@ async function fetchWithRetry(
         return response;
       }
 
-      // Interceptación de Rate Limit (HTTP 429)
+      // Interceptación de Rate Limit (HTTP 429) con Jitter
       const retryAfter = response.headers.get('Retry-After');
-      const waitTime = retryAfter ? parseInt(retryAfter, 10) * 1000 : delay;
+      const baseWaitTime = retryAfter ? parseInt(retryAfter, 10) * 1000 : delay;
+      const jitter = Math.floor(Math.random() * 1000); // Aleatoriedad de 0 a 999ms
+      const waitTime = baseWaitTime + jitter;
 
       logger.warn(
-        `[telegram-service] Límite de Tasa (429) detectado. Pausando hilo ${waitTime}ms (Intento ${attempt + 1}/${maxRetries})`
+        `[telegram-service] Límite de Tasa (429) detectado. Pausando hilo ${waitTime}ms (Jitter: ${jitter}ms, Intento ${attempt + 1}/${maxRetries})`
       );
 
       // Pausa no bloqueante del hilo de Node.js
@@ -48,8 +50,10 @@ async function fetchWithRetry(
       // Fallo de red severo (DNS, AbortError por timeout)
       if (attempt === maxRetries - 1) throw error;
 
-      logger.warn(`[telegram-service] Falla de red transitoria. Reintentando en ${delay}ms`);
-      await new Promise((resolve) => setTimeout(resolve, delay));
+      const jitter = Math.floor(Math.random() * 500);
+      const waitTime = delay + jitter;
+      logger.warn(`[telegram-service] Falla de red transitoria. Reintentando en ${waitTime}ms (Jitter: ${jitter}ms)`);
+      await new Promise((resolve) => setTimeout(resolve, waitTime));
       delay *= 2;
     }
   }
