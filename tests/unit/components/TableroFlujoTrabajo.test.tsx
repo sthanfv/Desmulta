@@ -59,6 +59,7 @@ vi.mock('@/lib/logger/security-logger', () => ({
       console.log('❌ ERROR DETECTADO EN COMPONENTE:', msg, meta);
     }),
     warn: vi.fn(),
+    security: vi.fn(),
   }
 }));
 

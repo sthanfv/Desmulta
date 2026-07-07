@@ -8,21 +8,20 @@ vi.mock('@/lib/firebase-admin', () => ({
   getAdminApp: vi.fn(),
 }));
 
+const mockGet = vi.fn();
+const mockSet = vi.fn();
+const mockUpdate = vi.fn();
+
 vi.mock('firebase-admin/firestore', () => {
-  const mockSet = vi.fn();
-  const mockUpdate = vi.fn();
-  const mockGet = vi.fn().mockResolvedValue({ exists: false, data: () => ({}) });
-  const mockDoc = vi.fn(() => ({
-    get: mockGet,
-    set: mockSet,
-    update: mockUpdate,
-  }));
-  const mockCollection = vi.fn(() => ({
-    doc: mockDoc,
-  }));
   return {
     getFirestore: vi.fn(() => ({
-      collection: mockCollection,
+      collection: vi.fn((collName) => ({
+        doc: vi.fn((docId) => ({
+          get: () => mockGet(collName, docId),
+          set: mockSet,
+          update: mockUpdate,
+        })),
+      })),
     })),
     FieldValue: {
       serverTimestamp: vi.fn(),
@@ -39,6 +38,7 @@ vi.mock('@/lib/logger/security-logger', () => ({
     info: vi.fn(),
     warn: vi.fn(),
     error: vi.fn(),
+    security: vi.fn(),
   },
 }));
 
@@ -48,6 +48,25 @@ describe('Wompi Webhook API', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     process.env.WOMPI_EVENTS_SECRET = SECRET;
+    mockGet.mockImplementation((collName: string, docId: string) => {
+      if (collName === 'processed_callbacks') {
+        return Promise.resolve({ exists: false, data: () => ({}) });
+      }
+      if (collName === 'purchases') {
+        return Promise.resolve({
+          exists: true,
+          data: () => ({
+            amountCop: 10000,
+            productType: 'poder_especial',
+            caseData: {
+              shortId: docId,
+              infractorName: 'Test Name',
+            },
+          }),
+        });
+      }
+      return Promise.resolve({ exists: false, data: () => ({}) });
+    });
   });
 
   it('debería rechazar peticiones con firma inválida (401)', async () => {

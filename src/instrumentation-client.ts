@@ -10,7 +10,14 @@ Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
   enabled: process.env.NODE_ENV === 'production',
 
-  integrations: [Sentry.replayIntegration()],
+  integrations: [
+    Sentry.replayIntegration({
+      maskAllText: true,
+      blockAllMedia: true,
+      networkDetailAllowUrls: [],
+      networkCaptureBodies: false,
+    }),
+  ],
 
   tracesSampleRate: 0.1,
   enableLogs: true,

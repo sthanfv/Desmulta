@@ -37,8 +37,7 @@ function ConfirmacionContent() {
       try {
         const downloadToken =
           (typeof window !== 'undefined' &&
-            (sessionStorage.getItem(`download_token_${ref}`) ||
-              localStorage.getItem(`download_token_${ref}`))) ||
+            sessionStorage.getItem(`download_token_${ref}`)) ||
           '';
         const res = await fetch(`/api/payments/status?ref=${ref}&downloadToken=${downloadToken}`);
         if (!res.ok) return false;
@@ -107,11 +106,10 @@ function ConfirmacionContent() {
 
     const handleDownload = async () => {
       try {
-        // Recuperar el token de descarga de sessionStorage (o fallback a localStorage)
+        // Recuperar el token de descarga de sessionStorage
         const downloadToken =
           (typeof window !== 'undefined' &&
-            (sessionStorage.getItem(`download_token_${ref}`) ||
-              localStorage.getItem(`download_token_${ref}`))) ||
+            sessionStorage.getItem(`download_token_${ref}`)) ||
           '';
         // Usar el cerebro premium del servidor para descargar el archivo unificado
         window.location.href = `/api/documentos/download?ref=${ref}&downloadToken=${downloadToken}&format=pdf`;
@@ -125,8 +123,7 @@ function ConfirmacionContent() {
       try {
         const downloadToken =
           (typeof window !== 'undefined' &&
-            (sessionStorage.getItem(`download_token_${ref}`) ||
-              localStorage.getItem(`download_token_${ref}`))) ||
+            sessionStorage.getItem(`download_token_${ref}`)) ||
           '';
         window.location.href = `/api/documentos/download?ref=${ref}&downloadToken=${downloadToken}&format=docx`;
       } catch (err) {

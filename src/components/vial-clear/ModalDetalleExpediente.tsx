@@ -24,10 +24,8 @@ import { KanbanItem } from './TableroFlujoTrabajo';
 import { useAuth } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { CAUSALES_TRANSITO } from '@/lib/legal/legal-types';
-import { logRevealAuditAction } from '@/app/admin/audit-actions';
 import { ModalDocumentos } from './modal-parts/ModalDocumentos';
 import { ModalEdicionDatos } from './modal-parts/ModalEdicionDatos';
-import { maskData } from '@/lib/security/masking';
 
 interface ModalDetalleExpedienteProps {
   data: KanbanItem;
@@ -47,6 +45,12 @@ export function ModalDetalleExpediente({
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [isRevealed, setIsRevealed] = useState(false);
+  const [revealedData, setRevealedData] = useState<{
+    cedula: string;
+    contacto: string;
+    placa: string;
+    nombre: string;
+  } | null>(null);
   const auth = useAuth();
   const { toast } = useToast();
   const [pdfPreviews, setPdfPreviews] = useState<{ base64: string; filename: string }[]>([]);
@@ -89,12 +93,16 @@ export function ModalDetalleExpediente({
   const esSimitCaptura = data?.cedula === 'SIMIT-CAPTURA';
 
   const templateData = {
-    nombre: esSimitCaptura ? 'REQUIERE INGRESO MANUAL' : data?.nombre || '',
-    cedula: esSimitCaptura ? 'REQUIERE INGRESO MANUAL' : data?.cedula || '',
+    nombre: esSimitCaptura ? 'REQUIERE INGRESO MANUAL' : (isRevealed && revealedData ? revealedData.nombre : data?.nombre) || '',
+    cedula: esSimitCaptura ? 'REQUIERE INGRESO MANUAL' : (isRevealed && revealedData ? revealedData.cedula : data?.cedula) || '',
     email: data?.email || '',
     ticketNumber: data?.ticketNumber || '',
     placa:
-      data?.placa && data?.placa !== 'N/A' && data?.placa !== 'Sin Identificar' ? data?.placa : '',
+      (isRevealed && revealedData ? revealedData.placa : data?.placa) &&
+      (isRevealed && revealedData ? revealedData.placa : data?.placa) !== 'N/A' &&
+      (isRevealed && revealedData ? revealedData.placa : data?.placa) !== 'Sin Identificar'
+        ? (isRevealed && revealedData ? revealedData.placa : data?.placa)
+        : '',
   };
 
   const [isEditing, setIsEditing] = useState(false);
@@ -109,6 +117,17 @@ export function ModalDetalleExpediente({
     ciudad: data && 'ciudad' in data ? String(data.ciudad) : '',
     operatorNote: '',
   });
+
+  React.useEffect(() => {
+    if (isRevealed && revealedData) {
+      setEditData((prev) => ({
+        ...prev,
+        nombre: revealedData.nombre,
+        cedula: revealedData.cedula,
+        placa: revealedData.placa,
+      }));
+    }
+  }, [isRevealed, revealedData]);
 
   const copyToClipboard = (text: string, field: string) => {
     navigator.clipboard.writeText(text);
@@ -138,8 +157,11 @@ export function ModalDetalleExpediente({
   const handleReveal = async () => {
     setIsProcessing('reveal');
     try {
-      const result = await logRevealAuditAction(data.id);
-      if (result.success) {
+      const idToken = (await auth?.currentUser?.getIdToken(true)) || '';
+      const { revealExpedienteSensitiveData } = await import('@/app/admin/actions');
+      const result = await revealExpedienteSensitiveData(idToken, data.id);
+      if (result.success && result.data) {
+        setRevealedData(result.data);
         setIsRevealed(true);
       } else {
         toast({
@@ -324,9 +346,9 @@ export function ModalDetalleExpediente({
                 <div className="ml-4 flex-1">
                   <p className="text-base font-bold text-slate-950 dark:text-white">
                     {isRevealed
-                      ? data.nombre ||
+                      ? revealedData?.nombre ||
                         (esCaptura ? 'Usuario de SIMIT (Requiere Validación)' : 'Sin Registrar')
-                      : maskData(data.nombre || 'Sin Registrar', 'name')}
+                      : data.nombre || 'Sin Registrar'}
                   </p>
                 </div>
               </div>
@@ -342,14 +364,14 @@ export function ModalDetalleExpediente({
                           Documento
                         </p>
                         <p className="text-sm font-mono font-bold text-slate-900 dark:text-slate-200 tracking-tight">
-                          {isRevealed ? data.cedula : maskData(data.cedula!, 'id')}
+                          {isRevealed ? revealedData?.cedula : data.cedula}
                         </p>
                       </div>
                     </div>
                     <button
                       onClick={() =>
                         copyToClipboard(
-                          isRevealed ? data.cedula! : maskData(data.cedula!, 'id'),
+                          isRevealed ? revealedData?.cedula || '' : data.cedula || '',
                           'cedula'
                         )
                       }
@@ -373,14 +395,14 @@ export function ModalDetalleExpediente({
                           Contacto
                         </p>
                         <p className="text-sm font-mono font-bold text-slate-900 dark:text-slate-200 tracking-tight">
-                          {isRevealed ? data.contacto : maskData(data.contacto!, 'phone')}
+                          {isRevealed ? revealedData?.contacto : data.contacto}
                         </p>
                       </div>
                     </div>
                     <button
                       onClick={() =>
                         copyToClipboard(
-                          isRevealed ? data.contacto! : maskData(data.contacto!, 'phone'),
+                          isRevealed ? revealedData?.contacto || '' : data.contacto || '',
                           'telefono'
                         )
                       }
@@ -533,12 +555,12 @@ export function ModalDetalleExpediente({
                   </p>
                   <div className="flex items-center justify-between">
                     <p className="text-3xl font-black text-yellow-600 dark:text-yellow-500 tracking-widest uppercase">
-                      {isRevealed ? data.placa : maskData(data.placa!, 'plate')}
+                      {isRevealed ? revealedData?.placa : data.placa}
                     </p>
                     <button
                       onClick={() =>
                         copyToClipboard(
-                          isRevealed ? data.placa! : maskData(data.placa!, 'plate'),
+                          isRevealed ? revealedData?.placa || '' : data.placa || '',
                           'placa'
                         )
                       }

@@ -671,3 +671,33 @@ Se leyó `C:\Users\Sthan\Escritorio\para antigravity\auditoria-forense-v2-delta.
   - `docs/MEMORY.md`
   - `MEMORY.md`
 - **Estado actual:** ✅ Pruebas pasando en verde y compilación completada con éxito.
+
+## 2026-07-07: Implementación de QA y Remediación de Seguridad (5 Hallazgos)
+- **Qué cambió:**
+  - **Mitigación de Condición de Carrera en Pagos (Hallazgo 1):** Se migró `wompiReference` a UUIDs robustos usando `crypto.randomUUID()`, persistiendo las pre-órdenes en Firestore con `.create()` para garantizar operaciones atómicas de escritura única. En `webhook-wompi/route.ts` se validó el monto cobrado por Wompi contra la orden esperada de forma server-side para interceptar discrepancias o manipulaciones de precio maliciosas.
+  - **Enmascaramiento de PII en Panel Administrativo (Hallazgo 2):** Se enmascararon todos los datos personales en `getCases` y `getConsultations` retornados desde el servidor (Zero-PII inicial). Se implementó la Server Action `revealExpedienteSensitiveData` que registra la acción en auditoría mediante `logRevealAuditAction`, aplica un rate limit de 20 peticiones por hora por administrador y retorna la PII real en claro de forma controlada para renderizar en `ModalDetalleExpediente.tsx` y rellenar el formulario de edición de PDFs.
+  - **Compilación Resiliente RSS/MDX (Hallazgo 3):** Se escaparon las llaves `{` y `}` como `\\{` y `\\}` en `sync-blog-rss.ts` para evitar la inyección accidental de llaves en los archivos MDX generados de manera automatizada. Se añadió un bloque `try-catch` alrededor de la compilación MDX en `mdx.ts` y se configuró el flujo de CI/CD `.github/workflows/blog-sync.yml` para proponer Pull Requests en lugar de realizar confirmaciones directas en `main`.
+  - **Saneamiento de Telemetría Sentry (Hallazgo 4):** Se enmascararon UUIDs y query params sensibles en `piiScrubber.ts` y se configuró la integración `replayIntegration` en `instrumentation-client.ts` con opciones estrictas (`maskAllText: true`, `blockAllMedia: true`, desactivación de captura de detalles de red y cuerpos de payloads) para prevenir la fuga accidental de PII.
+  - **Caducidad y Límites de downloadToken (Hallazgo 5):** Se limitaron las descargas directas en `download/route.ts` mediante la validación de fecha de expiración (72 horas) e incrementos del contador `downloadCount` contra un límite de `maxDownloads` (5 descargas). Se eliminaron fallbacks de almacenamiento persistente (`localStorage`) en `confirmacion/page.tsx` y `editor/[id]/page.tsx` para obligar al uso exclusivo de `sessionStorage`.
+- **Por qué cambió:**
+  - Cumplir con las mitigaciones obligatorias y remediaciones de seguridad propuestas en el Informe de Auditoría de Seguridad y QA del Proyecto Desmulta, elevando el nivel de robustez y resiliencia de la plataforma.
+- **Archivos afectados:**
+  - `src/app/api/payments/create-order/route.ts`
+  - `src/app/api/payments/webhook-wompi/route.ts`
+  - `src/app/admin/actions.ts`
+  - `src/components/vial-clear/ModalDetalleExpediente.tsx`
+  - `scripts/sync-blog-rss.ts`
+  - `src/lib/mdx.ts`
+  - `.github/workflows/blog-sync.yml`
+  - `src/lib/security/piiScrubber.ts`
+  - `src/instrumentation-client.ts`
+  - `src/app/api/documentos/download/route.ts`
+  - `src/app/documentos/confirmacion/page.tsx`
+  - `src/app/documentos/editor/[id]/page.tsx`
+  - `tests/unit/webhook.test.ts`
+  - `tests/unit/components/TableroFlujoTrabajo.test.tsx`
+  - `tests/integration/gallery.test.ts`
+- **Decisiones técnicas:**
+  - Se estructuró el enmascaramiento en el servidor para que los administradores listaran los leads de manera totalmente anonimizada por defecto, protegiendo a la base de datos de filtraciones masivas de datos viales y de identificación.
+  - Se modularizó la lógica de mocks de Firestore y Logger en Vitest para que el suite de pruebas unitarias continuara funcionando de manera confiable con 100% de éxito de forma estática.
+- **Estado actual:** ✅ Correcciones aplicadas. 100% de la suite de pruebas aprobada (461 de 461 tests exitosos). Linter impecable (0 advertencias). Compilación de Next.js en producción exitosa.

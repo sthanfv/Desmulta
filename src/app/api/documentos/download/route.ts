@@ -126,6 +126,37 @@ export async function GET(req: NextRequest) {
         );
       }
 
+      // 🛡️ FIX: Validar expiración del downloadToken (Hallazgo 5)
+      const expiresAt = purchase.downloadTokenExpiresAt?.toDate
+        ? purchase.downloadTokenExpiresAt.toDate()
+        : purchase.downloadTokenExpiresAt
+        ? new Date(purchase.downloadTokenExpiresAt)
+        : null;
+
+      if (expiresAt && new Date() > expiresAt) {
+        return new NextResponse('El enlace de descarga ha expirado (límite 72 horas).', {
+          status: 403,
+        });
+      }
+
+      // 🛡️ FIX: Validar límite de descargas (Hallazgo 5)
+      const downloadCount = purchase.downloadCount || 0;
+      const maxDownloads = purchase.maxDownloads || 5;
+      if (downloadCount >= maxDownloads) {
+        return new NextResponse(
+          'Se ha alcanzado el límite máximo de descargas para este documento.',
+          { status: 403 }
+        );
+      }
+
+      // Incrementar contador de descargas
+      await db
+        .collection('purchases')
+        .doc(refId)
+        .update({
+          downloadCount: FieldValue.increment(1),
+        });
+
       if (!purchase.caseData) {
         return new NextResponse('Datos del caso no encontrados en la compra', { status: 404 });
       }

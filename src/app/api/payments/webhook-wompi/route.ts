@@ -135,18 +135,47 @@ export async function POST(req: NextRequest) {
     result: status,
   });
 
-  // ── Paso 7: Actualizar el estado de la compra en Firestore ─────────────────
+  // ── Paso 7: Obtener y validar el monto esperado de la compra ──────────────
   const purchaseRef = db.collection('purchases').doc(reference);
+  const purchaseSnap = await purchaseRef.get();
+  const purchase = purchaseSnap.data() as PurchaseDocument | undefined;
+
+  if (!purchase) {
+    logger.security('[webhook-wompi] Referencia inexistente en purchases', { reference });
+    return NextResponse.json({ ok: true, ignored: true });
+  }
+
+  // 🛡️ FIX CRÍTICO: Validar que el monto que Wompi REALMENTE cobró coincide con
+  // el precio server-side establecido al crear la pre-orden en Firestore.
+  const amountConfirmadoPorWompi = Number(transaction.amount_in_cents);
+  if (status === 'APPROVED' && amountConfirmadoPorWompi !== purchase.amountCop) {
+    logger.security('[webhook-wompi] 🚨 DISCREPANCIA DE MONTO — posible intento de fraude', {
+      reference,
+      transactionId,
+      amountConfirmadoPorWompi,
+      amountEsperado: purchase.amountCop,
+    });
+    await purchaseRef.update({
+      status: 'FLAGGED_AMOUNT_MISMATCH',
+      wompiTransactionId: transactionId,
+      flaggedDetails: {
+        paidCents: amountConfirmadoPorWompi,
+        expectedCents: purchase.amountCop,
+        flaggedAt: new Date(),
+      }
+    });
+    return NextResponse.json({ ok: true, flagged: true });
+  }
+
+  // ── Paso 8: Actualizar el estado de la compra en Firestore ─────────────────
   await purchaseRef.update({
     status,
     wompiTransactionId: transactionId,
     ...(status === 'APPROVED' && { paidAt: FieldValue.serverTimestamp() }),
   });
 
-  // ── Paso 8: Si fue APPROVED → entregar el PDF de forma segura ─────────────
+  // ── Paso 9: Si fue APPROVED → entregar el PDF de forma segura ─────────────
   if (status === 'APPROVED') {
-    const purchaseSnap = await purchaseRef.get();
-    const purchase = purchaseSnap.data() as PurchaseDocument | undefined;
 
     if (purchase) {
       /**

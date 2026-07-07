@@ -6,6 +6,7 @@ import { getAdminApp } from '@/lib/firebase-admin';
 import { getFirestore, Timestamp, FieldValue } from 'firebase-admin/firestore';
 import type { DecodedIdToken } from 'firebase-admin/auth';
 import { decryptSymmetric, encryptSymmetric } from '@/lib/security/server-crypto';
+import { maskId, maskName, maskPhone, maskPlate } from '@/lib/security/masking';
 import { Consultation } from '@/lib/definitions';
 import { DocumentType } from '@/lib/legal/document-templates';
 import { ShowcaseConfig, FooterConfig } from '@/lib/site-config';
@@ -271,14 +272,27 @@ export async function getConsultations(
     const consultations = snapshot.docs.map((doc) => {
       const data = doc.data();
       const rawCedula = data.cedula || '';
-      const cedula = rawCedula.startsWith('ENC:') ? decryptSymmetric(rawCedula) : rawCedula;
+      const cedulaPlano = rawCedula.startsWith('ENC:') ? decryptSymmetric(rawCedula) : rawCedula;
+      const isSimitCaptura = cedulaPlano === 'SIMIT-CAPTURA';
 
       const safeData = serializeDataForNextJS(data) as Record<string, unknown>;
+
+      // Enmascaramiento preventivo server-side para Zero-PII
+      const nombre = (data.nombre && data.nombre !== 'Sin Registrar' && data.nombre !== 'REQUIERE INGRESO MANUAL' && data.nombre !== 'NO REGISTRADO')
+        ? maskName(data.nombre)
+        : (data.nombre || '');
+      const contacto = data.contacto ? maskPhone(data.contacto) : '';
+      const placa = (data.placa && data.placa !== 'N/A' && data.placa !== 'Sin Identificar')
+        ? maskPlate(data.placa)
+        : (data.placa || '');
 
       return {
         ...safeData,
         id: doc.id,
-        cedula,
+        cedula: isSimitCaptura ? cedulaPlano : maskId(cedulaPlano),
+        nombre,
+        contacto,
+        placa,
         // Mantener también las validaciones fallback si safeData omitiera algo
         createdAt: safeData.createdAt || null,
         updatedAt: safeData.updatedAt || null,
@@ -449,14 +463,27 @@ export async function getCases(idToken: string, pageSize: number = 20, lastDocId
     const cases = snapshot.docs.map((doc) => {
       const data = doc.data();
       const rawCedula = data.cedula || '';
-      const cedula = rawCedula.startsWith('ENC:') ? decryptSymmetric(rawCedula) : rawCedula;
+      const cedulaPlano = rawCedula.startsWith('ENC:') ? decryptSymmetric(rawCedula) : rawCedula;
+      const isSimitCaptura = cedulaPlano === 'SIMIT-CAPTURA';
 
       const safeData = serializeDataForNextJS(data) as Record<string, unknown>;
+
+      // Enmascaramiento preventivo server-side para Zero-PII
+      const nombre = (data.nombre && data.nombre !== 'Sin Registrar' && data.nombre !== 'REQUIERE INGRESO MANUAL' && data.nombre !== 'NO REGISTRADO')
+        ? maskName(data.nombre)
+        : (data.nombre || '');
+      const contacto = data.contacto ? maskPhone(data.contacto) : '';
+      const placa = (data.placa && data.placa !== 'N/A' && data.placa !== 'Sin Identificar')
+        ? maskPlate(data.placa)
+        : (data.placa || '');
 
       return {
         ...safeData,
         id: doc.id,
-        cedula,
+        cedula: isSimitCaptura ? cedulaPlano : maskId(cedulaPlano),
+        nombre,
+        contacto,
+        placa,
         // Serialización segura de fechas raíz
         createdAt: safeData.createdAt || null,
         updatedAt: safeData.updatedAt || null,
@@ -1213,6 +1240,62 @@ export async function updateReferralStatus(idToken: string, referralId: string, 
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Error al actualizar referido';
     logger.error('[updateReferralStatus] Error', { error: msg });
+    return { success: false, error: msg };
+  }
+}
+
+/**
+ * 🛡️ NUEVO: Revela datos sensibles de forma selectiva para un caso o lead.
+ * Registra la acción en logRevealAuditAction antes de devolver la información.
+ */
+export async function revealExpedienteSensitiveData(idToken: string, id: string) {
+  try {
+    const decodedToken = await requireAdminSession(idToken);
+    
+    // Rate limit preventivo: 20 revelaciones por hora por admin
+    const { rateLimit } = await import('@/lib/security/rate-limit');
+    const rl = await rateLimit(`reveal-pii:${decodedToken.uid}`, 20, 60 * 1000 * 60);
+    if (!rl.success) {
+      return { success: false, error: 'Límite de revelación de PII excedido. Intenta más tarde.' };
+    }
+
+    getAdminApp();
+    const db = getFirestore();
+
+    // Buscar en cases
+    let docRef = db.collection('cases').doc(id);
+    let docSnap = await docRef.get();
+
+    if (!docSnap.exists) {
+      // Si no existe, buscar en consultations
+      docRef = db.collection('consultations').doc(id);
+      docSnap = await docRef.get();
+    }
+
+    if (!docSnap.exists) {
+      return { success: false, error: 'Documento no encontrado' };
+    }
+
+    // Registrar acción de auditoría
+    const { logRevealAuditAction } = await import('@/app/admin/audit-actions');
+    await logRevealAuditAction(id);
+
+    const data = docSnap.data()!;
+    const rawCedula = data.cedula || '';
+    const cedula = rawCedula.startsWith('ENC:') ? decryptSymmetric(rawCedula) : rawCedula;
+
+    return {
+      success: true,
+      data: {
+        cedula,
+        contacto: data.contacto || '',
+        placa: data.placa || '',
+        nombre: data.nombre || '',
+      },
+    };
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : 'Error al revelar datos';
+    logger.error('[revealExpedienteSensitiveData] Error', { error: msg });
     return { success: false, error: msg };
   }
 }

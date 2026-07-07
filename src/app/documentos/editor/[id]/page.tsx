@@ -51,8 +51,7 @@ export default function DocumentEditor({ params }: { params: Promise<{ id: strin
         const token =
           searchParams.get('token') ||
           (typeof window !== 'undefined'
-            ? sessionStorage.getItem(`download_token_${refId}`) ||
-              localStorage.getItem(`download_token_${refId}`)
+            ? sessionStorage.getItem(`download_token_${refId}`) || ''
             : '') ||
           '';
         setDownloadToken(token);

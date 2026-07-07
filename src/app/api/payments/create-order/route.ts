@@ -97,9 +97,9 @@ export async function POST(req: NextRequest) {
   const amountCop = PRODUCT_PRICES[productType];
 
   // 3. Generar referencia única para esta transacción
-  const timestamp = Date.now();
-  const shortId = caseData.shortId.replace('CASE', '').slice(0, 6);
-  const wompiReference = `DSM-${shortId}-${timestamp}`;
+  // 🛡️ FIX: la referencia ya NO depende de shortId+timestamp (colisionable).
+  // crypto.randomUUID() da ~122 bits de entropía, eliminando la posibilidad de colisiones accidentales o provocadas.
+  const wompiReference = `DSM-${crypto.randomUUID()}`;
 
   // 4. Crear firma de integridad para Wompi
   // Fórmula Wompi: SHA256(reference + amountInCents + currency + integritySecret)
@@ -119,25 +119,42 @@ export async function POST(req: NextRequest) {
   const hashedCelular = hashPII(celular);
   const downloadToken = crypto.randomUUID();
 
-  await db
-    .collection('purchases')
-    .doc(wompiReference)
-    .set({
-      id: wompiReference,
-      wompiReference,
-      productType,
-      productLabel: caseData.infractorName + ' — ' + productType,
-      amountCop,
-      status: 'PENDING',
-      hashedCedula,
-      hashedCelular,
-      customerEmail,
-      caseData: { ...caseData, citizenEmail: customerEmail },
-      createdAt: FieldValue.serverTimestamp(),
-      idempotencyKey: wompiReference,
-      ipAddress: ip,
-      downloadToken,
-    });
+  try {
+    // 🛡️ FIX: .create() falla atómicamente (ALREADY_EXISTS) si el doc ya
+    // existe. A diferencia de .set(), JAMÁS sobrescribe una orden previa.
+    await db
+      .collection('purchases')
+      .doc(wompiReference)
+      .create({
+        id: wompiReference,
+        wompiReference,
+        productType,
+        productLabel: caseData.infractorName + ' — ' + productType,
+        amountCop,
+        status: 'PENDING',
+        hashedCedula,
+        hashedCelular,
+        customerEmail,
+        caseData: { ...caseData, citizenEmail: customerEmail },
+        createdAt: FieldValue.serverTimestamp(),
+        idempotencyKey: wompiReference,
+        ipAddress: ip,
+        downloadToken,
+        // 🛡️ FIX: expiración del enlace y control de descargas (Hallazgo 5)
+        downloadTokenExpiresAt: new Date(Date.now() + 72 * 60 * 60 * 1000), // 72h de validez
+        downloadCount: 0,
+        maxDownloads: 5,
+      });
+  } catch (err: unknown) {
+    const code = (err as { code?: number })?.code;
+    if (code === 6 /* ALREADY_EXISTS */) {
+      return NextResponse.json(
+        { error: 'Referencia en conflicto. Por favor intenta de nuevo.' },
+        { status: 409 }
+      );
+    }
+    throw err;
+  }
 
   // 6. Devolver los datos para que el frontend abra el checkout de Wompi
   return NextResponse.json({

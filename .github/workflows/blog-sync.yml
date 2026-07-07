@@ -35,17 +35,16 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           NEXT_PUBLIC_SITE_URL: "https://desmulta.online"
 
-      - name: Verificar Cambios y Hacer Commit
-        run: |
-          git status
-          # Verificar si hay archivos nuevos o modificados en la carpeta del blog
-          if [ -n "$(git status --porcelain src/content/blog)" ]; then
-            echo "Nuevos borradores detectados. Confirmando cambios en la rama principal..."
-            git config --global user.name "github-actions[bot]"
-            git config --global user.email "github-actions[bot]@users.noreply.github.com"
-            git add src/content/blog/
-            git commit -m "automatización: importar nuevos borradores de blog [skip ci]"
-            git push origin main
-          else
-            echo "Sin novedades. El blog ya se encuentra al día."
-          fi
+      - name: Crear Pull Request con nuevos borradores
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "automatización: importar nuevos borradores de blog"
+          branch: blog-sync/update-feed
+          title: "🤖 Nuevos borradores de blog — requiere revisión"
+          body: |
+            Se han importado nuevos borradores de blog automáticamente desde el feed RSS.
+            Por favor, revisa el contenido de las noticias antes de aprobar este Pull Request para evitar problemas tipográficos o expresiones MDX inválidas.
+          labels: |
+            blog
+            automatización

@@ -92,27 +92,32 @@ export async function getBlogPostBySlug(slug: string) {
 
   const contenido = fs.readFileSync(rutaArchivo, 'utf8');
 
-  const { content, frontmatter } = await compileMDX<BlogPostMeta>({
-    source: contenido,
-    options: { parseFrontmatter: true },
-    components: {
-      a: (props) =>
-        React.createElement('a', {
-          ...props,
-          target: '_blank',
-          rel: 'noopener noreferrer',
-          className: 'text-primary hover:text-primary/80 font-bold underline transition-colors',
-        }),
-    },
-  });
+  try {
+    const { content, frontmatter } = await compileMDX<BlogPostMeta>({
+      source: contenido,
+      options: { parseFrontmatter: true },
+      components: {
+        a: (props) =>
+          React.createElement('a', {
+            ...props,
+            target: '_blank',
+            rel: 'noopener noreferrer',
+            className: 'text-primary hover:text-primary/80 font-bold underline transition-colors',
+          }),
+      },
+    });
 
-  // Bloquear acceso a borradores en producción
-  if (process.env.NODE_ENV === 'production' && frontmatter.draft) {
+    // Bloquear acceso a borradores en producción
+    if (process.env.NODE_ENV === 'production' && frontmatter.draft) {
+      return null;
+    }
+
+    return {
+      content,
+      meta: { ...frontmatter, slug: slugSeguro },
+    };
+  } catch (err) {
+    console.error(`[MDX-Error] Error compilando MDX para el slug "${slugSeguro}":`, err);
     return null;
   }
-
-  return {
-    content,
-    meta: { ...frontmatter, slug: slugSeguro },
-  };
 }

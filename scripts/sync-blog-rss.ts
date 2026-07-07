@@ -51,8 +51,7 @@ function parseDate(rawDate: string): string {
     return new Date().toISOString().split('T')[0];
   }
 }
-
-// Limpia tags HTML básicos para convertirlos a Markdown
+// Limpia tags HTML básicos para convertirlos a Markdown y escapa llaves de MDX
 function htmlToMarkdown(html: string): string {
   if (!html) return '';
   return html
@@ -69,6 +68,8 @@ function htmlToMarkdown(html: string): string {
     .replace(/&quot;/g, '"')
     .replace(/<!\[CDATA\[(.*?)\]\]>/g, '$1') // CDATA wrapper
     .replace(/<[^>]*>/g, '') // Elimina cualquier otro tag residual
+    .replace(/\{/g, '\\{') // Escapa {
+    .replace(/\}/g, '\\}') // Escapa }
     .trim();
 }
 
