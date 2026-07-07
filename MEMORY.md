@@ -10,8 +10,17 @@
 - **Archivos afectados:**
   - `src/app/api/payments/status/route.ts` [MODIFICADO]
   - `src/components/sections/Hero.tsx` [MODIFICADO]
+  - `src/lib/payments/pdf-delivery.ts` [MODIFICADO]
 - **Estado actual:**
-  - Pantalla de confirmación de pago desbloqueada y componente responsivo ajustado. Test de validación en proceso.
+  - Pantalla de confirmación de pago desbloqueada, IDOR corregido (401 solucionado) y componente responsivo ajustado. Test de validación en proceso.
+
+## 2026-07-07 (Hotfix 2): Resolución de error 401 (IDOR) en Confirmación de Pagos
+- **Qué cambió:**
+  - En `src/lib/payments/pdf-delivery.ts` se eliminó la actualización de `downloadToken: tokenId` al marcar el PDF como entregado.
+- **Por qué cambió:**
+  - El sistema de generación de PDF sobreescribía el token de descarga original en Firestore (36 chars UUID) por uno nuevo en formato Hex (48 chars). Esto provocaba que, al intentar el frontend validar el estado de la compra usando el token almacenado en su sesión, recibiera un error `401 Unauthorized (IDOR detectado)` porque los tokens ya no coincidían. 
+- **Archivos afectados:**
+  - `src/lib/payments/pdf-delivery.ts` [MODIFICADO]
 
 ## 2026-07-06: Estabilización de E2E para Entornos de Hardware Limitado (Flaky Tests)
 - **Qué cambió:**

@@ -111,9 +111,8 @@ export async function generarYEnviarPDF(purchase: PurchaseDocument, db: Firestor
       downloadCount: 0,
     });
 
-  // 6. Marcar la compra como entregada y vincular el token de descarga
+  // 6. Marcar la compra como entregada
   await db.collection('purchases').doc(purchaseId).update({
     pdfDeliveredAt: FieldValue.serverTimestamp(),
-    downloadToken: tokenId,
   });
 }
