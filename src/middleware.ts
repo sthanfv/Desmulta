@@ -144,7 +144,10 @@ export async function middleware(request: NextRequest) {
   // ── 3. Rutas /admin — Guard JWT criptográfico ────────────────────────────
   if (pathname.startsWith('/admin')) {
     // 🛡️ E2E TESTING BYPASS: Permitir el bypass de autenticación en tests de Playwright usando el emulador
-    const isE2E = process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === 'true';
+    // FIX HALLAZGO 8: Se elimina la variable pública y se exige que NO sea el entorno de producción.
+    const isE2E =
+      process.env.USE_FIREBASE_EMULATOR === 'true' &&
+      process.env.NODE_ENV !== 'production';
     const hasMockSession = request.cookies.get('__session')?.value === 'mock-admin-token';
     if (isE2E && hasMockSession) {
       const response = NextResponse.next({
@@ -181,8 +184,10 @@ export async function middleware(request: NextRequest) {
       }
 
       // 🛡️ 2FA OTP Guard: Si es admin y no está en test, verificar la cookie `admin-2fa-token` y su firma JWT
-      const isE2E = process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === 'true';
-      if (!isE2E) {
+      const isE2E_2FA =
+        process.env.USE_FIREBASE_EMULATOR === 'true' &&
+        process.env.NODE_ENV !== 'production';
+      if (!isE2E_2FA) {
         const has2faCookie = request.cookies.has('admin-2fa-token');
         if (!has2faCookie) {
           console.error(
