@@ -38,10 +38,10 @@ export const Footer = ({ footerData, onOpenWhatsAppWarning }: FooterProps) => {
     });
   };
   return (
-    <footer id="contacto" className="py-16 md:py-32 px-4 relative z-10 reveal">
+    <footer id="contacto" className="py-12 md:py-32 px-4 relative z-10 reveal">
       <div className="max-w-7xl mx-auto space-y-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div className="lg:col-span-5 floating-card p-10 lg:p-12 bg-card/30 flex flex-col justify-between group overflow-hidden">
+          <div className="lg:col-span-5 floating-card p-6 md:p-10 lg:p-12 bg-card/30 flex flex-col justify-between group overflow-hidden">
             <div className="absolute -top-12 -right-12 w-48 h-48 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-all duration-700" />
             <div className="space-y-8 relative z-10">
               <Link href="/" className="flex items-center gap-4">
@@ -96,7 +96,7 @@ export const Footer = ({ footerData, onOpenWhatsAppWarning }: FooterProps) => {
           </div>
 
           <div className="lg:col-span-7 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-6">
-            <div className="lg:col-span-3 floating-card p-10 bg-card/20 border-white/5 space-y-8">
+            <div className="lg:col-span-3 floating-card p-6 md:p-10 bg-card/20 border-white/5 space-y-8">
               <h2 className="text-xs font-black uppercase tracking-[0.3em] text-foreground/70">
                 Navegación Táctica
               </h2>
@@ -130,7 +130,7 @@ export const Footer = ({ footerData, onOpenWhatsAppWarning }: FooterProps) => {
               </nav>
             </div>
 
-            <div className="lg:col-span-4 floating-card p-10 bg-primary/5 border-primary/10 space-y-8 relative overflow-hidden group">
+            <div className="lg:col-span-4 floating-card p-6 md:p-10 bg-primary/5 border-primary/10 space-y-8 relative overflow-hidden group">
               <div className="absolute top-0 right-0 p-4 opacity-5">
                 <MessageCircle size={120} className="text-primary rotate-12" />
               </div>

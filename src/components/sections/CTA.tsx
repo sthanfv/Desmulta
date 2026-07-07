@@ -37,7 +37,7 @@ export const CTA = ({ onConsultar, onOpenSimitTutorial }: CTAProps) => {
             <Button
               onClick={onConsultar}
               size="lg"
-              className="h-14 md:h-16 px-10 md:px-14 bg-foreground text-background hover:bg-foreground/90 font-semibold rounded-2xl active:scale-95 transition-all text-base md:text-lg shadow-lg border-none"
+              className="w-full sm:w-auto h-14 md:h-16 px-6 md:px-14 bg-foreground text-background hover:bg-foreground/90 font-semibold rounded-2xl active:scale-95 transition-all text-base md:text-lg shadow-lg border-none"
             >
               Consulta gratuita
             </Button>
@@ -45,7 +45,7 @@ export const CTA = ({ onConsultar, onOpenSimitTutorial }: CTAProps) => {
             <Button
               onClick={onOpenSimitTutorial}
               size="lg"
-              className="h-auto md:h-16 min-h-[3.5rem] px-8 md:px-12 bg-foreground text-background hover:bg-foreground/90 font-semibold rounded-2xl active:scale-95 transition-all text-base md:text-lg shadow-lg border-none relative overflow-hidden group flex flex-col items-center justify-center py-3"
+              className="w-full sm:w-auto h-auto md:h-16 min-h-[3.5rem] px-4 md:px-12 bg-foreground text-background hover:bg-foreground/90 font-semibold rounded-2xl active:scale-95 transition-all text-base md:text-lg shadow-lg border-none relative overflow-hidden group flex flex-col items-center justify-center py-3"
             >
               <span className="relative z-10 block mb-1">SIMIT</span>
               <span className="relative z-10 text-[10px] md:text-xs font-medium opacity-80 block leading-tight text-center">

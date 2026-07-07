@@ -10,9 +10,9 @@ import { TarjetaPremium } from '@/components/ui/TarjetaPremium';
  */
 export const Pillars = () => {
   return (
-    <section id="servicios" className="py-32 px-4 relative">
+    <section id="servicios" className="py-16 md:py-32 px-4 relative">
       <div className="max-w-6xl mx-auto">
-        <div className="text-center space-y-6 mb-20">
+        <div className="text-center space-y-6 mb-12 md:mb-20">
           <h2 className="text-2xl md:text-5xl font-black text-foreground tracking-tight reveal">
             Pilares de Autoridad Legal y Técnica
           </h2>

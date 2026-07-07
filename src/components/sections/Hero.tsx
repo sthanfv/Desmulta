@@ -41,7 +41,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
   const router = useRouter();
 
   return (
-    <section className="min-h-[100svh] flex items-center pt-24 sm:pt-32 md:pt-36 pb-12 sm:pb-20 md:pb-24 px-4 relative overflow-hidden">
+    <section className="min-h-[100svh] flex items-center pt-20 sm:pt-32 md:pt-36 pb-12 sm:pb-20 md:pb-24 px-4 relative overflow-hidden">
       {/* Atmósfera institucional */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/15 blur-[60px] sm:blur-[120px] opacity-50 rounded-full" />
@@ -64,7 +64,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
           </m.div>
 
           {/* Titular */}
-          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-bold text-foreground tracking-tighter leading-[0.95]">
+          <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-bold text-foreground tracking-tighter leading-[1.1] sm:leading-[0.95]">
             {cityContext ? (
               <>
                 <m.span
@@ -127,7 +127,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
             <Button
               onClick={onConsultar}
               size="lg"
-              className="h-14 sm:h-16 px-10 sm:px-12 text-base sm:text-lg font-semibold rounded-2xl shadow-md hover:shadow-lg hover:scale-[1.01] active:scale-95 transition-all"
+              className="w-full sm:w-auto h-14 sm:h-16 px-6 sm:px-12 text-base sm:text-lg font-semibold rounded-2xl shadow-md hover:shadow-lg hover:scale-[1.01] active:scale-95 transition-all"
             >
               <span className="flex items-center gap-3">
                 Iniciar estudio sin costo
@@ -218,7 +218,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
 
           {/* Vitrina de Soluciones Legales Directas (Folios A4 de frente) */}
           {/* NOTA DE DESARROLLO: Si modificas los precios visuales aquí, debes actualizar en concordancia los valores en centavos en PRODUCT_PRICES dentro de src/app/api/payments/create-order/route.ts */}
-          <div className="w-[280px] sm:w-[320px] md:w-full max-w-[350px] mx-auto lg:mr-12 flex flex-col gap-4 mt-4 lg:mt-[72px]">
+          <div className="w-full max-w-[320px] sm:max-w-[350px] md:w-full mx-auto lg:mr-12 flex flex-col gap-4 mt-4 lg:mt-[72px]">
             <p className="text-xs font-bold uppercase tracking-widest text-zinc-500 text-center lg:text-left">
               DOCUMENTOS DE DEFENSA
             </p>
