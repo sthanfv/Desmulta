@@ -136,8 +136,8 @@ export function CardSwap({
                 } as React.CSSProperties
               }
               className={isFront ? 'cursor-grab active:cursor-grabbing' : ''}
-              drag={isFront ? true : false}
-              dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+              drag={isFront ? 'x' : false}
+              dragConstraints={{ left: 0, right: 0 }}
               dragElastic={0.35}
               onDragEnd={handleDragEnd}
               /*
