@@ -25,7 +25,9 @@ jobs:
         # Las validaciones de tipos se hacen en el workflow de CI principal.
         run: npm run build
         env:
+          NODE_ENV: production
           NEXT_PUBLIC_USE_FIREBASE_EMULATOR: true
+          USE_FIREBASE_EMULATOR: true
           
       - name: Run Lighthouse CI
         run: |

@@ -22,9 +22,9 @@
     "test:coverage": "vitest run --coverage",
     "test:coverage:ci": "vitest run --coverage --reporter=json --outputFile=coverage/report.json",
     "test:integration": "firebase emulators:exec \"vitest --run\" --only firestore --config firebase.test.json",
-    "test:e2e": "firebase emulators:exec \"cross-env NEXT_PUBLIC_USE_FIREBASE_EMULATOR=true playwright test\" --only firestore --config firebase.test.json",
+    "test:e2e": "firebase emulators:exec \"cross-env USE_FIREBASE_EMULATOR=true NEXT_PUBLIC_USE_FIREBASE_EMULATOR=true playwright test\" --only firestore --config firebase.test.json",
     "validate": "npm run format && npm run typecheck && npm run test:integration && npm run test:e2e && npm run build && npm run lint",
-    "test:smoke": "firebase emulators:exec \"cross-env NEXT_PUBLIC_USE_FIREBASE_EMULATOR=true playwright test tests/e2e/smoke.test.ts\" --only firestore --config firebase.test.json",
+    "test:smoke": "firebase emulators:exec \"cross-env USE_FIREBASE_EMULATOR=true NEXT_PUBLIC_USE_FIREBASE_EMULATOR=true playwright test tests/e2e/smoke.test.ts\" --only firestore --config firebase.test.json",
     "blog:sync": "ts-node --skip-project -O \"{\\\"module\\\":\\\"commonjs\\\"}\" scripts/sync-blog-rss.ts",
     "repair:admins": "ts-node --skip-project -O \"{\\\"module\\\":\\\"commonjs\\\"}\" scripts/repair-admin-docs.ts",
     "docs:lint": "markdownlint README.md CONTRIBUTING.md CHANGELOG.md docs/*.md"

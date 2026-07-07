@@ -39,7 +39,7 @@ export default defineConfig({
 
   /* Configuración del Servidor de Pruebas */
   webServer: {
-    command: 'cross-env NEXT_PUBLIC_USE_FIREBASE_EMULATOR=true SUPERADMIN_AUDIT_PASSWORD=testpassword123 GOD_MODE_JWT_SECRET=testjwtsecret123 npm run dev',
+    command: 'cross-env USE_FIREBASE_EMULATOR=true NEXT_PUBLIC_USE_FIREBASE_EMULATOR=true SUPERADMIN_AUDIT_PASSWORD=testpassword123 GOD_MODE_JWT_SECRET=testjwtsecret123 npm run dev',
     url: 'http://localhost:9005',
     reuseExistingServer: false,
     timeout: 120 * 1000, // 120s para dar tiempo al build de Next.js
