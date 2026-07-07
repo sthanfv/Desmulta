@@ -218,7 +218,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
 
           {/* Vitrina de Soluciones Legales Directas (Folios A4 de frente) */}
           {/* NOTA DE DESARROLLO: Si modificas los precios visuales aquí, debes actualizar en concordancia los valores en centavos en PRODUCT_PRICES dentro de src/app/api/payments/create-order/route.ts */}
-          <div className="w-full max-w-[350px] lg:mr-12 flex flex-col gap-4 mt-4 lg:mt-[72px]">
+          <div className="w-[280px] sm:w-[320px] md:w-full max-w-[350px] mx-auto lg:mr-12 flex flex-col gap-4 mt-4 lg:mt-[72px]">
             <p className="text-xs font-bold uppercase tracking-widest text-zinc-500 text-center lg:text-left">
               DOCUMENTOS DE DEFENSA
             </p>

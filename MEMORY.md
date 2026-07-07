@@ -1,5 +1,18 @@
 # MEMORY.md - Historial del Sistema
 
+## 2026-07-07: Resolución de RangeError (timingSafeEqual) y Responsividad de CardSwap
+- **Qué cambió:**
+  - **[Seguridad - IDOR Fix]**: En `src/app/api/payments/status/route.ts`, se solucionó un error crítico `RangeError: Input buffers must have the same byte length`. La función `timingSafeEqual` lanzaba error cuando el `downloadToken` recibido tenía una longitud distinta a la de la base de datos, causando que el endpoint devolviera código 500 y dejara bloqueada la pantalla de "Cargando estado del pago". Ahora se valida que las longitudes sean idénticas y mayores a cero antes de comparar.
+  - **[UI/UX - Responsividad]**: En `src/components/sections/Hero.tsx`, se redujo dinámicamente el `max-width` del contenedor del componente `CardSwap` en pantallas pequeñas (móviles). 
+- **Por qué cambió:**
+  - Al fallar el estado del pago con un HTTP 500, los usuarios se quedaban en un "Loading" infinito tras volver del comercio (Wompi).
+  - El componente `CardSwap` (implementado con animaciones y "spring physics") desbordaba el ancho de pantallas móviles porque sus tarjetas se trasladaban horizontalmente sobrepasando los límites de `100vw`.
+- **Archivos afectados:**
+  - `src/app/api/payments/status/route.ts` [MODIFICADO]
+  - `src/components/sections/Hero.tsx` [MODIFICADO]
+- **Estado actual:**
+  - Pantalla de confirmación de pago desbloqueada y componente responsivo ajustado. Test de validación en proceso.
+
 ## 2026-07-06: Estabilización de E2E para Entornos de Hardware Limitado (Flaky Tests)
 - **Qué cambió:**
   - **[QA - Timeout Global]**: Se incrementó el `timeout` global de Playwright en `playwright.config.ts` de 60000ms a 120000ms para compensar la lentitud extrema de máquinas antiguas durante la inicialización y ejecución del servidor Next.js y el Emulador de Firebase.

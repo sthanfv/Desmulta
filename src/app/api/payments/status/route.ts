@@ -43,7 +43,14 @@ export async function GET(req: NextRequest) {
     // Validar el token de descarga
     const expected = Buffer.from(purchase.downloadToken || '');
     const received = Buffer.from(downloadToken || '');
-    if (expected.length === 0 || received.length === 0 || !timingSafeEqual(expected, received)) {
+    const isLengthOk = expected.length === received.length;
+    const isTokenValid =
+      isLengthOk &&
+      expected.length > 0 &&
+      received.length > 0 &&
+      timingSafeEqual(expected, received);
+
+    if (!isTokenValid) {
       logger.security('[api/payments/status] Token de descarga inválido (IDOR detectado)', {
         ref,
         receivedToken: downloadToken,
