@@ -17,7 +17,6 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Analytics } from '@vercel/analytics/react';
 import { PushProvider } from '@/components/providers/PushProvider';
 import { MotionProvider } from '@/components/providers/MotionProvider';
-import { OCRPrewarmer } from '@/components/providers/OCRPrewarmer';
 import { SystemHealthProvider } from '@/components/providers/SystemHealthProvider';
 import { PWAAutoUpdater } from '@/components/providers/PWAAutoUpdater';
 import { PageProgressBar } from '@/components/ui/PageProgressBar';
@@ -158,7 +157,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <SystemHealthProvider>
                 <PushProvider>
                   <MotionProvider>
-                    <OCRPrewarmer />
                     <PWAAutoUpdater />
                     <main id="main-content" className="overflow-x-hidden w-full relative">
                       {children}
