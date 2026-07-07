@@ -6,7 +6,7 @@ import { getAdminApp } from '@/lib/firebase-admin';
 import { getFirestore, Timestamp, FieldValue } from 'firebase-admin/firestore';
 import type { DecodedIdToken } from 'firebase-admin/auth';
 import { decryptSymmetric, encryptSymmetric } from '@/lib/security/server-crypto';
-import { maskId, maskName, maskPhone, maskPlate } from '@/lib/security/masking';
+import { maskId, maskName, maskPhone, maskPlate, maskEmail } from '@/lib/security/masking';
 import { Consultation } from '@/lib/definitions';
 import { DocumentType } from '@/lib/legal/document-templates';
 import { ShowcaseConfig, FooterConfig } from '@/lib/site-config';
@@ -291,19 +291,28 @@ export async function getConsultations(
           ? maskPlate(data.placa)
           : data.placa || '';
 
+      const email = data.email ? maskEmail(data.email) : '';
+
       return {
-        ...safeData,
         id: doc.id,
+        authorUid: data.authorUid || null,
         cedula: isSimitCaptura ? cedulaPlano : maskId(cedulaPlano),
         nombre,
         contacto,
         placa,
-        // Mantener también las validaciones fallback si safeData omitiera algo
-        createdAt: safeData.createdAt || null,
-        updatedAt: safeData.updatedAt || null,
-        notifiedAt: safeData.notifiedAt || null,
-        retriedAt: safeData.retriedAt || null,
-        timeline_updates: safeData.timeline_updates || [],
+        email,
+        ciudad: data.ciudad || '',
+        ticketNumber: data.ticketNumber || '',
+        status: (safeData.status as string) || 'nuevo',
+        trackingUuid: safeData.trackingUuid || null,
+        evidenceUrl: safeData.evidenceUrl || null,
+        esRecurrente: safeData.esRecurrente || false,
+        conteoRetornos: safeData.conteoRetornos || 0,
+        createdAt: (safeData.createdAt as string) || null,
+        updatedAt: (safeData.updatedAt as string) || null,
+        notifiedAt: (safeData.notifiedAt as string) || null,
+        retriedAt: (safeData.retriedAt as string) || null,
+        timeline_updates: (safeData.timeline_updates as any[]) || [],
       };
     });
 
@@ -487,18 +496,28 @@ export async function getCases(idToken: string, pageSize: number = 20, lastDocId
           ? maskPlate(data.placa)
           : data.placa || '';
 
+      const email = data.email ? maskEmail(data.email) : '';
+
       return {
-        ...safeData,
         id: doc.id,
+        authorUid: data.authorUid || null,
+        consultationId: data.consultationId || null,
         cedula: isSimitCaptura ? cedulaPlano : maskId(cedulaPlano),
         nombre,
         contacto,
         placa,
-        // Serialización segura de fechas raíz
-        createdAt: safeData.createdAt || null,
-        updatedAt: safeData.updatedAt || null,
-        history: safeData.history || [],
-        documents: safeData.documents || [],
+        email,
+        ciudad: data.ciudad || '',
+        ticketNumber: data.ticketNumber || '',
+        status: (safeData.status as string) || 'apertura',
+        trackingUuid: safeData.trackingUuid || null,
+        evidenceUrl: safeData.evidenceUrl || null,
+        esRecurrente: safeData.esRecurrente || false,
+        conteoRetornos: safeData.conteoRetornos || 0,
+        createdAt: (safeData.createdAt as string) || null,
+        updatedAt: (safeData.updatedAt as string) || null,
+        history: (safeData.history as any[]) || [],
+        documents: (safeData.documents as any[]) || [],
       };
     });
 
@@ -1301,6 +1320,7 @@ export async function revealExpedienteSensitiveData(idToken: string, id: string)
         contacto: data.contacto || '',
         placa: data.placa || '',
         nombre: data.nombre || '',
+        email: data.email || '',
       },
     };
   } catch (error) {

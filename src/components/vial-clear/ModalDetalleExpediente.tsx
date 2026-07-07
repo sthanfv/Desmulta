@@ -50,6 +50,7 @@ export function ModalDetalleExpediente({
     contacto: string;
     placa: string;
     nombre: string;
+    email?: string;
   } | null>(null);
   const auth = useAuth();
   const { toast } = useToast();
@@ -99,7 +100,7 @@ export function ModalDetalleExpediente({
     cedula: esSimitCaptura
       ? 'REQUIERE INGRESO MANUAL'
       : (isRevealed && revealedData ? revealedData.cedula : data?.cedula) || '',
-    email: data?.email || '',
+    email: (isRevealed && revealedData ? revealedData.email : data?.email) || '',
     ticketNumber: data?.ticketNumber || '',
     placa:
       (isRevealed && revealedData ? revealedData.placa : data?.placa) &&
@@ -131,6 +132,7 @@ export function ModalDetalleExpediente({
         nombre: revealedData.nombre,
         cedula: revealedData.cedula,
         placa: revealedData.placa,
+        email: revealedData.email !== undefined ? revealedData.email : prev.email,
       }));
     }
   }, [isRevealed, revealedData]);
