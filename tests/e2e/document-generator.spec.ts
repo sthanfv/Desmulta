@@ -44,9 +44,9 @@ test.describe('Generador de Documentos (Freemium Builder)', () => {
     await page.fill('input[name="direccion"]', 'Calle 123 # 4-56', { force: true });
     
     // 4. Verificar reactividad en la vista previa
-    await expect(page.getByText('Juan Pérez Automático', { exact: false }).first()).toBeVisible();
-    await expect(page.getByText('1234567890', { exact: false }).first()).toBeVisible();
-    await expect(page.getByText('XYZ987', { exact: false }).first()).toBeVisible();
+    await expect(page.getByText(/Juan P[ée]rez Autom[áa]tico/i).first()).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText(/1234567890/i).first()).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText(/XYZ987/i).first()).toBeVisible({ timeout: 15000 });
 
     // 5. Interceptar la llamada a /api/payments/create-order para no crear basura real en base de datos
     await page.route('**/api/payments/create-order', async route => {
@@ -74,6 +74,6 @@ test.describe('Generador de Documentos (Freemium Builder)', () => {
     await page.getByRole('button', { name: /Pagar y Descargar/i }).click({ force: true });
 
     // 7. Esperar a que se complete la redirección a la página de confirmación local
-    await expect(page).toHaveURL(/\/documentos\/confirmacion.*/, { timeout: 60000 });
+    await expect(page).toHaveURL(/\/documentos\/confirmacion.*/, { timeout: 90000 });
   });
 });

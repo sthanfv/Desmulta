@@ -529,7 +529,6 @@ body {
   }
 }
 
-
 /* --- ANIMACIONES DE CABECERA Y LOGO (DESMULTA) --- */
 .logo-text-transition {
   transition:
@@ -752,7 +751,7 @@ body {
  * que el toggler inyecta en <html> SOLO durante el toggle activo.
  * Esto evita interferir con cualquier otra View Transition de la app (Next.js, etc.)
  * ──────────────────────────────────────────────────────────────────────────── */
-html[data-magicui-theme-vt="active"]::view-transition-group(root) {
+html[data-magicui-theme-vt='active']::view-transition-group(root) {
   animation-duration: var(--magicui-theme-toggle-vt-duration, 500ms);
 }
 
@@ -761,6 +760,6 @@ html[data-magicui-theme-vt="active"]::view-transition-group(root) {
  * inicio, para que no se vea el tema sin recortar en los primeros frames
  * antes de que el JS asíncrono de ready.then() arrange la animación.
  */
-html[data-magicui-theme-vt="active"]::view-transition-new(root) {
+html[data-magicui-theme-vt='active']::view-transition-new(root) {
   clip-path: var(--magicui-theme-vt-clip-from);
 }

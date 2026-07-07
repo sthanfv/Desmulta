@@ -93,15 +93,21 @@ export function ModalDetalleExpediente({
   const esSimitCaptura = data?.cedula === 'SIMIT-CAPTURA';
 
   const templateData = {
-    nombre: esSimitCaptura ? 'REQUIERE INGRESO MANUAL' : (isRevealed && revealedData ? revealedData.nombre : data?.nombre) || '',
-    cedula: esSimitCaptura ? 'REQUIERE INGRESO MANUAL' : (isRevealed && revealedData ? revealedData.cedula : data?.cedula) || '',
+    nombre: esSimitCaptura
+      ? 'REQUIERE INGRESO MANUAL'
+      : (isRevealed && revealedData ? revealedData.nombre : data?.nombre) || '',
+    cedula: esSimitCaptura
+      ? 'REQUIERE INGRESO MANUAL'
+      : (isRevealed && revealedData ? revealedData.cedula : data?.cedula) || '',
     email: data?.email || '',
     ticketNumber: data?.ticketNumber || '',
     placa:
       (isRevealed && revealedData ? revealedData.placa : data?.placa) &&
       (isRevealed && revealedData ? revealedData.placa : data?.placa) !== 'N/A' &&
       (isRevealed && revealedData ? revealedData.placa : data?.placa) !== 'Sin Identificar'
-        ? (isRevealed && revealedData ? revealedData.placa : data?.placa)
+        ? isRevealed && revealedData
+          ? revealedData.placa
+          : data?.placa
         : '',
   };
 

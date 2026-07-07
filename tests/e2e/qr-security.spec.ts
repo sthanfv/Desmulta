@@ -15,8 +15,8 @@ test.describe('Seguridad API QR', () => {
     // Como Vercel/Next manejan el x-forwarded-for, la IP será la misma (localhost).
     let lastStatus = 200;
     
-    // Disparamos 32 requests para asegurar que pase el límite de 30
-    for (let i = 0; i < 32; i++) {
+    // Disparamos 40 requests para asegurar que pase el límite de 30
+    for (let i = 0; i < 40; i++) {
       const response = await request.get(`/api/qr?data=test&cb=${i}`);
       lastStatus = response.status();
       // Si recibimos un 429 tempranamente (quizás por ejecuciones paralelas), rompemos el loop

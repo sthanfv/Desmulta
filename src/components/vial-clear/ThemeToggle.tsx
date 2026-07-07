@@ -20,8 +20,8 @@ export function ThemeToggle() {
 
   return (
     <div className="relative group rounded-full overflow-hidden border border-white/5 active:scale-90 transition-transform">
-      <AnimatedThemeToggler 
-        variant="circle" 
+      <AnimatedThemeToggler
+        variant="circle"
         theme={currentTheme}
         onThemeChange={setTheme}
         className="flex items-center justify-center rounded-full w-10 h-10 hover:bg-white/10 dark:hover:bg-black/20 transition-colors"

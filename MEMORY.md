@@ -1,5 +1,18 @@
 # MEMORY.md - Historial del Sistema
 
+## 2026-07-06: Estabilización de E2E para Entornos de Hardware Limitado (Flaky Tests)
+- **Qué cambió:**
+  - **[QA - Timeout Global]**: Se incrementó el `timeout` global de Playwright en `playwright.config.ts` de 60000ms a 120000ms para compensar la lentitud extrema de máquinas antiguas durante la inicialización y ejecución del servidor Next.js y el Emulador de Firebase.
+  - **[QA - Timeout Asersión]**: En `tests/e2e/document-generator.spec.ts`, se aumentó el timeout específico de la aserción de redirección de confirmación de pago (`toHaveURL`) de 60s a 90s.
+  - **[QA - Rate Limit Test]**: En `tests/e2e/qr-security.spec.ts`, se incrementó el número de peticiones consecutivas (loop de 32 a 40) para garantizar que el límite de tasa (30 reqs/min) configurado en Upstash Redis (en memoria) dispare consistentemente el estado HTTP 429 independientemente del hardware.
+- **Por qué cambió:**
+  - Los tests E2E presentaban comportamiento "flaky" (intermitente) corriendo localmente bajo máquinas viejas, produciendo falsos positivos de fallas de timeout o barreras de red que no representaban defectos reales en el código base.
+- **Archivos afectados:**
+  - `playwright.config.ts` [MODIFICADO]
+  - `tests/e2e/document-generator.spec.ts` [MODIFICADO]
+  - `tests/e2e/qr-security.spec.ts` [MODIFICADO]
+  - `package.json` [MODIFICADO/LIMPIADO temporalmente]
+
 ## 2026-07-06: Correcciones CardSwap Modo Claro + Footer Plantillas
 - **Qué cambió:**
   - **[CardSwap]**: El overlay de profundidad ahora usa `rgba(0,0,0,0.18)` en lugar de `bg-background`, lo que crea una sombra de papel real en modo claro (las tarjetas de atrás se ven oscurecidas, no blancas).

@@ -1,5 +1,10 @@
 import { Document, Paragraph, TextRun, Packer, AlignmentType } from 'docx';
-import { DocumentType, DOCUMENT_TEMPLATES, CaseDataForPDF, DocumentBlock } from './document-templates';
+import {
+  DocumentType,
+  DOCUMENT_TEMPLATES,
+  CaseDataForPDF,
+  DocumentBlock,
+} from './document-templates';
 
 export interface MandatePayload {
   infractorName: string;
@@ -90,7 +95,9 @@ export async function generateMandateDOCX(payload: MandatePayload): Promise<Uint
         alignment: AlignmentType.LEFT,
         children: [
           new TextRun({
-            text: block.seccion1Titulo || (block.firmaTipo === 'poder' ? 'FACULTADES:' : 'HECHOS Y FUNDAMENTOS:'),
+            text:
+              block.seccion1Titulo ||
+              (block.firmaTipo === 'poder' ? 'FACULTADES:' : 'HECHOS Y FUNDAMENTOS:'),
             bold: true,
             size: 24,
           }),
@@ -108,14 +115,16 @@ export async function generateMandateDOCX(payload: MandatePayload): Promise<Uint
         alignment: AlignmentType.LEFT,
         children: [
           new TextRun({
-            text: block.seccion2Titulo || (block.firmaTipo === 'poder' ? 'INDEMNIDAD:' : 'PETICIONES:'),
+            text:
+              block.seccion2Titulo || (block.firmaTipo === 'poder' ? 'INDEMNIDAD:' : 'PETICIONES:'),
             bold: true,
             size: 24,
           }),
         ],
       })
     );
-    const indLines = typeof block.indemnidad === 'function' ? block.indemnidad(caseData) : block.indemnidad;
+    const indLines =
+      typeof block.indemnidad === 'function' ? block.indemnidad(caseData) : block.indemnidad;
     addLines(indLines);
   }
 
@@ -127,7 +136,9 @@ export async function generateMandateDOCX(payload: MandatePayload): Promise<Uint
         alignment: AlignmentType.LEFT,
         children: [
           new TextRun({
-            text: block.seccion3Titulo || (block.firmaTipo === 'poder' ? 'LEY 2213 DE 2022:' : 'ANEXOS Y NOTIFICACIONES:'),
+            text:
+              block.seccion3Titulo ||
+              (block.firmaTipo === 'poder' ? 'LEY 2213 DE 2022:' : 'ANEXOS Y NOTIFICACIONES:'),
             bold: true,
             size: 24,
           }),
@@ -143,18 +154,38 @@ export async function generateMandateDOCX(payload: MandatePayload): Promise<Uint
     new Paragraph({
       alignment: AlignmentType.LEFT,
       spacing: { after: 120 },
-      children: [new TextRun({ text: '________________________________________________', bold: true, size: 24 })],
+      children: [
+        new TextRun({
+          text: '________________________________________________',
+          bold: true,
+          size: 24,
+        }),
+      ],
     })
   );
 
   if (block.firmaTipo === 'poder') {
-    children.push(new Paragraph({ children: [new TextRun({ text: 'EL PODERDANTE', bold: true, size: 24 })] }));
+    children.push(
+      new Paragraph({ children: [new TextRun({ text: 'EL PODERDANTE', bold: true, size: 24 })] })
+    );
   } else {
-    children.push(new Paragraph({ children: [new TextRun({ text: 'EL SOLICITANTE / PETICIONARIO', bold: true, size: 24 })] }));
+    children.push(
+      new Paragraph({
+        children: [new TextRun({ text: 'EL SOLICITANTE / PETICIONARIO', bold: true, size: 24 })],
+      })
+    );
   }
-  
-  children.push(new Paragraph({ children: [new TextRun({ text: `Nombre: ${payload.infractorName}`, size: 24 })] }));
-  children.push(new Paragraph({ children: [new TextRun({ text: `C.C. No. ${payload.infractorId}`, size: 24 })] }));
+
+  children.push(
+    new Paragraph({
+      children: [new TextRun({ text: `Nombre: ${payload.infractorName}`, size: 24 })],
+    })
+  );
+  children.push(
+    new Paragraph({
+      children: [new TextRun({ text: `C.C. No. ${payload.infractorId}`, size: 24 })],
+    })
+  );
 
   // Creación del Documento
   const doc = new Document({
@@ -163,7 +194,7 @@ export async function generateMandateDOCX(payload: MandatePayload): Promise<Uint
         properties: {
           page: {
             margin: {
-              top: 1440,    // 1 pulgada (1440 twips)
+              top: 1440, // 1 pulgada (1440 twips)
               right: 1440,
               bottom: 1440,
               left: 1440,

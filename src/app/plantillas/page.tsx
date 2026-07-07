@@ -2,7 +2,16 @@
 
 import React, { useEffect } from 'react';
 import Link from 'next/link';
-import { ShieldCheck, FileText, ArrowRight, ArrowLeft, Gavel, Scale, FileClock, XOctagon } from 'lucide-react';
+import {
+  ShieldCheck,
+  FileText,
+  ArrowRight,
+  ArrowLeft,
+  Gavel,
+  Scale,
+  FileClock,
+  XOctagon,
+} from 'lucide-react';
 import { DOCUMENT_TEMPLATES, DocumentType } from '@/lib/legal/document-templates';
 import { TarjetaPremium } from '@/components/ui/TarjetaPremium';
 import dynamic from 'next/dynamic';
@@ -66,7 +75,8 @@ const TEMPLATE_CARDS = [
   {
     id: 'tutela_silencio',
     title: DOCUMENT_TEMPLATES['tutela_silencio'].titulo,
-    description: 'Acción Constitucional cuando Tránsito no responde tu petición en 15 días hábiles.',
+    description:
+      'Acción Constitucional cuando Tránsito no responde tu petición en 15 días hábiles.',
     badge: 'Urgente',
     exito: '99%',
     precio: '$19.900',
@@ -93,12 +103,12 @@ export default function PlantillasPage() {
   };
 
   return (
-    <div 
+    <div
       className="min-h-screen bg-background selection:bg-primary/30 selection:text-primary-foreground py-16 px-4 md:px-8 pt-24 relative overflow-hidden group/layout"
       onMouseMove={handleMouseMove}
     >
       <MeshBackground />
-      
+
       {/* Spotlight Desktop (Sigue el ratón, oculto en móvil) */}
       <div
         className="pointer-events-none fixed inset-0 z-0 opacity-0 transition duration-300 group-hover/layout:opacity-100 hidden md:block"
@@ -116,11 +126,10 @@ export default function PlantillasPage() {
       />
 
       <div className="max-w-6xl mx-auto relative z-10">
-        
         {/* Botón de Regreso */}
         <div className="mb-12">
-          <Link 
-            href="/" 
+          <Link
+            href="/"
             className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 dark:text-zinc-400 bg-white dark:bg-zinc-900/50 backdrop-blur-sm border border-slate-200 dark:border-zinc-800 rounded-full hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors shadow-sm hover:text-slate-900 dark:hover:text-zinc-200"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -134,7 +143,8 @@ export default function PlantillasPage() {
             Documentos de Defensa
           </h1>
           <p className="text-lg md:text-xl text-slate-600 dark:text-zinc-400 max-w-2xl mx-auto">
-            Escoge el recurso legal que se adapte a tu caso, completa tus datos en tiempo real y descarga tu defensa elaborada profesionalmente.
+            Escoge el recurso legal que se adapte a tu caso, completa tus datos en tiempo real y
+            descarga tu defensa elaborada profesionalmente.
           </p>
         </div>
 
@@ -152,15 +162,17 @@ export default function PlantillasPage() {
                   {tpl.badge}
                 </span>
               </div>
-              
-              <h3 className="text-2xl font-bold text-slate-900 dark:text-zinc-100 mb-4 relative z-10 font-serif tracking-tight">{tpl.title}</h3>
-              
+
+              <h3 className="text-2xl font-bold text-slate-900 dark:text-zinc-100 mb-4 relative z-10 font-serif tracking-tight">
+                {tpl.title}
+              </h3>
+
               <div className="w-12 h-px bg-slate-200 dark:bg-zinc-800 mb-4" />
 
               <p className="text-slate-600 dark:text-zinc-400 text-sm leading-relaxed flex-grow relative z-10">
                 {tpl.description}
               </p>
-              
+
               {/* Bloque Comercial / Antigravity UX Touch */}
               <div className="mt-6 flex justify-between items-center relative z-10 pt-4 border-t border-slate-100 dark:border-zinc-800/50">
                 <div className="flex items-center gap-1.5">
@@ -168,13 +180,15 @@ export default function PlantillasPage() {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                   </span>
-                  <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">{tpl.exito} Éxito</span>
+                  <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                    {tpl.exito} Éxito
+                  </span>
                 </div>
                 <span className="font-mono text-sm font-bold text-slate-800 dark:text-zinc-200">
                   {tpl.precio}
                 </span>
               </div>
-              
+
               <Link
                 href={`/documentos/generador/${tpl.id.replace(/_/g, '-')}`}
                 className="mt-8 w-full bg-slate-900 hover:bg-blue-600 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-primary text-white font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors relative z-10"

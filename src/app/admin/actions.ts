@@ -278,13 +278,18 @@ export async function getConsultations(
       const safeData = serializeDataForNextJS(data) as Record<string, unknown>;
 
       // Enmascaramiento preventivo server-side para Zero-PII
-      const nombre = (data.nombre && data.nombre !== 'Sin Registrar' && data.nombre !== 'REQUIERE INGRESO MANUAL' && data.nombre !== 'NO REGISTRADO')
-        ? maskName(data.nombre)
-        : (data.nombre || '');
+      const nombre =
+        data.nombre &&
+        data.nombre !== 'Sin Registrar' &&
+        data.nombre !== 'REQUIERE INGRESO MANUAL' &&
+        data.nombre !== 'NO REGISTRADO'
+          ? maskName(data.nombre)
+          : data.nombre || '';
       const contacto = data.contacto ? maskPhone(data.contacto) : '';
-      const placa = (data.placa && data.placa !== 'N/A' && data.placa !== 'Sin Identificar')
-        ? maskPlate(data.placa)
-        : (data.placa || '');
+      const placa =
+        data.placa && data.placa !== 'N/A' && data.placa !== 'Sin Identificar'
+          ? maskPlate(data.placa)
+          : data.placa || '';
 
       return {
         ...safeData,
@@ -469,13 +474,18 @@ export async function getCases(idToken: string, pageSize: number = 20, lastDocId
       const safeData = serializeDataForNextJS(data) as Record<string, unknown>;
 
       // Enmascaramiento preventivo server-side para Zero-PII
-      const nombre = (data.nombre && data.nombre !== 'Sin Registrar' && data.nombre !== 'REQUIERE INGRESO MANUAL' && data.nombre !== 'NO REGISTRADO')
-        ? maskName(data.nombre)
-        : (data.nombre || '');
+      const nombre =
+        data.nombre &&
+        data.nombre !== 'Sin Registrar' &&
+        data.nombre !== 'REQUIERE INGRESO MANUAL' &&
+        data.nombre !== 'NO REGISTRADO'
+          ? maskName(data.nombre)
+          : data.nombre || '';
       const contacto = data.contacto ? maskPhone(data.contacto) : '';
-      const placa = (data.placa && data.placa !== 'N/A' && data.placa !== 'Sin Identificar')
-        ? maskPlate(data.placa)
-        : (data.placa || '');
+      const placa =
+        data.placa && data.placa !== 'N/A' && data.placa !== 'Sin Identificar'
+          ? maskPlate(data.placa)
+          : data.placa || '';
 
       return {
         ...safeData,
@@ -1251,7 +1261,7 @@ export async function updateReferralStatus(idToken: string, referralId: string, 
 export async function revealExpedienteSensitiveData(idToken: string, id: string) {
   try {
     const decodedToken = await requireAdminSession(idToken);
-    
+
     // Rate limit preventivo: 20 revelaciones por hora por admin
     const { rateLimit } = await import('@/lib/security/rate-limit');
     const rl = await rateLimit(`reveal-pii:${decodedToken.uid}`, 20, 60 * 1000 * 60);

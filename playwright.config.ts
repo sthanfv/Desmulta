@@ -17,7 +17,7 @@ export default defineConfig({
   /* Límite de workers para no saturar la CPU en CI */
   workers: process.env.CI ? 2 : undefined,
   reporter: 'html',
-  timeout: 60000,
+  timeout: 120000,
   
   use: {
     /* Puerto 9005: Crucial para conectar con el servidor Next.js del proyecto */

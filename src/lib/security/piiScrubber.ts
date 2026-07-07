@@ -16,7 +16,10 @@ export function sanitizePII(payload: string): string {
     .replace(/\b\d{8,10}\b/g, '[DOC_OCULTO]') // Cédulas colombianas (8-10 dígitos)
     .replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, '[EMAIL_OCULTO]') // Emails
     .replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi, '[TOKEN_OCULTO]') // UUIDs
-    .replace(/([?&](?:token|downloadToken|temp_token|code|ref|cedula)=)[^&\s"']+/gi, '$1[REDACTED]'); // Query params
+    .replace(
+      /([?&](?:token|downloadToken|temp_token|code|ref|cedula)=)[^&\s"']+/gi,
+      '$1[REDACTED]'
+    ); // Query params
 }
 
 /**

@@ -18,9 +18,9 @@ export interface CardSwapProps {
  * Índice 0 = frente, índice 1 = segunda, índice 2 = tercera (fondo).
  */
 const STACK_CONFIG = [
-  { x: 0,  y: 0,  scale: 1,    rotateZ: 0,   zIndex: 30, brightness: 1    },
-  { x: 20, y: 14, scale: 0.92, rotateZ: 2.5, zIndex: 20, brightness: 0.70 },
-  { x: 38, y: 26, scale: 0.84, rotateZ: 5,   zIndex: 10, brightness: 0.48 },
+  { x: 0, y: 0, scale: 1, rotateZ: 0, zIndex: 30, brightness: 1 },
+  { x: 20, y: 14, scale: 0.92, rotateZ: 2.5, zIndex: 20, brightness: 0.7 },
+  { x: 38, y: 26, scale: 0.84, rotateZ: 5, zIndex: 10, brightness: 0.48 },
 ];
 
 /** Resorte para avance de tarjetas desde el fondo hacia el frente */
@@ -80,8 +80,12 @@ export function CardSwap({
     };
   }, [triggerSwap, delay, pauseOnHover]);
 
-  const handleMouseEnter = () => { isHoveredRef.current = true; };
-  const handleMouseLeave = () => { isHoveredRef.current = false; };
+  const handleMouseEnter = () => {
+    isHoveredRef.current = true;
+  };
+  const handleMouseLeave = () => {
+    isHoveredRef.current = false;
+  };
 
   const handleDragEnd = (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     if (isSwapping) return;
@@ -115,20 +119,22 @@ export function CardSwap({
           return (
             <m.div
               key={React.isValidElement(card) ? (card.key ?? index) : index}
-              style={{
-                width: '100%',
-                height: '100%',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                zIndex: cfg.zIndex,
-                touchAction: isFront ? 'none' : 'auto',
-                willChange: 'transform, opacity',
-                originX: '50%',
-                originY: '50%',
-                // Escala de brillo ajustada: en modo claro el oscurecimiento no queda tan intenso
-                filter: `brightness(${cfg.brightness})`,
-              } as React.CSSProperties}
+              style={
+                {
+                  width: '100%',
+                  height: '100%',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  zIndex: cfg.zIndex,
+                  touchAction: isFront ? 'none' : 'auto',
+                  willChange: 'transform, opacity',
+                  originX: '50%',
+                  originY: '50%',
+                  // Escala de brillo ajustada: en modo claro el oscurecimiento no queda tan intenso
+                  filter: `brightness(${cfg.brightness})`,
+                } as React.CSSProperties
+              }
               className={isFront ? 'cursor-grab active:cursor-grabbing' : ''}
               drag={isFront ? true : false}
               dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}

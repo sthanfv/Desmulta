@@ -118,10 +118,9 @@ describe('Sentry Webhook API Route', () => {
     expect(data.success).toBe(true);
 
     // Esperar a que las promesas dinámicas (waitUntil) se resuelvan en el event loop
-    await new Promise(resolve => setTimeout(resolve, 50));
-
-    // Verificar que el fetch a Telegram se haya llamado con los parámetros esperados
-    expect(fetch).toHaveBeenCalledTimes(1);
+    await vi.waitFor(() => {
+      expect(fetch).toHaveBeenCalledTimes(1);
+    }, { timeout: 2000 });
     const fetchArgs = vi.mocked(fetch).mock.calls[0];
     expect(fetchArgs[0]).toBe('https://api.telegram.org/bottest-bot-token/sendMessage');
     const fetchConfig = fetchArgs[1] as RequestInit;

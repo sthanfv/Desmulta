@@ -36,9 +36,7 @@ function ConfirmacionContent() {
     const checkStatus = async (): Promise<boolean> => {
       try {
         const downloadToken =
-          (typeof window !== 'undefined' &&
-            sessionStorage.getItem(`download_token_${ref}`)) ||
-          '';
+          (typeof window !== 'undefined' && sessionStorage.getItem(`download_token_${ref}`)) || '';
         const res = await fetch(`/api/payments/status?ref=${ref}&downloadToken=${downloadToken}`);
         if (!res.ok) return false;
         const data = await res.json();
@@ -108,9 +106,7 @@ function ConfirmacionContent() {
       try {
         // Recuperar el token de descarga de sessionStorage
         const downloadToken =
-          (typeof window !== 'undefined' &&
-            sessionStorage.getItem(`download_token_${ref}`)) ||
-          '';
+          (typeof window !== 'undefined' && sessionStorage.getItem(`download_token_${ref}`)) || '';
         // Usar el cerebro premium del servidor para descargar el archivo unificado
         window.location.href = `/api/documentos/download?ref=${ref}&downloadToken=${downloadToken}&format=pdf`;
       } catch (err) {
@@ -122,9 +118,7 @@ function ConfirmacionContent() {
     const handleDownloadWord = async () => {
       try {
         const downloadToken =
-          (typeof window !== 'undefined' &&
-            sessionStorage.getItem(`download_token_${ref}`)) ||
-          '';
+          (typeof window !== 'undefined' && sessionStorage.getItem(`download_token_${ref}`)) || '';
         window.location.href = `/api/documentos/download?ref=${ref}&downloadToken=${downloadToken}&format=docx`;
       } catch (err) {
         console.error('Error iniciando descarga Word:', err);

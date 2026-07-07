@@ -148,11 +148,9 @@ const peticionGeneral: DocumentBlock = {
         `- Las obligaciones descritas tienen una antiguedad aproximada de ${d.antiguedad} desde su fecha de imposicion.`
       );
     }
-    
+
     if (d.fechaHechos) {
-      listado.push(
-        `- Fecha(s) de los hechos o infracciones: ${d.fechaHechos}.`
-      );
+      listado.push(`- Fecha(s) de los hechos o infracciones: ${d.fechaHechos}.`);
     }
 
     listado.push(

@@ -162,7 +162,7 @@ export async function POST(req: NextRequest) {
         paidCents: amountConfirmadoPorWompi,
         expectedCents: purchase.amountCop,
         flaggedAt: new Date(),
-      }
+      },
     });
     return NextResponse.json({ ok: true, flagged: true });
   }
@@ -176,7 +176,6 @@ export async function POST(req: NextRequest) {
 
   // ── Paso 9: Si fue APPROVED → entregar el PDF de forma segura ─────────────
   if (status === 'APPROVED') {
-
     if (purchase) {
       /**
        * CORRECCIÓN CRÍTICA (auditoría 2026-06-22):

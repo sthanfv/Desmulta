@@ -50,7 +50,7 @@ test.describe('God Mode Easter Egg', () => {
     await shieldContainer.waitFor({ state: 'visible' });
     
     // 1. Ejecutar el Easter Egg (Triple Clic veloz)
-    await shieldContainer.dispatchEvent('click', { detail: 3 });
+    await shieldContainer.click({ clickCount: 3, force: true, delay: 50 });
 
     // 2. Esperar a que se complete la navegación a la página de auditoría
     await page.waitForURL(/\/admin\/auditoria.*/, { timeout: 30000, waitUntil: 'domcontentloaded' });

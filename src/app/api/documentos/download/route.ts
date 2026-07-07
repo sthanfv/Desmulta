@@ -130,8 +130,8 @@ export async function GET(req: NextRequest) {
       const expiresAt = purchase.downloadTokenExpiresAt?.toDate
         ? purchase.downloadTokenExpiresAt.toDate()
         : purchase.downloadTokenExpiresAt
-        ? new Date(purchase.downloadTokenExpiresAt)
-        : null;
+          ? new Date(purchase.downloadTokenExpiresAt)
+          : null;
 
       if (expiresAt && new Date() > expiresAt) {
         return new NextResponse('El enlace de descarga ha expirado (límite 72 horas).', {
@@ -175,7 +175,7 @@ export async function GET(req: NextRequest) {
           ? purchase.paidAt.toDate().toISOString()
           : new Date().toISOString(),
       };
-      
+
       const fileExt = format === 'docx' ? 'docx' : 'pdf';
       filename = `Documento_Desmulta_${purchase.caseData?.shortId || refId.slice(-8).toUpperCase()}.${fileExt}`;
     } else {
