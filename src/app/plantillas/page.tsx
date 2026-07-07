@@ -186,12 +186,12 @@ export default function PlantillasPage() {
           ))}
         </div>
 
-        {/* Antigravity Footer Signature */}
+        {/* Firma Desmulta */}
         <div className="mt-24 pb-8 flex flex-col items-center justify-center opacity-40 hover:opacity-100 transition-opacity duration-500">
           <div className="w-px h-12 bg-gradient-to-b from-transparent via-slate-400 dark:via-zinc-600 to-transparent mb-4" />
           <p className="text-xs text-slate-500 dark:text-zinc-500 font-mono tracking-widest flex items-center gap-3">
             <span className="text-primary/50">{'///'}</span>
-            CO-CRAFTED BY ANTIGRAVITY
+            DOCUMENTOS DE DEFENSA · DESMULTA
             <span className="text-primary/50">{'///'}</span>
           </p>
         </div>

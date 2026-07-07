@@ -253,7 +253,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
                     ejecutoriedad del cobro...
                   </p>
                 </div>
-                <div className="mt-auto pt-3 border-t border-zinc-200 dark:border-zinc-900 bg-white/95 dark:bg-[#120F17]/95">
+                <div className="mt-auto pt-3 border-t border-border bg-card">
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2.5 py-0.5 rounded-full font-bold border border-emerald-500/20">
                       95% Éxito
@@ -298,7 +298,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
                     establecido por la ley...
                   </p>
                 </div>
-                <div className="mt-auto pt-3 border-t border-zinc-200 dark:border-zinc-900 bg-white/95 dark:bg-[#120F17]/95">
+                <div className="mt-auto pt-3 border-t border-border bg-card">
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2.5 py-0.5 rounded-full font-bold border border-emerald-500/20">
                       98% Éxito
@@ -343,7 +343,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
                     remate o pago efectivo...
                   </p>
                 </div>
-                <div className="mt-auto pt-3 border-t border-zinc-200 dark:border-zinc-900 bg-white/95 dark:bg-[#120F17]/95">
+                <div className="mt-auto pt-3 border-t border-border bg-card">
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2.5 py-0.5 rounded-full font-bold border border-emerald-500/20">
                       94% Éxito
@@ -388,7 +388,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
                     consagrado en el artículo 29 de la C.P...
                   </p>
                 </div>
-                <div className="mt-auto pt-3 border-t border-zinc-200 dark:border-zinc-900 bg-white/95 dark:bg-[#120F17]/95">
+                <div className="mt-auto pt-3 border-t border-border bg-card">
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2.5 py-0.5 rounded-full font-bold border border-emerald-500/20">
                       96% Éxito
@@ -433,7 +433,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
                     ejercicio de mis derechos...
                   </p>
                 </div>
-                <div className="mt-auto pt-3 border-t border-zinc-200 dark:border-zinc-900 bg-white/95 dark:bg-[#120F17]/95">
+                <div className="mt-auto pt-3 border-t border-border bg-card">
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2.5 py-0.5 rounded-full font-bold border border-emerald-500/20">
                       99% Éxito

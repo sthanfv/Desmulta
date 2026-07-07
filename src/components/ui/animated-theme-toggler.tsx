@@ -105,7 +105,7 @@ function getThemeTransitionClipPaths(
       return [polygonCollapsed(cx, cy, 4), `polygon(${end})`]
     }
     case "star": {
-      // Small overscan so the last frames never leave a 1px seam before the transition group ends.
+      // Pequeño overscan para que los últimos frames nunca dejen una costura de 1px
       const R = maxRadius * Math.SQRT2 * 1.03
       const innerRatio = 0.42
       const starPolygon = (radius: number) => {
@@ -135,7 +135,7 @@ function getThemeTransitionClipPaths(
 
 export const AnimatedThemeToggler = ({
   className,
-  duration = 400,
+  duration = 500,
   variant,
   fromCenter = false,
   theme,
@@ -191,11 +191,13 @@ export const AnimatedThemeToggler = ({
 
     const applyTheme = () => {
       const newTheme = !isDark
-      // Always toggle the class synchronously so the View Transitions API
-      // snapshots the new theme inside the startViewTransition callback.
+      // Siempre alternar la clase sincrónicamente para que la View Transitions API
+      // tome la instantánea del nuevo tema dentro del callback startViewTransition
       document.documentElement.classList.toggle("dark")
-      document.documentElement.style.setProperty('color-scheme', newTheme ? 'dark' : 'light');
-      
+      document.documentElement.style.setProperty(
+        'color-scheme',
+        newTheme ? 'dark' : 'light'
+      )
       if (isControlled) {
         onThemeChange?.(newTheme ? "dark" : "light")
       } else {
@@ -224,8 +226,8 @@ export const AnimatedThemeToggler = ({
       "--magicui-theme-toggle-vt-duration",
       `${duration}ms`
     )
-    // Pin the collapsed clip-path via CSS so Firefox does not paint the new
-    // theme unclipped between snapshot and the ready.then() JS animation.
+    // Fijar el clip-path colapsado vía CSS para que Firefox no pinte el nuevo
+    // tema sin recortar entre la instantánea y la animación en ready.then()
     root.style.setProperty("--magicui-theme-vt-clip-from", clipPath[0])
     const cleanup = () => {
       delete root.dataset.magicuiThemeVt
@@ -246,12 +248,10 @@ export const AnimatedThemeToggler = ({
     if (ready && typeof ready.then === "function") {
       ready.then(() => {
         document.documentElement.animate(
-          {
-            clipPath,
-          },
+          { clipPath },
           {
             duration,
-            // Star: linear avoids easing overshoot that fights polygon interpolation at t→1; VT group duration is synced above.
+            // Star: linear evita el overshoot del easing que lucha contra la interpolación de polígonos
             easing: shape === "star" ? "linear" : "ease-in-out",
             fill: "forwards",
             pseudoElement: "::view-transition-new(root)",
@@ -266,15 +266,34 @@ export const AnimatedThemeToggler = ({
       type="button"
       ref={buttonRef}
       onClick={toggleTheme}
-      className={cn(className)}
+      aria-label={isDark ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
+      className={cn(
+        "relative flex items-center justify-center overflow-hidden",
+        className
+      )}
       {...props}
     >
-      {isDark ? (
-        <Sun className="h-[1.2rem] w-[1.2rem] text-amber-500 transition-all dark:-rotate-90" />
-      ) : (
-        <Moon className="h-[1.2rem] w-[1.2rem] text-blue-400 transition-all dark:rotate-0" />
-      )}
-      <span className="sr-only">Toggle theme</span>
+      {/* Sol — visible en modo oscuro */}
+      <Sun
+        className={cn(
+          "absolute h-[1.15rem] w-[1.15rem] text-amber-400 transition-all duration-300",
+          isDark
+            ? "rotate-0 scale-100 opacity-100"
+            : "rotate-90 scale-0 opacity-0"
+        )}
+      />
+      {/* Luna — visible en modo claro */}
+      <Moon
+        className={cn(
+          "absolute h-[1.15rem] w-[1.15rem] text-slate-600 dark:text-slate-300 transition-all duration-300",
+          isDark
+            ? "-rotate-90 scale-0 opacity-0"
+            : "rotate-0 scale-100 opacity-100"
+        )}
+      />
+      <span className="sr-only">
+        {isDark ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
+      </span>
     </button>
   )
 }

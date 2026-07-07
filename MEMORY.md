@@ -1,5 +1,58 @@
 # MEMORY.md - Historial del Sistema
 
+## 2026-07-06: Correcciones CardSwap Modo Claro + Footer Plantillas
+- **Qué cambió:**
+  - **[CardSwap]**: El overlay de profundidad ahora usa `rgba(0,0,0,0.18)` en lugar de `bg-background`, lo que crea una sombra de papel real en modo claro (las tarjetas de atrás se ven oscurecidas, no blancas).
+  - **[Hero.tsx]**: Los 5 fondos hardcodeados `bg-white/95 dark:bg-[#120F17]/95` de la sección de precio/botón de cada folio fueron reemplazados por `bg-card` (variable CSS del tema).
+  - **[Plantillas]**: La firma del pie de página cambió de `CO-CRAFTED BY ANTIGRAVITY` a `DOCUMENTOS DE DEFENSA · DESMULTA` en español.
+- **Archivos afectados:**
+  - `src/components/ui/CardSwap.tsx` [MODIFICADO]
+  - `src/components/sections/Hero.tsx` [MODIFICADO]
+  - `src/app/plantillas/page.tsx` [MODIFICADO]
+
+## 2026-07-06: Refinamiento AnimatedThemeToggler + CardSwap Modo Claro/Oscuro
+- **Qué cambió:**
+  - **[UI - Theme Toggler]**: Se actualizó `animated-theme-toggler.tsx` a la versión más reciente de MagicUI:
+    - El ícono Sol/Luna ahora usa animación cruzada con `rotate + scale + opacity` (ambos montados simultáneamente con `absolute`, permutando visibilidad). Esto da el efecto de swap premium del video.
+    - Se añadió `aria-label` en español dinámico según el tema activo.
+    - Duración subida a 500ms para un reveal circular más fluido.
+    - Comentarios de código migrados al español.
+  - **[CSS - View Transitions]**: Se mejoró el bloque de `globals.css` para el toggler:
+    - Se añadió la regla `html[data-magicui-theme-vt="active"]::view-transition-new(root) { clip-path: var(--magicui-theme-vt-clip-from) }` para compatibilidad con Firefox (evita el flash de tema sin recortar).
+    - Se añadió fallback `500ms` a la variable CSS del grupo de transición.
+  - **[UI - CardSwap]**: Se corrigió el soporte de modo claro/oscuro:
+    - Eliminados colores hardcodeados (`#120F17`, `rgba(255,255,255,0.08)`).
+    - La tarjeta ahora usa clases Tailwind `bg-card text-card-foreground border-border` para responder automáticamente al tema.
+    - El `filter: brightness()` se movió al `m.div` contenedor (correcto para Framer Motion).
+    - El overlay de profundidad usa `bg-background` (variable CSS) en lugar de `rgba(0,0,0)` para funcionar en ambos temas.
+- **Por qué cambió:**
+  - El CardSwap en modo claro mostraba fondo negro hardcodeado. El toggler necesitaba la animación Sol⇄Luna cruzada y compatibilidad Firefox.
+- **Archivos afectados:**
+  - `src/components/ui/animated-theme-toggler.tsx` [MODIFICADO]
+  - `src/components/ui/CardSwap.tsx` [MODIFICADO]
+  - `src/app/globals.css` [MODIFICADO]
+- **Decisiones Técnicas:**
+  - Se usan ambos íconos montados simultáneamente (`absolute`) con transición CSS para el swap Sol/Luna, en lugar de renderizado condicional, para evitar re-mounts que interrumpan la animación.
+
+## 2026-07-06: Refinamiento Efecto de Baraja CardSwap (Spring Physics)
+- **Qué cambió:**
+  - **[UI - Animaciones]**: Se reescribió completamente la lógica de animación de `CardSwap.tsx` para lograr un efecto fluido de "baraja de documentos".
+  - Se introdujo `STACK_CONFIG`: un array de configuraciones por capa que define `x`, `y`, `scale`, `rotateZ`, `zIndex` y `brightness` para cada posición (frente, segunda, fondo), en lugar de cálculos dinámicos con multiplicadores.
+  - La tarjeta **frontal al salir** ahora anima hacia abajo-derecha con `rotateZ: 14` y `opacity: 0` usando `EXIT_SPRING` (resorte rápido), simulando que se empuja la carta al fondo de la baraja.
+  - Las tarjetas de **fondo avanzan fluidamente** hacia su nueva posición con `SPRING_IN` (stiffness=300, damping=30) creando la ilusión de que el documento de atrás sube al frente.
+  - La tarjeta **nueva que entra** al DOM parte desde la posición del fondo del stack (`initial` = posición 2 del STACK_CONFIG), lo que hace perceptible y fluida su entrada.
+  - El `drag` ahora acepta **ambos ejes (x e y)** con umbral de 60px, haciendo el gesto de swipe más natural y responsivo en móvil.
+  - Se agregó `filter: brightness(cfg.brightness)` por capa para dar sensación real de profundidad en el stack.
+  - Se migró `triggerSwap` a `useCallback` y se corrigió la dependencia del `useEffect` del timer para evitar stale closures.
+- **Por qué cambió:**
+  - El efecto anterior era abrupto: la tarjeta salía deslizándose a la izquierda sin rotación ni física, y las tarjetas del fondo no avanzaban de forma perceptible. Se solicitó un efecto tipo "baraja de cartas/documentos" donde el siguiente documento emerge fluidamente desde atrás.
+- **Archivos afectados:**
+  - `src/components/ui/CardSwap.tsx` [MODIFICADO]
+- **Decisiones Técnicas:**
+  - Se usó `AnimatePresence mode="popLayout" initial={false}` para que las tarjetas nuevas que entran al DOM no disparen el `initial` en las ya existentes.
+  - Se eliminó la prop `cardDistance` y `verticalDistance` del destructuring (se mantienen en la interfaz para compatibilidad) ya que la lógica nueva usa `STACK_CONFIG` centralizado.
+  - El timeout del swap se ajustó a 440ms para coincidir con la duración del `EXIT_SPRING`.
+
 ## 2026-07-05: Implementación de Opción de Descarga en Word (.docx)
 - **Qué cambió:**
   - **[Backend]**: Se integró la librería `docx` y se creó `src/lib/legal/docx-engine.ts`, un motor generador de documentos Word nativos que replica la estructura y legalidad del `pdf-engine.ts`.
@@ -18,6 +71,7 @@
   - **[CSS]**: Se eliminó la regla `::view-transition-group(*)` en `globals.css` que interfería con Framer Motion, causando que la animación de modo oscuro atrapara por error a las tarjetas de fondo.
   - **[UI]**: En `CardSwap.tsx`, se invirtió la dirección horizontal a `-depth * cardDistance` para que las tarjetas regresen a apuntar hacia la izquierda en vez de la derecha.
   - **[UI - Animaciones]**: Se reescribió la animación de barajar del `CardSwap`. La opacidad transparente fue removida (para que las letras de atrás no se transparenten hacia adelante). En su lugar se usa un overlay negro/blanco interno para crear profundidad, y la tarjeta principal ahora sale con un *slide* sólido a la izquierda antes de entrar al final del maso.
+  - **[Seguridad - CSP]**: Se re-habilitó la regla `'unsafe-inline'` para `style-src` en los encabezados de seguridad de producción (`security-headers.ts`). El widget de Wompi inyecta atributos de estilo en el DOM de forma dinámica y la restricción previa causaba una falla bloqueante en el constructor `WidgetCheckout`.
 - **Archivos afectados:**
   - `src/app/globals.css` [MODIFICADO]
   - `src/components/ui/CardSwap.tsx` [MODIFICADO]

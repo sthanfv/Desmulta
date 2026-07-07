@@ -747,7 +747,20 @@ body {
   mix-blend-mode: normal;
 }
 
-/* Scoped to AnimatedThemeToggler — the toggler sets the data-attribute and the variable only during a theme toggle. */
+/* ─── AnimatedThemeToggler (MagicUI) ─────────────────────────────────────────
+ * Estas reglas están delimitadas al atributo data-magicui-theme-vt="active"
+ * que el toggler inyecta en <html> SOLO durante el toggle activo.
+ * Esto evita interferir con cualquier otra View Transition de la app (Next.js, etc.)
+ * ──────────────────────────────────────────────────────────────────────────── */
 html[data-magicui-theme-vt="active"]::view-transition-group(root) {
-  animation-duration: var(--magicui-theme-toggle-vt-duration);
+  animation-duration: var(--magicui-theme-toggle-vt-duration, 500ms);
+}
+
+/*
+ * Firefox: Clavar el clip-path colapsado en la snapshot "nueva" desde el
+ * inicio, para que no se vea el tema sin recortar en los primeros frames
+ * antes de que el JS asíncrono de ready.then() arrange la animación.
+ */
+html[data-magicui-theme-vt="active"]::view-transition-new(root) {
+  clip-path: var(--magicui-theme-vt-clip-from);
 }
