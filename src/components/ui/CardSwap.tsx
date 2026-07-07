@@ -127,7 +127,7 @@ export function CardSwap({
                   top: 0,
                   left: 0,
                   zIndex: cfg.zIndex,
-                  touchAction: isFront ? 'none' : 'auto',
+                  touchAction: isFront ? 'pan-y' : 'auto',
                   willChange: 'transform, opacity',
                   originX: '50%',
                   originY: '50%',

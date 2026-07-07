@@ -279,7 +279,8 @@ export function TouchDebugger() {
     (e: TouchEvent) => {
       const touch = e.touches[0];
       if (!touch) return;
-      const isInCorner = touch.clientX < 100 && touch.clientY > window.innerHeight - 100;
+      // Ampliado a 150x150px para facilitar el acceso en pantallas grandes/pequeñas
+      const isInCorner = touch.clientX < 150 && touch.clientY > window.innerHeight - 150;
       if (!isInCorner) return;
 
       const now = Date.now();
@@ -294,7 +295,8 @@ export function TouchDebugger() {
 
       if (newTaps.length === 5) {
         const span = newTaps[4] - newTaps[0];
-        if (span < 1500) {
+        // Aumentado a 2500ms (2.5 segundos) para dar tiempo al usuario de hacer los 5 taps
+        if (span < 2500) {
           tapTimesRef.current = [];
           setTapCount(0);
           if (tapCountResetTimer.current) clearTimeout(tapCountResetTimer.current);
