@@ -21,6 +21,13 @@
   - El sistema de generación de PDF sobreescribía el token de descarga original en Firestore (36 chars UUID) por uno nuevo en formato Hex (48 chars). Esto provocaba que, al intentar el frontend validar el estado de la compra usando el token almacenado en su sesión, recibiera un error `401 Unauthorized (IDOR detectado)` porque los tokens ya no coincidían. 
 - **Archivos afectados:**
   - `src/lib/payments/pdf-delivery.ts` [MODIFICADO]
+## 2026-07-07 (Mejora): Legibilidad de Listas en Plantillas Legales
+- **Qué cambió:**
+  - En `src/lib/legal/document-templates.ts`, se reemplazaron los números romanos en minúscula `(i), (ii), (iii)` por numeración arábiga estándar `1., 2., 3.` en las plantillas de Tutela y Nulidad.
+- **Por qué cambió:**
+  - El usuario reportó confusión visual al leer `(i)` considerándolo letras en minúscula. El uso de numeración arábiga es más natural y convencional en documentos legales nacionales para listar causales o hechos.
+- **Archivos afectados:**
+  - `src/lib/legal/document-templates.ts` [MODIFICADO]
 
 ## 2026-07-06: Estabilización de E2E para Entornos de Hardware Limitado (Flaky Tests)
 - **Qué cambió:**
