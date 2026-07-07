@@ -6,7 +6,7 @@ test.describe('Flujo E2E - Generador Derecho de Petición', () => {
     await page.goto('/documentos/generador/peticion-general');
 
     // 2. Verificar carga correcta de la interfaz
-    await expect(page.getByText('Derecho de Peticion', { exact: false }).first()).toBeVisible();
+    await expect(page.getByText(/Derecho de Petición/i).first()).toBeVisible();
     await expect(page.getByText('Tu Nombre Completo')).toBeVisible();
 
     // 3. Llenar los datos como un usuario real

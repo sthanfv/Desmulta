@@ -29,7 +29,7 @@ test.describe('Generador de Documentos (Freemium Builder)', () => {
     await page.goto('/documentos/generador/peticion-general');
 
     // 2. Verificar que los elementos visuales cargaron
-    await expect(page.getByText('Derecho de Peticion', { exact: false }).first()).toBeVisible();
+    await expect(page.getByText(/Derecho de Petición/i).first()).toBeVisible();
     await expect(page.getByText('Yo,', { exact: false }).first()).toBeVisible();
     await expect(page.getByRole('button', { name: /Pagar y Descargar/i })).toBeVisible();
 
