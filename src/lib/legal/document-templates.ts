@@ -53,12 +53,12 @@ export interface DocumentBlock {
 }
 
 const getApoderado = () => {
-  const name = process.env.OPERATOR_LEGAL_NAME;
-  const id = process.env.OPERATOR_LEGAL_ID;
+  const name = process.env.OPERATOR_LEGAL_NAME || process.env.DEFAULT_OPERATOR_NAME;
+  const id = process.env.OPERATOR_LEGAL_ID || process.env.DEFAULT_OPERATOR_ID;
   if (!name || !id) {
     if (process.env.NODE_ENV === 'production') {
       console.warn(
-        '[Seguridad] OPERATOR_LEGAL_NAME o OPERATOR_LEGAL_ID no configurados. Usando fallback legal genérico.'
+        '[Seguridad] OPERATOR_LEGAL_NAME o DEFAULT_OPERATOR_NAME no configurados. Usando fallback legal genérico.'
       );
       return 'Abogado de Apoyo Legal Desmulta';
     }
@@ -67,7 +67,7 @@ const getApoderado = () => {
   return `${name}, C.C. No. ${id}`;
 };
 const placa = (d: CaseDataForPDF) =>
-  d.licensePlate && d.licensePlate !== 'N/A' ? `, vehiculo placa ${d.licensePlate}` : '';
+  d.licensePlate && d.licensePlate !== 'N/A' ? `, vehículo placa ${d.licensePlate}` : '';
 
 // ═══════════════════════════════════════════════════════════════════
 // 0. PODER ESPECIAL DE GESTIÓN (Aislado)
@@ -89,7 +89,7 @@ const poderEspecial: DocumentBlock = {
     'Interponer recursos de reposición, apelación y queja.',
     'Presentar derechos de petición, solicitudes de revocatoria directa y prescripción.',
     'Suscribir acuerdos de pago y solicitar liquidaciones.',
-    'Desistimiento y cualquier otra facultad necesaria para el buen recaudo y defensa de mis intereses.',
+    'Desistimiento y cualquier otra facultad necesaria para el buen recaudó y defensa de mis intereses.',
   ],
   indemnidad: [
     'Eximo a mi apoderado de toda responsabilidad que derive de la inexactitud de la información',
@@ -108,7 +108,7 @@ const poderEspecial: DocumentBlock = {
 // 1. DERECHO DE PETICIÓN GENERAL
 // ═══════════════════════════════════════════════════════════════════
 const peticionGeneral: DocumentBlock = {
-  titulo: 'DERECHO DE PETICION',
+  titulo: 'DERECHO DE PETICIÓN',
   subtitulo: '(Art. 23 C.P. — Ley 1437 de 2011 CPACA — Ley 769 de 2002)',
   nombreArchivo: 'Peticion_General',
   fundamentosTitulo: 'II. FUNDAMENTOS JURIDICOS Y CAUSALES DE RECLAMACION:',
@@ -120,13 +120,13 @@ const peticionGeneral: DocumentBlock = {
       `PETICIONARIO: ${d.infractorName} (C.C. No. ${d.infractorId})`,
       ``,
       `Yo, ${d.infractorName}, mayor de edad, identificado(a) con C.C. No. ${d.infractorId},`,
-      `actuando en mi propio nombre y representacion, en ejercicio del Derecho de Peticion`,
-      `consagrado en el Articulo 23 de la Constitucion Politica de Colombia y la`,
+      `actuando en mi propio nombre y representación, en ejercicio del Derecho de Petición`,
+      `consagrado en el Articulo 23 de la Constitución Política de Colombia y la`,
       `Ley 1437 de 2011, me dirijo a ustedes muy respetuosamente para solicitar la declaratoria`,
-      `de prescripcion y/o nulidad de las obligaciones contravencionales que figuran en su sistema.`,
+      `de prescripción y/o nulidad de las obligaciones contravencionales que figuran en su sistema.`,
       ``,
-      `I. HECHOS Y OBLIGACIONES OBJETO DE PETICION:`,
-      `Figuran a mi nombre en su organismo de transito las siguientes obligaciones contravencionales:`,
+      `I. HECHOS Y OBLIGACIONES OBJETO DE PETICIÓN:`,
+      `Figuran a mi nombre en su organismo de tránsito las siguientes obligaciones contravencionales:`,
     ];
 
     if (d.ticketNumber && d.ticketNumber !== 'POR_DEFINIR') {
@@ -139,7 +139,7 @@ const peticionGeneral: DocumentBlock = {
       );
     } else {
       listado.push(
-        `- Obligaciones contravencionales asociadas a mi identificacion y/o vehiculos registrados en su jurisdiccion.`
+        `- Obligaciones contravencionales asociadas a mi identificación y/o vehículos registrados en su jurisdicción.`
       );
     }
 
@@ -161,13 +161,13 @@ const peticionGeneral: DocumentBlock = {
     return listado;
   },
   facultades: [
-    'DECLARAR LA PRESCRIPCION de oficio de la(s) obligacion(es) si existieren.',
+    'DECLARAR LA PRESCRIPCION de oficio de la(s) obligación(es) si existieren.',
     'ORDENAR EL LEVANTAMIENTO de medidas cautelares (embargos) si existieren.',
-    'EXPEDIR OFICIOS DE DESEMBARGO originales y remitirlos al correo electronico.',
+    'EXPEDIR OFICIOS DE DESEMBARGO originales y remitirlos al correo electrónico.',
     'ACTUALIZAR SIMIT Y RUNT con saldo en cero ($0).',
   ],
   indemnidad: (d) => [
-    'Para efectos de notificaciones, recibire comunicaciones en el correo electronico:',
+    'Para efectos de notificaciones, recibire comunicaciones en el correo electrónico:',
     `${d.citizenEmail || 'contactodesmulta@protonmail.com'}`,
   ],
   protocolo2213: (d) => [
@@ -186,36 +186,36 @@ const prescripcionDirecta: DocumentBlock = {
   cuerpo: (d) => [
     `Yo, ${d.infractorName}, identificado(a) con C.C. No. ${d.infractorId},`,
     `actuando en mi propio nombre, otorgo PODER ESPECIAL a ${getApoderado()},`,
-    `para que en mi nombre solicite ante la Secretaria de Transito competente`,
-    `la declaratoria de PRESCRIPCION EXTINTIVA de la(s) multa(s) de transito`,
-    `registradas a mi nombre${placa(d)}${d.ticketNumber && d.ticketNumber !== 'POR_DEFINIR' ? ' bajo la(s) resolucion(es) o comparendo(s) ' + d.ticketNumber : ''}.`,
+    `para que en mi nombre solicite ante la Secretaría de Tránsito competente`,
+    `la declaratoria de PRESCRIPCION EXTINTIVA de la(s) multa(s) de tránsito`,
+    `registradas a mi nombre${placa(d)}${d.ticketNumber && d.ticketNumber !== 'POR_DEFINIR' ? ' bajo la(s) resolución(es) o comparendo(s) ' + d.ticketNumber : ''}.`,
     ``,
     d.fechaHechos ? `Los hechos ocurrieron en la(s) siguiente(s) fecha(s): ${d.fechaHechos}.` : '',
     d.fechaHechos ? `` : '',
     `FUNDAMENTO DE DERECHO:`,
-    `El Art. 159 de la Ley 769 de 2002 (Codigo Nacional de Transito) establece`,
-    `que las sanciones de transito prescriben en TRES (3) ANOS contados desde`,
+    `El Art. 159 de la Ley 769 de 2002 (Codigo Nacional de Tránsito) establece`,
+    `que las sanciones de tránsito prescriben en TRES (3) AÑOS contados desde`,
     `la ocurrencia del hecho, cuando no se ha proferido mandamiento de pago.`,
-    `Han transcurrido mas de tres (3) anos sin interrupcion valida del termino.`,
-    `La prescripcion opera de pleno derecho y debe ser declarada de oficio`,
+    `Han transcurrido más de tres (3) años sin interrupcion valida del termino.`,
+    `La prescripción opera de pleno derecho y debe ser declarada de oficio`,
     `por la entidad (Sentencia C-980 de 2010, Corte Constitucional).`,
   ],
   facultades: [
-    'Presentar la solicitud formal de prescripcion extintiva ante la entidad.',
+    'Presentar la solicitud formal de prescripción extintiva ante la entidad.',
     'Aportar pruebas de la antiguedad de la infraccion y de la inactividad.',
-    'Recibir la resolucion de declaratoria de prescripcion.',
-    'Interponer recursos de reposicion y apelacion ante cualquier negativa.',
+    'Recibir la resolución de declaratoria de prescripción.',
+    'Interponer recursos de reposicion y apelación ante cualquier negativa.',
     'Solicitar la exclusion definitiva del registro en el SIMIT.',
   ],
   indemnidad: [
-    'Manifiesto bajo juramento que la informacion sobre la antiguedad de',
+    'Manifiesto bajo juramento que la información sobre la antiguedad de',
     'la infraccion es veraz. Asumo plena responsabilidad por la exactitud',
     'de los datos y eximo al apoderado de cualquier responsabilidad derivada',
-    'de informacion incorrecta o desactualizada por mi suministrada.',
+    'de información incorrecta o desactualizada por mi suministrada.',
   ],
   protocolo2213: (d) => [
     `Perfeccionamiento conforme a la Ley 2213 de 2022 (Art. 2):`,
-    `Remitir documento escaneado con firma olografa y copia del documento`,
+    `Remitir documento escaneado con firma ológrafa y copia del documento`,
     `de identidad desde: ${d.citizenEmail || '[correo del poderdante]'}`,
     `hacia: contactodesmulta@protonmail.com`,
     `Referencia: ${(d.caseId || d.shortId).replace(/CASE/gi, 'EXP')}`,
@@ -233,42 +233,42 @@ const doblePrescripcion: DocumentBlock = {
     `Yo, ${d.infractorName}, identificado(a) con C.C. No. ${d.infractorId},`,
     `otorgo PODER ESPECIAL AMPLIO a ${getApoderado()},`,
     `para que en mi nombre solicite la declaratoria de PRESCRIPCION EXTINTIVA`,
-    `POR DOBLE TERMINO de la(s) multa(s) de transito`,
-    `registradas a mi nombre${placa(d)}${d.ticketNumber && d.ticketNumber !== 'POR_DEFINIR' ? ' bajo la(s) resolucion(es) o comparendo(s) ' + d.ticketNumber : ''}.`,
+    `POR DOBLE TERMINO de la(s) multa(s) de tránsito`,
+    `registradas a mi nombre${placa(d)}${d.ticketNumber && d.ticketNumber !== 'POR_DEFINIR' ? ' bajo la(s) resolución(es) o comparendo(s) ' + d.ticketNumber : ''}.`,
     ``,
     d.fechaHechos ? `Los hechos asociados registran fecha(s): ${d.fechaHechos}.` : '',
     d.fechaHechos ? `` : '',
     `PRIMER TERMINO (Art. 159 C.N.T.):`,
-    `Han transcurrido mas de TRES (3) ANOS desde la fecha de la infraccion`,
-    `original sin interrupcion valida por parte de la entidad de transito.`,
+    `Han transcurrido más de TRES (3) AÑOS desde la fecha de la infraccion`,
+    `original sin interrupcion valida por parte de la entidad de tránsito.`,
     ``,
     `SEGUNDO TERMINO (Art. 2535 C.C. aplicado por analogia):`,
-    `Han transcurrido ademas mas de TRES (3) ANOS desde la notificacion del`,
+    `Han transcurrido ademas más de TRES (3) AÑOS desde la notificación del`,
     `mandamiento de pago o inicio del cobro coactivo, sin que la entidad`,
     `haya adelantado actuaciones efectivas de cobro que interrumpan el termino.`,
     ``,
     `La Sentencia T-645 de 2017 (Corte Constitucional) reconoce la operancia`,
-    `de la prescripcion acumulada cuando el tiempo total supera seis (6) anos`,
-    `sin gestion efectiva, lo que extingue definitivamente la obligacion.`,
+    `de la prescripción acumulada cuando el tiempo total supera seis (6) años`,
+    `sin gestion efectiva, lo que extingue definitivamente la obligación.`,
   ],
   facultades: [
-    'Argumentar juridicamente los dos terminos de prescripcion acumulados.',
+    'Argumentar jurídicamente los dos terminos de prescripción acumulados.',
     'Solicitar el archivo definitivo del proceso de cobro coactivo.',
     'Gestionar el levantamiento de embargos o medidas cautelares vigentes.',
     'Interponer recursos administrativos y/o acciones judiciales si la entidad',
-    'niega la prescripcion en cualquiera de sus instancias.',
+    'niega la prescripción en cualquiera de sus instancias.',
     'Solicitar certificacion de paz y salvo ante el SIMIT y la entidad.',
   ],
   indemnidad: [
-    'Certifico que la informacion sobre el tiempo transcurrido desde la',
+    'Certifico que la información sobre el tiempo transcurrido desde la',
     'infraccion original y desde el inicio del cobro coactivo es veraz.',
     'Entiendo que aportar datos falsos o inexactos puede constituir fraude',
     'procesal. Eximo expresamente a mi apoderado de toda responsabilidad',
     'por inexactitud en los datos por mi suministrados.',
   ],
   protocolo2213: (d) => [
-    `Firma olografa original requerida para este tipo de poder.`,
-    `Remitir documento escaneado con copia de cedula y documentos del cobro`,
+    `Firma ológrafa original requerida para este tipo de poder.`,
+    `Remitir documento escaneado con copia de cédula y documentos del cobro`,
     `coactivo desde: ${d.citizenEmail || '[correo del poderdante]'}`,
     `hacia: contactodesmulta@protonmail.com`,
     `Ley 2213/2022 — Ley 527/1999.`,
@@ -286,40 +286,40 @@ const nulidadNotificacion: DocumentBlock = {
   cuerpo: (d) => [
     `Yo, ${d.infractorName}, identificado(a) con C.C. No. ${d.infractorId},`,
     `otorgo PODER ESPECIAL a ${getApoderado()}, para que en`,
-    `mi nombre interponga RECURSO DE NULIDAD E INVALIDEZ ante la Secretaria`,
+    `mi nombre interponga RECURSO DE NULIDAD E INVALIDEZ ante la Secretaría`,
     `que resulto en la imposicion irregular de la(s) multa(s) o fotomulta(s)`,
-    `registrada(s) a mi nombre${placa(d)}${d.ticketNumber && d.ticketNumber !== 'POR_DEFINIR' ? ' (Resolucion(es) / Comparendo(s) ' + d.ticketNumber + ')' : ''}.`,
+    `registrada(s) a mi nombre${placa(d)}${d.ticketNumber && d.ticketNumber !== 'POR_DEFINIR' ? ' (Resolución(es) / Comparendo(s) ' + d.ticketNumber + ')' : ''}.`,
     ``,
     `FUNDAMENTO CONSTITUCIONAL:`,
     `La Sentencia C-038 de 2020 de la Corte Constitucional declaro inexequible`,
-    `la notificacion por aviso en foto-multas cuando no se acredita la plena`,
-    `identificacion del conductor infractor, vulnerando el Art. 29 C.P.`,
+    `la notificación por aviso en foto-multas cuando no se acredita la plena`,
+    `identificación del conductor infractor, vulnerando el Art. 29 C.P.`,
     ``,
     `ARGUMENTOS ESPECIFICOS DEL RECURSO:`,
-    `(i)  La entidad no acredito la identificacion plena del conductor.`,
-    `(ii) No se agoto la notificacion personal conforme al Art. 67 del CPACA`,
-    `     antes de acudir al mecanismo de notificacion por aviso.`,
+    `(i)  La entidad no acredito la identificación plena del conductor.`,
+    `(ii) No se agoto la notificación personal conforme al Art. 67 del CPACA`,
+    `     antes de acudir al mecanismo de notificación por aviso.`,
     `(iii) El comparendo carece de los requisitos del Art. 136 del C.N.T.`,
     `     que garantizan el derecho de contradiccion del infractor.`,
   ],
   facultades: [
     'Presentar el recurso de nulidad con soporte en la jurisprudencia',
     'constitucional C-038/2020 y la Ley 1437 de 2011.',
-    'Aportar pruebas documentales de la deficiencia en la notificacion.',
-    'Solicitar la suspension provisional del cobro mientras se decide.',
-    'Interponer apelacion ante el superior jerarquico de la entidad.',
-    'Instaurar accion de tutela si persiste la vulneracion al debido proceso.',
+    'Aportar pruebas documentales de la deficiencia en la notificación.',
+    'Solicitar la suspensión provisional del cobro mientras se decide.',
+    'Interponer apelación ante el superior jerárquico de la entidad.',
+    'Instaurar acción de tutela si persiste la vulneracion al debido proceso.',
   ],
   indemnidad: [
     'Autorizo a mi apoderado para invocar la Sentencia C-038/2020 en mi',
     'defensa. Comprendo que el exito del recurso depende del analisis del',
-    'expediente particular y de las pruebas disponibles sobre la notificacion.',
+    'expediente particular y de las pruebas disponibles sobre la notificación.',
     'Eximo al apoderado de responsabilidad por decisiones adversas de la',
     'administracion que no sean atribuibles a su gestion.',
   ],
   protocolo2213: (d) => [
-    `Firma olografa obligatoria para recursos de nulidad (puede exigirse`,
-    `autenticacion notarial segun la entidad receptora).`,
+    `Firma ológrafa obligatoria para recursos de nulidad (puede exigirse`,
+    `autenticación notarial segun la entidad receptora).`,
     `Remitir documento escaneado con foto del comparendo si se dispone de el,`,
     `desde: ${d.citizenEmail || '[correo del poderdante]'}`,
     `hacia: contactodesmulta@protonmail.com`,
@@ -331,44 +331,44 @@ const nulidadNotificacion: DocumentBlock = {
 // 5. ACCIÓN DE TUTELA (Silencio Administrativo / Vulneración Petición)
 // ═══════════════════════════════════════════════════════════════════
 const tutelaSilencio: DocumentBlock = {
-  titulo: 'PODER PARA ACCION DE TUTELA',
+  titulo: 'PODER PARA ACCIÓN DE TUTELA',
   subtitulo: '(Art. 86 C.P. — Decreto 2591/1991 — Silencio Administrativo Negativo)',
   nombreArchivo: 'Tutela_Silencio',
   cuerpo: (d) => [
     `Yo, ${d.infractorName}, identificado(a) con C.C. No. ${d.infractorId},`,
     `otorgo PODER ESPECIAL a ${getApoderado()}, para que`,
-    `en mi nombre interponga ACCION DE TUTELA ante el Juez competente`,
-    `(reparto) en contra de la Secretaria de Transito correspondiente,`,
-    `por VULNERACION DEL DERECHO FUNDAMENTAL DE PETICION (Art. 23 C.P.)`,
-    `y SILENCIO ADMINISTRATIVO NEGATIVO${placa(d) ? ` en asunto relacionado con${placa(d)}` : ''}.`,
+    `en mi nombre interponga ACCIÓN DE TUTELA ante el Juez competente`,
+    `(reparto) en contra de la Secretaría de Tránsito correspondiente,`,
+    `por VULNERACION DEL DERECHO FUNDAMENTAL DE PETICIÓN (Art. 23 C.P.)`,
+    `y SILENCIO ADMINISTRATIVO NEGATIVO${d.licensePlate && d.licensePlate !== 'N/A' ? ` en asunto relacionado con el vehículo de placa ${d.licensePlate}` : ''}.`,
     ``,
-    `HECHOS QUE FUNDAMENTAN LA ACCION:`,
-    `(i)   Se formulo Derecho de Peticion ante la entidad accionada.`,
-    `(ii)  Transcurrieron mas de QUINCE (15) dias habiles sin respuesta`,
+    `HECHOS QUE FUNDAMENTAN LA ACCIÓN:`,
+    `(i)   Se formuló Derecho de Petición ante la entidad accionada.`,
+    `(ii)  Transcurrieron más de QUINCE (15) días hábiles sin respuesta`,
     `      de fondo, clara, precisa y de fondo (Art. 14, Ley 1437/2011).`,
     `(iii) El silencio administrativo vulnera el Art. 23 de la C.P.`,
     `(iv)  No existe otro mecanismo judicial de defensa igualmente eficaz.`,
     `(v)   Se genera perjuicio irremediable al ignorarse el estado real`,
-    `      de las multas y la posible prescripcion de las mismas.`,
+    `      de las multas y la posible prescripción de las mismas.`,
   ],
   facultades: [
-    'Redactar e interponer la accion de tutela ante el juez competente.',
+    'Redactar e interponer la acción de tutela ante el juez competente.',
     'Allegar todas las pruebas de la omision de la entidad accionada.',
     'Notificarse de la admision, traslado y fallo de primera instancia.',
-    'Impugnar el fallo desfavorable ante el superior jerarquico.',
+    'Impugnar el fallo desfavorable ante el superior jerárquico.',
     'Solicitar el cumplimiento inmediato del fallo favorable.',
     'Iniciar incidente de desacato si la entidad incumple la orden judicial.',
   ],
   indemnidad: [
-    'Certifico que formule previamente el Derecho de Peticion y que la',
+    'Certifico que formule previamente el Derecho de Petición y que la',
     'entidad accionada no respondio en el termino legal establecido.',
     'Asumo responsabilidad total por la veracidad de los hechos relatados.',
     'Eximo al apoderado de responsabilidad por el resultado del fallo,',
-    'el cual depende exclusivamente de la decision del juez constitucional.',
+    'el cual depende exclusivamente de la decisión del juez constitucional.',
   ],
   protocolo2213: (d) => [
-    `IMPORTANTE: Para la tutela se requiere firma olografa ORIGINAL.`,
-    `El juez puede exigir autenticacion notarial del poder; coordinar`,
+    `IMPORTANTE: Para la tutela se requiere firma ológrafa ORIGINAL.`,
+    `El juez puede exigir autenticación notarial del poder; coordinar`,
     `con el apoderado para firma presencial o ante notario segun el caso.`,
     `Contacto: contactodesmulta@protonmail.com`,
     `Referencia: ${(d.caseId || d.shortId).replace(/CASE/gi, 'EXP')}`,
@@ -389,11 +389,11 @@ export const DOCUMENT_TEMPLATES: Record<DocumentType, DocumentBlock> = {
 
 export const DOCUMENT_TYPE_LABELS: Record<DocumentType, string> = {
   poder_especial: 'Poder Especial de Gestión',
-  peticion_general: 'Derecho de Peticion (General/Exploratorio)',
-  prescripcion_directa: 'Prescripcion Directa (3 anos sin mandamiento)',
-  doble_prescripcion: 'Doble Prescripcion (3+3 anos, cobro coactivo)',
-  nulidad_notificacion: 'Nulidad por Indebida Notificacion (Fotomultas)',
-  tutela_silencio: 'Accion de Tutela (Silencio / Vulneracion Peticion)',
+  peticion_general: 'Derecho de Petición (General/Exploratorio)',
+  prescripcion_directa: 'Prescripción Directa (3 años sin mandamiento)',
+  doble_prescripcion: 'Doble Prescripción (3+3 años, cobro coactivo)',
+  nulidad_notificacion: 'Nulidad por Indebida Notificación (Fotomultas)',
+  tutela_silencio: 'Accion de Tutela (Silencio / Vulneracion Petición)',
 };
 
 /** Sugerencia automática del tipo de documento según datos del caso */
@@ -412,26 +412,26 @@ export function sugerirTipoDocumento(
   if (masde3 && coactivo)
     return {
       tipo: 'doble_prescripcion',
-      razon: 'Mas de 3 anos + cobro coactivo → doble prescripcion',
+      razon: 'Más de 3 años + cobro coactivo → doble prescripción',
     };
   if (masde3 && !coactivo)
     return {
       tipo: 'prescripcion_directa',
-      razon: 'Mas de 3 anos sin mandamiento → prescripcion directa',
+      razon: 'Más de 3 años sin mandamiento → prescripción directa',
     };
   if (esFotomulta)
     return {
       tipo: 'nulidad_notificacion',
-      razon: 'Fotomulta → nulidad por indebida notificacion (C-038/2020)',
+      razon: 'Fotomulta → nulidad por indebida notificación (C-038/2020)',
     };
   if (entre1y3)
     return {
       tipo: 'peticion_general',
-      razon: 'Entre 1 y 3 anos → derecho de peticion informativo',
+      razon: 'Entre 1 y 3 años → derecho de petición informativo',
     };
 
   return {
     tipo: 'peticion_general',
-    razon: 'Caso general → iniciar con derecho de peticion exploratorio',
+    razon: 'Caso general → iniciar con derecho de petición exploratorio',
   };
 }

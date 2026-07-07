@@ -35,15 +35,20 @@ const MR = 50; // margen derecho
 const MT = 50; // margen superior
 const MB = 50; // margen inferior
 
-/** Elimina diacríticos — Las fuentes estándar de pdf-lib usan WinAnsi,
- * por lo que sanitizamos los textos para evitar crashes de encoding */
+/** Sanitiza el texto para pdf-lib (WinAnsiEncoding) preservando acentos y eñes.
+ * Reemplaza caracteres no soportados por sus equivalentes ASCII. */
 function n(text: string): string {
   if (!text) return '';
-  return text
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/ñ/g, 'n')
-    .replace(/Ñ/g, 'N');
+  return (
+    text
+      .replace(/—/g, '-')
+      .replace(/–/g, '-')
+      .replace(/[“”]/g, '"')
+      .replace(/[‘’]/g, "'")
+      .replace(/•/g, '-')
+      // Elimina cualquier caracter que no esté en la tabla WinAnsi
+      .replace(/[^\x00-\xFF]/g, '')
+  );
 }
 
 /** Word-wrap de ultra alta precisión usando el motor nativo de pdf-lib */
