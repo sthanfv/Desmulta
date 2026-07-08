@@ -96,19 +96,20 @@ async function reescribirConGemini(titulo: string, contenidoCrudo: string): Prom
   const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
   
   const prompt = `
-Eres un abogado experto en tránsito y transporte de Colombia. Escribes artículos informativos para el blog de "Desmulta", una plataforma dedicada a impugnar fotomultas y lograr el saneamiento legal de comparendos.
-A continuación se te entregará el extracto de una noticia o boletín sobre normativas de transporte, comparendos o reglas de tránsito.
+You are an expert Colombian traffic and transportation lawyer writing informational articles for the blog of "Desmulta", a legal tech platform dedicated to contesting speed camera tickets (fotomultas) and achieving legal clearance of traffic fines.
+You will be provided with an excerpt from a news article or bulletin regarding transportation regulations, fines, or traffic rules.
 
-Instrucciones Críticas:
-1. Reescribe la noticia de forma 100% original, libre de plagio, informativa y clara. Escribe alrededor de 3 a 5 párrafos cortos.
-2. Mantén un tono profesional y legal, pero completamente accesible al ciudadano común. No uses lenguaje enredado.
-3. TEMA SEO: Inserta sutilmente palabras clave relevantes como "fotomultas", "Secretaría de Movilidad", "impugnación", "SIMIT" o "prescripción" si el contexto lo permite.
-4. LLAMADO A LA ACCIÓN (OBLIGATORIO): Al final del artículo, en un párrafo nuevo, debes incluir SIEMPRE un mensaje directo indicando que: "En Desmulta, contamos con un equipo de expertos legales y tecnología automatizada listos para asesorar y defender tus derechos frente a infracciones de tránsito injustas. Conoce nuestros servicios de análisis de prescripción y saneamiento en https://desmulta.online".
-5. Retorna SOLO el texto final en formato Markdown (puedes usar negritas o listas). No incluyas notas explicativas tuyas al principio o al final.
+Critical Instructions:
+1. Rewrite the news story to be 100% original, plagiarism-free, informative, and clear. Write approximately 3 to 5 short paragraphs.
+2. The output language MUST be strictly in native Colombian Spanish.
+3. Maintain a professional and legal tone, but completely accessible to the average citizen. Do not use overly complex legalese.
+4. SEO FOCUS: Subtly insert relevant keywords such as "fotomultas", "Secretaría de Movilidad", "impugnación", "SIMIT", or "prescripción" where contextually appropriate.
+5. CALL TO ACTION (MANDATORY): At the very end of the article, in a new paragraph, you MUST ALWAYS include a direct promotional message indicating that: "En Desmulta, contamos con un equipo de expertos legales y tecnología automatizada listos para asesorar y defender tus derechos frente a infracciones de tránsito injustas. Conoce nuestros servicios de análisis de prescripción y saneamiento en https://desmulta.online". This must sound like Desmulta is the author/sponsor of the article.
+6. Return ONLY the final text in Markdown format (you can use bold text or lists). Do not include any introductory or concluding explanatory notes of your own.
 
-Noticia Original a reescribir:
-Título: ${titulo}
-Contenido: ${contenidoCrudo}
+Original News to rewrite:
+Title: ${titulo}
+Content: ${contenidoCrudo}
 `;
 
   try {
@@ -127,7 +128,7 @@ Contenido: ${contenidoCrudo}
       return contenidoCrudo; // Fallback
     }
 
-    const data = await response.json();
+    const data = (await response.json()) as any;
     const textoGenerado = data.candidates?.[0]?.content?.parts?.[0]?.text;
     
     if (!textoGenerado) {
