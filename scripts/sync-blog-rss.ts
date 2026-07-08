@@ -262,12 +262,18 @@ async function syncBlogFromRss() {
           .replace(/<[^>]*>/g, '')
           .trim();
 
-        // Filtro de relevancia: ignorar noticias de accidentes, choques o tragedias viales
+        // Filtro de relevancia: Lista Negra (accidentes/tragedias) y Lista Blanca (movilidad/legal)
         const titleLower = title.toLowerCase();
+        const descLower = description.toLowerCase();
+        
         const blacklist = ['fallece', 'fallecido', 'muerto', 'herido', 'choque', 'colision', 'accidente', 'tragedia', 'volcamiento', 'lesionado'];
         const contieneBasura = blacklist.some(palabra => titleLower.includes(palabra));
-        if (contieneBasura) {
-          console.log(`[-] Omitido por filtro de relevancia: "${title}"`);
+        
+        const whitelist = ['movilidad', 'tránsito', 'transito', 'transporte', 'fotomulta', 'multa', 'comparendo', 'licencia', 'conductor', 'vehículo', 'vehiculo', 'carro', 'moto', 'vía', 'via', 'peaje', 'soat', 'tecnomecánica', 'tecnomecanica', 'infractor', 'simit', 'runt', 'secretaría de movilidad', 'ministerio de transporte', 'conducir', 'parqueo', 'grúa', 'grua', 'pico y placa'];
+        const esRelevante = whitelist.some(palabra => titleLower.includes(palabra) || descLower.includes(palabra));
+
+        if (contieneBasura || !esRelevante) {
+          console.log(`[-] Omitido por filtro de relevancia estricto: "${title}"`);
           continue;
         }
 
