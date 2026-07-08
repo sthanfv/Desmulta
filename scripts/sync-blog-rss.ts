@@ -93,7 +93,7 @@ async function reescribirConGemini(titulo: string, contenidoCrudo: string): Prom
     return contenidoCrudo;
   }
 
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
   
   const prompt = `
 You are an expert Colombian traffic and transportation lawyer writing informational articles for the blog of "Desmulta", a legal tech platform dedicated to contesting speed camera tickets (fotomultas) and achieving legal clearance of traffic fines.
@@ -310,6 +310,14 @@ ${rewrittenContent}
         console.log(`[+] Borrador creado: src/content/blog/${slug}.mdx`);
         creadosList.push({ title, slug });
         creados++;
+        
+        // FinOps: Delay de 15 segundos entre peticiones para no exceder el límite gratuito de Google (5 RPM por ráfaga)
+        if (creados % 5 !== 0) {
+           await new Promise(resolve => setTimeout(resolve, 15000));
+        } else {
+           // Pausa más larga cada 5 artículos
+           await new Promise(resolve => setTimeout(resolve, 60000));
+        }
       }
     } catch (err: any) {
       console.error(`[ERROR-RSS] Falló la sincronización de la URL: ${url}. Motivo: ${err.message}`);
