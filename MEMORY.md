@@ -1,5 +1,10 @@
 # MEMORY.md - Historial del Sistema
 
+> [!WARNING]
+> **RESTRICCIÓN CRÍTICA DE HARDWARE (LEER ANTES DE EJECUTAR TAREAS)**
+> Se analizó el equipo local (DESKTOP-N9CGIFT) identificando un procesador antiguo `AMD PRO A10-8750B R7` (4 núcleos) y 16GB de RAM. Esta severa limitación en procesamiento de un solo hilo causa sobrecargas y Cold Starts extremadamente lentos.
+> **Regla permanente:** Está **ESTRICTAMENTE PROHIBIDO** ejecutar suites de validación masivas (`npm run validate` total) o pruebas E2E pesadas (Playwright) para cambios menores, ya que estresa severamente la máquina. Aplicar validación quirúrgica (linters específicos y pruebas aisladas) a menos que se trate de una reestructuración arquitectónica masiva autorizada por el usuario. Cuando las pruebas E2E sean necesarias, usar estrategias pasivas y timeouts elevados (`60000ms`).
+
 ## 2026-07-07: Mitigación de Vulnerabilidades de Auditoría (PII, Cookies HttpOnly, CSP y Source Maps)
 - **Qué cambió:**
   - **[Seguridad - Hallazgo 1 PII en sessionStorage]**: Se eliminó el almacenamiento del `downloadToken` en el cliente. Ahora se genera una Cookie `HttpOnly` firmada en `create-order/route.ts` que autoriza automáticamente las peticiones de descarga.
@@ -277,7 +282,7 @@
   - `tests/e2e/document-generator.spec.ts`
   - `src/app/admin/audit-actions.ts`
   - `tests/e2e/god-mode.spec.ts`
-- **Perfilado de Hardware y Límites del Entorno:** Se analizó el equipo local (DESKTOP-N9CGIFT) identificando un procesador antiguo `AMD PRO A10-8750B R7` (4 núcleos) y 16GB de RAM. Esta severa limitación en procesamiento de un solo hilo causa Cold Starts extremadamente lentos en el servidor de desarrollo de Next.js, siendo la causa raíz del flakiness en las pruebas de integración. Como **regla permanente**, al correr Playwright en este equipo se deben usar estrategias pasivas (`expect(page).toHaveURL`) y timeouts elevados (`60000ms`), evitando validaciones dependientes del rendimiento del DOM.
+- **Perfilado de Hardware:** (Anotación movida a la cabecera de este documento como RESTRICCIÓN CRÍTICA).
 - **Estado actual:** ✅ Pruebas E2E estabilizadas y tolerantes a latencia extrema del hardware local.
 ## 2026-06-28 (noche): Cierre de Auditoría de Seguridad #4 (Iteración v4)
 
