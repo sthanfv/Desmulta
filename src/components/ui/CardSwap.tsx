@@ -106,10 +106,10 @@ export function CardSwap({
 
   return (
     <div
-      className="relative flex shrink-0 items-center justify-center select-none overflow-visible"
+      className="relative select-none overflow-visible shrink-0 mx-auto"
       style={{
-        width,
-        height,
+        width: typeof width === 'number' ? `${width}px` : width,
+        height: typeof height === 'number' ? `${height}px` : height,
         perspective: '1200px',
         perspectiveOrigin: '50% 40%',
       }}
