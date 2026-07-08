@@ -85,6 +85,62 @@ function extractTagContent(itemXml: string, tagName: string): string {
   return '';
 }
 
+// Función nativa para llamar a Gemini API vía fetch y evitar instalar @google/generative-ai
+async function reescribirConGemini(titulo: string, contenidoCrudo: string): Promise<string> {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey || apiKey.trim() === '') {
+    console.warn('[GEMINI-WARN] No se encontró GEMINI_API_KEY. Se usará el contenido crudo (riesgo de contenido duplicado).');
+    return contenidoCrudo;
+  }
+
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  
+  const prompt = `
+Eres un abogado experto en tránsito y transporte de Colombia. Escribes artículos informativos para el blog de "Desmulta", una plataforma dedicada a impugnar fotomultas y lograr el saneamiento legal de comparendos.
+A continuación se te entregará el extracto de una noticia o boletín sobre normativas de transporte, comparendos o reglas de tránsito.
+
+Instrucciones Críticas:
+1. Reescribe la noticia de forma 100% original, libre de plagio, informativa y clara. Escribe alrededor de 3 a 5 párrafos cortos.
+2. Mantén un tono profesional y legal, pero completamente accesible al ciudadano común. No uses lenguaje enredado.
+3. TEMA SEO: Inserta sutilmente palabras clave relevantes como "fotomultas", "Secretaría de Movilidad", "impugnación", "SIMIT" o "prescripción" si el contexto lo permite.
+4. LLAMADO A LA ACCIÓN (OBLIGATORIO): Al final del artículo, en un párrafo nuevo, debes incluir SIEMPRE un mensaje directo indicando que: "En Desmulta, contamos con un equipo de expertos legales y tecnología automatizada listos para asesorar y defender tus derechos frente a infracciones de tránsito injustas. Conoce nuestros servicios de análisis de prescripción y saneamiento en https://desmulta.online".
+5. Retorna SOLO el texto final en formato Markdown (puedes usar negritas o listas). No incluyas notas explicativas tuyas al principio o al final.
+
+Noticia Original a reescribir:
+Título: ${titulo}
+Contenido: ${contenidoCrudo}
+`;
+
+  try {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.6 }
+      })
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      console.error(`[GEMINI-ERROR] HTTP ${response.status} - ${errText}`);
+      return contenidoCrudo; // Fallback
+    }
+
+    const data = await response.json();
+    const textoGenerado = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    
+    if (!textoGenerado) {
+      return contenidoCrudo; // Fallback
+    }
+    
+    return textoGenerado.trim();
+  } catch (error: any) {
+    console.error(`[GEMINI-ERROR] Excepción al contactar la API: ${error.message}`);
+    return contenidoCrudo; // Fallback
+  }
+}
+
 // Envía una notificación por Telegram al administrador sobre los borradores creados
 async function notifyTelegram(newPosts: { title: string; slug: string }[]) {
   const token = process.env.TELEGRAM_BOT_TOKEN;
@@ -224,8 +280,12 @@ async function syncBlogFromRss() {
         }
 
         const dateStr = parseDate(pubDate);
-        const cleanDescription = htmlToMarkdown(description).slice(0, 160).replace(/\n/g, ' ') + '...';
-        const cleanContent = htmlToMarkdown(description);
+        const htmlToMd = htmlToMarkdown(description);
+        
+        const cleanDescription = htmlToMd.slice(0, 160).replace(/\n/g, ' ') + '...';
+        
+        console.log(`[GEMINI] Procesando y reescribiendo artículo de forma única: ${title}...`);
+        const rewrittenContent = await reescribirConGemini(title, htmlToMd);
 
         const isAutoPublish = process.env.AUTO_PUBLISH_BLOG === 'true';
 
@@ -234,15 +294,15 @@ async function syncBlogFromRss() {
 title: "${title.replace(/"/g, '\\"')}"
 excerpt: "${cleanDescription.replace(/"/g, '\\"')}"
 date: "${dateStr}"
-author: "Equipo Desmulta"
+author: "Equipo Legal Desmulta"
 draft: ${!isAutoPublish}
-tags: ["noticias", "regulación", "supertransporte"]
+tags: ["noticias", "regulación", "transporte"]
 ---
 
-${cleanContent}
+${rewrittenContent}
 
 ---
-*Nota: Este artículo es importado de forma automática desde las novedades legales del sector transporte. Para más detalles, puedes consultar la fuente original en [este enlace](${link}).*
+*Nota Editorial: Este artículo fue procesado y analizado basándose en normativas oficiales de transporte. Fuente primaria de referencia: [Ver origen de la noticia](${link}).*
 `;
 
         fs.writeFileSync(filePath, mdxContent, 'utf8');
