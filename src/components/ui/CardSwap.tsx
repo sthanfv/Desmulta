@@ -106,7 +106,7 @@ export function CardSwap({
 
   return (
     <div
-      className="relative flex items-center justify-center select-none overflow-visible"
+      className="relative flex shrink-0 items-center justify-center select-none overflow-visible"
       style={{
         width,
         height,
