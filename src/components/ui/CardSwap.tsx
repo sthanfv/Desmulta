@@ -46,7 +46,13 @@ export function CardSwap({
   pauseOnHover = true,
   children,
 }: CardSwapProps) {
-  const [cards, setCards] = useState<React.ReactNode[]>(children);
+  // Asignamos un ID único a cada tarjeta en el montaje inicial para que Framer Motion las trackee
+  const [cards, setCards] = useState<{ id: number; content: React.ReactNode }[]>(() =>
+    React.Children.toArray(children).map((child, idx) => ({
+      id: idx,
+      content: child,
+    }))
+  );
   const [isSwapping, setIsSwapping] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const isHoveredRef = useRef(false);
@@ -110,32 +116,26 @@ export function CardSwap({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <AnimatePresence mode="popLayout" initial={false}>
-        {visibleCards.map((card, index) => {
+      <AnimatePresence initial={false}>
+        {visibleCards.map((cardObj, index) => {
           const isFront = index === 0;
           const cfg = STACK_CONFIG[index] ?? STACK_CONFIG[STACK_CONFIG.length - 1];
           const lastCfg = STACK_CONFIG[STACK_CONFIG.length - 1];
 
           return (
             <m.div
-              key={React.isValidElement(card) ? (card.key ?? index) : index}
-              style={
-                {
-                  width: '100%',
-                  height: '100%',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  zIndex: cfg.zIndex,
-                  touchAction: isFront ? 'pan-y' : 'auto',
-                  willChange: 'transform, opacity',
-                  originX: '50%',
-                  originY: '50%',
-                  // Escala de brillo ajustada: en modo claro el oscurecimiento no queda tan intenso
-                  filter: `brightness(${cfg.brightness})`,
-                } as React.CSSProperties
-              }
-              className={isFront ? 'cursor-grab active:cursor-grabbing' : ''}
+              key={cardObj.id}
+              className={`absolute top-0 left-0 w-full h-full ${
+                isFront ? 'cursor-grab active:cursor-grabbing' : ''
+              }`}
+              style={{
+                zIndex: cfg.zIndex,
+                touchAction: isFront ? 'pan-y' : 'auto',
+                willChange: 'transform, opacity',
+                originX: '50%',
+                originY: '50%',
+                filter: `brightness(${cfg.brightness})`,
+              }}
               drag={isFront ? 'x' : false}
               dragConstraints={{ left: 0, right: 0 }}
               dragElastic={0.35}
@@ -197,7 +197,7 @@ export function CardSwap({
                     }}
                   />
                 )}
-                {card}
+                {cardObj.content}
               </div>
             </m.div>
           );
