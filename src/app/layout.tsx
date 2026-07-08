@@ -54,9 +54,10 @@ export const metadata: Metadata = {
   authors: [{ name: 'Desmulta Legal', url: 'https://desmulta.online' }],
   creator: 'Desmulta Corp',
   publisher: 'Desmulta Colombia',
+  // FIX SEO: Forzar siempre el dominio canónico de producción para evitar
+  // que Vercel indexe subdominios (.vercel.app) en los bots de Google.
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ||
-      (process.env.NODE_ENV === 'development' ? 'http://localhost:9005' : 'https://desmulta.online')
+    process.env.NODE_ENV === 'development' ? 'http://localhost:9005' : 'https://desmulta.online'
   ),
   alternates: {
     canonical: '/',

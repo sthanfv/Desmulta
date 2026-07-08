@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://desmulta.online';
+const SITE_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:9005' : 'https://desmulta.online';
 
 export default function robots(): MetadataRoute.Robots {
   return {
