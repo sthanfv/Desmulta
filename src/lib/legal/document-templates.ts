@@ -60,9 +60,9 @@ const getApoderado = () => {
       console.warn(
         '[Seguridad] OPERATOR_LEGAL_NAME o DEFAULT_OPERATOR_NAME no configurados. Usando fallback legal genérico.'
       );
-      return 'Abogado de Apoyo Legal Desmulta';
+      return 'Analista Legal de Apoyo Desmulta';
     }
-    return 'Abogado de Prueba, C.C. No. 0000000000';
+    return 'Especialista en Tránsito de Prueba, C.C. No. 0000000000';
   }
   return `${name}, C.C. No. ${id}`;
 };

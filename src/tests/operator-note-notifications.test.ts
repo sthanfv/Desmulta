@@ -3,7 +3,7 @@ import { STATUS_TEMPLATES } from '../lib/notifications/notification-dispatcher';
 import { buildStatusChangeEmail } from '../lib/email-templates';
 
 describe('Notificaciones con Toque Humano (Notas de Operador)', () => {
-  const note = 'Esta es una nota personalizada del abogado.';
+  const note = 'Esta es una nota personalizada del especialista.';
   const caseId = 'CASE-12345';
 
   describe('Notificaciones Push', () => {

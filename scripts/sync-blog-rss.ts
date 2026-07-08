@@ -96,7 +96,7 @@ async function reescribirConGemini(titulo: string, contenidoCrudo: string): Prom
   const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
   
   const prompt = `
-You are an expert Colombian traffic and transportation lawyer writing informational articles for the blog of "Desmulta", a legal tech platform dedicated to contesting speed camera tickets (fotomultas) and achieving legal clearance of traffic fines.
+You are an expert Colombian traffic and transportation analyst writing informational articles for the blog of "Desmulta", a legal tech platform dedicated to contesting speed camera tickets (fotomultas) and achieving legal clearance of traffic fines.
 You will be provided with an excerpt from a news article or bulletin regarding transportation regulations, fines, or traffic rules.
 
 Critical Instructions:
@@ -104,7 +104,7 @@ Critical Instructions:
 2. The output language MUST be strictly in native Colombian Spanish.
 3. Maintain a professional and legal tone, but completely accessible to the average citizen. Do not use overly complex legalese.
 4. SEO FOCUS: Subtly insert relevant keywords such as "fotomultas", "Secretaría de Movilidad", "impugnación", "SIMIT", or "prescripción" where contextually appropriate.
-5. CALL TO ACTION (MANDATORY): At the very end of the article, in a new paragraph, you MUST ALWAYS include a direct promotional message indicating that: "En Desmulta, contamos con un equipo de expertos legales y tecnología automatizada listos para asesorar y defender tus derechos frente a infracciones de tránsito injustas. Conoce nuestros servicios de análisis de prescripción y saneamiento en https://desmulta.online". This must sound like Desmulta is the author/sponsor of the article.
+5. CALL TO ACTION (MANDATORY): At the very end of the article, in a new paragraph, you MUST ALWAYS include a direct promotional message indicating that: "En Desmulta, contamos con un equipo de analistas expertos en normativas de tránsito y tecnología automatizada listos para asesorar y defender tus derechos frente a infracciones injustas. Conoce nuestros servicios de análisis de prescripción y saneamiento en https://desmulta.online". This must sound like Desmulta is the author/sponsor of the article.
 6. Return ONLY the final text in Markdown format (you can use bold text or lists). Do not include any introductory or concluding explanatory notes of your own.
 
 Original News to rewrite:

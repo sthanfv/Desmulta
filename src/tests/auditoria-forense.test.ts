@@ -276,7 +276,7 @@ describe('F-09/F-11 — .env.example sin valores inseguros por defecto', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('F-02 — Dinamización de datos del apoderado legal', () => {
-  it('el archivo document-templates.ts no debe tener los datos del abogado hardcodeados', async () => {
+  it('el archivo document-templates.ts no debe tener los datos del especialista hardcodeados', async () => {
     const fs = await import('fs');
     const codigo = fs.readFileSync('src/lib/legal/document-templates.ts', 'utf-8');
     expect(codigo).not.toContain("const APODERADO = 'FABIAN ANDRES VELENO MOYA");
