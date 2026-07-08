@@ -33,6 +33,7 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: false,
   },
+  productionBrowserSourceMaps: false,
 
   images: {
     formats: ['image/avif', 'image/webp'],

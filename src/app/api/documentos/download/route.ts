@@ -83,7 +83,7 @@ export async function GET(req: NextRequest) {
       filename = `Documento_Desmulta_${tokenData.caseData?.shortId || tokenData.purchaseId.slice(-8).toUpperCase()}.pdf`;
     } else if (refId) {
       // ── FLUJO 2: DESCARGA DIRECTA (PANTALLA DE CONFIRMACIÓN) ──
-      const downloadToken = searchParams.get('downloadToken');
+      const downloadToken = req.cookies.get(`dt_${refId}`)?.value;
       if (!downloadToken || downloadToken.trim() === '') {
         logger.security(
           '[documentos/download] Intento de descarga sin token de descarga (IDOR bloqueado)',

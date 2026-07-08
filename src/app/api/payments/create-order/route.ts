@@ -157,12 +157,22 @@ export async function POST(req: NextRequest) {
   }
 
   // 6. Devolver los datos para que el frontend abra el checkout de Wompi
-  return NextResponse.json({
+  const response = NextResponse.json({
     wompiReference,
     amountCop,
     signature,
     publicKey: process.env.NEXT_PUBLIC_WOMPI_PUBLIC_KEY,
     redirectUrl: `${req.nextUrl.origin}/documentos/confirmacion?ref=${wompiReference}`,
-    downloadToken,
   });
+
+  // 🛡️ FIX: Establecer Cookie HttpOnly en lugar de enviar el secreto al frontend (Hallazgo 1)
+  response.cookies.set(`dt_${wompiReference}`, downloadToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: 72 * 60 * 60, // 72 horas
+    path: '/',
+  });
+
+  return response;
 }

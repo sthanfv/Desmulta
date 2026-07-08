@@ -35,9 +35,8 @@ function ConfirmacionContent() {
 
     const checkStatus = async (): Promise<boolean> => {
       try {
-        const downloadToken =
-          (typeof window !== 'undefined' && sessionStorage.getItem(`download_token_${ref}`)) || '';
-        const res = await fetch(`/api/payments/status?ref=${ref}&downloadToken=${downloadToken}`);
+        // 🛡️ FIX: Token ya no viaja por URL, se lee desde las Cookies HttpOnly
+        const res = await fetch(`/api/payments/status?ref=${ref}`);
         if (!res.ok) return false;
         const data = await res.json();
         if (data.status) {
@@ -104,11 +103,9 @@ function ConfirmacionContent() {
 
     const handleDownload = async () => {
       try {
-        // Recuperar el token de descarga de sessionStorage
-        const downloadToken =
-          (typeof window !== 'undefined' && sessionStorage.getItem(`download_token_${ref}`)) || '';
         // Usar el cerebro premium del servidor para descargar el archivo unificado
-        window.location.href = `/api/documentos/download?ref=${ref}&downloadToken=${downloadToken}&format=pdf`;
+        // 🛡️ FIX: Token autorizado mediante Cookie HttpOnly automáticamente por el navegador
+        window.location.href = `/api/documentos/download?ref=${ref}&format=pdf`;
       } catch (err) {
         console.error('Error iniciando descarga PDF:', err);
         alert('Ocurrió un error al descargar el PDF. Por favor, recarga la página.');
@@ -117,9 +114,7 @@ function ConfirmacionContent() {
 
     const handleDownloadWord = async () => {
       try {
-        const downloadToken =
-          (typeof window !== 'undefined' && sessionStorage.getItem(`download_token_${ref}`)) || '';
-        window.location.href = `/api/documentos/download?ref=${ref}&downloadToken=${downloadToken}&format=docx`;
+        window.location.href = `/api/documentos/download?ref=${ref}&format=docx`;
       } catch (err) {
         console.error('Error iniciando descarga Word:', err);
         alert('Ocurrió un error al descargar el archivo de Word. Por favor, recarga la página.');

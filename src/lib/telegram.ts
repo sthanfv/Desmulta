@@ -52,7 +52,9 @@ async function fetchWithRetry(
 
       const jitter = Math.floor(Math.random() * 500);
       const waitTime = delay + jitter;
-      logger.warn(`[telegram-service] Falla de red transitoria. Reintentando en ${waitTime}ms (Jitter: ${jitter}ms)`);
+      logger.warn(
+        `[telegram-service] Falla de red transitoria. Reintentando en ${waitTime}ms (Jitter: ${jitter}ms)`
+      );
       await new Promise((resolve) => setTimeout(resolve, waitTime));
       delay *= 2;
     }

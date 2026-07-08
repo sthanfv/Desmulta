@@ -2,6 +2,7 @@
 
 import { useState, useEffect, use } from 'react';
 import { ShieldCheck, Lock, FileText, Loader2 } from 'lucide-react';
+import { useExpedienteStore } from '@/store/useExpedienteStore';
 import { useRouter } from 'next/navigation';
 import {
   DocumentType,
@@ -50,20 +51,11 @@ export default function GeneradorDinamico({ params }: GeneradorDinamicoProps) {
     fechaHechos: '',
   });
 
-  // Cargar query parameters de la URL para autocompletar el formulario y establecer fecha local
+  // Cargar datos almacenados de forma segura en Zustand para autocompletar el formulario
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const search = new URLSearchParams(window.location.search);
-      const nombre = search.get('nombre');
-      const cedula = search.get('cedula');
-      const placa = search.get('placa');
-      const ciudad = search.get('ciudad');
-      const autoridad = search.get('autoridad');
-      const direccion = search.get('direccion');
-      const email = search.get('email');
-      const celular = search.get('celular');
-      const ticketNumber = search.get('ticketNumber');
-      const fechaHechos = search.get('fechaHechos');
+      const { nombre, cedula, placa, ciudad, autoridad, direccion, email, celular } =
+        useExpedienteStore.getState();
 
       setFormData((prev) => ({
         ...prev,
@@ -76,8 +68,6 @@ export default function GeneradorDinamico({ params }: GeneradorDinamicoProps) {
         direccion: direccion || prev.direccion,
         emailPersonal: email || prev.emailPersonal,
         celular: celular || prev.celular,
-        ticketNumber: ticketNumber || prev.ticketNumber,
-        fechaHechos: fechaHechos || prev.fechaHechos,
       }));
     }
   }, []);
@@ -155,9 +145,7 @@ export default function GeneradorDinamico({ params }: GeneradorDinamicoProps) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Error creando la orden');
 
-      if (typeof window !== 'undefined' && data.downloadToken) {
-        sessionStorage.setItem(`download_token_${data.wompiReference}`, data.downloadToken);
-      }
+      // 🛡️ FIX: sessionStorage eliminado. El downloadToken se maneja vía Cookie HttpOnly desde el backend.
 
       const initWompiWidget = () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

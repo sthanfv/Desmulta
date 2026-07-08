@@ -12,14 +12,22 @@ export interface Multa {
 
 interface ExpedienteState {
   cedula: string | null;
+  nombre: string | null;
+  placa: string | null;
+  email: string | null;
+  celular: string | null;
+  ciudad: string | null;
+  autoridad: string | null;
+  direccion: string | null;
   multas: Multa[];
   /** Timestamp (ms) de la última vez que se escribieron multas. Usada para invalidar el caché a las 24h. */
   multasCachedAt: number | null;
   ocrRawText: string | null;
   capturedImage: string | null; // No persistido (muy pesado)
+  setCapturedImage: (img: string | null) => void;
+  setFormData: (data: Partial<ExpedienteState>) => void;
   setCedula: (cedula: string) => void;
   setOcrRawText: (text: string) => void;
-  setCapturedImage: (img: string | null) => void;
   addMulta: (multa: Multa) => void;
   addMultas: (multas: Multa[]) => void;
   removeMulta: (id: string) => void;
@@ -31,13 +39,21 @@ export const useExpedienteStore = create<ExpedienteState>()(
   persist(
     (set, get) => ({
       cedula: null,
+      nombre: null,
+      placa: null,
+      email: null,
+      celular: null,
+      ciudad: null,
+      autoridad: null,
+      direccion: null,
       multas: [],
       multasCachedAt: null,
       ocrRawText: null,
       capturedImage: null,
+      setCapturedImage: (capturedImage) => set({ capturedImage }),
+      setFormData: (data) => set((state) => ({ ...state, ...data })),
       setCedula: (cedula) => set({ cedula }),
       setOcrRawText: (ocrRawText) => set({ ocrRawText }),
-      setCapturedImage: (capturedImage) => set({ capturedImage }),
       addMulta: (multa) =>
         set((state) => {
           if (state.multas.some((m) => m.comparendo === multa.comparendo)) return state;
@@ -56,6 +72,13 @@ export const useExpedienteStore = create<ExpedienteState>()(
       clearExpediente: () =>
         set({
           cedula: null,
+          nombre: null,
+          placa: null,
+          email: null,
+          celular: null,
+          ciudad: null,
+          autoridad: null,
+          direccion: null,
           multas: [],
           ocrRawText: null,
           capturedImage: null,

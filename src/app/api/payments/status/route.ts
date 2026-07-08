@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const ref = searchParams.get('ref');
-    const downloadToken = searchParams.get('downloadToken') || req.headers.get('x-download-token');
+    const downloadToken = req.cookies.get(`dt_${ref}`)?.value;
 
     if (!ref) {
       return NextResponse.json({ error: 'Referencia requerida' }, { status: 400 });

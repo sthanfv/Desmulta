@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import WatermarkedEvidence from '@/components/security/WatermarkedEvidence';
 import { useToast } from '@/hooks/use-toast';
 import { DocumentType, DOCUMENT_TYPE_LABELS } from '@/lib/legal/document-templates';
+import { useExpedienteStore } from '@/store/useExpedienteStore';
 
 interface StepSuccessProps {
   successData: { docId: string; trackingUuid?: string };
@@ -44,21 +45,27 @@ export default function StepSuccess({
   sugerencia,
   formValues,
 }: StepSuccessProps) {
-  // Construir URL de autogestión con los query params
+  // Construir URL de autogestión sin enviar PII por query params
   const getAutogestionUrl = () => {
     if (!sugerencia || !formValues) return '';
     const slug = sugerencia.tipo.replace(/_/g, '-');
-    const params = new URLSearchParams({
-      nombre: formValues.nombre || '',
-      cedula: formValues.cedula || '',
-      placa: formValues.placa || '',
-      contacto: formValues.contacto || '',
-      email: formValues.email || '',
-      ciudad: formValues.ciudad || '',
-      autoridad: formValues.autoridad || '',
-      direccion: formValues.direccion || '',
-    });
-    return `/documentos/generador/${slug}?${params.toString()}`;
+    return `/documentos/generador/${slug}`;
+  };
+
+  const handleAutogestionClick = () => {
+    if (formValues) {
+      useExpedienteStore.getState().setFormData({
+        nombre: formValues.nombre || '',
+        cedula: formValues.cedula || '',
+        placa: formValues.placa || '',
+        celular: formValues.contacto || '',
+        email: formValues.email || '',
+        ciudad: formValues.ciudad || '',
+        autoridad: formValues.autoridad || '',
+        direccion: formValues.direccion || '',
+      });
+    }
+    window.location.href = getAutogestionUrl();
   };
 
   const autogestionUrl = getAutogestionUrl();
@@ -100,9 +107,7 @@ export default function StepSuccess({
           </div>
 
           <Button
-            onClick={() => {
-              window.location.href = autogestionUrl;
-            }}
+            onClick={handleAutogestionClick}
             className="w-full h-12 bg-yellow-500 hover:bg-yellow-600 text-slate-950 font-black uppercase tracking-widest text-xs rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-yellow-500/10 transition-all active:scale-95"
           >
             Personalizar y Descargar Ahora

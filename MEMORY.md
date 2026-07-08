@@ -1,5 +1,25 @@
 # MEMORY.md - Historial del Sistema
 
+## 2026-07-07: Mitigación de Vulnerabilidades de Auditoría (PII, Cookies HttpOnly, CSP y Source Maps)
+- **Qué cambió:**
+  - **[Seguridad - Hallazgo 1 PII en sessionStorage]**: Se eliminó el almacenamiento del `downloadToken` en el cliente. Ahora se genera una Cookie `HttpOnly` firmada en `create-order/route.ts` que autoriza automáticamente las peticiones de descarga.
+  - **[Seguridad - Hallazgo 2 CSP]**: Se removió `'unsafe-inline'` de la directiva `style-src` en `security-headers.ts` para producción, mitigando ataques de inyección de estilos (XSS).
+  - **[Seguridad - Hallazgo 3 PII en URL]**: Se reemplazó el traspaso de datos sensibles mediante query parameters (URL) en `StepSuccess.tsx` hacia `generador/[slug]/page.tsx` por el uso de almacenamiento efímero seguro en memoria usando Zustand (`useExpedienteStore.getState().setFormData()`).
+  - **[Seguridad - Hallazgo 4 Source Maps]**: Se desactivaron los `productionBrowserSourceMaps` en `next.config.ts` para evitar la filtración de código fuente y comentarios de desarrollo en producción.
+- **Por qué cambió:**
+  - Resolución obligatoria de las vulnerabilidades reportadas en el documento externo `Informe_de_Auditoría_de_Seguridad_y_QA_-_Proyecto_Desmulta.docx`.
+- **Archivos afectados:**
+  - `src/app/api/payments/create-order/route.ts` [MODIFICADO]
+  - `src/app/api/payments/status/route.ts` [MODIFICADO]
+  - `src/app/api/documentos/download/route.ts` [MODIFICADO]
+  - `src/components/vial-clear/steps/StepSuccess.tsx` [MODIFICADO]
+  - `src/app/documentos/generador/[slug]/page.tsx` [MODIFICADO]
+  - `src/app/documentos/confirmacion/page.tsx` [MODIFICADO]
+  - `src/store/useExpedienteStore.ts` [MODIFICADO]
+  - `src/lib/security-headers.ts` [MODIFICADO]
+  - `next.config.ts` [MODIFICADO]
+- **Estado actual:** ✅ Auditoría resuelta. Tests de TypeScript limpios. El token de descarga es ahora inmune al robo de dispositivo y los parámetros de red están limpios de PII.
+
 ## 2026-07-07: Resolución de RangeError (timingSafeEqual) y Responsividad de CardSwap
 - **Qué cambió:**
   - **[Seguridad - IDOR Fix]**: En `src/app/api/payments/status/route.ts`, se solucionó un error crítico `RangeError: Input buffers must have the same byte length`. La función `timingSafeEqual` lanzaba error cuando el `downloadToken` recibido tenía una longitud distinta a la de la base de datos, causando que el endpoint devolviera código 500 y dejara bloqueada la pantalla de "Cargando estado del pago". Ahora se valida que las longitudes sean idénticas y mayores a cero antes de comparar.
