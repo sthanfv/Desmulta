@@ -61,6 +61,20 @@ export function CardSwap({
   easing = 'elastic',
   children
 }: CardSwapProps) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const activeCardDist = isMobile ? cardDistance * 0.45 : cardDistance;
+  const activeVertDist = isMobile ? verticalDistance * 0.45 : verticalDistance;
+
   const config = useMemo(() => 
     easing === 'elastic'
       ? {
@@ -104,7 +118,7 @@ export function CardSwap({
     // Asegurar posicionamiento inicial de todas las capas
     cardRefs.current.forEach((el, i) => {
       if (!el) return;
-      const slot = makeSlot(i, cardDistance, verticalDistance, totalCards);
+      const slot = makeSlot(i, activeCardDist, activeVertDist, totalCards);
       placeNow(el, slot, skewAmount);
       
       // Aplicar opacidad del overlay de profundidad inicial
@@ -143,7 +157,7 @@ export function CardSwap({
       rest.forEach((idx, i) => {
         const el = cardRefs.current[idx];
         if (!el) return;
-        const slot = makeSlot(i, cardDistance, verticalDistance, totalCards);
+        const slot = makeSlot(i, activeCardDist, activeVertDist, totalCards);
         
         tl.set(el, { zIndex: slot.zIndex }, 'promote');
         tl.to(
@@ -176,7 +190,7 @@ export function CardSwap({
       });
 
       // Retorno de la tarjeta vieja al fondo del stack
-      const backSlot = makeSlot(totalCards - 1, cardDistance, verticalDistance, totalCards);
+      const backSlot = makeSlot(totalCards - 1, activeCardDist, activeVertDist, totalCards);
       tl.addLabel('return');
       
       tl.set(elFront, { 
@@ -221,7 +235,7 @@ export function CardSwap({
       if (intervalRef.current) clearInterval(intervalRef.current);
       if (tlRef.current) tlRef.current.kill();
     };
-  }, [cardDistance, verticalDistance, delay, pauseOnHover, skewAmount, totalCards, config, isHovered]);
+  }, [activeCardDist, activeVertDist, delay, pauseOnHover, skewAmount, totalCards, config, isHovered]);
 
   const handleMouseEnter = () => {
     if (pauseOnHover) {
@@ -241,7 +255,7 @@ export function CardSwap({
   return (
     <div
       ref={containerRef}
-      className="relative select-none overflow-visible shrink-0 mx-auto [perspective:1200px]"
+      className="relative select-none overflow-visible shrink-0 mx-auto [perspective:1200px] origin-center max-[768px]:scale-[0.8] max-[480px]:scale-[0.65]"
       style={{
         width: typeof width === 'number' ? `${width}px` : width,
         height: typeof height === 'number' ? `${height}px` : height,
