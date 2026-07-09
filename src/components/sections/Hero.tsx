@@ -222,14 +222,13 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
             <p className="text-xs font-bold uppercase tracking-widest text-zinc-500 text-center lg:text-left">
               DOCUMENTOS DE DEFENSA
             </p>
-            <div className="relative w-full h-[520px] overflow-visible mt-2">
-              <CardSwap
-                width={300}
-                height={400}
-                delay={5000}
-                cardDistance={30}
-                verticalDistance={20}
-              >
+            <CardSwap
+              width={300}
+              height={400}
+              delay={5000}
+              cardDistance={30}
+              verticalDistance={20}
+            >
                 {/* Folio 1: Derecho de Petición General */}
                 <Card className="rounded-2xl border shadow-2xl p-6 flex flex-col justify-between overflow-hidden bg-card text-card-foreground border-border cursor-pointer">
                   <div className="absolute -inset-px bg-gradient-to-tr from-primary/5 via-transparent to-foreground/[0.03] rounded-2xl opacity-50 pointer-events-none" />
@@ -469,8 +468,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
                     </div>
                   </div>
                 </Card>
-              </CardSwap>
-            </div>
+            </CardSwap>
           </div>
         </div>
       </div>
