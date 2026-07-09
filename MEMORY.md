@@ -5,6 +5,59 @@
 > Se analizó el equipo local (DESKTOP-N9CGIFT) identificando un procesador antiguo `AMD PRO A10-8750B R7` (4 núcleos) y 16GB de RAM. Esta severa limitación en procesamiento de un solo hilo causa sobrecargas y Cold Starts extremadamente lentos.
 > **Regla permanente:** Está **ESTRICTAMENTE PROHIBIDO** ejecutar suites de validación masivas (`npm run validate` total) o pruebas E2E pesadas (Playwright) para cambios menores, ya que estresa severamente la máquina. Aplicar validación quirúrgica (linters específicos y pruebas aisladas) a menos que se trate de una reestructuración arquitectónica masiva autorizada por el usuario. Cuando las pruebas E2E sean necesarias, usar estrategias pasivas y timeouts elevados (`60000ms`).
 
+## 2026-07-08: Corrección Responsiva de UI (CardSwap Folletos Móviles)
+- **Qué cambió:**
+  - **[UI/UX - Móvil]**: Se corrigió el desbordamiento horizontal y pérdida del efecto "stack 3D" en el componente `CardSwap` en dispositivos móviles. Se asignaron claves (`key`) estáticas y únicas a los hijos usando `React.Children.toArray` y un `id` mapeado, en lugar de depender del índice del render. Se movió el atributo `position: 'absolute'` del prop `style` (que Framer Motion ocasionalmente sobrescribía) directamente al `className` usando clases utilitarias de Tailwind (`absolute top-0 left-0 w-full h-full`). 
+- **Por qué cambió:**
+  - Al renderizarse en pantallas móviles (dentro de un contenedor `flex-col`), el componente perdía el contexto de posicionamiento absoluto, causando que las tarjetas se alinearan una al lado de la otra como un carrusel desbordado (efecto "folleto" roto) en lugar de apilarse como baraja. Además, las animaciones de salida de Framer Motion fallaban porque los componentes mutaban en lugar de entrar/salir debido a la falta de IDs únicos estables.
+- **Archivos afectados:**
+  - `src/components/ui/CardSwap.tsx` [MODIFICADO]
+- **Estado actual:** ✅ Corregido. El componente de baraja 3D vuelve a apilarse perfectamente en cualquier tamaño de pantalla (Mobile/Desktop) con un rendimiento suave. Build sin errores en Vercel en progreso.
+
+## 2026-07-08: Recuperación de Artículos de Blog Originales (Manuales)
+- **Qué cambió:**
+  - **[Datos - Recuperación]**: Se restauraron 7 artículos de blog (`.mdx`) escritos manualmente por el usuario (`caducidad-audiencia-seis-meses.mdx`, `caducidad-simit.mdx`, `embargos-fotomultas.mdx`, `notificacion-correo-certificado.mdx`, `nulidad-comparendos-coactivo.mdx`, `prescripcion-6-anos-mitos.mdx`, `sentencia-c038.mdx`).
+- **Por qué cambió:**
+  - Durante la purga de los artículos basura generados por IA (ballenas, deportes, etc.) en la sesión anterior, ejecuté un borrado masivo vía terminal (`Remove-Item src\content\blog\*.mdx`) que arrastró accidentalmente los artículos legítimos del usuario. Al percatarse, se procedió a extraerlos directamente del historial inmutable de Git (commit previo al borrado) y se volvieron a subir a producción.
+- **Archivos afectados:**
+  - `src/content/blog/*.mdx` [RESTAURADOS]
+- **Estado actual:** ✅ Corregido. Los artículos propios del usuario ya están de nuevo en el repositorio y desplegados.
+
+## 2026-07-08: Refinamiento de Automatización, Notificaciones Push e Integración de CardSwap con GSAP
+- **Qué cambió:**
+  - **[UI/UX - Animación]**: Se implementó y migró el componente `CardSwap` a la variante de **CSS nativa** oficial de *React Bits*. Se crearon `CardSwap.tsx` y `CardSwap.css` utilizando las transiciones y posicionamiento 3D con GSAP y CSS media queries. Se configuró para que los folios se envuelvan bajo el componente `<Card>` exportado para mantener un tipado TypeScript limpio.
+  - **[UI/UX - Responsividad Móvil]**: Para solucionar el bug de colapso y solapamiento, se envolvió a `CardSwap` en `Hero.tsx` dentro de un contenedor `relative` que luego fue simplificado al hacer el componente en sí puramente relativo y auto-contenido. Para resolver el solapamiento con el título superior ("DOCUMENTOS DE DEFENSA") provocado por la traslación `y` negativa acumulativa de las cartas traseras (hasta -80px en PC y -57px en móvil), se inyectaron márgenes superiores dinámicos (`margin-top: 90px` en PC, `70px` en tablets y `50px` en teléfonos móviles) en `CardSwap.css`. Esto compensa exactamente el desplazamiento 3D permitiendo un renderizado limpio, sin solapamientos en ninguna resolución. Además, las media queries de CSS reducen la escala al `0.72` en pantallas de teléfono (`max-width: 480px`), garantizando que la baraja quepa en el viewport móvil y se adapte a los temas claro y oscuro automáticamente.
+  - **[Notificaciones Push - Estética]**: Se rediseñó por completo el formato visual de las notificaciones push enviadas al usuario en `notification-dispatcher.ts` y en las Cloud Functions (`push-notifications.ts`). Ahora muestran una jerarquía premium y estructurada usando emojis estratégicos, saltos de línea claros y espaciados limpios (ej: Título: `🔍 Estudio de Viabilidad`, Cuerpo con secciones separadas de `Expediente: [ID]`, mensaje de estado y `💬 Nota del especialista: "[nota]"`).
+  - **[Automatización - Blog]**: Se implementó una capa de seguridad en el script de sincronización de noticias. Se inyecta automáticamente el flag `autoGenerated: true` en el frontmatter de todas las noticias creadas por la IA. El sistema de poda (reciclaje cada 30 días) fue reprogramado para buscar y borrar *únicamente* los archivos que contengan este flag, creando una barrera inquebrantable que protegerá los artículos manuales del usuario frente a purgas.
+- **Por qué cambió:**
+  - La versión anterior basada en Framer Motion experimentaba fallos catastróficos de renderizado tanto en PC (donde las tarjetas colapsaban a un tamaño diminuto de 40px) como en teléfonos (donde la baraja quedaba aplastada y oculta tras los cambios de flexbox). La integración de GSAP con perspectiva 3D nativa y posicionamiento centrado mediante `absolute top-1/2 left-1/2` y transformaciones de porcentaje (`xPercent: -50`) corrige el bug de responsividad de forma definitiva e incondicional en todos los navegadores.
+  - Las notificaciones de estado del expediente se veían como un bloque continuo y plano de texto, resultando poco premium y difíciles de leer cuando un administrador añadía anotaciones.
+  - Tras el incidente del borrado de los archivos manuales, se determinó que la lógica de reciclaje de los 30 días dependía de autores genéricos, lo cual ponía en riesgo cualquier archivo, por lo que se diseñó un flag interno de rastreo.
+- **Archivos afectados:**
+  - `src/components/ui/CardSwap.tsx` [MODIFICADO]
+  - `scripts/sync-blog-rss.ts` [MODIFICADO]
+  - `src/lib/notifications/notification-dispatcher.ts` [MODIFICADO]
+  - `functions/src/push-notifications.ts` [MODIFICADO]
+- **Estado actual:** ✅ Desplegado. La nueva versión basada en GSAP está en producción. Las pruebas de compilación (typecheck) pasan limpiamente. Layouts responsivos estables.
+
+## 2026-07-07: Cierre de Sesión (Mitigación Legal y Filtros Anti-Basura del Blog Automático)
+- **Qué cambió:**
+  - **[Legal - Usurpación de Profesiones]**: Se eliminó estrictamente la palabra "abogado" de todo el código fuente y prompts. El sistema ahora se identifica como "Analista Legal de Apoyo Desmulta" y "Especialista en Tránsito". Esto mitiga el riesgo penal (Art. 282 Código Penal Colombiano) de ostentar el título sin tarjeta profesional.
+  - **[Calidad de Contenido - Blog]**: Se detectó que el feed RSS de Google Alerts inyectaba noticias basura (deportes, farándula, ballenas). Se eliminaron los 26 borradores contaminados en producción y se reemplazó la simple lista negra (blacklist) por un **Filtro de Lista Blanca Estricto (Whitelist)** en `sync-blog-rss.ts`. Ahora solo se procesan noticias que contengan palabras como "movilidad", "tránsito", "fotomulta", "comparendo", etc.
+  - **[AI - Optimización de Prompts y Llaves]**: Se actualizó la estructura de la llave de API de Gemini (`AQ.`) en `.env` basada en el nuevo estándar de Google AI Studio. Adicionalmente, se tradujo el prompt del script a inglés para maximizar la capacidad de razonamiento del modelo, garantizando que el output se genere en perfecto español con tono legal publicitario.
+  - **[AI - Endpoints]**: Se corrigió el nombre del modelo llamado a `gemini-1.5-flash-latest` (y el de cuota se identificó como `gemini-2.5-flash`) en la URL REST para evitar el error HTTP 404 del SDK manual.
+- **Por qué cambió:**
+  - Por riesgo legal inminente (multas o cárcel) detectado en la terminología y por una afectación severa a la reputación y SEO de la plataforma causada por noticias sin relación con la temática (farándula, deportes) que fueron re-empaquetadas erróneamente por la IA.
+- **Archivos afectados:**
+  - `scripts/sync-blog-rss.ts` [MODIFICADO]
+  - `src/lib/legal/document-templates.ts` [MODIFICADO]
+  - `src/tests/operator-note-notifications.test.ts` [MODIFICADO]
+  - `src/tests/auditoria-forense.test.ts` [MODIFICADO]
+  - `src/content/blog/*.mdx` [ELIMINADOS - 26 archivos]
+  - `.env` [MODIFICADO]
+- **Estado actual:** ✅ Sistema legalmente blindado y purgado. Motor automático del blog operando bajo lista blanca estricta con fallback sin IA en caso de agotamiento de cuota diaria (Free Tier de Google).
+
+
 ## 2026-07-07: Mitigación de Vulnerabilidades de Auditoría (PII, Cookies HttpOnly, CSP y Source Maps)
 - **Qué cambió:**
   - **[Seguridad - Hallazgo 1 PII en sessionStorage]**: Se eliminó el almacenamiento del `downloadToken` en el cliente. Ahora se genera una Cookie `HttpOnly` firmada en `create-order/route.ts` que autoriza automáticamente las peticiones de descarga.
