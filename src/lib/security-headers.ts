@@ -9,7 +9,7 @@ const scriptUnsafeInline = isDev ? " 'unsafe-inline'" : '';
 
 // En producción se remueve 'unsafe-inline' según las recomendaciones de la auditoría.
 // Dependerá de los nonces del middleware.
-const styleUnsafe = isDev ? " 'unsafe-inline'" : '';
+const styleUnsafe = " 'unsafe-inline'";
 
 const devHashes = isDev ? '' : " 'sha256-osMMQj3FsFuFoINhDY6u/ERO7gP52tI8DTruJmDXHD8='";
 

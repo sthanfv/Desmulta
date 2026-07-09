@@ -18,12 +18,12 @@ describe('Notificaciones con Toque Humano (Notas de Operador)', () => {
 
         // Generar notificación sin nota
         const pushWithoutNote = templateFn(caseId);
-        expect(pushWithoutNote.body).not.toContain('💬 Nota:');
+        expect(pushWithoutNote.body).not.toContain('💬 Nota del especialista:');
         expect(pushWithoutNote.body).not.toContain(note);
 
         // Generar notificación con nota
         const pushWithNote = templateFn(caseId, note);
-        expect(pushWithNote.body).toContain('💬 Nota:');
+        expect(pushWithNote.body).toContain('💬 Nota del especialista:');
         expect(pushWithNote.body).toContain(note);
       });
     });
