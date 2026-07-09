@@ -41,7 +41,7 @@ export async function POST(request: Request) {
   const ip = getSecureIp(request);
 
   try {
-    const { success, reset, isError } = await rateLimit(ip, 10, 60 * 1000, 'validar_consulta_rl');
+    const { success, reset, isError } = await rateLimit(ip, 3, 60 * 1000, 'validar_consulta_rl');
 
     if (!success) {
       if (isError) {

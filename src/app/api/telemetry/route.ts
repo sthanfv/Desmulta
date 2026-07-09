@@ -40,8 +40,8 @@ export async function POST(req: Request) {
   try {
     getAdminApp();
 
-    // 1. Identificación de IP para rate limiting en Firestore
-    const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown_ip';
+    const { getSecureIp } = await import('@/lib/security/ip-utils');
+    const ip = getSecureIp(req);
     // Sanitizar IP para usar como ID de documento (reemplaza cualquier cosa que no sea alfanumérica por guión bajo)
     const safeIpId = ip.replace(/[^a-zA-Z0-9]/g, '_');
 

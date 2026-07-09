@@ -20,8 +20,8 @@ function anonymizeIp(ip: string): string {
 }
 
 export async function POST(req: NextRequest) {
-  // 1. Extracción segura de IP — solo el primer valor del header (sin proxies encadenados)
-  const rawIp = (req.headers.get('x-forwarded-for') || '127.0.0.1').split(',')[0].trim();
+  const { getSecureIp } = await import('@/lib/security/ip-utils');
+  const rawIp = getSecureIp(req);
 
   // 2. Rate Limiting por IP anonimizada (10 peticiones cada 15 min)
   const { success, reset } = await rateLimit(`leads_${rawIp}`, 10, 15 * 60 * 1000);

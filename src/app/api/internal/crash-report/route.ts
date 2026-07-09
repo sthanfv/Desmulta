@@ -43,7 +43,8 @@ export async function POST(req: Request) {
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
-    const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown_ip';
+    const { getSecureIp } = await import('@/lib/security/ip-utils');
+    const ip = getSecureIp(req);
     const safeIpId = ip.replace(/[^a-zA-Z0-9]/g, '_');
 
     const rl = await rateLimit(

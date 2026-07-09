@@ -195,7 +195,8 @@ export async function GET(req: NextRequest) {
 
     // 🛡️ F-03 DEVSECOPS: Registrar log de auditoría directamente en el servidor al descargar
     try {
-      const ip = req.headers.get('x-forwarded-for') || 'Unknown IP';
+      const { getSecureIp } = await import('@/lib/security/ip-utils');
+      const ip = getSecureIp(req);
       const userAgent = req.headers.get('user-agent') || 'Unknown User-Agent';
       await db.collection('audit_logs').add({
         type: 'DOWNLOAD',

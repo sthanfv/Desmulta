@@ -18,7 +18,8 @@ function isValidDocIdOrShortId(id: unknown): boolean {
 
 export async function POST(request: Request) {
   try {
-    const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown-ip';
+    const { getSecureIp } = await import('@/lib/security/ip-utils');
+    const ip = getSecureIp(request);
     const { rateLimit } = await import('@/lib/security/rate-limit');
     const { success } = await rateLimit(ip, 10, 60 * 1000, 'web_push_register_rl');
     if (!success) {

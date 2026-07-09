@@ -113,7 +113,8 @@ function verifyOrigin(request: NextRequest): boolean {
 // ─── GET: Listar API Keys ──────────────────────────────────────────────────────
 
 export async function GET(request: NextRequest) {
-  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const { getSecureIp } = await import('@/lib/security/ip-utils');
+  const ip = getSecureIp(request);
 
   const rl = await checkRateLimit('galleryUpload', `admin-api-keys:${ip}`);
   if (!rl.success) {
@@ -177,7 +178,8 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const { getSecureIp } = await import('@/lib/security/ip-utils');
+  const ip = getSecureIp(request);
 
   const rl = await checkRateLimit('galleryUpload', `admin-api-keys-create:${ip}`);
   if (!rl.success) {
@@ -277,7 +279,8 @@ export async function DELETE(request: NextRequest) {
     );
   }
 
-  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const { getSecureIp } = await import('@/lib/security/ip-utils');
+  const ip = getSecureIp(request);
 
   const rl = await checkRateLimit('galleryDelete', `admin-api-keys-delete:${ip}`);
   if (!rl.success) {

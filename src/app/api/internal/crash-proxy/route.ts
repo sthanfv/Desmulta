@@ -23,7 +23,8 @@ export async function POST(req: Request) {
     }
 
     // 2. Rate Limit por IP del cliente
-    const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown';
+    const { getSecureIp } = await import('@/lib/security/ip-utils');
+    const ip = getSecureIp(req);
     const safeIpId = ip.replace(/[^a-zA-Z0-9]/g, '_');
 
     const rl = await rateLimit(`crash_proxy:${safeIpId}`, 5, 60 * 1000, 'crash_proxy_cooldown');

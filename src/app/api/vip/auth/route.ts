@@ -10,8 +10,8 @@ import { logger } from '@/lib/logger/security-logger';
 
 export async function POST(request: Request) {
   try {
-    // 1. Rate Limiting por IP
-    const ip = request.headers.get('x-forwarded-for') || 'unknown';
+    const { getSecureIp } = await import('@/lib/security/ip-utils');
+    const ip = getSecureIp(request);
 
     const rlResult = await rateLimit(`vip-auth:${ip}`, 5, 15 * 60 * 1000);
     if (!rlResult.success) {
@@ -100,15 +100,29 @@ export async function POST(request: Request) {
       );
     }
 
-    // 3. Generar y enviar OTP (FIX: Hallazgo 7)
-    const otp = generateOtp();
-    await storeOtpChallenge(hashedCedula, otp, hashedCelular);
+    // 🛡️ Tras probar coincidencia de Cédula y Celular, emitimos la sesión directamente
+    const { signVipSession } = await import('@/lib/security/vip-jwt');
+    const sessionToken = await signVipSession({
+      hashedCedula,
+      hashedCelular,
+    });
 
-    // El SMS se debe enviar al celular registrado, que coincide con el proporcionado.
-    // Como normalizedCelular fue verificado, lo usamos.
-    await sendOtpSms(normalizedCelular, otp);
+    const response = NextResponse.json(
+      { success: true, redirect: '/vip/dashboard' },
+      { status: 200 }
+    );
 
-    return NextResponse.json({ success: true, step: 'otp_required' }, { status: 200 });
+    response.cookies.set({
+      name: '_vip_session',
+      value: sessionToken,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7, // 7 días
+    });
+
+    return response;
   } catch (error) {
     logger.error('Error en autenticación VIP', {
       error: error instanceof Error ? error.message : String(error),

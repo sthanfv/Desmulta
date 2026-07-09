@@ -37,10 +37,15 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-  const rl = await rateLimit(`qr:${ip}`, 30, 60 * 1000, 'qrRateLimits');
+  const { getSecureIp } = await import('@/lib/security/ip-utils');
+  const ip = getSecureIp(request);
+  const rl = await rateLimit(`qr:${ip}`, 3, 24 * 60 * 60 * 1000, 'qrRateLimits');
   if (!rl.success) {
-    return new NextResponse('Too many requests', { status: 429 });
+    const hoursLeft = Math.ceil(rl.reset / (1000 * 60 * 60));
+    return new NextResponse(
+      `¡Has alcanzado el límite de generación de códigos QR! Por favor, intenta de nuevo en ${hoursLeft} horas.`,
+      { status: 429 }
+    );
   }
 
   try {

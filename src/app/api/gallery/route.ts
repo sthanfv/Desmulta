@@ -15,7 +15,8 @@ import { checkRateLimit } from '@/lib/security/rate-limit';
 export async function POST(req: NextRequest) {
   try {
     // 1. Rate Limit
-    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    const { getSecureIp } = await import('@/lib/security/ip-utils');
+    const ip = getSecureIp(req);
     const rateLimitStatus = await checkRateLimit('galleryUpload', ip);
     if (!rateLimitStatus.success) {
       return NextResponse.json(
@@ -188,7 +189,8 @@ export async function GET() {
 export async function DELETE(req: NextRequest) {
   try {
     // 1. Rate Limit
-    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    const { getSecureIp } = await import('@/lib/security/ip-utils');
+    const ip = getSecureIp(req);
     const rateLimitStatus = await checkRateLimit('galleryDelete', ip);
     if (!rateLimitStatus.success) {
       return NextResponse.json(

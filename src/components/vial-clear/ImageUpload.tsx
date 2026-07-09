@@ -52,10 +52,40 @@ export function ImageUpload({
   const isCarouselOpenRef = useRef(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [countdown, setCountdown] = useState<number | null>(null);
 
   // 🛡️ MANDATO-FILTRO: Validador OCR Zero-Waste — procesa en cliente, no consume servidor
   const { validarImagenSIMIT, analizando, progresoOCR, errorOCR, limpiarErrorOCR } =
     useSIMITValidator();
+
+  // 🕒 Reloj en reversa para rate-limiting (MANDATO-FILTRO)
+  React.useEffect(() => {
+    const errorMsg = error || errorOCR;
+    if (!errorMsg) {
+      setCountdown(null);
+      return;
+    }
+    const match = errorMsg.match(/(\d+)\s*segundos/i);
+    if (match) {
+      setCountdown(parseInt(match[1], 10));
+    } else {
+      setCountdown(null);
+    }
+  }, [error, errorOCR]);
+
+  React.useEffect(() => {
+    if (countdown === null) return;
+    if (countdown <= 0) {
+      setError(null);
+      limpiarErrorOCR();
+      setCountdown(null);
+      return;
+    }
+    const timer = setTimeout(() => {
+      setCountdown((prev) => (prev !== null ? prev - 1 : null));
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [countdown, limpiarErrorOCR]);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -363,13 +393,17 @@ export function ImageUpload({
           <m.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="absolute bottom-4 left-4 right-4 p-3 rounded-2xl bg-red-600/95 text-white shadow-2xl border border-red-400/30 flex flex-col gap-2"
+            className="absolute bottom-4 left-4 right-4 p-3 rounded-2xl bg-red-600/95 text-white shadow-2xl border border-red-400/30 flex flex-col gap-2 z-50"
           >
             <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-wider">
               <AlertCircle size={14} className="animate-pulse" />
               <span>Incidente de Procesamiento</span>
             </div>
-            <p className="text-[10px] font-medium leading-tight opacity-90">{error || errorOCR}</p>
+            <p className="text-[10px] font-medium leading-tight opacity-90">
+              {countdown !== null
+                ? `¡Has alcanzado el límite de escaneos de seguridad! Por favor, intenta de nuevo en ${countdown} segundos.`
+                : (error || errorOCR)}
+            </p>
           </m.div>
         )}
 

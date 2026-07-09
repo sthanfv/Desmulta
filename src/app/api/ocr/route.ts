@@ -50,9 +50,11 @@ export async function POST(request: NextRequest) {
 
     const rateLimitStatus = await checkRateLimit('ocr', rateLimitKey);
     if (!rateLimitStatus.success) {
+      const waitMs = rateLimitStatus.resetTime - Date.now();
+      const waitSec = Math.max(0, Math.ceil(waitMs / 1000));
       return NextResponse.json(
-        apiError('RATE_LIMITED', 'Demasiadas solicitudes. Espera 10 minutos.'),
-        { status: 429 }
+        apiError('RATE_LIMITED', `¡Has alcanzado el límite de escaneos de seguridad! Por favor, intenta de nuevo en ${waitSec} segundos.`),
+        { status: 429, headers: { 'Retry-After': String(waitSec) } }
       );
     }
 

@@ -32,9 +32,19 @@ const WebPushPayloadSchema = z.object({
 export async function POST(req: NextRequest) {
   // ✅ Verificar que solo el servidor interno puede llamar este endpoint
   const internalSecret = process.env.INTERNAL_API_SECRET;
-  const received = req.headers.get('x-internal-secret');
+  const received = req.headers.get('x-internal-secret') || '';
 
-  if (!internalSecret || received !== internalSecret) {
+  if (!internalSecret) {
+    return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+  }
+
+  const { timingSafeEqual } = await import('crypto');
+  const a = Buffer.from(received);
+  const b = Buffer.from(internalSecret);
+  const isLengthEqual = a.length === b.length;
+  const isSecretMatch = timingSafeEqual(a, isLengthEqual ? b : a);
+
+  if (!isLengthEqual || !isSecretMatch) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
   }
 

@@ -16,7 +16,17 @@ export async function POST(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const secretFromUrl = searchParams.get('secret');
-    const providedSecret = req.headers.get('x-sentry-hook-secret') || secretFromUrl || '';
+
+    // 🛡️ F-11 DEVSECOPS: Rechazar activamente si el secreto se proporciona en la URL (Evita filtraciones en logs de red)
+    if (secretFromUrl) {
+      logger.security('[sentry-webhook] Intento de acceso rechazado: secreto expuesto en los parámetros de la URL');
+      return NextResponse.json(
+        { error: 'Acceso prohibido: el secreto no debe enviarse a través de la URL. Use la cabecera x-sentry-hook-secret.' },
+        { status: 400 }
+      );
+    }
+
+    const providedSecret = req.headers.get('x-sentry-hook-secret') || '';
     const expectedSecret = process.env.SENTRY_WEBHOOK_SECRET;
 
     // 1. Validación de seguridad estricta

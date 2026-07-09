@@ -62,19 +62,17 @@ export async function registerReferral(
   // ── 2. Rate Limiting por IP ──────────────────────────────────────────────
   try {
     const headersList = await headers();
-    const ip =
-      headersList.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-      headersList.get('x-real-ip') ||
-      'unknown';
+    const { getSecureIp } = await import('@/lib/security/ip-utils');
+    const ip = getSecureIp(headersList);
 
-    const rl = await rateLimit(ip, 3, 10 * 60 * 1000, 'referidosCooldowns');
+    const rl = await rateLimit(ip, 5, 24 * 60 * 60 * 1000, 'referidosCooldowns');
 
     if (!rl.success && !rl.isError) {
-      const mins = Math.ceil(rl.reset / 60000);
+      const hours = Math.ceil(rl.reset / (1000 * 60 * 60));
       logger.warn(`[registerReferral] Rate limit superado para IP: ${ip.substring(0, 8)}***`);
       return {
         success: false,
-        error: `Has enviado demasiadas referencias seguidas. Por favor espera ${mins} minuto${mins !== 1 ? 's' : ''} antes de volver a intentarlo.`,
+        error: `Has alcanzado el límite diario de referencias. Por favor espera ${hours} hora${hours !== 1 ? 's' : ''} antes de volver a intentarlo.`,
       };
     }
 

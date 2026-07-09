@@ -24,10 +24,11 @@ const redis = Redis.fromEnv();
 export const rateLimiters = {
   // --- A. Operaciones Públicas ---
   leads: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(10, '15 m') }),
-  ocr: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(3, '10 m') }),
+  ocr: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(2, '10 m') }),
   consultation: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(5, '5 m') }),
-  validarOtp: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(10, '1 m') }),
-  qr: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(30, '1 m') }),
+  validarOtp: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(3, '1 m') }),
+  qr: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(3, '24 h') }),
+  referidos: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(5, '24 h') }),
 
   // --- A.1. Transacciones de Pago (cubeta EXCLUSIVA — no compartir con otras operaciones) ---
   // Límite conservador: 3 órdenes por IP por hora.
@@ -119,7 +120,7 @@ export async function rateLimit(
   else if (collectionName === 'galleryRateLimits') type = 'galleryUpload';
   else if (collectionName === 'exportPdfLimits') type = 'exportPdf';
   else if (collectionName === 'telemetryCooldowns') type = 'telemetry';
-  else if (collectionName === 'referidosCooldowns') type = 'leads';
+  else if (collectionName === 'referidosCooldowns') type = 'referidos';
   else if (collectionName === 'web_push_register_rl') type = 'vipAuth';
   else if (collectionName === 'web_push_revoke_rl') type = 'vipAuth';
   else if (collectionName === 'expediente_action_rl') type = 'operatorPin';

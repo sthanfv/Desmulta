@@ -9,7 +9,8 @@ import { rateLimit } from '@/lib/security/rate-limit';
 export async function POST(request: Request) {
   try {
     // Protección Rate Limit (10 por 30 mins)
-    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    const { getSecureIp } = await import('@/lib/security/ip-utils');
+    const ip = getSecureIp(request);
     const rl = await rateLimit(`export-pdf:${ip}`, 10, 30 * 60 * 1000, 'exportPdfLimits');
     if (!rl.success) {
       return NextResponse.json(

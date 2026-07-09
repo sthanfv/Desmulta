@@ -73,12 +73,9 @@ async function _authenticate(
   formData: FormData
 ): Promise<{ success: boolean; trackingUuid?: string; error?: string }> {
   try {
-    // 🛡️ Rate-limit por IP (máx 5 intentos / hora)
     const headersList = await headers();
-    const ip =
-      headersList.get('x-forwarded-for')?.split(',')[0]?.trim() ??
-      headersList.get('x-real-ip') ??
-      'unknown';
+    const { getSecureIp } = await import('@/lib/security/ip-utils');
+    const ip = getSecureIp(headersList);
 
     const rl = await rateLimit(`estado_login_${ip}`, 5, 60 * 60 * 1000);
     if (!rl.success) {
