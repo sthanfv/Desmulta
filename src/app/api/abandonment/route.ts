@@ -21,7 +21,8 @@ const AbandonmentSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
-    const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown';
+    const { getSecureIp } = await import('@/lib/security/ip-utils');
+    const ip = getSecureIp(req);
 
     // 🛡️ Rate Limit: máximo 10 intentos por minuto por IP
     const { success, isError } = await rateLimit(ip, 10, 1 * 60 * 1000, 'abandonmentRateLimits');

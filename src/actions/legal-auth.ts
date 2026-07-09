@@ -78,8 +78,8 @@ export async function dispatchOTP(email: string, documentId: string) {
 
     // Captura de IP nativa en Next.js App Router (Blindaje Legal)
     const headersList = await headers();
-    const clientIp =
-      headersList.get('x-forwarded-for') || headersList.get('x-real-ip') || 'IP_NOT_FOUND';
+    const { getSecureIp } = await import('@/lib/security/ip-utils');
+    const clientIp = getSecureIp(headersList);
     const userAgent = headersList.get('user-agent') || 'UNKNOWN_AGENT';
 
     // Hashear el OTP usando bcryptjs antes de almacenarlo en la base de datos (Zero-PII)

@@ -43,7 +43,8 @@ export async function consolidarExpedienteEnDB(payloadParams: ConsolidarPayload)
   try {
     const { headers } = await import('next/headers');
     const headerStore = await headers();
-    const ip = headerStore.get('x-forwarded-for')?.split(',')[0] || 'unknown-ip';
+    const { getSecureIp } = await import('@/lib/security/ip-utils');
+    const ip = getSecureIp(headerStore);
 
     const { rateLimit } = await import('@/lib/security/rate-limit');
     const { success } = await rateLimit(ip, 10, 60 * 1000, 'expediente_action_rl');

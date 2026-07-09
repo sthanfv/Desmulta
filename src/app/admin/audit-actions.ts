@@ -46,10 +46,8 @@ export async function logAdminAction(payload: {
     let ip = 'unknown';
     try {
       const headersList = await headers();
-      ip =
-        headersList.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-        headersList.get('x-real-ip') ||
-        'unknown';
+      const { getSecureIp } = await import('@/lib/security/ip-utils');
+      ip = getSecureIp(headersList);
     } catch {
       ip = 'background-task/test';
     }
@@ -122,7 +120,8 @@ export async function logExportAction(payload: {
 
 export async function verifyGodMode(password: string) {
   const headersList = await headers();
-  const ip = headersList.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const { getSecureIp } = await import('@/lib/security/ip-utils');
+  const ip = getSecureIp(headersList);
 
   // 🛡️ TESTING BYPASS: Evitar bloqueos de Rate Limit en tests E2E
   const isE2E = process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === 'true';
@@ -461,7 +460,8 @@ export async function verifyOperatorPin(pin: string) {
 
   // ── Rate limit: máximo 5 intentos por IP en 15 minutos ──────────────────
   const headersList = await headers();
-  const ip = headersList.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const { getSecureIp } = await import('@/lib/security/ip-utils');
+  const ip = getSecureIp(headersList);
   const rl = await rateLimit(`operator-pin:${ip}`, 5, 15 * 60 * 1000);
   if (!rl.success) {
     logger.security('Rate limit PIN operacional alcanzado', { ip });

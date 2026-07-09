@@ -69,7 +69,8 @@ const schema = z.object({
 });
 
 export async function POST(req: NextRequest) {
-  const ip = req.headers.get('x-forwarded-for') ?? 'unknown';
+  const { getSecureIp } = await import('@/lib/security/ip-utils');
+  const ip = getSecureIp(req);
 
   // 1. Rate limiting — cubeta EXCLUSIVA para pagos: máx 3 órdenes por IP por hora.
   // Se usa 'checkoutOrder' (NO 'consultation') para evitar bloqueos cruzados:

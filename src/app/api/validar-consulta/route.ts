@@ -37,8 +37,8 @@ function ofuscarPII(valor: string): string {
 }
 
 export async function POST(request: Request) {
-  // 🛡️ 1. RATE LIMITING (Protección contra Enumeración/Brute-force)
-  const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown';
+  const { getSecureIp } = await import('@/lib/security/ip-utils');
+  const ip = getSecureIp(request);
 
   try {
     const { success, reset, isError } = await rateLimit(ip, 10, 60 * 1000, 'validar_consulta_rl');

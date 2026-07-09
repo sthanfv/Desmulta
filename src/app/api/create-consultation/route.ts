@@ -86,7 +86,8 @@ export async function POST(request: NextRequest) {
   // ------------------------------------------------------------------
   // 1. CAPA 4 REUBICADA: ESCUDO ANTI-ATAQUES INMEDIATO (Upstash Redis)
   // ------------------------------------------------------------------
-  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || '127.0.0.1';
+  const { getSecureIp } = await import('@/lib/security/ip-utils');
+  const ip = getSecureIp(request);
 
   // Usando tu wrapper actual que conecta a Upstash
   const rateLimitStatus = await checkRateLimit('consultation', ip);
@@ -176,7 +177,7 @@ export async function POST(request: NextRequest) {
     if (validatedData.websiteHoneypot && validatedData.websiteHoneypot.length > 0) {
       logger.security('[create-consultation] Honeypot activado — bot detectado', {
         authorUid,
-        ip: request.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown',
+        ip,
       });
       return NextResponse.json(
         {

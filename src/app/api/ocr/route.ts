@@ -39,8 +39,8 @@ function getGeminiModel() {
 
 export async function POST(request: NextRequest) {
   try {
-    // 1. Rate limit por IP + Fingerprint (Canvas Hash) para evitar bypass con VPN rotativas
-    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    const { getSecureIp } = await import('@/lib/security/ip-utils');
+    const ip = getSecureIp(request);
     const fingerprint = request.headers.get('x-device-fingerprint') || 'no-fingerprint';
 
     // 🛡️ El Rate Limit DEBE basarse estrictamente en la IP.
