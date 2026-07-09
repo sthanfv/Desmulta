@@ -41,8 +41,6 @@ const placeNow = (el: HTMLElement, slot: Slot, skew: number) =>
     x: slot.x,
     y: slot.y,
     z: slot.z,
-    xPercent: -50,
-    yPercent: -50,
     skewY: skew,
     transformOrigin: 'center center',
     zIndex: slot.zIndex,
@@ -267,7 +265,7 @@ export function CardSwap({
         <div
           key={i}
           ref={el => { cardRefs.current[i] = el; }}
-          className="absolute top-1/2 left-1/2 rounded-2xl border shadow-2xl p-6 flex flex-col justify-between overflow-hidden bg-card text-card-foreground border-border [transform-style:preserve-3d] [will-change:transform] [backface-visibility:hidden] cursor-pointer"
+          className="absolute top-0 left-0 w-full h-full rounded-2xl border shadow-2xl p-6 flex flex-col justify-between overflow-hidden bg-card text-card-foreground border-border [transform-style:preserve-3d] [will-change:transform] [backface-visibility:hidden] cursor-pointer"
           style={{
             width: typeof width === 'number' ? `${width}px` : width,
             height: typeof height === 'number' ? `${height}px` : height,
