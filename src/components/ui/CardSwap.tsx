@@ -1,208 +1,280 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { m, AnimatePresence, PanInfo } from 'framer-motion';
+import React, {
+  Children,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react';
+import gsap from 'gsap';
 
 export interface CardSwapProps {
   width?: number | string;
   height?: number | string;
-  delay?: number;
-  pauseOnHover?: boolean;
   cardDistance?: number;
   verticalDistance?: number;
+  delay?: number;
+  pauseOnHover?: boolean;
+  onCardClick?: (idx: number) => void;
+  skewAmount?: number;
+  easing?: 'linear' | 'elastic';
   children: React.ReactNode[];
 }
 
-/**
- * Configuración de posición, escala y brillo para cada capa del stack.
- * Índice 0 = frente, índice 1 = segunda, índice 2 = tercera (fondo).
- */
-const STACK_CONFIG = [
-  { x: 0, y: 0, scale: 1, rotateZ: 0, zIndex: 30, brightness: 1 },
-  { x: 20, y: 14, scale: 0.92, rotateZ: 2.5, zIndex: 20, brightness: 0.7 },
-  { x: 38, y: 26, scale: 0.84, rotateZ: 5, zIndex: 10, brightness: 0.48 },
-];
+interface Slot {
+  x: number;
+  y: number;
+  z: number;
+  zIndex: number;
+}
 
-/** Resorte para avance de tarjetas desde el fondo hacia el frente */
-const SPRING_IN = {
-  type: 'spring' as const,
-  stiffness: 300,
-  damping: 30,
-  mass: 0.85,
-};
+const makeSlot = (i: number, distX: number, distY: number, total: number): Slot => ({
+  x: i * distX,
+  y: -i * distY,
+  z: -i * distX * 1.5,
+  zIndex: total - i
+});
 
-/** Transición de salida de la tarjeta frontal */
-const EXIT_SPRING = {
-  type: 'spring' as const,
-  stiffness: 340,
-  damping: 32,
-  mass: 0.7,
-};
+const placeNow = (el: HTMLElement, slot: Slot, skew: number) =>
+  gsap.set(el, {
+    x: slot.x,
+    y: slot.y,
+    z: slot.z,
+    xPercent: -50,
+    yPercent: -50,
+    skewY: skew,
+    transformOrigin: 'center center',
+    zIndex: slot.zIndex,
+    force3D: true
+  });
 
 export function CardSwap({
   width = 340,
   height = 440,
+  cardDistance = 20,
+  verticalDistance = 14,
   delay = 5000,
   pauseOnHover = true,
-  children,
+  onCardClick,
+  skewAmount = 2.5,
+  easing = 'elastic',
+  children
 }: CardSwapProps) {
-  // Asignamos un ID único a cada tarjeta en el montaje inicial para que Framer Motion las trackee
-  const [cards, setCards] = useState<{ id: number; content: React.ReactNode }[]>(() =>
-    React.Children.toArray(children).map((child, idx) => ({
-      id: idx,
-      content: child,
-    }))
+  const config = useMemo(() => 
+    easing === 'elastic'
+      ? {
+          ease: 'elastic.out(0.6, 0.9)',
+          durDrop: 1.8,
+          durMove: 1.8,
+          durReturn: 1.8,
+          promoteOverlap: 0.85,
+          returnDelay: 0.05
+        }
+      : {
+          ease: 'power2.inOut',
+          durDrop: 0.8,
+          durMove: 0.8,
+          durReturn: 0.8,
+          promoteOverlap: 0.45,
+          returnDelay: 0.2
+        },
+    [easing]
   );
-  const [isSwapping, setIsSwapping] = useState(false);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const isHoveredRef = useRef(false);
 
-  const triggerSwap = useCallback(() => {
-    if (isSwapping || cards.length < 2) return;
-    setIsSwapping(true);
+  const childArr = useMemo(() => Children.toArray(children), [children]);
+  const totalCards = childArr.length;
+  
+  // Guardamos las referencias a los elementos del DOM de las tarjetas
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const order = useRef<number[]>([]);
+  const tlRef = useRef<gsap.core.Timeline | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isHovered, setIsHovered] = useState(false);
 
-    // Esperamos a que la animación de salida de la tarjeta frontal termine
-    // para luego rotar el array y restablecer el estado
-    setTimeout(() => {
-      setCards((prev) => {
-        const [front, ...rest] = prev;
-        return [...rest, front];
-      });
-      setIsSwapping(false);
-    }, 440);
-  }, [isSwapping, cards.length]);
+  // Inicializar orden de las tarjetas
+  useEffect(() => {
+    order.current = Array.from({ length: totalCards }, (_, i) => i);
+  }, [totalCards]);
 
   useEffect(() => {
-    if (timerRef.current) clearInterval(timerRef.current);
+    if (totalCards === 0) return;
 
-    timerRef.current = setInterval(() => {
-      if (!isHoveredRef.current || !pauseOnHover) {
-        triggerSwap();
+    // Asegurar posicionamiento inicial de todas las capas
+    cardRefs.current.forEach((el, i) => {
+      if (!el) return;
+      const slot = makeSlot(i, cardDistance, verticalDistance, totalCards);
+      placeNow(el, slot, skewAmount);
+      
+      // Aplicar opacidad del overlay de profundidad inicial
+      const overlay = el.querySelector('.depth-overlay') as HTMLElement;
+      if (overlay) {
+        gsap.set(overlay, { opacity: i === 0 ? 0 : Math.min(i * 0.35, 0.8) });
       }
-    }, delay);
+    });
+
+    const swap = () => {
+      if (order.current.length < 2) return;
+
+      const [front, ...rest] = order.current;
+      const elFront = cardRefs.current[front];
+      if (!elFront) return;
+
+      const tl = gsap.timeline({
+        onComplete: () => {
+          order.current = [...rest, front];
+        }
+      });
+      tlRef.current = tl;
+
+      // Caída/salida de la tarjeta frontal (hacia abajo y un poco rotada)
+      tl.to(elFront, {
+        y: '+=500',
+        rotationZ: 12,
+        opacity: 0,
+        scale: 0.75,
+        duration: config.durDrop * 0.45,
+        ease: 'power2.in'
+      });
+
+      // Promoción de las tarjetas traseras
+      tl.addLabel('promote', `-=${config.durDrop * 0.2}`);
+      rest.forEach((idx, i) => {
+        const el = cardRefs.current[idx];
+        if (!el) return;
+        const slot = makeSlot(i, cardDistance, verticalDistance, totalCards);
+        
+        tl.set(el, { zIndex: slot.zIndex }, 'promote');
+        tl.to(
+          el,
+          {
+            x: slot.x,
+            y: slot.y,
+            z: slot.z,
+            skewY: skewAmount,
+            scale: i === 0 ? 1 : i === 1 ? 0.92 : 0.84, // Escala escalonada
+            duration: config.durMove * 0.5,
+            ease: config.ease
+          },
+          'promote'
+        );
+
+        // Animar el overlay de profundidad
+        const overlay = el.querySelector('.depth-overlay') as HTMLElement;
+        if (overlay) {
+          tl.to(
+            overlay,
+            {
+              opacity: i === 0 ? 0 : Math.min(i * 0.35, 0.8),
+              duration: config.durMove * 0.5,
+              ease: config.ease
+            },
+            'promote'
+          );
+        }
+      });
+
+      // Retorno de la tarjeta vieja al fondo del stack
+      const backSlot = makeSlot(totalCards - 1, cardDistance, verticalDistance, totalCards);
+      tl.addLabel('return');
+      
+      tl.set(elFront, { 
+        zIndex: backSlot.zIndex,
+        rotationZ: 0,
+        scale: 0.84
+      }, 'return');
+
+      tl.to(
+        elFront,
+        {
+          x: backSlot.x,
+          y: backSlot.y,
+          z: backSlot.z,
+          opacity: 1,
+          duration: config.durReturn * 0.45,
+          ease: 'power2.out'
+        },
+        'return'
+      );
+
+      const frontOverlay = elFront.querySelector('.depth-overlay') as HTMLElement;
+      if (frontOverlay) {
+        tl.to(
+          frontOverlay,
+          {
+            opacity: Math.min((totalCards - 1) * 0.35, 0.8),
+            duration: config.durReturn * 0.45,
+            ease: 'power2.out'
+          },
+          'return'
+        );
+      }
+    };
+
+    // Inicializar el intervalo de auto-swap
+    if (!isHovered || !pauseOnHover) {
+      intervalRef.current = setInterval(swap, delay);
+    }
 
     return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (tlRef.current) tlRef.current.kill();
     };
-  }, [triggerSwap, delay, pauseOnHover]);
+  }, [cardDistance, verticalDistance, delay, pauseOnHover, skewAmount, totalCards, config, isHovered]);
 
   const handleMouseEnter = () => {
-    isHoveredRef.current = true;
-  };
-  const handleMouseLeave = () => {
-    isHoveredRef.current = false;
-  };
-
-  const handleDragEnd = (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    if (isSwapping) return;
-    // Umbral de 60px en cualquier eje para disparar el swap con drag
-    if (Math.abs(info.offset.x) > 60 || Math.abs(info.offset.y) > 60) {
-      triggerSwap();
+    if (pauseOnHover) {
+      setIsHovered(true);
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      tlRef.current?.pause();
     }
   };
 
-  // OPTIMIZACIÓN: Solo renderizamos las primeras 3 tarjetas del stack visible
-  const visibleCards = cards.slice(0, Math.min(3, cards.length));
+  const handleMouseLeave = () => {
+    if (pauseOnHover) {
+      setIsHovered(false);
+      tlRef.current?.play();
+    }
+  };
 
   return (
     <div
-      className="relative select-none overflow-visible shrink-0 mx-auto"
+      ref={containerRef}
+      className="relative select-none overflow-visible shrink-0 mx-auto [perspective:1200px]"
       style={{
         width: typeof width === 'number' ? `${width}px` : width,
         height: typeof height === 'number' ? `${height}px` : height,
-        perspective: '1200px',
-        perspectiveOrigin: '50% 40%',
       }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <AnimatePresence initial={false}>
-        {visibleCards.map((cardObj, index) => {
-          const isFront = index === 0;
-          const cfg = STACK_CONFIG[index] ?? STACK_CONFIG[STACK_CONFIG.length - 1];
-          const lastCfg = STACK_CONFIG[STACK_CONFIG.length - 1];
-
-          return (
-            <m.div
-              key={cardObj.id}
-              className={`absolute top-0 left-0 w-full h-full ${
-                isFront ? 'cursor-grab active:cursor-grabbing' : ''
-              }`}
-              style={{
-                zIndex: cfg.zIndex,
-                touchAction: isFront ? 'pan-y' : 'auto',
-                willChange: 'transform, opacity',
-                originX: '50%',
-                originY: '50%',
-                filter: `brightness(${cfg.brightness})`,
-              }}
-              drag={isFront ? 'x' : false}
-              dragConstraints={{ left: 0, right: 0 }}
-              dragElastic={0.35}
-              onDragEnd={handleDragEnd}
-              /*
-               * initial: la tarjeta nueva entra desde la posición de fondo del stack
-               * (pequeña, desplazada, semiopaca) y avanza hacia su lugar con el resorte.
-               */
-              initial={{
-                x: lastCfg.x,
-                y: lastCfg.y,
-                scale: lastCfg.scale,
-                rotateZ: lastCfg.rotateZ,
-                opacity: isFront ? 0.55 : 1,
-              }}
-              /*
-               * animate: si es la tarjeta frontal y está swapping, sale hacia
-               * adelante-abajo con rotación, como si la empujáramos al fondo de la baraja.
-               * Si no, anima hacia su posición de reposo en el stack.
-               */
-              animate={
-                isSwapping && isFront
-                  ? {
-                      x: 55,
-                      y: 90,
-                      scale: 0.72,
-                      rotateZ: 14,
-                      opacity: 0,
-                      transition: EXIT_SPRING,
-                    }
-                  : {
-                      x: cfg.x,
-                      y: cfg.y,
-                      scale: cfg.scale,
-                      rotateZ: cfg.rotateZ,
-                      opacity: 1,
-                      transition: SPRING_IN,
-                    }
-              }
-            >
-              {/* Tarjeta — fondo papel adaptativo al tema */}
-              <div
-                className="w-full h-full rounded-2xl border shadow-2xl p-6 flex flex-col justify-between relative overflow-hidden bg-card text-card-foreground border-border"
-                style={{ transition: 'background-color 0.3s ease, border-color 0.3s ease' }}
-              >
-                {/* Gradiente sutil de profundidad */}
-                <div className="absolute -inset-px bg-gradient-to-tr from-primary/5 via-transparent to-foreground/[0.03] rounded-2xl opacity-50 pointer-events-none" />
-                {/*
-                 * Overlay de profundidad: en modo claro usa negro translúcido (sombra de papel),
-                 * en modo oscuro igual. El filter brightness del contenedor padre ya oscurece
-                 * el conjunto, este overlay refuerza el efecto en los bordes.
-                 */}
-                {index > 0 && (
-                  <div
-                    className="absolute inset-0 rounded-2xl pointer-events-none"
-                    style={{
-                      background: 'rgba(0, 0, 0, 0.18)',
-                      opacity: Math.min(index * 0.6, 1),
-                    }}
-                  />
-                )}
-                {cardObj.content}
-              </div>
-            </m.div>
-          );
-        })}
-      </AnimatePresence>
+      {childArr.map((child, i) => (
+        <div
+          key={i}
+          ref={el => { cardRefs.current[i] = el; }}
+          className="absolute top-1/2 left-1/2 rounded-2xl border shadow-2xl p-6 flex flex-col justify-between overflow-hidden bg-card text-card-foreground border-border [transform-style:preserve-3d] [will-change:transform] [backface-visibility:hidden] cursor-pointer"
+          style={{
+            width: typeof width === 'number' ? `${width}px` : width,
+            height: typeof height === 'number' ? `${height}px` : height,
+            transition: 'background-color 0.3s ease, border-color 0.3s ease',
+          }}
+          onClick={() => {
+            onCardClick?.(i);
+          }}
+        >
+          {/* Gradiente sutil de profundidad */}
+          <div className="absolute -inset-px bg-gradient-to-tr from-primary/5 via-transparent to-foreground/[0.03] rounded-2xl opacity-50 pointer-events-none" />
+          
+          {/* Overlay de profundidad */}
+          <div className="depth-overlay absolute inset-0 rounded-2xl pointer-events-none bg-black/20 dark:bg-black/50 transition-opacity duration-300" />
+          
+          {/* Contenido real de la tarjeta */}
+          <div className="relative z-10 w-full h-full flex flex-col justify-between">
+            {child}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
