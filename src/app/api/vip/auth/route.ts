@@ -2,8 +2,7 @@ import { NextResponse } from 'next/server';
 import { getAdminApp } from '@/lib/firebase-admin';
 import { getFirestore, QueryDocumentSnapshot } from 'firebase-admin/firestore';
 import { hashPII } from '@/lib/security/server-crypto';
-import { sendOtpSms } from '@/lib/notifications/sms-provider';
-import { generateOtp, storeOtpChallenge } from '@/lib/security/vip-otp-service';
+
 
 import { rateLimit } from '@/lib/security/rate-limit';
 import { logger } from '@/lib/logger/security-logger';

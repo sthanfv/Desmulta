@@ -9,10 +9,10 @@ import type { NextRequest } from 'next/server';
  * En desarrollo, recurre a `x-real-ip` o fallback local.
  * NUNCA confía en `x-forwarded-for` crudo del cliente.
  */
-export function getSecureIp(request: NextRequest | Request | Headers | any): string {
+export function getSecureIp(request: NextRequest | Request | Headers | unknown): string {
   // 1. Intentar obtener la IP validada por Vercel (si es NextRequest/Request)
-  if (request && typeof request.headers !== 'undefined') {
-    const ipVercel = ipAddress(request as any);
+  if (request && typeof (request as { headers?: unknown }).headers !== 'undefined') {
+    const ipVercel = ipAddress(request as Request);
     if (ipVercel) return ipVercel;
   }
 
