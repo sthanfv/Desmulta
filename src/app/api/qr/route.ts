@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
 
   const { getSecureIp } = await import('@/lib/security/ip-utils');
   const ip = getSecureIp(request);
-  const rl = await rateLimit(`qr:${ip}`, 3, 24 * 60 * 60 * 1000, 'qrRateLimits');
+  const rl = await rateLimit(`qr:${ip}`, 60, 60 * 60 * 1000, 'qrRateLimits');
   if (!rl.success) {
     const hoursLeft = Math.ceil(rl.reset / (1000 * 60 * 60));
     return new NextResponse(
