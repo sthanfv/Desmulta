@@ -682,7 +682,7 @@ Se leyó `C:\Users\Sthan\Escritorio\para antigravity\auditoria-forense-v2-delta.
   - **FIX CRÍTICO (Tracking Portal):** Se corrigió un bug donde el portal de seguimiento público (`/seguir/[id]`) se quedaba atascado en estado "Recibido". El listener de Firestore (`onSnapshot`) estaba apuntando erróneamente al ID cosmético (`EXP-...`) en lugar del `trackingUuid` real. Se expuso `docId` a la interfaz `TrackingCase` y se corrigió el enganche de WebSockets.
   - **FIX VISUAL (Admin Kanban):** Se reparó el overflow del badge "NUEVO" en el panel Kanban (`whitespace-nowrap flex-shrink-0`) que causaba una desmaquetación circular de la columna.
   - **FIX CRÍTICO (Estado Login):** Se solucionó el error `a.get is not a function`. En Next.js 15 (Vercel Edge Runtime), los objetos `FormData` y `Headers` a veces pierden sus métodos nativos al ser serializados por RPC. Se reescribió `ip-utils.ts` y `estado/actions.ts` para acceder a los datos de forma segura como objetos planos.
-  - **FIX CRÍTICO (QR dinámico roto):** El endpoint `/api/qr` estaba bloqueando dominios Vercel y locales debido a una estricta validación Anti-Phishing que solo aceptaba la variable de entorno `NEXT_PUBLIC_SITE_URL`. Se flexibilizó para permitir la cabecera `host` entrante y el sufijo `.vercel.app`, restaurando las imágenes QR.
+  - **FIX CRÍTICO (QR dinámico roto):** Se detectó y resolvió que el Rate Limit de Upstash Redis para el generador de QRs estaba configurado a 3 peticiones por cada 24 HORAS, lo que causaba un bloqueo 429 casi inmediato (imágenes rotas) al abrir el panel de administración. Se ajustó a 60 peticiones por hora.
 
 - **Estado actual:** ✅ Motor PDF robusto. Compatibilidad garantizada con Adobe Reader. Cero warnings de linter.
 

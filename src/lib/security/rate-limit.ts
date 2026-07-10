@@ -27,7 +27,7 @@ export const rateLimiters = {
   ocr: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(2, '10 m') }),
   consultation: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(5, '5 m') }),
   validarOtp: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(3, '1 m') }),
-  qr: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(3, '24 h') }),
+  qr: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(60, '1 h') }),
   referidos: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(5, '24 h') }),
 
   // --- A.1. Transacciones de Pago (cubeta EXCLUSIVA — no compartir con otras operaciones) ---
