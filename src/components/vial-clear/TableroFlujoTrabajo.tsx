@@ -894,17 +894,17 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
                 className="kanban-column w-[85vw] max-w-[340px] lg:w-auto lg:flex-1 lg:min-w-[320px] shrink-0 snap-center bg-slate-50/80 dark:bg-[#0a0a0c]/80 backdrop-blur-2xl rounded-[2rem] border border-slate-200/60 dark:border-white/5 p-5 flex flex-col shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_20px_40px_rgb(0,0,0,0.2)] transition-all hover:border-slate-300 dark:hover:border-white/10"
               >
                 <div className={`border-b-2 pb-3 mb-4 ${columna.color}`}>
-                  <div className="flex justify-between items-start">
-                    <div className="flex items-center gap-2">
-                      <div className={`p-1.5 rounded-lg ${columna.bgIcon}`}>
+                  <div className="flex justify-between items-start gap-2">
+                    <div className="flex flex-wrap items-center gap-2 flex-1 min-w-0">
+                      <div className={`p-1.5 rounded-lg shrink-0 ${columna.bgIcon}`}>
                         <columna.icono className="w-4 h-4" />
                       </div>
-                      <h3 className="font-black text-lg uppercase tracking-wide flex items-center gap-2">
+                      <h3 className="font-black text-lg uppercase tracking-wide flex flex-wrap items-center gap-2">
                         {columna.titulo}
                         {columna.id === 'NUEVO' && (realtimeNewLeadsCount || 0) > 0 && (
                           <Badge
                             variant="destructive"
-                            className="ml-2 animate-bounce border-none font-black shadow-[0_0_15px_rgba(239,68,68,0.5)] whitespace-nowrap flex-shrink-0"
+                            className="ml-1 animate-bounce border-none font-black shadow-[0_0_15px_rgba(239,68,68,0.5)] whitespace-nowrap flex-shrink-0"
                           >
                             {realtimeNewLeadsCount} Nuevo{realtimeNewLeadsCount !== 1 ? 's' : ''}
                           </Badge>
@@ -912,7 +912,7 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
                       </h3>
                       <Popover>
                         <PopoverTrigger asChild>
-                          <button className="text-muted-foreground/30 hover:text-primary transition-colors p-1 rounded-full hover:bg-white/5">
+                          <button className="text-muted-foreground/30 hover:text-primary transition-colors p-1 rounded-full hover:bg-white/5 shrink-0">
                             <Info className="w-3.5 h-3.5" />
                           </button>
                         </PopoverTrigger>
