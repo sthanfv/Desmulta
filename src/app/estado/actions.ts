@@ -86,8 +86,12 @@ async function _authenticate(
       };
     }
 
-    const cedula = (formData.get('cedula') as string)?.replace(/\s+/g, '');
-    const contacto = (formData.get('contacto') as string)?.replace(/\s+/g, '');
+    // 🛡️ WORKAROUND Next.js 15 RPC: Si formData se serializó como plain object, usar acceso directo
+    const cedulaRaw = typeof formData.get === 'function' ? formData.get('cedula') : (formData as any).cedula;
+    const contactoRaw = typeof formData.get === 'function' ? formData.get('contacto') : (formData as any).contacto;
+
+    const cedula = (cedulaRaw as string)?.replace(/\s+/g, '');
+    const contacto = (contactoRaw as string)?.replace(/\s+/g, '');
 
     const validation = AuthSchema.safeParse({ cedula, contacto });
     if (!validation.success) {

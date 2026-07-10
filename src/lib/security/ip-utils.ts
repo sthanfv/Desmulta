@@ -26,15 +26,24 @@ export function getSecureIp(request: NextRequest | Request | Headers | unknown):
   }
 
   // 2. Resolver el origen de las cabeceras
-  const headers = (req && typeof req.get === 'function')
-    ? req
-    : req?.headers;
+  let ipReal: string | null = null;
+  let forwarded: string | null = null;
 
-  const ipReal = headers?.get ? headers.get('x-real-ip') : null;
+  if (req && typeof req.get === 'function') {
+    ipReal = req.get('x-real-ip');
+    forwarded = req.get('x-forwarded-for');
+  } else if (req?.headers && typeof req.headers.get === 'function') {
+    ipReal = req.headers.get('x-real-ip');
+    forwarded = req.headers.get('x-forwarded-for');
+  } else if (req?.headers && typeof req.headers === 'object') {
+    // Si es un plain object de Node.js o RPC
+    const plainHeaders = req.headers as Record<string, string>;
+    ipReal = plainHeaders['x-real-ip'] || null;
+    forwarded = plainHeaders['x-forwarded-for'] || null;
+  }
+
   if (ipReal) return ipReal.trim();
 
-  // 3. Fallback de x-forwarded-for
-  const forwarded = headers?.get ? headers.get('x-forwarded-for') : null;
   if (forwarded) {
     const parts = forwarded.split(',');
     const lastIp = parts[parts.length - 1]?.trim();
