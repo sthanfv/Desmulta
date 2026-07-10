@@ -87,8 +87,9 @@ async function _authenticate(
     }
 
     // 🛡️ WORKAROUND Next.js 15 RPC: Si formData se serializó como plain object, usar acceso directo
-    const cedulaRaw = typeof formData.get === 'function' ? formData.get('cedula') : (formData as any).cedula;
-    const contactoRaw = typeof formData.get === 'function' ? formData.get('contacto') : (formData as any).contacto;
+    const plainForm = formData as unknown as Record<string, unknown>;
+    const cedulaRaw = typeof formData.get === 'function' ? formData.get('cedula') : plainForm.cedula;
+    const contactoRaw = typeof formData.get === 'function' ? formData.get('contacto') : plainForm.contacto;
 
     const cedula = (cedulaRaw as string)?.replace(/\s+/g, '');
     const contacto = (contactoRaw as string)?.replace(/\s+/g, '');
