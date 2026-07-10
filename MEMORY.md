@@ -676,6 +676,11 @@ Se leyó `C:\Users\Sthan\Escritorio\para antigravity\auditoria-forense-v2-delta.
 - **Decisiones técnicas:**
   - Se mantuvo la limpieza de diacríticos (`n(text)`) por seguridad del encoding `WinAnsi` de `pdf-lib` con fuentes estándar.
   - Las dimensiones se mantienen en `612x792` (Tamaño Carta - US Letter), el formato nativo estándar para documentos legales en el entorno local.
+- **Día 10/07/2026** (Autoevaluación de Linter y Fixes): 
+  - Limpieza completa de código muerto e imports huérfanos (`sendOtpSms`, etc) en el flujo VIP Auth.
+  - Corrección de un fallo de tipado (`RequestLike`) en la abstracción de seguridad de `ip-utils.ts` para cumplir con las validaciones estrictas del build.
+  - **FIX CRÍTICO (Tracking Portal):** Se corrigió un bug donde el portal de seguimiento público (`/seguir/[id]`) se quedaba atascado en estado "Recibido". El listener de Firestore (`onSnapshot`) estaba apuntando erróneamente al ID cosmético (`EXP-...`) en lugar del `trackingUuid` real. Se expuso `docId` a la interfaz `TrackingCase` y se corrigió el enganche de WebSockets.
+
 - **Estado actual:** ✅ Motor PDF robusto. Compatibilidad garantizada con Adobe Reader. Cero warnings de linter.
 
 

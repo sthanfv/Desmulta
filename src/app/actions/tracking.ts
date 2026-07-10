@@ -51,6 +51,7 @@ export const getExpedienteCacheado = unstable_cache(
 
     return {
       shortId: data.shortId || docSnap.id,
+      docId: docSnap.id,
       status: data.status || 'pendiente',
       nombre: data.nombreOfuscado || data.nombre || 'Ciudadano',
       ciudad: data.ciudad || 'Colombia',

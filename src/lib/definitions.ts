@@ -30,6 +30,7 @@ export interface EventoTracking {
 
 export interface TrackingCase {
   shortId: string;
+  docId?: string;
   status: string;
   nombre: string;
   ciudad: string;

@@ -185,13 +185,14 @@ export default function TrackingClientUI({
 
   useEffect(() => {
     if (!initialCaseData?.shortId) return;
-    const unsub = onSnapshot(doc(db, 'public_tracking', initialCaseData.shortId), (docSnap) => {
+    const documentId = initialCaseData.docId || initialCaseData.shortId;
+    const unsub = onSnapshot(doc(db, 'public_tracking', documentId), (docSnap) => {
       if (docSnap.exists()) {
         setCaseData(docSnap.data() as TrackingCase);
       }
     });
     return () => unsub();
-  }, [initialCaseData?.shortId]);
+  }, [initialCaseData?.shortId, initialCaseData?.docId]);
 
   const currentStep = getStepForStatus(caseData.status);
   const slaMsg = getSLAMessage(caseData.status);
