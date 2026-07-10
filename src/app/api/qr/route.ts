@@ -27,7 +27,13 @@ export async function GET(request: NextRequest) {
     if (data.startsWith('http://') || data.startsWith('https://')) {
       const parsedUrl = new URL(data);
       const siteUrl = new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://desmulta.online');
-      if (parsedUrl.hostname !== siteUrl.hostname) {
+      const appUrl = new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://desmulta.online');
+      const reqHost = request.headers.get('host') || '';
+      
+      const allowedHosts = [siteUrl.hostname, appUrl.hostname, reqHost, 'localhost', '127.0.0.1'];
+      const isAllowedVercel = parsedUrl.hostname.endsWith('.vercel.app');
+
+      if (!allowedHosts.includes(parsedUrl.hostname) && !isAllowedVercel) {
         return new NextResponse('URL de dominio externo no permitida', { status: 400 });
       }
     }

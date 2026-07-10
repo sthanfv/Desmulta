@@ -680,6 +680,9 @@ Se leyó `C:\Users\Sthan\Escritorio\para antigravity\auditoria-forense-v2-delta.
   - Limpieza completa de código muerto e imports huérfanos (`sendOtpSms`, etc) en el flujo VIP Auth.
   - Corrección de un fallo de tipado (`RequestLike`) en la abstracción de seguridad de `ip-utils.ts` para cumplir con las validaciones estrictas del build.
   - **FIX CRÍTICO (Tracking Portal):** Se corrigió un bug donde el portal de seguimiento público (`/seguir/[id]`) se quedaba atascado en estado "Recibido". El listener de Firestore (`onSnapshot`) estaba apuntando erróneamente al ID cosmético (`EXP-...`) en lugar del `trackingUuid` real. Se expuso `docId` a la interfaz `TrackingCase` y se corrigió el enganche de WebSockets.
+  - **FIX VISUAL (Admin Kanban):** Se reparó el overflow del badge "NUEVO" en el panel Kanban (`whitespace-nowrap flex-shrink-0`) que causaba una desmaquetación circular de la columna.
+  - **DEBUG (Estado Login):** Se habilitó exposición condicional de excepciones internas en el portal de estado del cliente para identificar la causa raíz de "Error interno de conexión".
+  - **FIX CRÍTICO (QR dinámico roto):** El endpoint `/api/qr` estaba bloqueando dominios Vercel y locales debido a una estricta validación Anti-Phishing que solo aceptaba la variable de entorno `NEXT_PUBLIC_SITE_URL`. Se flexibilizó para permitir la cabecera `host` entrante y el sufijo `.vercel.app`, restaurando las imágenes QR.
 
 - **Estado actual:** ✅ Motor PDF robusto. Compatibilidad garantizada con Adobe Reader. Cero warnings de linter.
 
