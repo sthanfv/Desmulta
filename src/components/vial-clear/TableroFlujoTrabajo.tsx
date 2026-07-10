@@ -904,7 +904,7 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
                         {columna.id === 'NUEVO' && (realtimeNewLeadsCount || 0) > 0 && (
                           <Badge
                             variant="destructive"
-                            className="ml-2 animate-bounce border-none font-black shadow-[0_0_15px_rgba(239,68,68,0.5)]"
+                            className="ml-2 animate-bounce border-none font-black shadow-[0_0_15px_rgba(239,68,68,0.5)] whitespace-nowrap flex-shrink-0"
                           >
                             {realtimeNewLeadsCount} Nuevo{realtimeNewLeadsCount !== 1 ? 's' : ''}
                           </Badge>

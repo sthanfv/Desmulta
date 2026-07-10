@@ -138,6 +138,8 @@ async function _authenticate(
 
     return { success: true, trackingUuid };
   } catch (_error) {
-    return { success: false, error: 'Error interno de conexión.' };
+    console.error("DEBUG_LOGIN_ERROR:", _error);
+    const msg = _error instanceof Error ? _error.message : String(_error);
+    return { success: false, error: `Error interno de conexión. Detalle: ${msg}` };
   }
 }
