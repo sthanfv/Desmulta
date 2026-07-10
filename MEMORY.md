@@ -5,6 +5,17 @@
 > Se analizó el equipo local (DESKTOP-N9CGIFT) identificando un procesador antiguo `AMD PRO A10-8750B R7` (4 núcleos) y 16GB de RAM. Esta severa limitación en procesamiento de un solo hilo causa sobrecargas y Cold Starts extremadamente lentos.
 > **Regla permanente:** Está **ESTRICTAMENTE PROHIBIDO** ejecutar suites de validación masivas (`npm run validate` total) o pruebas E2E pesadas (Playwright) para cambios menores, ya que estresa severamente la máquina. Aplicar validación quirúrgica (linters específicos y pruebas aisladas) a menos que se trate de una reestructuración arquitectónica masiva autorizada por el usuario. Cuando las pruebas E2E sean necesarias, usar estrategias pasivas y timeouts elevados (`60000ms`).
 
+## 2026-07-10: Limpieza de Linters y Tipado Estricto (IP Utilities)
+- **Qué cambió:**
+  - Se eliminaron importaciones no utilizadas (`sendOtpSms`, `generateOtp`, `storeOtpChallenge`) en `src/app/api/vip/auth/route.ts` que quedaron huérfanas tras eliminar la validación SMS.
+  - Se eliminó el uso de tipos `any` en `src/lib/security/ip-utils.ts` (reemplazado por `unknown` y type casting seguro `Request`) para resolver advertencias estrictas de `@typescript-eslint/no-explicit-any`.
+- **Por qué cambió:**
+  - Para mantener la base de código libre de advertencias de linting (0 warnings) y deuda técnica.
+- **Archivos afectados:**
+  - `src/app/api/vip/auth/route.ts` [MODIFICADO]
+  - `src/lib/security/ip-utils.ts` [MODIFICADO]
+- **Estado actual:** ✅ Corregido. `npm run lint` pasa exitosamente. Cambios enviados al repositorio.
+
 ## 2026-07-08: Corrección Responsiva de UI (CardSwap Folletos Móviles)
 - **Qué cambió:**
   - **[UI/UX - Móvil]**: Se corrigió el desbordamiento horizontal y pérdida del efecto "stack 3D" en el componente `CardSwap` en dispositivos móviles. Se asignaron claves (`key`) estáticas y únicas a los hijos usando `React.Children.toArray` y un `id` mapeado, en lugar de depender del índice del render. Se movió el atributo `position: 'absolute'` del prop `style` (que Framer Motion ocasionalmente sobrescribía) directamente al `className` usando clases utilitarias de Tailwind (`absolute top-0 left-0 w-full h-full`). 
