@@ -195,7 +195,7 @@ export function SavingsCalculator() {
                   setIsExpanded(true);
                 }}
                 min={0}
-                max={120}
+                max={312} // 26 años (desde el año 2000)
                 step={1}
                 className="py-2"
                 aria-label="Tiempo de mora en meses"
