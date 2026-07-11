@@ -377,7 +377,11 @@ export const STATUS_TEMPLATES: Record<
   }),
   estudio: (id, note) => ({
     title: '🔍 Estudio de Viabilidad',
-    body: formatBody(id, 'Analizando las pruebas y fundamentos para darte una respuesta definitiva.', note),
+    body: formatBody(
+      id,
+      'Analizando las pruebas y fundamentos para darte una respuesta definitiva.',
+      note
+    ),
   }),
   en_proceso: (id, note) => ({
     title: '⚙️ Expediente en Proceso',
@@ -389,19 +393,35 @@ export const STATUS_TEMPLATES: Record<
   }),
   apertura: (id, note) => ({
     title: '🟢 Expediente Iniciado',
-    body: formatBody(id, 'Tu caso ha sido aprobado y ya está formalmente abierto en el sistema.', note),
+    body: formatBody(
+      id,
+      'Tu caso ha sido aprobado y ya está formalmente abierto en el sistema.',
+      note
+    ),
   }),
   radicado: (id, note) => ({
     title: '✉️ Petición Radicada',
-    body: formatBody(id, 'Hemos radicado formalmente los documentos ante el organismo de tránsito.', note),
+    body: formatBody(
+      id,
+      'Hemos radicado formalmente los documentos ante el organismo de tránsito.',
+      note
+    ),
   }),
   tramite: (id, note) => ({
     title: '⚖️ Trámite Legal Activo',
-    body: formatBody(id, 'Tu caso se encuentra actualmente en gestión ante las autoridades viales.', note),
+    body: formatBody(
+      id,
+      'Tu caso se encuentra actualmente en gestión ante las autoridades viales.',
+      note
+    ),
   }),
   resolucion: (id, note) => ({
     title: '🏛️ En Resolución',
-    body: formatBody(id, 'Esperando el fallo o pronunciamiento oficial de la autoridad de tránsito.', note),
+    body: formatBody(
+      id,
+      'Esperando el fallo o pronunciamiento oficial de la autoridad de tránsito.',
+      note
+    ),
   }),
   en_espera: (id, note) => ({
     title: '⏳ Gestión en Espera',
@@ -409,11 +429,19 @@ export const STATUS_TEMPLATES: Record<
   }),
   descartado: (id, note) => ({
     title: '❌ Expediente Descartado',
-    body: formatBody(id, 'Tu solicitud ha sido descartada tras completar el análisis técnico.', note),
+    body: formatBody(
+      id,
+      'Tu solicitud ha sido descartada tras completar el análisis técnico.',
+      note
+    ),
   }),
   finalizado: (id, note) => ({
     title: '✅ Expediente Finalizado',
-    body: formatBody(id, 'El proceso de tu expediente ha concluido. Revisa el portal para ver el resultado.', note),
+    body: formatBody(
+      id,
+      'El proceso de tu expediente ha concluido. Revisa el portal para ver el resultado.',
+      note
+    ),
   }),
   archivo: (id, note) => ({
     title: '📁 Expediente Archivado',

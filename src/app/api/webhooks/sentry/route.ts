@@ -19,9 +19,14 @@ export async function POST(req: NextRequest) {
 
     // 🛡️ F-11 DEVSECOPS: Rechazar activamente si el secreto se proporciona en la URL (Evita filtraciones en logs de red)
     if (secretFromUrl) {
-      logger.security('[sentry-webhook] Intento de acceso rechazado: secreto expuesto en los parámetros de la URL');
+      logger.security(
+        '[sentry-webhook] Intento de acceso rechazado: secreto expuesto en los parámetros de la URL'
+      );
       return NextResponse.json(
-        { error: 'Acceso prohibido: el secreto no debe enviarse a través de la URL. Use la cabecera x-sentry-hook-secret.' },
+        {
+          error:
+            'Acceso prohibido: el secreto no debe enviarse a través de la URL. Use la cabecera x-sentry-hook-secret.',
+        },
         { status: 400 }
       );
     }

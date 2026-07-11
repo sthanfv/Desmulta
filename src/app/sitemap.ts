@@ -4,7 +4,8 @@ import infracciones from '@/lib/data/infracciones.json';
 import codigosInfraccion from '@/lib/data/codigos-infraccion.json';
 import { getBlogPosts } from '@/lib/mdx';
 
-const SITE_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:9005' : 'https://desmulta.online';
+const SITE_URL =
+  process.env.NODE_ENV === 'development' ? 'http://localhost:9005' : 'https://desmulta.online';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Rutas estáticas principales

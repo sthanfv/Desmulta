@@ -1,11 +1,9 @@
-import { ipAddress } from '@vercel/functions';
 import type { NextRequest } from 'next/server';
 
 /**
  * Extrae la dirección IP real del cliente de forma segura y no falsificable.
- * 
- * En producción (Vercel), utiliza `ipAddress()` que lee de cabeceras internas
- * encriptadas e inyectadas por la infraestructura perimetral.
+ *
+ * Extrae de cabeceras internas encriptadas e inyectadas por Vercel.
  * En desarrollo, recurre a `x-real-ip` o fallback local.
  * NUNCA confía en `x-forwarded-for` crudo del cliente.
  */
@@ -19,13 +17,7 @@ type RequestLike = {
 export function getSecureIp(request: NextRequest | Request | Headers | unknown): string {
   const req = request as RequestLike;
 
-  // 1. Intentar obtener la IP validada por Vercel (si es NextRequest/Request)
-  if (req && typeof req.headers !== 'undefined') {
-    const ipVercel = ipAddress(request as Request);
-    if (ipVercel) return ipVercel;
-  }
-
-  // 2. Resolver el origen de las cabeceras
+  // 1. Intentar extraer cabeceras directamente de NextRequest o Headers
   let ipReal: string | null = null;
   let forwarded: string | null = null;
 

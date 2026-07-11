@@ -3,7 +3,6 @@ import { getAdminApp } from '@/lib/firebase-admin';
 import { getFirestore, QueryDocumentSnapshot } from 'firebase-admin/firestore';
 import { hashPII } from '@/lib/security/server-crypto';
 
-
 import { rateLimit } from '@/lib/security/rate-limit';
 import { logger } from '@/lib/logger/security-logger';
 

@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
       const siteUrl = new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://desmulta.online');
       const appUrl = new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://desmulta.online');
       const reqHost = request.headers.get('host') || '';
-      
+
       const allowedHosts = [siteUrl.hostname, appUrl.hostname, reqHost, 'localhost', '127.0.0.1'];
       const isAllowedVercel = parsedUrl.hostname.endsWith('.vercel.app');
 

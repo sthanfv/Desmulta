@@ -101,7 +101,7 @@ describe('🛡️ Rate Limiting — Configuración y Límites', () => {
   });
 
   it('Debe mapear correctamente las llamadas clásicas a las nuevas cubetas', async () => {
-    const { limitMock } = await import('@upstash/ratelimit') as any;
+    const { limitMock } = (await import('@upstash/ratelimit')) as any;
     limitMock.mockClear();
 
     // OCR

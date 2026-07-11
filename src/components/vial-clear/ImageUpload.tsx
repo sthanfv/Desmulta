@@ -402,7 +402,7 @@ export function ImageUpload({
             <p className="text-[10px] font-medium leading-tight opacity-90">
               {countdown !== null
                 ? `¡Has alcanzado el límite de escaneos de seguridad! Por favor, intenta de nuevo en ${countdown} segundos.`
-                : (error || errorOCR)}
+                : error || errorOCR}
             </p>
           </m.div>
         )}

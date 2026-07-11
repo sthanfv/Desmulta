@@ -10,7 +10,7 @@ import React, {
   RefObject,
   useEffect,
   useMemo,
-  useRef
+  useRef,
 } from 'react';
 import gsap from 'gsap';
 import './CardSwap.css';
@@ -49,7 +49,7 @@ const makeSlot = (i: number, distX: number, distY: number, total: number): Slot 
   x: i * distX,
   y: -i * distY,
   z: -i * distX * 1.5,
-  zIndex: total - i
+  zIndex: total - i,
 });
 
 const placeNow = (el: HTMLElement, slot: Slot, skew: number) =>
@@ -60,7 +60,7 @@ const placeNow = (el: HTMLElement, slot: Slot, skew: number) =>
     skewY: skew,
     transformOrigin: 'center center',
     zIndex: slot.zIndex,
-    force3D: true
+    force3D: true,
   });
 
 export function CardSwap({
@@ -73,31 +73,38 @@ export function CardSwap({
   onCardClick,
   skewAmount = 2.5,
   easing = 'elastic',
-  children
+  children,
 }: CardSwapProps) {
-  const config = useMemo(() =>
-    easing === 'elastic'
-      ? {
-          ease: 'elastic.out(0.6, 0.9)',
-          durDrop: 2,
-          durMove: 2,
-          durReturn: 2,
-          promoteOverlap: 0.9,
-          returnDelay: 0.05
-        }
-      : {
-          ease: 'power1.inOut',
-          durDrop: 0.8,
-          durMove: 0.8,
-          durReturn: 0.8,
-          promoteOverlap: 0.45,
-          returnDelay: 0.2
-        },
+  const config = useMemo(
+    () =>
+      easing === 'elastic'
+        ? {
+            ease: 'elastic.out(0.6, 0.9)',
+            durDrop: 2,
+            durMove: 2,
+            durReturn: 2,
+            promoteOverlap: 0.9,
+            returnDelay: 0.05,
+          }
+        : {
+            ease: 'power1.inOut',
+            durDrop: 0.8,
+            durMove: 0.8,
+            durReturn: 0.8,
+            promoteOverlap: 0.45,
+            returnDelay: 0.2,
+          },
     [easing]
   );
 
-  const childArr = useMemo(() => Children.toArray(children) as ReactElement<CardProps>[], [children]);
-  const refs = useMemo<CardRef[]>(() => childArr.map(() => React.createRef<HTMLDivElement>()), [childArr]);
+  const childArr = useMemo(
+    () => Children.toArray(children) as ReactElement<CardProps>[],
+    [children]
+  );
+  const refs = useMemo<CardRef[]>(
+    () => childArr.map(() => React.createRef<HTMLDivElement>()),
+    [childArr]
+  );
 
   const order = useRef<number[]>([]);
 
@@ -133,7 +140,7 @@ export function CardSwap({
       tl.to(elFront, {
         y: '+=500',
         duration: config.durDrop,
-        ease: config.ease
+        ease: config.ease,
       });
 
       tl.addLabel('promote', `-=${config.durDrop * config.promoteOverlap}`);
@@ -149,7 +156,7 @@ export function CardSwap({
             y: slot.y,
             z: slot.z,
             duration: config.durMove,
-            ease: config.ease
+            ease: config.ease,
           },
           `promote+=${i * 0.15}`
         );
@@ -171,7 +178,7 @@ export function CardSwap({
           y: backSlot.y,
           z: backSlot.z,
           duration: config.durReturn,
-          ease: config.ease
+          ease: config.ease,
         },
         'return'
       );
@@ -201,7 +208,7 @@ export function CardSwap({
         if (intervalRef.current) clearInterval(intervalRef.current);
       };
     }
-    
+
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
       if (tlRef.current) tlRef.current.kill();
@@ -214,10 +221,10 @@ export function CardSwap({
           key: i,
           ref: refs[i],
           style: { width, height, ...(child.props.style ?? {}) },
-          onClick: e => {
+          onClick: (e) => {
             child.props.onClick?.(e as React.MouseEvent<HTMLDivElement>);
             onCardClick?.(i);
-          }
+          },
         } as CardProps & React.RefAttributes<HTMLDivElement>)
       : child
   );
