@@ -47,9 +47,9 @@ describe('🛡️ Rate Limiting — Configuración y Límites', () => {
     expect(rateLimiters.validarOtp.limiter.tokens).toBe(3);
     expect(rateLimiters.validarOtp.limiter.window).toBe('1 m');
 
-    // QR: 3 por 24 horas
-    expect(rateLimiters.qr.limiter.tokens).toBe(3);
-    expect(rateLimiters.qr.limiter.window).toBe('24 h');
+    // QR: 60 por 1 hora
+    expect(rateLimiters.qr.limiter.tokens).toBe(60);
+    expect(rateLimiters.qr.limiter.window).toBe('1 h');
 
     // Referidos: 5 por 24 horas
     expect(rateLimiters.referidos.limiter.tokens).toBe(5);

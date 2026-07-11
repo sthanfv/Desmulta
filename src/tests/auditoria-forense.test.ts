@@ -355,7 +355,7 @@ describe('F-07 — Validación de dominio en endpoint QR', () => {
   it('el endpoint de QR debe verificar el host de las URLs', async () => {
     const fs = await import('fs');
     const codigo = fs.readFileSync('src/app/api/qr/route.ts', 'utf-8');
-    expect(codigo).toContain('parsedUrl.hostname !== siteUrl.hostname');
+    expect(codigo).toContain('!allowedHosts.includes(parsedUrl.hostname)');
     expect(codigo).toContain('URL de dominio externo no permitida');
   });
 });
