@@ -51,7 +51,7 @@ export function SavingsCalculator() {
     simulatedDate.setMonth(simulatedDate.getMonth() - mesesMora);
     const fechaInfraccionISO = simulatedDate.toISOString().split('T')[0];
 
-    const interesCalculado = calcularInteresesHistoricos(montoBase, fechaInfraccionISO);
+    const interesCalculado = calcularInteresesHistoricos(montoBase, fechaInfraccionISO, coactivo);
     setIntereses(interesCalculado);
 
     const res = calcularViabilidadLegal(fechaInfraccionISO, coactivo);
@@ -370,11 +370,11 @@ export function SavingsCalculator() {
             <div className="flex items-center gap-1.5">
               <Info className="w-3 h-3 flex-shrink-0" />
               <span>
-                Cálculo basado en Tasa Usura - 2% (Art. 635 E.T.). Valores reales SIMIT varían.
+                Simulador SIMIT: Interés Simple con Límite de Prescripción (Art 159).
               </span>
             </div>
             <span className="text-[9px] opacity-75">
-              *El SIMIT cobra intereses desde la Resolución Sancionatoria (típicamente 60 días después del comparendo).
+              *Los intereses se congelan legalmente a los 3 años (o 6 si hay coactivo).
             </span>
           </div>
         </div>

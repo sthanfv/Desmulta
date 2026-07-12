@@ -165,7 +165,11 @@ import { FINANCIAL_HISTORY, getSMDLVHistorico } from './financial-history';
  * @param fechaInfraccionISO - Fecha de la infracción en formato YYYY-MM-DD.
  * @returns El valor total de los intereses generados.
  */
-export function calcularInteresesHistoricos(montoBaseReal: number, fechaInfraccionISO: string): number {
+export function calcularInteresesHistoricos(
+  montoBaseReal: number, 
+  fechaInfraccionISO: string,
+  tieneCobroCoactivo: boolean = false
+): number {
   if (!montoBaseReal || montoBaseReal <= 0) return 0;
 
   const fechaInfraccion = new Date(`${fechaInfraccionISO}T00:00:00Z`);
@@ -177,43 +181,53 @@ export function calcularInteresesHistoricos(montoBaseReal: number, fechaInfracci
   const anioInfraccion = fechaInfraccion.getUTCFullYear();
   const anioActual = hoyUTC.getUTCFullYear();
 
-  let capitalAcumulado = montoBaseReal;
+  let interesesAcumulados = 0;
   const msPorDia = 1000 * 60 * 60 * 24;
+  
+  // Limite legal de años sumando intereses (Estatuto Tributario / CNT)
+  const limiteAnios = tieneCobroCoactivo ? 6 : 3;
+  const maxDiasPermitidos = limiteAnios * 365;
+  let diasComputadosTotales = 0;
 
   for (let anio = anioInfraccion; anio <= anioActual; anio++) {
-    // Artículo 635 del Estatuto Tributario: Tasa de Usura menos 2 puntos porcentuales para moratoria
+    // Si ya alcanzamos el tope legal de prescripción, congelar intereses
+    if (diasComputadosTotales >= maxDiasPermitidos) break;
+
+    // Artículo 635 del Estatuto Tributario: Tasa de Usura menos 2 puntos porcentuales
     let tasaEA = (FINANCIAL_HISTORY[anio]?.usuraEA || TASA_EA_VIGENTE) - 0.02;
-    // Evitar que la tasa sea negativa en un caso anómalo
     tasaEA = Math.max(0, tasaEA);
     
-    const tasaDiaria = Math.pow(1 + tasaEA, 1 / 365) - 1;
+    // Tasa diaria nominal para Interés Simple
+    const tasaDiaria = tasaEA / 365; 
 
     let diasEnEsteAnio = 365;
 
-    // Si es el año de la infracción, calcular solo desde la fecha de infracción hasta el 31 de dic
     if (anio === anioInfraccion) {
       const finDeAnio = new Date(Date.UTC(anio, 11, 31)); // 31 Dic
       diasEnEsteAnio = Math.max(0, Math.floor((finDeAnio.getTime() - fechaInfraccion.getTime()) / msPorDia));
       
-      // Aplicar gracia procesal (Gap de Resolución). Normalmente son 30 a 90 días muertos
-      // donde el comparendo no ha sido convertido en Resolución.
-      // Restamos 60 días de gracia del cálculo inicial de intereses.
+      // Aplicar gracia procesal (Gap de Resolución)
       diasEnEsteAnio = Math.max(0, diasEnEsteAnio - 60);
     }
-    // Si es el año actual, calcular solo hasta la fecha de hoy
     else if (anio === anioActual) {
       const inicioDeAnio = new Date(Date.UTC(anio, 0, 1)); // 1 Ene
       diasEnEsteAnio = Math.max(0, Math.floor((hoyUTC.getTime() - inicioDeAnio.getTime()) / msPorDia));
     }
 
+    // Topar días según el máximo permitido
+    if (diasComputadosTotales + diasEnEsteAnio > maxDiasPermitidos) {
+      diasEnEsteAnio = maxDiasPermitidos - diasComputadosTotales;
+    }
+
     if (diasEnEsteAnio > 0) {
-      // Aplicar interés compuesto de los días correspondientes a este año
-      capitalAcumulado *= Math.pow(1 + tasaDiaria, diasEnEsteAnio);
+      // Aplicar INTERÉS SIMPLE
+      const interesAnual = montoBaseReal * tasaDiaria * diasEnEsteAnio;
+      interesesAcumulados += interesAnual;
+      diasComputadosTotales += diasEnEsteAnio;
     }
   }
 
-  const interesesAcumulados = capitalAcumulado - montoBaseReal;
-  return interesesAcumulados > 0 ? interesesAcumulados : 0;
+  return Math.round(interesesAcumulados);
 }
 
 /**
