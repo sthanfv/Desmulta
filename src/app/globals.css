@@ -470,9 +470,7 @@ body {
 }
 
 .defer-render {
-  will-change: auto;
-  content-visibility: auto;
-  contain-intrinsic-size: 0 500px;
+  will-change: transform, opacity;
 }
 
 /* Fix Scroll iOS Safari en Modales */

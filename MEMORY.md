@@ -5,6 +5,18 @@
 > Se analizó el equipo local (DESKTOP-N9CGIFT) identificando un procesador antiguo `AMD PRO A10-8750B R7` (4 núcleos) y 16GB de RAM. Esta severa limitación en procesamiento de un solo hilo causa sobrecargas y Cold Starts extremadamente lentos.
 > **Regla permanente:** Está **ESTRICTAMENTE PROHIBIDO** ejecutar suites de validación masivas (`npm run validate` total) o pruebas E2E pesadas (Playwright) para cambios menores, ya que estresa severamente la máquina. Aplicar validación quirúrgica (linters específicos y pruebas aisladas) a menos que se trate de una reestructuración arquitectónica masiva autorizada por el usuario. Cuando las pruebas E2E sean necesarias, usar estrategias pasivas y timeouts elevados (`60000ms`).
 
+## 2026-07-12: Mejora UI/UX y Performance (Scroll + WhatsApp FAB)
+- **Qué cambió:**
+  - **[Rendimiento de Renderizado]**: Se eliminó la regla `content-visibility: auto` de la clase `.defer-render` en `src/app/globals.css` y se reemplazó por optimizaciones de GPU (`will-change: transform, opacity`). 
+  - **[Iconografía UI]**: Se reemplazó el icono genérico de burbuja de chat (`MessageCircle` de lucide-react) en el botón flotante de WhatsApp (`HomeClient.tsx`) por el logotipo oficial de WhatsApp en formato SVG nativo (inline).
+- **Por qué cambió:**
+  - La propiedad CSS `content-visibility: auto` es una optimización muy agresiva que le dice al navegador que destruya/desmonte todo el HTML que no está en la pantalla. Al hacer scroll rápido con la rueda del mouse, el navegador no alcanzaba a repintar los elementos a tiempo, causando "flashes" blancos o negros (sensación de que la página crasheaba).
+  - El icono genérico de WhatsApp restaba profesionalismo. Usar el SVG nativo aumenta la tasa de conversión (CTR) ya que los usuarios reconocen inmediatamente el logo.
+- **Archivos afectados:**
+  - `src/app/globals.css` [MODIFICADO]
+  - `src/app/_components/HomeClient.tsx` [MODIFICADO]
+- **Estado actual:** ✅ Corregido y empujado a producción.
+
 ## 2026-07-12: Mejora UI/UX - Contraste Global y Accesibilidad (Modo Claro)
 - **Qué cambió:**
   - **[Design Tokens]**: Se actualizaron las variables HSL en `:root` de `src/app/globals.css`. `--background` pasó a ser un Slate ultraligero (`210 40% 98.5%`) para generar relieve, mientras que `--card` y `--popover` son Blanco Puro (`0 0% 100%`).
