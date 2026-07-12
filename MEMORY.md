@@ -5,6 +5,17 @@
 > Se analizó el equipo local (DESKTOP-N9CGIFT) identificando un procesador antiguo `AMD PRO A10-8750B R7` (4 núcleos) y 16GB de RAM. Esta severa limitación en procesamiento de un solo hilo causa sobrecargas y Cold Starts extremadamente lentos.
 > **Regla permanente:** Está **ESTRICTAMENTE PROHIBIDO** ejecutar suites de validación masivas (`npm run validate` total) o pruebas E2E pesadas (Playwright) para cambios menores, ya que estresa severamente la máquina. Aplicar validación quirúrgica (linters específicos y pruebas aisladas) a menos que se trate de una reestructuración arquitectónica masiva autorizada por el usuario. Cuando las pruebas E2E sean necesarias, usar estrategias pasivas y timeouts elevados (`60000ms`).
 
+## 2026-07-12: Mejora UI/UX - Contraste Global y Accesibilidad (Modo Claro)
+- **Qué cambió:**
+  - **[Design Tokens]**: Se actualizaron las variables HSL en `:root` de `src/app/globals.css`. `--background`, `--card` y `--popover` pasaron de tener un tinte crema/amarillento (45 30% 98%) a ser Blanco Puro (0 0% 100%).
+  - **[Tipografía]**: Se oscureció `--muted-foreground` (texto secundario de párrafos) de un `46.9%` de luminosidad a `36.9%` (Slate 700), aumentando drásticamente la relación de contraste (WCAG).
+  - **[Bordes/Inputs]**: Se neutralizaron de grises amarillentos a grises pizarras (Slate 200/100) para no competir con el amarillo principal (`--primary`).
+- **Por qué cambió:**
+  - El fondo crema competía con la tipografía gris clara y lavaba los acentos de la marca (Amarillo). Al purificar los fondos y oscurecer los grises, se igualó la nitidez y el estilo "premium" del mercado (ej. Factus), manteniendo intacto el ADN visual original de Desmulta.
+- **Archivos afectados:**
+  - `src/app/globals.css` [MODIFICADO]
+- **Estado actual:** ✅ Corregido y empujado a producción.
+
 ## 2026-07-12 (Hotfix): Reversión Parcial CSP (Framer Motion / GSAP 3D UI)
 - **Qué cambió:**
   - **[Seguridad - CSP]**: Se reactivó `'unsafe-inline'` en la directiva `style-src` de `src/lib/security-headers.ts` para entornos de producción.
