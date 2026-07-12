@@ -1,9 +1,7 @@
 // src/lib/calculadora-legal.ts
 import {
   TASA_EA_VIGENTE,
-  SMMLV_2026,
   SMDLV_2026,
-  VIGENCIA_CONSTANTES_ANIO,
 } from './config-constants';
 import { PrescriptionEngine, OCRSanitizer } from '@/lib/legal/prescription-engine';
 
@@ -154,51 +152,72 @@ export function calcularViabilidadLegal(
   };
 }
 
+// ─── Motor Matemático Financiero (Cálculo Histórico y Compuesto) ───────────────
+
+import { FINANCIAL_HISTORY, getSMDLVHistorico } from './financial-history';
+
 /**
- * Calcula los intereses moratorios usando interés compuesto diario.
- * Basado en la Tasa Efectiva Anual (EA) vigente.
+ * Calcula los intereses moratorios usando interés compuesto ANUALIZADO real.
+ * Si la multa es de 2015, calcula el interés de 2015 con la tasa de 2015,
+ * el interés de 2016 con la tasa de 2016, etc.
  *
- * @param montoBase - Capital adeudado original en pesos colombianos.
+ * @param montoBaseReal - Capital adeudado original en pesos del AÑO DE LA INFRACCIÓN.
  * @param fechaInfraccionISO - Fecha de la infracción en formato YYYY-MM-DD.
  * @returns El valor total de los intereses generados.
  */
-export function calcularIntereses(montoBase: number, fechaInfraccionISO: string): number {
-  // Validación temprana: monto nulo o negativo retorna 0 de forma segura
-  if (!montoBase || montoBase <= 0) return 0;
+export function calcularInteresesHistoricos(montoBaseReal: number, fechaInfraccionISO: string): number {
+  if (!montoBaseReal || montoBaseReal <= 0) return 0;
 
   const fechaInfraccion = new Date(`${fechaInfraccionISO}T00:00:00Z`);
   const hoy = new Date();
   const hoyUTC = new Date(Date.UTC(hoy.getUTCFullYear(), hoy.getUTCMonth(), hoy.getUTCDate()));
 
-  if (isNaN(fechaInfraccion.getTime())) {
-    return 0; // Fallback seguro
+  if (isNaN(fechaInfraccion.getTime())) return 0;
+
+  const anioInfraccion = fechaInfraccion.getUTCFullYear();
+  const anioActual = hoyUTC.getUTCFullYear();
+
+  let capitalAcumulado = montoBaseReal;
+  const msPorDia = 1000 * 60 * 60 * 24;
+
+  for (let anio = anioInfraccion; anio <= anioActual; anio++) {
+    const tasaEA = FINANCIAL_HISTORY[anio]?.usuraEA || TASA_EA_VIGENTE;
+    const tasaDiaria = Math.pow(1 + tasaEA, 1 / 365) - 1;
+
+    let diasEnEsteAnio = 365;
+
+    // Si es el año de la infracción, calcular solo desde la fecha de infracción hasta el 31 de dic
+    if (anio === anioInfraccion) {
+      const finDeAnio = new Date(Date.UTC(anio, 11, 31)); // 31 Dic
+      diasEnEsteAnio = Math.max(0, Math.floor((finDeAnio.getTime() - fechaInfraccion.getTime()) / msPorDia));
+    }
+    // Si es el año actual, calcular solo hasta la fecha de hoy
+    else if (anio === anioActual) {
+      const inicioDeAnio = new Date(Date.UTC(anio, 0, 1)); // 1 Ene
+      diasEnEsteAnio = Math.max(0, Math.floor((hoyUTC.getTime() - inicioDeAnio.getTime()) / msPorDia));
+    }
+
+    if (diasEnEsteAnio > 0) {
+      // Aplicar interés compuesto de los días correspondientes a este año
+      capitalAcumulado *= Math.pow(1 + tasaDiaria, diasEnEsteAnio);
+    }
   }
 
-  const msPorDia = 1000 * 60 * 60 * 24;
-  const diasTotales = Math.floor((hoyUTC.getTime() - fechaInfraccion.getTime()) / msPorDia);
-
-  if (diasTotales <= 0) return 0;
-
-  const tasaDiaria = Math.pow(1 + TASA_EA_VIGENTE, 1 / 365) - 1;
-
-  // Fórmula de interés COMPUESTO diario (más precisa que el interés simple):
-  // Intereses = Monto * ((1 + tasaDiaria)^días - 1)
-  const intereses = montoBase * (Math.pow(1 + tasaDiaria, diasTotales) - 1);
-
-  return intereses;
+  const interesesAcumulados = capitalAcumulado - montoBaseReal;
+  return interesesAcumulados > 0 ? interesesAcumulados : 0;
 }
 
 /**
  * Función unificada para la API B2B: calcula prescripción + intereses + SMLMV.
  * Acepta fecha exacta (formato ISO) y monto base de la multa.
  *
- * @param valorMulta - Monto original de la multa en pesos colombianos
+ * @param valorMulta2026 - Monto nominal de la multa en pesos ACTUALES (Ej: C29 = 650,000 en 2026)
  * @param fechaInfraccionISO - Fecha de la infracción en formato YYYY-MM-DD
  * @param tieneCobroCoactivo - Si el caso está en cobro coactivo
  * @param textoOCR - Texto crudo del OCR para análisis avanzado (opcional)
  */
 export function calcularMultaCompleta(
-  valorMulta: number,
+  valorMulta2026: number,
   fechaInfraccionISO: string,
   tieneCobroCoactivo: boolean = false,
   textoOCR: string = ''
@@ -206,37 +225,50 @@ export function calcularMultaCompleta(
   // 1. Calcular viabilidad legal
   const prescripcion = calcularViabilidadLegal(fechaInfraccionISO, tieneCobroCoactivo);
 
-  // 2. Si hay texto OCR, enriquecer con PrescriptionEngine completo
+  // 2. Enriquecer con PrescriptionEngine si hay OCR
   if (textoOCR) {
     const fechasDetectadas = OCRSanitizer.extractDates(textoOCR);
     if (fechasDetectadas.length > 0) {
       const dictamenEnriquecido = PrescriptionEngine.evaluate(textoOCR, fechasDetectadas);
       if (dictamenEnriquecido.status) {
-        prescripcion.estadoLegal =
-          dictamenEnriquecido.status as ResultadoPrescripcion['estadoLegal'];
+        prescripcion.estadoLegal = dictamenEnriquecido.status as ResultadoPrescripcion['estadoLegal'];
         prescripcion.isViable = dictamenEnriquecido.isViable ?? false;
       }
     }
   }
 
-  // 3. Calcular deuda financiera
-  const interesesAcumulados = Math.round(calcularIntereses(valorMulta, fechaInfraccionISO));
-  const valorTotalActual = valorMulta + interesesAcumulados;
-  const valorEnSMMLV = Number((valorMulta / SMMLV_2026).toFixed(2));
-  const valorEnSMDLV = Number((valorMulta / SMDLV_2026).toFixed(1));
+  // 3. Re-ingeniería Financiera (Regresión Histórica)
+  // Determinar el año de la infracción
+  const fechaObj = new Date(`${fechaInfraccionISO}T00:00:00Z`);
+  const anioInfraccion = isNaN(fechaObj.getTime()) ? 2026 : fechaObj.getUTCFullYear();
+  
+  // Calcular los SMDLV basándose en el valor enviado frente al SMDLV 2026
+  const cantidadSMDLV = valorMulta2026 / SMDLV_2026; 
+  
+  // Calcular el Valor Original REAL en pesos del año en que ocurrió
+  const smdlvHistorico = getSMDLVHistorico(anioInfraccion);
+  const valorOriginalHistorico = Math.round(cantidadSMDLV * smdlvHistorico);
+
+  // Calcular Intereses sobre el valor histórico usando el motor de tramos anuales
+  const interesesAcumulados = Math.round(calcularInteresesHistoricos(valorOriginalHistorico, fechaInfraccionISO));
+  
+  const valorTotalActual = valorOriginalHistorico + interesesAcumulados;
+  
+  const valorEnSMMLV = Number((valorOriginalHistorico / (smdlvHistorico * 30)).toFixed(2));
+  const valorEnSMDLV = Number(cantidadSMDLV.toFixed(1));
 
   return {
     prescripcion,
     financiero: {
-      valorOriginal: valorMulta,
+      valorOriginal: valorOriginalHistorico,
       interesesAcumulados,
       valorTotalActual,
-      tasaEAVigente: TASA_EA_VIGENTE,
+      tasaEAVigente: TASA_EA_VIGENTE, // Tasa actual de referencia
       valorEnSMMLV,
       valorEnSMDLV,
-      smmlvVigente: SMMLV_2026,
-      smdlvVigente: SMDLV_2026,
-      vigenciaAnio: VIGENCIA_CONSTANTES_ANIO,
+      smmlvVigente: smdlvHistorico * 30, // SMMLV del año de la infracción
+      smdlvVigente: smdlvHistorico,
+      vigenciaAnio: anioInfraccion,
       fechaCalculo: new Date().toISOString().split('T')[0],
     },
   };

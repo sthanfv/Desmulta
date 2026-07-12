@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { TarjetaPremium } from '@/components/ui/TarjetaPremium';
 import { StarBorder } from '@/components/ui/star-border';
-import { calcularViabilidadLegal, calcularIntereses } from '@/lib/calculadora-legal';
+import { calcularViabilidadLegal, calcularInteresesHistoricos } from '@/lib/calculadora-legal';
 import { TASA_EA_VIGENTE } from '@/lib/config-constants';
 
 export function SavingsCalculator() {
@@ -52,7 +52,7 @@ export function SavingsCalculator() {
     simulatedDate.setMonth(simulatedDate.getMonth() - mesesMora);
     const fechaInfraccionISO = simulatedDate.toISOString().split('T')[0];
 
-    const interesCalculado = calcularIntereses(montoBase, fechaInfraccionISO);
+    const interesCalculado = calcularInteresesHistoricos(montoBase, fechaInfraccionISO);
     setIntereses(interesCalculado);
 
     const res = calcularViabilidadLegal(fechaInfraccionISO, coactivo);

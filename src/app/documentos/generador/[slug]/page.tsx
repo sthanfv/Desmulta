@@ -10,6 +10,7 @@ import {
   DOCUMENT_TYPE_LABELS,
   DocumentBlock,
 } from '@/lib/legal/document-templates';
+import { TRANSIT_AUTHORITIES } from '@/data/transit-authorities';
 
 interface GeneradorDinamicoProps {
   params: Promise<{ slug: string }>;
@@ -26,6 +27,8 @@ export default function GeneradorDinamico({ params }: GeneradorDinamicoProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [precioDisplay, setPrecioDisplay] = useState<string | null>(null);
+  const [selectedAuthId, setSelectedAuthId] = useState<string>('');
+  const [isManualAuth, setIsManualAuth] = useState(false);
 
   // Redirigir a inicio si la plantilla no es válida
   useEffect(() => {
@@ -96,8 +99,28 @@ export default function GeneradorDinamico({ params }: GeneradorDinamicoProps) {
     );
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleCitySelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    if (val === 'MANUAL') {
+      setIsManualAuth(true);
+      setSelectedAuthId('');
+      setFormData({ ...formData, ciudad: '', autoridad: '' });
+    } else {
+      setIsManualAuth(false);
+      setSelectedAuthId(val);
+      const auth = TRANSIT_AUTHORITIES.find((a) => a.id === val);
+      if (auth) {
+        setFormData({
+          ...formData,
+          ciudad: auth.ciudad,
+          autoridad: auth.nombreOficial,
+        });
+      }
+    }
   };
 
   const handlePay = async () => {
@@ -334,15 +357,35 @@ export default function GeneradorDinamico({ params }: GeneradorDinamicoProps) {
           <hr className="my-6 border-slate-200" />
 
           <div>
-            <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-              Ciudad del Tránsito
+            <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+              <span>Ciudad del Tránsito</span>
+              {!isManualAuth && selectedAuthId && (
+                <span className="text-green-600 bg-green-50 px-2 py-0.5 rounded-full text-[9px]">Directorio Oficial</span>
+              )}
             </label>
-            <input
-              name="ciudad"
-              value={formData.ciudad}
-              onChange={handleChange}
-              className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 outline-none transition-all font-medium shadow-sm"
-            />
+            <select
+              value={isManualAuth ? 'MANUAL' : selectedAuthId}
+              onChange={handleCitySelect}
+              className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:bg-white focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 outline-none transition-all font-medium shadow-sm mb-3"
+            >
+              <option value="" disabled>Selecciona la ciudad...</option>
+              {TRANSIT_AUTHORITIES.map((auth) => (
+                <option key={auth.id} value={auth.id}>
+                  {auth.ciudad} ({auth.departamento})
+                </option>
+              ))}
+              <option value="MANUAL">Otra ciudad (Ingreso Manual)</option>
+            </select>
+            
+            {isManualAuth && (
+              <input
+                name="ciudad"
+                value={formData.ciudad}
+                onChange={handleChange}
+                placeholder="Ej. Puerto Colombia"
+                className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-yellow-400 outline-none transition-all font-medium shadow-sm"
+              />
+            )}
           </div>
           <div>
             <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
@@ -352,8 +395,19 @@ export default function GeneradorDinamico({ params }: GeneradorDinamicoProps) {
               name="autoridad"
               value={formData.autoridad}
               onChange={handleChange}
-              className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 outline-none transition-all font-medium shadow-sm"
+              disabled={!isManualAuth}
+              placeholder="Ej. Secretaría de Movilidad..."
+              className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 outline-none transition-all font-medium shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
             />
+            {!isManualAuth && selectedAuthId && (
+              <div className="mt-2 text-xs text-slate-500 bg-blue-50/50 p-2 rounded-lg border border-blue-100">
+                <p>📍 {TRANSIT_AUTHORITIES.find(a => a.id === selectedAuthId)?.direccion}</p>
+                <p>📧 {TRANSIT_AUTHORITIES.find(a => a.id === selectedAuthId)?.emailNotificaciones}</p>
+                <p className="text-[10px] text-slate-400 mt-1 italic">
+                  ℹ️ Datos extraídos de directorios públicos. Verifica su disponibilidad.
+                </p>
+              </div>
+            )}
           </div>
           <div>
             <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
@@ -432,8 +486,16 @@ export default function GeneradorDinamico({ params }: GeneradorDinamicoProps) {
               <p>
                 <strong>Señores:</strong>
               </p>
-              <p className="uppercase font-bold">{formData.autoridad}</p>
-              <p>E. S. D.</p>
+              <p className="uppercase font-bold text-slate-900">{formData.autoridad || '[Autoridad de Tránsito]'}</p>
+              
+              {!isManualAuth && selectedAuthId && (
+                <div className="text-slate-600 mt-1">
+                  <p>{TRANSIT_AUTHORITIES.find(a => a.id === selectedAuthId)?.direccion}</p>
+                  <p>{TRANSIT_AUTHORITIES.find(a => a.id === selectedAuthId)?.emailNotificaciones}</p>
+                </div>
+              )}
+              
+              <p className="mt-2">E. S. D.</p>
             </div>
 
             <div className="mb-6">
