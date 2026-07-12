@@ -274,7 +274,7 @@ export async function POST(request: NextRequest) {
       try {
         // Configurar Tesseract.js en el entorno Node.js apuntando a CDNs para soportar Vercel Serverless
         const worker = await createWorker('spa', 1, {
-          langPath: 'https://tessdata.projectnaptha.com/4.0.0',
+          langPath: 'https://lca0irnf7loubfjn.public.blob.vercel-storage.com',
           workerPath: 'https://cdn.jsdelivr.net/npm/tesseract.js@7/dist/worker.min.js',
           corePath: 'https://cdn.jsdelivr.net/npm/tesseract.js-core@7/tesseract-core.wasm.js',
         });
