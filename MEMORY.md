@@ -7,11 +7,11 @@
 
 ## 2026-07-12: Mejora UI/UX - Contraste Global y Accesibilidad (Modo Claro)
 - **Qué cambió:**
-  - **[Design Tokens]**: Se actualizaron las variables HSL en `:root` de `src/app/globals.css`. `--background`, `--card` y `--popover` pasaron de tener un tinte crema/amarillento (45 30% 98%) a ser Blanco Puro (0 0% 100%).
+  - **[Design Tokens]**: Se actualizaron las variables HSL en `:root` de `src/app/globals.css`. `--background` pasó a ser un Slate ultraligero (`210 40% 98.5%`) para generar relieve, mientras que `--card` y `--popover` son Blanco Puro (`0 0% 100%`).
+  - **[Relieve y Bento Grid]**: Se oscurecieron los bordes (`--border`) a un Slate 300 (`214.3 31.8% 88%`) para que las tarjetas del sistema Bento Grid ("Pilares" y "Proceso") tengan un límite crispante y se separen visualmente del fondo, recuperando la tridimensionalidad perdida.
   - **[Tipografía]**: Se oscureció `--muted-foreground` (texto secundario de párrafos) de un `46.9%` de luminosidad a `36.9%` (Slate 700), aumentando drásticamente la relación de contraste (WCAG).
-  - **[Bordes/Inputs]**: Se neutralizaron de grises amarillentos a grises pizarras (Slate 200/100) para no competir con el amarillo principal (`--primary`).
 - **Por qué cambió:**
-  - El fondo crema competía con la tipografía gris clara y lavaba los acentos de la marca (Amarillo). Al purificar los fondos y oscurecer los grises, se igualó la nitidez y el estilo "premium" del mercado (ej. Factus), manteniendo intacto el ADN visual original de Desmulta.
+  - El fondo crema original competía con la tipografía gris clara. Al intentar purificarlo, se igualó el fondo y las tarjetas a blanco puro, perdiendo el relieve (las tarjetas se camuflaban). La solución definitiva SaaS fue aplicar un fondo sutilmente frío con tarjetas blancas puras y bordes definidos, logrando el estilo "premium" y separando correctamente las tarjetas del Bento Grid.
 - **Archivos afectados:**
   - `src/app/globals.css` [MODIFICADO]
 - **Estado actual:** ✅ Corregido y empujado a producción.
