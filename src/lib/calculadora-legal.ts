@@ -181,7 +181,11 @@ export function calcularInteresesHistoricos(montoBaseReal: number, fechaInfracci
   const msPorDia = 1000 * 60 * 60 * 24;
 
   for (let anio = anioInfraccion; anio <= anioActual; anio++) {
-    const tasaEA = FINANCIAL_HISTORY[anio]?.usuraEA || TASA_EA_VIGENTE;
+    // Artículo 635 del Estatuto Tributario: Tasa de Usura menos 2 puntos porcentuales para moratoria
+    let tasaEA = (FINANCIAL_HISTORY[anio]?.usuraEA || TASA_EA_VIGENTE) - 0.02;
+    // Evitar que la tasa sea negativa en un caso anómalo
+    tasaEA = Math.max(0, tasaEA);
+    
     const tasaDiaria = Math.pow(1 + tasaEA, 1 / 365) - 1;
 
     let diasEnEsteAnio = 365;
@@ -190,6 +194,11 @@ export function calcularInteresesHistoricos(montoBaseReal: number, fechaInfracci
     if (anio === anioInfraccion) {
       const finDeAnio = new Date(Date.UTC(anio, 11, 31)); // 31 Dic
       diasEnEsteAnio = Math.max(0, Math.floor((finDeAnio.getTime() - fechaInfraccion.getTime()) / msPorDia));
+      
+      // Aplicar gracia procesal (Gap de Resolución). Normalmente son 30 a 90 días muertos
+      // donde el comparendo no ha sido convertido en Resolución.
+      // Restamos 60 días de gracia del cálculo inicial de intereses.
+      diasEnEsteAnio = Math.max(0, diasEnEsteAnio - 60);
     }
     // Si es el año actual, calcular solo hasta la fecha de hoy
     else if (anio === anioActual) {

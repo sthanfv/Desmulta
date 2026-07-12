@@ -16,7 +16,6 @@ import {
 import { TarjetaPremium } from '@/components/ui/TarjetaPremium';
 import { StarBorder } from '@/components/ui/star-border';
 import { calcularViabilidadLegal, calcularInteresesHistoricos } from '@/lib/calculadora-legal';
-import { TASA_EA_VIGENTE } from '@/lib/config-constants';
 
 export function SavingsCalculator() {
   // Estados Financieros
@@ -367,11 +366,15 @@ export function SavingsCalculator() {
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 justify-center text-[10px] text-muted-foreground font-medium text-center pt-2">
-            <Info className="w-3 h-3 flex-shrink-0" />
-            <span>
-              Cálculo proyectado ({(TASA_EA_VIGENTE * 100).toFixed(1)}% E.A.). Valores reales SIMIT
-              pueden variar ligeramente.
+          <div className="flex flex-col items-center gap-1.5 justify-center text-[10px] text-muted-foreground font-medium text-center pt-2">
+            <div className="flex items-center gap-1.5">
+              <Info className="w-3 h-3 flex-shrink-0" />
+              <span>
+                Cálculo basado en Tasa Usura - 2% (Art. 635 E.T.). Valores reales SIMIT varían.
+              </span>
+            </div>
+            <span className="text-[9px] opacity-75">
+              *El SIMIT cobra intereses desde la Resolución Sancionatoria (típicamente 60 días después del comparendo).
             </span>
           </div>
         </div>
