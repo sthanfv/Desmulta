@@ -26,7 +26,7 @@ import { useToast } from '@/hooks/use-toast';
 import { CAUSALES_TRANSITO } from '@/lib/legal/legal-types';
 import { ModalDocumentos } from './modal-parts/ModalDocumentos';
 import { ModalEdicionDatos } from './modal-parts/ModalEdicionDatos';
-
+import { QRCode } from 'react-qrcode-logo';
 interface ModalDetalleExpedienteProps {
   data: KanbanItem;
   onClose: () => void;
@@ -438,13 +438,20 @@ export function ModalDetalleExpediente({
                 <div className="flex items-start gap-4">
                   {/* QR visible — pequeño, solo para mostrar */}
                   <div className="bg-white p-2 rounded-xl border border-slate-200 shadow-sm flex-shrink-0">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={`/api/qr?data=${encodeURIComponent(`${process.env.NEXT_PUBLIC_APP_URL || 'https://desmulta.online'}/seguir/${data.trackingUuid}`)}&size=150`}
-                      alt="QR Seguimiento"
-                      width={72}
-                      height={72}
-                      className="block"
+                    <QRCode
+                      value={`${process.env.NEXT_PUBLIC_APP_URL || 'https://desmulta.online'}/seguir/${data.trackingUuid}`}
+                      size={72}
+                      bgColor="#ffffff"
+                      fgColor="#111827"
+                      qrStyle="squares"
+                      eyeRadius={4}
+                      logoImage="/icon.png"
+                      logoWidth={20}
+                      logoHeight={20}
+                      logoPadding={2}
+                      logoPaddingStyle="square"
+                      removeQrCodeBehindLogo={true}
+                      ecLevel="H"
                     />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -456,21 +463,31 @@ export function ModalDetalleExpediente({
                       iniciar sesión.
                     </p>
                     {/* Imagen oculta en alta resolución para la descarga */}
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      id={`qr-hd-${data.trackingUuid}`}
-                      src={`/api/qr?data=${encodeURIComponent(`${process.env.NEXT_PUBLIC_APP_URL || 'https://desmulta.online'}/seguir/${data.trackingUuid}`)}&size=320`}
-                      alt="QR HD"
-                      crossOrigin="anonymous"
-                      style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}
-                    />
+                    <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
+                      <QRCode
+                        id={`qr-hd-${data.trackingUuid}`}
+                        value={`${process.env.NEXT_PUBLIC_APP_URL || 'https://desmulta.online'}/seguir/${data.trackingUuid}`}
+                        size={320}
+                        bgColor="#ffffff"
+                        fgColor="#111827"
+                        qrStyle="squares"
+                        eyeRadius={12}
+                        logoImage="/icon.png"
+                        logoWidth={90}
+                        logoHeight={90}
+                        logoPadding={5}
+                        logoPaddingStyle="square"
+                        removeQrCodeBehindLogo={true}
+                        ecLevel="H"
+                      />
+                    </div>
                     <button
                       onClick={() => {
                         const trackingId = data.trackingUuid || 'NA';
                         const imgElement = document.getElementById(
                           `qr-hd-${trackingId}`
-                        ) as HTMLImageElement;
-                        if (!imgElement || !imgElement.complete) {
+                        ) as HTMLCanvasElement;
+                        if (!imgElement) {
                           toast({
                             title: 'Cargando',
                             description: 'El código QR todavía se está generando...',

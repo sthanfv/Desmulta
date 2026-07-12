@@ -4,7 +4,7 @@ import WatermarkedEvidence from '@/components/security/WatermarkedEvidence';
 import { useToast } from '@/hooks/use-toast';
 import { DocumentType, DOCUMENT_TYPE_LABELS } from '@/lib/legal/document-templates';
 import { useExpedienteStore } from '@/store/useExpedienteStore';
-
+import { QRCode } from 'react-qrcode-logo';
 interface StepSuccessProps {
   successData: { docId: string; trackingUuid?: string };
   evidenceUrl: string | undefined;
@@ -178,23 +178,29 @@ export default function StepSuccess({
               Código QR de Respaldo
             </p>
             <div className="bg-white p-2 rounded-xl shadow-sm border border-slate-100">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <QRCode
                 id={`qr-client-${successData.trackingUuid}`}
-                src={`/api/qr?data=${encodeURIComponent(`https://desmulta.online/seguir/${successData.trackingUuid}`)}&size=320`}
-                alt="QR de Respaldo"
-                width={120}
-                height={120}
-                crossOrigin="anonymous"
-                className="block"
+                value={`https://desmulta.online/seguir/${successData.trackingUuid}`}
+                size={120}
+                bgColor="#ffffff"
+                fgColor="#111827"
+                qrStyle="squares"
+                eyeRadius={6}
+                logoImage="/icon.png"
+                logoWidth={32}
+                logoHeight={32}
+                logoPadding={2}
+                logoPaddingStyle="square"
+                removeQrCodeBehindLogo={true}
+                ecLevel="H"
               />
             </div>
             <Button
               onClick={() => {
                 const imgElement = document.getElementById(
                   `qr-client-${successData.trackingUuid}`
-                ) as HTMLImageElement;
-                if (!imgElement || !imgElement.complete) {
+                ) as HTMLCanvasElement;
+                if (!imgElement) {
                   toast({
                     title: 'Cargando',
                     description: 'Por favor, espera a que el QR termine de cargar.',
@@ -231,8 +237,8 @@ export default function StepSuccess({
                   imgElement,
                   0,
                   0,
-                  imgElement.naturalWidth,
-                  imgElement.naturalHeight,
+                  imgElement.width,
+                  imgElement.height,
                   PADDING,
                   HEADER_H + PADDING,
                   targetSize,

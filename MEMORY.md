@@ -146,6 +146,8 @@
   - El código QR tradicional generado por backend era rígido, de bordes rectos y carecía de branding. La migración al componente cliente permite manipulación vectorial y estilización avanzada requerida por el estándar de diseño de la marca, sin sobrecargar la API.
 - **Archivos afectados:**
   - `src/app/seguir/[id]/TrackingClientUI.tsx` [MODIFICADO]
+  - `src/components/vial-clear/ModalDetalleExpediente.tsx` [MODIFICADO] (Unificación global de estética)
+  - `src/components/vial-clear/steps/StepSuccess.tsx` [MODIFICADO] (Unificación global de estética)
   - `package.json` [MODIFICADO] (Nueva librería `react-qrcode-logo`)
 
 - **Qué cambió:**
