@@ -7,9 +7,9 @@ const isDev = process.env.NODE_ENV === 'development';
 const unsafeEval = isDev ? " 'unsafe-eval'" : '';
 const scriptUnsafeInline = isDev ? " 'unsafe-inline'" : '';
 
-// En producción se remueve 'unsafe-inline' según las recomendaciones de la auditoría.
-// Dependerá de los nonces del middleware y MotionConfig.
-const styleUnsafe = isDev ? " 'unsafe-inline'" : '';
+// En producción, las animaciones 3D y Framer Motion requieren 'unsafe-inline' en style-src
+// ya que inyectan estilos dinámicos que cambian por cada frame de animación.
+const styleUnsafe = " 'unsafe-inline'";
 
 const devHashes = isDev ? '' : " 'sha256-osMMQj3FsFuFoINhDY6u/ERO7gP52tI8DTruJmDXHD8='";
 
