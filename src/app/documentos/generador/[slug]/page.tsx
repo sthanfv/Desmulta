@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, use } from 'react';
-import { ShieldCheck, Lock, FileText, Loader2 } from 'lucide-react';
+import { ShieldCheck, Lock, FileText, Loader2, ChevronDown } from 'lucide-react';
 import { useExpedienteStore } from '@/store/useExpedienteStore';
 import { useRouter } from 'next/navigation';
 import {
@@ -369,16 +369,19 @@ export default function GeneradorDinamico({ params }: GeneradorDinamicoProps) {
                 <span className="text-green-600 bg-green-50 px-2 py-0.5 rounded-full text-[9px]">Directorio Oficial</span>
               )}
             </label>
-            <input
-              name="ciudad"
-              value={formData.ciudad}
-              onChange={handleCiudadInputChange}
-              onFocus={() => setShowDropdown(true)}
-              onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
-              autoComplete="off"
-              placeholder="Ej. Cali, Bogotá, Envigado..."
-              className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:bg-white focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 outline-none transition-all font-medium shadow-sm mb-3"
-            />
+            <div className="relative">
+              <input
+                name="ciudad"
+                value={formData.ciudad}
+                onChange={handleCiudadInputChange}
+                onFocus={() => setShowDropdown(true)}
+                onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+                autoComplete="off"
+                placeholder="Ej. Cali, Bogotá, Envigado..."
+                className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 pr-10 text-sm text-slate-900 focus:bg-white focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 outline-none transition-all font-medium shadow-sm mb-3"
+              />
+              <ChevronDown className={`absolute right-4 top-[14px] w-5 h-5 text-slate-400 transition-transform duration-200 pointer-events-none ${showDropdown ? 'rotate-180' : ''}`} />
+            </div>
             {showDropdown && (
               <div className="absolute z-50 w-full bg-white border-2 border-slate-200 rounded-xl mt-[-10px] shadow-xl max-h-56 overflow-y-auto">
                 {TRANSIT_AUTHORITIES.filter((a) => 

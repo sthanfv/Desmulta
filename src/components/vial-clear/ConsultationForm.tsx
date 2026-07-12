@@ -182,6 +182,40 @@ export function ConsultationForm({ onSuccess, mode = 'full', nonce }: Consultati
     return () => unsubscribe();
   }, [form]);
 
+  // 🔔 SISTEMA DE INCENTIVO (Nudge UI por inactividad)
+  useEffect(() => {
+    // Si ya completó, no hacemos nada
+    if (form.formState.isSubmitSuccessful || successData || step > 2) return;
+    
+    let nudgeTimeout: NodeJS.Timeout | null = null;
+
+    // Suscribirse a cambios en el formulario
+    const { unsubscribe } = form.watch((value) => {
+      const hasStarted = value.contacto || value.cedula || value.nombre || value.placa;
+      if (!hasStarted) return;
+      
+      // Limpiar timeout anterior
+      if (nudgeTimeout) clearTimeout(nudgeTimeout);
+      
+      // Crear nuevo timeout de 15 segundos
+      nudgeTimeout = setTimeout(() => {
+        // Verificar nuevamente que no haya enviado antes de mostrar
+        if (form.formState.isSubmitSuccessful || successData) return;
+        
+        toast({
+          title: '¡Estás a un paso! 🚀',
+          description: 'Termina de llenar tus datos para que nuestro equipo evalúe tus multas de forma gratuita y confidencial.',
+          duration: 8000,
+        });
+      }, 15000);
+    });
+
+    return () => {
+      unsubscribe();
+      if (nudgeTimeout) clearTimeout(nudgeTimeout);
+    };
+  }, [form, step, successData, toast]);
+
   // 🔔 SISTEMA DE ABANDONO (Lead Nurturing & Operator Alert)
   // Trackear si el usuario cierra la pestaña antes de enviar
   useEffect(() => {

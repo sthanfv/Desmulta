@@ -99,41 +99,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (accion === 'ping') {
-      // 1. Notificar vía Telegram al operador (si hay datos de contacto)
-      const botToken = process.env.TELEGRAM_BOT_TOKEN;
-      const chatId = process.env.TELEGRAM_CHAT_ID;
-
-      if (botToken && chatId && (contacto || email)) {
-        const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
-
-        // 🛡️ ZERO-PII: Enmascarar datos personales antes de transmitir a Telegram.
-        // ADR-001: Contactos de usuarios que no completaron el formulario NO deben
-        // transmitirse en texto plano a canales externos (posible interceptación).
-        const contactoMask = contacto ? `${contacto.slice(0, 3)}****${contacto.slice(-2)}` : 'N/A';
-        const emailMask = email
-          ? `${email.split('@')[0].slice(0, 2)}***@${email.split('@')[1]}`
-          : 'N/A';
-
-        const text = `⚠️ *Lead Parcial Capturado* ⚠️\n\nEl usuario ingresó datos pero no ha finalizado:\n- 📞 *Contacto:* ${contactoMask}\n- 📧 *Email:* ${emailMask}\n\n_Atención: si no recibes el form completo en unos minutos, es un abandono._`;
-
-        fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: chatId,
-            text,
-            parse_mode: 'Markdown',
-            disable_notification: true,
-          }),
-        })
-          .then(async (res) => {
-            if (!res.ok) logger.warn('[abandonment] Telegram error', { status: res.status });
-          })
-          .catch((err) => {
-            logger.warn('[abandonment] Telegram fetch falló', { err: err?.message });
-          });
-      }
-
+      // 1. Ya no enviamos notificaciones a Telegram por abandono parcial a petición del usuario.
       // 2. Activar Web Push (Lead Nurturing) si el usuario ya tiene fcmToken
       if (fcmToken) {
         try {
