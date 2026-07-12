@@ -29,6 +29,7 @@ export default function GeneradorDinamico({ params }: GeneradorDinamicoProps) {
   const [precioDisplay, setPrecioDisplay] = useState<string | null>(null);
   const [selectedAuthId, setSelectedAuthId] = useState<string>('');
   const [isManualAuth, setIsManualAuth] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   // Redirigir a inicio si la plantilla no es válida
   useEffect(() => {
@@ -361,7 +362,7 @@ export default function GeneradorDinamico({ params }: GeneradorDinamicoProps) {
 
           <hr className="my-6 border-slate-200" />
 
-          <div>
+          <div className="relative">
             <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
               <span>Ciudad del Tránsito</span>
               {!isManualAuth && selectedAuthId && (
@@ -369,18 +370,49 @@ export default function GeneradorDinamico({ params }: GeneradorDinamicoProps) {
               )}
             </label>
             <input
-              list="ciudades-list"
               name="ciudad"
               value={formData.ciudad}
               onChange={handleCiudadInputChange}
+              onFocus={() => setShowDropdown(true)}
+              onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+              autoComplete="off"
               placeholder="Ej. Cali, Bogotá, Envigado..."
               className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:bg-white focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 outline-none transition-all font-medium shadow-sm mb-3"
             />
-            <datalist id="ciudades-list">
-              {TRANSIT_AUTHORITIES.map((auth) => (
-                <option key={auth.id} value={`${auth.ciudad} (${auth.departamento})`} />
-              ))}
-            </datalist>
+            {showDropdown && (
+              <div className="absolute z-50 w-full bg-white border-2 border-slate-200 rounded-xl mt-[-10px] shadow-xl max-h-56 overflow-y-auto">
+                {TRANSIT_AUTHORITIES.filter((a) => 
+                  a.ciudad.toLowerCase().includes(formData.ciudad.toLowerCase()) || 
+                  a.departamento.toLowerCase().includes(formData.ciudad.toLowerCase())
+                ).map((auth) => (
+                  <div
+                    key={auth.id}
+                    className="px-4 py-3 hover:bg-slate-50 cursor-pointer text-sm text-slate-700 border-b border-slate-100 last:border-0 transition-colors"
+                    onClick={() => {
+                      setIsManualAuth(false);
+                      setSelectedAuthId(auth.id);
+                      setFormData({
+                        ...formData,
+                        ciudad: auth.ciudad,
+                        autoridad: auth.nombreOficial,
+                      });
+                      setShowDropdown(false);
+                    }}
+                  >
+                    <span className="font-bold text-slate-900">{auth.ciudad}</span>
+                    <span className="text-slate-500 text-xs ml-1">({auth.departamento})</span>
+                  </div>
+                ))}
+                {TRANSIT_AUTHORITIES.filter((a) => 
+                  a.ciudad.toLowerCase().includes(formData.ciudad.toLowerCase()) || 
+                  a.departamento.toLowerCase().includes(formData.ciudad.toLowerCase())
+                ).length === 0 && (
+                  <div className="px-4 py-3 text-sm text-slate-500 italic">
+                    Sin coincidencias. Ingreso manual activado.
+                  </div>
+                )}
+              </div>
+            )}
           </div>
           <div>
             <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
