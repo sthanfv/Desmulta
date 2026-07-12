@@ -7,10 +7,12 @@ const isDev = process.env.NODE_ENV === 'development';
 const unsafeEval = isDev ? " 'unsafe-eval'" : '';
 const scriptUnsafeInline = isDev ? " 'unsafe-inline'" : '';
 
-// En producción, las animaciones 3D y Framer Motion requieren 'unsafe-inline' en style-src
+// En producción, las animaciones 3D (GSAP) y Framer Motion requieren 'unsafe-inline' en style-src
 // ya que inyectan estilos dinámicos que cambian por cada frame de animación.
-// 🛡️ FIX Hallazgo 13: Se desactiva en producción para mantener una CSP estricta.
-const styleUnsafe = isDev ? " 'unsafe-inline'" : "";
+// 🛡️ REVERSIÓN PARCIAL (Hallazgo 13): Reactivado porque bloquear inline-styles
+// rompe críticamente la UI 3D (CardSwap). Se acepta el riesgo de 'unsafe-inline' en CSS
+// a favor de la funcionalidad Core del producto, mientras script-src sigue protegido con nonce.
+const styleUnsafe = " 'unsafe-inline'";
 
 const devHashes = isDev ? '' : " 'sha256-osMMQj3FsFuFoINhDY6u/ERO7gP52tI8DTruJmDXHD8='";
 

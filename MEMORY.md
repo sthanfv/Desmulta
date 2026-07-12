@@ -5,6 +5,15 @@
 > Se analizó el equipo local (DESKTOP-N9CGIFT) identificando un procesador antiguo `AMD PRO A10-8750B R7` (4 núcleos) y 16GB de RAM. Esta severa limitación en procesamiento de un solo hilo causa sobrecargas y Cold Starts extremadamente lentos.
 > **Regla permanente:** Está **ESTRICTAMENTE PROHIBIDO** ejecutar suites de validación masivas (`npm run validate` total) o pruebas E2E pesadas (Playwright) para cambios menores, ya que estresa severamente la máquina. Aplicar validación quirúrgica (linters específicos y pruebas aisladas) a menos que se trate de una reestructuración arquitectónica masiva autorizada por el usuario. Cuando las pruebas E2E sean necesarias, usar estrategias pasivas y timeouts elevados (`60000ms`).
 
+## 2026-07-12 (Hotfix): Reversión Parcial CSP (Framer Motion / GSAP 3D UI)
+- **Qué cambió:**
+  - **[Seguridad - CSP]**: Se reactivó `'unsafe-inline'` en la directiva `style-src` de `src/lib/security-headers.ts` para entornos de producción.
+- **Por qué cambió:**
+  - La eliminación estricta de `'unsafe-inline'` recomendada por la auditoría (Hallazgo 13) causó un bloqueo catastrófico de Content Security Policy (`Applying inline style violates the following Content Security Policy directive...`) que rompió por completo el componente tridimensional (`CardSwap`) impulsado por GSAP/Framer Motion. Se acepta el riesgo documentado a favor de mantener operativa la funcionalidad Core del producto.
+- **Archivos afectados:**
+  - `src/lib/security-headers.ts` [MODIFICADO]
+- **Estado actual:** ✅ Corregido y empujado a producción.
+
 ## 2026-07-12: Auditoría de Seguridad - Remediación Final y Cross-Check
 - **Qué cambió:**
   - **[Seguridad - Hallazgo 13 CSP]**: Se desactivó la directiva `'unsafe-inline'` para `style-src` en el archivo `security-headers.ts` cuando se corre en modo producción. Esto refuerza la política de seguridad contra inyecciones XSS, tal como lo pedía la auditoría, y deja a Next.js (y al pipeline de hashes/nonces) a cargo.
