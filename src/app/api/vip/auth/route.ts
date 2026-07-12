@@ -98,17 +98,12 @@ export async function POST(request: Request) {
       );
     }
 
-    // 🛡️ Emitir JWT _vip_session directamente si la cédula y celular coinciden (Hallazgo 7 revertido por falta de SMS)
+    // 🛡️ REVERSIÓN HALLAZGO 7: Al no contar con API de SMS, se acepta el riesgo de autenticar
+    // solo con Cédula + Celular. Se mitiga con el Rate Limiting estricto ya aplicado arriba.
     const { signVipSession } = await import('@/lib/security/vip-jwt');
-    const sessionToken = await signVipSession({
-      hashedCedula,
-      hashedCelular,
-    });
+    const sessionToken = await signVipSession({ hashedCedula, hashedCelular });
 
-    const response = NextResponse.json(
-      { success: true, redirect: '/vip/dashboard' },
-      { status: 200 }
-    );
+    const response = NextResponse.json({ success: true, redirect: '/vip/dashboard' }, { status: 200 });
 
     response.cookies.set({
       name: '_vip_session',

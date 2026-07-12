@@ -23,6 +23,7 @@ En el flujo de checkout y compra del Derecho de Petición:
 * **Estado `loading`:** Al presionar el botón "Pagar y Descargar PDF", el estado local `loading` cambia de inmediato a `true`.
 * **Deshabilitación del Botón:** El botón de pago renderiza un indicador de carga animado (`Loader2`) y se deshabilita mediante `disabled={loading}`.
 * **Neutralización de Clics:** Al estar deshabilitado nativamente, el navegador no emite más eventos `onClick={handlePay}` hacia la función manejadora.
+* **`src/app/documentos/generador/[slug]/page.tsx`**: Botón de firma deshabilitado inmediatamente al hacer clic + toast de carga para prevenir el envío doble de contratos.
 
 ---
 

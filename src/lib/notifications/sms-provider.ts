@@ -1,15 +1,20 @@
 import { logger } from '@/lib/logger/security-logger';
 
 /**
- * Mock SMS Provider
+ * Mock SMS Provider (INACTIVO)
  *
- * En producción, esto debería integrarse con Twilio, AWS SNS, Infobip, etc.
- * Actualmente imprime el código OTP en la consola del servidor.
+ * ⚠️ NOTA DE ARQUITECTURA:
+ * El proyecto actualmente no cuenta con presupuesto ni integración con una API
+ * de SMS externa (Twilio, AWS SNS, Infobip, etc.).
+ * Por lo tanto, cualquier intento de requerir OTP por SMS (como se recomendaba en
+ * la auditoría para el Portal VIP) ha sido categorizado como "Riesgo Aceptado"
+ * por el negocio, mitigado por un rate limiting agresivo.
+ *
+ * Esta función queda estrictamente como un MOCK inactivo.
  */
 export async function sendOtpSms(celular: string, otpCode: string): Promise<void> {
-  // Aquí iría la llamada HTTP al proveedor SMS.
-  logger.info(`[SMS Mock] Enviando OTP ${otpCode} al celular ${celular}`);
-  console.log(`[SMS MOCK] => Código OTP para ${celular}: ${otpCode}`);
+  logger.warn(`[SMS Mock] Se intentó enviar un OTP, pero la infraestructura SMS está inactiva. Celular: ${celular}`);
+  console.log(`[SMS MOCK INACTIVO] => Código OTP para ${celular}: ${otpCode}`);
 
   // Simulamos delay de red
   await new Promise((resolve) => setTimeout(resolve, 500));

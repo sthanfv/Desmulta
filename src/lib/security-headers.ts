@@ -9,7 +9,8 @@ const scriptUnsafeInline = isDev ? " 'unsafe-inline'" : '';
 
 // En producción, las animaciones 3D y Framer Motion requieren 'unsafe-inline' en style-src
 // ya que inyectan estilos dinámicos que cambian por cada frame de animación.
-const styleUnsafe = " 'unsafe-inline'";
+// 🛡️ FIX Hallazgo 13: Se desactiva en producción para mantener una CSP estricta.
+const styleUnsafe = isDev ? " 'unsafe-inline'" : "";
 
 const devHashes = isDev ? '' : " 'sha256-osMMQj3FsFuFoINhDY6u/ERO7gP52tI8DTruJmDXHD8='";
 

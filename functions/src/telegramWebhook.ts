@@ -2,7 +2,7 @@ import { onRequest } from 'firebase-functions/v2/https';
 import * as admin from 'firebase-admin';
 import { logger } from 'firebase-functions';
 import { decryptSymmetric } from './crypto-utils';
-
+import { timingSafeEqual } from 'crypto';
 /**
  * telegramWebhook — CRM por Telegram v2.0
  *
@@ -256,9 +256,18 @@ export const telegramWebhook = onRequest(
     const webhookSecret = process.env.TELEGRAM_WEBHOOK_SECRET?.trim();
     const receivedToken = req.headers['x-telegram-bot-api-secret-token'];
 
-    if (!webhookSecret || receivedToken !== webhookSecret) {
+    let isTokenValid = false;
+    if (webhookSecret && typeof receivedToken === 'string') {
+      const expectedBuffer = Buffer.from(webhookSecret);
+      const providedBuffer = Buffer.from(receivedToken);
+      if (expectedBuffer.length === providedBuffer.length) {
+        isTokenValid = timingSafeEqual(expectedBuffer, providedBuffer);
+      }
+    }
+
+    if (!isTokenValid) {
       logger.warn('[telegramWebhook] Secret no coincide o no configurado — ignorando.', { 
-        received: receivedToken, 
+        received: typeof receivedToken === 'string' ? '[REDACTED]' : 'null', 
         expectedLength: webhookSecret?.length || 0 
       });
       res.status(200).send({ ok: true });

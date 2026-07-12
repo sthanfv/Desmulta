@@ -84,7 +84,15 @@ async function verifyAdminAuth(request: NextRequest): Promise<boolean> {
 
     if (!tokens) return false;
 
-    // Verificar que el email del token sea un admin conocido
+    const db = getFirestore();
+    const adminDoc = await db.collection('admins').doc(tokens.decodedToken.uid).get();
+
+    if (!adminDoc.exists || adminDoc.data()?.disabled) {
+      logger.error('[admin/api-keys] Acceso denegado: Usuario no es admin en Firestore o está suspendido', { uid: tokens.decodedToken.uid });
+      return false;
+    }
+
+    // Mantener la verificación por email para mayor seguridad en profundidad
     const adminEmails = (process.env.ADMIN_EMAILS || '').split(',').map((e) => e.trim());
     const userEmail = tokens.decodedToken.email ?? '';
     if (adminEmails.length === 0 || (adminEmails.length === 1 && adminEmails[0] === '')) {

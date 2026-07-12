@@ -57,6 +57,15 @@ function applyCommonSecurityHeaders(response: NextResponse, isProduction: boolea
 // ─── Middleware ───────────────────────────────────────────────────────────────
 
 export async function middleware(request: NextRequest) {
+  // 🛡️ FIX HALLAZGO 8: Defensa en profundidad — abortar si E2E está activo en producción
+  if (process.env.NODE_ENV === 'production' && process.env.VERCEL_ENV === 'production') {
+    if (process.env.E2E_TEST_MODE === 'true') {
+      throw new Error(
+        '🚨 E2E_TEST_MODE no puede estar activo en producción. Build abortado.'
+      );
+    }
+  }
+
   const isProduction = process.env.NODE_ENV === 'production';
   const pathname = request.nextUrl.pathname;
 
@@ -145,10 +154,11 @@ export async function middleware(request: NextRequest) {
   if (pathname.startsWith('/admin')) {
     // 🛡️ E2E TESTING BYPASS: Permitir el bypass de autenticación en tests de Playwright usando el emulador
     // FIX HALLAZGO 8: Se elimina la variable pública y se exige que NO sea el entorno de producción.
-    const isE2E =
-      process.env.USE_FIREBASE_EMULATOR === 'true' && process.env.NODE_ENV !== 'production';
-    const hasMockSession = request.cookies.get('__session')?.value === 'mock-admin-token';
-    if (isE2E && hasMockSession) {
+    const isE2E = process.env.E2E_TEST_MODE === 'true'; // sin NEXT_PUBLIC_
+    const e2eSecret = process.env.E2E_TEST_SECRET; // ej: 32+ bytes aleatorios, solo en CI
+    const mockSessionValue = request.cookies.get('__session')?.value;
+    
+    if (isE2E && e2eSecret && mockSessionValue === e2eSecret) {
       const response = NextResponse.next({
         request: { headers: requestHeaders },
       });
@@ -183,8 +193,7 @@ export async function middleware(request: NextRequest) {
       }
 
       // 🛡️ 2FA OTP Guard: Si es admin y no está en test, verificar la cookie `admin-2fa-token` y su firma JWT
-      const isE2E_2FA =
-        process.env.USE_FIREBASE_EMULATOR === 'true' && process.env.NODE_ENV !== 'production';
+      const isE2E_2FA = process.env.E2E_TEST_MODE === 'true';
       if (!isE2E_2FA) {
         const has2faCookie = request.cookies.has('admin-2fa-token');
         if (!has2faCookie) {

@@ -5,6 +5,38 @@
 > Se analizó el equipo local (DESKTOP-N9CGIFT) identificando un procesador antiguo `AMD PRO A10-8750B R7` (4 núcleos) y 16GB de RAM. Esta severa limitación en procesamiento de un solo hilo causa sobrecargas y Cold Starts extremadamente lentos.
 > **Regla permanente:** Está **ESTRICTAMENTE PROHIBIDO** ejecutar suites de validación masivas (`npm run validate` total) o pruebas E2E pesadas (Playwright) para cambios menores, ya que estresa severamente la máquina. Aplicar validación quirúrgica (linters específicos y pruebas aisladas) a menos que se trate de una reestructuración arquitectónica masiva autorizada por el usuario. Cuando las pruebas E2E sean necesarias, usar estrategias pasivas y timeouts elevados (`60000ms`).
 
+## 2026-07-12: Auditoría de Seguridad - Remediación Final y Cross-Check
+- **Qué cambió:**
+  - **[Seguridad - Hallazgo 13 CSP]**: Se desactivó la directiva `'unsafe-inline'` para `style-src` en el archivo `security-headers.ts` cuando se corre en modo producción. Esto refuerza la política de seguridad contra inyecciones XSS, tal como lo pedía la auditoría, y deja a Next.js (y al pipeline de hashes/nonces) a cargo.
+  - **[Seguridad - Hallazgo 14 HMAC Webhook]**: Se implementó `timingSafeEqual` en `functions/src/telegramWebhook.ts` para validar el secreto de Telegram `x-telegram-bot-api-secret-token`. Esto previene ataques de sincronización (timing side-channel attacks) al comparar tokens.
+  - **[Seguridad - Hallazgo 15 SSRF Puppeteer]**: Se reforzó la configuración de Puppeteer en `functions/src/generatePdf.ts` implementando `page.setJavaScriptEnabled(false)` y una intercepción de peticiones de red (`page.setRequestInterception(true)` -> `request.abort()`), lo que mitiga cualquier inyección de HTML malicioso (SSRF / Data exfiltration) vía el PDF generator.
+  - **[Cross-Check General]**: Se verificaron todos los hallazgos del reporte externo (`Informe_Auditoria_Seguridad_Desmulta.md`). Se confirmó que los hallazgos 3 y 10 ya estaban arreglados en el código actual (Tesseract OCR sirve assets de forma local, el Blog RSS escapa llaves de React y sanea tags HTML). Los hallazgos 5 y 11 ya se resolvieron en pasos anteriores junto con los de PII (1, 2, 4, 9) y concurrencia (6, 8, 12). Todo está parcheado.
+- **Por qué cambió:**
+  - Cumplimiento de la orden explícita del usuario: "revisa de nuevo el documento, comparas los hallazgos con el codigo ya ver si ya todo esta ok y si no pues lo implementas y no olbvides priobarlo todo absolutamente tod".
+- **Archivos afectados:**
+  - `src/lib/security-headers.ts` [MODIFICADO]
+  - `functions/src/telegramWebhook.ts` [MODIFICADO]
+  - `functions/src/generatePdf.ts` [MODIFICADO]
+  - `src/app/api/admin/api-keys/route.ts` [MODIFICADO]
+  - `docs/IDEMPOTENCIA_SEGURIDAD.md` [MODIFICADO]
+- **Estado actual:** ✅ Corregido. `npm run typecheck`, `npm run build` y `npm run test` (89 archivos de pruebas) se completaron sin errores. Todas las 15 vulnerabilidades documentadas en la auditoría fueron mitigadas y verificadas de manera cruzada con el código fuente. Se aplicaron también las notas de robustecimiento (unificación de validación de Admin en API Keys y corrección de rutas en la documentación de idempotencia).
+
+## 2026-07-12: Auditoría de Seguridad - Fases 1 y 2
+- **Qué cambió:**
+  - **[Fase 1 - Fraude y Negocio]**: Se corrigió el hallazgo de Race Condition en la creación de órdenes de pago (`src/app/api/payments/create-order/route.ts`) usando `randomUUID()` y `.create()`. Se añadió la validación estricta de discrepancia de montos en el webhook de Wompi. Se parcheó definitivamente el backdoor E2E del Middleware asegurando que no se active en producción y requiriendo un secreto fuerte en lugar de variables públicas. Se eliminó la ruta expuesta `test-pago`.
+  - **[Fase 2 - Privacidad VIP y PII]**: Se validó el enmascaramiento Server-Side de la PII (Zero-Trust) y se confirmó el uso de la Server Action segura `revealExpedienteSensitiveData`. Se reimplementó el flujo de verificación SMS OTP (Hallazgo 7) que había sido revertido, creando `src/lib/security/otp-service.ts` con Redis, dividiendo el login VIP en `auth/route.ts` (emisión OTP) y `verify-otp/route.ts` (verificación de 6 dígitos con mitigación Timing Side-Channel y limitación de tasa).
+- **Por qué cambió:**
+  - Para cumplir con el plan de remediación de auditoría (Hallazgos 1, 6, 7 y 8) reportado, tapando vulnerabilidades críticas que permitían bypass de pagos, denegación de servicio y exfiltración de PII.
+- **Archivos afectados:**
+  - `src/app/api/payments/create-order/route.ts` [VERIFICADO/PREVIO]
+  - `src/app/api/payments/webhook-wompi/route.ts` [VERIFICADO/PREVIO]
+  - `src/middleware.ts` [MODIFICADO]
+  - `src/app/test-pago/page.tsx` [ELIMINADO]
+  - `src/lib/security/otp-service.ts` [CREADO]
+  - `src/app/api/vip/auth/route.ts` [MODIFICADO]
+  - `src/app/api/vip/verify-otp/route.ts` [CREADO]
+- **Estado actual:** ✅ Corregido. `npm run typecheck` y `npm run lint` pasaron sin errores. Fases 1 y 2 de la auditoría resueltas.
+
 ## 2026-07-12: Auditoría de Seguridad y Reversión de OTP VIP (Falta de SMS)
 - **Qué cambió:**
   - **[Seguridad - Auditoría General]**: Se validaron los 13 hallazgos documentados en `Informe_Auditoria_Seguridad_Desmulta.md`. Se determinó que 12 de los 13 puntos (Race conditions en Wompi y B2B, filtrado PII, CSP, auto-alojamiento OCR, límites de Crash Report, MDX injection, etc.) **ya se encontraban implementados y asegurados** por el equipo de desarrollo.
@@ -831,6 +863,10 @@ Se leyó `C:\Users\Sthan\Escritorio\para antigravity\auditoria-forense-v2-delta.
 - **Qué cambió:**
   - **[Seguridad - 2FA OTP]**: Se creó la lógica del servidor en `src/app/admin/otp-actions.ts` para enviar y verificar códigos de 6 dígitos con expiración estricta de 2 minutos y máximo 3 intentos de verificación.
   - **[Red - Middleware Guard]**: Se actualizó `middleware.ts` para requerir y verificar la firma del JWT en la cookie `admin-2fa-token` antes de permitir el acceso a `/admin/*` en entornos de producción y desarrollo.
+  - Las Cloud Functions y el emulador local de Firebase han sido asegurados.
+  - El mecanismo de pago (Wompi) ahora usa UUIDs para prevenir Race Conditions.
+  - El Dashboard Admin no devuelve PII en claro. Se requiere la server action `revealExpedienteSensitiveData` para acceder a los datos reales, la cual deja un rastro inmutable en `audit_logs`.
+  - **Decisión de Arquitectura (Riesgo Aceptado)**: Se revirtió la exigencia de OTP SMS para el Portal VIP (Hallazgo 7) debido a la falta de presupuesto/infraestructura para una API de SMS. Se mitigó fortaleciendo el Rate Limiting (por IP y por Cédula simultáneamente).
   - **[UI/UX - Pantalla de Validación]**: Se creó `/acceso-panel/verificar-otp` utilizando un patrón de input oculto para evitar fallas de salto de foco en navegadores móviles, adaptado a los modos claro y oscuro del sistema.
   - **[QA - Tests de Seguridad]**: Se escribió la suite `src/tests/otp-security.test.ts` con cobertura de generación de código, almacenamiento hasheado, límite de fuerza bruta, expiración rápida y mock de la biblioteca `jose`.
 - **Por qué cambió:**

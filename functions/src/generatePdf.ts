@@ -40,6 +40,14 @@ export const generatePdf = onRequest(
 
       const page = await browser.newPage();
       
+      // 🛡️ FIX HALLAZGO 15: Prevenir SSRF bloqueando red y deshabilitando JS
+      await page.setJavaScriptEnabled(false);
+      await page.setRequestInterception(true);
+      page.on('request', (request) => {
+        // Bloquear todas las peticiones de red externas ya que inyectamos el HTML directamente
+        request.abort();
+      });
+
       // Establecer el contenido HTML
       await page.setContent(htmlContent, {
         waitUntil: 'domcontentloaded',
