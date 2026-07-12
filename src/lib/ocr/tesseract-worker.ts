@@ -42,7 +42,7 @@ class TesseractWorkerManager {
         mediaLogger.log('OCR', 'Iniciando creación de Worker (spa)...');
         const worker = await createWorker('spa', 1, {
           workerPath: '/ocr/worker.min.js',
-          langPath: 'https://tessdata.projectnaptha.com/4.0.0_best',
+          langPath: '/ocr',
           corePath: '/ocr/tesseract-core.wasm.js',
           logger: (m) => {
             if (this.currentOnProgress) {

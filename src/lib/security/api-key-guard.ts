@@ -145,33 +145,36 @@ async function getFromFirestore(keyId: string): Promise<ApiKeyDocument | null> {
   }
 }
 
-// ─── Incremento de Uso (Fire-and-Forget) ──────────────────────────────────────
+const LUA_ATOMIC_QUOTA = `
+local usoMesKey = KEYS[1]
+local usoTotalKey = KEYS[2]
+local ultimoUsoKey = KEYS[3]
+local syncQueueKey = KEYS[4]
 
-/**
- * Incrementa los contadores de uso en Redis de forma asíncrona (O(1)).
- * El CRON en background (/api/cron/sync-usage) sincronizará esto a Firestore periódicamente.
- */
-async function incrementUsage(keyId: string, plan: ApiKeyPlan): Promise<void> {
-  try {
-    const mesActual = new Date().toISOString().substring(0, 7); // "YYYY-MM"
+local fallbackUsoMes = tonumber(ARGV[1])
+local maxRequests = tonumber(ARGV[2])
+local currentTime = ARGV[3]
+local keyId = ARGV[4]
 
-    // Ejecutar atómicamente en un pipeline
-    const pipeline = redis.pipeline();
-    pipeline.incr(`apikey:usoTotal:${keyId}`);
-    pipeline.incr(`apikey:usoMes:${mesActual}:${keyId}`);
-    pipeline.set(`apikey:ultimoUso:${keyId}`, new Date().toISOString());
-    // Añadir el keyId a la cola de sincronización para que el CRON sepa qué keys actualizar
-    pipeline.sadd(`apikey:sync_queue`, keyId);
+local current = redis.call("GET", usoMesKey)
+if not current then
+  current = fallbackUsoMes
+else
+  current = tonumber(current)
+end
 
-    await pipeline.exec();
-  } catch (error) {
-    logger.warn('[api-key-guard] Fallo al incrementar contador de uso en Redis', {
-      keyId,
-      plan,
-      error: String(error),
-    });
-  }
-}
+if current >= maxRequests then
+  return -1
+end
+
+local newUsoMes = current + 1
+redis.call("SET", usoMesKey, newUsoMes)
+redis.call("INCR", usoTotalKey)
+redis.call("SET", ultimoUsoKey, currentTime)
+redis.call("SADD", syncQueueKey, keyId)
+
+return newUsoMes
+`;
 
 // ─── Función Principal de Validación ──────────────────────────────────────────
 
@@ -268,23 +271,51 @@ export async function validateApiKey(rawKey: string | null): Promise<ApiKeyValid
     }
   }
 
-  // 8. Verificar quota mensual
+  // 8. Verificar rate limit por plan (Upstash — sliding window por minuto)
   const planConfig = API_KEY_PLANS[keyDoc.plan];
+  const rateLimiter = planRateLimiters[keyDoc.plan];
+  const rateLimitKey = `apikey:rl:${keyId}`;
+  const rlResult = await rateLimiter.limit(rateLimitKey);
+
+  if (!rlResult.success) {
+    // Para no romper la interfaz de respuesta, calculamos remainingMonth aunque estemos bloqueados
+    const mesActualParaRl = new Date().toISOString().substring(0, 7);
+    const usoMesRedis = await redis.get<number>(`apikey:usoMes:${mesActualParaRl}:${keyId}`);
+    const usoMesFall =
+      usoMesRedis !== null
+        ? Number(usoMesRedis)
+        : keyDoc.mesActual === mesActualParaRl
+          ? (keyDoc.usoMesActual ?? 0)
+          : 0;
+    const remMonth = Math.max(0, planConfig.requestsPerMonth - usoMesFall);
+
+    return {
+      valid: false,
+      errorCode: 'RATE_LIMITED',
+      errorMessage: `Demasiadas solicitudes por minuto. Tu plan ${keyDoc.plan} permite ${planConfig.requestsPerMinute} req/min. Espera unos segundos.`,
+      remainingMonth: remMonth,
+      remainingMinute: 0,
+    };
+  }
+
+  // 9. Verificar quota mensual y hacer incremento ATÓMICO
   const mesActual = new Date().toISOString().substring(0, 7);
+  const fallbackUsoMes = keyDoc.mesActual === mesActual ? (keyDoc.usoMesActual ?? 0) : 0;
 
-  // Leer el uso del mes en tiempo real desde Redis. Si no está en caché (por ejemplo, primer request del mes o cache flush),
-  // hacemos fallback al dato de Firestore y el de Firestore solo será válido si el mes coincide.
-  const usoMesRedis = await redis.get<number>(`apikey:usoMes:${mesActual}:${keyId}`);
-  const usoMes =
-    usoMesRedis !== null
-      ? Number(usoMesRedis)
-      : keyDoc.mesActual === mesActual
-        ? (keyDoc.usoMesActual ?? 0)
-        : 0;
+  const evalResult = await redis.eval(
+    LUA_ATOMIC_QUOTA,
+    [
+      `apikey:usoMes:${mesActual}:${keyId}`,
+      `apikey:usoTotal:${keyId}`,
+      `apikey:ultimoUso:${keyId}`,
+      `apikey:sync_queue`,
+    ],
+    [fallbackUsoMes, planConfig.requestsPerMonth, new Date().toISOString(), keyId]
+  );
 
-  const remainingMonth = planConfig.requestsPerMonth - usoMes;
+  const newUsoMes = Number(evalResult);
 
-  if (remainingMonth <= 0) {
+  if (newUsoMes === -1) {
     return {
       valid: false,
       errorCode: 'QUOTA_EXCEEDED',
@@ -293,27 +324,11 @@ export async function validateApiKey(rawKey: string | null): Promise<ApiKeyValid
     };
   }
 
-  // 9. Verificar rate limit por plan (Upstash — sliding window por minuto)
-  const rateLimiter = planRateLimiters[keyDoc.plan];
-  const rateLimitKey = `apikey:rl:${keyId}`;
-  const rlResult = await rateLimiter.limit(rateLimitKey);
-
-  if (!rlResult.success) {
-    return {
-      valid: false,
-      errorCode: 'RATE_LIMITED',
-      errorMessage: `Demasiadas solicitudes por minuto. Tu plan ${keyDoc.plan} permite ${planConfig.requestsPerMinute} req/min. Espera unos segundos.`,
-      remainingMonth,
-      remainingMinute: 0,
-    };
-  }
-
-  // 10. ¡Todo válido! Incrementar uso en background (no bloqueante)
-  void incrementUsage(keyId, keyDoc.plan);
+  const remainingMonth = planConfig.requestsPerMonth - newUsoMes;
 
   logger.info('[api-key-guard] Request autorizado', {
     plan: keyDoc.plan,
-    usoMes,
+    usoMes: newUsoMes,
     remainingMonth,
     remainingMinute: rlResult.remaining,
   });

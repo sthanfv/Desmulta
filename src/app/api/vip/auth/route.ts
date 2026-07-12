@@ -98,7 +98,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // 🛡️ Tras probar coincidencia de Cédula y Celular, emitimos la sesión directamente
+    // 🛡️ Emitir JWT _vip_session directamente si la cédula y celular coinciden (Hallazgo 7 revertido por falta de SMS)
     const { signVipSession } = await import('@/lib/security/vip-jwt');
     const sessionToken = await signVipSession({
       hashedCedula,

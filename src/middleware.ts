@@ -254,11 +254,13 @@ export async function middleware(request: NextRequest) {
   // ── 6. Páginas públicas — CSP con nonce ──────────────────────────────────
   const nonce = generateNonce();
 
-  // CSP: se añade el nonce SOLO en script-src, y SOLO en producción.
+  // CSP: se añade el nonce SOLO en script-src y style-src, y SOLO en producción.
   // En desarrollo, el nonce rompe el 'unsafe-inline' que requiere el dev server de Next.js.
   let cspWithNonce = cspHeader;
   if (isProduction) {
-    cspWithNonce = cspWithNonce.replace("script-src 'self'", `script-src 'nonce-${nonce}' 'self'`);
+    cspWithNonce = cspWithNonce
+      .replace("script-src 'self'", `script-src 'nonce-${nonce}' 'self'`)
+      .replace("style-src 'self'", `style-src 'nonce-${nonce}' 'self'`);
   }
 
   // Asegurar que base-uri esté en la CSP (previene base-tag injection)

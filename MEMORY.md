@@ -5,6 +5,22 @@
 > Se analizó el equipo local (DESKTOP-N9CGIFT) identificando un procesador antiguo `AMD PRO A10-8750B R7` (4 núcleos) y 16GB de RAM. Esta severa limitación en procesamiento de un solo hilo causa sobrecargas y Cold Starts extremadamente lentos.
 > **Regla permanente:** Está **ESTRICTAMENTE PROHIBIDO** ejecutar suites de validación masivas (`npm run validate` total) o pruebas E2E pesadas (Playwright) para cambios menores, ya que estresa severamente la máquina. Aplicar validación quirúrgica (linters específicos y pruebas aisladas) a menos que se trate de una reestructuración arquitectónica masiva autorizada por el usuario. Cuando las pruebas E2E sean necesarias, usar estrategias pasivas y timeouts elevados (`60000ms`).
 
+## 2026-07-12: Auditoría de Seguridad y Reversión de OTP VIP (Falta de SMS)
+- **Qué cambió:**
+  - **[Seguridad - Auditoría General]**: Se validaron los 13 hallazgos documentados en `Informe_Auditoria_Seguridad_Desmulta.md`. Se determinó que 12 de los 13 puntos (Race conditions en Wompi y B2B, filtrado PII, CSP, auto-alojamiento OCR, límites de Crash Report, MDX injection, etc.) **ya se encontraban implementados y asegurados** por el equipo de desarrollo.
+  - **[Autenticación VIP - Reversión de Hallazgo 7]**: Se eliminó la validación OTP simulada mediante Redis en `src/app/api/vip/auth/route.ts`. Ahora el sistema autoriza y emite el JWT directamente (`_vip_session`) si y solo si el hash de la Cédula y el Celular coinciden de forma exacta con la base de datos Firestore, manteniendo la protección por rate-limiting.
+  - **[Limpieza]**: Se eliminó por completo el endpoint obsoleto `verify-otp/route.ts` y la interfaz del paso 2 (OTP) en `src/app/vip/page.tsx`, dejando un inicio de sesión directo de 1 solo paso.
+  - **[Bugfix Typescript]**: Se corrigió un error persistente en `src/lib/security/api-key-guard.ts` donde la variable `planConfig` no estaba declarada.
+- **Por qué cambió:**
+  - A solicitud explícita del Product Owner, debido a la falta de un proveedor real de SMS para el envío del código OTP del Portal VIP. El sistema fue simplificado a la coincidencia exacta de Cédula/Celular, que es suficientemente segura (combinada con Rate Limit por IP y Cédula) para el nivel de riesgo de esta área de lectura.
+- **Archivos afectados:**
+  - `src/app/api/vip/auth/route.ts` [MODIFICADO]
+  - `src/app/api/vip/verify-otp/route.ts` [ELIMINADO]
+  - `src/app/vip/page.tsx` [MODIFICADO]
+  - `src/lib/security/api-key-guard.ts` [MODIFICADO]
+- **Estado actual:** ✅ Corregido. `npm run typecheck` y `npm run lint` limpios (surgical validation). Plan final de auditoría ejecutado y validado de manera exitosa.
+
+
 ## 2026-07-10: Limpieza de Linters y Tipado Estricto (IP Utilities)
 - **Qué cambió:**
   - Se eliminaron importaciones no utilizadas (`sendOtpSms`, `generateOtp`, `storeOtpChallenge`) en `src/app/api/vip/auth/route.ts` que quedaron huérfanas tras eliminar la validación SMS.

@@ -6,9 +6,9 @@ import { getAdminApp } from '@/lib/firebase-admin';
 import { timingSafeEqual } from 'crypto';
 
 const CrashPayloadSchema = z.object({
-  message: z.string(),
-  digest: z.string().optional(),
-  path: z.string(),
+  message: z.string().max(1000),
+  digest: z.string().max(200).optional(),
+  path: z.string().max(200),
 });
 
 const MAX_REQUESTS_PER_WINDOW = 50;

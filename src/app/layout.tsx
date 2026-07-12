@@ -157,7 +157,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               {/* PushProvider inyectado globalmente — escucha notificaciones en primer y segundo plano */}
               <SystemHealthProvider>
                 <PushProvider>
-                  <MotionProvider>
+                  <MotionProvider nonce={nonce}>
                     <PWAAutoUpdater />
                     <main id="main-content" className="overflow-x-hidden w-full relative">
                       {children}
