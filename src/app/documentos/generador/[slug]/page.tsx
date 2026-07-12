@@ -103,23 +103,28 @@ export default function GeneradorDinamico({ params }: GeneradorDinamicoProps) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleCitySelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleCiudadInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
-    if (val === 'MANUAL') {
+    
+    const auth = TRANSIT_AUTHORITIES.find(
+      (a) => a.ciudad.toLowerCase() === val.toLowerCase() || `${a.ciudad} (${a.departamento})`.toLowerCase() === val.toLowerCase()
+    );
+
+    if (auth) {
+      setIsManualAuth(false);
+      setSelectedAuthId(auth.id);
+      setFormData({
+        ...formData,
+        ciudad: auth.ciudad,
+        autoridad: auth.nombreOficial,
+      });
+    } else {
       setIsManualAuth(true);
       setSelectedAuthId('');
-      setFormData({ ...formData, ciudad: '', autoridad: '' });
-    } else {
-      setIsManualAuth(false);
-      setSelectedAuthId(val);
-      const auth = TRANSIT_AUTHORITIES.find((a) => a.id === val);
-      if (auth) {
-        setFormData({
-          ...formData,
-          ciudad: auth.ciudad,
-          autoridad: auth.nombreOficial,
-        });
-      }
+      setFormData({
+        ...formData,
+        ciudad: val,
+      });
     }
   };
 
@@ -363,29 +368,19 @@ export default function GeneradorDinamico({ params }: GeneradorDinamicoProps) {
                 <span className="text-green-600 bg-green-50 px-2 py-0.5 rounded-full text-[9px]">Directorio Oficial</span>
               )}
             </label>
-            <select
-              value={isManualAuth ? 'MANUAL' : selectedAuthId}
-              onChange={handleCitySelect}
+            <input
+              list="ciudades-list"
+              name="ciudad"
+              value={formData.ciudad}
+              onChange={handleCiudadInputChange}
+              placeholder="Ej. Cali, Bogotá, Envigado..."
               className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:bg-white focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 outline-none transition-all font-medium shadow-sm mb-3"
-            >
-              <option value="" disabled>Selecciona la ciudad...</option>
+            />
+            <datalist id="ciudades-list">
               {TRANSIT_AUTHORITIES.map((auth) => (
-                <option key={auth.id} value={auth.id}>
-                  {auth.ciudad} ({auth.departamento})
-                </option>
+                <option key={auth.id} value={`${auth.ciudad} (${auth.departamento})`} />
               ))}
-              <option value="MANUAL">Otra ciudad (Ingreso Manual)</option>
-            </select>
-            
-            {isManualAuth && (
-              <input
-                name="ciudad"
-                value={formData.ciudad}
-                onChange={handleChange}
-                placeholder="Ej. Puerto Colombia"
-                className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-yellow-400 outline-none transition-all font-medium shadow-sm"
-              />
-            )}
+            </datalist>
           </div>
           <div>
             <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
