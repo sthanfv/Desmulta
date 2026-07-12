@@ -13,6 +13,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
+import { QRCode } from 'react-qrcode-logo';
 import {
   Shield,
   Clock,
@@ -669,24 +670,42 @@ export default function TrackingClientUI({
             transition={{ delay: 0.5 }}
             className="flex flex-col sm:flex-row items-center gap-6 bg-card border border-border rounded-2xl p-6 mb-8 shadow-sm"
           >
-            {/* Imagen oculta alta resolución */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              id="qr-cliente-hd"
-              src={`/api/qr?data=${encodeURIComponent(windowUrl)}&size=320`}
-              alt="QR HD"
-              crossOrigin="anonymous"
-              style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}
-            />
+            {/* QR oculto de alta resolución para la descarga (320px) */}
+            <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
+              <QRCode
+                id="qr-cliente-hd"
+                value={windowUrl}
+                size={320}
+                bgColor="#ffffff"
+                fgColor="#111827"
+                qrStyle="squares"
+                eyeRadius={12}
+                logoImage="/icon.png"
+                logoWidth={90}
+                logoHeight={90}
+                logoPadding={5}
+                logoPaddingStyle="square"
+                removeQrCodeBehindLogo={true}
+                ecLevel="H"
+              />
+            </div>
 
-            <div className="p-3 bg-white rounded-xl shadow-sm border border-slate-100 flex-shrink-0">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={`/api/qr?data=${encodeURIComponent(windowUrl)}&size=100`}
-                alt="QR Tracking"
-                width={100}
-                height={100}
-                className="block"
+            {/* QR de visualización para el UI (100px) */}
+            <div className="p-3 bg-white rounded-xl shadow-sm border border-slate-100 flex-shrink-0 flex items-center justify-center">
+              <QRCode
+                value={windowUrl}
+                size={100}
+                bgColor="#ffffff"
+                fgColor="#111827"
+                qrStyle="squares"
+                eyeRadius={4}
+                logoImage="/icon.png"
+                logoWidth={28}
+                logoHeight={28}
+                logoPadding={2}
+                logoPaddingStyle="square"
+                removeQrCodeBehindLogo={true}
+                ecLevel="H"
               />
             </div>
 
@@ -701,11 +720,11 @@ export default function TrackingClientUI({
               </p>
               <button
                 onClick={() => {
-                  const imgElement = document.getElementById('qr-cliente-hd') as HTMLImageElement;
-                  if (!imgElement || !imgElement.complete) {
+                  const qrCanvas = document.getElementById('qr-cliente-hd') as HTMLCanvasElement;
+                  if (!qrCanvas) {
                     toast({
-                      title: 'Cargando',
-                      description: 'Por favor, espera a que el QR termine de cargar.',
+                      title: 'Error',
+                      description: 'Por favor, espera a que el QR termine de procesarse.',
                     });
                     return;
                   }
@@ -734,7 +753,7 @@ export default function TrackingClientUI({
                   ctx.textBaseline = 'middle';
                   ctx.fillText('DESMULTA', TOTAL_W / 2, HEADER_H / 2);
 
-                  ctx.drawImage(imgElement, PADDING, HEADER_H + PADDING, QR_SIZE, QR_SIZE);
+                  ctx.drawImage(qrCanvas, PADDING, HEADER_H + PADDING, QR_SIZE, QR_SIZE);
 
                   ctx.fillStyle = '#6b7280';
                   ctx.font = '13px system-ui, -apple-system, sans-serif';

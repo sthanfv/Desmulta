@@ -137,6 +137,17 @@
   - `src/lib/legal/document-templates.ts` [MODIFICADO]
 
 ## 2026-07-06: Estabilización de E2E para Entornos de Hardware Limitado (Flaky Tests)
+## 2026-07-12: Rediseño Premium de UI para QR de Seguimiento
+- **Qué cambió:**
+  - **[UI - Componente]**: Se migró la generación del código QR del servidor (`/api/qr` con la librería Node `qrcode`) a renderizado nativo en el navegador usando `react-qrcode-logo` en el componente `TrackingClientUI.tsx`.
+  - **[Estética]**: Se implementó una estética premium con cuadrados tradicionales (`qrStyle="squares"`) para formalidad, pero con marcos exteriores redondeados (`eyeRadius={4}` y `12` para el Canvas HD), e inserción dinámica del logo corporativo central (`/icon.png`) con corrección de errores de nivel `H`.
+  - **[Descarga HD]**: Se corrigió la intercepción del Canvas (para mantener la inyección del cabezote amarillo "DESMULTA" al exportar) renderizando un Canvas secundario invisible de 320px, permitiendo descargas en alta resolución y renderizado UI limpio.
+- **Por qué cambió:**
+  - El código QR tradicional generado por backend era rígido, de bordes rectos y carecía de branding. La migración al componente cliente permite manipulación vectorial y estilización avanzada requerida por el estándar de diseño de la marca, sin sobrecargar la API.
+- **Archivos afectados:**
+  - `src/app/seguir/[id]/TrackingClientUI.tsx` [MODIFICADO]
+  - `package.json` [MODIFICADO] (Nueva librería `react-qrcode-logo`)
+
 - **Qué cambió:**
   - **[QA - Timeout Global]**: Se incrementó el `timeout` global de Playwright en `playwright.config.ts` de 60000ms a 120000ms para compensar la lentitud extrema de máquinas antiguas durante la inicialización y ejecución del servidor Next.js y el Emulador de Firebase.
   - **[QA - Timeout Asersión]**: En `tests/e2e/document-generator.spec.ts`, se aumentó el timeout específico de la aserción de redirección de confirmación de pago (`toHaveURL`) de 60s a 90s.
