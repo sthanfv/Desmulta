@@ -60,8 +60,6 @@ export default function VipLoginPage() {
     }
   };
 
-
-
   return (
     <div className="w-full max-w-md bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
       {/* Decorative Glow */}
@@ -88,59 +86,58 @@ export default function VipLoginPage() {
         </div>
       )}
 
-
-        <form onSubmit={handleLogin} className="space-y-5 relative z-10">
-          <div className="space-y-1">
-            <label
-              htmlFor="cedula-input"
-              className="text-xs font-semibold text-slate-300 uppercase tracking-wider pl-1"
-            >
-              Número de Cédula
-            </label>
-            <Input
-              id="cedula-input"
-              type="tel"
-              value={cedula}
-              onChange={(e) => setCedula(e.target.value.replace(/\D/g, ''))}
-              placeholder="Ej: 1010123456"
-              disabled={isLoading}
-              className="h-14 bg-black/40 border-white/10 text-white placeholder:text-slate-600 focus:border-[#D4AF37]/50 focus:ring-[#D4AF37]/20 rounded-xl text-lg px-4 transition-all"
-            />
-          </div>
-
-          <div className="space-y-1">
-            <label
-              htmlFor="celular-input"
-              className="text-xs font-semibold text-slate-300 uppercase tracking-wider pl-1"
-            >
-              Número de Celular
-            </label>
-            <Input
-              id="celular-input"
-              type="tel"
-              value={celular}
-              onChange={(e) => setCelular(e.target.value.replace(/\D/g, ''))}
-              placeholder="Ej: 3001234567"
-              disabled={isLoading}
-              className="h-14 bg-black/40 border-white/10 text-white placeholder:text-slate-600 focus:border-[#D4AF37]/50 focus:ring-[#D4AF37]/20 rounded-xl text-lg px-4 transition-all"
-            />
-          </div>
-
-          <Button
-            type="submit"
-            disabled={isLoading}
-            className="w-full h-14 bg-[#D4AF37] hover:bg-[#c4a133] text-black font-bold text-lg rounded-xl shadow-[0_0_20px_rgba(212,175,55,0.3)] transition-all active:scale-[0.98] mt-4 flex items-center justify-center gap-2 group"
+      <form onSubmit={handleLogin} className="space-y-5 relative z-10">
+        <div className="space-y-1">
+          <label
+            htmlFor="cedula-input"
+            className="text-xs font-semibold text-slate-300 uppercase tracking-wider pl-1"
           >
-            {isLoading ? (
-              <Loader2 className="w-6 h-6 animate-spin" />
-            ) : (
-              <>
-                Continuar
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </>
-            )}
-          </Button>
-        </form>
+            Número de Cédula
+          </label>
+          <Input
+            id="cedula-input"
+            type="tel"
+            value={cedula}
+            onChange={(e) => setCedula(e.target.value.replace(/\D/g, ''))}
+            placeholder="Ej: 1010123456"
+            disabled={isLoading}
+            className="h-14 bg-black/40 border-white/10 text-white placeholder:text-slate-600 focus:border-[#D4AF37]/50 focus:ring-[#D4AF37]/20 rounded-xl text-lg px-4 transition-all"
+          />
+        </div>
+
+        <div className="space-y-1">
+          <label
+            htmlFor="celular-input"
+            className="text-xs font-semibold text-slate-300 uppercase tracking-wider pl-1"
+          >
+            Número de Celular
+          </label>
+          <Input
+            id="celular-input"
+            type="tel"
+            value={celular}
+            onChange={(e) => setCelular(e.target.value.replace(/\D/g, ''))}
+            placeholder="Ej: 3001234567"
+            disabled={isLoading}
+            className="h-14 bg-black/40 border-white/10 text-white placeholder:text-slate-600 focus:border-[#D4AF37]/50 focus:ring-[#D4AF37]/20 rounded-xl text-lg px-4 transition-all"
+          />
+        </div>
+
+        <Button
+          type="submit"
+          disabled={isLoading}
+          className="w-full h-14 bg-[#D4AF37] hover:bg-[#c4a133] text-black font-bold text-lg rounded-xl shadow-[0_0_20px_rgba(212,175,55,0.3)] transition-all active:scale-[0.98] mt-4 flex items-center justify-center gap-2 group"
+        >
+          {isLoading ? (
+            <Loader2 className="w-6 h-6 animate-spin" />
+          ) : (
+            <>
+              Continuar
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </>
+          )}
+        </Button>
+      </form>
 
       <div className="mt-8 flex items-center justify-center gap-2 text-xs text-slate-500 relative z-10">
         <ShieldCheck className="w-4 h-4 text-emerald-500" />

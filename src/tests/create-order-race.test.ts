@@ -2,10 +2,10 @@ import { describe, it, expect, vi } from 'vitest';
 import { POST } from '../app/api/payments/create-order/route';
 
 // Mock de NextResponse
-const mockJson = vi.fn((data, options) => ({ 
-  data, 
+const mockJson = vi.fn((data, options) => ({
+  data,
   options,
-  cookies: { set: vi.fn() }
+  cookies: { set: vi.fn() },
 }));
 vi.mock('next/server', () => ({
   NextResponse: {
@@ -20,7 +20,7 @@ vi.mock('@/lib/firebase-admin', () => ({
 
 const mockCreate = vi.fn();
 const mockDoc = vi.fn(() => ({
-  create: mockCreate
+  create: mockCreate,
 }));
 const mockCollection = vi.fn(() => ({
   doc: mockDoc,
@@ -51,15 +51,15 @@ global.fetch = mockFetch;
 describe('Prevención de Race Conditions en Wompi (Hallazgo 1)', () => {
   it('Debe generar un wompiReference único (UUID) en vez de usar el nombre de la colección', async () => {
     mockDoc.mockReturnValue({ id: 'uuid-unico', create: mockCreate });
-    
+
     mockFetch.mockResolvedValue({
       ok: true,
       json: async () => ({
         data: {
           id: 'wompi-id-123',
-          created_at: '2026-01-01T00:00:00Z'
-        }
-      })
+          created_at: '2026-01-01T00:00:00Z',
+        },
+      }),
     });
 
     process.env.WOMPI_INTEGRITY_SECRET = 'test-secret';
@@ -75,19 +75,19 @@ describe('Prevención de Race Conditions en Wompi (Hallazgo 1)', () => {
           infractorName: 'Juan Perez',
           infractorId: '123456789',
           shortId: 'SHORT-123',
-        }
+        },
       }),
     }) as any;
     req.nextUrl = { origin: 'http://localhost' };
 
-    const res = await POST(req) as any;
-    
+    const res = (await POST(req)) as any;
+
     // Verificamos que se llame a collection('purchases')
     expect(mockCollection).toHaveBeenCalledWith('purchases');
     // Verificamos que doc() se llame con el UUID y se use create()
-    expect(mockDoc).toHaveBeenCalledWith(expect.stringMatching(/^DSM-/)); 
+    expect(mockDoc).toHaveBeenCalledWith(expect.stringMatching(/^DSM-/));
     expect(mockCreate).toHaveBeenCalled();
-    
+
     // Verificamos que se retorna el UUID en la respuesta
     expect(mockJson).toHaveBeenCalledWith(
       expect.objectContaining({

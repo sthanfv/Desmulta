@@ -369,9 +369,7 @@ export function SavingsCalculator() {
           <div className="flex flex-col items-center gap-1.5 justify-center text-[10px] text-muted-foreground font-medium text-center pt-2">
             <div className="flex items-center gap-1.5">
               <Info className="w-3 h-3 flex-shrink-0" />
-              <span>
-                Simulador SIMIT: Interés Simple con Límite de Prescripción (Art 159).
-              </span>
+              <span>Simulador SIMIT: Interés Simple con Límite de Prescripción (Art 159).</span>
             </div>
             <span className="text-[9px] opacity-75">
               *Los intereses se congelan legalmente a los 3 años (o 6 si hay coactivo).

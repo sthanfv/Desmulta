@@ -10,13 +10,13 @@ describe('Pruebas de Motor de Decisiones y Sugerencia de Documentos', () => {
   it('debe sugerir doble_prescripcion si tiene más de 3 años y está en coactivo', () => {
     const sugerencia = sugerirTipoDocumento('Más de 3 años', 'SÍ', 'C29');
     expect(sugerencia.tipo).toBe('doble_prescripcion');
-    expect(sugerencia.razon).toContain('doble prescripción');
+    expect(sugerencia.razon).toContain('prescripción absoluta 6+ años');
   });
 
   it('debe sugerir prescripcion_directa si tiene más de 3 años y no está en coactivo', () => {
     const sugerencia = sugerirTipoDocumento('Más de 3 años', 'NO', 'C29');
     expect(sugerencia.tipo).toBe('prescripcion_directa');
-    expect(sugerencia.razon).toContain('prescripción directa');
+    expect(sugerencia.razon).toContain('prescripción 3 años');
   });
 
   it('debe sugerir nulidad_notificacion si es fotomulta (infracción por cámara)', () => {
@@ -25,9 +25,9 @@ describe('Pruebas de Motor de Decisiones y Sugerencia de Documentos', () => {
     expect(sugerencia.razon).toContain('nulidad por indebida notificación');
   });
 
-  it('debe sugerir peticion_general para casos entre 1 y 3 años generales', () => {
+  it('debe sugerir caducidad_1_anio para casos entre 1 y 3 años generales', () => {
     const sugerencia = sugerirTipoDocumento('Entre 1 y 3 años', 'NO', 'C29');
-    expect(sugerencia.tipo).toBe('peticion_general');
+    expect(sugerencia.tipo).toBe('caducidad_1_anio');
   });
 });
 

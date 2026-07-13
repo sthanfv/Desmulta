@@ -61,14 +61,28 @@ export default function GeneradorDinamico({ params }: GeneradorDinamicoProps) {
       const { nombre, cedula, placa, ciudad, autoridad, direccion, email, celular } =
         useExpedienteStore.getState();
 
+      const cityToMatch = ciudad || '';
+      const auth = TRANSIT_AUTHORITIES.find(
+        (a) =>
+          a.ciudad.toLowerCase() === cityToMatch.toLowerCase() ||
+          `${a.ciudad} (${a.departamento})`.toLowerCase() === cityToMatch.toLowerCase()
+      );
+
+      if (auth) {
+        setSelectedAuthId(auth.id);
+        setIsManualAuth(false);
+      } else {
+        setIsManualAuth(true);
+      }
+
       setFormData((prev) => ({
         ...prev,
         fecha: new Date().toLocaleDateString('es-CO'),
         nombre: nombre || prev.nombre,
         cedula: cedula || prev.cedula,
         placa: (placa === 'N/A' ? '' : placa) || prev.placa,
-        ciudad: ciudad || prev.ciudad,
-        autoridad: autoridad || prev.autoridad,
+        ciudad: cityToMatch,
+        autoridad: autoridad || auth?.nombreOficial || prev.autoridad,
         direccion: direccion || prev.direccion,
         emailPersonal: email || prev.emailPersonal,
         celular: celular || prev.celular,
@@ -106,9 +120,11 @@ export default function GeneradorDinamico({ params }: GeneradorDinamicoProps) {
 
   const handleCiudadInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
-    
+
     const auth = TRANSIT_AUTHORITIES.find(
-      (a) => a.ciudad.toLowerCase() === val.toLowerCase() || `${a.ciudad} (${a.departamento})`.toLowerCase() === val.toLowerCase()
+      (a) =>
+        a.ciudad.toLowerCase() === val.toLowerCase() ||
+        `${a.ciudad} (${a.departamento})`.toLowerCase() === val.toLowerCase()
     );
 
     if (auth) {
@@ -366,7 +382,9 @@ export default function GeneradorDinamico({ params }: GeneradorDinamicoProps) {
             <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
               <span>Ciudad del Tránsito</span>
               {!isManualAuth && selectedAuthId && (
-                <span className="text-green-600 bg-green-50 px-2 py-0.5 rounded-full text-[9px]">Directorio Oficial</span>
+                <span className="text-green-600 bg-green-50 px-2 py-0.5 rounded-full text-[9px]">
+                  Directorio Oficial
+                </span>
               )}
             </label>
             <div className="relative">
@@ -380,13 +398,16 @@ export default function GeneradorDinamico({ params }: GeneradorDinamicoProps) {
                 placeholder="Ej. Cali, Bogotá, Envigado..."
                 className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 pr-10 text-sm text-slate-900 focus:bg-white focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 outline-none transition-all font-medium shadow-sm mb-3"
               />
-              <ChevronDown className={`absolute right-4 top-[14px] w-5 h-5 text-slate-400 transition-transform duration-200 pointer-events-none ${showDropdown ? 'rotate-180' : ''}`} />
+              <ChevronDown
+                className={`absolute right-4 top-[14px] w-5 h-5 text-slate-400 transition-transform duration-200 pointer-events-none ${showDropdown ? 'rotate-180' : ''}`}
+              />
             </div>
             {showDropdown && (
               <div className="absolute z-50 w-full bg-white border-2 border-slate-200 rounded-xl mt-[-10px] shadow-xl max-h-56 overflow-y-auto">
-                {TRANSIT_AUTHORITIES.filter((a) => 
-                  a.ciudad.toLowerCase().includes(formData.ciudad.toLowerCase()) || 
-                  a.departamento.toLowerCase().includes(formData.ciudad.toLowerCase())
+                {TRANSIT_AUTHORITIES.filter(
+                  (a) =>
+                    a.ciudad.toLowerCase().includes(formData.ciudad.toLowerCase()) ||
+                    a.departamento.toLowerCase().includes(formData.ciudad.toLowerCase())
                 ).map((auth) => (
                   <div
                     key={auth.id}
@@ -406,9 +427,10 @@ export default function GeneradorDinamico({ params }: GeneradorDinamicoProps) {
                     <span className="text-slate-500 text-xs ml-1">({auth.departamento})</span>
                   </div>
                 ))}
-                {TRANSIT_AUTHORITIES.filter((a) => 
-                  a.ciudad.toLowerCase().includes(formData.ciudad.toLowerCase()) || 
-                  a.departamento.toLowerCase().includes(formData.ciudad.toLowerCase())
+                {TRANSIT_AUTHORITIES.filter(
+                  (a) =>
+                    a.ciudad.toLowerCase().includes(formData.ciudad.toLowerCase()) ||
+                    a.departamento.toLowerCase().includes(formData.ciudad.toLowerCase())
                 ).length === 0 && (
                   <div className="px-4 py-3 text-sm text-slate-500 italic">
                     Sin coincidencias. Ingreso manual activado.
@@ -431,8 +453,10 @@ export default function GeneradorDinamico({ params }: GeneradorDinamicoProps) {
             />
             {!isManualAuth && selectedAuthId && (
               <div className="mt-2 text-xs text-slate-500 bg-blue-50/50 p-2 rounded-lg border border-blue-100">
-                <p>📍 {TRANSIT_AUTHORITIES.find(a => a.id === selectedAuthId)?.direccion}</p>
-                <p>📧 {TRANSIT_AUTHORITIES.find(a => a.id === selectedAuthId)?.emailNotificaciones}</p>
+                <p>📍 {TRANSIT_AUTHORITIES.find((a) => a.id === selectedAuthId)?.direccion}</p>
+                <p>
+                  📧 {TRANSIT_AUTHORITIES.find((a) => a.id === selectedAuthId)?.emailNotificaciones}
+                </p>
                 <p className="text-[10px] text-slate-400 mt-1 italic">
                   ℹ️ Datos extraídos de directorios públicos. Verifica su disponibilidad.
                 </p>
@@ -516,15 +540,19 @@ export default function GeneradorDinamico({ params }: GeneradorDinamicoProps) {
               <p>
                 <strong>Señores:</strong>
               </p>
-              <p className="uppercase font-bold text-slate-900">{formData.autoridad || '[Autoridad de Tránsito]'}</p>
-              
+              <p className="uppercase font-bold text-slate-900">
+                {formData.autoridad || '[Autoridad de Tránsito]'}
+              </p>
+
               {!isManualAuth && selectedAuthId && (
                 <div className="text-slate-600 mt-1">
-                  <p>{TRANSIT_AUTHORITIES.find(a => a.id === selectedAuthId)?.direccion}</p>
-                  <p>{TRANSIT_AUTHORITIES.find(a => a.id === selectedAuthId)?.emailNotificaciones}</p>
+                  <p>{TRANSIT_AUTHORITIES.find((a) => a.id === selectedAuthId)?.direccion}</p>
+                  <p>
+                    {TRANSIT_AUTHORITIES.find((a) => a.id === selectedAuthId)?.emailNotificaciones}
+                  </p>
                 </div>
               )}
-              
+
               <p className="mt-2">E. S. D.</p>
             </div>
 
@@ -633,9 +661,14 @@ export default function GeneradorDinamico({ params }: GeneradorDinamicoProps) {
                 este escrito, así como en el correo electrónico registrado para el envío del
                 expediente:
               </p>
-              <p className="font-bold bg-slate-50 px-3 py-2 rounded-lg border border-slate-100 inline-block">
-                {formData.emailPersonal || '[Tu Correo Electrónico]'}
-              </p>
+              <div className="flex flex-col gap-2 mt-3">
+                <p className="font-bold bg-slate-50 px-3 py-2 rounded-lg border border-slate-100 w-fit">
+                  Física: {formData.direccion || '[Tu Dirección Física]'}
+                </p>
+                <p className="font-bold bg-slate-50 px-3 py-2 rounded-lg border border-slate-100 w-fit">
+                  Email: {formData.emailPersonal || '[Tu Correo Electrónico]'}
+                </p>
+              </div>
               <p className="text-xs text-slate-500 mt-3 italic">
                 Anexo: Copia de la Cédula de Ciudadanía y captura de pantalla del estado de cuenta
                 SIMIT.

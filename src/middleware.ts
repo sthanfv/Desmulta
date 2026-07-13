@@ -60,9 +60,7 @@ export async function middleware(request: NextRequest) {
   // 🛡️ FIX HALLAZGO 8: Defensa en profundidad — abortar si E2E está activo en producción
   if (process.env.NODE_ENV === 'production' && process.env.VERCEL_ENV === 'production') {
     if (process.env.E2E_TEST_MODE === 'true') {
-      throw new Error(
-        '🚨 E2E_TEST_MODE no puede estar activo en producción. Build abortado.'
-      );
+      throw new Error('🚨 E2E_TEST_MODE no puede estar activo en producción. Build abortado.');
     }
   }
 
@@ -157,7 +155,7 @@ export async function middleware(request: NextRequest) {
     const isE2E = process.env.E2E_TEST_MODE === 'true'; // sin NEXT_PUBLIC_
     const e2eSecret = process.env.E2E_TEST_SECRET; // ej: 32+ bytes aleatorios, solo en CI
     const mockSessionValue = request.cookies.get('__session')?.value;
-    
+
     if (isE2E && e2eSecret && mockSessionValue === e2eSecret) {
       const response = NextResponse.next({
         request: { headers: requestHeaders },
@@ -268,8 +266,7 @@ export async function middleware(request: NextRequest) {
   // ignoran 'unsafe-inline' si hay un nonce presente, rompiendo Framer Motion.
   let cspWithNonce = cspHeader;
   if (isProduction) {
-    cspWithNonce = cspWithNonce
-      .replace("script-src 'self'", `script-src 'nonce-${nonce}' 'self'`);
+    cspWithNonce = cspWithNonce.replace("script-src 'self'", `script-src 'nonce-${nonce}' 'self'`);
   }
 
   // Asegurar que base-uri esté en la CSP (previene base-tag injection)

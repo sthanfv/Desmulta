@@ -13,7 +13,9 @@ import { logger } from '@/lib/logger/security-logger';
  * Esta función queda estrictamente como un MOCK inactivo.
  */
 export async function sendOtpSms(celular: string, otpCode: string): Promise<void> {
-  logger.warn(`[SMS Mock] Se intentó enviar un OTP, pero la infraestructura SMS está inactiva. Celular: ${celular}`);
+  logger.warn(
+    `[SMS Mock] Se intentó enviar un OTP, pero la infraestructura SMS está inactiva. Celular: ${celular}`
+  );
   console.log(`[SMS MOCK INACTIVO] => Código OTP para ${celular}: ${otpCode}`);
 
   // Simulamos delay de red

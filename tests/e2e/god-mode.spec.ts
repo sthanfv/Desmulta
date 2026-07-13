@@ -6,7 +6,7 @@ test.describe('God Mode Easter Egg', () => {
     await page.context().addCookies([
       {
         name: '__session',
-        value: 'mock-admin-token',
+        value: process.env.E2E_TEST_SECRET || 'mock-admin-token',
         domain: 'localhost',
         path: '/',
       }

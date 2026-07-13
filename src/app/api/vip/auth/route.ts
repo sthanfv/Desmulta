@@ -103,7 +103,10 @@ export async function POST(request: Request) {
     const { signVipSession } = await import('@/lib/security/vip-jwt');
     const sessionToken = await signVipSession({ hashedCedula, hashedCelular });
 
-    const response = NextResponse.json({ success: true, redirect: '/vip/dashboard' }, { status: 200 });
+    const response = NextResponse.json(
+      { success: true, redirect: '/vip/dashboard' },
+      { status: 200 }
+    );
 
     response.cookies.set({
       name: '_vip_session',

@@ -88,7 +88,10 @@ async function verifyAdminAuth(request: NextRequest): Promise<boolean> {
     const adminDoc = await db.collection('admins').doc(tokens.decodedToken.uid).get();
 
     if (!adminDoc.exists || adminDoc.data()?.disabled) {
-      logger.error('[admin/api-keys] Acceso denegado: Usuario no es admin en Firestore o está suspendido', { uid: tokens.decodedToken.uid });
+      logger.error(
+        '[admin/api-keys] Acceso denegado: Usuario no es admin en Firestore o está suspendido',
+        { uid: tokens.decodedToken.uid }
+      );
       return false;
     }
 

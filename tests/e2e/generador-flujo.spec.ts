@@ -3,10 +3,10 @@ import { test, expect } from '@playwright/test';
 test.describe('Flujo E2E - Generador Derecho de Petición', () => {
   test('El usuario debe poder llenar el formulario y el Live Preview debe actualizarse', async ({ page }) => {
     // 1. Visitar la página del generador
-    await page.goto('/documentos/generador/peticion-general');
+    await page.goto('/documentos/generador/caducidad-1-anio');
 
     // 2. Verificar carga correcta de la interfaz
-    await expect(page.getByText(/Derecho de Petición/i).first()).toBeVisible();
+    await expect(page.getByText(/CADUCIDAD/i).first()).toBeVisible();
     await expect(page.getByText('Tu Nombre Completo')).toBeVisible();
 
     // 3. Llenar los datos como un usuario real
@@ -15,9 +15,10 @@ test.describe('Flujo E2E - Generador Derecho de Petición', () => {
     await page.fill('input[name="placa"]', 'ZZZ000');
     await page.fill('input[name="celular"]', '3009998877');
     await page.fill('input[name="emailPersonal"]', 'e2e@desmulta.online');
+    
+    // Select city from dropdown which auto-fills autoridad and direccion
     await page.fill('input[name="ciudad"]', 'Cali');
-    await page.fill('input[name="autoridad"]', 'Secretaría de Movilidad Cali');
-    await page.fill('input[name="direccion"]', 'Avenida Siempre Viva 742');
+    await page.getByText('Valle del Cauca').first().click();
 
     // 4. Asegurarse que el panel derecho (Live Preview del Canvas) refleja la información introducida
     // El nombre y la cédula deben aparecer resaltados

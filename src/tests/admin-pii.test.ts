@@ -9,12 +9,12 @@ vi.mock('firebase-admin/firestore', () => ({
       where: vi.fn(() => ({
         orderBy: vi.fn(() => ({
           limit: vi.fn(() => ({
-            get: mockGet
-          }))
-        }))
-      }))
-    }))
-  }))
+            get: mockGet,
+          })),
+        })),
+      })),
+    })),
+  })),
 }));
 
 // Mock Firebase Admin
@@ -25,16 +25,16 @@ vi.mock('@/lib/firebase-admin', () => ({
 // Mock session/auth
 vi.mock('next/headers', () => ({
   cookies: vi.fn(async () => ({
-    get: vi.fn(() => ({ value: 'valid-token' }))
-  }))
+    get: vi.fn(() => ({ value: 'valid-token' })),
+  })),
 }));
 
 vi.mock('@/lib/auth/require-admin-session', () => ({
   requireAdminSession: vi.fn(async () => ({
     uid: 'admin123',
     email: 'admin@desmulta.com',
-    role: 'superadmin'
-  }))
+    role: 'superadmin',
+  })),
 }));
 
 describe('Protección PII en Dashboard Admin (Hallazgo 2)', () => {
@@ -52,10 +52,10 @@ describe('Protección PII en Dashboard Admin (Hallazgo 2)', () => {
             cedulaHash: 'hash1',
             contactoHash: 'hash2',
             createdAt: { toDate: () => new Date() },
-            updatedAt: { toDate: () => new Date() }
-          })
-        }
-      ]
+            updatedAt: { toDate: () => new Date() },
+          }),
+        },
+      ],
     });
 
     const result = await getCases(1);
@@ -68,12 +68,11 @@ describe('Protección PII en Dashboard Admin (Hallazgo 2)', () => {
     // Verificamos que la PII haya sido enmascarada (Zero-PII)
     expect(caseData.cedula).not.toBe('1090123456');
     expect(caseData.cedula).toContain('*');
-    
+
     expect(caseData.contacto).not.toBe('3001234567');
     expect(caseData.contacto).toContain('*');
-    
+
     expect(caseData.nombre).not.toBe('Juan Perez');
     expect(caseData.nombre).toContain('*');
-    
   });
 });

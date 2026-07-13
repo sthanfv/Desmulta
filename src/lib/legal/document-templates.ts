@@ -20,7 +20,9 @@ export type DocumentType =
   | 'prescripcion_directa'
   | 'doble_prescripcion'
   | 'nulidad_notificacion'
-  | 'tutela_silencio';
+  | 'tutela_silencio'
+  | 'caducidad_1_anio'
+  | 'nulidad_falta_identidad';
 
 export interface CaseDataForPDF {
   infractorName: string;
@@ -105,225 +107,261 @@ const poderEspecial: DocumentBlock = {
 };
 
 // ═══════════════════════════════════════════════════════════════════
-// 1. DERECHO DE PETICIÓN GENERAL
+// 1. DERECHO DE PETICIÓN GENERAL (EXPLORATORIA) - FASE 1
 // ═══════════════════════════════════════════════════════════════════
 const peticionGeneral: DocumentBlock = {
-  titulo: 'DERECHO DE PETICIÓN',
-  subtitulo: '(Art. 23 C.P. — Ley 1437 de 2011 CPACA — Ley 769 de 2002)',
-  nombreArchivo: 'Peticion_General',
-  fundamentosTitulo: 'II. FUNDAMENTOS JURIDICOS Y CAUSALES DE RECLAMACION:',
-  seccion1Titulo: 'III. PETICIONES CONCRETAS:',
-  seccion2Titulo: 'IV. NOTIFICACIONES Y ANEXOS:',
-  firmaTexto: 'FIRMA DEL PETICIONARIO',
+  titulo: 'DERECHO DE PETICIÓN EN INTERÉS PARTICULAR',
+  subtitulo: '(Art. 23 C.P. — Solicitud de copias íntegras y trazabilidad de notificación)',
+  nombreArchivo: 'Peticion_Copias_Expediente',
+  seccion1Titulo: 'II. PETICIONES CONCRETAS:',
+  seccion2Titulo: 'III. NOTIFICACIONES Y ANEXOS:',
   cuerpo: (d) => {
-    const listado: string[] = [
-      `PETICIONARIO: ${d.infractorName} (C.C. No. ${d.infractorId})`,
+    return [
+      `Me dirijo a ustedes para elevar la siguiente solicitud de información y expedición de copias, respecto al comparendo No. ${d.ticketNumber || '[NUMERO DE COMPARENDO]'}${d.licensePlate && d.licensePlate !== 'N/A' ? ` asociado al vehículo de placas ${d.licensePlate}` : ''}.`,
       ``,
-      `Yo, ${d.infractorName}, mayor de edad, identificado(a) con C.C. No. ${d.infractorId},`,
-      `actuando en mi propio nombre y representación, en ejercicio del Derecho de Petición`,
-      `consagrado en el Articulo 23 de la Constitución Política de Colombia y la`,
-      `Ley 1437 de 2011, me dirijo a ustedes muy respetuosamente para solicitar la declaratoria`,
-      `de prescripción y/o nulidad de las obligaciones contravencionales que figuran en su sistema.`,
+      `FUNDAMENTOS DE DERECHO`,
       ``,
-      `I. HECHOS Y OBLIGACIONES OBJETO DE PETICIÓN:`,
-      `Figuran a mi nombre en su organismo de tránsito las siguientes obligaciones contravencionales:`,
+      `Esta solicitud se ampara en el derecho fundamental al debido proceso (Art. 29 de la Constitución Política) y el derecho de acceso a la información y documentos públicos (Art. 74 C.P.).`,
+      ``,
+      `Estos derechos son requisitos indispensables para poder ejercer de manera material mi derecho a la defensa y contradicción, dado que a la fecha desconozco los detalles procesales de la actuación surtida por esta entidad y los soportes que le dieron origen.`,
     ];
-
-    if (d.ticketNumber && d.ticketNumber !== 'POR_DEFINIR') {
-      const infraccionTxt = d.tipoInfraccion ? ` (Infraccion ${d.tipoInfraccion})` : '';
-      const coactivoTxt = d.estadoCoactivo ? `, Estado/Coactivo: ${d.estadoCoactivo}` : '';
-      const placaTxt =
-        d.licensePlate && d.licensePlate !== 'N/A' ? `, Vehiculo de Placa: ${d.licensePlate}` : '';
-      listado.push(
-        `- Comparendo/Obligacion No. ${d.ticketNumber}${infraccionTxt}${placaTxt}${coactivoTxt}.`
-      );
-    } else {
-      listado.push(
-        `- Obligaciones contravencionales asociadas a mi identificación y/o vehículos registrados en su jurisdicción.`
-      );
-    }
-
-    if (d.antiguedad) {
-      listado.push(
-        `- Las obligaciones descritas tienen una antiguedad aproximada de ${d.antiguedad} desde su fecha de imposicion.`
-      );
-    }
-
-    if (d.fechaHechos) {
-      listado.push(`- Fecha(s) de los hechos o infracciones: ${d.fechaHechos}.`);
-    }
-
-    listado.push(
-      ``,
-      `Sustento el presente escrito en los siguientes hechos, fundamentos de derecho y causales específicas:`
-    );
-
-    return listado;
   },
   facultades: [
-    'DECLARAR LA PRESCRIPCION de oficio de la(s) obligación(es) si existieren.',
-    'ORDENAR EL LEVANTAMIENTO de medidas cautelares (embargos) si existieren.',
-    'EXPEDIR OFICIOS DE DESEMBARGO originales y remitirlos al correo electrónico.',
-    'ACTUALIZAR SIMIT Y RUNT con saldo en cero ($0).',
+    'Expedir y enviar copia íntegra de la orden de comparendo referenciada, junto con sus respectivos soportes gráficos y/o documentales.',
+    'Remitir copia de la guía de envío generada por la empresa de mensajería (correo certificado) mediante la cual se pretendió notificar la orden, incluyendo el acuse de recibo.',
+    'Certificar y entregar copia de la Resolución Sancionatoria o Mandamiento de Pago (de haberse proferido), así como la guía de mensajería correspondiente a dichos actos.',
+    'En caso de tratarse de fotodetección, entregar copia del certificado de calibración vigente expedido por la entidad competente para el dispositivo tecnológico.',
+    'Informar el estado procesal actual de la actuación administrativa, detallando si se encuentra en etapa de cobro persuasivo, coactivo, o si existen medidas cautelares.',
   ],
-  indemnidad: (d) => [
-    'Para efectos de notificaciones, recibire comunicaciones en el correo electrónico:',
-    `${d.citizenEmail || 'contactodesmulta@protonmail.com'}`,
+  indemnidad: [
+    'Anexo: Fotocopia de la cédula de ciudadanía.',
+    'Anexo: Impresión de la consulta del estado de cuenta en el SIMIT.',
   ],
   protocolo2213: (d) => [
     `Documento generado mediante plataforma digital Desmulta.`,
     `Referencia del sistema: ${(d.caseId || d.shortId).replace(/CASE/gi, 'EXP')}`,
+    `Advertencia Interna: Riesgo BAJO. Fase preparatoria. Esta petición no elimina la multa de facto; recolecta pruebas vinculantes para estructurar la defensa (ej. Nulidad por indebida notificación).`,
   ],
 };
 
 // ═══════════════════════════════════════════════════════════════════
-// 2. PRESCRIPCIÓN DIRECTA (3 años sin mandamiento de pago)
+// 2. PRESCRIPCIÓN DIRECTA (3 AÑOS SIN MANDAMIENTO)
 // ═══════════════════════════════════════════════════════════════════
 const prescripcionDirecta: DocumentBlock = {
-  titulo: 'PODER PARA SOLICITUD DE PRESCRIPCION EXTINTIVA',
-  subtitulo: '(Art. 159 Ley 769 de 2002 — Art. 2535 C.C. — Sentencia C-980/2010)',
-  nombreArchivo: 'Prescripcion_Directa',
-  cuerpo: (d) => [
-    `Yo, ${d.infractorName}, identificado(a) con C.C. No. ${d.infractorId},`,
-    `actuando en mi propio nombre, otorgo PODER ESPECIAL a ${getApoderado()},`,
-    `para que en mi nombre solicite ante la Secretaría de Tránsito competente`,
-    `la declaratoria de PRESCRIPCION EXTINTIVA de la(s) multa(s) de tránsito`,
-    `registradas a mi nombre${placa(d)}${d.ticketNumber && d.ticketNumber !== 'POR_DEFINIR' ? ' bajo la(s) resolución(es) o comparendo(s) ' + d.ticketNumber : ''}.`,
-    ``,
-    d.fechaHechos ? `Los hechos ocurrieron en la(s) siguiente(s) fecha(s): ${d.fechaHechos}.` : '',
-    d.fechaHechos ? `` : '',
-    `FUNDAMENTO DE DERECHO:`,
-    `El Art. 159 de la Ley 769 de 2002 (Codigo Nacional de Tránsito) establece`,
-    `que las sanciones de tránsito prescriben en TRES (3) AÑOS contados desde`,
-    `la ocurrencia del hecho, cuando no se ha proferido mandamiento de pago.`,
-    `Han transcurrido más de tres (3) años sin interrupcion valida del termino.`,
-    `La prescripción opera de pleno derecho y debe ser declarada de oficio`,
-    `por la entidad (Sentencia C-980 de 2010, Corte Constitucional).`,
-  ],
+  titulo: 'DERECHO DE PETICIÓN EN INTERÉS PARTICULAR',
+  subtitulo: '(Art. 23 C.P. — Solicitud declaratoria de PRESCRIPCIÓN Art. 159 Ley 769 de 2002)',
+  nombreArchivo: 'Derecho_Peticion_Prescripcion',
+  seccion1Titulo: 'II. PETICIONES CONCRETAS:',
+  seccion2Titulo: 'III. NOTIFICACIONES Y ANEXOS:',
+  cuerpo: (d) => {
+    return [
+      `PRIMERO: El día ${d.fechaHechos || '[FECHA DE LA INFRACCIÓN]'} se generó la orden de comparendo No. ${d.ticketNumber || '[NUMERO DE COMPARENDO]'}${d.licensePlate && d.licensePlate !== 'N/A' ? ` asociada al vehículo de placas ${d.licensePlate}` : ''}.`,
+      ``,
+      `SEGUNDO: Desde la fecha de ocurrencia de los hechos hasta el día de la presentación de esta petición, han transcurrido más de TRES (3) AÑOS.`,
+      ``,
+      `TERCERO: Durante este lapso, no he sido notificado(a) en debida forma, conforme a los lineamientos legales y constitucionales, de ningún Mandamiento de Pago que interrumpa el término de prescripción de la acción de cobro.`,
+      ``,
+      `FUNDAMENTOS DE DERECHO`,
+      ``,
+      `Apoyo mi solicitud en el Artículo 159 de la Ley 769 de 2002 (Código Nacional de Tránsito), el cual es claro y perentorio al establecer:`,
+      ``,
+      `"Las sanciones impuestas por infracciones a las normas de tránsito prescribirán en tres (3) años contados a partir de la ocurrencia del hecho; la prescripción deberá ser declarada de oficio y se interrumpirá con la notificación del mandamiento de pago. La autoridad de tránsito no podrá iniciar el cobro coactivo de sanciones respecto de las cuales se encuentren configurados los supuestos de la caducidad."`,
+      ``,
+      `Al haber superado el límite temporal de los tres (3) años sin que la administración haya ejercido de manera efectiva y notificada su acción de cobro, el Estado pierde la competencia jurídica para exigir el pago de dicha obligación.`,
+    ];
+  },
   facultades: [
-    'Presentar la solicitud formal de prescripción extintiva ante la entidad.',
-    'Aportar pruebas de la antiguedad de la infraccion y de la inactividad.',
-    'Recibir la resolución de declaratoria de prescripción.',
-    'Interponer recursos de reposicion y apelación ante cualquier negativa.',
-    'Solicitar la exclusion definitiva del registro en el SIMIT.',
+    'Declarar de manera formal y mediante acto administrativo la PRESCRIPCIÓN de la acción de cobro respecto a la sanción originada por el comparendo referenciado en los hechos.',
+    'Ordenar el archivo definitivo del proceso de cobro coactivo que curse o pretenda cursar en mi contra por esta infracción, levantando cualquier medida cautelar (embargos) que se hubiese proferido, si aplica.',
+    'Ordenar la descarga, actualización y eliminación inmediata del registro de esta deuda a mi cargo en el Sistema Integrado de Información sobre Multas (SIMIT) y en el RUNT.',
   ],
   indemnidad: [
-    'Manifiesto bajo juramento que la información sobre la antiguedad de',
-    'la infraccion es veraz. Asumo plena responsabilidad por la exactitud',
-    'de los datos y eximo al apoderado de cualquier responsabilidad derivada',
-    'de información incorrecta o desactualizada por mi suministrada.',
+    'Anexo: Fotocopia de la cédula de ciudadanía.',
+    'Anexo: Impresión del estado de cuenta (SIMIT/RUNT) donde se evidencia la fecha de la infracción.',
   ],
   protocolo2213: (d) => [
-    `Perfeccionamiento conforme a la Ley 2213 de 2022 (Art. 2):`,
-    `Remitir documento escaneado con firma ológrafa y copia del documento`,
-    `de identidad desde: ${d.citizenEmail || '[correo del poderdante]'}`,
-    `hacia: contactodesmulta@protonmail.com`,
-    `Referencia: ${(d.caseId || d.shortId).replace(/CASE/gi, 'EXP')}`,
+    `Documento generado mediante plataforma digital Desmulta.`,
+    `Referencia del sistema: ${(d.caseId || d.shortId).replace(/CASE/gi, 'EXP')}`,
+    `Advertencia Interna: Riesgo nivel MEDIO por posible interrupción del término (Mandamiento de Pago emitido antes de los 3 años). Posible fase 2 requerida.`,
   ],
 };
 
 // ═══════════════════════════════════════════════════════════════════
-// 3. DOBLE PRESCRIPCIÓN (3 años + 3 años tras cobro coactivo)
+// 3. DOBLE PRESCRIPCIÓN / PRESCRIPCIÓN ABSOLUTA (MÁS DE 6 AÑOS)
 // ═══════════════════════════════════════════════════════════════════
 const doblePrescripcion: DocumentBlock = {
-  titulo: 'PODER PARA PRESCRIPCION POR DOBLE TERMINO (COBRO COACTIVO)',
-  subtitulo: '(Art. 159 C.N.T. — Arts. 2512, 2535 C.C. — Ley 1066/2006 — T-645/2017)',
-  nombreArchivo: 'Doble_Prescripcion',
-  cuerpo: (d) => [
-    `Yo, ${d.infractorName}, identificado(a) con C.C. No. ${d.infractorId},`,
-    `otorgo PODER ESPECIAL AMPLIO a ${getApoderado()},`,
-    `para que en mi nombre solicite la declaratoria de PRESCRIPCION EXTINTIVA`,
-    `POR DOBLE TERMINO de la(s) multa(s) de tránsito`,
-    `registradas a mi nombre${placa(d)}${d.ticketNumber && d.ticketNumber !== 'POR_DEFINIR' ? ' bajo la(s) resolución(es) o comparendo(s) ' + d.ticketNumber : ''}.`,
-    ``,
-    d.fechaHechos ? `Los hechos asociados registran fecha(s): ${d.fechaHechos}.` : '',
-    d.fechaHechos ? `` : '',
-    `PRIMER TERMINO (Art. 159 C.N.T.):`,
-    `Han transcurrido más de TRES (3) AÑOS desde la fecha de la infraccion`,
-    `original sin interrupcion valida por parte de la entidad de tránsito.`,
-    ``,
-    `SEGUNDO TERMINO (Art. 2535 C.C. aplicado por analogia):`,
-    `Han transcurrido ademas más de TRES (3) AÑOS desde la notificación del`,
-    `mandamiento de pago o inicio del cobro coactivo, sin que la entidad`,
-    `haya adelantado actuaciones efectivas de cobro que interrumpan el termino.`,
-    ``,
-    `La Sentencia T-645 de 2017 (Corte Constitucional) reconoce la operancia`,
-    `de la prescripción acumulada cuando el tiempo total supera seis (6) años`,
-    `sin gestion efectiva, lo que extingue definitivamente la obligación.`,
-  ],
+  titulo: 'DERECHO DE PETICIÓN EN INTERÉS PARTICULAR',
+  subtitulo:
+    '(Art. 23 C.P. — Prescripción absoluta de la acción de cobro y pérdida de ejecutoriedad)',
+  nombreArchivo: 'Prescripcion_Absoluta_6_Anios',
+  seccion1Titulo: 'II. PETICIONES CONCRETAS:',
+  seccion2Titulo: 'III. NOTIFICACIONES Y ANEXOS:',
+  cuerpo: (d) => {
+    return [
+      `PRIMERO: El día ${d.fechaHechos || '[FECHA DE LA INFRACCIÓN]'} se generó la orden de comparendo No. ${d.ticketNumber || '[NUMERO DE COMPARENDO]'}${d.licensePlate && d.licensePlate !== 'N/A' ? ` asociada al vehículo de placas ${d.licensePlate}` : ''}.`,
+      ``,
+      `SEGUNDO: Desde la fecha de la presunta infracción han transcurrido más de SEIS (6) AÑOS, superando ampliamente el límite temporal máximo que otorga la ley para perseguir el pago de obligaciones de tránsito.`,
+      ``,
+      `TERCERO: Aun en el supuesto escenario en el que esa entidad hubiese proferido y notificado en debida forma el respectivo Mandamiento de Pago (interrumpiendo el término inicial de tres años del artículo 159 del Código Nacional de Tránsito), a la fecha ya ha transcurrido un término superior a TRES (3) AÑOS desde dicha interrupción sin que se hubiese hecho efectivo el recaudo.`,
+      ``,
+      `FUNDAMENTOS DE DERECHO`,
+      ``,
+      `El Artículo 159 de la Ley 769 de 2002 estipula que las multas de tránsito prescriben a los tres (3) años, término que se interrumpe con la notificación del mandamiento de pago.`,
+      ``,
+      `Ante el vacío normativo sobre qué ocurre después de notificado el mandamiento de pago, aplica la remisión al Estatuto Tributario Nacional, Artículo 818, el cual señala que, interrumpida la prescripción, el término empezará a correr de nuevo. Es decir, la administración cuenta con tres (3) años adicionales como límite fatal y definitivo.`,
+      ``,
+      `Sumado a lo anterior, el Artículo 91 de la Ley 1437 de 2011 (CPACA), numeral 3, establece que los actos administrativos pierden obligatoriedad y no podrán ser ejecutados "Cuando al cabo de cinco (5) años de estar en firme, la autoridad no ha realizado los actos que le correspondan para ejecutarlos."`,
+      ``,
+      `En mi caso particular, se han superado holgadamente todos los límites temporales (tanto los 3+3 años del Estatuto Tributario, como los 5 años del CPACA), consolidando la prescripción definitiva.`,
+    ];
+  },
   facultades: [
-    'Argumentar jurídicamente los dos terminos de prescripción acumulados.',
-    'Solicitar el archivo definitivo del proceso de cobro coactivo.',
-    'Gestionar el levantamiento de embargos o medidas cautelares vigentes.',
-    'Interponer recursos administrativos y/o acciones judiciales si la entidad',
-    'niega la prescripción en cualquiera de sus instancias.',
-    'Solicitar certificacion de paz y salvo ante el SIMIT y la entidad.',
+    'Declarar probada la PRESCRIPCIÓN ABSOLUTA del cobro coactivo derivado de la orden de comparendo referenciada en los hechos.',
+    'Ordenar el archivo definitivo del proceso administrativo de cobro coactivo en mi contra.',
+    'Ordenar el levantamiento inmediato de cualquier medida cautelar (embargos y/o secuestros), oficiando de inmediato a las entidades financieras y Oficinas de Registro de Instrumentos Públicos.',
+    'Ordenar la depuración y eliminación de mi información como deudor de esta obligación en las bases de datos del SIMIT y del RUNT.',
   ],
   indemnidad: [
-    'Certifico que la información sobre el tiempo transcurrido desde la',
-    'infraccion original y desde el inicio del cobro coactivo es veraz.',
-    'Entiendo que aportar datos falsos o inexactos puede constituir fraude',
-    'procesal. Eximo expresamente a mi apoderado de toda responsabilidad',
-    'por inexactitud en los datos por mi suministrados.',
+    'Anexo: Fotocopia de la cédula de ciudadanía.',
+    'Anexo: Impresión del estado de cuenta SIMIT.',
   ],
   protocolo2213: (d) => [
-    `Firma ológrafa original requerida para este tipo de poder.`,
-    `Remitir documento escaneado con copia de cédula y documentos del cobro`,
-    `coactivo desde: ${d.citizenEmail || '[correo del poderdante]'}`,
-    `hacia: contactodesmulta@protonmail.com`,
-    `Ley 2213/2022 — Ley 527/1999.`,
-    `Referencia: ${(d.caseId || d.shortId).replace(/CASE/gi, 'EXP')}`,
+    `Documento generado mediante plataforma digital Desmulta.`,
+    `Referencia del sistema: ${(d.caseId || d.shortId).replace(/CASE/gi, 'EXP')}`,
+    `Advertencia Interna: EXCEPCIÓN ALTA. Los Acuerdos de Pago incumplidos reinician los términos desde cero (fecha de incumplimiento), inhabilitando esta defensa.`,
   ],
 };
 
 // ═══════════════════════════════════════════════════════════════════
-// 4. NULIDAD POR INDEBIDA NOTIFICACIÓN (Fotomultas — C-038/2020)
+// 4. NULIDAD POR INDEBIDA NOTIFICACIÓN (FOTOMULTAS - LEY 1843)
 // ═══════════════════════════════════════════════════════════════════
 const nulidadNotificacion: DocumentBlock = {
-  titulo: 'PODER PARA RECURSO DE NULIDAD POR INDEBIDA NOTIFICACION',
-  subtitulo: '(Sentencia C-038/2020 C. Const. — Art. 136 Ley 769/2002 — Art. 49 CPACA)',
-  nombreArchivo: 'Nulidad_Notificacion',
-  cuerpo: (d) => [
-    `Yo, ${d.infractorName}, identificado(a) con C.C. No. ${d.infractorId},`,
-    `otorgo PODER ESPECIAL a ${getApoderado()}, para que en`,
-    `mi nombre interponga RECURSO DE NULIDAD E INVALIDEZ ante la Secretaría`,
-    `que resulto en la imposicion irregular de la(s) multa(s) o fotomulta(s)`,
-    `registrada(s) a mi nombre${placa(d)}${d.ticketNumber && d.ticketNumber !== 'POR_DEFINIR' ? ' (Resolución(es) / Comparendo(s) ' + d.ticketNumber + ')' : ''}.`,
-    ``,
-    `FUNDAMENTO CONSTITUCIONAL:`,
-    `La Sentencia C-038 de 2020 de la Corte Constitucional declaro inexequible`,
-    `la notificación por aviso en foto-multas cuando no se acredita la plena`,
-    `identificación del conductor infractor, vulnerando el Art. 29 C.P.`,
-    ``,
-    `ARGUMENTOS ESPECIFICOS DEL RECURSO:`,
-    `1.  La entidad no acreditó la identificación plena del conductor.`,
-    `2.  No se agotó la notificación personal conforme al Art. 67 del CPACA`,
-    `     antes de acudir al mecanismo de notificación por aviso.`,
-    `3.  El comparendo carece de los requisitos del Art. 136 del C.N.T.`,
-    `     que garantizan el derecho de contradicción del infractor.`,
-  ],
+  titulo: 'DERECHO DE PETICIÓN EN INTERÉS PARTICULAR',
+  subtitulo: '(Art. 23 C.P. — Nulidad por vulneración al debido proceso y Ley 1843 de 2017)',
+  nombreArchivo: 'Nulidad_Indebida_Notificacion',
+  seccion1Titulo: 'II. PETICIONES CONCRETAS:',
+  seccion2Titulo: 'III. NOTIFICACIONES Y ANEXOS:',
+  cuerpo: (d) => {
+    return [
+      `PRIMERO: Al consultar la plataforma del Sistema Integrado de Información sobre Multas y Sanciones por Infracciones de Tránsito (SIMIT), encontré que aparece a mi cargo la orden de comparendo electrónico No. ${d.ticketNumber || '[NUMERO DE COMPARENDO]'}, presuntamente impuesta el día ${d.fechaHechos || '[FECHA DE LA INFRACCIÓN]'}${d.licensePlate && d.licensePlate !== 'N/A' ? ` al vehículo de placas ${d.licensePlate}` : ''}.`,
+      ``,
+      `SEGUNDO: A la fecha de radicación de este documento, NO he recibido notificación personal ni correspondencia alguna en mi lugar de residencia registrado en el Registro Único Nacional de Tránsito (RUNT), el cual corresponde a la dirección física de notificaciones aportada al final de este escrito.`,
+      ``,
+      `TERCERO: Al no haber sido notificado dentro de los tiempos estipulados por la ley, se me cercenó el derecho a la legítima defensa, a contradecir las pruebas, a solicitar audiencia pública y a acceder a los descuentos por pronto pago.`,
+      ``,
+      `FUNDAMENTOS DE DERECHO`,
+      ``,
+      `Artículo 29 de la Constitución Política: "El debido proceso se aplicará a toda clase de actuaciones judiciales y administrativas (...)"`,
+      ``,
+      `Ley 1843 de 2017, Artículo 8: Establece que la validación del comparendo debe hacerse en los diez (10) días hábiles siguientes, y posteriormente, el envío de la orden de comparendo y sus soportes debe realizarse dentro de los tres (3) días hábiles siguientes a través de correo certificado a la última dirección registrada en el RUNT.`,
+      ``,
+      `La Corte Constitucional en reiterada jurisprudencia ha manifestado que la notificación no es un mero formalismo, sino el acto que garantiza el principio de publicidad y el derecho a la defensa. Sin una notificación efectiva, los actos administrativos carecen de validez y no son oponibles al ciudadano.`,
+    ];
+  },
   facultades: [
-    'Presentar el recurso de nulidad con soporte en la jurisprudencia',
-    'constitucional C-038/2020 y la Ley 1437 de 2011.',
-    'Aportar pruebas documentales de la deficiencia en la notificación.',
-    'Solicitar la suspensión provisional del cobro mientras se decide.',
-    'Interponer apelación ante el superior jerárquico de la entidad.',
-    'Instaurar acción de tutela si persiste la vulneracion al debido proceso.',
+    'Declarar la vulneración al debido proceso administrativo por la falta de notificación en los términos de la Ley 1843 de 2017.',
+    'Decretar la nulidad de la orden de comparendo electrónico referenciada y de los actos administrativos sancionatorios derivados, procediendo a mi exoneración.',
+    'Ordenar la eliminación inmediata del registro de este comparendo en el sistema SIMIT, RUNT y demás bases de datos de deudores morosos.',
+    'En caso de respuesta desfavorable, remitir copia íntegra del expediente, incluyendo guía de envío certificada y copia de validación metrológica de la cámara.',
   ],
   indemnidad: [
-    'Autorizo a mi apoderado para invocar la Sentencia C-038/2020 en mi',
-    'defensa. Comprendo que el exito del recurso depende del analisis del',
-    'expediente particular y de las pruebas disponibles sobre la notificación.',
-    'Eximo al apoderado de responsabilidad por decisiones adversas de la',
-    'administracion que no sean atribuibles a su gestion.',
+    'Anexo: Fotocopia de la cédula de ciudadanía.',
+    'Anexo: Pantallazo del RUNT donde consta mi dirección de notificación registrada.',
+    'Anexo: Impresión del estado de cuenta del SIMIT.',
   ],
   protocolo2213: (d) => [
-    `Firma ológrafa obligatoria para recursos de nulidad (puede exigirse`,
-    `autenticación notarial segun la entidad receptora).`,
-    `Remitir documento escaneado con foto del comparendo si se dispone de el,`,
-    `desde: ${d.citizenEmail || '[correo del poderdante]'}`,
-    `hacia: contactodesmulta@protonmail.com`,
-    `Referencia: ${(d.caseId || d.shortId).replace(/CASE/gi, 'EXP')}`,
+    `Documento generado mediante plataforma digital Desmulta.`,
+    `Referencia del sistema: ${(d.caseId || d.shortId).replace(/CASE/gi, 'EXP')}`,
+    `Advertencia Interna: Riesgo si la dirección registrada en el RUNT a la fecha de infracción difiere de la dirección declarada por el usuario.`,
+  ],
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// NEW 1. CADUCIDAD 1 AÑO
+// ═══════════════════════════════════════════════════════════════════
+const caducidad1Anio: DocumentBlock = {
+  titulo: 'DERECHO DE PETICIÓN EN INTERÉS PARTICULAR',
+  subtitulo: '(Art. 23 C.P. — Solicitud declaratoria de CADUCIDAD Art. 161 Ley 769 de 2002)',
+  nombreArchivo: 'Derecho_Peticion_Caducidad',
+  seccion1Titulo: 'II. PETICIONES CONCRETAS:',
+  seccion2Titulo: 'III. NOTIFICACIONES Y ANEXOS:',
+  cuerpo: (d) => {
+    return [
+      `PRIMERO: El día ${d.fechaHechos || '[FECHA DE LA INFRACCIÓN]'} se impuso orden de comparendo No. ${d.ticketNumber || '[NUMERO DE COMPARENDO]'}${d.licensePlate && d.licensePlate !== 'N/A' ? ` asociado al vehículo de placas ${d.licensePlate}` : ''}.`,
+      ``,
+      `SEGUNDO: A la fecha de radicación de la presente petición, ha transcurrido más de un (1) año desde la ocurrencia del presunto hecho infractor.`,
+      ``,
+      `TERCERO: Durante este término de más de un (1) año calendario, esa Secretaría o Dirección de Tránsito NO expidió ni notificó en debida forma la resolución sancionatoria que declare la responsabilidad contravencional, o al menos, la misma no me fue notificada con las exigencias del debido proceso.`,
+      ``,
+      `FUNDAMENTOS DE DERECHO`,
+      ``,
+      `Sustento mi solicitud en lo preceptuado en el Artículo 161 de la Ley 769 de 2002 (Código Nacional de Tránsito), el cual establece de manera perentoria:`,
+      ``,
+      `"Caducidad. La acción o contravención de las normas de tránsito caduca al año (1), contado a partir de la ocurrencia de los hechos que dieron origen a ella. En consecuencia, durante este término se deberá celebrar la audiencia para declarar la contraventora, momento en el cual se interrumpirá la caducidad."`,
+      ``,
+      `Al no haberse surtido la etapa procesal correspondiente ni emitido acto administrativo sancionatorio dentro del año siguiente a la infracción, el Estado pierde la facultad para sancionar y cobrar.`,
+    ];
+  },
+  facultades: [
+    'Declarar formalmente la CADUCIDAD de la acción contravencional respecto a la orden de comparendo referenciada en los hechos.',
+    'Ordenar el archivo definitivo del expediente contravencional y la cesación de cualquier procedimiento administrativo o de cobro coactivo.',
+    'Ordenar la actualización inmediata y depuración en la plataforma SIMIT y RUNT eliminando cualquier registro o deuda asociada a mi número de cédula.',
+  ],
+  indemnidad: [
+    'Anexo: Fotocopia de la Cédula de Ciudadanía.',
+    'Anexo: Impresión del estado de cuenta del SIMIT / RUNT donde consta el comparendo objeto de petición.',
+  ],
+  protocolo2213: (d) => [
+    `Documento generado mediante plataforma digital Desmulta.`,
+    `Referencia del sistema: ${(d.caseId || d.shortId).replace(/CASE/gi, 'EXP')}`,
+    `Advertencia Interna: Riesgo nivel BAJO por posible Resolución Sancionatoria tardía no reflejada en SIMIT.`,
+  ],
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// NEW 2. NULIDAD FALTA IDENTIDAD CONDUCTOR (C-038/2020)
+// ═══════════════════════════════════════════════════════════════════
+const nulidadFaltaIdentidad: DocumentBlock = {
+  titulo: 'DERECHO DE PETICIÓN EN INTERÉS PARTICULAR',
+  subtitulo:
+    '(Art. 23 C.P. — Exoneración por falta de identidad del conductor Sentencia C-038/2020)',
+  nombreArchivo: 'Nulidad_Identidad_C038',
+  seccion1Titulo: 'II. PETICIONES CONCRETAS:',
+  seccion2Titulo: 'III. NOTIFICACIONES Y ANEXOS:',
+  cuerpo: (d) => {
+    return [
+      `PRIMERO: El día ${d.fechaHechos || '[FECHA DE LA INFRACCIÓN]'} se generó la orden de comparendo electrónico No. ${d.ticketNumber || '[NUMERO DE COMPARENDO]'} por una presunta infracción cometida en el vehículo de placas ${d.licensePlate || '[PLACA DEL VEHÍCULO]'}.`,
+      ``,
+      `SEGUNDO: Fui vinculado al procedimiento contravencional única y exclusivamente por mi calidad de propietario(a) del vehículo, según consta en el Registro Único Nacional de Tránsito (RUNT).`,
+      ``,
+      `TERCERO: Las evidencias fotográficas o fílmicas allegadas al expediente se limitan a registrar la placa del automotor, pero son técnica y materialmente insuficientes para individualizar, identificar y probar de manera indubitable mi identidad como conductor en el momento exacto de la presunta infracción.`,
+      ``,
+      `FUNDAMENTOS DE DERECHO`,
+      ``,
+      `Mi solicitud se fundamenta en la Sentencia C-038 de 2020 proferida por la Corte Constitucional, la cual declaró inexequible el parágrafo 1 del artículo 8 de la Ley 1843 de 2017.`,
+      ``,
+      `En dicha providencia, la Alta Corte eliminó la responsabilidad solidaria entre el propietario del vehículo y el conductor, ratificando que el derecho sancionatorio en Colombia se rige por el principio de responsabilidad personal. La Corte fue categórica al establecer que:`,
+      ``,
+      `Es inconstitucional sancionar al propietario del vehículo sin que la autoridad de tránsito pruebe que él era quien iba conduciendo.`,
+      ``,
+      `La carga de la prueba recae exclusivamente sobre el Estado (Organismo de Tránsito), quien debe utilizar la tecnología para identificar plenamente al infractor. El propietario no está obligado a autoincriminarse ni a denunciar a quien conducía (Artículo 33 de la Constitución Política).`,
+      ``,
+      `Al no existir prueba documental, técnica ni testimonial en el expediente que demuestre de manera irrefutable que mi persona se encontraba al volante cometiendo la infracción, sancionarme implicaría una violación directa al debido proceso y a la presunción de inocencia.`,
+    ];
+  },
+  facultades: [
+    'Declarar que la Secretaría de Movilidad carece de material probatorio suficiente para determinar mi plena identidad como conductor infractor, conforme a la Sentencia C-038/2020.',
+    'En consecuencia, fallar a mi favor, revocando la orden de comparendo electrónico referenciada y exonerándome de toda responsabilidad contravencional y pecuniaria.',
+    'Ordenar la eliminación y depuración inmediata del registro de este comparendo en la plataforma del SIMIT, RUNT y cualquier otra base de datos aplicable.',
+  ],
+  indemnidad: [
+    'Anexo: Fotocopia de la cédula de ciudadanía.',
+    'Anexo: Impresión del estado de cuenta del SIMIT.',
+  ],
+  protocolo2213: (d) => [
+    `Documento generado mediante plataforma digital Desmulta.`,
+    `Referencia del sistema: ${(d.caseId || d.shortId).replace(/CASE/gi, 'EXP')}`,
+    `Advertencia Interna: EXCEPCIÓN. Si la multa es por SOAT o Técnico-Mecánica (C35/D02), esta defensa es ineficaz según Sentencia C-321/2022.`,
   ],
 };
 
@@ -385,15 +423,19 @@ export const DOCUMENT_TEMPLATES: Record<DocumentType, DocumentBlock> = {
   doble_prescripcion: doblePrescripcion,
   nulidad_notificacion: nulidadNotificacion,
   tutela_silencio: tutelaSilencio,
+  caducidad_1_anio: caducidad1Anio,
+  nulidad_falta_identidad: nulidadFaltaIdentidad,
 };
 
 export const DOCUMENT_TYPE_LABELS: Record<DocumentType, string> = {
   poder_especial: 'Poder Especial de Gestión',
-  peticion_general: 'Derecho de Petición (General/Exploratorio)',
-  prescripcion_directa: 'Prescripción Directa (3 años sin mandamiento)',
-  doble_prescripcion: 'Doble Prescripción (3+3 años, cobro coactivo)',
-  nulidad_notificacion: 'Nulidad por Indebida Notificación (Fotomultas)',
-  tutela_silencio: 'Accion de Tutela (Silencio / Vulneracion Petición)',
+  peticion_general: 'Petición Pruebas Expediente (Exploratoria)',
+  prescripcion_directa: 'Prescripción 3 Años (Sin Mandamiento)',
+  doble_prescripcion: 'Prescripción Absoluta 6+ Años (Cobro Coactivo)',
+  nulidad_notificacion: 'Nulidad Indebida Notificación (Fotomultas Ley 1843)',
+  tutela_silencio: 'Acción de Tutela (Silencio / Vulneracion Petición)',
+  caducidad_1_anio: 'Caducidad de Acción (1 Año)',
+  nulidad_falta_identidad: 'Nulidad Falta de Identidad (Fotomultas C-038)',
 };
 
 /** Sugerencia automática del tipo de documento según datos del caso */
@@ -412,26 +454,27 @@ export function sugerirTipoDocumento(
   if (masde3 && coactivo)
     return {
       tipo: 'doble_prescripcion',
-      razon: 'Más de 3 años + cobro coactivo → doble prescripción',
+      razon: 'Más de 3 años + cobro coactivo → prescripción absoluta 6+ años',
     };
   if (masde3 && !coactivo)
     return {
       tipo: 'prescripcion_directa',
-      razon: 'Más de 3 años sin mandamiento → prescripción directa',
+      razon: 'Más de 3 años sin mandamiento → prescripción 3 años',
     };
   if (esFotomulta)
     return {
       tipo: 'nulidad_notificacion',
-      razon: 'Fotomulta → nulidad por indebida notificación (C-038/2020)',
+      razon:
+        'Fotomulta → nulidad por indebida notificación (Ley 1843) o Falta de Identidad (C-038/2020)',
     };
   if (entre1y3)
     return {
-      tipo: 'peticion_general',
-      razon: 'Entre 1 y 3 años → derecho de petición informativo',
+      tipo: 'caducidad_1_anio',
+      razon: 'Entre 1 y 3 años → intentar declarar caducidad por falta de resolución',
     };
 
   return {
     tipo: 'peticion_general',
-    razon: 'Caso general → iniciar con derecho de petición exploratorio',
+    razon: 'Caso general → iniciar con petición de pruebas exploratoria',
   };
 }

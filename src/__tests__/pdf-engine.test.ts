@@ -141,7 +141,7 @@ describe('PDF Engine — Motor de Generación de Poder Legal', () => {
 
       // Verificamos que el título se haya inyectado correctamente
       const pdfText = extractPDFText(buffer);
-      expect(pdfText).toContain('PODER PARA SOLICITUD DE PRESCRIPCION EXTINTIVA');
+      expect(pdfText).toContain('Solicitud declaratoria de PRESCRIPCI');
     });
 
     it('debe generar un PDF valido con la estrategia NULIDAD_NOTIFICACION', async () => {
@@ -153,7 +153,7 @@ describe('PDF Engine — Motor de Generación de Poder Legal', () => {
       expect(buffer).toBeInstanceOf(Uint8Array);
 
       const pdfText = extractPDFText(buffer);
-      expect(pdfText).toContain('PODER PARA RECURSO DE NULIDAD POR INDEBIDA NOTIFICACION');
+      expect(pdfText).toContain('Nulidad por vulneraci');
     });
 
     it('debe usar PETICION_GENERAL por defecto si no se envia estrategia', async () => {

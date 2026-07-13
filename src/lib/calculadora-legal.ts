@@ -1,8 +1,5 @@
 // src/lib/calculadora-legal.ts
-import {
-  TASA_EA_VIGENTE,
-  SMDLV_2026,
-} from './config-constants';
+import { TASA_EA_VIGENTE, SMDLV_2026 } from './config-constants';
 import { PrescriptionEngine, OCRSanitizer } from '@/lib/legal/prescription-engine';
 
 // ─── Tipos Públicos ─────────────────────────────────────────────────────────────
@@ -166,7 +163,7 @@ import { FINANCIAL_HISTORY, getSMDLVHistorico } from './financial-history';
  * @returns El valor total de los intereses generados.
  */
 export function calcularInteresesHistoricos(
-  montoBaseReal: number, 
+  montoBaseReal: number,
   fechaInfraccionISO: string,
   tieneCobroCoactivo: boolean = false
 ): number {
@@ -183,7 +180,7 @@ export function calcularInteresesHistoricos(
 
   let interesesAcumulados = 0;
   const msPorDia = 1000 * 60 * 60 * 24;
-  
+
   // Limite legal de años sumando intereses (Estatuto Tributario / CNT)
   const limiteAnios = tieneCobroCoactivo ? 6 : 3;
   const maxDiasPermitidos = limiteAnios * 365;
@@ -196,22 +193,27 @@ export function calcularInteresesHistoricos(
     // Artículo 635 del Estatuto Tributario: Tasa de Usura menos 2 puntos porcentuales
     let tasaEA = (FINANCIAL_HISTORY[anio]?.usuraEA || TASA_EA_VIGENTE) - 0.02;
     tasaEA = Math.max(0, tasaEA);
-    
+
     // Tasa diaria nominal para Interés Simple
-    const tasaDiaria = tasaEA / 365; 
+    const tasaDiaria = tasaEA / 365;
 
     let diasEnEsteAnio = 365;
 
     if (anio === anioInfraccion) {
       const finDeAnio = new Date(Date.UTC(anio, 11, 31)); // 31 Dic
-      diasEnEsteAnio = Math.max(0, Math.floor((finDeAnio.getTime() - fechaInfraccion.getTime()) / msPorDia));
-      
+      diasEnEsteAnio = Math.max(
+        0,
+        Math.floor((finDeAnio.getTime() - fechaInfraccion.getTime()) / msPorDia)
+      );
+
       // Aplicar gracia procesal (Gap de Resolución)
       diasEnEsteAnio = Math.max(0, diasEnEsteAnio - 60);
-    }
-    else if (anio === anioActual) {
+    } else if (anio === anioActual) {
       const inicioDeAnio = new Date(Date.UTC(anio, 0, 1)); // 1 Ene
-      diasEnEsteAnio = Math.max(0, Math.floor((hoyUTC.getTime() - inicioDeAnio.getTime()) / msPorDia));
+      diasEnEsteAnio = Math.max(
+        0,
+        Math.floor((hoyUTC.getTime() - inicioDeAnio.getTime()) / msPorDia)
+      );
     }
 
     // Topar días según el máximo permitido
@@ -254,7 +256,8 @@ export function calcularMultaCompleta(
     if (fechasDetectadas.length > 0) {
       const dictamenEnriquecido = PrescriptionEngine.evaluate(textoOCR, fechasDetectadas);
       if (dictamenEnriquecido.status) {
-        prescripcion.estadoLegal = dictamenEnriquecido.status as ResultadoPrescripcion['estadoLegal'];
+        prescripcion.estadoLegal =
+          dictamenEnriquecido.status as ResultadoPrescripcion['estadoLegal'];
         prescripcion.isViable = dictamenEnriquecido.isViable ?? false;
       }
     }
@@ -264,19 +267,21 @@ export function calcularMultaCompleta(
   // Determinar el año de la infracción
   const fechaObj = new Date(`${fechaInfraccionISO}T00:00:00Z`);
   const anioInfraccion = isNaN(fechaObj.getTime()) ? 2026 : fechaObj.getUTCFullYear();
-  
+
   // Calcular los SMDLV basándose en el valor enviado frente al SMDLV 2026
-  const cantidadSMDLV = valorMulta2026 / SMDLV_2026; 
-  
+  const cantidadSMDLV = valorMulta2026 / SMDLV_2026;
+
   // Calcular el Valor Original REAL en pesos del año en que ocurrió
   const smdlvHistorico = getSMDLVHistorico(anioInfraccion);
   const valorOriginalHistorico = Math.round(cantidadSMDLV * smdlvHistorico);
 
   // Calcular Intereses sobre el valor histórico usando el motor de tramos anuales
-  const interesesAcumulados = Math.round(calcularInteresesHistoricos(valorOriginalHistorico, fechaInfraccionISO));
-  
+  const interesesAcumulados = Math.round(
+    calcularInteresesHistoricos(valorOriginalHistorico, fechaInfraccionISO)
+  );
+
   const valorTotalActual = valorOriginalHistorico + interesesAcumulados;
-  
+
   const valorEnSMMLV = Number((valorOriginalHistorico / (smdlvHistorico * 30)).toFixed(2));
   const valorEnSMDLV = Number(cantidadSMDLV.toFixed(1));
 

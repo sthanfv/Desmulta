@@ -43,6 +43,8 @@ const PRODUCT_PRICES: Record<string, number> = {
   nulidad_notificacion: 3000000, // $30.000 COP
   tutela_silencio: 5000000, // $50.000 COP
   poder_especial: 2000000, // $20.000 COP
+  caducidad_1_anio: 3000000, // $30.000 COP
+  nulidad_falta_identidad: 3500000, // $35.000 COP
 };
 
 /**

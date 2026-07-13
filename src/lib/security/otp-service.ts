@@ -15,23 +15,26 @@ export async function storeOtpChallenge(hashedCedula: string, otp: string): Prom
   await redis.setex(key, 300, otp);
 }
 
-export async function verifyOtpChallenge(hashedCedula: string, providedOtp: string): Promise<boolean> {
+export async function verifyOtpChallenge(
+  hashedCedula: string,
+  providedOtp: string
+): Promise<boolean> {
   const key = `vip-otp:${hashedCedula}`;
   const storedOtp = await redis.get<string>(key);
-  
+
   if (!storedOtp) return false;
-  
+
   // timingSafeEqual para evitar ataques de timing side-channel
   const storedBuf = Buffer.from(String(storedOtp));
   const providedBuf = Buffer.from(String(providedOtp));
-  
+
   if (storedBuf.length !== providedBuf.length) return false;
-  
+
   const isValid = timingSafeEqual(storedBuf, providedBuf);
-  
+
   if (isValid) {
     await redis.del(key); // OTP de un solo uso
   }
-  
+
   return isValid;
 }
