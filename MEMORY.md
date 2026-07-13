@@ -5,6 +5,22 @@
 > Se analizó el equipo local (DESKTOP-N9CGIFT) identificando un procesador antiguo `AMD PRO A10-8750B R7` (4 núcleos) y 16GB de RAM. Esta severa limitación en procesamiento de un solo hilo causa sobrecargas y Cold Starts extremadamente lentos.
 > **Regla permanente:** Está **ESTRICTAMENTE PROHIBIDO** ejecutar suites de validación masivas (`npm run validate` total) o pruebas E2E pesadas (Playwright) para cambios menores, ya que estresa severamente la máquina. Aplicar validación quirúrgica (linters específicos y pruebas aisladas) a menos que se trate de una reestructuración arquitectónica masiva autorizada por el usuario. Cuando las pruebas E2E sean necesarias, usar estrategias pasivas y timeouts elevados (`60000ms`).
 
+## 2026-07-13: Integración de Plantillas Legales Definitivas y Estabilización E2E
+- **Qué cambió:**
+  - **[Plantillas Legales]**: Se integraron y formatearon 8 plantillas legales definitivas en `src/lib/legal/document-templates.ts` (Caducidad, Prescripción, Indebida Notificación Fotomultas, Falta de Identidad C-038/20, Pruebas y Copias, Prescripción Absoluta, Acción de Tutela y Revocatoria Directa Alcoholemia). Se corrigieron campos dinámicos para inyección de datos del usuario.
+  - **[Estabilización QA/E2E]**: Se resolvieron los tests intermitentes (flaky tests) y bloqueos por timeouts en `generador-flujo.spec.ts`. Se refactorizó el script para interactuar correctamente con inputs controlados y menús desplegables (dropdowns). Se inyectaron variables de entorno seguras para emulador en Playwright vía `package.json`.
+  - **[Linter y Tests]**: La suite de pruebas completa pasó al 100% (lint, typecheck, build, unit, E2E), entregando un código completamente limpio.
+- **Por qué cambió:**
+  - El usuario proveyó las 8 plantillas legales validadas que serán comercializadas. Se requería inyectar los datos del usuario asegurando un formato impecable para envío legal.
+  - Era obligatorio entregar un repositorio "limpio" y verde sin timeouts ni errores para habilitar la Fase de QA Manual del usuario.
+- **Archivos afectados:**
+  - `src/lib/legal/document-templates.ts` [MODIFICADO]
+  - `tests/e2e/generador-flujo.spec.ts` [MODIFICADO]
+  - `tests/e2e/god-mode.spec.ts` [MODIFICADO]
+  - `tests/e2e/qr-security.spec.ts` [MODIFICADO]
+  - `package.json` [MODIFICADO]
+- **Estado actual:** ✅ Completo, subido a producción. Listo para QA Manual.
+
 ## 2026-07-12: Mejora UI/UX y Performance (Scroll + WhatsApp FAB)
 - **Qué cambió:**
   - **[Rendimiento de Renderizado]**: Se eliminó la regla `content-visibility: auto` de la clase `.defer-render` en `src/app/globals.css` y se reemplazó por optimizaciones de GPU (`will-change: transform, opacity`). 

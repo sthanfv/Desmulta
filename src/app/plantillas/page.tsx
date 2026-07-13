@@ -42,7 +42,7 @@ const getIconForDoc = (type: DocumentType) => {
 const TEMPLATE_CARDS = [
   {
     id: 'peticion_general',
-    title: DOCUMENT_TEMPLATES['peticion_general'].titulo,
+    title: 'Petición Pruebas y Trazabilidad',
     description: 'Solicitud formal para indagar sobre comparendos, prescripción y nulidad básica.',
     badge: 'Uso General',
     exito: '95%',
@@ -50,7 +50,7 @@ const TEMPLATE_CARDS = [
   },
   {
     id: 'prescripcion_directa',
-    title: DOCUMENT_TEMPLATES['prescripcion_directa'].titulo,
+    title: 'Prescripción 3 Años (Sin Mandamiento)',
     description: 'Para comparendos con más de 3 años sin que se haya emitido mandamiento de pago.',
     badge: 'Popular',
     exito: '98%',
@@ -58,7 +58,7 @@ const TEMPLATE_CARDS = [
   },
   {
     id: 'doble_prescripcion',
-    title: DOCUMENT_TEMPLATES['doble_prescripcion'].titulo,
+    title: 'Prescripción Absoluta 6+ Años',
     description: 'Para deudas en cobro coactivo que llevan más de 5 años adicionales congeladas.',
     badge: 'Especializada',
     exito: '94%',
@@ -66,7 +66,7 @@ const TEMPLATE_CARDS = [
   },
   {
     id: 'nulidad_notificacion',
-    title: DOCUMENT_TEMPLATES['nulidad_notificacion'].titulo,
+    title: 'Nulidad Fotomultas (Indebida Notificación)',
     description: 'Nulidad de fotomultas por no notificación personal (Sentencia C-038/2020).',
     badge: 'Fotomultas',
     exito: '96%',
@@ -74,7 +74,7 @@ const TEMPLATE_CARDS = [
   },
   {
     id: 'tutela_silencio',
-    title: DOCUMENT_TEMPLATES['tutela_silencio'].titulo,
+    title: 'Acción de Tutela (Silencio de Tránsito)',
     description:
       'Acción Constitucional cuando Tránsito no responde tu petición en 15 días hábiles.',
     badge: 'Urgente',
