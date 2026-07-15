@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
   ShieldCheck,
@@ -84,7 +84,14 @@ const TEMPLATE_CARDS = [
 ];
 
 export default function PlantillasPage() {
+  const [prices, setPrices] = useState<Record<string, { display: string }> | null>(null);
+
   useEffect(() => {
+    fetch('/api/payments/prices')
+      .then((r) => r.json())
+      .then((data) => setPrices(data))
+      .catch((e) => console.error('Error fetching prices:', e));
+
     // ✦ ANTIGRAVITY SIGNATURE EASTER EGG ✦
     console.log(
       '%c✦ DESMULTA ENGINE v1.0 ✦\n%cArquitectura Lógica y Visual co-creada por Antigravity.\n"El código es la ley."',
@@ -185,7 +192,7 @@ export default function PlantillasPage() {
                   </span>
                 </div>
                 <span className="font-mono text-sm font-bold text-slate-800 dark:text-zinc-200">
-                  {tpl.precio}
+                  {prices && prices[tpl.id] ? prices[tpl.id].display : tpl.precio}
                 </span>
               </div>
 
