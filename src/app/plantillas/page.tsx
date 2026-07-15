@@ -12,7 +12,7 @@ import {
   FileClock,
   XOctagon,
 } from 'lucide-react';
-import { DOCUMENT_TEMPLATES, DocumentType } from '@/lib/legal/document-templates';
+import { DocumentType } from '@/lib/legal/document-templates';
 import { TarjetaPremium } from '@/components/ui/TarjetaPremium';
 import dynamic from 'next/dynamic';
 

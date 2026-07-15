@@ -33,14 +33,14 @@ import { createHash } from 'crypto';
 // Precios en CENTAVOS COP (Ej: 2500000 = $25.000 COP)
 // NOTA DE DESARROLLO: Si modificas los precios aquí en el Backend, debes actualizar en concordancia los valores visuales del frontend en src/components/sections/Hero.tsx para evitar inconsistencias de cobro al usuario.
 const PRODUCT_PRICES: Record<string, number> = {
-  peticion_general: 2500000, // $25.000 COP
-  prescripcion_directa: 3500000, // $35.000 COP
-  doble_prescripcion: 4500000, // $45.000 COP
-  nulidad_notificacion: 3000000, // $30.000 COP
-  tutela_silencio: 5000000, // $50.000 COP
-  poder_especial: 2000000, // $20.000 COP
-  caducidad_1_anio: 3000000, // $30.000 COP
-  nulidad_falta_identidad: 3500000, // $35.000 COP
+  peticion_general: 1490000, // $14.900 COP
+  prescripcion_directa: 2490000, // $24.900 COP
+  doble_prescripcion: 3490000, // $34.900 COP
+  nulidad_notificacion: 2990000, // $29.900 COP
+  tutela_silencio: 1990000, // $19.900 COP
+  poder_especial: 1490000, // $14.900 COP (Ajustado comercialmente)
+  caducidad_1_anio: 1990000, // $19.900 COP (Ajustado comercialmente)
+  nulidad_falta_identidad: 2990000, // $29.900 COP (Igual a nulidad_notificacion)
 };
 
 const schema = z.object({
