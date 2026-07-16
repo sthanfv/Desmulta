@@ -5,6 +5,16 @@
 > Se analizó el equipo local (DESKTOP-N9CGIFT) identificando un procesador antiguo `AMD PRO A10-8750B R7` (4 núcleos) y 16GB de RAM. Esta severa limitación en procesamiento de un solo hilo causa sobrecargas y Cold Starts extremadamente lentos.
 > **Regla permanente:** Está **ESTRICTAMENTE PROHIBIDO** ejecutar suites de validación masivas (`npm run validate` total) o pruebas E2E pesadas (Playwright) para cambios menores, ya que estresa severamente la máquina. Aplicar validación quirúrgica (linters específicos y pruebas aisladas) a menos que se trate de una reestructuración arquitectónica masiva autorizada por el usuario. Cuando las pruebas E2E sean necesarias, usar estrategias pasivas y timeouts elevados (`60000ms`).
 
+## 2026-07-16: Corrección UX/UI — Apertura de Web Checkout de Wompi en Pestaña Nueva
+
+- **Qué cambió:**
+  - **[UX/UI - Wompi Checkout]**: En `src/components/payments/WompiCheckout.tsx`, se modificó el enlace del botón de pago agregando los atributos `target="_blank" rel="noopener noreferrer"`. Esto hace que la pasarela de Wompi se abra en una pestaña independiente.
+- **Por qué cambió:**
+  - El usuario reportó un bug de navegación: al presionar "descargar comprobante" desde la pantalla de éxito de Wompi, el navegador abría la URL del blob PDF (`blob:https://checkout.wompi.co/...`) en la pestaña actual de la aplicación, destruyendo el historial de Next.js y bloqueando el retorno al portal de Desmulta. Abrirlo en una pestaña nueva aísla el checkout de Wompi y conserva Desmulta siempre visible en la pestaña original.
+- **Archivos afectados:**
+  - `src/components/payments/WompiCheckout.tsx` [MODIFICADO]
+- **Estado actual:** ✅ Corregido. `npx tsc --noEmit` pasa sin errores.
+
 ## 2026-07-16: Pruebas de Integración de Telemetría, Modo Dios y Registro de Ventas
 
 - **Qué cambió:**
