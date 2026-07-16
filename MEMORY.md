@@ -5,6 +5,23 @@
 > Se analizó el equipo local (DESKTOP-N9CGIFT) identificando un procesador antiguo `AMD PRO A10-8750B R7` (4 núcleos) y 16GB de RAM. Esta severa limitación en procesamiento de un solo hilo causa sobrecargas y Cold Starts extremadamente lentos.
 > **Regla permanente:** Está **ESTRICTAMENTE PROHIBIDO** ejecutar suites de validación masivas (`npm run validate` total) o pruebas E2E pesadas (Playwright) para cambios menores, ya que estresa severamente la máquina. Aplicar validación quirúrgica (linters específicos y pruebas aisladas) a menos que se trate de una reestructuración arquitectónica masiva autorizada por el usuario. Cuando las pruebas E2E sean necesarias, usar estrategias pasivas y timeouts elevados (`60000ms`).
 
+## 2026-07-16: Corrección UX/UI — Sincronización Absoluta de Precios Frontend/Backend
+
+- **Qué cambió:**
+  - **[Backend - Precios Centralizados]**: En `src/lib/payments/product-prices.ts`, se actualizaron los precios oficiales (en centavos) de la aplicación para que correspondan exactamente con los precios de venta que ve el usuario en el listado de plantillas (peticion_general = $14.900, doble_prescripcion = $34.900, etc.).
+  - **[Backend - Integración]**: En `src/app/api/payments/create-order/route.ts`, se eliminó la constante redundante `PRODUCT_PRICES` que contenía precios antiguos/incorrectos (ej. $45.000 para doble prescripción) y se importó la fuente de verdad `@/lib/payments/product-prices`.
+  - **[Frontend - Calibración]**:
+    - En `src/app/calculadora/page.tsx`, se actualizó la llamada a la acción de "$25.000" a "$14.900" (precio de la petición general).
+    - En `src/app/documentos/generador/[slug]/page.tsx`, se configuró un diccionario de precios fallback locales dinámicos por slug en caso de fallos de red en el cliente, reemplazando el fallback estático genérico de "$25.000" que provocaba discrepancias visuales al pagar.
+- **Por qué cambió:**
+  - El usuario detectó una inconsistencia crítica de negocio: el frontend mostraba precios (ej. $34.900 por doble prescripción) pero al abrir el checkout de Wompi se le cobraba un valor diferente ($45.000). Esto se debía a que no se estaba importando el diccionario central en la creación de órdenes y los fallbacks del frontend no estaban alineados.
+- **Archivos afectados:**
+  - `src/lib/payments/product-prices.ts` [MODIFICADO]
+  - `src/app/api/payments/create-order/route.ts` [MODIFICADO]
+  - `src/app/calculadora/page.tsx` [MODIFICADO]
+  - `src/app/documentos/generador/[slug]/page.tsx` [MODIFICADO]
+- **Estado actual:** ✅ Corregido y alineado.
+
 ## 2026-07-16: Corrección UX/UI — Apertura de Web Checkout de Wompi en Pestaña Nueva
 
 - **Qué cambió:**

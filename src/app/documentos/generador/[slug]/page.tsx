@@ -93,6 +93,17 @@ export default function GeneradorDinamico({ params }: GeneradorDinamicoProps) {
   // Cargar el precio dinámicamente desde el servidor al montar el componente
   useEffect(() => {
     if (!tmpl) return;
+    const FALLBACK_PRICES: Record<string, string> = {
+      peticion_general: '$14.900',
+      prescripcion_directa: '$24.900',
+      doble_prescripcion: '$34.900',
+      nulidad_notificacion: '$29.900',
+      tutela_silencio: '$19.900',
+      poder_especial: '$14.900',
+      caducidad_1_anio: '$29.900',
+      nulidad_falta_identidad: '$24.900',
+    };
+
     fetch('/api/payments/prices')
       .then((res) => res.json())
       .then((precios) => {
@@ -102,7 +113,8 @@ export default function GeneradorDinamico({ params }: GeneradorDinamicoProps) {
         }
       })
       .catch(() => {
-        setPrecioDisplay('$25.000');
+        const key = slug.replace(/-/g, '_');
+        setPrecioDisplay(FALLBACK_PRICES[key] || '$14.900');
       });
   }, [slug, tmpl]);
 

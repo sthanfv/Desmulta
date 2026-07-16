@@ -29,19 +29,7 @@ import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 import { checkRateLimit } from '@/lib/security/rate-limit';
 import { hashPII } from '@/lib/security/server-crypto';
 import { createHash } from 'crypto';
-
-// Precios en CENTAVOS COP (Ej: 2500000 = $25.000 COP)
-// NOTA DE DESARROLLO: Si modificas los precios aquí en el Backend, debes actualizar en concordancia los valores visuales del frontend en src/components/sections/Hero.tsx para evitar inconsistencias de cobro al usuario.
-const PRODUCT_PRICES: Record<string, number> = {
-  peticion_general: 2500000, // $25.000 COP
-  prescripcion_directa: 3500000, // $35.000 COP
-  doble_prescripcion: 4500000, // $45.000 COP
-  nulidad_notificacion: 3000000, // $30.000 COP
-  tutela_silencio: 5000000, // $50.000 COP
-  poder_especial: 2000000, // $20.000 COP
-  caducidad_1_anio: 3000000, // $30.000 COP
-  nulidad_falta_identidad: 3500000, // $35.000 COP
-};
+import { PRODUCT_PRICES } from '@/lib/payments/product-prices';
 
 const schema = z.object({
   productType: z.enum([
