@@ -125,9 +125,9 @@ export function PDFPreviewModal({ isOpen, onClose, base64, filename }: PDFPrevie
             </div>
             <DialogPrimitive.Close
               className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-all"
-              aria-label="Cerrar"
+              aria-label="Cerrar vista previa del PDF"
             >
-              <X className="w-4 h-4" />
+              <X className="w-4 h-4" aria-hidden="true" />
             </DialogPrimitive.Close>
           </div>
 

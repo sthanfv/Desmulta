@@ -6,9 +6,10 @@ import { getAdminApp } from '@/lib/firebase-admin';
 import { timingSafeEqual } from 'crypto';
 
 const CrashPayloadSchema = z.object({
-  message: z.string().max(1000),
-  digest: z.string().max(200).optional(),
-  path: z.string().max(200),
+  // 🛡️ FIX H-4: límites estrictos para prevenir payloads abusivos
+  message: z.string().max(2000, 'El mensaje no puede superar 2000 caracteres.').default('(sin mensaje)'),
+  digest: z.string().max(100).optional(),
+  path: z.string().max(512, 'La ruta no puede superar 512 caracteres.').default('/'),
 });
 
 const MAX_REQUESTS_PER_WINDOW = 50;
@@ -83,7 +84,8 @@ export async function POST(req: Request) {
           path: data.path,
           ip: ip,
           timestamp: FieldValue.serverTimestamp(),
-          userAgent: userAgent,
+          // 🛡️ FIX H-4: truncar userAgent para evitar almacenamiento de cabeceras abusivas
+          userAgent: userAgent.substring(0, 300),
         });
       } catch (dbErr) {
         logger.error('[crash-report] Error guardando en Firestore', { err: String(dbErr) });

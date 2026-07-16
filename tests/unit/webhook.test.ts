@@ -11,6 +11,7 @@ vi.mock('@/lib/firebase-admin', () => ({
 const mockGet = vi.fn();
 const mockSet = vi.fn();
 const mockUpdate = vi.fn();
+const mockCreate = vi.fn();
 
 vi.mock('firebase-admin/firestore', () => {
   return {
@@ -20,6 +21,7 @@ vi.mock('firebase-admin/firestore', () => {
           get: () => mockGet(collName, docId),
           set: mockSet,
           update: mockUpdate,
+          create: (...args: any[]) => mockCreate(collName, docId, ...args),
         })),
       })),
     })),
@@ -48,6 +50,7 @@ describe('Wompi Webhook API', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     process.env.WOMPI_EVENTS_SECRET = SECRET;
+    mockCreate.mockResolvedValue(undefined);
     mockGet.mockImplementation((collName: string, docId: string) => {
       if (collName === 'processed_callbacks') {
         return Promise.resolve({ exists: false, data: () => ({}) });

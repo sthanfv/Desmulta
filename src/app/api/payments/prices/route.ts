@@ -3,9 +3,8 @@
  * @description Endpoint público que expone los precios de los productos de Desmulta.
  *
  * PROPÓSITO — FUENTE DE VERDAD ÚNICA:
- *   Los precios de los productos deben vivir EXCLUSIVAMENTE en el servidor
- *   (definidos en `create-order/route.ts`). Este endpoint los expone al frontend
- *   para que ninguna página tenga precios hardcodeados.
+ *   Los precios de los productos viven EXCLUSIVAMENTE en `@/lib/payments/product-prices`.
+ *   Este endpoint los expone al frontend para que ninguna página tenga precios hardcodeados.
  *
  *   Beneficios:
  *   - Un solo cambio de precio en el servidor se refleja automáticamente en
@@ -27,37 +26,7 @@
  */
 
 import { NextResponse } from 'next/server';
-
-/**
- * Diccionario de precios en CENTAVOS COP.
- * FUENTE DE VERDAD: Este diccionario es idéntico al de `create-order/route.ts`.
- * Si se cambia el precio en `create-order`, DEBE cambiarse aquí también.
- *
- * Convención: 1 COP = 1 centavo (Wompi usa centavos internamente).
- *   $25.000 COP → 2_500_000 centavos
- */
-const PRODUCT_PRICES: Record<string, number> = {
-  peticion_general: 2500000, // $25.000 COP
-  prescripcion_directa: 3500000, // $35.000 COP
-  doble_prescripcion: 4500000, // $45.000 COP
-  nulidad_notificacion: 3000000, // $30.000 COP
-  tutela_silencio: 5000000, // $50.000 COP
-  poder_especial: 2000000, // $20.000 COP
-  caducidad_1_anio: 3000000, // $30.000 COP
-  nulidad_falta_identidad: 3500000, // $35.000 COP
-};
-
-/**
- * Formatea centavos a pesos colombianos con separadores de miles.
- * Ejemplo: 2500000 → "$25.000"
- *
- * @param centavos - Monto en centavos COP (como lo usa Wompi internamente)
- * @returns Cadena formateada para mostrar al usuario en pesos COP
- */
-function formatearCOP(centavos: number): string {
-  const pesos = centavos / 100;
-  return '$' + pesos.toLocaleString('es-CO');
-}
+import { PRODUCT_PRICES, formatearCOP } from '@/lib/payments/product-prices';
 
 /**
  * Manejador GET del endpoint de precios.

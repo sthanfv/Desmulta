@@ -124,6 +124,7 @@ describe('buildCaseReplyMarkup — Pipeline completo de 8 estados', () => {
 describe('telegramWebhook — Seguridad y comandos', () => {
   let req: any;
   let res: any;
+  const AUTHORIZED_CHAT_ID = 12345;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -135,6 +136,7 @@ describe('telegramWebhook — Seguridad y comandos', () => {
 
     process.env.TELEGRAM_WEBHOOK_SECRET = 'secret_test';
     process.env.TELEGRAM_BOT_TOKEN = 'token_test';
+    process.env.TELEGRAM_CHAT_ID = String(AUTHORIZED_CHAT_ID);
     process.env.PII_ENCRYPTION_KEY = 'test_encryption_key_32_bytes_long!!';
     process.env.PII_HMAC_SECRET = 'test_hmac_secret_value_for_testing';
 
@@ -157,7 +159,7 @@ describe('telegramWebhook — Seguridad y comandos', () => {
   });
 
   it('debe responder al comando /start con el menú de comandos', async () => {
-    req.body = { message: { chat: { id: 12345 }, text: '/start' } };
+    req.body = { message: { chat: { id: AUTHORIZED_CHAT_ID }, text: '/start' } };
     await (telegramWebhook as any)(req, res);
     expect(mocks.mockFetch).toHaveBeenCalledWith(
       expect.stringContaining('sendMessage'),
@@ -166,7 +168,7 @@ describe('telegramWebhook — Seguridad y comandos', () => {
   });
 
   it('debe responder al comando /resumen con estadísticas', async () => {
-    req.body = { message: { chat: { id: 12345 }, text: '/resumen' } };
+    req.body = { message: { chat: { id: AUTHORIZED_CHAT_ID }, text: '/resumen' } };
     await (telegramWebhook as any)(req, res);
     expect(mocks.mockFetch).toHaveBeenCalledWith(
       expect.stringContaining('sendMessage'),
@@ -180,7 +182,7 @@ describe('telegramWebhook — Seguridad y comandos', () => {
         id: 'cb456',
         from: { id: 111, first_name: 'Ana' },
         data: 'estado_radicado_doc999',
-        message: { chat: { id: 999 }, message_id: 777, text: 'texto original' },
+        message: { chat: { id: AUTHORIZED_CHAT_ID }, message_id: 777, text: 'texto original' },
       },
     };
 
@@ -215,7 +217,7 @@ describe('telegramWebhook — Seguridad y comandos', () => {
         id: 'cb_dup',
         from: { id: 111, first_name: 'Bot' },
         data: 'estado_contactado_doc_dup',
-        message: { chat: { id: 999 }, message_id: 777, text: 'x' },
+        message: { chat: { id: AUTHORIZED_CHAT_ID }, message_id: 777, text: 'x' },
       },
     };
 
@@ -239,7 +241,7 @@ describe('telegramWebhook — Seguridad y comandos', () => {
         id: 'cb789',
         from: { id: 111, first_name: 'Bob' },
         data: 'push_viable_doc123',
-        message: { chat: { id: 999 }, message_id: 888 },
+        message: { chat: { id: AUTHORIZED_CHAT_ID }, message_id: 888 },
       },
     };
 
@@ -269,7 +271,7 @@ describe('telegramWebhook — Seguridad y comandos', () => {
           id: 'cb_ced',
           from: { id: 111, first_name: 'Bob' },
           data: 'vercedula_doc123_cedula',
-          message: { chat: { id: 999 }, message_id: 888 },
+          message: { chat: { id: AUTHORIZED_CHAT_ID }, message_id: 888 },
         },
       };
 
@@ -302,7 +304,7 @@ describe('telegramWebhook — Seguridad y comandos', () => {
           id: 'cb_ced_err',
           from: { id: 111 },
           data: 'vercedula_doc_simit',
-          message: { chat: { id: 999 }, message_id: 888 },
+          message: { chat: { id: AUTHORIZED_CHAT_ID }, message_id: 888 },
         },
       };
 
@@ -332,7 +334,7 @@ describe('telegramWebhook — Seguridad y comandos', () => {
           id: 'cb_ced_fail',
           from: { id: 111 },
           data: 'vercedula_doc_bad',
-          message: { chat: { id: 999 }, message_id: 888 },
+          message: { chat: { id: AUTHORIZED_CHAT_ID }, message_id: 888 },
         },
       };
 

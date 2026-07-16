@@ -10,10 +10,10 @@
  *   1. Parsear el payload JSON.
  *   2. Validar la firma criptográfica dinámica de Wompi (HMAC-SHA256).
  *   3. Filtrar: solo procesar el evento `transaction.updated`.
- *   4. Idempotencia: verificar si el webhook ya fue procesado (colección
- *      `processed_callbacks`) para evitar dobles entregas.
- *   5. Marcar el webhook como procesado ANTES de cualquier operación (previene
- *      race conditions si Wompi re-envía simultáneamente).
+ *   4. Idempotencia atómica: `create()` en `processed_callbacks` — si el doc ya
+ *      existe (código 6), retorna 200 inmediatamente. Elimina la ventana de race
+ *      condition del patrón anterior get()+set().
+ *   5. (Unificado en paso 4 — ver descripción de idempotencia atómica).
  *   6. Actualizar el estado de la compra en Firestore (PENDING → APPROVED/DECLINED).
  *   7. Si fue APPROVED: lanzar la entrega del PDF con `waitUntil()`.
  *   8. Siempre responder HTTP 200 a Wompi (si no, reintentará hasta 10 veces).
@@ -28,9 +28,12 @@
  * HISTORIAL:
  *   - v1.0.0 (2026-06-21): Implementación inicial con firma dinámica e idempotencia.
  *   - v1.1.0 (2026-06-21): Corrección de firma Wompi con properties dinámicas.
- *   - v1.2.0 (2026-06-22): CORRECCIÓN CRÍTICA — se reemplaza `void promise`
+ *   - v1.2.0 (2026-06-22): CORRECCIóN CRÍTICA — se reemplaza `void promise`
  *     (fire-and-forget) por `waitUntil()` para garantizar la entrega del PDF
  *     en entornos Serverless de Vercel. Auditoría forense 2026-06-22.
+ *   - v1.3.0 (2026-07-16): Corrección de seguridad — idempotencia atómica.
+ *     Se reemplaza get()+set() por create() atómico. Cierra race condition
+ *     en entregas dobles simultáneas de Wompi.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -114,26 +117,28 @@ export async function POST(req: NextRequest) {
 
   const db = getFirestore(getAdminApp());
 
-  // ── Paso 5: Idempotencia — evitar dobles entregas ──────────────────────────
-  // Si Wompi envía el mismo evento más de una vez (comportamiento esperado),
-  // lo ignoramos y respondemos 200 para que deje de reintentar.
+  // ── Pasos 5 y 6: Idempotencia ATÓMICA — evitar dobles entregas ─────────────
+  // 🛡️ FIX: Se reemplaza la secuencia get()+set() por un único create() atómico.
+  // Si Wompi envía el mismo evento en paralelo, dos instancias serverless pueden
+  // pasar el get() simultáneamente antes de que ninguna escriba el set().
+  // Con create(), Firestore garantiza que solo UNA instancia triunfa (escritura
+  // exclusiva); la segunda recibe el código de error 6 (ALREADY_EXISTS) y retorna
+  // 200 de inmediato, cerrando la ventana de race condition.
   const callbackRef = db.collection('processed_callbacks').doc(transactionId);
-  const alreadyProcessed = await callbackRef.get();
-
-  if (alreadyProcessed.exists) {
-    logger.info('[webhook-wompi] Webhook duplicado ignorado', { transactionId });
-    return NextResponse.json({ ok: true, duplicate: true });
+  try {
+    await callbackRef.create({
+      wompiTransactionId: transactionId,
+      processedAt: FieldValue.serverTimestamp(),
+      result: status,
+    });
+  } catch (err: unknown) {
+    const code = (err as { code?: number })?.code;
+    if (code === 6 /* ALREADY_EXISTS — webhook duplicado */) {
+      logger.info('[webhook-wompi] Webhook duplicado ignorado (idempotencia atómica)', { transactionId });
+      return NextResponse.json({ ok: true, duplicate: true });
+    }
+    throw err;
   }
-
-  // ── Paso 6: Marcar como procesado ANTES de cualquier operación ────────────
-  // Esto previene race conditions si Wompi envía el mismo webhook dos veces
-  // de forma simultánea (ambos pasarían la verificación de idempotencia si
-  // no se persiste primero).
-  await callbackRef.set({
-    wompiTransactionId: transactionId,
-    processedAt: FieldValue.serverTimestamp(),
-    result: status,
-  });
 
   // ── Paso 7: Obtener y validar el monto esperado de la compra ──────────────
   const purchaseRef = db.collection('purchases').doc(reference);

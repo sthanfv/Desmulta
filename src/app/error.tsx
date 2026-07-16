@@ -31,9 +31,10 @@ export default function Error({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          message: error.message,
-          digest: error.digest,
-          path: window.location.pathname + window.location.search,
+          // 🛡️ FIX H-4: truncar campos para evitar payloads de telemetría abusivos
+          message: (error.message || 'Error desconocido').substring(0, 500),
+          digest: error.digest?.substring(0, 50),
+          path: (window.location.pathname + window.location.search).substring(0, 256),
         }),
         keepalive: true,
       }).catch(() => {

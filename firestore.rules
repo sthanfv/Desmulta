@@ -117,7 +117,10 @@ service cloud.firestore {
     }
 
     match /pdf_tokens/{tokenId} {
-      allow get: if true;          // El cliente puede verificar si el token existe
+      // 🛡️ FIX H-16: El único lector legítimo es el Admin SDK de Next.js (/api/documentos/download),
+      // que ignora estas reglas por diseño. El SDK cliente NUNCA debe poder leer este documento.
+      // Antes era `allow get: if true` lo que permitía leer caseData (cédulas) con solo el tokenId.
+      allow get: if false;
       allow list: if false;
       allow write: if false;       // Solo Admin SDK (server-side)
     }

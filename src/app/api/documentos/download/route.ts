@@ -66,13 +66,20 @@ export async function GET(req: NextRequest) {
       const purchaseSnap = await db.collection('purchases').doc(tokenData.purchaseId).get();
       const purchase = purchaseSnap.data();
 
+      // 🛡️ FIX H-16: caseData se recupera desde purchases (colección protegida),
+      // ya que pdf_tokens ya no lo almacena para evitar PII en colección pública.
+      const caseData = purchase?.caseData;
+      if (!caseData) {
+        return new NextResponse('Datos del caso no encontrados en la compra', { status: 404 });
+      }
+
       payload = {
-        ...tokenData.caseData,
-        ticketNumber: tokenData.caseData?.ticketNumber ?? '',
-        licensePlate: tokenData.caseData?.licensePlate ?? '',
-        shortId: tokenData.caseData?.shortId ?? tokenData.purchaseId.slice(-6).toUpperCase(),
-        infractorName: tokenData.caseData?.infractorName ?? '',
-        infractorId: tokenData.caseData?.infractorId ?? '',
+        ...caseData,
+        ticketNumber: caseData?.ticketNumber ?? '',
+        licensePlate: caseData?.licensePlate ?? '',
+        shortId: caseData?.shortId ?? tokenData.purchaseId.slice(-6).toUpperCase(),
+        infractorName: caseData?.infractorName ?? '',
+        infractorId: caseData?.infractorId ?? '',
         documentType: tokenData.productType as DocumentType,
         operatorName: 'SISTEMA AUTOMATIZADO DESMULTA',
         operatorId: 'NIT 900.000.000-1',
@@ -80,7 +87,7 @@ export async function GET(req: NextRequest) {
           ? purchase.paidAt.toDate().toISOString()
           : new Date().toISOString(),
       };
-      filename = `Documento_Desmulta_${tokenData.caseData?.shortId || tokenData.purchaseId.slice(-8).toUpperCase()}.pdf`;
+      filename = `Documento_Desmulta_${caseData?.shortId || tokenData.purchaseId.slice(-8).toUpperCase()}.pdf`;
     } else if (refId) {
       // ── FLUJO 2: DESCARGA DIRECTA (PANTALLA DE CONFIRMACIÓN) ──
       const downloadToken = req.cookies.get(`dt_${refId}`)?.value;

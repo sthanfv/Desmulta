@@ -98,6 +98,19 @@ describe('🛡️ Rate Limiting — Configuración y Límites', () => {
     // Crash Report: 20 por 1 minuto
     expect(rateLimiters.crashReport.limiter.tokens).toBe(20);
     expect(rateLimiters.crashReport.limiter.window).toBe('1 m');
+
+    // 🛡️ Nuevas cubetas agregadas por auditoría
+    expect(rateLimiters.referral.limiter.tokens).toBe(3);
+    expect(rateLimiters.referral.limiter.window).toBe('10 m');
+
+    expect(rateLimiters.abandonment.limiter.tokens).toBe(5);
+    expect(rateLimiters.abandonment.limiter.window).toBe('1 h');
+
+    expect(rateLimiters.webPushRegister.limiter.tokens).toBe(5);
+    expect(rateLimiters.webPushRegister.limiter.window).toBe('1 h');
+
+    expect(rateLimiters.webPushRevoke.limiter.tokens).toBe(10);
+    expect(rateLimiters.webPushRevoke.limiter.window).toBe('1 h');
   });
 
   it('Debe mapear correctamente las llamadas clásicas a las nuevas cubetas', async () => {
@@ -112,17 +125,17 @@ describe('🛡️ Rate Limiting — Configuración y Límites', () => {
     await rateLimit('test-ip', 3, 600, 'qrRateLimits');
     expect(limitMock).toHaveBeenLastCalledWith('ratelimit:qr:test-ip');
 
-    // Referidos
+    // Referidos (mapea a referral, cubeta aislada)
     await rateLimit('test-ip', 5, 600, 'referidosCooldowns');
-    expect(limitMock).toHaveBeenLastCalledWith('ratelimit:referidos:test-ip');
+    expect(limitMock).toHaveBeenLastCalledWith('ratelimit:referral:test-ip');
 
     // Validar OTP
     await rateLimit('test-ip', 10, 60, 'validar_consulta_rl');
     expect(limitMock).toHaveBeenLastCalledWith('ratelimit:validarOtp:test-ip');
 
-    // Leads
+    // Leads (mapea a abandonment, cubeta aislada)
     await rateLimit('test-ip', 10, 60, 'abandonmentRateLimits');
-    expect(limitMock).toHaveBeenLastCalledWith('ratelimit:leads:test-ip');
+    expect(limitMock).toHaveBeenLastCalledWith('ratelimit:abandonment:test-ip');
 
     // Consultation
     await rateLimit('test-ip', 5, 60, 'consultationCooldowns');
@@ -144,12 +157,12 @@ describe('🛡️ Rate Limiting — Configuración y Límites', () => {
     await rateLimit('test-ip', 3, 60, 'telemetryCooldowns');
     expect(limitMock).toHaveBeenLastCalledWith('ratelimit:telemetry:test-ip');
 
-    // Web Push Register/Revoke -> vipAuth
+    // Web Push Register/Revoke -> cubetas aisladas
     await rateLimit('test-ip', 5, 60, 'web_push_register_rl');
-    expect(limitMock).toHaveBeenLastCalledWith('ratelimit:vipAuth:test-ip');
+    expect(limitMock).toHaveBeenLastCalledWith('ratelimit:webPushRegister:test-ip');
 
     await rateLimit('test-ip', 5, 60, 'web_push_revoke_rl');
-    expect(limitMock).toHaveBeenLastCalledWith('ratelimit:vipAuth:test-ip');
+    expect(limitMock).toHaveBeenLastCalledWith('ratelimit:webPushRevoke:test-ip');
 
     // Expediente Action -> operatorPin
     await rateLimit('test-ip', 5, 60, 'expediente_action_rl');

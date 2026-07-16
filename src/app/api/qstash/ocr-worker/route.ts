@@ -104,8 +104,15 @@ export async function POST(request: NextRequest) {
     ]);
 
     const rawRespuesta = result.response.text().trim();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let finalPayload: any = {};
+    interface GeminiOCRResult {
+      success: boolean;
+      error?: string;
+      message?: string;
+      resultados?: unknown[];
+      _meta?: { plan: string };
+    }
+    
+    let finalPayload: GeminiOCRResult = { success: false };
 
     if (
       rawRespuesta === 'NO_VALID_DOCUMENT' ||

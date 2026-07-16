@@ -4,7 +4,7 @@ import { logger } from 'firebase-functions';
 import { decryptSymmetric } from './crypto-utils';
 import { timingSafeEqual } from 'crypto';
 /**
- * telegramWebhook — CRM por Telegram v2.0
+ * telegramWebhook — CRM por Telegram v2.1
  *
  * Comandos disponibles:
  *   /resumen       — Estadísticas del día
@@ -15,6 +15,11 @@ import { timingSafeEqual } from 'crypto';
  *   [✅ Contactado] [🔍 En Estudio] [📋 Radicado] [❌ Descartar]
  *   Cada botón cambia el estado en Firestore Y notifica al cliente por email automáticamente
  *   (onCaseStatusChange ya se encarga del email — sin duplicar lógica)
+ *
+ * Seguridad:
+ *   - Verificación de secret con timingSafeEqual (anti timing attack)
+ *   - Allowlist de chat_id via TELEGRAM_CHAT_ID (H-14 Fix C)
+ *   - Token recibido NUNCA se loguea en texto plano
  */
 
 interface TelegramUpdate {
@@ -296,6 +301,22 @@ export const telegramWebhook = onRequest(
     }
 
     const db = admin.firestore();
+
+    // 🛡️ FIX H-14 (Fix C): Allowlist de chat_id.
+    // Cualquier chat (incluso privados de atacantes) que conozca el secret puede
+    // enviar comandos sin este control. Solo el grupo/canal configurado puede operar.
+    const authorizedChatId = Number(process.env.TELEGRAM_CHAT_ID);
+    const incomingChatId =
+      update.message?.chat.id ?? update.callback_query?.message?.chat.id;
+
+    if (!authorizedChatId || incomingChatId !== authorizedChatId) {
+      logger.warn('[telegramWebhook] Comando recibido de chat no autorizado — ignorando.', {
+        incomingChatId,
+        // NUNCA loguear authorizedChatId completo (evitar exposición del ID en logs)
+      });
+      res.status(200).send({ ok: true }); // Responder 200 a Telegram de todos modos
+      return;
+    }
 
     logger.info(`[telegramWebhook] Recibido ${req.method}`, { isString: typeof req.body === 'string' });
 

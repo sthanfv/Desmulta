@@ -1,6 +1,8 @@
 import { onRequest } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
 import puppeteer from 'puppeteer';
+import sanitizeHtml from 'sanitize-html';
+import { timingSafeEqual } from 'crypto';
 
 export const generatePdf = onRequest(
   {
@@ -10,10 +12,20 @@ export const generatePdf = onRequest(
     region: 'us-central1'
   },
   async (req, res) => {
-    // 1. Validar el secreto de autenticación para asegurar que solo nuestro Next.js lo llama
-    const authHeader = req.headers.authorization;
-    if (!authHeader || authHeader !== `Bearer ${process.env.PDF_API_SECRET}`) {
-      logger.error('Intento no autorizado a generatePdf', { ip: req.ip });
+    // 1. Validar el secreto de autenticación
+    // 🛡️ FIX H-15: timingSafeEqual previene timing attacks en la verificación del secreto.
+    // La comparación directa con `!==` permitía reconstruir el secreto bit a bit midiendo tiempos.
+    const authHeader = req.headers.authorization || '';
+    const pdfApiSecret = process.env.PDF_API_SECRET || '';
+    const expected = `Bearer ${pdfApiSecret}`;
+    const isAuthValid =
+      typeof authHeader === 'string' &&
+      authHeader.length === expected.length &&
+      pdfApiSecret.length > 0 &&
+      timingSafeEqual(Buffer.from(authHeader), Buffer.from(expected));
+
+    if (!isAuthValid) {
+      logger.error('[generatePdf] Intento no autorizado.', { ip: req.ip });
       res.status(401).json({ error: 'No autorizado' });
       return;
     }
@@ -25,10 +37,31 @@ export const generatePdf = onRequest(
 
     const { htmlContent } = req.body;
 
-    if (!htmlContent) {
-      res.status(400).json({ error: 'Falta htmlContent en el cuerpo de la petición' });
+    // 🛡️ FIX H-15: Rechazar payloads HTML excesivamente grandes (vector de DoS).
+    const MAX_HTML_BYTES = 500_000; // 500 KB
+    if (!htmlContent || Buffer.byteLength(htmlContent, 'utf8') > MAX_HTML_BYTES) {
+      res.status(400).json({ error: 'Contenido HTML inválido o demasiado grande.' });
       return;
     }
+
+    // 🛡️ FIX H-15: Sanitizar el HTML antes de pasarlo a Puppeteer.
+    // Sin sanitización, un atacante con el PDF_API_SECRET puede inyectar <script>
+    // que ejecute fetch() hacia metadata.google.internal y exfiltre el token del Service Account.
+    const htmlLimpio = sanitizeHtml(htmlContent, {
+      allowedTags: sanitizeHtml.defaults.allowedTags.concat([
+        'style', 'table', 'thead', 'tbody', 'tr', 'th', 'td',
+        'h1', 'h2', 'h3', 'p', 'ul', 'ol', 'li', 'strong', 'em', 'span', 'div',
+        'img', 'br', 'hr',
+      ]),
+      allowedAttributes: {
+        '*': ['style', 'class'],
+        'a': ['href'],
+        'img': ['src', 'alt', 'width', 'height'],
+      },
+      // Sin 'file://', 'http://', 'data:', 'javascript:' — solo HTTPS para recursos externos
+      allowedSchemes: ['https'],
+      disallowedTagsMode: 'discard',
+    });
 
     let browser = null;
     try {
@@ -48,8 +81,8 @@ export const generatePdf = onRequest(
         request.abort();
       });
 
-      // Establecer el contenido HTML
-      await page.setContent(htmlContent, {
+      // Establecer el contenido HTML ya sanitizado
+      await page.setContent(htmlLimpio, {
         waitUntil: 'domcontentloaded',
         timeout: 60000,
       });

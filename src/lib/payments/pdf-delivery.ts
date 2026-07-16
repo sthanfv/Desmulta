@@ -98,6 +98,9 @@ export async function generarYEnviarPDF(purchase: PurchaseDocument, db: Firestor
   });
 
   // 5. Crear token de descarga para el portal (válido 72h, máx 3 descargas)
+  // 🛡️ FIX H-16: NO guardar caseData en pdf_tokens (colección con allow get: if true).
+  // El endpoint de descarga recupera caseData desde purchases/{purchaseId} vía Admin SDK.
+  // Esto previene que cualquier poseedor del tokenId lea cédulas directamente desde el SDK cliente.
   const tokenId = randomBytes(24).toString('hex');
   await db
     .collection('pdf_tokens')
@@ -105,7 +108,7 @@ export async function generarYEnviarPDF(purchase: PurchaseDocument, db: Firestor
     .set({
       purchaseId,
       productType,
-      caseData,
+      // ❌ ELIMINADO: caseData — recuperar desde purchases en el momento de la descarga
       expiresAt: new Date(Date.now() + 72 * 60 * 60 * 1000),
       maxDownloads: 3,
       downloadCount: 0,
