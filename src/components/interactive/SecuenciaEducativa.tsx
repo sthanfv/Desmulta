@@ -261,52 +261,68 @@ export function SecuenciaEducativa({ infoList, onClose }: SecuenciaEducativaProp
             </m.div>
           </AnimatePresence>
 
-          {/* Barra de navegación secuencial (solo con múltiples multas) */}
-          {hayMultiples && (
-            <div className="flex items-center justify-between gap-3 px-5 py-4 border-t border-white/8 bg-white/[0.02]">
-              {/* Botón Anterior */}
-              <button
-                id="btn-anterior-educativa"
-                onClick={handleAnterior}
-                disabled={esPrimera}
-                className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all active:scale-95 ${
-                  esPrimera
-                    ? 'opacity-0 pointer-events-none'
-                    : 'bg-white/8 hover:bg-white/15 text-white/60 hover:text-white border border-white/10'
-                }`}
-                aria-label="Ver infracción anterior"
-              >
-                <ChevronLeft size={14} />
-                Anterior
-              </button>
+          {/* Barra de navegación secuencial o de confirmación de lectura */}
+          <div className="flex items-center justify-between gap-3 px-5 py-4 border-t border-white/8 bg-white/[0.02]">
+            {hayMultiples ? (
+              <>
+                {/* Botón Anterior */}
+                <button
+                  id="btn-anterior-educativa"
+                  onClick={handleAnterior}
+                  disabled={esPrimera}
+                  className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all active:scale-95 ${
+                    esPrimera
+                      ? 'opacity-0 pointer-events-none'
+                      : 'bg-white/8 hover:bg-white/15 text-white/60 hover:text-white border border-white/10'
+                  }`}
+                  aria-label="Ver infracción anterior"
+                >
+                  <ChevronLeft size={14} />
+                  Anterior
+                </button>
 
-              {/* Botón Siguiente / Listo */}
+                {/* Botón Siguiente / Listo */}
+                <button
+                  id="btn-siguiente-educativa"
+                  onClick={handleSiguiente}
+                  className={`flex items-center gap-1.5 px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all active:scale-95 shadow-lg ${
+                    esUltima
+                      ? 'bg-green-500/20 hover:bg-green-500/30 text-green-300 border border-green-500/30 shadow-green-500/10'
+                      : 'bg-primary text-black border border-primary/80 shadow-primary/20 hover:bg-primary/90'
+                  }`}
+                  aria-label={
+                    esUltima ? 'Cerrar resumen de infracciones' : 'Ver siguiente infracción'
+                  }
+                >
+                  {esUltima ? (
+                    <>
+                      <CheckCircle2 size={14} />
+                      Listo, continuar
+                    </>
+                  ) : (
+                    <>
+                      Siguiente
+                      <ChevronRight size={14} />
+                    </>
+                  )}
+                </button>
+              </>
+            ) : (
+              /* Caso de una sola multa: botón de confirmación de lectura principal de ancho completo */
               <button
-                id="btn-siguiente-educativa"
-                onClick={handleSiguiente}
-                className={`flex items-center gap-1.5 px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all active:scale-95 shadow-lg ${
-                  esUltima
-                    ? 'bg-green-500/20 hover:bg-green-500/30 text-green-300 border border-green-500/30 shadow-green-500/10'
-                    : 'bg-primary text-black border border-primary/80 shadow-primary/20 hover:bg-primary/90'
-                }`}
-                aria-label={
-                  esUltima ? 'Cerrar resumen de infracciones' : 'Ver siguiente infracción'
-                }
+                id="btn-entendido-educativa"
+                onClick={() => {
+                  Haptics.success();
+                  onClose();
+                }}
+                className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-xs font-black uppercase tracking-widest bg-primary text-black border border-primary/80 shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-[0.98]"
+                aria-label="Confirmar lectura y habilitar envío"
               >
-                {esUltima ? (
-                  <>
-                    <CheckCircle2 size={14} />
-                    Listo
-                  </>
-                ) : (
-                  <>
-                    Siguiente
-                    <ChevronRight size={14} />
-                  </>
-                )}
+                <CheckCircle2 size={14} />
+                Entendido, continuar
               </button>
-            </div>
-          )}
+            )}
+          </div>
         </m.div>
       </AnimatePresence>
     </LazyMotion>
