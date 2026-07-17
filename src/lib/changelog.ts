@@ -61,8 +61,39 @@ export const TAG_ICONS: Record<ChangeTag, string> = {
 // ═══════════════════════════════════════════════════════════════════════
 export const changelogHistory: ChangelogRelease[] = [
   {
+    version: '1.1.0',
+    date: '',
+    title: 'Catálogo de Defensa y Directorio de Tránsito',
+    changes: [
+      {
+        tag: 'NUEVA FUNCIÓN',
+        text: 'Adquisición de Recursos de Defensa: Catálogo de plantillas jurídicas profesionales y personalizadas (prescripciones, fotomultas, tutelas) listas para descargar tras pago digital seguro.',
+      },
+      {
+        tag: 'NUEVA FUNCIÓN',
+        text: 'Directorio de Tránsito Inteligente: Ubicación y selección automática de los datos oficiales de contacto de las Secretarías de Movilidad de Colombia directamente en tu formulario.',
+      },
+      {
+        tag: 'NUEVA FUNCIÓN',
+        text: 'Panel de Novedades Educativas: Botón de lectura rápida en la explicación de multas del SIMIT para avanzar ágilmente en tu consulta.',
+      },
+      {
+        tag: 'OPTIMIZACIÓN',
+        text: 'Noticias y Novedades del Tránsito: Canal automático con artículos informativos para estar al día sobre fotomultas, embargos y nuevas leyes de movilidad.',
+      },
+      {
+        tag: 'OPTIMIZACIÓN',
+        text: 'CRM Interactivo para Asesores: Integración de notificaciones en tiempo real en la plataforma de asistencia para que nuestro equipo atienda tus solicitudes en segundos.',
+      },
+      {
+        tag: 'SEGURIDAD',
+        text: 'Protección de Datos Personales (Cero-Fugas): Cifrado digital hermético de tu información privada y sensible durante todo el proceso de análisis.',
+      },
+    ],
+  },
+  {
     version: '1.0.0',
-    date: '18 May 2026',
+    date: '',
     title: '¡Te damos la bienvenida a Desmulta!',
     changes: [
       {

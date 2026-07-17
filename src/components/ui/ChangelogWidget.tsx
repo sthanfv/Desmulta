@@ -114,9 +114,11 @@ export function ChangelogWidget({ usePortal = false }: { usePortal?: boolean }) 
                           <span className="text-xs font-bold text-gray-800 dark:text-zinc-200">
                             v{release.version}
                           </span>
-                          <span className="text-[10px] text-gray-400 dark:text-zinc-500 font-medium">
-                            {release.date}
-                          </span>
+                          {release.date && (
+                            <span className="text-[10px] text-gray-400 dark:text-zinc-500 font-medium">
+                              {release.date}
+                            </span>
+                          )}
                         </div>
                         <span className="text-[11px] text-gray-500 dark:text-zinc-400 font-medium mt-0.5">
                           {release.title}
