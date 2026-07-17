@@ -103,7 +103,7 @@ export default function CalculadoraPage() {
             href="/documentos/generador/peticion-general"
             className="inline-flex items-center justify-center gap-3 bg-black text-yellow-400 font-extrabold text-xl py-5 px-10 rounded-full hover:bg-zinc-900 transition-colors"
           >
-            Generar Petición por $14.900 <ArrowRight className="w-6 h-6" />
+            Generar Petición por $20.000 <ArrowRight className="w-6 h-6" />
           </Link>
           <p className="mt-4 text-sm font-bold text-black/60">
             Entrega Inmediata en PDF. Listo para radicar.

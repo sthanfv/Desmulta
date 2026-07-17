@@ -11,8 +11,9 @@
   - **[Backend - Precios Centralizados]**: En `src/lib/payments/product-prices.ts`, se actualizaron los precios oficiales (en centavos) de la aplicación para que correspondan exactamente con los precios de venta que ve el usuario en el listado de plantillas (peticion_general = $14.900, doble_prescripcion = $34.900, etc.).
   - **[Backend - Integración]**: En `src/app/api/payments/create-order/route.ts`, se eliminó la constante redundante `PRODUCT_PRICES` que contenía precios antiguos/incorrectos (ej. $45.000 para doble prescripción) y se importó la fuente de verdad `@/lib/payments/product-prices`.
   - **[Frontend - Calibración]**:
-    - En `src/app/calculadora/page.tsx`, se actualizó la llamada a la acción de "$25.000" a "$14.900" (precio de la petición general).
+    - En `src/app/calculadora/page.tsx`, se actualizó la llamada a la acción de "$25.000" a "$20.000" (precio de la petición general).
     - En `src/app/documentos/generador/[slug]/page.tsx`, se configuró un diccionario de precios fallback locales dinámicos por slug en caso de fallos de red en el cliente, reemplazando el fallback estático genérico de "$25.000" que provocaba discrepancias visuales al pagar.
+    - En `src/components/sections/Hero.tsx`, se actualizaron los precios estáticos de las cartas rotantes `CardSwap` para reflejar la escala neta cerrada ($20k, $30k, $60k, $40k, $25k).
 - **Por qué cambió:**
   - El usuario detectó una inconsistencia crítica de negocio: el frontend mostraba precios (ej. $34.900 por doble prescripción) pero al abrir el checkout de Wompi se le cobraba un valor diferente ($45.000). Esto se debía a que no se estaba importando el diccionario central en la creación de órdenes y los fallbacks del frontend no estaban alineados.
 - **Archivos afectados:**
@@ -20,6 +21,7 @@
   - `src/app/api/payments/create-order/route.ts` [MODIFICADO]
   - `src/app/calculadora/page.tsx` [MODIFICADO]
   - `src/app/documentos/generador/[slug]/page.tsx` [MODIFICADO]
+  - `src/components/sections/Hero.tsx` [MODIFICADO]
 - **Estado actual:** ✅ Corregido y alineado.
 
 ## 2026-07-16: Corrección UX/UI — Apertura de Web Checkout de Wompi en Pestaña Nueva

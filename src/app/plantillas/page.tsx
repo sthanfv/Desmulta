@@ -46,7 +46,7 @@ const TEMPLATE_CARDS = [
     description: 'Solicitud formal para indagar sobre comparendos, prescripción y nulidad básica.',
     badge: 'Uso General',
     exito: '95%',
-    precio: '$14.900',
+    precio: '$20.000',
   },
   {
     id: 'prescripcion_directa',
@@ -54,7 +54,7 @@ const TEMPLATE_CARDS = [
     description: 'Para comparendos con más de 3 años sin que se haya emitido mandamiento de pago.',
     badge: 'Popular',
     exito: '98%',
-    precio: '$24.900',
+    precio: '$30.000',
   },
   {
     id: 'doble_prescripcion',
@@ -62,7 +62,7 @@ const TEMPLATE_CARDS = [
     description: 'Para deudas en cobro coactivo que llevan más de 5 años adicionales congeladas.',
     badge: 'Especializada',
     exito: '94%',
-    precio: '$34.900',
+    precio: '$60.000',
   },
   {
     id: 'nulidad_notificacion',
@@ -70,7 +70,7 @@ const TEMPLATE_CARDS = [
     description: 'Nulidad de fotomultas por no notificación personal (Sentencia C-038/2020).',
     badge: 'Fotomultas',
     exito: '96%',
-    precio: '$29.900',
+    precio: '$40.000',
   },
   {
     id: 'tutela_silencio',
@@ -79,7 +79,7 @@ const TEMPLATE_CARDS = [
       'Acción Constitucional cuando Tránsito no responde tu petición en 15 días hábiles.',
     badge: 'Urgente',
     exito: '99%',
-    precio: '$19.900',
+    precio: '$25.000',
   },
 ];
 
@@ -144,7 +144,7 @@ export default function PlantillasPage() {
           </Link>
         </div>
 
-        <div className="text-center mb-16">
+        <div className="text-center mb-12">
           <ShieldCheck className="w-16 h-16 text-slate-900 dark:text-zinc-100 mx-auto mb-6" />
           <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-zinc-100 mb-4 tracking-tight">
             Documentos de Defensa
@@ -153,6 +153,21 @@ export default function PlantillasPage() {
             Escoge el recurso legal que se adapte a tu caso, completa tus datos en tiempo real y
             descarga tu defensa elaborada profesionalmente.
           </p>
+        </div>
+
+        {/* Banner de Disclaimer Legal Obligatorio */}
+        <div className="max-w-4xl mx-auto mb-16 p-6 bg-yellow-500/5 dark:bg-yellow-400/5 border border-yellow-500/20 dark:border-yellow-400/20 rounded-3xl flex flex-col md:flex-row gap-4 items-start relative z-10 shadow-lg">
+          <div className="p-3 bg-yellow-500/10 dark:bg-yellow-400/10 rounded-xl text-yellow-600 dark:text-yellow-400 shrink-0">
+            <ShieldCheck className="w-6 h-6" />
+          </div>
+          <div className="text-left">
+            <h4 className="font-black text-slate-950 dark:text-yellow-400 text-sm uppercase tracking-widest mb-1.5">
+              Aviso de Alcance Legal y Responsabilidad
+            </h4>
+            <p className="text-xs md:text-sm text-slate-600 dark:text-zinc-400 leading-relaxed font-medium">
+              Los documentos disponibles en esta plataforma son herramientas técnicas estructuradas para ejercer formalmente tu derecho a la defensa y debido proceso bajo la legislación colombiana (Ley 769 de 2002 y Ley 1437 de 2011). La generación y descarga de estas peticiones no garantiza por sí sola la exoneración o eliminación inmediata de la multa del SIMIT, ya que la decisión definitiva depende de forma exclusiva de la Secretaría de Tránsito correspondiente y de los hechos de tu caso.
+            </p>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

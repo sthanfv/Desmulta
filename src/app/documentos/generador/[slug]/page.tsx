@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, use } from 'react';
-import { ShieldCheck, Lock, FileText, Loader2, ChevronDown } from 'lucide-react';
+import { ShieldCheck, ShieldAlert, Lock, FileText, Loader2, ChevronDown } from 'lucide-react';
 import { useExpedienteStore } from '@/store/useExpedienteStore';
 import { useRouter } from 'next/navigation';
 import {
@@ -94,14 +94,13 @@ export default function GeneradorDinamico({ params }: GeneradorDinamicoProps) {
   useEffect(() => {
     if (!tmpl) return;
     const FALLBACK_PRICES: Record<string, string> = {
-      peticion_general: '$14.900',
-      prescripcion_directa: '$24.900',
-      doble_prescripcion: '$34.900',
-      nulidad_notificacion: '$29.900',
-      tutela_silencio: '$19.900',
-      poder_especial: '$14.900',
-      caducidad_1_anio: '$29.900',
-      nulidad_falta_identidad: '$24.900',
+      peticion_general: '$20.000',
+      prescripcion_directa: '$30.000',
+      doble_prescripcion: '$60.000',
+      nulidad_notificacion: '$40.000',
+      tutela_silencio: '$25.000',
+      caducidad_1_anio: '$30.000',
+      nulidad_falta_identidad: '$35.000',
     };
 
     fetch('/api/payments/prices')
@@ -490,10 +489,23 @@ export default function GeneradorDinamico({ params }: GeneradorDinamicoProps) {
         </div>
 
         <div className="mt-8 pt-6 border-t border-slate-100 bg-white">
+          {/* Alerta de Disclaimer Legal Obligatorio */}
+          <div className="mb-6 p-4 bg-yellow-500/5 border border-yellow-500/20 rounded-2xl flex gap-3 items-start text-left shadow-sm">
+            <ShieldAlert className="w-5 h-5 text-yellow-600 dark:text-yellow-400 shrink-0 mt-0.5" />
+            <div>
+              <h5 className="font-black text-[11px] text-yellow-700 dark:text-yellow-400 uppercase tracking-widest mb-1.5">
+                Aviso de Alcance Legal
+              </h5>
+              <p className="text-[11px] text-slate-500 dark:text-zinc-400 leading-relaxed font-medium">
+                Esta petición inicia un trámite de defensa formal. La decisión de exonerar o eliminar la multa depende de forma exclusiva de la Secretaría de Tránsito y de los hechos de tu caso. Desmulta no garantiza ni puede asegurar un resultado positivo del 100% de la radicación.
+              </p>
+            </div>
+          </div>
+
           <div className="flex justify-between items-center mb-4">
             <span className="text-sm font-bold text-slate-600">Total a pagar:</span>
             {precioDisplay ? (
-              <span className="text-2xl font-black text-slate-900">{precioDisplay} COP</span>
+              <span className="text-2xl font-black text-slate-900">{precioDisplay}</span>
             ) : (
               <span className="text-2xl font-black text-slate-400 animate-pulse">Cargando...</span>
             )}

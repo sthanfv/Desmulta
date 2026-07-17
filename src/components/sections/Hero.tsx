@@ -255,7 +255,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
                         95% Éxito
                       </span>
                       <span className="text-xs text-zinc-500 dark:text-zinc-400 font-bold">
-                        $14.900
+                        $20.000
                       </span>
                     </div>
                     <h4 className="text-xs font-bold text-zinc-800 dark:text-zinc-200">
@@ -303,7 +303,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
                         98% Éxito
                       </span>
                       <span className="text-xs text-zinc-500 dark:text-zinc-400 font-bold">
-                        $24.900
+                        $30.000
                       </span>
                     </div>
                     <h4 className="text-xs font-bold text-zinc-800 dark:text-zinc-200">
@@ -351,7 +351,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
                         94% Éxito
                       </span>
                       <span className="text-xs text-zinc-500 dark:text-zinc-400 font-bold">
-                        $34.900
+                        $60.000
                       </span>
                     </div>
                     <h4 className="text-xs font-bold text-zinc-800 dark:text-zinc-200">
@@ -399,7 +399,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
                         96% Éxito
                       </span>
                       <span className="text-xs text-zinc-500 dark:text-zinc-400 font-bold">
-                        $29.900
+                        $40.000
                       </span>
                     </div>
                     <h4 className="text-xs font-bold text-zinc-800 dark:text-zinc-200">
@@ -447,7 +447,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
                         99% Éxito
                       </span>
                       <span className="text-xs text-zinc-500 dark:text-zinc-400 font-bold">
-                        $19.900
+                        $25.000
                       </span>
                     </div>
                     <h4 className="text-xs font-bold text-zinc-800 dark:text-zinc-200">

@@ -38,7 +38,6 @@ const schema = z.object({
     'doble_prescripcion',
     'nulidad_notificacion',
     'tutela_silencio',
-    'poder_especial',
     'caducidad_1_anio',
     'nulidad_falta_identidad',
   ]),
