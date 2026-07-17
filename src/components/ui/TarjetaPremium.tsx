@@ -2,7 +2,7 @@
 
 import { MouseEvent, useRef } from 'react';
 
-interface TarjetaPremiumProps {
+interface TarjetaPremiumProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
   className?: string;
   onClick?: () => void;
@@ -25,6 +25,7 @@ export function TarjetaPremium({
   onClick,
   style,
   id,
+  ...props
 }: TarjetaPremiumProps) {
   const divRef = useRef<HTMLDivElement>(null);
 
@@ -49,6 +50,7 @@ export function TarjetaPremium({
       onClick={onClick}
       style={style}
       className={`card-elevated relative overflow-hidden bg-card border border-border rounded-3xl group transition-colors duration-300 ${className}`}
+      {...props}
     >
       {/* Efecto Linterna (Solo en PC con puntero real para optimizar móvil) */}
       <div

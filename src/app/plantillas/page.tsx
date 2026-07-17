@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   ShieldCheck,
   FileText,
@@ -11,6 +12,9 @@ import {
   Scale,
   FileClock,
   XOctagon,
+  Info,
+  Lightbulb,
+  X,
 } from 'lucide-react';
 import { DocumentType } from '@/lib/legal/document-templates';
 import { TarjetaPremium } from '@/components/ui/TarjetaPremium';
@@ -44,6 +48,7 @@ const TEMPLATE_CARDS = [
     id: 'peticion_general',
     title: 'Petición Pruebas y Trazabilidad',
     description: 'Solicitud formal para indagar sobre comparendos, prescripción y nulidad básica.',
+    scenario: 'Úsala como primer paso si sabes que tienes multas pendientes pero desconoces si te notificaron correctamente. Te permite recolectar los soportes y pruebas oficiales para armar tu defensa sin asumir riesgos.',
     badge: 'Uso General',
     exito: '95%',
     precio: '$20.000',
@@ -52,6 +57,7 @@ const TEMPLATE_CARDS = [
     id: 'prescripcion_directa',
     title: 'Prescripción 3 Años (Sin Mandamiento)',
     description: 'Para comparendos con más de 3 años sin que se haya emitido mandamiento de pago.',
+    scenario: 'Aplica si tus multas tienen más de 3 años de antigüedad y la Secretaría de Tránsito NUNCA inició un proceso de cobro coactivo (embargo o mandamiento de pago). Solicita la exoneración directa por vencimiento de plazo inicial.',
     badge: 'Popular',
     exito: '98%',
     precio: '$30.000',
@@ -60,6 +66,7 @@ const TEMPLATE_CARDS = [
     id: 'doble_prescripcion',
     title: 'Prescripción Absoluta 6+ Años',
     description: 'Para deudas en cobro coactivo que llevan más de 5 años adicionales congeladas.',
+    scenario: 'El recurso definitivo si tu deudada ya está en cobro coactivo o embargada. Si pasaron más de 5 años desde que el tránsito dictó el mandamiento de pago (típicamente sumando 6 años en total desde el comparendo), la ley obliga a borrar la deuda.',
     badge: 'Especializada',
     exito: '94%',
     precio: '$60.000',
@@ -68,6 +75,7 @@ const TEMPLATE_CARDS = [
     id: 'nulidad_notificacion',
     title: 'Nulidad Fotomultas (Indebida Notificación)',
     description: 'Nulidad de fotomultas por no notificación personal (Sentencia C-038/2020).',
+    scenario: 'Perfecta para cámaras de fotodetección. Úsala si el tránsito te cargó una fotomulta sin enviarte la citación física a tu dirección del RUNT dentro de los 13 días hábiles posteriores, violando tu derecho a defenderte.',
     badge: 'Fotomultas',
     exito: '96%',
     precio: '$40.000',
@@ -77,6 +85,7 @@ const TEMPLATE_CARDS = [
     title: 'Acción de Tutela (Silencio de Tránsito)',
     description:
       'Acción Constitucional cuando Tránsito no responde tu petición en 15 días hábiles.',
+    scenario: 'Úsala si ya enviaste un derecho de petición y el organismo de tránsito guardó silencio por más de 15 días hábiles. Este recurso constitucional obliga a un juez a ordenarles responderte de forma inmediata en 48 horas.',
     badge: 'Urgente',
     exito: '99%',
     precio: '$25.000',
@@ -85,6 +94,7 @@ const TEMPLATE_CARDS = [
 
 export default function PlantillasPage() {
   const [prices, setPrices] = useState<Record<string, { display: string }> | null>(null);
+  const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
 
   useEffect(() => {
     fetch('/api/payments/prices')
@@ -174,13 +184,38 @@ export default function PlantillasPage() {
           {TEMPLATE_CARDS.map((tpl) => (
             <TarjetaPremium
               key={tpl.id}
-              className="p-8 flex flex-col h-full bg-white dark:bg-[#15131A] border border-slate-200 dark:border-zinc-800 rounded-[2rem] min-h-[420px]"
+              className="p-8 flex flex-col h-full bg-white dark:bg-[#15131A] border border-slate-200 dark:border-zinc-800 rounded-[2rem] min-h-[440px] relative transition-all duration-500 hover:-translate-y-3 hover:shadow-[0_20px_50px_rgba(245,193,7,0.06)] hover:border-primary/30"
+              onMouseEnter={() => {
+                if (window.innerWidth >= 768) {
+                  setActiveTooltip(tpl.id);
+                }
+              }}
+              onMouseLeave={() => {
+                if (window.innerWidth >= 768) {
+                  setActiveTooltip(null);
+                }
+              }}
             >
+              {/* Botón de Información visible en móvil (táctil para abrir/cerrar) */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setActiveTooltip(activeTooltip === tpl.id ? null : tpl.id);
+                }}
+                className="absolute top-6 right-6 z-30 p-2.5 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-zinc-950/60 dark:hover:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-slate-500 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-primary transition-all duration-300 md:hidden flex items-center justify-center shadow-md active:scale-90"
+                aria-label="Ver escenario de uso"
+              >
+                <Info size={15} />
+              </button>
+
               <div className="flex items-start justify-between mb-8 relative z-10">
                 <div className="p-3 bg-slate-50 dark:bg-zinc-900/50 rounded-xl group-hover:bg-blue-50 dark:group-hover:bg-primary/10 transition-colors">
                   {getIconForDoc(tpl.id as DocumentType)}
                 </div>
-                <span className="px-3 py-1 bg-slate-100 dark:bg-zinc-900/80 text-slate-600 dark:text-zinc-300 text-xs font-bold rounded-full border border-slate-200 dark:border-zinc-800">
+                {/* Ocultamos el badge si está abierto el tooltip en móvil para evitar encimamiento */}
+                <span className="px-3 py-1 bg-slate-100 dark:bg-zinc-900/80 text-slate-600 dark:text-zinc-300 text-xs font-bold rounded-full border border-slate-200 dark:border-zinc-800 md:block hidden">
                   {tpl.badge}
                 </span>
               </div>
@@ -218,6 +253,65 @@ export default function PlantillasPage() {
                 Redactar Documento
                 <ArrowRight className="w-4 h-4" />
               </Link>
+
+              {/* Capa Explicativa / Tooltip Overlay (Premium) */}
+              <AnimatePresence>
+                {activeTooltip === tpl.id && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 15 }}
+                    transition={{ duration: 0.25, ease: 'easeOut' }}
+                    className="absolute inset-0 z-20 p-8 rounded-[2rem] bg-slate-950/95 dark:bg-black/95 backdrop-blur-xl border-2 border-primary/30 flex flex-col justify-between"
+                  >
+                    {/* Botón de cerrar explícito en la capa (móvil y PC) */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setActiveTooltip(null);
+                      }}
+                      className="absolute top-6 right-6 p-2.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white transition-all active:scale-90"
+                      aria-label="Cerrar explicación"
+                    >
+                      <X size={15} />
+                    </button>
+
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-2 text-primary">
+                        <Lightbulb className="w-5 h-5 text-yellow-400 animate-pulse" />
+                        <span className="text-[10px] font-black uppercase tracking-widest text-yellow-400 font-mono">
+                          ¿Cuándo usar este recurso?
+                        </span>
+                      </div>
+                      <h4 className="text-xl font-bold text-white font-serif tracking-tight leading-snug">
+                        {tpl.title}
+                      </h4>
+                      <p className="text-xs md:text-sm text-zinc-300 leading-relaxed font-medium">
+                        {tpl.scenario}
+                      </p>
+                    </div>
+
+                    <div className="pt-4 border-t border-white/10 flex items-center justify-between">
+                      <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-widest">
+                        {tpl.exito} efectividad promedio
+                      </span>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setActiveTooltip(null);
+                        }}
+                        className="px-4 py-2 bg-primary hover:bg-primary/95 text-black text-xs font-black uppercase tracking-wider rounded-xl transition-all active:scale-95 shadow-md shadow-primary/10"
+                      >
+                        Entendido
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </TarjetaPremium>
           ))}
         </div>
