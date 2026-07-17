@@ -304,15 +304,24 @@ export const telegramWebhook = onRequest(
 
     // 🛡️ FIX H-14 (Fix C): Allowlist de chat_id.
     // Cualquier chat (incluso privados de atacantes) que conozca el secret puede
-    // enviar comandos sin este control. Solo el grupo/canal configurado puede operar.
-    const authorizedChatId = Number(process.env.TELEGRAM_CHAT_ID);
+    // enviar comandos sin este control. Soportamos múltiples IDs separados por comas.
+    const parseAllowedIds = (envVal: string | undefined): number[] => {
+      if (!envVal) return [];
+      return envVal.split(',').map((val) => Number(val.trim())).filter((val) => !isNaN(val));
+    };
+
+    const allowedIds = [
+      ...parseAllowedIds(process.env.TELEGRAM_CHAT_ID),
+      ...parseAllowedIds(process.env.TELEGRAM_DEV_CHAT_ID),
+      ...parseAllowedIds(process.env.TELEGRAM_SECURITY_CHAT_ID),
+    ];
+
     const incomingChatId =
       update.message?.chat.id ?? update.callback_query?.message?.chat.id;
 
-    if (!authorizedChatId || incomingChatId !== authorizedChatId) {
+    if (allowedIds.length === 0 || !incomingChatId || !allowedIds.includes(incomingChatId)) {
       logger.warn('[telegramWebhook] Comando recibido de chat no autorizado — ignorando.', {
         incomingChatId,
-        // NUNCA loguear authorizedChatId completo (evitar exposición del ID en logs)
       });
       res.status(200).send({ ok: true }); // Responder 200 a Telegram de todos modos
       return;

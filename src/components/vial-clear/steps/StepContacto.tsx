@@ -424,23 +424,6 @@ export default function StepContacto({
                       onChange={(e) => field.onChange(formatPhone(e.target.value))}
                       onBlur={(e) => {
                         field.onBlur();
-                        const rawPhone = e.target.value.replace(/\D/g, '');
-                        const isValidColPhone = /^3[0-9]{9}$/.test(rawPhone);
-                        if (isValidColPhone) {
-                          fetch('/api/abandonment', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                              contacto: rawPhone,
-                              accion: 'ping',
-                              fcmToken,
-                            }),
-                          }).catch((e: unknown) => {
-                            if (process.env.NODE_ENV !== 'production') {
-                              console.debug('[telemetry-ping] fallo silencioso:', e);
-                            }
-                          });
-                        }
                       }}
                       className={cn(
                         'w-full bg-background border-border/50 rounded-2xl pl-12 h-16 text-lg font-medium shadow-Inner',
