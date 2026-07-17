@@ -17,11 +17,13 @@
     - En `src/components/vial-clear/steps/StepContacto.tsx`, se eliminó el fetch a `/api/abandonment` que se ejecutaba en el evento `onBlur` del campo de teléfono. Esto causaba el envío instantáneo de notificaciones push de abandono al celular del usuario mientras todavía estaba interactuando con el resto del formulario, haciéndolo extremadamente agresivo.
     - En `functions/src/telegramWebhook.ts`, se flexibilizó el allowlist de `chat_id` para parsear listas de IDs separadas por comas en las variables `TELEGRAM_CHAT_ID`, `TELEGRAM_DEV_CHAT_ID` y `TELEGRAM_SECURITY_CHAT_ID`. Esto soluciona el problema de inactividad de los botones interactivos cuando se presionan desde un chat directo privado del administrador en lugar de un canal grupal.
     - En `src/components/interactive/SecuenciaEducativa.tsx`, se inyectó una barra de acciones inferior con un botón principal de confirmación de lectura ("Entendido, continuar") que permite cerrar el panel educativo de forma intuitiva, lo cual a su vez desbloquea el flujo y activa el botón de enviar consulta en el formulario padre.
+    - En `src/lib/changelog.ts` y `src/components/ui/ChangelogWidget.tsx`, se actualizó el listado oficial de novedades a la versión `v1.1.0` incorporando todas las características ciudadanas (carrusel de multas, catálogo de plantillas, protección PII de datos y directorio de tránsito). Asimismo, se silenciaron visualmente las fechas del panel de novedades para evitar exponer fechas estáticas obsoletas.
 - **Por qué cambió:**
   - El usuario detectó una inconsistencia crítica de negocio: el frontend mostraba precios (ej. $34.900 por doble prescripción) pero al abrir el checkout de Wompi se le cobraba un valor diferente ($45.000). Esto se debía a que no se estaba importando el diccionario central en la creación de órdenes y los fallbacks del frontend no estaban alineados.
   - El usuario reportó que el aviso push de inactividad aparecía instantáneamente al escribir su teléfono en el input de WhatsApp en el modo SIMIT.
   - El usuario reportó que los botones interactivos de la tarjeta de Telegram no ejecutaban ningún cambio de estado al ser presionados en el chat privado con el bot.
   - El usuario reportó que se quedaba bloqueado en la tarjeta de explicación pedagógica de multas sin saber que tenía que cerrarla (haciendo clic en una pequeña X superior) para que el botón de enviar consulta se habilitara.
+  - El usuario solicitó actualizar el registro de novedades (changelog) a las nuevas funciones del sistema y remover la visualización de fechas en el widget.
 - **Archivos afectados:**
   - `src/lib/payments/product-prices.ts` [MODIFICADO]
   - `src/app/api/payments/create-order/route.ts` [MODIFICADO]
@@ -31,6 +33,8 @@
   - `src/components/vial-clear/steps/StepContacto.tsx` [MODIFICADO]
   - `functions/src/telegramWebhook.ts` [MODIFICADO]
   - `src/components/interactive/SecuenciaEducativa.tsx` [MODIFICADO]
+  - `src/lib/changelog.ts` [MODIFICADO]
+  - `src/components/ui/ChangelogWidget.tsx` [MODIFICADO]
 - **Estado actual:** ✅ Corregido y alineado.
 
 ## 2026-07-16: Corrección UX/UI — Apertura de Web Checkout de Wompi en Pestaña Nueva
