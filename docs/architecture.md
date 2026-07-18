@@ -113,7 +113,7 @@ onCaseStatusChange          onConsultationStatusChange
 | Validación | Zod en todos los endpoints | Cada `route.ts` |
 | Upload | Magic bytes + MIME whitelist + 10MB | `src/app/api/upload/route.ts` |
 | Anti-bot | Cloudflare Turnstile server-side | `src/lib/turnstile.ts` |
-| Cifrado | RSA E2EE formulario + SHA-256 PII | `src/lib/encryption.ts` |
+| Cifrado | RSA E2EE formulario + PBKDF2 (600k iteraciones) + AES-256-GCM para PII en reposo | `src/lib/security/server-crypto.ts` |
 
 ### Excepciones de Seguridad Conocidas
 *   **style-src unsafe-inline (CSP):** Se permite la directiva `'unsafe-inline'` en `style-src` debido a los requerimientos de hidratación dinámica de Framer Motion y Tailwind CSS en Next.js. Es una excepción aceptada en beneficio del dinamismo visual de la interfaz de usuario de cara al cliente y en ausencia de un motor de hashes/nonces dinámicos a tiempo de compilación.
@@ -151,6 +151,8 @@ TELEGRAM_CHAT_ID=...
 INTERNAL_API_SECRET=...          # Para /api/internal/purge-blob
 BLOB_READ_WRITE_TOKEN=...        # Vercel Blob
 NEXT_PUBLIC_VAPID_KEY=...        # Push notifications web
+PII_ENCRYPTION_KEY=...           # Clave simétrica primaria para cifrado AES
+PII_ENCRYPTION_SALT=...          # Semilla hexadecimal (64 chars) para PBKDF2
 ```
 
 ### Firebase Secrets (Cloud Functions)
