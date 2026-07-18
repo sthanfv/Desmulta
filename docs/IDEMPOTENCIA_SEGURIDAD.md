@@ -31,17 +31,29 @@ En el flujo de checkout y compra del Derecho de Petición:
 
 Si un cliente lograra evadir la protección del frontend, el backend de Desmulta aplica idempotencia estricta en la generación de transacciones con la pasarela de pagos.
 
-### A. Referencia Única Determinista (`create-order/route.ts`)
-Cada solicitud de checkout en el endpoint `/api/payments/create-order` genera un identificador de referencia único global (`wompiReference`):
+### A. Referencia Única de Alta Entropía (`create-order/route.ts`)
+Cada solicitud de checkout en el endpoint `/api/payments/create-order` genera un identificador de referencia único global (`wompiReference`) de alta entropía:
 ```typescript
-const wompiReference = `DSM-${shortId}-${timestamp}`;
+const wompiReference = `DSM-${randomUUID()}`;
 ```
-Este identificador se compone del ID único del caso y la marca de tiempo exacta de la solicitud inicial.
+Este identificador no es predecible ni colisionable, lo que garantiza que dos solicitudes concurrentes nunca compartan el mismo ID de referencia.
 
-### B. Persistencia E Idempotency Key en Firestore
+### B. Persistencia e Idempotencia Atómica en Firestore
 * La orden de compra se persiste en Firestore utilizando la `wompiReference` como el **ID del documento** en la colección correspondiente.
 * Se almacena explícitamente el campo `idempotencyKey` mapeado a esta referencia única.
-* Si el cliente intenta recrear o re-enviar la misma orden, Firestore rechazará la escritura duplicada si se intenta crear una nueva entrada con el mismo ID, o bien se actualizará de forma segura la orden existente en lugar de duplicarla.
+* Para evitar sobrescribir una orden existente si se diera una colisión de clave, el servidor realiza una escritura **atómica** utilizando `.create()` sobre Firestore en lugar de `.set()`:
+  ```typescript
+  try {
+    await purchaseRef.create({ ...datosDeLaOrden... });
+  } catch (err: unknown) {
+    const code = (err as { code?: number })?.code;
+    if (code === 6 /* ALREADY_EXISTS */) {
+      return NextResponse.json({ error: 'Referencia en conflicto, reintenta.' }, { status: 409 });
+    }
+    throw err;
+  }
+  ```
+  Esto garantiza que Firestore rechace cualquier escritura duplicada devolviendo un código 409 Conflict.
 
 ### C. Restricción en la Pasarela Wompi
 La `wompiReference` generada es la que se envía como parámetro `reference` al inicializar el **Widget Checkout de Wompi**:
@@ -62,30 +74,41 @@ La pasarela de pagos Wompi tiene la regla estricta de no procesar dos transaccio
 
 El riesgo más crítico en sistemas de pago es la recepción duplicada de notificaciones (webhooks). Las pasarelas de pago reintentan el envío del webhook si el servidor de destino no responde a tiempo o si hay micro-cortes de red, lo que podría provocar la generación duplicada de PDFs o múltiples envíos de correos electrónicos.
 
-### A. El Registro de Confirmaciones (`webhook-wompi/route.ts`)
+### A. El Registro de Confirmaciones Atómico (`webhook-wompi/route.ts`)
 Desmulta implementa un sistema de idempotencia de nivel empresarial en el receptor del webhook:
 1. **Identificador de Transacción de Wompi:** Cada pago confirmado por la pasarela cuenta con un identificador de transacción único propio de Wompi (`wompiTransactionId` o `transactionId`).
-2. **Validación Duplicada en Base de Datos:** Antes de procesar el webhook, el servidor consulta la colección de Firestore `processed_callbacks` utilizando el `transactionId` único de Wompi como ID del documento:
+2. **Validación Duplicada Atómica en Base de Datos:** En lugar de ejecutar una secuencia vulnerable de consulta (`get()`) seguida de escritura (`set()`) que deja abierta una ventana de carrera, el webhook realiza una inserción atómica usando `.create()` sobre la colección `processed_callbacks`:
    ```typescript
-   const callbackRef = db.collection('processed_callbacks').doc(transactionId);
-   const callbackDoc = await callbackRef.get();
-   ```
-3. **Descarte Silencioso:** Si el documento ya existe, el webhook se clasifica como duplicado y el servidor aborta el procesamiento de inmediato:
-   ```typescript
-   if (callbackDoc.exists) {
-     logger.info('[webhook-wompi] Webhook duplicado ignorado', { transactionId });
-     return NextResponse.json({ status: 'ignored', reason: 'duplicate' }, { status: 200 });
+   try {
+     await callbackRef.create({
+       wompiTransactionId: transactionId,
+       processedAt: FieldValue.serverTimestamp(),
+       result: status,
+     });
+   } catch (err: unknown) {
+     const code = (err as { code?: number })?.code;
+     if (code === 6 /* ALREADY_EXISTS */) {
+       logger.info('[webhook-wompi] Webhook duplicado ignorado (atómico)', { transactionId });
+       return NextResponse.json({ ok: true, duplicate: true });
+     }
+     throw err;
    }
    ```
-   **Importante:** Se devuelve un código HTTP `200 OK` para informarle a la pasarela que el mensaje fue recibido correctamente, deteniendo así la ráfaga de reintentos automáticos.
+3. **Descarte Silencioso:** Si la inserción atómica falla por duplicidad (código 6 `ALREADY_EXISTS`), el servidor aborta el procesamiento de inmediato y retorna un código HTTP `200 OK` de confirmación de recepción para detener el reenvío de webhooks por parte de Wompi.
 
 ### B. Mitigación de Condiciones de Carrera (Race Conditions)
-Si dos peticiones webhook idénticas llegaran exactamente al mismo milisegundo (condición de carrera), ambas podrían pasar la validación `callbackDoc.exists` al mismo tiempo si la base de datos se consulta en paralelo antes de escribir.
+Al usarse `.create()` directamente como la primera instrucción sobre `processed_callbacks`, el bloqueo de base de datos se ejecuta en una única operación atómica indivisible. Cualquier petición duplicada paralela que llegue en la misma ventana de milisegundos recibirá de inmediato la excepción de duplicado de Firestore y será descartada de forma segura antes de despachar el PDF.
 
-Para mitigar esto, Desmulta aplica la técnica de **registro de estado temprano**:
-* **Escritura Previa:** El documento en `processed_callbacks` se crea **antes** de iniciar cualquier tarea pesada, asíncrona o externa (como la llamada al motor de generación de PDF o el envío del correo electrónico mediante `resend`).
-* **Bloqueo Atómico:** Al escribirse la transacción en Firestore al inicio del flujo, cualquier petición paralela que consulte la base de datos una fracción de segundo después detectará inmediatamente la existencia del registro de confirmación y se detendrá, impidiendo la duplicidad de la lógica de negocio.
-* **Procesamiento en Background Asíncrono Seguro:** La entrega del PDF al correo se delega mediante `waitUntil()` de `@vercel/functions`, lo que mantiene el ciclo de vida de la función activo en Vercel de forma controlada pero desacoplada de la respuesta inmediata del webhook, garantizando el retorno rápido de HTTP 200 hacia la pasarela.
+Adicionalmente, se ejecuta una validación de monto antes de continuar:
+```typescript
+const amountConfirmadoPorWompi = Number(transaction.amount_in_cents);
+if (amountConfirmadoPorWompi !== purchase.amountCop) {
+  logger.security('[webhook-wompi] 🚨 DISCREPANCIA DE MONTO', { reference, amountConfirmadoPorWompi });
+  await purchaseRef.update({ status: 'FLAGGED_AMOUNT_MISMATCH' });
+  return NextResponse.json({ ok: true, flagged: true });
+}
+```
+Esto anula por completo la inyección de órdenes baratas para adquirir productos caros. El envío del PDF se delega mediante `waitUntil()` de `@vercel/functions` en segundo plano.
 
 ---
 
@@ -97,15 +120,17 @@ graph TD
     B -- Sí --x C[Clic bloqueado/ignorado]
     B -- No --> D[Activar loading = true & Deshabilitar Botón]
     D --> E[API: create-order]
-    E --> F[Generar referencia única determinista DSM-X-Y]
-    F --> G[Persistir en Firestore con ID = Referencia]
-    G --> H[Inicializar Widget Wompi con Referencia]
-    H --> I{¿Doble pago de la misma Referencia?}
-    I -- Sí --x J[Wompi bloquea la transacción en su pasarela]
-    I -- No --> K[Procesamiento del webhook de pago]
-    K --> L{¿wompiTransactionId ya está en processed_callbacks?}
-    L -- Sí --x M[Retornar 200 OK de inmediato e ignorar]
-    L -- No --> N[Registrar de inmediato transactionId en processed_callbacks]
-    N --> O[Generar PDF y enviar correo vía waitUntil en segundo plano]
-    O --> P[Retornar 200 OK a Wompi]
+    E --> F[Generar referencia única randomUUID DSM-UUID]
+    F --> G[Creación atómica en Firestore con .create]
+    G -- Fallo 409 --x H[Referencia existente, reintentar]
+    G -- Éxito --> I[Inicializar Widget Wompi con Referencia]
+    I --> J{¿Doble pago de la misma Referencia?}
+    J -- Sí --x K[Wompi bloquea la transacción en su pasarela]
+    J -- No --> L[Procesamiento del webhook de pago]
+    L --> M{¿create en processed_callbacks exitoso?}
+    M -- Fallo ALREADY_EXISTS --x N[Retornar 200 OK de inmediato e ignorar]
+    M -- Éxito --> O{¿Monto pagado coincide con la orden?}
+    O -- No --x P[Actualizar estado a FLAGGED_AMOUNT_MISMATCH]
+    O -- Sí --> Q[Generar PDF y enviar correo vía waitUntil en segundo plano]
+    Q --> R[Retornar 200 OK a Wompi]
 ```
