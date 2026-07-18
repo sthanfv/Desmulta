@@ -159,7 +159,21 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const isSimitCapture = bodyAsRecord?.fuente === 'simit_capture';
+    // 🛡️ FIX V2-A2: La detección del tipo de schema NO debe depender del campo
+    // 'fuente' enviado por el cliente. Un actor malicioso puede añadir
+    // "fuente": "simit_capture" a cualquier request para evadir el
+    // ConsultationSchema completo (que exige cédula, placa, etc.) y usar el
+    // SimitCaptureSchema más permisivo.
+    //
+    // La detección correcta es estructural: una captura SIMIT tiene
+    // evidenceUrl Y no tiene cédula ni placa directa. Ningún campo controlable
+    // por el cliente puede alterar esta decisión.
+    const isSimitCapture = Boolean(
+      bodyAsRecord?.evidenceUrl &&
+        !bodyAsRecord?.cedula &&
+        !bodyAsRecord?.placa
+    );
+
     const schema = isSimitCapture ? SimitCaptureSchema : ConsultationSchema;
 
     const validation = schema.safeParse(body);

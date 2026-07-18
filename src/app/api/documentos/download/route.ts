@@ -225,6 +225,18 @@ export async function GET(req: NextRequest) {
       headers: {
         'Content-Type': contentType,
         'Content-Disposition': `attachment; filename="${filename}"`,
+        // 🛡️ FIX V2-C2: Prevenir que proxies corporativos, CDNs y navegadores
+        // almacenen en caché el PDF descargado o el token de autorización.
+        // 'no-store' es más estricto que 'no-cache': no guarda absolutamente nada
+        // en disco, memoria ni caché de proxy. Esencial para documentos legales con PII.
+        'Cache-Control': 'no-store, no-cache, must-revalidate, private',
+        'Pragma': 'no-cache',
+        // 🛡️ FIX V2-C2: Prevenir que el navegador reinterprete el MIME del archivo
+        // (MIME sniffing). Un atacante no puede engañar al browser para ejecutar
+        // un PDF como HTML o JavaScript renombrando la extensión.
+        'X-Content-Type-Options': 'nosniff',
+        // 🛡️ Prevenir que el PDF sea embebido en iframes de terceros (clickjacking)
+        'X-Frame-Options': 'DENY',
       },
     });
   } catch (error) {

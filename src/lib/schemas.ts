@@ -61,7 +61,20 @@ export const ConsultationSchemaBase = z.object({
     .min(1, { message: 'El nombre es requerido.' })
     .min(3, { message: 'El nombre es requerido y debe tener al menos 3 caracteres.' })
     .max(60, { message: 'El nombre no puede tener más de 60 caracteres.' })
-    .transform((val) => val.replace(/[<>]/g, '')),
+    // 🛡️ FIX V2-A1: Sanear caracteres de inyección de Markdown, Telegram y PDF.
+    // El render JSX de React escapa <> automáticamente, pero estos valores también
+    // llegan a mensajes de Telegram (que interpreta Markdown) y a plantillas de PDF.
+    // Se eliminan: comillas simples/dobles, barras, corchetes, llaves, backticks.
+    .transform((val) =>
+      val
+        .replace(/[<>'"\\\/\[\]{}|`]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim()
+    )
+    .refine(
+      (val) => /^[a-záéíóúüñA-ZÁÉÍÓÚÜÑ\s\-\.]+$/.test(val),
+      { message: 'El nombre solo puede contener letras, espacios, guiones y puntos.' }
+    ),
   contacto: z
     .string({ required_error: 'El celular de contacto es requerido.' })
     .min(1, { message: 'El celular de contacto es requerido.' })

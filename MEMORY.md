@@ -5,7 +5,34 @@
 > Se analizó el equipo local (DESKTOP-N9CGIFT) identificando un procesador antiguo `AMD PRO A10-8750B R7` (4 núcleos) y 16GB de RAM. Esta severa limitación en procesamiento de un solo hilo causa sobrecargas y Cold Starts extremadamente lentos.
 > **Regla permanente:** Está **ESTRICTAMENTE PROHIBIDO** ejecutar suites de validación masivas (`npm run validate` total) o pruebas E2E pesadas (Playwright) para cambios menores, ya que estresa severamente la máquina. Aplicar validación quirúrgica (linters específicos y pruebas aisladas) a menos que se trate de una reestructuración arquitectónica masiva autorizada por el usuario. Cuando las pruebas E2E sean necesarias, usar estrategias pasivas y timeouts elevados (`60000ms`).
 
+
+## 2026-07-18: Remediación de Auditoría v2 — 4 Hallazgos de Segunda Ronda Forense
+
+- **Qué cambió:**
+  - **[V2-C1 — Seguridad Crítica — webhook-wompi]**: Se reemplazó la comparación insegura `!==` de la firma HMAC de Wompi por `timingSafeEqual` de tiempo constante del módulo `crypto` de Node.js. El operador `!==` cortocircuita en el primer carácter no coincidente, permitiendo que un atacante mida la latencia y reconstruya la firma (timing attack). Adicionalmente, se eliminaron los campos `recibido` y `esperado` del `logger.warn` de firma inválida — ambas firmas aparecían en texto plano en GCP Cloud Logging, exponiendo el secreto ante accesos indebidos a los logs. Ahora los logs solo registran las longitudes de las firmas para diagnóstico.
+  - **[V2-A1 — Arquitectura Media — schemas.ts]**: Se amplió el `.transform()` del campo `nombre` en `ConsultationSchemaBase`. Antes solo se eliminaban `<>`. Ahora se eliminan todos los caracteres peligrosos para Telegram (que interpreta Markdown) y PDFs: comillas simples/dobles, barras, corchetes, llaves y backticks. Se añadió también un `.refine()` con allowlist estricta de caracteres de nombre real (letras, espacios, guiones y puntos).
+  - **[V2-A2 — Arquitectura Media — create-consultation/route.ts]**: Se corrigió la detección de `isSimitCapture` para que no dependa del campo `fuente` enviado por el cliente. Un actor malicioso podía añadir `"fuente": "simit_capture"` a cualquier request para usar el `SimitCaptureSchema` más permisivo (sin cédula, placa, ni campos obligatorios). Ahora la detección es estructural: se verifica si el body tiene `evidenceUrl` sin `cedula` ni `placa`. Ningún campo controlable por el cliente altera esta decisión.
+  - **[V2-C2 — Seguridad Crítica — documentos/download/route.ts]**: Se añadieron headers de seguridad a la respuesta de descarga de PDFs. `Cache-Control: no-store, no-cache, must-revalidate, private` previene que proxies corporativos, CDNs y navegadores almacenen el PDF. `X-Content-Type-Options: nosniff` previene MIME sniffing. `X-Frame-Options: DENY` previene embedding en iframes de terceros. Aplica a ambos flujos (token de email y pantalla de confirmación). El Flujo 2 (pantalla de confirmación) ya usaba cookies HttpOnly correctamente — eso estaba bien desde la remediación anterior.
+
+- **Por qué cambió:**
+  - El equipo de auditoría externa realizó una segunda ronda forense con evidencia de código exacta (números de línea) que identificó 5 nuevos hallazgos en el documento `Auditoria_5_Pilares_Desmulta_v2.md`. Uno (V2-C3 — bloqueo cruzado de rate limiter) ya estaba resuelto de la ronda anterior. Los 4 restantes se cerraron en esta sesión.
+
+- **Archivos afectados:**
+  - `src/app/api/payments/webhook-wompi/route.ts` [MODIFICADO — V2-C1: timingSafeEqual + logs sin firma]
+  - `src/lib/schemas.ts` [MODIFICADO — V2-A1: saneamiento completo de nombre + refine allowlist]
+  - `src/app/api/create-consultation/route.ts` [MODIFICADO — V2-A2: isSimitCapture estructural]
+  - `src/app/api/documentos/download/route.ts` [MODIFICADO — V2-C2: headers de seguridad PDF]
+
+- **Decisiones técnicas:**
+  - Para V2-C1: `timingSafeEqual` requiere buffers de la misma longitud. Se compara primero la longitud de las cadenas antes de llamar a `timingSafeEqual`, garantizando que ningún panic de Node.js pueda ocurrir.
+  - Para V2-A1: El `.refine()` con allowlist va DESPUÉS del `.transform()` — correcto porque el transform limpia primero y el refine valida el resultado. La allowlist permite nombres compuestos con guiones y puntos (ej: "Ana María López-Gómez").
+  - Para V2-A2: La detección estructural es retrocompatible — las consultas SIMIT legítimas siempre tienen `evidenceUrl` y nunca tienen `cedula` directa en el body.
+  - Para V2-C2: No se eliminó el token de URL del Flujo 1 (email) porque cambiar eso requeriría actualizar las plantillas de email y crear un flujo de pre-autorización con Redis — refactor mayor. Los headers de seguridad añaden defensa en profundidad sobre el token existente.
+
+- **Estado actual:** ✅ Validado. TypeScript sin errores (`npx tsc --noEmit`). 90 archivos de tests / 485 casos en verde (`npx vitest run`). Build de producción en curso.
+
 ## 2026-07-16: Corrección UX/UI — Sincronización Absoluta de Precios Frontend/Backend
+
 
 - **Qué cambió:**
   - **[Backend - Precios Centralizados]**: En `src/lib/payments/product-prices.ts`, se actualizaron los precios oficiales (en centavos) de la aplicación para que correspondan exactamente con los precios de venta que ve el usuario en el listado de plantillas (peticion_general = $14.900, doble_prescripcion = $34.900, etc.).

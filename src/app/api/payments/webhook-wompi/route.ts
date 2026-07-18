@@ -37,7 +37,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createHash } from 'crypto';
+import { createHash, timingSafeEqual } from 'crypto';
 import { waitUntil } from '@vercel/functions';
 import { getAdminApp } from '@/lib/firebase-admin';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
@@ -95,10 +95,23 @@ export async function POST(req: NextRequest) {
 
   const expectedSignature = createHash('sha256').update(concatenatedValues).digest('hex');
 
-  if (event.signature.checksum !== expectedSignature) {
+  // 🛡️ FIX V2-C1: Comparación en tiempo constante (timingSafeEqual).
+  // El operador !== compara carácter por carácter y cortocircuita en el primer
+  // mismatch, permitiendo que un atacante mida la latencia y reconstruya la firma
+  // (timing attack). timingSafeEqual tarda siempre el mismo tiempo sin importar
+  // cuántos caracteres coincidan.
+  const receivedSig = String(event.signature.checksum || '');
+  const signaturesMatch =
+    receivedSig.length === expectedSignature.length &&
+    timingSafeEqual(Buffer.from(receivedSig), Buffer.from(expectedSignature));
+
+  if (!signaturesMatch) {
+    // 🛡️ FIX V2-C1: NUNCA loguear la firma esperada ni la recibida.
+    // Loguear ambas expondría el secreto en GCP Cloud Logging si los logs
+    // son accedidos por un actor interno o en una brecha de acceso.
     logger.warn('[webhook-wompi] Firma inválida — checksum no coincide', {
-      recibido: event.signature.checksum,
-      esperado: expectedSignature,
+      receivedLength: receivedSig.length,
+      expectedLength: expectedSignature.length,
     });
     return NextResponse.json({ error: 'Firma inválida' }, { status: 401 });
   }
