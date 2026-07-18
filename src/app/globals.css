@@ -57,7 +57,7 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    overscroll-behavior: none;
+    overscroll-behavior: auto; /* 🛡️ FIX: Permitir scroll chaining nativo y fluido en computadores de escritorio */
     -webkit-tap-highlight-color: transparent;
     user-select: auto;
     scroll-behavior: smooth;
@@ -453,9 +453,15 @@
 
 /* ─── ADN NATIVO PWA ─── */
 body {
-  overscroll-behavior-y: none;
+  overscroll-behavior-y: auto; /* 🛡️ FIX: Respuesta inmediata a la ruedita del mouse en escritorio */
   background-color: hsl(var(--background));
   @apply pwa-native-feel;
+}
+
+@media (max-width: 767px) {
+  body {
+    overscroll-behavior-y: none; /* Evitar pull-to-refresh en teléfonos */
+  }
 }
 
 @layer utilities {
