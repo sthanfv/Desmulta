@@ -410,6 +410,23 @@
   opacity: 0.12;
 }
 
+/* 🛡️ FIX D-1: Desactivar blobs animados en móviles para garantizar scroll fluido a 60 FPS */
+@media (max-width: 767px) {
+  .blob-primary,
+  .blob-secondary {
+    display: none !important;
+  }
+
+  .aurora-bg {
+    background: radial-gradient(
+      ellipse at 30% 60%,
+      rgba(255, 191, 0, 0.05) 0%,
+      #090d16 50%,
+      #000000 100%
+    ) !important;
+  }
+}
+
 .glass-ultra {
   background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(40px);

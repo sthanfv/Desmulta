@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { ArrowUp, FileText, ChevronRight, Shield } from 'lucide-react';
-import { m } from 'framer-motion';
+import { LazyMotion, domAnimation, m } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
@@ -41,7 +41,8 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
   const router = useRouter();
 
   return (
-    <section className="min-h-[100svh] flex items-center pt-20 sm:pt-32 md:pt-36 pb-12 sm:pb-20 md:pb-24 px-4 relative overflow-hidden">
+    <LazyMotion features={domAnimation} strict>
+      <section className="min-h-[100svh] flex items-center pt-20 sm:pt-32 md:pt-36 pb-12 sm:pb-20 md:pb-24 px-4 relative overflow-hidden">
       {/* Atmósfera institucional */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/15 blur-[60px] sm:blur-[120px] opacity-50 rounded-full" />
@@ -467,5 +468,6 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
         </div>
       </div>
     </section>
+  </LazyMotion>
   );
 };

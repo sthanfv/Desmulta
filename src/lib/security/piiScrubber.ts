@@ -17,7 +17,7 @@ export function sanitizePII(payload: string): string {
     .replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, '[EMAIL_OCULTO]') // Emails
     .replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi, '[TOKEN_OCULTO]') // UUIDs
     .replace(
-      /([?&](?:token|downloadToken|temp_token|code|ref|cedula)=)[^&\s"']+/gi,
+      /([?&](?:token|downloadToken|temp_token|code|ref|cedula|celular|phone|whatsapp)=)[^&\s"'#]*/gi,
       '$1[REDACTED]'
     ); // Query params
 }
@@ -50,12 +50,38 @@ export function applyPIIScrubber(event: ErrorEvent): ErrorEvent {
         if (typeof crumb.message === 'string') {
           crumb.message = sanitizePII(crumb.message);
         }
+        if (crumb.data && typeof crumb.data === 'object') {
+          try {
+            crumb.data = JSON.parse(sanitizePII(JSON.stringify(crumb.data)));
+          } catch {
+            // Fallback de seguridad
+          }
+        }
       });
     }
 
     // 4. URL de Petición
     if (event.request && typeof event.request.url === 'string') {
       event.request.url = sanitizePII(event.request.url);
+    }
+
+    // 5. 🛡️ FIX AB-2: Sanitizar cabeceras de peticiones sensibles
+    if (event.request?.headers && typeof event.request.headers === 'object') {
+      const sensitiveHeaders = ['authorization', 'cookie', 'x-internal-secret', 'x-wompi-signature'];
+      sensitiveHeaders.forEach((h) => {
+        if ((event.request!.headers as Record<string, string>)[h]) {
+          (event.request!.headers as Record<string, string>)[h] = '[REDACTED]';
+        }
+      });
+    }
+
+    // 6. 🛡️ FIX AB-2: Sanitizar metadatos adicionales (extra context)
+    if (event.extra && typeof event.extra === 'object') {
+      try {
+        event.extra = JSON.parse(sanitizePII(JSON.stringify(event.extra)));
+      } catch {
+        // Fallback de seguridad
+      }
     }
   } catch (err) {
     console.warn('[QA-DevSecOps] Error mudo en la sobreescritura del Scrubber Sentry.', err);

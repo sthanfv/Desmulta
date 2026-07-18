@@ -70,19 +70,34 @@ export function decryptE2EPayload<T = unknown>(encryptedBase64: string): T {
 const SYMMETRIC_ALGO = 'aes-256-gcm';
 const ENC_PREFIX = 'ENC:';
 
+// 🛡️ FIX CR-2: Memoización de la llave derivada para alto desempeño del backend
+let _derivedKey: Buffer | null = null;
+
 function getSymmetricKey(): Buffer {
-  // 🛡️ F-12 DEVSECOPS: PII_ENCRYPTION_KEY DEBE ser independiente de PII_HMAC_SECRET.
-  // Usar el mismo secreto para HMAC (hashing) y AES (cifrado) viola el principio de separación de claves.
-  // El fallback a PII_HMAC_SECRET fue eliminado. Esta variable es ahora OBLIGATORIA.
+  if (_derivedKey) return _derivedKey;
+
   const keyBase = process.env.PII_ENCRYPTION_KEY;
-  if (!keyBase) {
+  const salt = process.env.PII_ENCRYPTION_SALT;
+
+  if (!keyBase || !salt) {
     throw new Error(
-      "🛡️ [DevSecOps] PII_ENCRYPTION_KEY no configurada. Esta variable es obligatoria para el cifrado de PII. Genera una con: node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\""
+      "🛡️ [DevSecOps] PII_ENCRYPTION_KEY y PII_ENCRYPTION_SALT no configuradas en el entorno. " +
+      "Ambas son obligatorias para el cifrado PII. Genera claves con: " +
+      "node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\""
     );
   }
-  // SHA-256 genera exactamente 32 bytes (256 bits) garantizados, sin importar
-  // la longitud del secreto original. Ideal para AES-256.
-  return crypto.createHash('sha256').update(keyBase).digest();
+
+  // 🛡️ FIX CR-2: Derivación de clave robusta usando PBKDF2 (600,000 iteraciones)
+  // en lugar de sha256 simple, neutralizando ataques de GPU por fuerza bruta.
+  _derivedKey = crypto.pbkdf2Sync(
+    keyBase,
+    Buffer.from(salt, 'hex'),
+    600_000, // Iteraciones recomendadas NIST 2023
+    32,      // 32 bytes para clave AES-256
+    'sha256'
+  );
+
+  return _derivedKey;
 }
 
 /**

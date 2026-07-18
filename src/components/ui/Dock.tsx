@@ -2,7 +2,9 @@
 
 import React, { Children, cloneElement, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  motion,
+  LazyMotion,
+  domAnimation,
+  m,
   MotionValue,
   useMotionValue,
   useSpring,
@@ -78,7 +80,7 @@ function DockItem({
   };
 
   return (
-    <motion.div
+    <m.div
       ref={ref}
       style={{
         width: size,
@@ -103,7 +105,7 @@ function DockItem({
             })
           : child
       )}
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -127,7 +129,7 @@ function DockLabel({ children, className = '', isHovered }: DockLabelProps) {
   return (
     <AnimatePresence>
       {isVisible && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 0 }}
           animate={{ opacity: 1, y: -10 }}
           exit={{ opacity: 0, y: 0 }}
@@ -137,7 +139,7 @@ function DockLabel({ children, className = '', isHovered }: DockLabelProps) {
           style={{ x: '-50%' }}
         >
           {children}
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );
@@ -174,41 +176,43 @@ export default function Dock({
   const height = useSpring(heightRow, spring);
 
   return (
-    <motion.div
-      style={{ height, scrollbarWidth: 'none' }}
-      className="mx-2 flex max-w-full items-center relative overflow-visible"
-    >
-      <motion.div
-        onMouseMove={({ pageX }) => {
-          isHovered.set(1);
-          mouseX.set(pageX);
-        }}
-        onMouseLeave={() => {
-          isHovered.set(0);
-          mouseX.set(Infinity);
-        }}
-        className={`absolute bottom-2 left-1/2 transform -translate-x-1/2 flex items-end w-fit gap-4 rounded-2xl border-neutral-700 border-2 pb-2 px-4 bg-[#120f17]/90 backdrop-blur-md pointer-events-auto ${className}`}
-        style={{ height: panelHeight }}
-        role="toolbar"
-        aria-label="Application dock"
+    <LazyMotion features={domAnimation} strict>
+      <m.div
+        style={{ height, scrollbarWidth: 'none' }}
+        className="mx-2 flex max-w-full items-center relative overflow-visible"
       >
-        {items.map((item, index) => (
-          <DockItem
-            key={index}
-            onClick={item.onClick}
-            className={item.className}
-            mouseX={mouseX}
-            spring={spring}
-            distance={distance}
-            magnification={magnification}
-            baseItemSize={baseItemSize}
-            label={item.label}
-          >
-            <DockIcon>{item.icon}</DockIcon>
-            <DockLabel>{item.label}</DockLabel>
-          </DockItem>
-        ))}
-      </motion.div>
-    </motion.div>
+        <m.div
+          onMouseMove={({ pageX }) => {
+            isHovered.set(1);
+            mouseX.set(pageX);
+          }}
+          onMouseLeave={() => {
+            isHovered.set(0);
+            mouseX.set(Infinity);
+          }}
+          className={`absolute bottom-2 left-1/2 transform -translate-x-1/2 flex items-end w-fit gap-4 rounded-2xl border-neutral-700 border-2 pb-2 px-4 bg-[#120f17]/90 backdrop-blur-md pointer-events-auto ${className}`}
+          style={{ height: panelHeight }}
+          role="toolbar"
+          aria-label="Application dock"
+        >
+          {items.map((item, index) => (
+            <DockItem
+              key={index}
+              onClick={item.onClick}
+              className={item.className}
+              mouseX={mouseX}
+              spring={spring}
+              distance={distance}
+              magnification={magnification}
+              baseItemSize={baseItemSize}
+              label={item.label}
+            >
+              <DockIcon>{item.icon}</DockIcon>
+              <DockLabel>{item.label}</DockLabel>
+            </DockItem>
+          ))}
+        </m.div>
+      </m.div>
+    </LazyMotion>
   );
 }
