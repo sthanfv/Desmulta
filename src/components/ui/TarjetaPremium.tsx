@@ -74,8 +74,7 @@ export function TarjetaPremium({
         }}
       />
 
-      {/* Contenido Real */}
-      <div className="relative z-10 h-full">{children}</div>
+      {children}
     </div>
   );
 }

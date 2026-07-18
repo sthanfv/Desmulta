@@ -184,7 +184,7 @@ export default function PlantillasPage() {
           {TEMPLATE_CARDS.map((tpl) => (
             <TarjetaPremium
               key={tpl.id}
-              className="p-8 flex flex-col h-full bg-white dark:bg-[#15131A] border border-slate-200 dark:border-zinc-800 rounded-[2rem] min-h-[440px] relative transition-all duration-500 hover:-translate-y-3 hover:shadow-[0_20px_50px_rgba(245,193,7,0.06)] hover:border-primary/30"
+              className="flex flex-col h-full bg-white dark:bg-[#15131A] border border-slate-200 dark:border-zinc-800 rounded-[2rem] min-h-[440px] relative transition-all duration-500 hover:-translate-y-3 hover:shadow-[0_20px_50px_rgba(245,193,7,0.06)] hover:border-primary/30"
               onMouseEnter={() => {
                 if (window.innerWidth >= 768) {
                   setActiveTooltip(tpl.id);
@@ -210,49 +210,52 @@ export default function PlantillasPage() {
                 <Info size={15} />
               </button>
 
-              <div className="flex items-start justify-between mb-8 relative z-10">
-                <div className="p-3 bg-slate-50 dark:bg-zinc-900/50 rounded-xl group-hover:bg-blue-50 dark:group-hover:bg-primary/10 transition-colors">
-                  {getIconForDoc(tpl.id as DocumentType)}
-                </div>
-                {/* Ocultamos el badge si está abierto el tooltip en móvil para evitar encimamiento */}
-                <span className="px-3 py-1 bg-slate-100 dark:bg-zinc-900/80 text-slate-600 dark:text-zinc-300 text-xs font-bold rounded-full border border-slate-200 dark:border-zinc-800 md:block hidden">
-                  {tpl.badge}
-                </span>
-              </div>
-
-              <h3 className="text-2xl font-bold text-slate-900 dark:text-zinc-100 mb-4 relative z-10 font-serif tracking-tight">
-                {tpl.title}
-              </h3>
-
-              <div className="w-12 h-px bg-slate-200 dark:bg-zinc-800 mb-4" />
-
-              <p className="text-slate-600 dark:text-zinc-400 text-sm leading-relaxed flex-grow relative z-10">
-                {tpl.description}
-              </p>
-
-              {/* Bloque Comercial / Antigravity UX Touch */}
-              <div className="mt-6 flex justify-between items-center relative z-10 pt-4 border-t border-slate-100 dark:border-zinc-800/50">
-                <div className="flex items-center gap-1.5">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                  </span>
-                  <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                    {tpl.exito} Éxito
+              {/* Envoltura interna del contenido con padding */}
+              <div className="p-8 flex flex-col h-full flex-grow relative z-10">
+                <div className="flex items-start justify-between mb-8">
+                  <div className="p-3 bg-slate-50 dark:bg-zinc-900/50 rounded-xl group-hover:bg-blue-50 dark:group-hover:bg-primary/10 transition-colors">
+                    {getIconForDoc(tpl.id as DocumentType)}
+                  </div>
+                  {/* Ocultamos el badge si está abierto el tooltip en móvil para evitar encimamiento */}
+                  <span className="px-3 py-1 bg-slate-100 dark:bg-zinc-900/80 text-slate-600 dark:text-zinc-300 text-xs font-bold rounded-full border border-slate-200 dark:border-zinc-800 md:block hidden">
+                    {tpl.badge}
                   </span>
                 </div>
-                <span className="font-mono text-sm font-bold text-slate-800 dark:text-zinc-200">
-                  {prices && prices[tpl.id] ? prices[tpl.id].display : tpl.precio}
-                </span>
-              </div>
 
-              <Link
-                href={`/documentos/generador/${tpl.id.replace(/_/g, '-')}`}
-                className="mt-8 w-full bg-slate-900 hover:bg-blue-600 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-primary text-white font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors relative z-10"
-              >
-                Redactar Documento
-                <ArrowRight className="w-4 h-4" />
-              </Link>
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-zinc-100 mb-4 font-serif tracking-tight">
+                  {tpl.title}
+                </h3>
+
+                <div className="w-12 h-px bg-slate-200 dark:bg-zinc-800 mb-4" />
+
+                <p className="text-slate-600 dark:text-zinc-400 text-sm leading-relaxed flex-grow">
+                  {tpl.description}
+                </p>
+
+                {/* Bloque Comercial / Antigravity UX Touch */}
+                <div className="mt-6 flex justify-between items-center pt-4 border-t border-slate-100 dark:border-zinc-800/50">
+                  <div className="flex items-center gap-1.5">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                      {tpl.exito} Éxito
+                    </span>
+                  </div>
+                  <span className="font-mono text-sm font-bold text-slate-800 dark:text-zinc-200">
+                    {prices && prices[tpl.id] ? prices[tpl.id].display : tpl.precio}
+                  </span>
+                </div>
+
+                <Link
+                  href={`/documentos/generador/${tpl.id.replace(/_/g, '-')}`}
+                  className="mt-8 w-full bg-slate-900 hover:bg-blue-600 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-primary text-white font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors"
+                >
+                  Redactar Documento
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
 
               {/* Capa Explicativa / Tooltip Overlay (Premium) */}
               <AnimatePresence>
