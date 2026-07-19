@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { createWorker } from 'tesseract.js';
 import { checkRateLimit } from '@/lib/security/rate-limit';
 import { logger } from '@/lib/logger/security-logger';
 import { apiError } from '@/lib/types/api-response';

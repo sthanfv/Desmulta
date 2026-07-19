@@ -148,18 +148,18 @@ export default function StepSuccess({
 
           <div className="bg-white dark:bg-black border border-red-500/30 p-1 pl-4 rounded-xl w-full flex items-center justify-between gap-2 shadow-inner">
             <a
-              href={`https://desmulta.online/seguir/${successData.trackingUuid}`}
+              href={`${typeof window !== 'undefined' ? window.location.origin : 'https://desmulta.online'}/seguir/${successData.trackingUuid}`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-primary font-bold text-xs truncate max-w-[200px] hover:underline"
             >
-              desmulta.online/seguir/{successData.trackingUuid}
+              {typeof window !== 'undefined' ? window.location.host : 'desmulta.online'}/seguir/{(successData.trackingUuid || '').slice(0, 8)}...
             </a>
             <Button
               size="sm"
               onClick={() => {
                 navigator.clipboard.writeText(
-                  `https://desmulta.online/seguir/${successData?.trackingUuid}`
+                  `${typeof window !== 'undefined' ? window.location.origin : 'https://desmulta.online'}/seguir/${successData?.trackingUuid}`
                 );
                 toast({
                   title: '¡Enlace Copiado!',
@@ -180,7 +180,7 @@ export default function StepSuccess({
             <div className="bg-white p-2 rounded-xl shadow-sm border border-slate-100 relative">
               <QRCode
                 id={`qr-client-${successData.trackingUuid}`}
-                value={`https://desmulta.online/seguir/${successData.trackingUuid}`}
+                value={`${typeof window !== 'undefined' ? window.location.origin : 'https://desmulta.online'}/seguir/${successData.trackingUuid}`}
                 size={120}
                 bgColor="#ffffff"
                 fgColor="#111827"
@@ -199,7 +199,7 @@ export default function StepSuccess({
               <div className="hidden">
                 <QRCode
                   id={`qr-client-hd-${successData.trackingUuid}`}
-                  value={`https://desmulta.online/seguir/${successData.trackingUuid}`}
+                  value={`${typeof window !== 'undefined' ? window.location.origin : 'https://desmulta.online'}/seguir/${successData.trackingUuid}`}
                   size={320}
                   bgColor="#ffffff"
                   fgColor="#111827"

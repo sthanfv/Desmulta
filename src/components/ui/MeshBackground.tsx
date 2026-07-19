@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useReducedMotion } from 'framer-motion';
 
 /**
@@ -13,8 +13,19 @@ import { useReducedMotion } from 'framer-motion';
  */
 export function MeshBackground() {
   const reducedMotion = useReducedMotion();
+  const [isLowTier, setIsLowTier] = useState(false);
 
-  if (reducedMotion) {
+  useEffect(() => {
+    if (typeof navigator !== 'undefined') {
+      const isLowMemory = (navigator as any).deviceMemory && (navigator as any).deviceMemory < 4;
+      const isLowCores = navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4;
+      if (isLowMemory || isLowCores) {
+        setIsLowTier(true);
+      }
+    }
+  }, []);
+
+  if (reducedMotion || isLowTier) {
     return <div className="fixed inset-0 -z-20 bg-background" />;
   }
 

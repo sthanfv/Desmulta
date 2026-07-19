@@ -8,6 +8,7 @@
  * Cumple ADR-001 Zero-PII.
  */
 import crypto from 'crypto';
+import { logger } from '@/lib/logger/security-logger';
 export { signPortalSession, verifyPortalSession } from './portal-jwt';
 
 /**
@@ -149,9 +150,9 @@ export function decryptSymmetric(encryptedString: string): string {
 
     return decrypted;
   } catch (err) {
-    console.error(
+    logger.error(
       '[Crypto] Error de descifrado simétrico (posible cambio de clave o datos corruptos):',
-      err
+      { error: String(err) }
     );
     return '[Error de Descifrado - PII Protegida]';
   }

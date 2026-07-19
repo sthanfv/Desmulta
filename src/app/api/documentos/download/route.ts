@@ -5,13 +5,31 @@ import { generateMandatePDF, MandatePayload } from '@/lib/legal/pdf-engine';
 import { generateMandateDOCX } from '@/lib/legal/docx-engine';
 import { DocumentType } from '@/lib/legal/document-templates';
 import { logger } from '@/lib/logger/security-logger';
+import { Redis } from '@upstash/redis';
 import { timingSafeEqual } from 'crypto';
+const redis = Redis.fromEnv();
+
 export async function GET(req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
-    const tokenId = searchParams.get('token');
-    const refId = searchParams.get('ref');
-    const format = searchParams.get('format') || 'pdf';
+    const dlSession = req.cookies.get('dl_session')?.value;
+    
+    if (!dlSession) {
+      return new NextResponse('No autorizado. Falta sesión de descarga.', { status: 401 });
+    }
+
+    const sessionData = await redis.get(`dl:${dlSession}`);
+    if (!sessionData) {
+      return new NextResponse('Sesión de descarga expirada o inválida', { status: 403 });
+    }
+
+    // 🛡️ FIX V2-C2: Descarga de un solo uso, invalidar sesión inmediatamente
+    await redis.del(`dl:${dlSession}`);
+
+    const { token: tokenId, ref: refId, downloadToken } = typeof sessionData === 'string' 
+      ? JSON.parse(sessionData) 
+      : (sessionData as Record<string, unknown>);
+      
+    const format = req.nextUrl.searchParams.get('format') || 'pdf';
 
     if (!tokenId && !refId) {
       return new NextResponse('Falta el parametro token o ref', { status: 400 });
@@ -90,10 +108,9 @@ export async function GET(req: NextRequest) {
       filename = `Documento_Desmulta_${caseData?.shortId || tokenData.purchaseId.slice(-8).toUpperCase()}.pdf`;
     } else if (refId) {
       // ── FLUJO 2: DESCARGA DIRECTA (PANTALLA DE CONFIRMACIÓN) ──
-      const downloadToken = req.cookies.get(`dt_${refId}`)?.value;
       if (!downloadToken || downloadToken.trim() === '') {
         logger.security(
-          '[documentos/download] Intento de descarga sin token de descarga (IDOR bloqueado)',
+          '[documentos/download] Intento de descarga sin token de descarga',
           { refId }
         );
         return new NextResponse('No autorizado. Token de descarga requerido.', { status: 401 });
@@ -116,7 +133,7 @@ export async function GET(req: NextRequest) {
           '[documentos/download] Intento de descarga con token inválido (IDOR bloqueado)',
           {
             refId,
-            providedToken: downloadToken,
+            // 🛡️ FIX R-01: Remover logging del token provisto en texto plano
           }
         );
         return new NextResponse('No autorizado. Token de descarga inválido.', { status: 401 });
@@ -220,25 +237,22 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    return new NextResponse(fileBytes as unknown as BodyInit, {
+    const response = new NextResponse(fileBytes as unknown as BodyInit, {
       status: 200,
       headers: {
         'Content-Type': contentType,
         'Content-Disposition': `attachment; filename="${filename}"`,
-        // 🛡️ FIX V2-C2: Prevenir que proxies corporativos, CDNs y navegadores
-        // almacenen en caché el PDF descargado o el token de autorización.
-        // 'no-store' es más estricto que 'no-cache': no guarda absolutamente nada
-        // en disco, memoria ni caché de proxy. Esencial para documentos legales con PII.
         'Cache-Control': 'no-store, no-cache, must-revalidate, private',
         'Pragma': 'no-cache',
-        // 🛡️ FIX V2-C2: Prevenir que el navegador reinterprete el MIME del archivo
-        // (MIME sniffing). Un atacante no puede engañar al browser para ejecutar
-        // un PDF como HTML o JavaScript renombrando la extensión.
         'X-Content-Type-Options': 'nosniff',
-        // 🛡️ Prevenir que el PDF sea embebido en iframes de terceros (clickjacking)
         'X-Frame-Options': 'DENY',
       },
     });
+    
+    // 🛡️ FIX V2-C2: Limpiar la cookie tras la descarga
+    response.cookies.delete('dl_session');
+    
+    return response;
   } catch (error) {
     logger.error('[documentos/download] Error generando PDF de descarga:', {
       error: String(error),

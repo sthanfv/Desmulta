@@ -204,7 +204,7 @@ export default function PlantillasPage() {
                   e.stopPropagation();
                   setActiveTooltip(activeTooltip === tpl.id ? null : tpl.id);
                 }}
-                className="absolute top-6 right-6 z-30 p-2.5 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-zinc-950/60 dark:hover:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-slate-500 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-primary transition-all duration-300 md:hidden flex items-center justify-center shadow-md active:scale-90"
+                className="absolute top-6 right-6 z-30 w-11 h-11 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-zinc-950/60 dark:hover:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-slate-500 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-primary transition-all duration-300 md:hidden flex items-center justify-center shadow-md active:scale-90"
                 aria-label="Ver escenario de uso"
               >
                 <Info size={15} />
@@ -275,7 +275,7 @@ export default function PlantillasPage() {
                         e.stopPropagation();
                         setActiveTooltip(null);
                       }}
-                      className="absolute top-6 right-6 p-2.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white transition-all active:scale-90"
+                      className="absolute top-6 right-6 w-11 h-11 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white transition-all active:scale-90 flex items-center justify-center"
                       aria-label="Cerrar explicación"
                     >
                       <X size={15} />

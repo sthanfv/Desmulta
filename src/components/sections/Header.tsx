@@ -148,7 +148,7 @@ export const Header = ({ onOpenModal }: HeaderProps) => {
               onClick={() => onOpenModal('simit')}
               variant="outline"
               size="icon"
-              className="w-10 h-10 rounded-full border-primary/20 text-primary hover:bg-primary/10 shadow-sm"
+              className="w-11 h-11 rounded-full border-primary/20 text-primary hover:bg-primary/10 shadow-sm"
               aria-label="Subir captura"
             >
               <Camera size={18} />
@@ -158,7 +158,7 @@ export const Header = ({ onOpenModal }: HeaderProps) => {
             {/* Menú Hamburguesa Animado (Hamburger to X) */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="relative w-10 h-10 flex flex-col justify-center items-center bg-foreground/5 hover:bg-foreground/10 rounded-full transition-colors"
+              className="relative w-11 h-11 flex flex-col justify-center items-center bg-foreground/5 hover:bg-foreground/10 rounded-full transition-colors"
               aria-label="Abrir menú móvil"
             >
               <span

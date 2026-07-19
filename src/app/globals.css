@@ -24,7 +24,6 @@
     --input: 214.3 31.8% 88%;
     --ring: 45 100% 52%;
     --radius: 1.25rem;
-    scroll-behavior: smooth;
   }
 
   .dark {
@@ -60,7 +59,6 @@
     overscroll-behavior: auto; /* 🛡️ FIX: Permitir scroll chaining nativo y fluido en computadores de escritorio */
     -webkit-tap-highlight-color: transparent;
     user-select: auto;
-    scroll-behavior: smooth;
     min-height: 100svh;
   }
 
@@ -783,4 +781,10 @@ html[data-magicui-theme-vt='active']::view-transition-group(root) {
  */
 html[data-magicui-theme-vt='active']::view-transition-new(root) {
   clip-path: var(--magicui-theme-vt-clip-from);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-ping {
+    animation: none !important;
+  }
 }

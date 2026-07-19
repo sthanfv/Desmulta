@@ -39,10 +39,7 @@ function normalizePrivateKey(rawKey: string | undefined): string {
   const match = keyStr.match(pemRegex);
 
   if (process.env.NODE_ENV !== 'production') {
-    logger.info('[firebase-admin] Analizando formato de llave v7.5.11:', {
-      isKeyValid: keyStr.length > 100,
-      hasPemMarkers: !!match,
-    });
+    console.debug('[firebase-admin] Procesando formato de llave privada.');
   }
 
   if (match) {
@@ -58,7 +55,7 @@ function normalizePrivateKey(rawKey: string | undefined): string {
       const lines = cleanBody.match(/.{1,64}/g) ?? [];
       const canonicalPem = `${header}\n${lines.join('\n')}\n${footer}\n`;
       if (process.env.NODE_ENV !== 'production') {
-        logger.info('[firebase-admin] Llave reformateada a PEM canónico (64 chars/linea).');
+        console.debug('[firebase-admin] Llave reformateada a PEM canónico (64 chars/linea).');
       }
       return canonicalPem;
     }
@@ -70,7 +67,7 @@ function normalizePrivateKey(rawKey: string | undefined): string {
 
   if (lines) {
     if (process.env.NODE_ENV !== 'production') {
-      logger.info('[firebase-admin] Reconstruyendo bloque PKCS#8 desde Base64 puro.');
+      console.debug('[firebase-admin] Reconstruyendo bloque PKCS#8 desde Base64 puro.');
     }
     return `-----BEGIN PRIVATE KEY-----\n${lines.join('\n')}\n-----END PRIVATE KEY-----\n`;
   }

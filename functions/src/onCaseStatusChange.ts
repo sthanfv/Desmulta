@@ -186,7 +186,7 @@ async function processCaseEmail(caseId: string, after: CaseAfterData, isNew: boo
               ` : ''}
 
               <div style="margin: 30px 0; padding: 20px; background: #fffbeb; border-left: 4px solid ${info.color}; border-radius: 4px;">
-                <p style="margin: 0; font-size: 14px; color: #2d3748; font-weight: bold;">Nuevo estado legal: <span style="color: ${info.color}; text-transform: uppercase;">${status.replace('_', ' ')}</span></p>
+                <p style="margin: 0; font-size: 14px; color: #2d3748; font-weight: bold;">Nuevo estado legal: <span style="color: ${info.color}; text-transform: uppercase;">${escapeHtml(status).replace('_', ' ')}</span></p>
               </div>
 
               ${trackingUuid ? `

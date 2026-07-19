@@ -14,7 +14,11 @@ const withPWA = withPWAInit({
   dynamicStartUrl: false,
   workboxOptions: {
     runtimeCaching: [], // Desactivar el precaching agresivo por defecto
-    exclude: [/firebase-messaging-sw\.js$/],
+    exclude: [
+      /firebase-messaging-sw\.js$/,
+      /\/admin\//,
+      /\/api\/admin\//,
+    ],
     additionalManifestEntries: [],
     importScripts: ['/firebase-messaging-sw.js'],
   },

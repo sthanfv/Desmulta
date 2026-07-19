@@ -73,11 +73,10 @@ export async function POST(req: NextRequest) {
   let concatenatedValues = '';
   for (const prop of event.signature.properties) {
     const parts = prop.split('.');
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let val: any = event.data;
+    let val: Record<string, unknown> | unknown = event.data;
     for (const part of parts) {
       if (val === undefined || val === null) break;
-      val = val[part];
+      val = (val as Record<string, unknown>)[part];
     }
     // String() convierte números (ej. monto = 0) correctamente sin omitirlos
     if (val !== undefined && val !== null) {

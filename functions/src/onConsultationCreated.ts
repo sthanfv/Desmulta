@@ -69,20 +69,20 @@ export const onConsultationCreated = onDocumentCreated({
     try {
       const resend = new Resend(process.env.RESEND_API_KEY);
       
-      // Humanizar nombre (para casos SIMIT que no tienen nombre real)
       const isSimitCapture = data.nombre && data.nombre.startsWith('VÍA CAPTURA');
-      const nombreUsuario = isSimitCapture ? 'conductor' : data.nombre;
+      const nombreUsuario = isSimitCapture ? 'conductor' : escapeHtml(data.nombre || 'conductor');
       const saludoInicial = isSimitCapture 
         ? `¡Hola! 👋 Te damos la bienvenida a Desmulta.` 
         : `¡Hola, ${nombreUsuario}! 👋 Te damos la bienvenida a Desmulta.`;
 
-
+      const safePlaca = escapeHtml(data.placa || 'en trámite');
+      const safeShortId = escapeHtml(shortId);
 
       await resend.emails.send({
         from: 'Desmulta Gestión <gestion@desmulta.online>',
         replyTo: 'contactodesmulta@protonmail.com',
         to: emailCiudadano,
-        subject: `✅ Consulta Recibida: ${shortId} (${data.placa || 'Trámite'})`,
+        subject: `✅ Consulta Recibida: ${safeShortId} (${safePlaca})`,
         html: `
           <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #2c3e50; line-height: 1.6; background-color: #f8f9fa; padding: 20px;">
             <div style="background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
@@ -94,7 +94,7 @@ export const onConsultationCreated = onDocumentCreated({
               <div style="padding: 40px 30px;">
                 <h2 style="color: #000000; font-size: 22px; margin-top: 0;">${saludoInicial}</h2>
                 <p style="font-size: 16px; color: #4a5568;">
-                  Queremos confirmarte que hemos recibido exitosamente tu solicitud de revisión y ya hemos comenzado a procesar tu caso para la placa <strong style="background: #edf2f7; padding: 4px 8px; border-radius: 6px; color: #2d3748; border: 1px solid #e2e8f0;">${data.placa || 'en trámite'}</strong>.
+                  Queremos confirmarte que hemos recibido exitosamente tu solicitud de revisión y ya hemos comenzado a procesar tu caso para la placa <strong style="background: #edf2f7; padding: 4px 8px; border-radius: 6px; color: #2d3748; border: 1px solid #e2e8f0;">${safePlaca}</strong>.
                 </p>
                 
                 <p style="font-size: 15px; color: #4a5568;">
@@ -125,7 +125,7 @@ export const onConsultationCreated = onDocumentCreated({
                 
                 <div style="margin: 40px 0; text-align: center; background: #f8fafc; padding: 25px; border-radius: 12px; border: 1px dashed #cbd5e1;">
                   <p style="font-size: 13px; color: #64748b; margin-top: 0; text-transform: uppercase; font-weight: bold;">Tu ID de Radicado Único</p>
-                  <p style="font-size: 24px; font-family: monospace; color: #000000; margin: 10px 0; letter-spacing: 2px;"><b>${shortId}</b></p>
+                  <p style="font-size: 24px; font-family: monospace; color: #000000; margin: 10px 0; letter-spacing: 2px;"><b>${safeShortId}</b></p>
                   
                   ${trackingUuid ? `<div style="margin-top: 20px;">
                     <a href="https://desmulta.online/seguir/${trackingUuid}" style="background: #000000; color: #D4AF37; padding: 14px 32px; border-radius: 8px; text-decoration: none; display: inline-block; font-weight: bold; text-transform: uppercase; font-size: 13px; letter-spacing: 0.05em; border: 1px solid #D4AF37;">Ver Estado en Vivo</a>
@@ -351,10 +351,8 @@ export const onConsultationCreated = onDocumentCreated({
     }
   }
 
-  // Marcar como completado para futuros retries
+  // Marcar como completado para futuros retries (no sobreescribir telegramStatus porque ya se manejó)
   await db.collection('consultations').doc(docId).update({
     processingStatus: 'done',
-    telegramStatus: 'sent',
-    welcomeEmailSent: true,
   });
 });

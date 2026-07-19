@@ -145,6 +145,21 @@ export async function middleware(request: NextRequest) {
       'Permissions-Policy',
       'camera=(), microphone=(), geolocation=(), payment=(), xr-spatial-tracking=()'
     );
+
+    // 🛡️ Prevenir cacheo en endpoints sensibles (Zero-Trust Caching)
+    if (
+      pathname.startsWith('/api/admin') ||
+      pathname.startsWith('/api/auth') ||
+      pathname.startsWith('/api/vip')
+    ) {
+      response.headers.set(
+        'Cache-Control',
+        'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0'
+      );
+      response.headers.set('Pragma', 'no-cache');
+      response.headers.set('Expires', '0');
+    }
+
     return response;
   }
 

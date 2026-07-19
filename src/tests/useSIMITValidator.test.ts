@@ -46,6 +46,10 @@ vi.mock('@/lib/logger/media-logger', () => ({
   },
 }));
 
+// Mock global.fetch para interceptar llamadas a /api/ocr
+const mockFetch = vi.fn();
+global.fetch = mockFetch;
+
 describe('useSIMITValidator: Motor OCR y Resiliencia (v7.4.4)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -57,15 +61,16 @@ describe('useSIMITValidator: Motor OCR y Resiliencia (v7.4.4)', () => {
     const mockOcrTextValido =
       'REPUBLICA DE COLOMBIA - SIMIT - ESTADO DE CUENTA - INFRACCION DE TRANSITO';
 
-    vi.mocked(tesseractManager.recognize).mockResolvedValue({
-      data: {
-        text: mockOcrTextValido,
-        words: [
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        texto: mockOcrTextValido,
+        palabras: [
           { text: 'SIMIT', confidence: 90, bbox: { x0: 0, y0: 0, x1: 10, y1: 10 } },
           { text: 'ESTADO', confidence: 90, bbox: { x0: 10, y0: 0, x1: 20, y1: 10 } },
           { text: 'CUENTA', confidence: 90, bbox: { x0: 20, y0: 0, x1: 30, y1: 10 } },
         ],
-      },
+      }),
     });
 
     const { result } = renderHook(() => useSIMITValidator());
@@ -85,11 +90,12 @@ describe('useSIMITValidator: Motor OCR y Resiliencia (v7.4.4)', () => {
   it('❌ Debe RECHAZAR imagen sin tokens SIMIT válidos (Fail-Closed: esValida DEBE ser false)', async () => {
     const mockOcrTextInvalido = 'Esta es una imagen de un paisaje con montañas y un lago.';
 
-    vi.mocked(tesseractManager.recognize).mockResolvedValue({
-      data: {
-        text: mockOcrTextInvalido,
-        words: [{ text: 'Recibo', confidence: 90, bbox: { x0: 0, y0: 0, x1: 10, y1: 10 } }],
-      },
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        texto: mockOcrTextInvalido,
+        palabras: [{ text: 'Recibo', confidence: 90, bbox: { x0: 0, y0: 0, x1: 10, y1: 10 } }],
+      }),
     });
 
     const { result } = renderHook(() => useSIMITValidator());
@@ -108,11 +114,12 @@ describe('useSIMITValidator: Motor OCR y Resiliencia (v7.4.4)', () => {
   it('🛡️ Debe ser resiliente a ruidos y normalizar correctamente (MAYÚSCULAS/Unicode)', async () => {
     const mockOcrTextRuido = 'Símít... éstádó de cuêntâ... ínfráccíón de tránsítö!!!'; // Con tildes y caracteres extra
 
-    vi.mocked(tesseractManager.recognize).mockResolvedValue({
-      data: {
-        text: mockOcrTextRuido,
-        words: [],
-      },
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        texto: mockOcrTextRuido,
+        palabras: [],
+      }),
     });
 
     const { result } = renderHook(() => useSIMITValidator());
@@ -131,15 +138,16 @@ describe('useSIMITValidator: Motor OCR y Resiliencia (v7.4.4)', () => {
     const mockOcrTextConCodigo =
       'REPUBLICA DE COLOMBIA - SIMIT - ESTADO DE CUENTA - COMPARENDO DE INFRACCION: C29 - MULTA - VALOR A PAGAR - TRANSITO';
 
-    vi.mocked(tesseractManager.recognize).mockResolvedValue({
-      data: {
-        text: mockOcrTextConCodigo,
-        words: [
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        texto: mockOcrTextConCodigo,
+        palabras: [
           { text: 'SIMIT', confidence: 95, bbox: { x0: 0, y0: 0, x1: 10, y1: 10 } },
           { text: 'ESTADO', confidence: 95, bbox: { x0: 10, y0: 0, x1: 20, y1: 10 } },
           { text: 'CUENTA', confidence: 95, bbox: { x0: 20, y0: 0, x1: 30, y1: 10 } },
         ],
-      },
+      }),
     });
 
     const { result } = renderHook(() => useSIMITValidator());
@@ -165,15 +173,16 @@ describe('useSIMITValidator: Motor OCR y Resiliencia (v7.4.4)', () => {
     const mockOcrTextSinCodigo =
       'REPUBLICA DE COLOMBIA - SIMIT - ESTADO DE CUENTA - COMPARENDO DE INFRACCION - MULTA - VALOR A PAGAR - TRANSITO';
 
-    vi.mocked(tesseractManager.recognize).mockResolvedValue({
-      data: {
-        text: mockOcrTextSinCodigo,
-        words: [
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        texto: mockOcrTextSinCodigo,
+        palabras: [
           { text: 'SIMIT', confidence: 90, bbox: { x0: 0, y0: 0, x1: 10, y1: 10 } },
           { text: 'ESTADO', confidence: 90, bbox: { x0: 10, y0: 0, x1: 20, y1: 10 } },
           { text: 'CUENTA', confidence: 90, bbox: { x0: 20, y0: 0, x1: 30, y1: 10 } },
         ],
-      },
+      }),
     });
 
     const { result } = renderHook(() => useSIMITValidator());

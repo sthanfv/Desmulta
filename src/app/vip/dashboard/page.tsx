@@ -11,8 +11,8 @@ import { VipPushNotification } from '@/components/vip/VipPushNotification';
 import { getVipSecret } from '@/lib/security/vip-jwt';
 import { getCachedDoc } from '@/lib/cache/redis-cache';
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-function serializeVipExpediente(data: any) {
+// removed
+function serializeVipExpediente(data: Record<string, unknown> | null | undefined) {
   if (!data) return data;
   const serialized = { ...data };
 
@@ -29,7 +29,7 @@ function serializeVipExpediente(data: any) {
   }
 
   if (Array.isArray(serialized.history)) {
-    serialized.history = serialized.history.map((h: any) => {
+    serialized.history = serialized.history.map((h: Record<string, unknown>) => {
       let dateVal = h.date;
       if (dateVal?.toDate) {
         dateVal = dateVal.toDate().toISOString();
@@ -48,7 +48,7 @@ function serializeVipExpediente(data: any) {
   }
 
   if (Array.isArray(serialized.timeline_updates)) {
-    serialized.timeline_updates = serialized.timeline_updates.map((tu: any) => {
+    serialized.timeline_updates = serialized.timeline_updates.map((tu: Record<string, unknown>) => {
       let dateVal = tu.date;
       if (dateVal?.toDate) {
         dateVal = dateVal.toDate().toISOString();

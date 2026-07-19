@@ -7,6 +7,7 @@ import { useUser, useAuth } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import { Loader2, RefreshCw } from 'lucide-react';
 import { OfflineBanner } from '@/components/ui/offline-banner';
+import { secureLogout } from '@/lib/security/client-logout';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -71,10 +72,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const INACTIVITY_TIME = 30 * 60 * 1000; // 30 minutos
 
     const logout = async () => {
-      logger.warn('Cerrando sesión por inactividad');
-      await fetch('/api/auth/session', { method: 'DELETE' });
-      if (auth) await auth.signOut();
-      window.location.href = '/acceso-panel?reason=inactividad';
+      await secureLogout(auth, 'inactividad');
     };
 
     const resetTimer = () => {
@@ -160,11 +158,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <Button
             variant="outline"
             onClick={async () => {
-              await fetch('/api/auth/session', { method: 'DELETE' });
-              if (auth) {
-                await auth.signOut();
-              }
-              window.location.href = '/acceso-panel';
+              await secureLogout(auth, 'manual');
             }}
           >
             Cerrar Sesión

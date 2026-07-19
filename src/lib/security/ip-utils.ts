@@ -38,8 +38,9 @@ export function getSecureIp(request: NextRequest | Request | Headers | unknown):
 
   if (forwarded) {
     const parts = forwarded.split(',');
-    const lastIp = parts[parts.length - 1]?.trim();
-    if (lastIp) return lastIp;
+    // 🛡️ FIX A-03: La primera IP de la cadena es la IP original del cliente
+    const firstIp = parts[0]?.trim();
+    if (firstIp) return firstIp;
   }
 
   return '127.0.0.1';

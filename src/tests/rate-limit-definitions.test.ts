@@ -39,9 +39,9 @@ describe('🛡️ Rate Limiting — Configuración y Límites', () => {
     expect(rateLimiters.leads.limiter.tokens).toBe(10);
     expect(rateLimiters.leads.limiter.window).toBe('15 m');
 
-    // OCR: 2 por 10 minutos
-    expect(rateLimiters.ocr.limiter.tokens).toBe(2);
-    expect(rateLimiters.ocr.limiter.window).toBe('10 m');
+    // OCR: 3 por semana (modificado a petición del usuario)
+    expect(rateLimiters.ocr.limiter.tokens).toBe(3);
+    expect(rateLimiters.ocr.limiter.window).toBe('7 d');
 
     // Validación rápida: 3 por 1 minuto
     expect(rateLimiters.validarOtp.limiter.tokens).toBe(3);

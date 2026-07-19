@@ -55,10 +55,10 @@ export async function GET(req: NextRequest) {
     // Validar el token de descarga
     const expected = Buffer.from(purchase.downloadToken || '');
     const received = Buffer.from(token || '');
-    if (expected.length === 0 || received.length === 0 || !timingSafeEqual(expected, received)) {
+    if (expected.length === 0 || received.length === 0 || expected.length !== received.length || !timingSafeEqual(expected, received)) {
       logger.security('[api/documentos/editor] Token de descarga inválido (IDOR detectado)', {
         ref,
-        receivedToken: token,
+        // 🛡️ FIX R-01: Token removido
       });
       return NextResponse.json({ error: 'No autorizado. Token inválido.' }, { status: 401 });
     }
@@ -123,12 +123,12 @@ export async function POST(req: NextRequest) {
     // Validar el token de descarga
     const expected = Buffer.from(purchase.downloadToken || '');
     const received = Buffer.from(token || '');
-    if (expected.length === 0 || received.length === 0 || !timingSafeEqual(expected, received)) {
+    if (expected.length === 0 || received.length === 0 || expected.length !== received.length || !timingSafeEqual(expected, received)) {
       logger.security(
         '[api/documentos/editor] Token de descarga inválido en guardado (IDOR detectado)',
         {
           ref,
-          receivedToken: token,
+          // 🛡️ FIX R-01: Token removido
         }
       );
       return NextResponse.json({ error: 'No autorizado. Token inválido.' }, { status: 401 });

@@ -7,6 +7,11 @@ export async function comprimirCaptura(file: File, maxWidth = 1200, quality = 0.
     throw new Error('El archivo no es una imagen válida');
   }
 
+  // 🛡️ FIX D-05: Limitar a 20MB para evitar colapso de RAM en dispositivos gama baja
+  if (file.size > 20 * 1024 * 1024) {
+    throw new Error('La imagen es demasiado pesada (máx 20MB). Por favor recórtela o elija otra.');
+  }
+
   // 🛡️ FIX CR-1: URL.createObjectURL no consume memoria heap de JS para string Base64
   const objectUrl = URL.createObjectURL(file);
 
@@ -21,6 +26,12 @@ export async function comprimirCaptura(file: File, maxWidth = 1200, quality = 0.
       const canvas = document.createElement('canvas');
       let width = img.width;
       let height = img.height;
+
+      // 🛡️ FIX D-05: Prevenir OOM en Canvas si la imagen es masiva (ej. Panorámicas 8K)
+      if (width * height > 24000000) { // ~24 Megapíxeles
+        URL.revokeObjectURL(objectUrl);
+        return reject(new Error('La resolución de la imagen es excesiva y podría bloquear tu dispositivo.'));
+      }
 
       // Redimensionamiento inteligente manteniendo el Aspect Ratio
       if (width > maxWidth) {

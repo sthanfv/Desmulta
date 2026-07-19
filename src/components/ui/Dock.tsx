@@ -193,7 +193,7 @@ export default function Dock({
           className={`absolute bottom-2 left-1/2 transform -translate-x-1/2 flex items-end w-fit gap-4 rounded-2xl border-neutral-700 border-2 pb-2 px-4 bg-[#120f17]/90 backdrop-blur-md pointer-events-auto ${className}`}
           style={{ height: panelHeight }}
           role="toolbar"
-          aria-label="Application dock"
+          aria-label="Barra de aplicaciones"
         >
           {items.map((item, index) => (
             <DockItem

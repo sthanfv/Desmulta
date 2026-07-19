@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useFirestore, useDoc, useMemoFirebase, useAuth } from '@/firebase';
+import { secureLogout } from '@/lib/security/client-logout';
 import { doc } from 'firebase/firestore';
 import {
   deleteExpiredConsultations,
@@ -241,14 +242,11 @@ export function AdminDashboard() {
       });
     },
     onLogout: async () => {
-      await fetch('/api/auth/session', { method: 'DELETE' });
-      await auth?.signOut();
-      window.location.href = '/acceso-panel';
-      toast({
-        variant: 'destructive',
-        title: 'Sesión cerrada',
-        description: 'Desconectado por inactividad (15 min).',
-      });
+      try {
+        await secureLogout(auth, 'inactivity');
+      } catch (_error) {
+        window.location.href = '/acceso-panel';
+      }
     },
   });
 
@@ -471,9 +469,11 @@ export function AdminDashboard() {
               variant="ghost"
               size="sm"
               onClick={async () => {
-                await fetch('/api/auth/session', { method: 'DELETE' });
-                await auth?.signOut();
-                window.location.href = '/acceso-panel';
+                try {
+                  await secureLogout(auth, 'manual');
+                } catch (_error) {
+                  window.location.href = '/acceso-panel';
+                }
               }}
               className="gap-1.5 text-muted-foreground hover:text-foreground rounded-xl text-xs"
             >

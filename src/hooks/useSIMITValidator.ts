@@ -33,6 +33,8 @@ export interface InfoEducativa {
   contexto_legal: string;
   /** Defensa clave resumida para la impugnación */
   defensa_clave: string;
+  /** ID único de la multa inyectado dinámicamente */
+  idUnicoMulta?: string;
 }
 
 /**
@@ -467,20 +469,21 @@ export const useSIMITValidator = () => {
                 infoEducativas.push({
                    ...entrada,
                    idUnicoMulta: comp.numeroComparendo || Date.now().toString() // Inyectar ID para el carrusel
-                } as any);
+                });
               }
             }
           } else {
             // Es resolución / comparendo manual (Línea gris): inyectar tarjeta genérica grave
             infoEducativas.push({
               codigo: comp.numeroComparendo || 'RESOLUCIÓN SANCIONATORIA',
-              tipo: 'Resolución de Tránsito en Firme',
-              descripcion: comp.descripcionInfraccion || 'Infracción confirmada por la autoridad de tránsito',
-              inmovilizacion: 'Riesgo alto si no se regulariza',
+              nombre: comp.descripcionInfraccion || 'Infracción confirmada por la autoridad de tránsito',
               gravedad: 'Muy Grave (En Cobro)',
-              costoEstimado: comp.valorMulta || 'Desconocido',
+              sancion_cop: String(comp.valorMulta || 'Desconocido'),
+              inmoviliza: true, // Riesgo alto
+              contexto_legal: 'Resolución de Tránsito en Firme',
+              defensa_clave: 'Verificación de notificaciones y debido proceso',
               idUnicoMulta: comp.numeroComparendo || Date.now().toString()
-            } as any);
+            });
           }
         });
       } else {

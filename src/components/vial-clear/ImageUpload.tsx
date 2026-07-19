@@ -48,7 +48,7 @@ export function ImageUpload({
   const [warning, setWarning] = useState<string | null>(null);
   /** Información educativa de los códigos CNT detectados por el OCR — null si no aplica */
   const [infoEducativas, setInfoEducativas] = useState<InfoEducativa[] | null>(null);
-  const [pendingUploadUrl, setPendingUploadUrl] = useState<string | null>(null);
+  // removed unused state
   const isCarouselOpenRef = useRef(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);

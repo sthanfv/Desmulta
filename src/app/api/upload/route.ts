@@ -67,7 +67,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const lunes = new Date(Date.UTC(ahora.getUTCFullYear(), ahora.getUTCMonth(), diff));
     const semanaKey = lunes.toISOString().split('T')[0];
     
-    const docId = `${authorUid}_${semanaKey}`.replace(/[.:]/g, '_');
+    const docId = `v2_${authorUid}_${semanaKey}`.replace(/[.:]/g, '_');
 
     logger.info('[upload] Paso 1: Iniciando para IP:', { clienteIp, docId });
 
@@ -84,8 +84,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     const docSnap = await rateLimitRef.get();
     let contador = 0;
-    // MANDATO-FILTRO v2.4.4: Límite estricto de 50 cargas por IP/semana (Temporal para QA/Pruebas)
-    const limite = 50;
+    // MANDATO-FILTRO v2.4.4: Límite estricto de 3 cargas por IP/semana para evitar abuso
+    const limite = 3;
 
     if (docSnap.exists) {
       contador = docSnap.data()?.count || 0;
