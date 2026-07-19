@@ -173,10 +173,11 @@ export default function StepSuccess({
           </div>
 
           {/* CÓDIGO QR DE RESPALDO */}
-          <div className="flex flex-col items-center gap-2 mt-4 w-full bg-white dark:bg-black p-4 rounded-2xl border border-red-500/20 shadow-inner">
-            <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest mb-1">
-              Código QR de Respaldo
-            </p>
+          {successData.trackingUuid && (
+            <div className="flex flex-col items-center gap-2 mt-4 w-full bg-white dark:bg-black p-4 rounded-2xl border border-red-500/20 shadow-inner">
+              <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest mb-1">
+                Código QR de Respaldo
+              </p>
             <div className="bg-white p-2 rounded-xl shadow-sm border border-slate-100 relative">
               <QRCode
                 id={`qr-client-${successData.trackingUuid}`}

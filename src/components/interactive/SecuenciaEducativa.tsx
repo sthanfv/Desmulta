@@ -150,6 +150,7 @@ export function SecuenciaEducativa({ infoList, onClose }: SecuenciaEducativaProp
 
             {/* Botón cerrar */}
             <button
+              type="button"
               id="btn-cerrar-educativa"
               onClick={onClose}
               className="flex-shrink-0 w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
@@ -222,6 +223,7 @@ export function SecuenciaEducativa({ infoList, onClose }: SecuenciaEducativaProp
 
               {/* Contexto legal — expandible */}
               <button
+                type="button"
                 id={`btn-expandir-educativa-${info.codigo}`}
                 onClick={() => setExpandida((p) => !p)}
                 className="w-full flex items-center justify-between px-5 py-3 border-t border-white/8 text-left hover:bg-white/5 transition-colors"
@@ -267,6 +269,7 @@ export function SecuenciaEducativa({ infoList, onClose }: SecuenciaEducativaProp
               <>
                 {/* Botón Anterior */}
                 <button
+                  type="button"
                   id="btn-anterior-educativa"
                   onClick={handleAnterior}
                   disabled={esPrimera}
@@ -283,6 +286,7 @@ export function SecuenciaEducativa({ infoList, onClose }: SecuenciaEducativaProp
 
                 {/* Botón Siguiente / Listo */}
                 <button
+                  type="button"
                   id="btn-siguiente-educativa"
                   onClick={handleSiguiente}
                   className={`flex items-center gap-1.5 px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all active:scale-95 shadow-lg ${
@@ -310,6 +314,7 @@ export function SecuenciaEducativa({ infoList, onClose }: SecuenciaEducativaProp
             ) : (
               /* Caso de una sola multa: botón de confirmación de lectura principal de ancho completo */
               <button
+                type="button"
                 id="btn-entendido-educativa"
                 onClick={() => {
                   Haptics.success();
