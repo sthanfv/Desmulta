@@ -226,6 +226,11 @@ export async function POST(req: NextRequest) {
       const chatId = process.env.TELEGRAM_CHAT_ID;
       
       if (botToken && chatId) {
+        // Extraemos datos extra si existen en el documento de la compra
+        const nombre = purchase?.caseData?.infractorName || 'Cliente Anónimo';
+        const producto = purchase?.productLabel || 'Documento Legal';
+        const ticket = purchase?.caseData?.ticketNumber ? `\n*Comparendo:* \`${purchase.caseData.ticketNumber}\`` : '';
+
         waitUntil(
           fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
             method: 'POST',
@@ -233,7 +238,7 @@ export async function POST(req: NextRequest) {
             body: JSON.stringify({
               chat_id: chatId,
               parse_mode: 'Markdown',
-              text: `💰 *¡NUEVO PAGO RECIBIDO!* 💰\n\n*Monto:* $${(amountConfirmadoPorWompi / 100).toLocaleString('es-CO')} COP\n*Referencia:* \`${reference}\`\n*Transacción:* \`${transactionId}\`\n\nEl PDF se está enviando al cliente automáticamente. 🚀`
+              text: `💰 *¡NUEVO PAGO RECIBIDO!* 💰\n\n*Cliente:* ${nombre}\n*Producto:* ${producto}${ticket}\n*Monto:* $${(amountConfirmadoPorWompi / 100).toLocaleString('es-CO')} COP\n*Ref:* \`${reference}\`\n\nEl PDF se está enviando automáticamente. 🚀`
             })
           }).catch(err => {
             logger.warn('[webhook-wompi] Fallo al enviar el Cha-ching por Telegram', { error: String(err) });
