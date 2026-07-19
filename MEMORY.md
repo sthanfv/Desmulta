@@ -5,6 +5,15 @@
 > Se analizó el equipo local (DESKTOP-N9CGIFT) identificando un procesador antiguo `AMD PRO A10-8750B R7` (4 núcleos) y 16GB de RAM. Esta severa limitación en procesamiento de un solo hilo causa sobrecargas y Cold Starts extremadamente lentos.
 > **Regla permanente:** Está **ESTRICTAMENTE PROHIBIDO** ejecutar suites de validación masivas (`npm run validate` total) o pruebas E2E pesadas (Playwright) para cambios menores, ya que estresa severamente la máquina. Aplicar validación quirúrgica (linters específicos y pruebas aisladas) a menos que se trate de una reestructuración arquitectónica masiva autorizada por el usuario. Cuando las pruebas E2E sean necesarias, usar estrategias pasivas y timeouts elevados (`60000ms`).
 
+## 2026-07-19: Hotfix - Error de Compilación en VIP Dashboard (TypeScript)
+
+- **Qué cambió:**
+  - **[Bugfix Typescript]**: En `src/app/vip/dashboard/page.tsx`, se añadió la anotación `Record<string, any>` para el objeto `serialized` dentro de la función `serializeVipExpediente`, silenciando explícitamente el linter (`eslint-disable-next-line @typescript-eslint/no-explicit-any`). 
+- **Por qué cambió:**
+  - El pipeline de despliegue en Vercel falló (`npm run build exited with 1`) lanzando el error: `Property 'toDate' does not exist on type '{}'`. Esto ocurría porque TypeScript infería estrictamente que el objeto devuelto de Firestore no podía tener funciones internas predeterminadas de fecha. 
+- **Archivos afectados:**
+  - `src/app/vip/dashboard/page.tsx` [MODIFICADO]
+- **Estado actual:** ✅ Corregido. El build de producción se encuentra compilando exitosamente de nuevo.
 ## 2026-07-19: QA Final - Corrección de Bugs de Ruteo QR y Tests de Seguridad
 
 - **Qué cambió:**

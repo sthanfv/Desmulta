@@ -14,7 +14,8 @@ import { getCachedDoc } from '@/lib/cache/redis-cache';
 // removed
 function serializeVipExpediente(data: Record<string, unknown> | null | undefined) {
   if (!data) return data;
-  const serialized = { ...data };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const serialized: Record<string, any> = { ...data };
 
   if (serialized.createdAt?.toDate) {
     serialized.createdAt = serialized.createdAt.toDate().toISOString();
