@@ -353,7 +353,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       apiError(
         errorCode,
-        'Nuestros servidores de IA están temporalmente saturados por alta demanda. Por favor, intenta de nuevo en unos minutos.'
+        `DEBUG ERROR: ${errorMsg}`
       ),
       { status: statusCode }
     );
