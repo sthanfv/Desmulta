@@ -84,8 +84,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     const docSnap = await rateLimitRef.get();
     let contador = 0;
-    // MANDATO-FILTRO v2.4.4: Límite estricto de 5 cargas por IP/semana solicitado por el usuario
-    const limite = 5;
+    // MANDATO-FILTRO v2.4.4: Límite estricto de 50 cargas por IP/semana (Temporal para QA/Pruebas)
+    const limite = 50;
 
     if (docSnap.exists) {
       contador = docSnap.data()?.count || 0;
