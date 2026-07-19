@@ -186,7 +186,7 @@ export const useSIMITValidator = () => {
       }
 
       const objectUrl = URL.createObjectURL(archivoProcesar);
-      let ocrTimeoutId: NodeJS.Timeout;
+      let ocrTimeoutId: NodeJS.Timeout | undefined = undefined;
       const timeoutPromise = new Promise<never>((_, reject) => {
         ocrTimeoutId = setTimeout(() => reject(new Error('TIMEOUT_OCR')), OCR_TIMEOUT_MS);
       });
