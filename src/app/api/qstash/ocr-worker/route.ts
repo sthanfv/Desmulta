@@ -23,7 +23,7 @@ function getGeminiModel() {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error('[ocr-worker] GEMINI_API_KEY no configurada.');
   const genAI = new GoogleGenerativeAI(apiKey);
-  return genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+  return genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 }
 
 export async function POST(request: NextRequest) {
@@ -116,12 +116,14 @@ export async function POST(request: NextRequest) {
 
     if (
       rawRespuesta === 'NO_VALID_DOCUMENT' ||
-      rawRespuesta.includes('"error":"NO_VALID_DOCUMENT"')
+      rawRespuesta.includes('"error":"NO_VALID_DOCUMENT"') ||
+      rawRespuesta === 'PROMPT_INJECTION_DETECTED' ||
+      rawRespuesta.includes('"error":"PROMPT_INJECTION_DETECTED"')
     ) {
       finalPayload = {
         success: false,
-        error: 'INVALID_DOCUMENT',
-        message: 'La imagen no parece ser una multa o resolución de tránsito válida.',
+        error: rawRespuesta.includes('PROMPT_INJECTION_DETECTED') ? 'PROMPT_INJECTION_DETECTED' : 'INVALID_DOCUMENT',
+        message: 'La imagen no parece ser una multa válida o contiene instrucciones no permitidas.',
       };
     } else {
       let parsedJSON: unknown = null;
@@ -159,7 +161,7 @@ export async function POST(request: NextRequest) {
         const analisis = construirAnalisisCompleto(
           textoCompleto,
           null,
-          'google-gemini-2.5-flash',
+          'google-gemini-1.5-flash',
           parsedJSON !== null ? 95 : 60
         );
         finalPayload = {
@@ -169,7 +171,7 @@ export async function POST(request: NextRequest) {
         };
       } else {
         const resultados = comparendos.map((comp) =>
-          construirAnalisisCompleto(textoCompleto, comp, 'google-gemini-2.5-flash', 95)
+          construirAnalisisCompleto(textoCompleto, comp, 'google-gemini-1.5-flash', 95)
         );
         finalPayload = {
           success: true,

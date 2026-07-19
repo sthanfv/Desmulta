@@ -92,7 +92,7 @@ function getGeminiModel() {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error('[analizar-comparendo] GEMINI_API_KEY no configurada.');
   const genAI = new GoogleGenerativeAI(apiKey);
-  return genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+  return genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 }
 
 const PROMPT_EXTRACCION_ESTRUCTURADA = PROMPT_EXTRACCION_ESTRUCTURADA_SINGLE;
@@ -252,13 +252,13 @@ export async function POST(request: NextRequest) {
         construirAnalisisCompleto(
           textoCompleto,
           null,
-          'google-gemini-2.5-flash',
+          'google-gemini-1.5-flash',
           parsedJSON !== null ? 95 : 60
         ),
       ];
     } else {
       resultados = comparendos.map((comp) =>
-        construirAnalisisCompleto(textoCompleto, comp, 'google-gemini-2.5-flash', 95)
+        construirAnalisisCompleto(textoCompleto, comp, 'google-gemini-1.5-flash', 95)
       );
     }
 
