@@ -56,10 +56,10 @@ function SweeperContent() {
   }, []);
 
   const steps = [
-    { icon: ShieldCheck, text: 'Activando protocolo Zero-Trust...' },
-    { icon: DatabaseZap, text: 'Destruyendo credenciales seguras...' },
-    { icon: Sparkles, text: 'Vaciando caché y base de datos local...' },
-    { icon: CheckCircle2, text: 'Limpieza completada. Redirigiendo...' }
+    { icon: ShieldCheck, text: 'Cerrando sesión de forma segura...' },
+    { icon: DatabaseZap, text: 'Borrando información confidencial...' },
+    { icon: Sparkles, text: 'Limpiando memoria de la aplicación...' },
+    { icon: CheckCircle2, text: 'Limpieza completada. Hasta pronto.' }
   ];
 
   const CurrentIcon = steps[step].icon;
