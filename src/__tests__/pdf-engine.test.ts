@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { generateMandatePDF, MandatePayload } from '@/lib/legal/pdf-engine';
 import { DocumentType } from '@/lib/legal/document-templates';
-import zlib from 'zlib';
 
 // (removido extractPDFText porque sus aserciones eran inestables)
 

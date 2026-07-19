@@ -135,6 +135,10 @@ export default async function VipDashboardPage() {
   const expediente = await getVipData();
   const { data } = expediente;
 
+  if (!data) {
+    redirect('/vip');
+  }
+
   // Extraer timeline_updates o history (dependiendo de si es caso o lead)
   // Casos usan history, leads ahora usan timeline_updates
   const rawHistory = expediente.tipo === 'caso' ? data.history : data.timeline_updates;
