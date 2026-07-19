@@ -71,6 +71,26 @@ const COINCIDENCIAS_TOTALES_MINIMAS = 6;
 
 const OCR_TIMEOUT_MS = 55000;
 
+export interface ComparendoEstructurado {
+  numeroComparendo: string | null;
+  fechaInfraccion: string | null;
+  placa: string | null;
+  codigoInfraccion: string | null;
+  descripcionInfraccion: string | null;
+  valorMulta: number | null;
+  nombreInfractor: string | null;
+  cedulaInfractor: string | null;
+  entidadEmisora: string | null;
+  ciudad: string | null;
+  esFotomulta: boolean;
+  tieneCobroCoactivo: boolean;
+  tieneMandamientoPago: boolean;
+  tieneResolucionSancionatoria: boolean;
+  fechaResolucion: string | null;
+  estado: string | null;
+  textoCompleto?: string | null;
+}
+
 export interface ResultadoOCR {
   esValida: boolean;
   coincidencias: string[];
@@ -84,7 +104,7 @@ export interface ResultadoOCR {
   infoEducativa?: InfoEducativa | null;
   /** Información educativa de los múltiples códigos de infracción detectados */
   infoEducativas?: InfoEducativa[] | null;
-  comparendosEstructurados?: any[] | null;
+  comparendosEstructurados?: ComparendoEstructurado[] | null;
   requiresManualReview?: boolean;
 }
 
@@ -100,7 +120,7 @@ import { comprimirCaptura } from '@/lib/optimizador-imagenes';
 const reconocerTextoConIA = async (
   file: File,
   onProgress?: (progreso: number) => void
-): Promise<{ texto: string; palabras: TesseractWord[]; comparendo?: any[] }> => {
+): Promise<{ texto: string; palabras: TesseractWord[]; comparendo?: ComparendoEstructurado[] }> => {
   onProgress?.(10);
 
   const base64 = await new Promise<string>((resolve, reject) => {
@@ -192,7 +212,7 @@ export const useSIMITValidator = () => {
       });
 
       let resultRaw: { data: { text: string; words?: TesseractWord[]; confidence?: number } };
-      let comparendosEstructurados: any[] | null = null;
+      let comparendosEstructurados: ComparendoEstructurado[] | null = null;
       try {
         /*
          * =========================================================================
@@ -434,7 +454,7 @@ export const useSIMITValidator = () => {
         // Usar los datos estructurados extraídos por Gemini
         const codigosProcesados = new Set<string>();
 
-        comparendosEstructurados.forEach((comp: any) => {
+        comparendosEstructurados.forEach((comp: ComparendoEstructurado) => {
           if (comp.esFotomulta && comp.codigoInfraccion) {
             // Es fotomulta: buscar la tarjeta específica
             const codigoNorm = comp.codigoInfraccion.toUpperCase();
