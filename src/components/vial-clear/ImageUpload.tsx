@@ -178,7 +178,7 @@ export function ImageUpload({
         if (!response.ok) {
           const data = await response.json().catch(() => ({}));
           if (response.status === 429) {
-            throw new Error(data.error || '¡Has alcanzado el límite de 5 cargas por hoy!');
+            throw new Error(data.error || '¡Has alcanzado el límite de cargas por hoy!');
           }
           if (response.status === 403 && data.tokenConsumed) {
             throw new Error(data.error || 'Validación de seguridad fallida. Token consumido.');

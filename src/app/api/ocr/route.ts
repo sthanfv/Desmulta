@@ -133,9 +133,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 4. Llamar a Google Gemini con Timeout de 35s para evitar Vercel 504 Timeout y dar tiempo a Tesseract
+    // 4. Llamar a Google Gemini con Timeout de 50s para evitar Vercel 504 Timeout y dar tiempo a Tesseract
     const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error('OCR_TIMEOUT_35S')), 35000);
+      setTimeout(() => reject(new Error('OCR_TIMEOUT_50S')), 50000);
     });
 
     try {
@@ -269,7 +269,7 @@ export async function POST(request: NextRequest) {
 
       // Si el error fue por timeout, no vale la pena intentar Tesseract si Vercel está a punto de matarnos
       // Pero como aumentamos maxDuration a 60s, si el timeout fue de 15s, Tesseract (que toma 10s) sí alcanza a correr.
-      if (gMsg.includes('OCR_TIMEOUT_35S')) {
+      if (gMsg.includes('OCR_TIMEOUT_50S')) {
         logger.warn('[OCR] Timeout de 35s alcanzado. Pasando a Tesseract...');
       }
 

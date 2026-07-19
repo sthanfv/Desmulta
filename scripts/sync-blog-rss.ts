@@ -145,7 +145,7 @@ Content: ${contenidoCrudo}
 // Envía una notificación por Telegram al administrador sobre los borradores creados
 async function notifyTelegram(newPosts: { title: string; slug: string }[]) {
   const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
+  const chatId = process.env.TELEGRAM_SECURITY_CHAT_ID || process.env.TELEGRAM_CHAT_ID;
 
   if (!token || !chatId) {
     console.log('[TELEGRAM] Ignorado: TELEGRAM_BOT_TOKEN o TELEGRAM_CHAT_ID no configurados.');
@@ -215,6 +215,19 @@ async function syncBlogFromRss() {
     console.log(`[RSS-SYNC] Consultando novedades viales en: ${url}`);
     
     try {
+      const urlObj = new URL(url);
+      const allowedDomains = [
+        'diariodetransporte.com',
+        'mintransporte.gov.co',
+        'simit.org.co',
+        'www.movilidadbogota.gov.co',
+        'www.google.com'
+      ];
+      if (!allowedDomains.includes(urlObj.hostname)) {
+        console.error(`[RSS-SYNC-ERROR] URL denegada por política de seguridad: el dominio ${urlObj.hostname} no está en la allowlist.`);
+        continue;
+      }
+
       const response = await fetch(url);
       if (!response.ok) {
         console.error(`[RSS-SYNC-WARN] HTTP ${response.status} - No se pudo descargar el feed: ${url}`);
@@ -270,7 +283,8 @@ async function syncBlogFromRss() {
         const contieneBasura = blacklist.some(palabra => titleLower.includes(palabra));
         
         const whitelist = ['movilidad', 'tránsito', 'transito', 'transporte', 'fotomulta', 'multa', 'comparendo', 'licencia', 'conductor', 'vehículo', 'vehiculo', 'carro', 'moto', 'vía', 'via', 'peaje', 'soat', 'tecnomecánica', 'tecnomecanica', 'infractor', 'simit', 'runt', 'secretaría de movilidad', 'ministerio de transporte', 'conducir', 'parqueo', 'grúa', 'grua', 'pico y placa'];
-        const esRelevante = whitelist.some(palabra => titleLower.includes(palabra) || descLower.includes(palabra));
+        // Filtro estricto: la palabra clave DEBE estar en el título. (Evitar noticias donde solo mencionen "vehículo" en el cuerpo)
+        const esRelevante = whitelist.some(palabra => titleLower.includes(palabra));
 
         if (contieneBasura || !esRelevante) {
           console.log(`[-] Omitido por filtro de relevancia estricto: "${title}"`);
