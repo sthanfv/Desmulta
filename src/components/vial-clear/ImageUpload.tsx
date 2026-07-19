@@ -190,11 +190,7 @@ export function ImageUpload({
 
         const blob = (await response.json()) as { url: string };
         setIsUploaded(true);
-        if (isCarouselOpenRef.current) {
-          setPendingUploadUrl(blob.url);
-        } else {
-          onUploadSuccess(blob.url);
-        }
+        onUploadSuccess(blob.url);
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : 'Error desconocido';
         setPreview(null);
@@ -429,10 +425,6 @@ export function ImageUpload({
           onClose={() => {
             setInfoEducativas(null);
             isCarouselOpenRef.current = false;
-            if (pendingUploadUrl) {
-              onUploadSuccess(pendingUploadUrl);
-              setPendingUploadUrl(null);
-            }
           }}
         />
       )}
