@@ -37,20 +37,15 @@ export async function secureLogout(
       await Promise.all(cacheNames.map((name) => caches.delete(name)));
     }
 
-    // 5. Destrucción de IndexedDB (Firebase Auth y otros estados persistentes)
-    if (typeof window !== 'undefined' && window.indexedDB) {
+    // 5. Desregistrar Service Workers (Evita que intercepten red en estado corrupto tras borrar caches)
+    if ('serviceWorker' in navigator) {
       try {
-        const databases = await window.indexedDB.databases?.();
-        if (databases) {
-          for (const db of databases) {
-            if (db.name) {
-              window.indexedDB.deleteDatabase(db.name);
-            }
-          }
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        for (const registration of registrations) {
+          await registration.unregister();
         }
       } catch (e: unknown) {
-        // En navegadores antiguos o Firefox incognito `databases()` puede fallar
-        logger.warn('No se pudo borrar IndexedDB (navegador no soporta enumeración)', e);
+        logger.warn('No se pudieron desregistrar los Service Workers', e);
       }
     }
 
