@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import dynamic from 'next/dynamic';
 import { LazyMotion, domAnimation, m, useMotionValue, useSpring, useTransform, type MotionValue } from 'framer-motion';
 
-const ModeToggle = dynamic(() => import('@/components/mode-toggle').then((mod) => mod.ModeToggle), {
+const ThemeToggle = dynamic(() => import('@/components/vial-clear/ThemeToggle').then((mod) => mod.ThemeToggle), {
   ssr: false,
 });
 const ChangelogWidget = dynamic(
@@ -138,7 +138,7 @@ export const Header = ({ onOpenModal }: HeaderProps) => {
             </div>
 
             <MagneticItem mouseX={mouseX}>
-              <ModeToggle />
+              <ThemeToggle />
             </MagneticItem>
           </div>
 
@@ -153,7 +153,7 @@ export const Header = ({ onOpenModal }: HeaderProps) => {
             >
               <Camera size={18} />
             </Button>
-            <ModeToggle />
+            <ThemeToggle />
 
             {/* Menú Hamburguesa Animado (Hamburger to X) */}
             <button
