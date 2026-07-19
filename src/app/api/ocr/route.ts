@@ -34,7 +34,7 @@ function getGeminiModel() {
 
   const genAI = new GoogleGenerativeAI(apiKey);
   // Usar flash-1.5 por ser el más estable y óptimo para OCR multimodal
-  return genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
+  return genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 }
 
 export async function POST(request: NextRequest) {
@@ -241,7 +241,7 @@ export async function POST(request: NextRequest) {
         // Campo legacy: texto crudo para el flujo existente (simit-parser, PrescriptionEngine)
         texto: textoCompleto,
         palabras: [],
-        proveedor: 'google-gemini-1.5-flash-latest',
+        proveedor: 'google-gemini-2.5-flash',
         // Campo nuevo: datos estructurados del comparendo (null si Gemini respondió en modo texto)
         comparendo,
       });
