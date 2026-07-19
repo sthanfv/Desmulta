@@ -223,7 +223,7 @@ export async function POST(req: NextRequest) {
 
       // 🔔 Notificación "Cha-ching!" por Telegram al dueño
       const botToken = process.env.TELEGRAM_BOT_TOKEN;
-      const chatId = process.env.TELEGRAM_SALES_CHAT_ID || process.env.TELEGRAM_CHAT_ID;
+      const chatId = process.env.TELEGRAM_CHAT_ID;
       
       if (botToken && chatId) {
         // Extraemos datos extra si existen en el documento de la compra
