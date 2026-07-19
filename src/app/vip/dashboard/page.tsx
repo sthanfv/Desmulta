@@ -30,8 +30,10 @@ function serializeVipExpediente(data: Record<string, unknown> | null | undefined
   }
 
   if (Array.isArray(serialized.history)) {
-    serialized.history = serialized.history.map((h: Record<string, unknown>) => {
-      let dateVal = h.date;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    serialized.history = serialized.history.map((h: Record<string, any>) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let dateVal: any = h.date;
       if (dateVal?.toDate) {
         dateVal = dateVal.toDate().toISOString();
       } else if (dateVal instanceof Date) {
@@ -49,8 +51,10 @@ function serializeVipExpediente(data: Record<string, unknown> | null | undefined
   }
 
   if (Array.isArray(serialized.timeline_updates)) {
-    serialized.timeline_updates = serialized.timeline_updates.map((tu: Record<string, unknown>) => {
-      let dateVal = tu.date;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    serialized.timeline_updates = serialized.timeline_updates.map((tu: Record<string, any>) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let dateVal: any = tu.date;
       if (dateVal?.toDate) {
         dateVal = dateVal.toDate().toISOString();
       } else if (dateVal instanceof Date) {
@@ -69,7 +73,6 @@ function serializeVipExpediente(data: Record<string, unknown> | null | undefined
 
   return serialized;
 }
-/* eslint-enable @typescript-eslint/no-explicit-any */
 
 async function getVipData() {
   const cookieStore = await cookies();

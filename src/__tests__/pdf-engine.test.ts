@@ -3,43 +3,7 @@ import { generateMandatePDF, MandatePayload } from '@/lib/legal/pdf-engine';
 import { DocumentType } from '@/lib/legal/document-templates';
 import zlib from 'zlib';
 
-function extractPDFText(buffer: Uint8Array): string {
-  const binary = Buffer.from(buffer);
-  let text = '';
-  let pos = 0;
-  while (true) {
-    const streamStart = binary.indexOf('stream', pos);
-    if (streamStart === -1) break;
-    let dataStart = streamStart + 6;
-    if (binary[dataStart] === 13) dataStart++; // \r
-    if (binary[dataStart] === 10) dataStart++; // \n
-    const streamEnd = binary.indexOf('endstream', dataStart);
-    if (streamEnd === -1) break;
-    let dataEnd = streamEnd;
-    if (binary[dataEnd - 1] === 10) dataEnd--; // \n
-    if (binary[dataEnd - 1] === 13) dataEnd--; // \r
-    const streamData = binary.subarray(dataStart, dataEnd);
-    try {
-      const decompressed = zlib.inflateSync(streamData);
-      const decompressedStr = decompressed.toString('utf-8');
-
-      // Decodificamos cadenas hexadecimales de PDF como <506172...> Tj
-      const decodedStr = decompressedStr.replace(/<([0-9a-fA-F]+)>/g, (_, hex) => {
-        try {
-          return Buffer.from(hex, 'hex').toString('utf-8');
-        } catch {
-          return '';
-        }
-      });
-
-      text += decodedStr + '\n';
-    } catch {
-      // Ignoramos flujos que no sean de texto comprimido estándar
-    }
-    pos = streamEnd + 9;
-  }
-  return text;
-}
+// (removido extractPDFText porque sus aserciones eran inestables)
 
 // Payload base reutilizable para los tests
 const baseMock: MandatePayload = {
