@@ -173,11 +173,10 @@ export default function StepSuccess({
           </div>
 
           {/* CÓDIGO QR DE RESPALDO */}
-          {successData.trackingUuid && (
-            <div className="flex flex-col items-center gap-2 mt-4 w-full bg-white dark:bg-black p-4 rounded-2xl border border-red-500/20 shadow-inner">
-              <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest mb-1">
-                Código QR de Respaldo
-              </p>
+          <div className="flex flex-col items-center gap-2 mt-4 w-full bg-white dark:bg-black p-4 rounded-2xl border border-red-500/20 shadow-inner">
+            <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest mb-1">
+              Código QR de Respaldo
+            </p>
             <div className="bg-white p-2 rounded-xl shadow-sm border border-slate-100 relative">
               <QRCode
                 id={`qr-client-${successData.trackingUuid}`}
@@ -280,10 +279,9 @@ export default function StepSuccess({
               Descargar QR
             </Button>
           </div>
-          )}
         </div>
-      </div>
-    </m.div>
+      )}
+
       {!fcmToken && !hasInteractedWithPush && (
         <div
           className={`mb-8 p-4 rounded-[2rem] border-2 flex flex-col items-center gap-3 w-full max-w-sm ${isSimitMode ? 'border-amber-500/40 bg-amber-500/10' : 'border-primary/20 bg-primary/5'}`}
