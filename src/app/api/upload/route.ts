@@ -59,8 +59,15 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     // Usar UID verificado o IP como fallback (nunca el header no verificado)
     const authorUid = verifiedUid || clienteIp;
-    const hoy = new Date().toISOString().split('T')[0];
-    const docId = `${authorUid}_${hoy}`.replace(/[.:]/g, '_');
+    
+    // Obtener el lunes de la semana actual para conteo semanal
+    const ahora = new Date();
+    const dia = ahora.getUTCDay(); // 0 = Dom, 1 = Lun...
+    const diff = ahora.getUTCDate() - dia + (dia === 0 ? -6 : 1);
+    const lunes = new Date(Date.UTC(ahora.getUTCFullYear(), ahora.getUTCMonth(), diff));
+    const semanaKey = lunes.toISOString().split('T')[0];
+    
+    const docId = `${authorUid}_${semanaKey}`.replace(/[.:]/g, '_');
 
     logger.info('[upload] Paso 1: Iniciando para IP:', { clienteIp, docId });
 
@@ -77,34 +84,18 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     const docSnap = await rateLimitRef.get();
     let contador = 0;
-    // MANDATO-FILTRO v2.4.4: Límite estricto de 5 cargas por IP/día solicitado por el usuario
+    // MANDATO-FILTRO v2.4.4: Límite estricto de 5 cargas por IP/semana solicitado por el usuario
     const limite = 5;
 
     if (docSnap.exists) {
       contador = docSnap.data()?.count || 0;
       if (contador >= limite) {
-        logger.warn('[upload] Límite excedido bloqueado:', { clienteIp, contador });
-
-        // Calcular tiempo hasta medianoche UTC (cuando cambia la fecha ISO)
-        const ahora = new Date();
-        const mañana = new Date(
-          Date.UTC(ahora.getUTCFullYear(), ahora.getUTCMonth(), ahora.getUTCDate() + 1)
-        );
-        const msFaltantes = mañana.getTime() - ahora.getTime();
-        const horas = Math.floor(msFaltantes / (1000 * 60 * 60));
-        const minutos = Math.floor((msFaltantes % (1000 * 60 * 60)) / (1000 * 60));
-
-        let tiempoEspera = '';
-        if (horas > 0) {
-          tiempoEspera = `${horas} ${horas === 1 ? 'hora' : 'horas'} y ${minutos} ${minutos === 1 ? 'minuto' : 'minutos'}`;
-        } else {
-          tiempoEspera = `${minutos} ${minutos === 1 ? 'minuto' : 'minutos'}`;
-        }
+        logger.warn('[upload] Límite semanal excedido bloqueado:', { clienteIp, contador });
 
         return NextResponse.json(
           apiError(
             'RATE_LIMITED',
-            `¡Has alcanzado el límite de seguridad diario! Solo permitimos ${limite} cargas por día para proteger el sistema. Por favor, intenta de nuevo en ${tiempoEspera}.`
+            `¡Has alcanzado el límite de seguridad! Solo permitimos ${limite} cargas por semana para proteger el sistema.`
           ),
           { status: 429 }
         );
@@ -170,10 +161,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     // Actualizar contador
     logger.info('[upload] Paso 4: Actualizando contador en DB...');
+    const hoyParaLog = new Date().toISOString().split('T')[0];
     await rateLimitRef.set(
       {
         ip: clienteIp,
-        fecha: hoy,
+        fecha: hoyParaLog,
         count: contador + 1,
         ultimaCargaEn: new Date().toISOString(),
       },

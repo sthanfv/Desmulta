@@ -84,6 +84,7 @@ export interface ResultadoOCR {
   infoEducativa?: InfoEducativa | null;
   /** Información educativa de los múltiples códigos de infracción detectados */
   infoEducativas?: InfoEducativa[] | null;
+  comparendosEstructurados?: any[] | null;
   requiresManualReview?: boolean;
 }
 
@@ -99,7 +100,7 @@ import { comprimirCaptura } from '@/lib/optimizador-imagenes';
 const reconocerTextoConIA = async (
   file: File,
   onProgress?: (progreso: number) => void
-): Promise<{ texto: string; palabras: TesseractWord[] }> => {
+): Promise<{ texto: string; palabras: TesseractWord[]; comparendo?: any[] }> => {
   onProgress?.(10);
 
   const base64 = await new Promise<string>((resolve, reject) => {
@@ -190,7 +191,44 @@ export const useSIMITValidator = () => {
       );
 
       let resultRaw: { data: { text: string; words?: TesseractWord[]; confidence?: number } };
+      let comparendosEstructurados: any[] | null = null;
       try {
+        /*
+         * =========================================================================
+         * [MANDATO-FILTRO: OCR DESHABILITADO EN FAVOR DE LA API GEMINI]
+         * =========================================================================
+         * El cliente ha solicitado que el OCR local (Tesseract) quede encapsulado
+         * y desconectado, pero funcional como reserva histórica. Se ha migrado 
+         * 100% a la API de Gemini (flash-2.5) debido a su mayor precisión,
+         * velocidad y cuota gratuita suficiente (1500 req/día vs límite de 5/sem).
+         */
+        const USAR_TESSERACT_LOCAL = false;
+
+        if (!USAR_TESSERACT_LOCAL) {
+          mediaLogger.log('OCR', 'Enrutando hacia API Gemini (Tesseract en reserva)...');
+          setProgresoOCR(50);
+          const iaData = await reconocerTextoConIA(archivoProcesar, (p) => setProgresoOCR(p));
+          
+          if (!iaData || !iaData.texto) {
+            throw new Error('La API de IA no pudo extraer texto de la imagen.');
+          }
+
+          resultRaw = {
+            data: {
+              text: iaData.texto,
+              words: iaData.palabras,
+              confidence: 100
+            }
+          };
+          
+          // Gemini nos devuelve un Array estructurado con todas las multas
+          if (Array.isArray(iaData.comparendo)) {
+            comparendosEstructurados = iaData.comparendo;
+          }
+          
+          setProgresoOCR(100);
+        } else {
+        // --- INICIO CÓDIGO TESSERACT (RESERVA) ---
         const ocrTask = async () => {
           mediaLogger.log('OCR', 'Inicializando motor Tesseract local (IA desactivada)...');
           await tesseractManager.init((m: { status: string; progress: number }) => {
@@ -238,6 +276,8 @@ export const useSIMITValidator = () => {
           avgConfidence: `${avgConf}%`,
           textLength: resultRaw.data.text.length,
         });
+        // --- FIN CÓDIGO TESSERACT ---
+        }
       } catch (ocrError) {
         const esTimeout = ocrError instanceof Error && ocrError.message === 'TIMEOUT_OCR';
         mediaLogger.log('ERROR', esTimeout ? 'Timeout en OCR' : 'Fallo crítico en motor OCR', {
@@ -383,42 +423,66 @@ export const useSIMITValidator = () => {
         confidence: w.confidence,
       }));
 
-      // ── Lookup educativo local: extraer código CNT y buscar en diccionario ──────
-      // 100% cliente, sin llamadas a red. El diccionario está compilado en el bundle.
-      const codigoDetectado = extraerCodigoInfraccion(rawText);
-      let infoEducativa: InfoEducativa | null = null;
-
-      if (codigoDetectado) {
-        // Buscar el código en el array de codigos-infraccion.json (búsqueda lineal — ~100 items)
-        const entrada = (codigosData as InfoEducativa[]).find(
-          (c) => c.codigo.toUpperCase() === codigoDetectado.toUpperCase()
-        );
-        if (entrada) {
-          infoEducativa = entrada;
-        }
-      }
-
-      // Buscar todos los códigos únicos y su información correspondiente para soporte multi-comparendo
-      const codigosDetectados = extraerCodigosInfraccion(rawText);
+      // ── Lookup educativo (Soporte Multi-Multa Psicológico) ──────
       const infoEducativas: InfoEducativa[] = [];
-      codigosDetectados.forEach((cod) => {
-        const entrada = (codigosData as InfoEducativa[]).find(
-          (c) => c.codigo.toUpperCase() === cod.toUpperCase()
-        );
-        if (entrada) {
-          infoEducativas.push(entrada);
-        }
-      });
+      const multasSimples = extraerMultasDeTexto(rawText); // Fallback engine
+
+      if (comparendosEstructurados && comparendosEstructurados.length > 0) {
+        // Usar los datos estructurados extraídos por Gemini
+        const codigosProcesados = new Set<string>();
+
+        comparendosEstructurados.forEach((comp: any) => {
+          if (comp.esFotomulta && comp.codigoInfraccion) {
+            // Es fotomulta: buscar la tarjeta específica
+            const codigoNorm = comp.codigoInfraccion.toUpperCase();
+            if (!codigosProcesados.has(codigoNorm)) {
+              codigosProcesados.add(codigoNorm);
+              const entrada = (codigosData as InfoEducativa[]).find(
+                (c) => c.codigo.toUpperCase() === codigoNorm
+              );
+              if (entrada) {
+                infoEducativas.push({
+                   ...entrada,
+                   idUnicoMulta: comp.numeroComparendo || Date.now().toString() // Inyectar ID para el carrusel
+                } as any);
+              }
+            }
+          } else {
+            // Es resolución / comparendo manual (Línea gris): inyectar tarjeta genérica grave
+            infoEducativas.push({
+              codigo: comp.numeroComparendo || 'RESOLUCIÓN SANCIONATORIA',
+              tipo: 'Resolución de Tránsito en Firme',
+              descripcion: comp.descripcionInfraccion || 'Infracción confirmada por la autoridad de tránsito',
+              inmovilizacion: 'Riesgo alto si no se regulariza',
+              gravedad: 'Muy Grave (En Cobro)',
+              costoEstimado: comp.valorMulta || 'Desconocido',
+              idUnicoMulta: comp.numeroComparendo || Date.now().toString()
+            } as any);
+          }
+        });
+      } else {
+        // Fallback si la IA no devolvió el array JSON pero sí el texto
+        const codigosDetectados = extraerCodigosInfraccion(rawText);
+        codigosDetectados.forEach((cod) => {
+          const entrada = (codigosData as InfoEducativa[]).find(
+            (c) => c.codigo.toUpperCase() === cod.toUpperCase()
+          );
+          if (entrada) {
+            infoEducativas.push(entrada);
+          }
+        });
+      }
 
       return {
         esValida: true,
         coincidencias,
-        multasExtraidas: extraerMultasDeTexto(rawText),
+        multasExtraidas: multasSimples,
         palabrasDetectadas,
         archivoOptimizado: archivoProcesar,
         ocrData,
-        infoEducativa,
+        infoEducativa: infoEducativas.length > 0 ? infoEducativas[0] : null,
         infoEducativas: infoEducativas.length > 0 ? infoEducativas : null,
+        comparendosEstructurados, // Propagar array a los componentes
       };
     } catch (error) {
       const mensaje = error instanceof Error ? error.message : 'Error al procesar la imagen.';

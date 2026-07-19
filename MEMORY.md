@@ -6,6 +6,28 @@
 > **Regla permanente:** Está **ESTRICTAMENTE PROHIBIDO** ejecutar suites de validación masivas (`npm run validate` total) o pruebas E2E pesadas (Playwright) para cambios menores, ya que estresa severamente la máquina. Aplicar validación quirúrgica (linters específicos y pruebas aisladas) a menos que se trate de una reestructuración arquitectónica masiva autorizada por el usuario. Cuando las pruebas E2E sean necesarias, usar estrategias pasivas y timeouts elevados (`60000ms`).
 
 
+
+## 2026-07-18: Migración a Gemini OCR y UI Psicológica
+
+- **Qué cambió:**
+  - **[Motor OCR]**: Se migró de Tesseract local a la API de Gemini 1.5 Flash para extraer el texto estructurado en array.
+  - **[Reserva Histórica]**: Se encapsuló Tesseract en un bloque inactivo como fallback si es necesario, sin borrar el código.
+  - **[Rate Limits Semanales]**: Se ajustó la base de datos Firestore y `/api/upload` para usar `lunes` de la semana actual y un límite estricto de 5 imágenes por semana por IP.
+  - **[Prompt IA]**: Se forzó al prompt a regresar un array JSON para detectar múltiples infracciones y discernir entre `esFotomulta: true` (código C24) o `false` (resolución).
+  - **[UX Psicológico]**: Se ajustó `SecuenciaEducativa.tsx` para deduplicar fotomultas iguales, y generar tarjetas genéricas de cobro coactivo (línea gris) para las resoluciones manuales. Se garantizó keys únicas para react.
+
+- **Por qué cambió:**
+  - Evitar sobrecostos de IA limitando a 5 cargas por semana y aprovechando Gemini gratis. Crear presión psicológica específica para las resoluciones sancionatorias sin código en SIMIT. Evitar la fatiga visual con fotomultas repetidas.
+
+- **Archivos afectados:**
+  - `src/app/api/upload/route.ts` [MODIFICADO]
+  - `src/lib/ai/gemini-prompts.ts` [MODIFICADO]
+  - `src/hooks/useSIMITValidator.ts` [MODIFICADO]
+  - `src/components/interactive/SecuenciaEducativa.tsx` [MODIFICADO]
+  - `src/app/api/v1/analizar-comparendo/route.ts` [MODIFICADO]
+
+- **Estado actual:** ✅ Completo y probado. `npm run typecheck` finalizado sin errores.
+
 ## 2026-07-18: Remediación de Auditoría v2 — 4 Hallazgos de Segunda Ronda Forense
 
 - **Qué cambió:**

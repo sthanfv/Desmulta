@@ -213,12 +213,14 @@ export async function POST(request: NextRequest) {
     // Detectar rechazo de documento
     if (
       rawRespuesta === 'NO_VALID_DOCUMENT' ||
-      rawRespuesta.includes('"error":"NO_VALID_DOCUMENT"')
+      rawRespuesta.includes('"error":"NO_VALID_DOCUMENT"') ||
+      rawRespuesta === 'PROMPT_INJECTION_DETECTED' ||
+      rawRespuesta.includes('"error":"PROMPT_INJECTION_DETECTED"')
     ) {
       return NextResponse.json(
         apiError(
           'INVALID_DOCUMENT',
-          'La imagen no parece ser una multa o resolución de tránsito válida.'
+          'La imagen no parece ser una multa de tránsito válida o contiene instrucciones no permitidas.'
         ),
         { status: 422 }
       );

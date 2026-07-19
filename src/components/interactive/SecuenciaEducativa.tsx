@@ -162,7 +162,7 @@ export function SecuenciaEducativa({ infoList, onClose }: SecuenciaEducativaProp
           {/* Contenido Animado de la Multa Activa */}
           <AnimatePresence mode="wait" custom={direccion}>
             <m.div
-              key={info.codigo}
+              key={`${info.codigo}-${activeIdx}`}
               custom={direccion}
               variants={{
                 enter: (dir: number) => ({ opacity: 0, x: dir * 24 }),
