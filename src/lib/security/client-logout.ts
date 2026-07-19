@@ -7,11 +7,21 @@
  */
 
 import { logger } from '@/lib/logger/security-logger';
+import { toast } from '@/hooks/use-toast';
 
 import type { Auth } from 'firebase/auth';
 
 export async function secureLogout(authInstance: Auth | null | undefined, reason: string = 'manual') {
   logger.warn(`Iniciando cierre de sesión seguro (Zero-Trust). Razón: ${reason}`);
+
+  // Mostrar notificación visual para mitigar la percepción de lentitud
+  // causada por el borrado asíncrono de gigabytes de caché.
+  if (typeof window !== 'undefined') {
+    toast({
+      title: 'Cerrando sesión',
+      description: 'Limpiando memoria caché y destruyendo credenciales seguras...',
+    });
+  }
 
   try {
     // 1. Invalidar sesión en el servidor (elimina cookies HTTP)
