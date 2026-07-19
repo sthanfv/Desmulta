@@ -16,9 +16,12 @@ const withPWA = withPWAInit({
     runtimeCaching: [], // Desactivar el precaching agresivo por defecto
     exclude: [
       /firebase-messaging-sw\.js$/,
-      /\/admin\//,
-      /\/api\/admin\//,
+      /^\/admin(\/.*)?$/,
+      /^\/api\/admin(\/.*)?$/,
+      /^\/acceso-panel(\/.*)?$/,
     ],
+    // Evitar que el Service Worker intercepte estas rutas para el fallback offline
+    navigateFallbackDenylist: [/^\/admin/, /^\/api/, /^\/acceso-panel/],
     additionalManifestEntries: [],
     importScripts: ['/firebase-messaging-sw.js'],
   },

@@ -103,24 +103,20 @@ export default function AccesoPanel() {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // ── Sincronizar usuarios ya autenticados (solo en fase idle) ──────────────
-  // IMPORTANTE: Este efecto solo se activa si el usuario tiene sesión Firebase
-  // ANTES de que el flujo 2FA comience. No interfiere con el flujo OTP activo.
+  // IMPORTANTE: Si el usuario llega a /acceso-panel (ya sea manual o por redirección 
+  // del middleware debido a que su cookie __session caducó), debemos purgar el estado 
+  // local de Firebase Auth. Esto rompe el bucle infinito de redirección.
   useEffect(() => {
     // Guard explícito: cualquier fase que no sea idle cancela este efecto
     if (phase !== 'idle') return;
     if (isUserLoading || !user || !auth) return;
 
-    const has2faFlag = document.cookie
-      .split('; ')
-      .some((r) => r.trim().startsWith('admin-2fa-flag='));
-
-    if (has2faFlag) {
-      router.push('/admin');
-    } else {
-      // Usuario tiene sesión Firebase pero no 2FA completado → forzar cierre
-      auth.signOut().catch(() => {});
-    }
-  }, [user, isUserLoading, auth, router, phase]);
+    // Si el usuario tiene estado local pero está en la pantalla de login,
+    // significa que el servidor rechazó su cookie __session o decidió cerrar sesión.
+    // Purgamos el estado local para mantener la sincronización y mostrar el form.
+    logger.info('[acceso-panel] Purgando estado local obsoleto para sincronizar con el servidor.');
+    auth.signOut().catch(() => {});
+  }, [user, isUserLoading, auth, phase]);
 
   // ── Cooldown de reenvío ───────────────────────────────────────────────────
   useEffect(() => {
