@@ -65,7 +65,7 @@ function SweeperContent() {
   const CurrentIcon = steps[step].icon;
 
   return (
-    <div className="flex h-screen w-full items-center justify-center bg-zinc-950 overflow-hidden relative">
+    <div className="flex h-screen w-full items-center justify-center bg-background overflow-hidden relative">
       {/* Background glow */}
       <div className="absolute inset-0 flex items-center justify-center opacity-30">
         <div className="w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px] animate-pulse" />
@@ -87,14 +87,14 @@ function SweeperContent() {
                <CurrentIcon className="w-24 h-24 text-primary relative z-10" strokeWidth={1.5} />
             </div>
             
-            <h2 className="text-xl md:text-2xl font-medium text-zinc-100 font-sans tracking-wide">
+            <h2 className="text-xl md:text-2xl font-medium text-foreground font-sans tracking-wide">
               {steps[step].text}
             </h2>
           </motion.div>
         </AnimatePresence>
 
         {/* Progress bar container */}
-        <div className="w-full max-w-xs h-1.5 bg-zinc-800 rounded-full mt-16 overflow-hidden">
+        <div className="w-full max-w-xs h-1.5 bg-secondary rounded-full mt-16 overflow-hidden">
            <motion.div 
              className="h-full bg-primary"
              initial={{ width: "0%" }}
@@ -109,7 +109,7 @@ function SweeperContent() {
 
 export default function LogoutSweeperPage() {
   return (
-    <Suspense fallback={<div className="h-screen w-full bg-zinc-950" />}>
+    <Suspense fallback={<div className="h-screen w-full bg-background" />}>
       <SweeperContent />
     </Suspense>
   );
