@@ -220,6 +220,26 @@ export async function POST(req: NextRequest) {
           });
         })
       );
+
+      // 🔔 Notificación "Cha-ching!" por Telegram al dueño
+      const botToken = process.env.TELEGRAM_BOT_TOKEN;
+      const chatId = process.env.TELEGRAM_CHAT_ID;
+      
+      if (botToken && chatId) {
+        waitUntil(
+          fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chat_id: chatId,
+              parse_mode: 'Markdown',
+              text: `💰 *¡NUEVO PAGO RECIBIDO!* 💰\n\n*Monto:* $${(amountConfirmadoPorWompi / 100).toLocaleString('es-CO')} COP\n*Referencia:* \`${reference}\`\n*Transacción:* \`${transactionId}\`\n\nEl PDF se está enviando al cliente automáticamente. 🚀`
+            })
+          }).catch(err => {
+            logger.warn('[webhook-wompi] Fallo al enviar el Cha-ching por Telegram', { error: String(err) });
+          })
+        );
+      }
     }
   }
 
