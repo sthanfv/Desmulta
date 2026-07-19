@@ -40,7 +40,7 @@ export type Comparendo = z.infer<typeof ComparendoSchema>;
 export interface AnalisisComparendo {
   /** Datos del OCR y el proveedor utilizado */
   ocr: {
-    proveedor: 'google-gemini-1.5-flash' | 'tesseract-js-fallback' | 'texto-crudo';
+    proveedor: 'google-gemini-1.5-flash-latest' | 'tesseract-js-fallback' | 'texto-crudo';
     modoEstructurado: boolean;
     confianza: number; // 0-100
   };
@@ -213,7 +213,7 @@ function convertirFechaAISO(fechaDDMMYYYY: string): string | null {
 export function construirAnalisisCompleto(
   textoOCR: string,
   comparendo: Comparendo | null,
-  proveedor: 'google-gemini-1.5-flash' | 'tesseract-js-fallback' | 'texto-crudo',
+  proveedor: 'google-gemini-1.5-flash-latest' | 'tesseract-js-fallback' | 'texto-crudo',
   confianza: number = 100
 ): AnalisisComparendo {
   // 1. Extraer fechas del texto para el motor de prescripción

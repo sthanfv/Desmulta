@@ -23,7 +23,7 @@ function getGeminiModel() {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error('[ocr-worker] GEMINI_API_KEY no configurada.');
   const genAI = new GoogleGenerativeAI(apiKey);
-  return genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  return genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
 }
 
 export async function POST(request: NextRequest) {
@@ -161,7 +161,7 @@ export async function POST(request: NextRequest) {
         const analisis = construirAnalisisCompleto(
           textoCompleto,
           null,
-          'google-gemini-1.5-flash',
+          'google-gemini-1.5-flash-latest',
           parsedJSON !== null ? 95 : 60
         );
         finalPayload = {
@@ -171,7 +171,7 @@ export async function POST(request: NextRequest) {
         };
       } else {
         const resultados = comparendos.map((comp) =>
-          construirAnalisisCompleto(textoCompleto, comp, 'google-gemini-1.5-flash', 95)
+          construirAnalisisCompleto(textoCompleto, comp, 'google-gemini-1.5-flash-latest', 95)
         );
         finalPayload = {
           success: true,
