@@ -94,6 +94,10 @@ export async function middleware(request: NextRequest) {
   const esRutaWebhookSentry = pathname.startsWith('/api/webhooks/sentry');
   const esRutaAssets = pathname.startsWith('/_next');
   const esPaginaBloqueo = pathname.startsWith('/geo-bloqueado');
+  const esArchivoSEO = pathname.endsWith('.xml') || pathname.endsWith('.txt') || pathname.endsWith('.html');
+  
+  const userAgent = request.headers.get('user-agent') || '';
+  const isBot = /Googlebot|bingbot|yandex|baiduspider|twitterbot|facebookexternalhit|rogerbot|linkedinbot|embedly|quora link preview|showyoubot|outbrain|pinterest|slackbot|vkShare|W3C_Validator|whatsapp|OAI-SearchBot|PerplexityBot/i.test(userAgent);
 
   if (
     paisUsuario && // Solo bloquear si Vercel inyectó la cabecera (no en dev)
@@ -104,7 +108,9 @@ export async function middleware(request: NextRequest) {
     !esRutaWebhookWompi &&
     !esRutaWebhookSentry &&
     !esRutaAssets &&
-    !esPaginaBloqueo
+    !esPaginaBloqueo &&
+    !esArchivoSEO &&
+    !isBot
   ) {
     // HTTP 451: estándar para contenido no disponible por razones geográficas/legales
     return NextResponse.redirect(new URL('/geo-bloqueado', request.url), { status: 302 });
