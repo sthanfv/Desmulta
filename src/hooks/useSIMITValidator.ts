@@ -69,7 +69,7 @@ const TOKENS_SIMIT_DEBILES = [
 const COINCIDENCIAS_FUERTES_MINIMAS = 3;
 const COINCIDENCIAS_TOTALES_MINIMAS = 6;
 
-const OCR_TIMEOUT_MS = 60_000;
+const OCR_TIMEOUT_MS = 55000;
 
 export interface ResultadoOCR {
   esValida: boolean;
@@ -186,9 +186,10 @@ export const useSIMITValidator = () => {
       }
 
       const objectUrl = URL.createObjectURL(archivoProcesar);
-      const timeoutPromise = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('TIMEOUT_OCR')), OCR_TIMEOUT_MS)
-      );
+      let ocrTimeoutId: NodeJS.Timeout;
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        ocrTimeoutId = setTimeout(() => reject(new Error('TIMEOUT_OCR')), OCR_TIMEOUT_MS);
+      });
 
       let resultRaw: { data: { text: string; words?: TesseractWord[]; confidence?: number } };
       let comparendosEstructurados: any[] | null = null;
@@ -227,6 +228,7 @@ export const useSIMITValidator = () => {
           }
           
           setProgresoOCR(100);
+          clearTimeout(ocrTimeoutId);
         } else {
         // --- INICIO CÓDIGO TESSERACT (RESERVA) ---
         const ocrTask = async () => {
@@ -279,6 +281,7 @@ export const useSIMITValidator = () => {
         // --- FIN CÓDIGO TESSERACT ---
         }
       } catch (ocrError) {
+        clearTimeout(ocrTimeoutId);
         const esTimeout = ocrError instanceof Error && ocrError.message === 'TIMEOUT_OCR';
         mediaLogger.log('ERROR', esTimeout ? 'Timeout en OCR' : 'Fallo crítico en motor OCR', {
           err: String(ocrError),

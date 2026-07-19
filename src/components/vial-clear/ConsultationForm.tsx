@@ -199,8 +199,8 @@ export function ConsultationForm({ onSuccess, mode = 'full', nonce }: Consultati
 
       // Crear nuevo timeout de 15 segundos
       nudgeTimeout = setTimeout(() => {
-        // Verificar nuevamente que no haya enviado antes de mostrar
-        if (form.formState.isSubmitSuccessful || successData) return;
+        // Verificar nuevamente que no haya enviado y que no esté procesando OCR
+        if (form.formState.isSubmitSuccessful || successData || isScanningOCR || form.formState.isSubmitting) return;
 
         toast({
           title: '¡Estás a un paso! 🚀',
@@ -215,7 +215,7 @@ export function ConsultationForm({ onSuccess, mode = 'full', nonce }: Consultati
       unsubscribe();
       if (nudgeTimeout) clearTimeout(nudgeTimeout);
     };
-  }, [form, step, successData, toast]);
+  }, [form, step, successData, toast, isScanningOCR]);
 
   // 🔔 SISTEMA DE ABANDONO (Lead Nurturing & Operator Alert)
   // Trackear si el usuario cierra la pestaña antes de enviar

@@ -133,9 +133,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 4. Llamar a Google Gemini con Timeout de 15s para evitar Vercel 504 Timeout y dar tiempo a Tesseract
+    // 4. Llamar a Google Gemini con Timeout de 35s para evitar Vercel 504 Timeout y dar tiempo a Tesseract
     const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error('OCR_TIMEOUT_15S')), 15000);
+      setTimeout(() => reject(new Error('OCR_TIMEOUT_35S')), 35000);
     });
 
     try {
@@ -173,7 +173,9 @@ export async function POST(request: NextRequest) {
       // Detectar rechazo de documento (JSON de error de Gemini)
       if (
         rawRespuesta === 'NO_VALID_DOCUMENT' ||
-        rawRespuesta.includes('"error":"NO_VALID_DOCUMENT"')
+        rawRespuesta.includes('"error":"NO_VALID_DOCUMENT"') ||
+        rawRespuesta === 'PROMPT_INJECTION_DETECTED' ||
+        rawRespuesta.includes('"error":"PROMPT_INJECTION_DETECTED"')
       ) {
         logger.warn('[OCR] Imagen rechazada: no parece un documento de tránsito válido', { ip });
         return NextResponse.json(
@@ -267,16 +269,16 @@ export async function POST(request: NextRequest) {
 
       // Si el error fue por timeout, no vale la pena intentar Tesseract si Vercel está a punto de matarnos
       // Pero como aumentamos maxDuration a 60s, si el timeout fue de 15s, Tesseract (que toma 10s) sí alcanza a correr.
-      if (gMsg.includes('OCR_TIMEOUT_15S')) {
-        logger.warn('[OCR] Timeout de 15s alcanzado. Pasando a Tesseract...');
+      if (gMsg.includes('OCR_TIMEOUT_35S')) {
+        logger.warn('[OCR] Timeout de 35s alcanzado. Pasando a Tesseract...');
       }
 
       try {
         // Configurar Tesseract.js en el entorno Node.js apuntando a CDNs para soportar Vercel Serverless
         const worker = await createWorker('spa', 1, {
-          langPath: 'https://lca0irnf7loubfjn.public.blob.vercel-storage.com',
-          workerPath: 'https://cdn.jsdelivr.net/npm/tesseract.js@7/dist/worker.min.js',
-          corePath: 'https://cdn.jsdelivr.net/npm/tesseract.js-core@7/tesseract-core.wasm.js',
+          langPath: 'https://tessdata.projectnaptha.com/4.0.0',
+          workerPath: 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/worker.min.js',
+          corePath: 'https://cdn.jsdelivr.net/npm/tesseract.js-core@5/tesseract-core.wasm.js',
         });
 
         // Competir Tesseract contra el reloj restante (10s aprox si Gemini falló rápido)
