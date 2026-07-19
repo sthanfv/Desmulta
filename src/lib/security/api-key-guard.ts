@@ -116,7 +116,7 @@ export async function invalidateApiKeyCache(keyId: string): Promise<void> {
   try {
     await redis.del(cacheKey(keyId));
     logger.info('[api-key-guard] Caché invalidado', { keyId });
-  } catch (err) {
+  } catch (err: unknown) {
     logger.warn('[api-key-guard] Fallo al invalidar caché', { keyId, err: String(err) });
   }
 }
@@ -139,7 +139,7 @@ async function getFromFirestore(keyId: string): Promise<ApiKeyDocument | null> {
 
     if (!snap.exists) return null;
     return snap.data() as ApiKeyDocument;
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('[api-key-guard] Error al consultar Firestore', { error: String(error) });
     return null;
   }

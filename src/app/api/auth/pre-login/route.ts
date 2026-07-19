@@ -16,6 +16,18 @@ import { requireAdminSession } from '@/lib/auth/require-admin-session';
 import { sendOtpToAdmin } from '@/lib/auth/otp-service';
 import { SignJWT } from 'jose';
 import { logger } from '@/lib/logger/security-logger';
+import { getSecureIp } from '@/lib/security/ip-utils';
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
+
+// Inicializar Upstash Redis y Rate-Limiter (3 peticiones por IP cada 5 minutos)
+const redis = Redis.fromEnv();
+const rateLimit = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(3, '5 m'),
+  analytics: true,
+  prefix: '@upstash/ratelimit/admin_otp',
+});
 
 // Forzar runtime Node.js para poder usar Firebase Admin y crypto
 export const runtime = 'nodejs';
@@ -27,6 +39,26 @@ export async function POST(request: NextRequest) {
 
     if (!idToken || typeof idToken !== 'string') {
       return NextResponse.json({ error: 'Token de autorización requerido.' }, { status: 400 });
+    }
+
+    // 0. Rate Limiting por IP
+    const ip = getSecureIp(request);
+    const { success, limit, remaining, reset } = await rateLimit.limit(ip);
+    
+    if (!success) {
+      logger.security('[pre-login] Rate limit excedido para solicitud de OTP (Admin)', { ip });
+      return NextResponse.json(
+        { error: 'Demasiadas solicitudes de código OTP. Por favor, intenta de nuevo en unos minutos.' },
+        { 
+          status: 429,
+          headers: {
+            'X-RateLimit-Limit': limit.toString(),
+            'X-RateLimit-Remaining': remaining.toString(),
+            'X-RateLimit-Reset': reset.toString(),
+            'Retry-After': Math.ceil((reset - Date.now()) / 1000).toString()
+          }
+        }
+      );
     }
 
     // 1. Validar que el token pertenece a un administrador

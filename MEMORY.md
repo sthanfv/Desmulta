@@ -5,6 +5,53 @@
 > Se analizó el equipo local (DESKTOP-N9CGIFT) identificando un procesador antiguo `AMD PRO A10-8750B R7` (4 núcleos) y 16GB de RAM. Esta severa limitación en procesamiento de un solo hilo causa sobrecargas y Cold Starts extremadamente lentos.
 > **Regla permanente:** Está **ESTRICTAMENTE PROHIBIDO** ejecutar suites de validación masivas (`npm run validate` total) o pruebas E2E pesadas (Playwright) para cambios menores, ya que estresa severamente la máquina. Aplicar validación quirúrgica (linters específicos y pruebas aisladas) a menos que se trate de una reestructuración arquitectónica masiva autorizada por el usuario. Cuando las pruebas E2E sean necesarias, usar estrategias pasivas y timeouts elevados (`60000ms`).
 
+## 2026-07-19: Cierre de Auditoría de Seguridad (Niveles Amarillo y Naranja)
+
+- **Qué cambió:**
+  - **[Seguridad Financiera]**: Se añadió Rate-Limiting con `Upstash Redis` (3 requests / 5 min por IP) a la ruta `/api/auth/pre-login` para bloquear posibles ataques de "Toll Fraud" que agoten el saldo de SMS OTPs.
+  - **[Deuda Técnica y TypeScript]**: Se habilitó `noImplicitAny: true` en `tsconfig.json` y se limpiaron los últimos castings implícitos a `any` en los bloques `catch` de `api-key-guard.ts`, `client-logout.ts`, y `webhook-wompi/route.ts` usando `: unknown`.
+  - **[A11y y UI Táctil]**: Se corrigió el botón "Cerrar" del componente `Sheet` para asegurar un área táctil mínima de 44x44px (`w-11 h-11`) centrando el ícono en su interior. Se comprobó que el menú del Header ya cumplía con los estándares.
+- **Por qué cambió:**
+  - En respuesta al reporte de auditoría técnica. El Rate Limiter cierra una vulnerabilidad seria de abuso económico. El TypeScript estricto previene errores en tiempo de ejecución causados por contratos de datos débiles, y la accesibilidad mejorada ayuda a pasar las validaciones WCAG y de rendimiento UX de Vercel/Lighthouse.
+- **Archivos afectados:**
+  - `src/app/api/auth/pre-login/route.ts` [MODIFICADO]
+  - `tsconfig.json` [MODIFICADO]
+  - `src/lib/security/api-key-guard.ts` [MODIFICADO]
+  - `src/lib/security/client-logout.ts` [MODIFICADO]
+  - `src/app/api/payments/webhook-wompi/route.ts` [MODIFICADO]
+  - `src/components/ui/sheet.tsx` [MODIFICADO]
+- **Estado actual:** ✅ Auditoría superada, sistema tipado estrictamente y endpoints de SMS blindados.
+
+## 2026-07-19: Reparación Notificaciones "Cha-ching!" por Telegram
+
+- **Qué cambió:**
+  - **[Backend - Webhook Wompi]**: Se modificó `src/app/api/payments/webhook-wompi/route.ts` para capturar e imprimir logs ante rechazos de la API de Telegram. Se reemplazó la sintaxis `parse_mode: 'Markdown'` por `HTML` seguro, y se añadió fallback de la variable de entorno `TELEGRAM_DEV_CHAT_ID` para asegurar el envío a la bandeja técnica ("segundo chat").
+- **Por qué cambió:**
+  - El usuario reportó que las compras de prueba generaban el documento y registraban la venta en la base de datos, pero la notificación a Telegram no llegaba. Esto ocurría porque la API de Telegram rechaza silenciosamente con HTTP 400 los mensajes de tipo `Markdown` si contienen caracteres no escapados en variables dinámicas (como nombres o referencias). Además, el sistema estaba apuntando al chat principal en lugar de al técnico.
+- **Archivos afectados:**
+  - `src/app/api/payments/webhook-wompi/route.ts` [MODIFICADO]
+- **Estado actual:** ✅ Corregido y desplegado a producción. Las alertas ahora usan HTML (mucho más robusto frente a strings no sanitizados) y llegan al chat técnico correspondiente.
+
+## 2026-07-19: Adaptación Tema Dinámico (Claro/Oscuro) en Logout Sweeper
+
+- **Qué cambió:**
+  - **[UI/UX]**: Se sustituyeron los colores codificados rígidos (`bg-zinc-950`, `text-zinc-100`) de la nueva pantalla de cierre de sesión (`src/app/logout/page.tsx`) por las variables de sistema de Tailwind (`bg-background`, `text-foreground`, `bg-secondary`).
+- **Por qué cambió:**
+  - Para garantizar que la animación de limpieza de sesión respete la elección estética del usuario, adaptándose de forma automática y organizada al tema claro u oscuro global de la web.
+- **Archivos afectados:**
+  - `src/app/logout/page.tsx` [MODIFICADO]
+- **Estado actual:** ✅ Implementado y empujado a producción.
+
+## 2026-07-19: Unificación de Animación de Tema (Ripple Effect)
+
+- **Qué cambió:**
+  - **[UI/UX]**: Se reemplazó el componente genérico `ModeToggle` por el componente animado `ThemeToggle` (basado en `AnimatedThemeToggler`) en la barra de navegación principal (`src/components/sections/Header.tsx`).
+- **Por qué cambió:**
+  - El usuario notó que la animación premium de expansión radial (onda o "ripple") al cambiar entre modo oscuro y claro solo funcionaba dentro del panel de administración, mientras que la landing page usaba un cambio abrupto convencional. Ahora la experiencia es consistente en toda la plataforma.
+- **Archivos afectados:**
+  - `src/components/sections/Header.tsx` [MODIFICADO]
+- **Estado actual:** ✅ Corregido. El componente `ModeToggle` obsoleto ya no se invoca en ningún lado de la aplicación.
+
 ## 2026-07-19: Pantalla Animada de Cierre de Sesión (Zero-Trust Sweeper)
 
 - **Qué cambió:**

@@ -212,7 +212,7 @@ export async function POST(req: NextRequest) {
        * Referencia: https://vercel.com/docs/functions/functions-api-reference#waituntil
        */
       waitUntil(
-        generarYEnviarPDF(purchase, db).catch((err) => {
+        generarYEnviarPDF(purchase, db).catch((err: unknown) => {
           logger.error('[webhook-wompi] Fallo en entrega PDF — revisar sistema de reintentos', {
             reference,
             transactionId,
@@ -247,7 +247,7 @@ export async function POST(req: NextRequest) {
                logger.warn('[webhook-wompi] Telegram API rechazó el mensaje', { errorBody });
             }
           })
-          .catch(err => {
+          .catch((err: unknown) => {
             logger.warn('[webhook-wompi] Fallo de red al enviar Telegram', { error: String(err) });
           })
         );

@@ -48,14 +48,14 @@ export async function secureLogout(
             }
           }
         }
-      } catch (e) {
+      } catch (e: unknown) {
         // En navegadores antiguos o Firefox incognito `databases()` puede fallar
         logger.warn('No se pudo borrar IndexedDB (navegador no soporta enumeración)', e);
       }
     }
 
     logger.info('Cierre de sesión Scorched Earth completado con éxito.');
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error durante el cierre de sesión seguro', error);
   } finally {
     if (!skipRedirect) {
