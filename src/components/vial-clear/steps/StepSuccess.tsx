@@ -280,9 +280,10 @@ export default function StepSuccess({
               Descargar QR
             </Button>
           </div>
+          )}
         </div>
-      )}
-
+      </div>
+    </m.div>
       {!fcmToken && !hasInteractedWithPush && (
         <div
           className={`mb-8 p-4 rounded-[2rem] border-2 flex flex-col items-center gap-3 w-full max-w-sm ${isSimitMode ? 'border-amber-500/40 bg-amber-500/10' : 'border-primary/20 bg-primary/5'}`}
