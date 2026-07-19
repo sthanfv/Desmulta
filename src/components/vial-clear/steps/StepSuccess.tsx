@@ -177,7 +177,7 @@ export default function StepSuccess({
             <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest mb-1">
               Código QR de Respaldo
             </p>
-            <div className="bg-white p-2 rounded-xl shadow-sm border border-slate-100">
+            <div className="bg-white p-2 rounded-xl shadow-sm border border-slate-100 relative">
               <QRCode
                 id={`qr-client-${successData.trackingUuid}`}
                 value={`https://desmulta.online/seguir/${successData.trackingUuid}`}
@@ -194,11 +194,31 @@ export default function StepSuccess({
                 removeQrCodeBehindLogo={true}
                 ecLevel="H"
               />
+              
+              {/* QR Oculto en HD para la descarga */}
+              <div className="hidden">
+                <QRCode
+                  id={`qr-client-hd-${successData.trackingUuid}`}
+                  value={`https://desmulta.online/seguir/${successData.trackingUuid}`}
+                  size={320}
+                  bgColor="#ffffff"
+                  fgColor="#111827"
+                  qrStyle="squares"
+                  eyeRadius={12}
+                  logoImage="/icon.png"
+                  logoWidth={85}
+                  logoHeight={85}
+                  logoPadding={4}
+                  logoPaddingStyle="square"
+                  removeQrCodeBehindLogo={true}
+                  ecLevel="H"
+                />
+              </div>
             </div>
             <Button
               onClick={() => {
                 const imgElement = document.getElementById(
-                  `qr-client-${successData.trackingUuid}`
+                  `qr-client-hd-${successData.trackingUuid}`
                 ) as HTMLCanvasElement;
                 if (!imgElement) {
                   toast({
@@ -211,7 +231,7 @@ export default function StepSuccess({
                 const targetSize = 320;
                 const HEADER_H = 60;
                 const PADDING = 20;
-                const BOTTOM_H = 60;
+                const BOTTOM_H = 30;
 
                 const tempCanvas = document.createElement('canvas');
                 tempCanvas.width = targetSize + PADDING * 2;
@@ -235,24 +255,10 @@ export default function StepSuccess({
                 // Dibujar el QR centrado
                 ctx.drawImage(
                   imgElement,
-                  0,
-                  0,
-                  imgElement.width,
-                  imgElement.height,
                   PADDING,
                   HEADER_H + PADDING,
                   targetSize,
                   targetSize
-                );
-
-                // Texto del ID en el bottom
-                ctx.fillStyle = '#666666';
-                ctx.font = '16px sans-serif';
-                ctx.textBaseline = 'alphabetic';
-                ctx.fillText(
-                  `ID: ${(successData.trackingUuid || 'N-A').slice(0, 8)}`,
-                  tempCanvas.width / 2,
-                  tempCanvas.height - 25
                 );
 
                 tempCanvas.toBlob((blob) => {

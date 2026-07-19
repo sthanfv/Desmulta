@@ -273,6 +273,10 @@ export async function POST(request: NextRequest) {
         logger.warn('[OCR] Timeout de 35s alcanzado. Pasando a Tesseract...');
       }
 
+      // --- INICIO BLOQUE TESSERACT DESHABILITADO ---
+      // A petición del administrador, se conserva el código pero NO se usa.
+      // Se prefiere usar exclusivamente la API de Gemini por precisión.
+      /*
       try {
         // Configurar Tesseract.js en el entorno Node.js apuntando a CDNs para soportar Vercel Serverless
         const worker = await createWorker('spa', 1, {
@@ -316,6 +320,11 @@ export async function POST(request: NextRequest) {
 
         throw new Error(`Fallback Tesseract falló: ${tMsg}. Error original Gemini: ${gMsg}`);
       }
+      */
+      // --- FIN BLOQUE TESSERACT DESHABILITADO ---
+      
+      // Propagamos el error de Gemini al manejador principal para devolver el 503/500
+      throw geminiError;
     }
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error);
