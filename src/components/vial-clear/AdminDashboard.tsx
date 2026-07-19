@@ -241,12 +241,8 @@ export function AdminDashboard() {
         ),
       });
     },
-    onLogout: async () => {
-      try {
-        await secureLogout(auth, 'inactivity');
-      } catch (_error) {
-        window.location.href = '/acceso-panel';
-      }
+    onLogout: () => {
+      window.location.href = '/logout?reason=inactividad';
     },
   });
 
@@ -468,12 +464,8 @@ export function AdminDashboard() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={async () => {
-                try {
-                  await secureLogout(auth, 'manual');
-                } catch (_error) {
-                  window.location.href = '/acceso-panel';
-                }
+              onClick={() => {
+                window.location.href = '/logout?reason=manual';
               }}
               className="gap-1.5 text-muted-foreground hover:text-foreground rounded-xl text-xs"
             >

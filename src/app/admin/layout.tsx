@@ -71,8 +71,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     let timeoutId: NodeJS.Timeout;
     const INACTIVITY_TIME = 30 * 60 * 1000; // 30 minutos
 
-    const logout = async () => {
-      await secureLogout(auth, 'inactividad');
+    const logout = () => {
+      router.push('/logout?reason=inactividad');
     };
 
     const resetTimer = () => {
@@ -157,9 +157,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
           <Button
             variant="outline"
-            onClick={async () => {
-              await secureLogout(auth, 'manual');
-            }}
+            onClick={() => router.push('/logout?reason=manual')}
           >
             Cerrar Sesión
           </Button>

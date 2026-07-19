@@ -11,17 +11,12 @@ import { toast } from '@/hooks/use-toast';
 
 import type { Auth } from 'firebase/auth';
 
-export async function secureLogout(authInstance: Auth | null | undefined, reason: string = 'manual') {
+export async function secureLogout(
+  authInstance: Auth | null | undefined,
+  reason: string = 'manual',
+  skipRedirect: boolean = false
+) {
   logger.warn(`Iniciando cierre de sesión seguro (Zero-Trust). Razón: ${reason}`);
-
-  // Mostrar notificación visual para mitigar la percepción de lentitud
-  // causada por el borrado asíncrono de gigabytes de caché.
-  if (typeof window !== 'undefined') {
-    toast({
-      title: 'Cerrando sesión',
-      description: 'Limpiando memoria caché y destruyendo credenciales seguras...',
-    });
-  }
 
   try {
     // 1. Invalidar sesión en el servidor (elimina cookies HTTP)
@@ -63,7 +58,9 @@ export async function secureLogout(authInstance: Auth | null | undefined, reason
   } catch (error) {
     logger.error('Error durante el cierre de sesión seguro', error);
   } finally {
-    // 6. Redirección dura (sin router.push) para purgar memoria RAM de Next.js
-    window.location.href = `/acceso-panel${reason !== 'manual' ? `?reason=${reason}` : ''}`;
+    if (!skipRedirect) {
+      // 6. Redirección dura (sin router.push) para purgar memoria RAM de Next.js
+      window.location.href = `/acceso-panel${reason !== 'manual' ? `?reason=${reason}` : ''}`;
+    }
   }
 }

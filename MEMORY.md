@@ -5,6 +5,21 @@
 > Se analizó el equipo local (DESKTOP-N9CGIFT) identificando un procesador antiguo `AMD PRO A10-8750B R7` (4 núcleos) y 16GB de RAM. Esta severa limitación en procesamiento de un solo hilo causa sobrecargas y Cold Starts extremadamente lentos.
 > **Regla permanente:** Está **ESTRICTAMENTE PROHIBIDO** ejecutar suites de validación masivas (`npm run validate` total) o pruebas E2E pesadas (Playwright) para cambios menores, ya que estresa severamente la máquina. Aplicar validación quirúrgica (linters específicos y pruebas aisladas) a menos que se trate de una reestructuración arquitectónica masiva autorizada por el usuario. Cuando las pruebas E2E sean necesarias, usar estrategias pasivas y timeouts elevados (`60000ms`).
 
+## 2026-07-19: Pantalla Animada de Cierre de Sesión (Zero-Trust Sweeper)
+
+- **Qué cambió:**
+  - **[UX/UI - Sweeper]**: Se creó la nueva página `src/app/logout/page.tsx` para manejar visualmente el proceso asíncrono de destrucción de sesión, mostrando una animación de Framer Motion paso a paso.
+  - **[Refactor de Lógica]**: Se actualizó `src/lib/security/client-logout.ts` para extraer la redirección forzada y devolver una promesa, permitiendo a la nueva pantalla de `/logout` controlar los tiempos de limpieza (Service Worker, IndexedDB, Cookies HTTP).
+  - **[Redireccionamiento]**: Se actualizaron `src/app/admin/layout.tsx` y `src/components/vial-clear/AdminDashboard.tsx` para redirigir a `/logout` tanto en cierres manuales como por inactividad.
+- **Por qué cambió:**
+  - El borrado exhaustivo de la PWA y Firebase Auth tomaba entre 2 a 4 segundos, lo que dejaba al usuario viendo un "spinner congelado" o una pantalla negra aparente (debido a la redirección previa a `/acceso-panel` que debía esperar a que terminara todo). Ahora, el usuario recibe retroalimentación inmediata, atractiva y entendible del protocolo "Tierra Arrasada" de seguridad.
+- **Archivos afectados:**
+  - `src/lib/security/client-logout.ts` [MODIFICADO]
+  - `src/app/logout/page.tsx` [CREADO]
+  - `src/app/admin/layout.tsx` [MODIFICADO]
+  - `src/components/vial-clear/AdminDashboard.tsx` [MODIFICADO]
+- **Estado actual:** ✅ Implementado y compilado. UX significativamente mejorada durante el deslogueo.
+
 ## 2026-07-19: Hotfix - Error de Compilación en VIP Dashboard (TypeScript)
 
 - **Qué cambió:**
