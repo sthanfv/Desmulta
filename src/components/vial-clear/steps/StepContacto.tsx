@@ -10,6 +10,7 @@ import {
   ScanSearch,
   ShieldCheck,
   AlertCircle,
+  Lock,
 } from 'lucide-react';
 import { UseFormReturn } from 'react-hook-form';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
@@ -205,7 +206,7 @@ export default function StepContacto({
                     </button>
                   </div>
                   <p className="text-[10px] text-muted-foreground pl-1">
-                    Solo números (5 a 20 dígitos).
+                    Solo números. Usado exclusivamente para validar su identidad jurídica.
                   </p>
                   <div id="cedula-error">
                     {form.formState.errors.cedula && (
@@ -297,7 +298,7 @@ export default function StepContacto({
                       />
                     </div>
                     <p className="text-[10px] text-muted-foreground pl-1">
-                      10 dígitos, debe empezar por 3.
+                      10 dígitos. Solo lo usaremos para enviarle su diagnóstico legal, sin spam.
                     </p>
                     <div id="whatsapp-error">
                       {form.formState.errors.contacto && (
@@ -575,6 +576,13 @@ export default function StepContacto({
             ⚠️ Error de Configuración: NEXT_PUBLIC_TURNSTILE_SITE_KEY faltante.
           </div>
         )}
+      </div>
+
+      <div className="flex items-center justify-center gap-2 mb-2 text-muted-foreground bg-muted/20 py-2 px-4 rounded-full w-fit mx-auto border border-border/50">
+        <Lock size={14} className="text-emerald-500" />
+        <span className="text-[10px] font-bold uppercase tracking-widest">
+          Datos protegidos y encriptados • Ley 1581 (Habeas Data)
+        </span>
       </div>
 
       <Button
