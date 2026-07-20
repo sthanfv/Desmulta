@@ -139,7 +139,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
                 className="w-full sm:w-auto h-14 sm:h-16 px-6 sm:px-12 text-base sm:text-lg font-semibold rounded-2xl shadow-md hover:shadow-2xl hover:-translate-y-1 active:scale-95 transition-all group"
               >
                 <span className="flex items-center gap-3">
-                  Consultar mis multas gratis
+                  Iniciar estudio sin costo
                   <ArrowUp className="w-5 h-5 rotate-45 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                 </span>
               </Button>

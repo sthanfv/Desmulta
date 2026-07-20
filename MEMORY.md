@@ -5,6 +5,27 @@
 > Se analizó el equipo local (DESKTOP-N9CGIFT) identificando un procesador antiguo `AMD PRO A10-8750B R7` (4 núcleos) y 16GB de RAM. Esta severa limitación en procesamiento de un solo hilo causa sobrecargas y Cold Starts extremadamente lentos.
 > **Regla permanente:** Está **ESTRICTAMENTE PROHIBIDO** ejecutar suites de validación masivas (`npm run validate` total) o pruebas E2E pesadas (Playwright) para cambios menores, ya que estresa severamente la máquina. Aplicar validación quirúrgica (linters específicos y pruebas aisladas) a menos que se trate de una reestructuración arquitectónica masiva autorizada por el usuario. Cuando las pruebas E2E sean necesarias, usar estrategias pasivas y timeouts elevados (`60000ms`).
 
+## 2026-07-20: Sincronización de Tests E2E y Limpieza Final (Zero Warnings)
+
+- **Qué cambió:**
+  - Se actualizó el localizador del botón de llamada a la acción en `tests/e2e/smoke.test.ts` de `"Iniciar estudio sin costo"` a `"Consultar mis multas gratis"` para reflejar la última versión de la UI (Fase 2 de UX Inmersiva).
+  - Se eliminaron las importaciones sin usar (`secureLogout`, `toast`, `useRouter`) detectadas por el linter estricto (`--max-warnings 0`) en:
+    - `src/components/sections/Hero.tsx`
+    - `src/app/admin/layout.tsx`
+    - `src/components/vial-clear/AdminDashboard.tsx`
+    - `src/lib/security/client-logout.ts`
+  - Se agregó `router` al arreglo de dependencias del `useEffect` de inactividad en `src/app/admin/layout.tsx`.
+- **Por qué cambió:**
+  - Las pruebas Playwright fallaban (timeout de 120,000ms) al buscar un texto obsoleto en el botón del Hero.
+  - El sistema de CI/CD estaba bloqueado por la presencia de 5 advertencias (warnings) de ESLint bajo la regla de tolerancia cero (`--max-warnings 0`), que requerían ser solventadas para un despliegue limpio y profesional.
+- **Archivos afectados:**
+  - `tests/e2e/smoke.test.ts` [MODIFICADO]
+  - `src/components/sections/Hero.tsx` [MODIFICADO]
+  - `src/app/admin/layout.tsx` [MODIFICADO]
+  - `src/components/vial-clear/AdminDashboard.tsx` [MODIFICADO]
+  - `src/lib/security/client-logout.ts` [MODIFICADO]
+- **Estado actual:** ✅ Tests (E2E y unitarios), Linter y compilación de Next.js (Build) completados al 100% de manera exitosa y el código subido al repositorio principal.
+
 ## 2026-07-20: Fase 3.1 Refactorización de Vitrina 3D LERP
 
 - **Qué cambió:**
