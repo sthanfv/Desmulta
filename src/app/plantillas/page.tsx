@@ -121,7 +121,7 @@ export default function PlantillasPage() {
 
   return (
     <div
-      className="min-h-screen bg-gradient-to-br from-white via-white to-amber-50/50 dark:bg-background selection:bg-primary/30 selection:text-primary-foreground py-16 px-4 md:px-8 pt-24 relative overflow-hidden group/layout"
+      className="min-h-screen bg-gradient-to-br from-white via-white to-amber-50/50 dark:bg-none dark:bg-background selection:bg-primary/30 selection:text-primary-foreground py-16 px-4 md:px-8 pt-24 relative overflow-hidden group/layout"
       onMouseMove={handleMouseMove}
     >
       {/* Patrón de puntos amigable (amarillo tenue) en lugar de negro para evitar que se vea 'sucio' u 'oscuro' */}
@@ -189,7 +189,7 @@ export default function PlantillasPage() {
           {TEMPLATE_CARDS.map((tpl) => (
             <TarjetaPremium
               key={tpl.id}
-              className="flex flex-col h-full bg-white dark:bg-[#15131A] border border-slate-200 dark:border-zinc-800 rounded-[2rem] min-h-[440px] relative transition-all duration-500 hover:-translate-y-3 hover:shadow-[0_20px_50px_rgba(245,193,7,0.06)] hover:border-primary/30"
+              className="flex flex-col h-full bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 rounded-[2rem] min-h-[440px] relative transition-all duration-500 hover:-translate-y-3 hover:shadow-[0_20px_50px_rgba(245,193,7,0.06)] hover:border-primary/30"
               onMouseEnter={() => {
                 if (window.innerWidth >= 768) {
                   setActiveTooltip(tpl.id);
