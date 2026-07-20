@@ -89,8 +89,8 @@ export function ModalAuthGodMode({
             Autenticación Modo Dios
           </DialogTitle>
           <DialogDescription className="text-zinc-400 font-medium">
-            Para ejecutar la acción de{' '}
-            <strong className="text-zinc-200">{actionName}</strong>, debes confirmar tu identidad de SuperAdmin.
+            Para ejecutar la acción de <strong className="text-zinc-200">{actionName}</strong>,
+            debes confirmar tu identidad de SuperAdmin.
           </DialogDescription>
         </DialogHeader>
 

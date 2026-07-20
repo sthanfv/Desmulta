@@ -85,7 +85,9 @@ export async function GET(request: NextRequest) {
       expireAt: Timestamp.fromDate(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)),
     });
 
-    logger.security(`[admin/download] Operador ${adminEmail} descargó PDF de la venta ${purchaseId}`);
+    logger.security(
+      `[admin/download] Operador ${adminEmail} descargó PDF de la venta ${purchaseId}`
+    );
 
     const payload = purchaseData.caseData;
     const pdfBytes = await generateMandatePDF(payload);

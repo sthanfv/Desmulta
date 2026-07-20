@@ -59,7 +59,7 @@ function ConfirmacionContent() {
           setDownloadError(true);
           return true;
         }
-        
+
         const testStatus = params.get('test_status');
         if (testStatus === 'DECLINED' || testStatus === 'ERROR' || testStatus === 'PENDING') {
           setStatus(testStatus);
@@ -280,7 +280,9 @@ function ConfirmacionContent() {
         {/* Branding Desmulta */}
         <div className="flex items-center gap-2 mb-10 opacity-80">
           <ShieldAlert className="w-6 h-6 text-yellow-500 dark:text-yellow-400" />
-          <span className="text-xl font-black tracking-widest text-slate-900 dark:text-white">DESMULTA</span>
+          <span className="text-xl font-black tracking-widest text-slate-900 dark:text-white">
+            DESMULTA
+          </span>
         </div>
 
         <div className="relative">
@@ -310,7 +312,9 @@ function ConfirmacionContent() {
             {downloadError ? (
               <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-500/30 rounded-3xl p-6 md:p-8 text-center animate-in fade-in zoom-in">
                 <AlertTriangle className="w-12 h-12 text-red-500 dark:text-red-400 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-red-600 dark:text-red-400 mb-2">Error de Descarga</h3>
+                <h3 className="text-xl font-bold text-red-600 dark:text-red-400 mb-2">
+                  Error de Descarga
+                </h3>
                 <p className="text-slate-700 dark:text-zinc-300 text-sm mb-6 max-w-md mx-auto">
                   Tuvimos un problema técnico al entregar tu PDF, pero tu pago está{' '}
                   <strong>seguro y confirmado</strong>. Por favor, contáctanos inmediatamente por
@@ -379,7 +383,9 @@ function ConfirmacionContent() {
                   Copia y pega esto en tu correo:
                 </h4>
                 <div className="mb-5">
-                  <span className="text-xs font-bold text-yellow-600 dark:text-yellow-500 uppercase">Asunto:</span>
+                  <span className="text-xs font-bold text-yellow-600 dark:text-yellow-500 uppercase">
+                    Asunto:
+                  </span>
                   <div className="bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-4 rounded-xl text-[15px] font-medium text-slate-800 dark:text-zinc-200 select-all mt-2 tracking-wide shadow-inner">
                     DERECHO DE PETICIÓN (ART 23 CP) - C.C. [Tu Cédula] - [Tu Placa]
                   </div>
@@ -466,12 +472,16 @@ Dirección de notificaciones: [Tu Dirección]`}
   return (
     <div className="flex flex-col items-center justify-center min-h-[50vh] text-center p-6 relative z-10">
       <Clock className="w-20 h-20 text-yellow-500 dark:text-yellow-400 mb-6 animate-pulse" />
-      <h2 className="text-4xl font-black text-slate-900 dark:text-white mb-3">Procesando pago...</h2>
+      <h2 className="text-4xl font-black text-slate-900 dark:text-white mb-3">
+        Procesando pago...
+      </h2>
       <p className="text-slate-700 dark:text-zinc-300 mt-2 max-w-md text-lg">
         Estamos esperando la confirmación de Wompi y tu banco.
       </p>
       <div className="mt-8 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-full py-3 px-6 inline-block shadow-sm dark:shadow-none">
-        <p className="text-sm text-slate-500 dark:text-zinc-400">Esta página se actualizará automáticamente.</p>
+        <p className="text-sm text-slate-500 dark:text-zinc-400">
+          Esta página se actualizará automáticamente.
+        </p>
       </div>
     </div>
   );
@@ -481,7 +491,7 @@ export default function ConfirmacionPago() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#050505] text-slate-900 dark:text-zinc-100 flex items-center justify-center relative selection:bg-yellow-400 selection:text-black overflow-hidden transition-colors duration-500">
       <MeshBackground />
-      
+
       {/* Patrón de puntos para modo oscuro (solicitado) */}
       <div
         className="absolute inset-0 z-0 hidden dark:block opacity-5 pointer-events-none"

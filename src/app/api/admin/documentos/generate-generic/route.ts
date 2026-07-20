@@ -63,9 +63,10 @@ export async function GET(request: NextRequest) {
 
     // Generar un Payload genérico (vacío)
     const genericPayload = {
-      productType: type,
-      authorityCity: '____________________',
-      authorityName: '____________________',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      documentType: type as any,
+      transitAuthority: '____________________',
+      transitCity: '____________________',
       infractorName: '____________________',
       infractorId: '____________________',
       infractorIdCity: '____________________',
@@ -94,7 +95,9 @@ export async function GET(request: NextRequest) {
       expireAt: Timestamp.fromDate(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)),
     });
 
-    logger.security(`[admin/generate-generic] MODO DIOS: ${adminEmail} generó plantilla gratis ${type} en ${format}`);
+    logger.security(
+      `[admin/generate-generic] MODO DIOS: ${adminEmail} generó plantilla gratis ${type} en ${format}`
+    );
 
     if (format === 'pdf') {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
