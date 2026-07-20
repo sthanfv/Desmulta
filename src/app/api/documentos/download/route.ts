@@ -12,26 +12,28 @@ const redis = Redis.fromEnv();
 export async function GET(req: NextRequest) {
   try {
     const dlSession = req.cookies.get('dl_session')?.value;
+    let tokenId = '';
+    let refId = req.nextUrl.searchParams.get('ref') || '';
+    let downloadToken = '';
 
-    if (!dlSession) {
-      return new NextResponse('No autorizado. Falta sesión de descarga.', { status: 401 });
+    if (dlSession) {
+      const sessionData = await redis.get(`dl:${dlSession}`);
+      if (!sessionData) {
+        return new NextResponse('Sesión de descarga expirada o inválida', { status: 403 });
+      }
+      // 🛡️ FIX V2-C2: Descarga de un solo uso, invalidar sesión inmediatamente
+      await redis.del(`dl:${dlSession}`);
+      
+      const parsed = typeof sessionData === 'string' ? JSON.parse(sessionData) : sessionData;
+      tokenId = parsed.token || '';
+      refId = parsed.ref || refId;
+      downloadToken = parsed.downloadToken || '';
+    } else if (refId) {
+      // Fallback para descargas directas desde confirmación usando la cookie dt_ref
+      downloadToken = req.cookies.get(`dt_${refId}`)?.value || '';
+    } else {
+      return new NextResponse('No autorizado. Falta sesión de descarga o referencia.', { status: 401 });
     }
-
-    const sessionData = await redis.get(`dl:${dlSession}`);
-    if (!sessionData) {
-      return new NextResponse('Sesión de descarga expirada o inválida', { status: 403 });
-    }
-
-    // 🛡️ FIX V2-C2: Descarga de un solo uso, invalidar sesión inmediatamente
-    await redis.del(`dl:${dlSession}`);
-
-    const {
-      token: tokenId,
-      ref: refId,
-      downloadToken,
-    } = typeof sessionData === 'string'
-      ? JSON.parse(sessionData)
-      : (sessionData as Record<string, unknown>);
 
     const format = req.nextUrl.searchParams.get('format') || 'pdf';
 

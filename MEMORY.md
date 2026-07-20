@@ -5,6 +5,23 @@
 > Se analizó el equipo local (DESKTOP-N9CGIFT) identificando un procesador antiguo `AMD PRO A10-8750B R7` (4 núcleos) y 16GB de RAM. Esta severa limitación en procesamiento de un solo hilo causa sobrecargas y Cold Starts extremadamente lentos.
 > **Regla permanente:** Está **ESTRICTAMENTE PROHIBIDO** ejecutar suites de validación masivas (`npm run validate` total) o pruebas E2E pesadas (Playwright) para cambios menores, ya que estresa severamente la máquina. Aplicar validación quirúrgica (linters específicos y pruebas aisladas) a menos que se trate de una reestructuración arquitectónica masiva autorizada por el usuario. Cuando las pruebas E2E sean necesarias, usar estrategias pasivas y timeouts elevados (`60000ms`).
 
+## 2026-07-20: Estrategia de "Value-Based Pricing" para Documentos Web
+
+- **Qué cambió:**
+  - Se incrementaron estratégicamente los precios base comerciales de todas las plantillas web entre un 20% y 35% en el backend (`product-prices.ts`).
+  - Se alinearon las 14 instancias del Frontend donde los precios estaban codificados estáticamente para reflejar el nuevo backend (Hero, Plantillas, Calculadora y el modal del Generador).
+  - Se ajustaron los parámetros del simulador en `telemetry-system.test.ts` para que los mocks reflejaran las nuevas aserciones monetarias.
+- **Por qué cambió:**
+  - Las multas por infracciones B y C rondan entre $300.000 y $600.000 COP, por lo que cobrar $20.000 por la solución demeritaba el esfuerzo (anclaje de precio incorrecto). Se subió el margen para que los usuarios perciban el documento como una solución *Premium* y al mismo tiempo aumente la rentabilidad. Las asesorías completas / personalizadas seguirán manejándose exclusivamente mediante trato directo con los asesores (Venta No Libre) para evitar cuellos de botella en la plataforma automatizada.
+- **Archivos afectados:**
+  - `src/lib/payments/product-prices.ts` [MODIFICADO]
+  - `src/app/calculadora/page.tsx` [MODIFICADO]
+  - `src/app/documentos/generador/[slug]/page.tsx` [MODIFICADO]
+  - `src/app/plantillas/page.tsx` [MODIFICADO]
+  - `src/components/ui/DocumentShowcase.tsx` [MODIFICADO]
+  - `src/tests/telemetry-system.test.ts` [MODIFICADO]
+- **Estado actual:** ✅ Tests (Typecheck y Linter) finalizados exitosamente (se evitó correr full tests para proteger la RAM local, siguiendo las reglas del MEMORY.md). Cambios desplegados en GitHub.
+
 ## 2026-07-20: Sincronización de Tests E2E y Limpieza Final (Zero Warnings)
 
 - **Qué cambió:**
