@@ -94,13 +94,13 @@ export default function GeneradorDinamico({ params }: GeneradorDinamicoProps) {
   useEffect(() => {
     if (!tmpl) return;
     const FALLBACK_PRICES: Record<string, string> = {
-      peticion_general: '$20.000',
-      prescripcion_directa: '$30.000',
-      doble_prescripcion: '$60.000',
-      nulidad_notificacion: '$40.000',
-      tutela_silencio: '$25.000',
-      caducidad_1_anio: '$30.000',
-      nulidad_falta_identidad: '$35.000',
+      peticion_general: '$39.000',
+      prescripcion_directa: '$59.000',
+      doble_prescripcion: '$79.000',
+      nulidad_notificacion: '$49.000',
+      tutela_silencio: '$39.000',
+      caducidad_1_anio: '$59.000',
+      nulidad_falta_identidad: '$49.000',
     };
 
     fetch('/api/payments/prices')

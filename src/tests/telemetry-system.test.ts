@@ -157,7 +157,7 @@ describe('📊 Sistema Integrado de Telemetría, Modo Dios y Ventas', () => {
           return Promise.resolve({
             exists: true,
             data: () => ({
-              amountCop: 30000_00, // 30.000 COP en centavos
+              amountCop: 39000_00, // 39.000 COP en centavos
               productType: 'peticion_general',
               caseData: { shortId: 'EXP-101', infractorName: 'Pedro Pérez' },
             }),
@@ -171,7 +171,7 @@ describe('📊 Sistema Integrado de Telemetría, Modo Dios y Ventas', () => {
 
       // Reconstruir la firma dinámica de Wompi
       const concatenatedValues =
-        transactionId + 'APPROVED' + '3000000' + String(timestamp) + SECRET;
+        transactionId + 'APPROVED' + '3900000' + String(timestamp) + SECRET;
       const signatureChecksum = crypto
         .createHash('sha256')
         .update(concatenatedValues)
@@ -184,7 +184,7 @@ describe('📊 Sistema Integrado de Telemetría, Modo Dios y Ventas', () => {
             id: transactionId,
             reference: reference,
             status: 'APPROVED',
-            amount_in_cents: 30000_00,
+            amount_in_cents: 39000_00,
           },
         },
         timestamp,
@@ -236,7 +236,7 @@ describe('📊 Sistema Integrado de Telemetría, Modo Dios y Ventas', () => {
           return Promise.resolve({
             exists: true,
             data: () => ({
-              amountCop: 50000_00, // 50.000 COP esperado
+              amountCop: 59000_00, // 59.000 COP esperado
               productType: 'prescripcion_directa',
             }),
           });
