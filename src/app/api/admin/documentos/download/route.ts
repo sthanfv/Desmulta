@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
     const payload = purchaseData.caseData;
     const pdfBytes = await generateMandatePDF(payload);
 
-    return new NextResponse(pdfBytes, {
+    return new NextResponse(Buffer.from(pdfBytes), {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',

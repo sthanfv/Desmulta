@@ -95,7 +95,7 @@ export async function GET(request: NextRequest) {
 
     if (format === 'pdf') {
       const pdfBytes = await generateMandatePDF(genericPayload as any);
-      return new NextResponse(pdfBytes, {
+      return new NextResponse(Buffer.from(pdfBytes), {
         status: 200,
         headers: {
           'Content-Type': 'application/pdf',
@@ -104,7 +104,7 @@ export async function GET(request: NextRequest) {
       });
     } else {
       const docxBytes = await generateMandateDOCX(genericPayload as any);
-      return new NextResponse(docxBytes, {
+      return new NextResponse(Buffer.from(docxBytes), {
         status: 200,
         headers: {
           'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
