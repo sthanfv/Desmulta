@@ -37,6 +37,7 @@ import {
   Gift,
   Key,
   CreditCard,
+  FileDown,
 } from 'lucide-react';
 import { TableroFlujoTrabajo } from '@/components/vial-clear/TableroFlujoTrabajo';
 import { AnalyticsView } from '@/components/vial-clear/AnalyticsView';
@@ -66,6 +67,15 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 // ─── Schemas ─────────────────────────────────────────────────────────────────
 
@@ -458,6 +468,44 @@ export function AdminDashboard() {
             >
               <ImageIcon size={16} />
             </a>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="text-muted-foreground rounded-xl" title="Plantillas Genéricas (Modo Dios)">
+                  <FileDown size={16} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-64 rounded-xl shadow-lg border-border/50">
+                <DropdownMenuLabel className="text-xs uppercase tracking-wider text-muted-foreground flex justify-between items-center">
+                  <span>Modo Dios</span>
+                  <span className="text-[10px] text-yellow-500 bg-yellow-500/10 px-1.5 py-0.5 rounded">.DOCX</span>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-border/40" />
+                <DropdownMenuItem onClick={() => window.open('/api/admin/documentos/generate-generic?type=poder_especial', '_blank')} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
+                  <span className="font-medium text-sm">Poder Especial</span>
+                  <span className="text-muted-foreground text-xs">$11,000</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => window.open('/api/admin/documentos/generate-generic?type=tutela', '_blank')} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
+                  <span className="font-medium text-sm">Acción de Tutela</span>
+                  <span className="text-muted-foreground text-xs">$27,000</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => window.open('/api/admin/documentos/generate-generic?type=derecho_peticion', '_blank')} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
+                  <span className="font-medium text-sm">Derecho de Petición</span>
+                  <span className="text-muted-foreground text-xs">$9,500</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => window.open('/api/admin/documentos/generate-generic?type=impugnacion', '_blank')} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
+                  <span className="font-medium text-sm">Impugnación / Audiencia</span>
+                  <span className="text-muted-foreground text-xs">$15,000</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => window.open('/api/admin/documentos/generate-generic?type=solicitud_revocatoria', '_blank')} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
+                  <span className="font-medium text-sm">Solicitud de Revocatoria</span>
+                  <span className="text-muted-foreground text-xs">$15,000</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => window.open('/api/admin/documentos/generate-generic?type=recurso_apelacion', '_blank')} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
+                  <span className="font-medium text-sm">Recurso de Apelación</span>
+                  <span className="text-muted-foreground text-xs">$18,000</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <ThemeToggle />
             <div className="w-px h-5 bg-border mx-1" />
             <Button

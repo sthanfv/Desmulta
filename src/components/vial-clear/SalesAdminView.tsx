@@ -207,7 +207,7 @@ export function SalesAdminView() {
                           size="sm"
                           className="h-8 gap-1.5 text-blue-400 hover:text-blue-300 hover:bg-blue-500/10"
                           onClick={() => {
-                            window.open(`/documentos/confirmacion?ref=${purchase.id}`, '_blank');
+                            window.open(`/api/admin/documentos/download?purchaseId=${purchase.id}`, '_blank');
                           }}
                         >
                           <FileDown size={14} /> PDF
