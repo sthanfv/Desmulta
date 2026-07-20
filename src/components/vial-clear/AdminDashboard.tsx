@@ -201,7 +201,7 @@ export function AdminDashboard() {
 
   const handleDownloadGeneric = async (type: string) => {
     try {
-      const res = await fetch(`/api/admin/documentos/generate-generic?type=${type}`);
+      const res = await fetch(`/api/admin/documentos/generate-generic?type=${type}&format=pdf`);
       if (!res.ok) {
         toast({
           title: 'Acceso Denegado',
@@ -214,7 +214,7 @@ export function AdminDashboard() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `plantilla_${type}.docx`; // Por defecto, o el formato que retorne
+      a.download = `plantilla_${type}.pdf`; // Cambiado a PDF a petición
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -522,8 +522,8 @@ export function AdminDashboard() {
               >
                 <DropdownMenuLabel className="text-xs uppercase tracking-wider text-muted-foreground flex justify-between items-center">
                   <span>Modo Dios</span>
-                  <span className="text-[10px] text-yellow-500 bg-yellow-500/10 px-1.5 py-0.5 rounded">
-                    .DOCX
+                  <span className="text-[10px] font-black bg-yellow-500/10 text-yellow-500 px-1.5 py-0.5 rounded border border-yellow-500/20">
+                    .PDF
                   </span>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-border/40" />
