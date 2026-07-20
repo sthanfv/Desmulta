@@ -67,7 +67,12 @@ export function applyPIIScrubber(event: ErrorEvent): ErrorEvent {
 
     // 5. 🛡️ FIX AB-2: Sanitizar cabeceras de peticiones sensibles
     if (event.request?.headers && typeof event.request.headers === 'object') {
-      const sensitiveHeaders = ['authorization', 'cookie', 'x-internal-secret', 'x-wompi-signature'];
+      const sensitiveHeaders = [
+        'authorization',
+        'cookie',
+        'x-internal-secret',
+        'x-wompi-signature',
+      ];
       sensitiveHeaders.forEach((h) => {
         if ((event.request!.headers as Record<string, string>)[h]) {
           (event.request!.headers as Record<string, string>)[h] = '[REDACTED]';

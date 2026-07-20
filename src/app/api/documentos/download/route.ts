@@ -12,7 +12,7 @@ const redis = Redis.fromEnv();
 export async function GET(req: NextRequest) {
   try {
     const dlSession = req.cookies.get('dl_session')?.value;
-    
+
     if (!dlSession) {
       return new NextResponse('No autorizado. Falta sesión de descarga.', { status: 401 });
     }
@@ -25,10 +25,14 @@ export async function GET(req: NextRequest) {
     // 🛡️ FIX V2-C2: Descarga de un solo uso, invalidar sesión inmediatamente
     await redis.del(`dl:${dlSession}`);
 
-    const { token: tokenId, ref: refId, downloadToken } = typeof sessionData === 'string' 
-      ? JSON.parse(sessionData) 
+    const {
+      token: tokenId,
+      ref: refId,
+      downloadToken,
+    } = typeof sessionData === 'string'
+      ? JSON.parse(sessionData)
       : (sessionData as Record<string, unknown>);
-      
+
     const format = req.nextUrl.searchParams.get('format') || 'pdf';
 
     if (!tokenId && !refId) {
@@ -109,10 +113,9 @@ export async function GET(req: NextRequest) {
     } else if (refId) {
       // ── FLUJO 2: DESCARGA DIRECTA (PANTALLA DE CONFIRMACIÓN) ──
       if (!downloadToken || downloadToken.trim() === '') {
-        logger.security(
-          '[documentos/download] Intento de descarga sin token de descarga',
-          { refId }
-        );
+        logger.security('[documentos/download] Intento de descarga sin token de descarga', {
+          refId,
+        });
         return new NextResponse('No autorizado. Token de descarga requerido.', { status: 401 });
       }
 
@@ -243,15 +246,15 @@ export async function GET(req: NextRequest) {
         'Content-Type': contentType,
         'Content-Disposition': `attachment; filename="${filename}"`,
         'Cache-Control': 'no-store, no-cache, must-revalidate, private',
-        'Pragma': 'no-cache',
+        Pragma: 'no-cache',
         'X-Content-Type-Options': 'nosniff',
         'X-Frame-Options': 'DENY',
       },
     });
-    
+
     // 🛡️ FIX V2-C2: Limpiar la cookie tras la descarga
     response.cookies.delete('dl_session');
-    
+
     return response;
   } catch (error) {
     logger.error('[documentos/download] Error generando PDF de descarga:', {

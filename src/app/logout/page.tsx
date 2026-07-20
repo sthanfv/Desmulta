@@ -11,12 +11,12 @@ function SweeperContent() {
   const auth = useAuth();
   const searchParams = useSearchParams();
   const reason = searchParams.get('reason') || 'manual';
-  
+
   const [step, setStep] = useState(0);
 
   useEffect(() => {
     let isMounted = true;
-    
+
     const runSweep = async () => {
       // Step 0: "Activando protocolo Zero-Trust..."
       if (isMounted) setStep(0);
@@ -24,25 +24,25 @@ function SweeperContent() {
 
       // Step 1: "Destruyendo credenciales seguras..."
       if (isMounted) setStep(1);
-      
+
       // Iniciar el borrado real en segundo plano
       const logoutPromise = secureLogout(auth, reason, true);
-      
+
       await new Promise((r) => setTimeout(r, 1500));
 
       // Step 2: "Vaciando caché y base de datos local..."
       if (isMounted) setStep(2);
-      
+
       // Esperar a que el protocolo Scorched Earth termine realmente
       await logoutPromise;
-      
+
       await new Promise((r) => setTimeout(r, 1000));
 
       // Step 3: "Limpieza completada"
       if (isMounted) setStep(3);
-      
+
       await new Promise((r) => setTimeout(r, 800));
-      
+
       // Redirección dura final (purga memoria de Next.js)
       window.location.href = `/acceso-panel?reason=clean`;
     };
@@ -59,7 +59,7 @@ function SweeperContent() {
     { icon: ShieldCheck, text: 'Cerrando sesión de forma segura...' },
     { icon: DatabaseZap, text: 'Borrando información confidencial...' },
     { icon: Sparkles, text: 'Limpiando memoria de la aplicación...' },
-    { icon: CheckCircle2, text: 'Limpieza completada. Hasta pronto.' }
+    { icon: CheckCircle2, text: 'Limpieza completada. Hasta pronto.' },
   ];
 
   const CurrentIcon = steps[step].icon;
@@ -70,7 +70,7 @@ function SweeperContent() {
       <div className="absolute inset-0 flex items-center justify-center opacity-30">
         <div className="w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px] animate-pulse" />
       </div>
-      
+
       <div className="flex flex-col items-center justify-center z-10 max-w-md w-full p-8 text-center">
         <AnimatePresence mode="wait">
           <motion.div
@@ -78,15 +78,15 @@ function SweeperContent() {
             initial={{ opacity: 0, scale: 0.8, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 1.1, y: -20 }}
-            transition={{ duration: 0.5, ease: "easeInOut" }}
+            transition={{ duration: 0.5, ease: 'easeInOut' }}
             className="flex flex-col items-center gap-8"
           >
             <div className="relative">
-               {/* Icon Glow */}
-               <div className="absolute -inset-4 bg-primary/20 blur-xl rounded-full" />
-               <CurrentIcon className="w-24 h-24 text-primary relative z-10" strokeWidth={1.5} />
+              {/* Icon Glow */}
+              <div className="absolute -inset-4 bg-primary/20 blur-xl rounded-full" />
+              <CurrentIcon className="w-24 h-24 text-primary relative z-10" strokeWidth={1.5} />
             </div>
-            
+
             <h2 className="text-xl md:text-2xl font-medium text-foreground font-sans tracking-wide">
               {steps[step].text}
             </h2>
@@ -95,12 +95,12 @@ function SweeperContent() {
 
         {/* Progress bar container */}
         <div className="w-full max-w-xs h-1.5 bg-secondary rounded-full mt-16 overflow-hidden">
-           <motion.div 
-             className="h-full bg-primary"
-             initial={{ width: "0%" }}
-             animate={{ width: `${((step + 1) / steps.length) * 100}%` }}
-             transition={{ duration: 0.8, ease: "easeInOut" }}
-           />
+          <motion.div
+            className="h-full bg-primary"
+            initial={{ width: '0%' }}
+            animate={{ width: `${((step + 1) / steps.length) * 100}%` }}
+            transition={{ duration: 0.8, ease: 'easeInOut' }}
+          />
         </div>
       </div>
     </div>

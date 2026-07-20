@@ -7,7 +7,6 @@ import { useUser, useAuth } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import { Loader2, RefreshCw } from 'lucide-react';
 import { OfflineBanner } from '@/components/ui/offline-banner';
-import { secureLogout } from '@/lib/security/client-logout';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -90,7 +89,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       clearTimeout(timeoutId);
       events.forEach((event) => document.removeEventListener(event, resetTimer));
     };
-  }, [user, isAdmin, auth]);
+  }, [user, isAdmin, auth, router]);
 
   const handleRefreshPermissions = async () => {
     if (!user) return;
@@ -155,10 +154,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             Refrescar Permisos
           </Button>
 
-          <Button
-            variant="outline"
-            onClick={() => router.push('/logout?reason=manual')}
-          >
+          <Button variant="outline" onClick={() => router.push('/logout?reason=manual')}>
             Cerrar Sesión
           </Button>
           <Button variant="ghost" onClick={() => router.push('/')}>

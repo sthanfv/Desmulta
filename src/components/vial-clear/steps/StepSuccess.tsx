@@ -153,7 +153,8 @@ export default function StepSuccess({
               rel="noopener noreferrer"
               className="text-primary font-bold text-xs truncate max-w-[200px] hover:underline"
             >
-              {typeof window !== 'undefined' ? window.location.host : 'desmulta.online'}/seguir/{(successData.trackingUuid || '').slice(0, 8)}...
+              {typeof window !== 'undefined' ? window.location.host : 'desmulta.online'}/seguir/
+              {(successData.trackingUuid || '').slice(0, 8)}...
             </a>
             <Button
               size="sm"
@@ -194,7 +195,7 @@ export default function StepSuccess({
                 removeQrCodeBehindLogo={true}
                 ecLevel="H"
               />
-              
+
               {/* QR Oculto en HD para la descarga */}
               <div className="hidden">
                 <QRCode
@@ -253,13 +254,7 @@ export default function StepSuccess({
                 ctx.fillText('DESMULTA.ONLINE', tempCanvas.width / 2, HEADER_H / 2 + 8);
 
                 // Dibujar el QR centrado
-                ctx.drawImage(
-                  imgElement,
-                  PADDING,
-                  HEADER_H + PADDING,
-                  targetSize,
-                  targetSize
-                );
+                ctx.drawImage(imgElement, PADDING, HEADER_H + PADDING, targetSize, targetSize);
 
                 tempCanvas.toBlob((blob) => {
                   if (!blob) return;

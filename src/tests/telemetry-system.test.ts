@@ -80,7 +80,6 @@ vi.mock('next-firebase-auth-edge/lib/next/tokens', () => ({
 // TESTS DE SISTEMAS: MODO DIOS, TOUCH DEBUGGER Y REGISTRO DE VENTAS
 // ──────────────────────────────────────────────────────────────────────────────
 describe('📊 Sistema Integrado de Telemetría, Modo Dios y Ventas', () => {
-
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -124,7 +123,7 @@ describe('📊 Sistema Integrado de Telemetría, Modo Dios y Ventas', () => {
 
       expect(result.success).toBe(true);
       expect(mockAddLog).toHaveBeenCalledTimes(1);
-      
+
       const call = mockAddLog.mock.calls[0];
       expect(call[1]).toMatchObject({
         adminEmail: 'admin_test@desmulta.online', // Extraído del mock de sesión
@@ -142,7 +141,7 @@ describe('📊 Sistema Integrado de Telemetría, Modo Dios y Ventas', () => {
   // ============================================================================
   describe('🛒 Registro de Ventas (Integridad en Base de Datos)', () => {
     const SECRET = 'wompi_events_secret_val_123';
-    
+
     beforeEach(() => {
       process.env.WOMPI_EVENTS_SECRET = SECRET;
     });
@@ -171,8 +170,12 @@ describe('📊 Sistema Integrado de Telemetría, Modo Dios y Ventas', () => {
       mockUpdatePurchase.mockResolvedValue(undefined);
 
       // Reconstruir la firma dinámica de Wompi
-      const concatenatedValues = transactionId + 'APPROVED' + '3000000' + String(timestamp) + SECRET;
-      const signatureChecksum = crypto.createHash('sha256').update(concatenatedValues).digest('hex');
+      const concatenatedValues =
+        transactionId + 'APPROVED' + '3000000' + String(timestamp) + SECRET;
+      const signatureChecksum = crypto
+        .createHash('sha256')
+        .update(concatenatedValues)
+        .digest('hex');
 
       const payload = {
         event: 'transaction.updated',
@@ -243,7 +246,10 @@ describe('📊 Sistema Integrado de Telemetría, Modo Dios y Ventas', () => {
 
       // El atacante intentó alterar el payload para pagar solo 50 COP
       const concatenatedValues = transactionId + 'APPROVED' + '5000' + String(timestamp) + SECRET;
-      const signatureChecksum = crypto.createHash('sha256').update(concatenatedValues).digest('hex');
+      const signatureChecksum = crypto
+        .createHash('sha256')
+        .update(concatenatedValues)
+        .digest('hex');
 
       const payload = {
         event: 'transaction.updated',

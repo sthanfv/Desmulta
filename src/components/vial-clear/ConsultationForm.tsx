@@ -200,7 +200,13 @@ export function ConsultationForm({ onSuccess, mode = 'full', nonce }: Consultati
       // Crear nuevo timeout de 15 segundos
       nudgeTimeout = setTimeout(() => {
         // Verificar nuevamente que no haya enviado y que no esté procesando OCR
-        if (form.formState.isSubmitSuccessful || successData || isScanningOCR || form.formState.isSubmitting) return;
+        if (
+          form.formState.isSubmitSuccessful ||
+          successData ||
+          isScanningOCR ||
+          form.formState.isSubmitting
+        )
+          return;
 
         toast({
           title: '¡Estás a un paso! 🚀',

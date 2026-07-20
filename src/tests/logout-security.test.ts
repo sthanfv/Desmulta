@@ -33,10 +33,12 @@ describe('secureLogout (Zero-Trust Caching)', () => {
           href: '',
         },
         indexedDB: {
-          databases: vi.fn().mockResolvedValue([
-            { name: 'firebaseLocalStorageDb' },
-            { name: 'workbox-expiration' },
-          ]),
+          databases: vi
+            .fn()
+            .mockResolvedValue([
+              { name: 'firebaseLocalStorageDb' },
+              { name: 'workbox-expiration' },
+            ]),
           deleteDatabase: vi.fn(),
         },
       },

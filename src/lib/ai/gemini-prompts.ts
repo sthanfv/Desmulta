@@ -1,7 +1,7 @@
 /**
  * Prompts centralizados para Google Gemini
  * Versionado para un fácil mantenimiento y actualización.
- * 
+ *
  * 🛡️ [SEGURIDAD OWASP LLM] Protecciones integradas contra Prompt Injection (Inyección de instrucciones maliciosas en la imagen).
  * 🛡️ [VALIDACION SIMIT] Validaciones estructurales visuales obligatorias para evitar procesar imágenes ajenas a la entidad (SIMIT).
  */

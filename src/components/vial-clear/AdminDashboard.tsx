@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useFirestore, useDoc, useMemoFirebase, useAuth } from '@/firebase';
-import { secureLogout } from '@/lib/security/client-logout';
 import { doc } from 'firebase/firestore';
 import {
   deleteExpiredConsultations,

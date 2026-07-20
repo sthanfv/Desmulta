@@ -1,13 +1,12 @@
 /**
  * Zero-Trust Logout (Scorched Earth)
- * 
+ *
  * Este módulo garantiza la destrucción total de la sesión en el cliente,
  * incluyendo cookies, almacenamiento local, bases de datos IndexedDB
  * y la caché del Service Worker (Workbox).
  */
 
 import { logger } from '@/lib/logger/security-logger';
-import { toast } from '@/hooks/use-toast';
 
 import type { Auth } from 'firebase/auth';
 
@@ -30,6 +29,18 @@ export async function secureLogout(
     // 3. Destruir almacenamiento síncrono del navegador
     localStorage.clear();
     sessionStorage.clear();
+
+    // Destrucción de IndexedDB (Tierra Arrasada)
+    if (typeof window !== 'undefined' && window.indexedDB && window.indexedDB.databases) {
+      try {
+        const dbs = await window.indexedDB.databases();
+        dbs.forEach((db) => {
+          if (db.name) window.indexedDB.deleteDatabase(db.name);
+        });
+      } catch (e: unknown) {
+        logger.warn('No se pudo limpiar IndexedDB', e);
+      }
+    }
 
     // 4. Barrido de Caché del Service Worker (Workbox / CacheStorage)
     if (typeof caches !== 'undefined') {

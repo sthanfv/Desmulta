@@ -82,9 +82,9 @@ function getSymmetricKey(): Buffer {
 
   if (!keyBase || !salt) {
     throw new Error(
-      "🛡️ [DevSecOps] PII_ENCRYPTION_KEY y PII_ENCRYPTION_SALT no configuradas en el entorno. " +
-      "Ambas son obligatorias para el cifrado PII. Genera claves con: " +
-      "node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\""
+      '🛡️ [DevSecOps] PII_ENCRYPTION_KEY y PII_ENCRYPTION_SALT no configuradas en el entorno. ' +
+        'Ambas son obligatorias para el cifrado PII. Genera claves con: ' +
+        "node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\""
     );
   }
 
@@ -94,7 +94,7 @@ function getSymmetricKey(): Buffer {
     keyBase,
     Buffer.from(salt, 'hex'),
     600_000, // Iteraciones recomendadas NIST 2023
-    32,      // 32 bytes para clave AES-256
+    32, // 32 bytes para clave AES-256
     'sha256'
   );
 

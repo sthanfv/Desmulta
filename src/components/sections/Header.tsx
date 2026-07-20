@@ -5,11 +5,22 @@ import Link from 'next/link';
 import { ShieldCheck, BookOpen, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import dynamic from 'next/dynamic';
-import { LazyMotion, domAnimation, m, useMotionValue, useSpring, useTransform, type MotionValue } from 'framer-motion';
+import {
+  LazyMotion,
+  domAnimation,
+  m,
+  useMotionValue,
+  useSpring,
+  useTransform,
+  type MotionValue,
+} from 'framer-motion';
 
-const ThemeToggle = dynamic(() => import('@/components/vial-clear/ThemeToggle').then((mod) => mod.ThemeToggle), {
-  ssr: false,
-});
+const ThemeToggle = dynamic(
+  () => import('@/components/vial-clear/ThemeToggle').then((mod) => mod.ThemeToggle),
+  {
+    ssr: false,
+  }
+);
 const ChangelogWidget = dynamic(
   () => import('@/components/ui/ChangelogWidget').then((mod) => mod.ChangelogWidget),
   {

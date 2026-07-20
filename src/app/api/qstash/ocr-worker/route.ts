@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
       resultados?: unknown[];
       _meta?: { plan: string };
     }
-    
+
     let finalPayload: GeminiOCRResult = { success: false };
 
     if (
@@ -122,7 +122,9 @@ export async function POST(request: NextRequest) {
     ) {
       finalPayload = {
         success: false,
-        error: rawRespuesta.includes('PROMPT_INJECTION_DETECTED') ? 'PROMPT_INJECTION_DETECTED' : 'INVALID_DOCUMENT',
+        error: rawRespuesta.includes('PROMPT_INJECTION_DETECTED')
+          ? 'PROMPT_INJECTION_DETECTED'
+          : 'INVALID_DOCUMENT',
         message: 'La imagen no parece ser una multa válida o contiene instrucciones no permitidas.',
       };
     } else {

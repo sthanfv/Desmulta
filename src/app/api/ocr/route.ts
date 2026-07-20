@@ -321,7 +321,7 @@ export async function POST(request: NextRequest) {
       }
       */
       // --- FIN BLOQUE TESSERACT DESHABILITADO ---
-      
+
       // Propagamos el error de Gemini al manejador principal para devolver el 503/500
       throw geminiError;
     }

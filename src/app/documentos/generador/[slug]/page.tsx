@@ -497,7 +497,10 @@ export default function GeneradorDinamico({ params }: GeneradorDinamicoProps) {
                 Aviso de Alcance Legal
               </h5>
               <p className="text-[11px] text-slate-500 dark:text-zinc-400 leading-relaxed font-medium">
-                Esta petición inicia un trámite de defensa formal. La decisión de exonerar o eliminar la multa depende de forma exclusiva de la Secretaría de Tránsito y de los hechos de tu caso. Desmulta no garantiza ni puede asegurar un resultado positivo del 100% de la radicación.
+                Esta petición inicia un trámite de defensa formal. La decisión de exonerar o
+                eliminar la multa depende de forma exclusiva de la Secretaría de Tránsito y de los
+                hechos de tu caso. Desmulta no garantiza ni puede asegurar un resultado positivo del
+                100% de la radicación.
               </p>
             </div>
           </div>

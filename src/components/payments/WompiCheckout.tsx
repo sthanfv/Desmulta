@@ -32,7 +32,12 @@ export function WompiCheckout({
   const wompiUrl = `https://checkout.wompi.co/p/?${params.toString()}`;
 
   return (
-    <a href={wompiUrl} target="_blank" rel="noopener noreferrer" className="inline-block w-full sm:w-auto">
+    <a
+      href={wompiUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-block w-full sm:w-auto"
+    >
       <button
         type="button"
         className="w-full sm:w-auto px-8 py-4 bg-[#1E293B] hover:bg-[#0F172A] dark:bg-white dark:hover:bg-slate-200 text-white dark:text-slate-900 font-black uppercase tracking-wider rounded-2xl transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 flex items-center justify-center gap-3"

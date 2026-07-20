@@ -7,7 +7,10 @@ import { timingSafeEqual } from 'crypto';
 
 const CrashPayloadSchema = z.object({
   // 🛡️ FIX H-4: límites estrictos para prevenir payloads abusivos
-  message: z.string().max(2000, 'El mensaje no puede superar 2000 caracteres.').default('(sin mensaje)'),
+  message: z
+    .string()
+    .max(2000, 'El mensaje no puede superar 2000 caracteres.')
+    .default('(sin mensaje)'),
   digest: z.string().max(100).optional(),
   path: z.string().max(512, 'La ruta no puede superar 512 caracteres.').default('/'),
 });

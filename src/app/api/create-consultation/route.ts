@@ -169,9 +169,7 @@ export async function POST(request: NextRequest) {
     // evidenceUrl Y no tiene cédula ni placa directa. Ningún campo controlable
     // por el cliente puede alterar esta decisión.
     const isSimitCapture = Boolean(
-      bodyAsRecord?.evidenceUrl &&
-        !bodyAsRecord?.cedula &&
-        !bodyAsRecord?.placa
+      bodyAsRecord?.evidenceUrl && !bodyAsRecord?.cedula && !bodyAsRecord?.placa
     );
 
     const schema = isSimitCapture ? SimitCaptureSchema : ConsultationSchema;

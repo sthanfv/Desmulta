@@ -26,11 +26,10 @@ export const Pillars = () => {
                 <ShieldCheck className="w-8 h-8" />
               </div>
               <div className="space-y-3">
-                <h3 className="text-xl md:text-2xl font-black text-foreground">
-                  Conocemos la Ley
-                </h3>
+                <h3 className="text-xl md:text-2xl font-black text-foreground">Conocemos la Ley</h3>
                 <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
-                  Operamos 100% bajo la ley para analizar y resolver su caso. Nuestro conocimiento de las normas de tránsito es su mejor y más sólida defensa.
+                  Operamos 100% bajo la ley para analizar y resolver su caso. Nuestro conocimiento
+                  de las normas de tránsito es su mejor y más sólida defensa.
                 </p>
               </div>
             </div>
@@ -43,11 +42,11 @@ export const Pillars = () => {
                 <FileSearch className="w-8 h-8" />
               </div>
               <div className="space-y-3">
-                <h3 className="text-xl md:text-2xl font-black text-foreground">
-                  Privacidad Total
-                </h3>
+                <h3 className="text-xl md:text-2xl font-black text-foreground">Privacidad Total</h3>
                 <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
-                  Analizamos la foto de su multa usando tecnología segura directamente en su celular o computador. Su información nunca viaja a servidores externos, garantizando que nadie más la vea.
+                  Analizamos la foto de su multa usando tecnología segura directamente en su celular
+                  o computador. Su información nunca viaja a servidores externos, garantizando que
+                  nadie más la vea.
                 </p>
               </div>
             </div>
@@ -64,7 +63,8 @@ export const Pillars = () => {
                   Atención Personalizada
                 </h3>
                 <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
-                  Trato humano, directo y altamente profesional enfocado en solucionar su historial vial lo más rápido posible.
+                  Trato humano, directo y altamente profesional enfocado en solucionar su historial
+                  vial lo más rápido posible.
                 </p>
               </div>
             </div>
@@ -81,7 +81,8 @@ export const Pillars = () => {
                   Resultados Reales
                 </h3>
                 <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
-                  Sabemos exactamente cuándo los tránsitos cometen errores en el proceso de cobro, y usamos esas fallas legales a su favor para eliminar la deuda.
+                  Sabemos exactamente cuándo los tránsitos cometen errores en el proceso de cobro, y
+                  usamos esas fallas legales a su favor para eliminar la deuda.
                 </p>
               </div>
             </div>

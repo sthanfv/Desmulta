@@ -6,35 +6,40 @@ import { Shield, ChevronLeft, ChevronRight, FileText } from 'lucide-react';
 
 const templates = [
   {
-    header: 'SEÑOR: ORGANISMO DE TRÁNSITO Y TRANSPORTE<br>E. S. D.<br>REF: DERECHO DE PETICIÓN — ART. 23 C.P.',
+    header:
+      'SEÑOR: ORGANISMO DE TRÁNSITO Y TRANSPORTE<br>E. S. D.<br>REF: DERECHO DE PETICIÓN — ART. 23 C.P.',
     title: 'Petición General',
     desc: 'Plantilla exploratoria para exigir copia de comparendos y guías de envío al Tránsito.',
     price: '$20.000',
     successRate: '95% Éxito',
   },
   {
-    header: 'AL DESPACHO DEL INSPECTOR DE TRÁNSITO<br>E. S. D.<br>REF: SOLICITUD DE PRESCRIPCIÓN — ART. 159 C.N.T.',
+    header:
+      'AL DESPACHO DEL INSPECTOR DE TRÁNSITO<br>E. S. D.<br>REF: SOLICITUD DE PRESCRIPCIÓN — ART. 159 C.N.T.',
     title: 'Prescripción Directa (3 Años)',
     desc: 'Solicite la eliminación de la multa tras haber cumplido 3 años sin mandamiento de pago.',
     price: '$30.000',
     successRate: '98% Éxito',
   },
   {
-    header: 'OFICINA DE EJECUCIONES COACTIVAS DE TRÁNSITO<br>E. S. D.<br>REF: EXCEPCIÓN DE PRESCRIPCIÓN ACUMULADA (3+3)',
+    header:
+      'OFICINA DE EJECUCIONES COACTIVAS DE TRÁNSITO<br>E. S. D.<br>REF: EXCEPCIÓN DE PRESCRIPCIÓN ACUMULADA (3+3)',
     title: 'Doble Prescripción (Coactivo)',
     desc: 'Levante embargos y exija caducidad si han pasado 6 años sin pago efectivo o remate.',
     price: '$60.000',
     successRate: '94% Éxito',
   },
   {
-    header: 'AUTORIDAD DE TRÁNSITO Y TRANSPORTE<br>E. S. D.<br>REF: RECURSO DE NULIDAD CONTRA FOTOMULTA — SENT. C-038/20',
+    header:
+      'AUTORIDAD DE TRÁNSITO Y TRANSPORTE<br>E. S. D.<br>REF: RECURSO DE NULIDAD CONTRA FOTOMULTA — SENT. C-038/20',
     title: 'Nulidad de Fotomulta',
     desc: 'Tumbe su fotomulta exigiendo la plena identificación del infractor obligada por la Corte.',
     price: '$40.000',
     successRate: '96% Éxito',
   },
   {
-    header: 'SEÑOR: JUEZ CONSTITUCIONAL DE LA REPÚBLICA<br>E. S. D.<br>REF: ACCIÓN DE TUTELA — VULNERACIÓN DEBIDO PROCESO',
+    header:
+      'SEÑOR: JUEZ CONSTITUCIONAL DE LA REPÚBLICA<br>E. S. D.<br>REF: ACCIÓN DE TUTELA — VULNERACIÓN DEBIDO PROCESO',
     title: 'Acción de Tutela (Silencio)',
     desc: 'Demande a Tránsito ante un juez si ignoran sus peticiones o violan su debido proceso.',
     price: '$25.000',
@@ -50,7 +55,7 @@ export function DocumentShowcase() {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const stackRef = useRef<HTMLDivElement>(null);
-  
+
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const isHovering = useRef(false);
 
@@ -95,7 +100,7 @@ export function DocumentShowcase() {
     return () => {
       stopAutoplay();
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Swipes
@@ -104,7 +109,7 @@ export function DocumentShowcase() {
   const activeTemplate = templates[currentIndex];
 
   return (
-    <div 
+    <div
       className="w-full flex justify-center items-center relative group cursor-grab active:cursor-grabbing pb-12"
       ref={containerRef}
       onMouseEnter={() => {
@@ -137,7 +142,7 @@ export function DocumentShowcase() {
       {/* Flechas eliminadas para mejor UX táctil e indicadores */}
 
       {/* Stack de Cartas */}
-      <div 
+      <div
         ref={stackRef}
         className="relative w-full max-w-[320px] aspect-[3/4.2] will-change-transform"
         style={{ transform: 'translateX(0px) translateY(0px)' }}
@@ -145,48 +150,65 @@ export function DocumentShowcase() {
         {/* SVG Texture Pattern */}
         <svg className="hidden">
           <filter id="noiseFilter">
-            <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" stitchTiles="stitch" />
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0.85"
+              numOctaves="3"
+              stitchTiles="stitch"
+            />
           </filter>
         </svg>
-        
+
         {/* Carta Trasera 2 */}
-        <div 
+        <div
           className="absolute inset-0 rounded-3xl bg-card border border-border"
-          style={{ 
+          style={{
             transform: 'rotate(10deg) translateX(10px) translateY(5px)',
             transformOrigin: 'bottom left',
-            boxShadow: 'var(--tw-shadow-color, 0 10px 30px -10px rgba(0,0,0,0.15)), inset 0 1px 0 rgba(255,255,255,0.8)',
+            boxShadow:
+              'var(--tw-shadow-color, 0 10px 30px -10px rgba(0,0,0,0.15)), inset 0 1px 0 rgba(255,255,255,0.8)',
           }}
         >
-          <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ filter: 'url(#noiseFilter)' }} />
+          <div
+            className="absolute inset-0 opacity-[0.03] pointer-events-none"
+            style={{ filter: 'url(#noiseFilter)' }}
+          />
         </div>
 
         {/* Carta Trasera 1 */}
-        <div 
+        <div
           className="absolute inset-0 rounded-3xl bg-card border border-border"
-          style={{ 
+          style={{
             transform: 'rotate(5deg) translateX(5px) translateY(2px)',
             transformOrigin: 'bottom left',
-            boxShadow: 'var(--tw-shadow-color, 0 15px 35px -10px rgba(0,0,0,0.15)), inset 0 1px 0 rgba(255,255,255,0.8)',
+            boxShadow:
+              'var(--tw-shadow-color, 0 15px 35px -10px rgba(0,0,0,0.15)), inset 0 1px 0 rgba(255,255,255,0.8)',
           }}
         >
-           <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ filter: 'url(#noiseFilter)' }} />
+          <div
+            className="absolute inset-0 opacity-[0.03] pointer-events-none"
+            style={{ filter: 'url(#noiseFilter)' }}
+          />
         </div>
 
         {/* Carta Frontal */}
-        <div 
+        <div
           className="absolute inset-0 rounded-3xl bg-card text-card-foreground flex flex-col p-3 sm:p-4 z-10 overflow-hidden border border-border"
-          style={{ 
+          style={{
             transform: 'rotate(0deg)',
             transformOrigin: 'bottom left',
-            boxShadow: 'var(--tw-shadow-color, 0 25px 50px -12px rgba(0,0,0,0.25)), inset 0 1px 0 rgba(255,255,255,0.8)',
+            boxShadow:
+              'var(--tw-shadow-color, 0 25px 50px -12px rgba(0,0,0,0.25)), inset 0 1px 0 rgba(255,255,255,0.8)',
           }}
         >
-          <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ filter: 'url(#noiseFilter)' }} />
-          
+          <div
+            className="absolute inset-0 opacity-[0.03] pointer-events-none"
+            style={{ filter: 'url(#noiseFilter)' }}
+          />
+
           {/* Contenedor del Carrusel Interno (Scroll Horizontal Suave) */}
           <div className="flex-grow flex flex-col relative z-10 w-full h-full overflow-hidden">
-            <div 
+            <div
               className="flex w-full h-full transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]"
               style={{ transform: `translateX(-${currentIndex * 100}%)` }}
             >
@@ -202,22 +224,31 @@ export function DocumentShowcase() {
 
                   {/* Textos */}
                   <div className="flex-grow flex flex-col justify-center relative min-h-0">
-                    <div 
+                    <div
                       className="text-[7px] sm:text-[8px] text-muted-foreground font-mono tracking-widest uppercase mb-1 leading-relaxed font-semibold relative z-10"
                       dangerouslySetInnerHTML={{ __html: template.header }}
                     />
-                    
+
                     <h3 className="text-base sm:text-xl font-black text-foreground mb-1 leading-tight tracking-tight relative z-10">
                       {template.title}
                     </h3>
-                    
+
                     <p className="text-[10px] sm:text-xs text-muted-foreground italic font-medium leading-tight line-clamp-2 relative z-10">
                       {template.desc}
                     </p>
 
                     {/* Falso cuerpo del documento difuminado (Background absoluto para no empujar el flex) */}
-                    <div className="absolute bottom-0 translate-y-2 left-0 right-0 text-[6px] sm:text-[7px] text-muted-foreground leading-tight blur-[1px] opacity-25 select-none pointer-events-none hidden sm:block overflow-hidden z-0" style={{ height: '50px' }}>
-                      <p>Yo, mayor de edad, identificado como aparece al pie de mi firma, en ejercicio del Derecho Constitucional de Petición consagrado en el artículo 23 de la Constitución Política y la Ley 1437 de 2011. Solicito respetuosamente se sirva ordenar la actualización de las bases de datos correspondientes al SIMIT y RUNT...</p>
+                    <div
+                      className="absolute bottom-0 translate-y-2 left-0 right-0 text-[6px] sm:text-[7px] text-muted-foreground leading-tight blur-[1px] opacity-25 select-none pointer-events-none hidden sm:block overflow-hidden z-0"
+                      style={{ height: '50px' }}
+                    >
+                      <p>
+                        Yo, mayor de edad, identificado como aparece al pie de mi firma, en
+                        ejercicio del Derecho Constitucional de Petición consagrado en el artículo
+                        23 de la Constitución Política y la Ley 1437 de 2011. Solicito
+                        respetuosamente se sirva ordenar la actualización de las bases de datos
+                        correspondientes al SIMIT y RUNT...
+                      </p>
                     </div>
                   </div>
 
@@ -225,19 +256,26 @@ export function DocumentShowcase() {
                   <div className="flex-none mt-2 pt-2 border-t border-border">
                     <div className="flex justify-between items-end mb-2">
                       <div>
-                        <p className="text-[8px] text-muted-foreground mb-0.5 font-semibold uppercase tracking-wider">Precio especial</p>
+                        <p className="text-[8px] text-muted-foreground mb-0.5 font-semibold uppercase tracking-wider">
+                          Precio especial
+                        </p>
                         <div className="flex items-baseline gap-1">
-                          <span className="text-xl sm:text-2xl font-black text-foreground">{template.price}</span>
+                          <span className="text-xl sm:text-2xl font-black text-foreground">
+                            {template.price}
+                          </span>
                         </div>
                       </div>
                     </div>
-                    
-                    <button 
+
+                    <button
                       onClick={() => router.push('/plantillas')}
                       className="w-full py-2 px-3 bg-primary hover:bg-primary/90 text-primary-foreground font-black text-xs sm:text-sm rounded-lg shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-1.5 group/btn focus:outline-none"
                     >
                       <span>Ver Solución Legal</span>
-                      <FileText size={14} className="group-hover/btn:-translate-y-1 group-hover/btn:rotate-6 transition-transform" />
+                      <FileText
+                        size={14}
+                        className="group-hover/btn:-translate-y-1 group-hover/btn:rotate-6 transition-transform"
+                      />
                     </button>
                   </div>
                 </div>

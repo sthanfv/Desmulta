@@ -103,8 +103,8 @@ export default function AccesoPanel() {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // ── Sincronizar usuarios ya autenticados (solo en fase idle) ──────────────
-  // IMPORTANTE: Si el usuario llega a /acceso-panel (ya sea manual o por redirección 
-  // del middleware debido a que su cookie __session caducó), debemos purgar el estado 
+  // IMPORTANTE: Si el usuario llega a /acceso-panel (ya sea manual o por redirección
+  // del middleware debido a que su cookie __session caducó), debemos purgar el estado
   // local de Firebase Auth. Esto rompe el bucle infinito de redirección.
   useEffect(() => {
     // Guard explícito: cualquier fase que no sea idle cancela este efecto

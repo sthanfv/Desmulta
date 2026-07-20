@@ -55,7 +55,7 @@ test.describe('Portal Ciudadano - Smoke Tests', () => {
     await page.waitForLoadState('load');
     
     // 3. Hacer clic en el botón de la Hero (búsqueda precisa y forzada)
-    const consultButton = page.locator('button', { hasText: /Iniciar estudio sin costo/i }).first();
+    const consultButton = page.locator('button', { hasText: /Consultar mis multas gratis/i }).first();
     await consultButton.waitFor({ state: 'visible' });
     await consultButton.dispatchEvent('click');
     

@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
     const { token, ref, downloadToken } = body;
 
     const db = getFirestore(getAdminApp());
-    
+
     // Validar token/downloadToken (misma lógica que el GET actual)
     let isValid = false;
 
@@ -32,12 +32,17 @@ export async function POST(req: NextRequest) {
             : purchase.downloadTokenExpiresAt
               ? new Date(purchase.downloadTokenExpiresAt)
               : null;
-          
+
           if (!expiresAt || new Date() <= expiresAt) {
             const expected = Buffer.from(purchase.downloadToken || '');
             const provided = Buffer.from(downloadToken || '');
-            
-            if (expected.length > 0 && provided.length > 0 && expected.length === provided.length && crypto.timingSafeEqual(expected, provided)) {
+
+            if (
+              expected.length > 0 &&
+              provided.length > 0 &&
+              expected.length === provided.length &&
+              crypto.timingSafeEqual(expected, provided)
+            ) {
               isValid = true;
             }
           }
@@ -63,7 +68,7 @@ export async function POST(req: NextRequest) {
       path: '/api/documentos/download',
       maxAge: 300,
     });
-    
+
     return response;
   } catch (error) {
     console.error('[authorize-download] Error interno:', error);

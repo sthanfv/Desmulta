@@ -221,7 +221,7 @@ export const useSIMITValidator = () => {
          * [MANDATO-FILTRO: OCR DESHABILITADO EN FAVOR DE LA API GEMINI]
          * =========================================================================
          * El cliente ha solicitado que el OCR local (Tesseract) quede encapsulado
-         * y desconectado, pero funcional como reserva histórica. Se ha migrado 
+         * y desconectado, pero funcional como reserva histórica. Se ha migrado
          * 100% a la API de Gemini (flash-2.5) debido a su mayor precisión,
          * velocidad y cuota gratuita suficiente (1500 req/día vs límite de 5/sem).
          */
@@ -231,7 +231,7 @@ export const useSIMITValidator = () => {
           mediaLogger.log('OCR', 'Enrutando hacia API Gemini (Tesseract en reserva)...');
           setProgresoOCR(50);
           const iaData = await reconocerTextoConIA(archivoProcesar, (p) => setProgresoOCR(p));
-          
+
           if (!iaData || !iaData.texto) {
             throw new Error('La API de IA no pudo extraer texto de la imagen.');
           }
@@ -240,67 +240,69 @@ export const useSIMITValidator = () => {
             data: {
               text: iaData.texto,
               words: iaData.palabras,
-              confidence: 100
-            }
+              confidence: 100,
+            },
           };
-          
+
           // Gemini nos devuelve un Array estructurado con todas las multas
           if (Array.isArray(iaData.comparendo)) {
             comparendosEstructurados = iaData.comparendo;
           }
-          
+
           setProgresoOCR(100);
           clearTimeout(ocrTimeoutId);
         } else {
-        // --- INICIO CÓDIGO TESSERACT (RESERVA) ---
-        const ocrTask = async () => {
-          mediaLogger.log('OCR', 'Inicializando motor Tesseract local (IA desactivada)...');
-          await tesseractManager.init((m: { status: string; progress: number }) => {
-            switch (m.status) {
-              case 'loading tesseract core':
-                setCargandoModelo(true);
-                setProgresoOCR((prev) => Math.max(prev, 10));
-                break;
-              case 'loaded tesseract core':
-                setProgresoOCR((prev) => Math.max(prev, 15));
-                break;
-              case 'loading language traineddata':
-                setProgresoOCR((prev) => Math.max(prev, 25));
-                break;
-              case 'loaded language traineddata':
-                setProgresoOCR((prev) => Math.max(prev, 30));
-                break;
-              case 'initializing tesseract':
-                setProgresoOCR((prev) => Math.max(prev, 40));
-                break;
-              case 'initialized tesseract':
-                setProgresoOCR((prev) => Math.max(prev, 45));
-                break;
-              case 'recognizing text':
-                setCargandoModelo(false);
-                const progress = 45 + Math.round(m.progress * 55);
-                setProgresoOCR((prev) => Math.max(prev, progress));
-                break;
-            }
+          // --- INICIO CÓDIGO TESSERACT (RESERVA) ---
+          const ocrTask = async () => {
+            mediaLogger.log('OCR', 'Inicializando motor Tesseract local (IA desactivada)...');
+            await tesseractManager.init((m: { status: string; progress: number }) => {
+              switch (m.status) {
+                case 'loading tesseract core':
+                  setCargandoModelo(true);
+                  setProgresoOCR((prev) => Math.max(prev, 10));
+                  break;
+                case 'loaded tesseract core':
+                  setProgresoOCR((prev) => Math.max(prev, 15));
+                  break;
+                case 'loading language traineddata':
+                  setProgresoOCR((prev) => Math.max(prev, 25));
+                  break;
+                case 'loaded language traineddata':
+                  setProgresoOCR((prev) => Math.max(prev, 30));
+                  break;
+                case 'initializing tesseract':
+                  setProgresoOCR((prev) => Math.max(prev, 40));
+                  break;
+                case 'initialized tesseract':
+                  setProgresoOCR((prev) => Math.max(prev, 45));
+                  break;
+                case 'recognizing text':
+                  setCargandoModelo(false);
+                  const progress = 45 + Math.round(m.progress * 55);
+                  setProgresoOCR((prev) => Math.max(prev, progress));
+                  break;
+              }
+            });
+
+            mediaLogger.log('OCR', 'Iniciando escaneo de patrones...');
+            return await tesseractManager.recognize(objectUrl);
+          };
+
+          resultRaw = (await Promise.race([ocrTask(), timeoutPromise])) as typeof resultRaw;
+
+          const palabrasRaw = resultRaw.data.words || [];
+          const avgConf =
+            palabrasRaw.length > 0
+              ? Math.round(
+                  palabrasRaw.reduce((acc, w) => acc + w.confidence, 0) / palabrasRaw.length
+                )
+              : 0;
+          mediaLogger.log('OCR', 'Escaneo local completado con éxito', {
+            wordCount: palabrasRaw.length,
+            avgConfidence: `${avgConf}%`,
+            textLength: resultRaw.data.text.length,
           });
-
-          mediaLogger.log('OCR', 'Iniciando escaneo de patrones...');
-          return await tesseractManager.recognize(objectUrl);
-        };
-
-        resultRaw = (await Promise.race([ocrTask(), timeoutPromise])) as typeof resultRaw;
-
-        const palabrasRaw = resultRaw.data.words || [];
-        const avgConf =
-          palabrasRaw.length > 0
-            ? Math.round(palabrasRaw.reduce((acc, w) => acc + w.confidence, 0) / palabrasRaw.length)
-            : 0;
-        mediaLogger.log('OCR', 'Escaneo local completado con éxito', {
-          wordCount: palabrasRaw.length,
-          avgConfidence: `${avgConf}%`,
-          textLength: resultRaw.data.text.length,
-        });
-        // --- FIN CÓDIGO TESSERACT ---
+          // --- FIN CÓDIGO TESSERACT ---
         }
       } catch (ocrError) {
         clearTimeout(ocrTimeoutId);
@@ -467,8 +469,8 @@ export const useSIMITValidator = () => {
               );
               if (entrada) {
                 infoEducativas.push({
-                   ...entrada,
-                   idUnicoMulta: comp.numeroComparendo || Date.now().toString() // Inyectar ID para el carrusel
+                  ...entrada,
+                  idUnicoMulta: comp.numeroComparendo || Date.now().toString(), // Inyectar ID para el carrusel
                 });
               }
             }
@@ -476,13 +478,14 @@ export const useSIMITValidator = () => {
             // Es resolución / comparendo manual (Línea gris): inyectar tarjeta genérica grave
             infoEducativas.push({
               codigo: comp.numeroComparendo || 'RESOLUCIÓN SANCIONATORIA',
-              nombre: comp.descripcionInfraccion || 'Infracción confirmada por la autoridad de tránsito',
+              nombre:
+                comp.descripcionInfraccion || 'Infracción confirmada por la autoridad de tránsito',
               gravedad: 'Muy Grave (En Cobro)',
               sancion_cop: String(comp.valorMulta || 'Desconocido'),
               inmoviliza: true, // Riesgo alto
               contexto_legal: 'Resolución de Tránsito en Firme',
               defensa_clave: 'Verificación de notificaciones y debido proceso',
-              idUnicoMulta: comp.numeroComparendo || Date.now().toString()
+              idUnicoMulta: comp.numeroComparendo || Date.now().toString(),
             });
           }
         });

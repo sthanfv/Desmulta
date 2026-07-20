@@ -59,14 +59,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     // Usar UID verificado o IP como fallback (nunca el header no verificado)
     const authorUid = verifiedUid || clienteIp;
-    
+
     // Obtener el lunes de la semana actual para conteo semanal
     const ahora = new Date();
     const dia = ahora.getUTCDay(); // 0 = Dom, 1 = Lun...
     const diff = ahora.getUTCDate() - dia + (dia === 0 ? -6 : 1);
     const lunes = new Date(Date.UTC(ahora.getUTCFullYear(), ahora.getUTCMonth(), diff));
     const semanaKey = lunes.toISOString().split('T')[0];
-    
+
     const docId = `v2_${authorUid}_${semanaKey}`.replace(/[.:]/g, '_');
 
     logger.info('[upload] Paso 1: Iniciando para IP:', { clienteIp, docId });

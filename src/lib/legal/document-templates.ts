@@ -47,7 +47,7 @@ function getPreamble(d: CaseDataForPDF, asunto: string): string[] {
   const date = new Date();
   const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
   const fecha = date.toLocaleDateString('es-CO', options);
-  
+
   return [
     `Lugar y fecha: ${ciudad}, ${fecha}`,
     '',
@@ -62,7 +62,7 @@ function getPreamble(d: CaseDataForPDF, asunto: string): string[] {
     `Yo, ${d.infractorName}, mayor de edad y residente en la ciudad de ${ciudad}, identificado(a) con cédula de ciudadanía No. ${d.infractorId}, actuando en nombre propio y en ejercicio del Derecho de Petición consagrado en el artículo 23 de la Constitución Política y regulado por la Ley 1437 de 2011, me dirijo a ustedes con el fin de solicitar y declarar lo siguiente:`,
     '',
     'HECHOS',
-    ''
+    '',
   ];
 }
 
@@ -145,7 +145,10 @@ const peticionGeneral: DocumentBlock = {
   seccion2Titulo: 'III. NOTIFICACIONES Y ANEXOS:',
   cuerpo: (d) => {
     return [
-      ...getPreamble(d, `Derecho de Petición en interés particular - Solicitud de copias íntegras del expediente y trazabilidad de notificación respecto al comparendo No. ${d.ticketNumber || '[NUMERO]'}`),
+      ...getPreamble(
+        d,
+        `Derecho de Petición en interés particular - Solicitud de copias íntegras del expediente y trazabilidad de notificación respecto al comparendo No. ${d.ticketNumber || '[NUMERO]'}`
+      ),
       `Me dirijo a ustedes para elevar la siguiente solicitud de información y expedición de copias, respecto al comparendo No. ${d.ticketNumber || '[NUMERO DE COMPARENDO]'}${d.licensePlate && d.licensePlate !== 'N/A' ? ` asociado al vehículo de placas ${d.licensePlate}` : ''}.`,
       ``,
       `FUNDAMENTOS DE DERECHO`,
@@ -184,7 +187,10 @@ const prescripcionDirecta: DocumentBlock = {
   seccion2Titulo: 'III. NOTIFICACIONES Y ANEXOS:',
   cuerpo: (d) => {
     return [
-      ...getPreamble(d, `Derecho de Petición en interés particular - Solicitud de declaratoria de PRESCRIPCIÓN de la acción de cobro respecto a la multa/comparendo No. ${d.ticketNumber || '[NUMERO]'}`),
+      ...getPreamble(
+        d,
+        `Derecho de Petición en interés particular - Solicitud de declaratoria de PRESCRIPCIÓN de la acción de cobro respecto a la multa/comparendo No. ${d.ticketNumber || '[NUMERO]'}`
+      ),
       `PRIMERO: El día ${d.fechaHechos || '[FECHA DE LA INFRACCIÓN]'} se generó la orden de comparendo No. ${d.ticketNumber || '[NUMERO DE COMPARENDO]'}${d.licensePlate && d.licensePlate !== 'N/A' ? ` asociada al vehículo de placas ${d.licensePlate}` : ''}.`,
       ``,
       `SEGUNDO: Desde la fecha de ocurrencia de los hechos hasta el día de la presentación de esta petición, han transcurrido más de TRES (3) AÑOS.`,
@@ -228,7 +234,10 @@ const doblePrescripcion: DocumentBlock = {
   seccion2Titulo: 'III. NOTIFICACIONES Y ANEXOS:',
   cuerpo: (d) => {
     return [
-      ...getPreamble(d, `Derecho de Petición en interés particular - Solicitud de declaratoria de PRESCRIPCIÓN ABSOLUTA de la acción de cobro coactivo y pérdida de ejecutoriedad respecto al comparendo No. ${d.ticketNumber || '[NUMERO]'}`),
+      ...getPreamble(
+        d,
+        `Derecho de Petición en interés particular - Solicitud de declaratoria de PRESCRIPCIÓN ABSOLUTA de la acción de cobro coactivo y pérdida de ejecutoriedad respecto al comparendo No. ${d.ticketNumber || '[NUMERO]'}`
+      ),
       `PRIMERO: El día ${d.fechaHechos || '[FECHA DE LA INFRACCIÓN]'} se generó la orden de comparendo No. ${d.ticketNumber || '[NUMERO DE COMPARENDO]'}${d.licensePlate && d.licensePlate !== 'N/A' ? ` asociada al vehículo de placas ${d.licensePlate}` : ''}.`,
       ``,
       `SEGUNDO: Desde la fecha de la presunta infracción han transcurrido más de SEIS (6) AÑOS, superando ampliamente el límite temporal máximo que otorga la ley para perseguir el pago de obligaciones de tránsito.`,
@@ -274,7 +283,10 @@ const nulidadNotificacion: DocumentBlock = {
   seccion2Titulo: 'III. NOTIFICACIONES Y ANEXOS:',
   cuerpo: (d) => {
     return [
-      ...getPreamble(d, `Derecho de Petición - Solicitud de revocatoria directa y exoneración por vulneración al debido proceso (Indebida Notificación) del comparendo electrónico No. ${d.ticketNumber || '[NUMERO]'}`),
+      ...getPreamble(
+        d,
+        `Derecho de Petición - Solicitud de revocatoria directa y exoneración por vulneración al debido proceso (Indebida Notificación) del comparendo electrónico No. ${d.ticketNumber || '[NUMERO]'}`
+      ),
       `PRIMERO: Al consultar la plataforma del Sistema Integrado de Información sobre Multas y Sanciones por Infracciones de Tránsito (SIMIT), encontré que aparece a mi cargo la orden de comparendo electrónico No. ${d.ticketNumber || '[NUMERO DE COMPARENDO]'}, presuntamente impuesta el día ${d.fechaHechos || '[FECHA DE LA INFRACCIÓN]'}${d.licensePlate && d.licensePlate !== 'N/A' ? ` al vehículo de placas ${d.licensePlate}` : ''}.`,
       ``,
       `SEGUNDO: A la fecha de radicación de este documento, NO he recibido notificación personal ni correspondencia alguna en mi lugar de residencia registrado en el Registro Único Nacional de Tránsito (RUNT), el cual corresponde a la dirección física de notificaciones aportada al final de este escrito.`,
@@ -319,7 +331,10 @@ const caducidad1Anio: DocumentBlock = {
   seccion2Titulo: 'III. NOTIFICACIONES Y ANEXOS:',
   cuerpo: (d) => {
     return [
-      ...getPreamble(d, `Derecho de Petición en interés particular - Solicitud de declaratoria de CADUCIDAD de la acción contravencional respecto al comparendo No. ${d.ticketNumber || '[NUMERO]'}`),
+      ...getPreamble(
+        d,
+        `Derecho de Petición en interés particular - Solicitud de declaratoria de CADUCIDAD de la acción contravencional respecto al comparendo No. ${d.ticketNumber || '[NUMERO]'}`
+      ),
       `PRIMERO: El día ${d.fechaHechos || '[FECHA DE LA INFRACCIÓN]'} se impuso orden de comparendo No. ${d.ticketNumber || '[NUMERO DE COMPARENDO]'}${d.licensePlate && d.licensePlate !== 'N/A' ? ` asociado al vehículo de placas ${d.licensePlate}` : ''}.`,
       ``,
       `SEGUNDO: A la fecha de radicación de la presente petición, ha transcurrido más de un (1) año desde la ocurrencia del presunto hecho infractor.`,
@@ -363,7 +378,10 @@ const nulidadFaltaIdentidad: DocumentBlock = {
   seccion2Titulo: 'III. NOTIFICACIONES Y ANEXOS:',
   cuerpo: (d) => {
     return [
-      ...getPreamble(d, `Derecho de Petición - Solicitud de exoneración de comparendo electrónico No. ${d.ticketNumber || '[NUMERO]'} por falta de plena identidad del conductor y aplicación de la Sentencia C-038 de 2020`),
+      ...getPreamble(
+        d,
+        `Derecho de Petición - Solicitud de exoneración de comparendo electrónico No. ${d.ticketNumber || '[NUMERO]'} por falta de plena identidad del conductor y aplicación de la Sentencia C-038 de 2020`
+      ),
       `PRIMERO: El día ${d.fechaHechos || '[FECHA DE LA INFRACCIÓN]'} se generó la orden de comparendo electrónico No. ${d.ticketNumber || '[NUMERO DE COMPARENDO]'} por una presunta infracción cometida en el vehículo de placas ${d.licensePlate || '[PLACA DEL VEHÍCULO]'}.`,
       ``,
       `SEGUNDO: Fui vinculado al procedimiento contravencional única y exclusivamente por mi calidad de propietario(a) del vehículo, según consta en el Registro Único Nacional de Tránsito (RUNT).`,

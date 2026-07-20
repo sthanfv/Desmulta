@@ -71,10 +71,9 @@ export const ConsultationSchemaBase = z.object({
         .replace(/\s+/g, ' ')
         .trim()
     )
-    .refine(
-      (val) => /^[a-záéíóúüñA-ZÁÉÍÓÚÜÑ\s\-\.]+$/.test(val),
-      { message: 'El nombre solo puede contener letras, espacios, guiones y puntos.' }
-    ),
+    .refine((val) => /^[a-záéíóúüñA-ZÁÉÍÓÚÜÑ\s\-\.]+$/.test(val), {
+      message: 'El nombre solo puede contener letras, espacios, guiones y puntos.',
+    }),
   contacto: z
     .string({ required_error: 'El celular de contacto es requerido.' })
     .min(1, { message: 'El celular de contacto es requerido.' })

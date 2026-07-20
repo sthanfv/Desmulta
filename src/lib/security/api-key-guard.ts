@@ -365,5 +365,7 @@ const CODE_MAP: Record<string, string> = {
 export function handleApiKeyError(r: ApiKeyValidationResult): NextResponse {
   const status = STATUS_MAP[r.errorCode ?? 'INVALID'] ?? 401;
   const code = CODE_MAP[r.errorCode ?? 'INVALID'] ?? 'API_KEY_INVALID';
-  return NextResponse.json(apiError(code as Parameters<typeof apiError>[0], r.errorMessage ?? ''), { status });
+  return NextResponse.json(apiError(code as Parameters<typeof apiError>[0], r.errorMessage ?? ''), {
+    status,
+  });
 }

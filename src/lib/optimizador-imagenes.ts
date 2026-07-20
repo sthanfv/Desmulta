@@ -28,9 +28,12 @@ export async function comprimirCaptura(file: File, maxWidth = 1200, quality = 0.
       let height = img.height;
 
       // 🛡️ FIX D-05: Prevenir OOM en Canvas si la imagen es masiva (ej. Panorámicas 8K)
-      if (width * height > 24000000) { // ~24 Megapíxeles
+      if (width * height > 24000000) {
+        // ~24 Megapíxeles
         URL.revokeObjectURL(objectUrl);
-        return reject(new Error('La resolución de la imagen es excesiva y podría bloquear tu dispositivo.'));
+        return reject(
+          new Error('La resolución de la imagen es excesiva y podría bloquear tu dispositivo.')
+        );
       }
 
       // Redimensionamiento inteligente manteniendo el Aspect Ratio

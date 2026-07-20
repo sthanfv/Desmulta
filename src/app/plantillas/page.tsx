@@ -48,7 +48,8 @@ const TEMPLATE_CARDS = [
     id: 'peticion_general',
     title: 'Petición Pruebas y Trazabilidad',
     description: 'Solicitud formal para indagar sobre comparendos, prescripción y nulidad básica.',
-    scenario: 'Úsala como primer paso si sabes que tienes multas pendientes pero desconoces si te notificaron correctamente. Te permite recolectar los soportes y pruebas oficiales para armar tu defensa sin asumir riesgos.',
+    scenario:
+      'Úsala como primer paso si sabes que tienes multas pendientes pero desconoces si te notificaron correctamente. Te permite recolectar los soportes y pruebas oficiales para armar tu defensa sin asumir riesgos.',
     badge: 'Uso General',
     exito: '95%',
     precio: '$20.000',
@@ -57,7 +58,8 @@ const TEMPLATE_CARDS = [
     id: 'prescripcion_directa',
     title: 'Prescripción 3 Años (Sin Mandamiento)',
     description: 'Para comparendos con más de 3 años sin que se haya emitido mandamiento de pago.',
-    scenario: 'Aplica si tus multas tienen más de 3 años de antigüedad y la Secretaría de Tránsito NUNCA inició un proceso de cobro coactivo (embargo o mandamiento de pago). Solicita la exoneración directa por vencimiento de plazo inicial.',
+    scenario:
+      'Aplica si tus multas tienen más de 3 años de antigüedad y la Secretaría de Tránsito NUNCA inició un proceso de cobro coactivo (embargo o mandamiento de pago). Solicita la exoneración directa por vencimiento de plazo inicial.',
     badge: 'Popular',
     exito: '98%',
     precio: '$30.000',
@@ -66,7 +68,8 @@ const TEMPLATE_CARDS = [
     id: 'doble_prescripcion',
     title: 'Prescripción Absoluta 6+ Años',
     description: 'Para deudas en cobro coactivo que llevan más de 5 años adicionales congeladas.',
-    scenario: 'El recurso definitivo si tu deudada ya está en cobro coactivo o embargada. Si pasaron más de 5 años desde que el tránsito dictó el mandamiento de pago (típicamente sumando 6 años en total desde el comparendo), la ley obliga a borrar la deuda.',
+    scenario:
+      'El recurso definitivo si tu deudada ya está en cobro coactivo o embargada. Si pasaron más de 5 años desde que el tránsito dictó el mandamiento de pago (típicamente sumando 6 años en total desde el comparendo), la ley obliga a borrar la deuda.',
     badge: 'Especializada',
     exito: '94%',
     precio: '$60.000',
@@ -75,7 +78,8 @@ const TEMPLATE_CARDS = [
     id: 'nulidad_notificacion',
     title: 'Nulidad Fotomultas (Indebida Notificación)',
     description: 'Nulidad de fotomultas por no notificación personal (Sentencia C-038/2020).',
-    scenario: 'Perfecta para cámaras de fotodetección. Úsala si el tránsito te cargó una fotomulta sin enviarte la citación física a tu dirección del RUNT dentro de los 13 días hábiles posteriores, violando tu derecho a defenderte.',
+    scenario:
+      'Perfecta para cámaras de fotodetección. Úsala si el tránsito te cargó una fotomulta sin enviarte la citación física a tu dirección del RUNT dentro de los 13 días hábiles posteriores, violando tu derecho a defenderte.',
     badge: 'Fotomultas',
     exito: '96%',
     precio: '$40.000',
@@ -85,7 +89,8 @@ const TEMPLATE_CARDS = [
     title: 'Acción de Tutela (Silencio de Tránsito)',
     description:
       'Acción Constitucional cuando Tránsito no responde tu petición en 15 días hábiles.',
-    scenario: 'Úsala si ya enviaste un derecho de petición y el organismo de tránsito guardó silencio por más de 15 días hábiles. Este recurso constitucional obliga a un juez a ordenarles responderte de forma inmediata en 48 horas.',
+    scenario:
+      'Úsala si ya enviaste un derecho de petición y el organismo de tránsito guardó silencio por más de 15 días hábiles. Este recurso constitucional obliga a un juez a ordenarles responderte de forma inmediata en 48 horas.',
     badge: 'Urgente',
     exito: '99%',
     precio: '$25.000',
@@ -125,9 +130,12 @@ export default function PlantillasPage() {
       onMouseMove={handleMouseMove}
     >
       {/* Patrón de puntos amigable (amarillo tenue) en lugar de negro para evitar que se vea 'sucio' u 'oscuro' */}
-      <div 
-        className="absolute inset-0 z-0 opacity-10 dark:opacity-5 pointer-events-none" 
-        style={{ backgroundImage: 'radial-gradient(#f59e0b 1px, transparent 1px)', backgroundSize: '32px 32px' }} 
+      <div
+        className="absolute inset-0 z-0 opacity-10 dark:opacity-5 pointer-events-none"
+        style={{
+          backgroundImage: 'radial-gradient(#f59e0b 1px, transparent 1px)',
+          backgroundSize: '32px 32px',
+        }}
       />
       <MeshBackground />
 
@@ -180,7 +188,12 @@ export default function PlantillasPage() {
               Aviso de Alcance Legal y Responsabilidad
             </h4>
             <p className="text-xs md:text-sm text-slate-600 dark:text-zinc-400 leading-relaxed font-medium">
-              Los documentos disponibles en esta plataforma son herramientas técnicas estructuradas para ejercer formalmente tu derecho a la defensa y debido proceso bajo la legislación colombiana (Ley 769 de 2002 y Ley 1437 de 2011). La generación y descarga de estas peticiones no garantiza por sí sola la exoneración o eliminación inmediata de la multa del SIMIT, ya que la decisión definitiva depende de forma exclusiva de la Secretaría de Tránsito correspondiente y de los hechos de tu caso.
+              Los documentos disponibles en esta plataforma son herramientas técnicas estructuradas
+              para ejercer formalmente tu derecho a la defensa y debido proceso bajo la legislación
+              colombiana (Ley 769 de 2002 y Ley 1437 de 2011). La generación y descarga de estas
+              peticiones no garantiza por sí sola la exoneración o eliminación inmediata de la multa
+              del SIMIT, ya que la decisión definitiva depende de forma exclusiva de la Secretaría
+              de Tránsito correspondiente y de los hechos de tu caso.
             </p>
           </div>
         </div>

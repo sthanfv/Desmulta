@@ -44,19 +44,22 @@ export async function POST(request: NextRequest) {
     // 0. Rate Limiting por IP
     const ip = getSecureIp(request);
     const { success, limit, remaining, reset } = await rateLimit.limit(ip);
-    
+
     if (!success) {
       logger.security('[pre-login] Rate limit excedido para solicitud de OTP (Admin)', { ip });
       return NextResponse.json(
-        { error: 'Demasiadas solicitudes de código OTP. Por favor, intenta de nuevo en unos minutos.' },
-        { 
+        {
+          error:
+            'Demasiadas solicitudes de código OTP. Por favor, intenta de nuevo en unos minutos.',
+        },
+        {
           status: 429,
           headers: {
             'X-RateLimit-Limit': limit.toString(),
             'X-RateLimit-Remaining': remaining.toString(),
             'X-RateLimit-Reset': reset.toString(),
-            'Retry-After': Math.ceil((reset - Date.now()) / 1000).toString()
-          }
+            'Retry-After': Math.ceil((reset - Date.now()) / 1000).toString(),
+          },
         }
       );
     }

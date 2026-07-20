@@ -4,12 +4,12 @@
  * NUNCA duplicar este diccionario en otros archivos.
  */
 export const PRODUCT_PRICES: Record<string, number> = {
-  peticion_general:        2_000_000, // $20.000 COP
-  prescripcion_directa:    3_000_000, // $30.000 COP
-  doble_prescripcion:      6_000_000, // $60.000 COP
-  nulidad_notificacion:    4_000_000, // $40.000 COP
-  tutela_silencio:         2_500_000, // $25.000 COP
-  caducidad_1_anio:        3_000_000, // $30.000 COP
+  peticion_general: 2_000_000, // $20.000 COP
+  prescripcion_directa: 3_000_000, // $30.000 COP
+  doble_prescripcion: 6_000_000, // $60.000 COP
+  nulidad_notificacion: 4_000_000, // $40.000 COP
+  tutela_silencio: 2_500_000, // $25.000 COP
+  caducidad_1_anio: 3_000_000, // $30.000 COP
   nulidad_falta_identidad: 3_500_000, // $35.000 COP
 } as const;
 

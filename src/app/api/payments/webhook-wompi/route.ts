@@ -146,7 +146,9 @@ export async function POST(req: NextRequest) {
   } catch (err: unknown) {
     const code = (err as { code?: number })?.code;
     if (code === 6 /* ALREADY_EXISTS — webhook duplicado */) {
-      logger.info('[webhook-wompi] Webhook duplicado ignorado (idempotencia atómica)', { transactionId });
+      logger.info('[webhook-wompi] Webhook duplicado ignorado (idempotencia atómica)', {
+        transactionId,
+      });
       return NextResponse.json({ ok: true, duplicate: true });
     }
     throw err;
@@ -224,12 +226,14 @@ export async function POST(req: NextRequest) {
       // 🔔 Notificación "Cha-ching!" por Telegram al dueño
       const botToken = process.env.TELEGRAM_BOT_TOKEN;
       const chatId = process.env.TELEGRAM_DEV_CHAT_ID || process.env.TELEGRAM_CHAT_ID;
-      
+
       if (botToken && chatId) {
         // Extraemos datos extra si existen en el documento de la compra
         const nombre = purchase?.caseData?.infractorName || 'Cliente Anónimo';
         const producto = purchase?.productLabel || 'Documento Legal';
-        const ticketStr = purchase?.caseData?.ticketNumber ? `\n<b>Comparendo:</b> <code>${purchase.caseData.ticketNumber}</code>` : '';
+        const ticketStr = purchase?.caseData?.ticketNumber
+          ? `\n<b>Comparendo:</b> <code>${purchase.caseData.ticketNumber}</code>`
+          : '';
 
         waitUntil(
           fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
@@ -238,18 +242,20 @@ export async function POST(req: NextRequest) {
             body: JSON.stringify({
               chat_id: chatId,
               parse_mode: 'HTML',
-              text: `💰 <b>¡NUEVO PAGO RECIBIDO!</b> 💰\n\n<b>Cliente:</b> ${nombre}\n<b>Producto:</b> ${producto}${ticketStr}\n<b>Monto:</b> $${(amountConfirmadoPorWompi / 100).toLocaleString('es-CO')} COP\n<b>Ref:</b> <code>${reference}</code>\n\nEl PDF se está enviando automáticamente. 🚀`
+              text: `💰 <b>¡NUEVO PAGO RECIBIDO!</b> 💰\n\n<b>Cliente:</b> ${nombre}\n<b>Producto:</b> ${producto}${ticketStr}\n<b>Monto:</b> $${(amountConfirmadoPorWompi / 100).toLocaleString('es-CO')} COP\n<b>Ref:</b> <code>${reference}</code>\n\nEl PDF se está enviando automáticamente. 🚀`,
+            }),
+          })
+            .then(async (res) => {
+              if (!res.ok) {
+                const errorBody = await res.text();
+                logger.warn('[webhook-wompi] Telegram API rechazó el mensaje', { errorBody });
+              }
             })
-          })
-          .then(async (res) => {
-            if (!res.ok) {
-               const errorBody = await res.text();
-               logger.warn('[webhook-wompi] Telegram API rechazó el mensaje', { errorBody });
-            }
-          })
-          .catch((err: unknown) => {
-            logger.warn('[webhook-wompi] Fallo de red al enviar Telegram', { error: String(err) });
-          })
+            .catch((err: unknown) => {
+              logger.warn('[webhook-wompi] Fallo de red al enviar Telegram', {
+                error: String(err),
+              });
+            })
         );
       }
     }
