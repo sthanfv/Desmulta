@@ -5,6 +5,70 @@
 > Se analizó el equipo local (DESKTOP-N9CGIFT) identificando un procesador antiguo `AMD PRO A10-8750B R7` (4 núcleos) y 16GB de RAM. Esta severa limitación en procesamiento de un solo hilo causa sobrecargas y Cold Starts extremadamente lentos.
 > **Regla permanente:** Está **ESTRICTAMENTE PROHIBIDO** ejecutar suites de validación masivas (`npm run validate` total) o pruebas E2E pesadas (Playwright) para cambios menores, ya que estresa severamente la máquina. Aplicar validación quirúrgica (linters específicos y pruebas aisladas) a menos que se trate de una reestructuración arquitectónica masiva autorizada por el usuario. Cuando las pruebas E2E sean necesarias, usar estrategias pasivas y timeouts elevados (`60000ms`).
 
+## 2026-07-20: Fase 3.1 Refactorización de Vitrina 3D LERP
+
+- **Qué cambió:**
+  - Se eliminó la librería `gsap` y el componente complejo `CardSwap.tsx`.
+  - Se implementó un nuevo componente `DocumentShowcase.tsx` basado en CSS puramente isométrico (`transform-style: preserve-3d`) y físicas LERP ligeras nativas en Vanilla JS/React.
+  - Se centralizaron y vincularon los datos reales de plantillas legales de la aplicación dentro de la nueva estructura de carrusel 3D con fade transicional.
+- **Por qué cambió:**
+  - Petición explícita del usuario para solucionar problemas de renderizado borroso (blur), atascos gráficos en móviles, y alta carga pesada por librerías complejas. La nueva propuesta técnica del usuario rinde infinitamente mejor usando la GPU nativa mediante CSS.
+- **Archivos afectados:**
+  - `src/components/ui/DocumentShowcase.tsx` [CREADO]
+  - `src/components/ui/CardSwap.tsx` [ELIMINADO]
+  - `src/components/ui/CardSwap.css` [ELIMINADO]
+  - `src/components/sections/Hero.tsx` [MODIFICADO]
+
+## 2026-07-20: Fase 3 Confianza Comercial (Trust Seals y Auditoría UX)
+
+- **Qué cambió:**
+  - Se inyectó condicionalmente el script de auditoría UX `Microsoft Clarity` en `layout.tsx` (requiere configurar `NEXT_PUBLIC_CLARITY_ID` en las variables de entorno de Vercel).
+  - Se agregaron Trust Seals (sellos de seguridad) en `StepContacto.tsx` indicando el cumplimiento de la Ley 1581 de Habeas Data y protección de datos.
+  - Se modificaron los subtextos (placeholders/helpers) de los inputs sensibles (Cédula y WhatsApp) para explicar explícitamente el uso no intrusivo de los mismos.
+- **Por qué cambió:**
+  - Para reducir la fricción en la entrega de datos, prevenir el abandono del formulario (drop-off) y preparar la plataforma para capturar métricas avanzadas de comportamiento (heatmaps, session replay).
+- **Archivos afectados:**
+  - `src/app/layout.tsx`
+  - `src/components/vial-clear/steps/StepContacto.tsx`
+
+## 2026-07-20: Fase 2 UX Inmersiva (Liquid Glass, Accesibilidad Cognitiva, Microanimaciones)
+
+- **Qué cambió:**
+  - Se refactorizó el componente `TarjetaPremium.tsx` pasando de un fondo sólido opaco (`bg-card`) a un efecto "Liquid Glass" (cristal translúcido con refracción usando `backdrop-blur-2xl` y bordes interiores brillantes).
+  - Se simplificó radicalmente la jerga legal en los componentes `Hero.tsx` y `Pillars.tsx` hacia un lenguaje claro y directo que conecte con el usuario común ("Conocemos la Ley", "Borramos sus multas", "Privacidad Total").
+  - Se añadieron microanimaciones en el botón principal ("Consultar mis multas gratis"), aplicando un efecto de levitación y deslizamiento de flecha interactivo (`hover:-translate-y-1` y `group-hover:translate-x-1`).
+- **Por qué cambió:**
+  - Ejecución de la Fase 2 de la hoja de ruta de Excelencia 2026 para mejorar las conversiones mediante un lenguaje más humano y una estética interactiva de última generación.
+- **Archivos afectados:**
+  - `src/components/ui/TarjetaPremium.tsx`
+  - `src/components/sections/Hero.tsx`
+  - `src/components/sections/Pillars.tsx`
+
+## 2026-07-20: Fase 1 Cimentación Visual (Bento Grid, Tipografía XXL, Whitespace)
+
+- **Qué cambió:**
+  - Se aumentó significativamente el padding vertical en todas las secciones principales (`Hero`, `Pillars`, `Methodology`, `SuccessCases`, `FAQ`, `CTA`).
+  - Se incrementaron los tamaños y pesos de las fuentes de los titulares principales a tipografías "XXL" (`text-6xl` hasta `text-[7rem]`, `font-black`, `tracking-tighter`).
+  - Se reestructuró la sección de Servicios (Pilares) de un grid básico `2x2` a un moderno **Bento Grid** asimétrico, donde los elementos cobran distintos pesos visuales.
+- **Por qué cambió:**
+  - En base a la hoja de ruta estratégica para elevar el diseño a "Estándares de Excelencia 2026". El diseño Bento y los grandes espacios en blanco reducen la carga cognitiva y proyectan un estándar premium, moderno y de extrema autoridad legal.
+- **Archivos afectados:**
+  - `src/components/sections/Hero.tsx`
+  - `src/components/sections/Pillars.tsx`
+  - `src/components/sections/Methodology.tsx`
+  - `src/components/sections/SuccessCases.tsx`
+  - `src/components/sections/FAQ.tsx`
+  - `src/components/sections/CTA.tsx`
+
+## 2026-07-19: Corrección Bug "auth/network-request-failed" post-barrido
+
+- **Qué cambió:**
+  - Se modificó la rutina "Scorched Earth" en `client-logout.ts`. Se eliminó el borrado forzado y violento mediante `window.indexedDB.deleteDatabase()` y en su lugar se implementó la des-registración formal de los **Service Workers**.
+- **Por qué cambió:**
+  - El borrado violento de todas las bases de datos de `IndexedDB` generaba una condición de carrera corrupta con la propia función `auth.signOut()` de Firebase (que ya limpia su propia DB de forma segura). Esto ocasionaba que, al intentar ingresar inmediatamente después, Firebase o el Service Worker colapsaran con un error `auth/network-request-failed`. Al desregistrar el Service Worker y dejar que `auth.signOut()` haga su trabajo en `IndexedDB`, el navegador queda completamente limpio y listo para un nuevo login sin errores.
+- **Archivos afectados:**
+  - `src/lib/security/client-logout.ts` [MODIFICADO]
+
 ## 2026-07-19: Cierre de Auditoría de Seguridad (Niveles Amarillo y Naranja)
 
 - **Qué cambió:**
