@@ -47,7 +47,6 @@ const AUTOPLAY_DELAY = 4500;
 export function DocumentShowcase() {
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isFading, setIsFading] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const stackRef = useRef<HTMLDivElement>(null);
@@ -83,33 +82,20 @@ export function DocumentShowcase() {
   };
 
   const changeCard = (index: number) => {
-    if (index === currentIndex || isFading) return;
-    
-    setIsFading(true);
-    targetY.current = -0.5; // Empujoncito físico
-
-    setTimeout(() => {
-      setCurrentIndex(index);
-      setIsFading(false);
-    }, 300); // 300ms debe coincidir con la duración de Tailwind (duration-300)
-
+    if (index === currentIndex) return;
+    targetY.current = -0.5;
+    setCurrentIndex(index);
     resetAutoplay();
   };
 
   const handleNext = () => {
-    setCurrentIndex((prev) => {
-      const nextIndex = (prev + 1) % templates.length;
-      changeCard(nextIndex);
-      return prev; // No mutamos aquí directamente para respetar la animación, se muta en el timeout
-    });
+    const nextIndex = (currentIndex + 1) % templates.length;
+    changeCard(nextIndex);
   };
 
   const handlePrev = () => {
-    setCurrentIndex((prev) => {
-      const prevIndex = (prev - 1 + templates.length) % templates.length;
-      changeCard(prevIndex);
-      return prev;
-    });
+    const prevIndex = (currentIndex - 1 + templates.length) % templates.length;
+    changeCard(prevIndex);
   };
 
   const lerp = (start: number, end: number, factor: number) => {
@@ -206,7 +192,7 @@ export function DocumentShowcase() {
       {/* Stack de Cartas */}
       <div 
         ref={stackRef}
-        className="relative w-full max-w-[320px] aspect-[3/4.2] will-change-transform"
+        className="relative w-full max-w-[340px] h-[520px] sm:h-[550px] will-change-transform"
         style={{ transformStyle: 'preserve-3d', transform: 'rotateX(15deg) rotateY(-10deg)' }}
       >
         {/* SVG Texture Pattern */}
@@ -248,57 +234,67 @@ export function DocumentShowcase() {
         >
           <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ filter: 'url(#noiseFilter)' }} />
           
-          {/* Tag Éxito */}
-          <div className="flex-none mb-4 relative z-10">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 text-[11px] font-bold border border-emerald-200 animate-pulse">
-              <Shield size={12} className="fill-emerald-600/20" />
-              {activeTemplate.successRate}
-            </div>
-          </div>
-
-          {/* Contenido Dinámico */}
-          <div 
-            className={`flex-grow flex flex-col justify-center relative z-10 transition-opacity duration-300 ${isFading ? 'opacity-0' : 'opacity-100'}`}
-          >
+          {/* Contenedor del Carrusel Interno (Scroll Horizontal Suave) */}
+          <div className="flex-grow flex flex-col relative z-10 w-full h-full overflow-hidden">
             <div 
-              className="text-[9px] text-zinc-500 font-mono tracking-widest uppercase mb-3 leading-relaxed font-semibold"
-              dangerouslySetInnerHTML={{ __html: activeTemplate.header }}
-            />
-            
-            <h3 className="text-2xl sm:text-3xl font-black text-foreground mb-2 leading-tight tracking-tight">
-              {activeTemplate.title}
-            </h3>
-            
-            <p className="text-sm text-muted-foreground italic font-medium leading-relaxed">
-              {activeTemplate.desc}
-            </p>
-
-            {/* Falso cuerpo del documento difuminado */}
-            <div className="mt-5 space-y-2 text-[8px] text-muted-foreground leading-relaxed blur-[1.5px] opacity-25 select-none pointer-events-none hidden sm:block">
-              <p>Yo, mayor de edad, identificado como aparece al pie de mi firma, en ejercicio del Derecho Constitucional de Petición consagrado en el artículo 23 de la Constitución Política y la Ley 1437 de 2011...</p>
-              <p>Solicito respetuosamente se sirva ordenar la actualización de las bases de datos correspondientes al SIMIT y RUNT de las siguientes obligaciones contravencionales que figuran a mi nombre...</p>
-            </div>
-          </div>
-
-          {/* Footer Carta */}
-          <div className={`flex-none mt-6 pt-4 border-t border-zinc-200 relative z-10 transition-opacity duration-300 ${isFading ? 'opacity-0' : 'opacity-100'}`}>
-            <div className="flex justify-between items-end mb-4">
-              <div>
-                <p className="text-[10px] text-muted-foreground mb-1 font-semibold uppercase tracking-wider">Precio especial</p>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-black text-foreground">{activeTemplate.price}</span>
-                  <span className="text-xs font-bold text-muted-foreground">COP</span>
-                </div>
-              </div>
-            </div>
-            
-            <button 
-              onClick={() => router.push('/plantillas')}
-              className="w-full py-3.5 px-4 bg-primary hover:bg-primary/90 text-primary-foreground font-black text-sm sm:text-base rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 group/btn focus:outline-none"
+              className="flex w-full h-full transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]"
+              style={{ transform: `translateX(-${currentIndex * 100}%)` }}
             >
-              <span>Ver Solución Legal</span>
-              <FileText size={18} className="group-hover/btn:-translate-y-1 group-hover/btn:rotate-6 transition-transform" />
-            </button>
+              {templates.map((template, idx) => (
+                <div key={idx} className="w-full h-full shrink-0 flex flex-col">
+                  {/* Tag Éxito */}
+                  <div className="flex-none mb-4">
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[11px] font-bold border border-emerald-200 dark:border-emerald-500/20 animate-pulse">
+                      <Shield size={12} className="fill-emerald-600/20 dark:fill-emerald-400/20" />
+                      {template.successRate}
+                    </div>
+                  </div>
+
+                  {/* Textos */}
+                  <div className="flex-grow flex flex-col justify-center">
+                    <div 
+                      className="text-[9px] text-muted-foreground font-mono tracking-widest uppercase mb-3 leading-relaxed font-semibold"
+                      dangerouslySetInnerHTML={{ __html: template.header }}
+                    />
+                    
+                    <h3 className="text-2xl sm:text-3xl font-black text-foreground mb-2 leading-tight tracking-tight">
+                      {template.title}
+                    </h3>
+                    
+                    <p className="text-sm text-muted-foreground italic font-medium leading-relaxed">
+                      {template.desc}
+                    </p>
+
+                    {/* Falso cuerpo del documento difuminado */}
+                    <div className="mt-5 space-y-2 text-[8px] text-muted-foreground leading-relaxed blur-[1.5px] opacity-25 select-none pointer-events-none hidden sm:block">
+                      <p>Yo, mayor de edad, identificado como aparece al pie de mi firma, en ejercicio del Derecho Constitucional de Petición consagrado en el artículo 23 de la Constitución Política y la Ley 1437 de 2011...</p>
+                      <p>Solicito respetuosamente se sirva ordenar la actualización de las bases de datos correspondientes al SIMIT y RUNT de las siguientes obligaciones contravencionales que figuran a mi nombre...</p>
+                    </div>
+                  </div>
+
+                  {/* Footer Carta */}
+                  <div className="flex-none mt-6 pt-4 border-t border-border">
+                    <div className="flex justify-between items-end mb-4">
+                      <div>
+                        <p className="text-[10px] text-muted-foreground mb-1 font-semibold uppercase tracking-wider">Precio especial</p>
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-3xl font-black text-foreground">{template.price}</span>
+                          <span className="text-xs font-bold text-muted-foreground">COP</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <button 
+                      onClick={() => router.push('/plantillas')}
+                      className="w-full py-3.5 px-4 bg-primary hover:bg-primary/90 text-primary-foreground font-black text-sm sm:text-base rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 group/btn focus:outline-none"
+                    >
+                      <span>Ver Solución Legal</span>
+                      <FileText size={18} className="group-hover/btn:-translate-y-1 group-hover/btn:rotate-6 transition-transform" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

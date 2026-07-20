@@ -10,12 +10,14 @@
 - **Qué cambió:**
   - Se eliminó la librería `gsap` y el componente complejo `CardSwap.tsx`.
   - Se implementó un nuevo componente `DocumentShowcase.tsx` basado en CSS puramente isométrico (`transform-style: preserve-3d`) y físicas LERP ligeras nativas en Vanilla JS/React.
-  - Se centralizaron y vincularon los datos reales de plantillas legales de la aplicación dentro de la nueva estructura de carrusel 3D con fade transicional.
-  - Se restauró el texto difuminado descriptivo del documento en lugar de líneas falsas.
-  - Se adaptó la paleta de colores de las cartas al modo oscuro dinámico (bg-card / text-foreground).
-  - Se eliminaron las flechas de navegación izquierda/derecha flotantes para limpiar el UI, delegando la navegación al swipe, auto-play y los indicadores inferiores.
+  - Se centralizaron y vincularon los datos reales de plantillas legales de la aplicación dentro de la nueva estructura.
+  - Se restauró el texto difuminado descriptivo del documento original.
+  - Se adaptó la paleta de colores al modo oscuro dinámico (bg-card / text-foreground).
+  - Se eliminaron las flechas de navegación laterales.
+  - Se refactorizó la renderización del contenido a un contenedor flex (`flex-row`) con `translateX` para generar un desplazamiento horizontal real (carrusel) suave y fluido (duration-700, cubic-bezier).
+  - Se ajustó la altura base de la tarjeta (de aspect ratio estricto a una altura mínima controlada) para prevenir el desbordamiento oculto del botón y los precios.
 - **Por qué cambió:**
-  - Petición explícita del usuario para solucionar problemas de renderizado, evitar la ceguera por fondos blancos absolutos en modo oscuro y mantener la estética difuminada original del texto interior sin recargar el componente.
+  - El usuario notificó que los precios y el botón del footer estaban siendo recortados debido a las reglas estrictas de aspect-ratio en pantallas determinadas. Asimismo, solicitó un desplazamiento horizontal fluido y real al cambiar de documento, reemplazando el "fade" anterior por un scroll físico simulado mediante CSS `transform`.
 - **Archivos afectados:**
   - `src/components/ui/DocumentShowcase.tsx` [CREADO]
   - `src/components/ui/CardSwap.tsx` [ELIMINADO]
