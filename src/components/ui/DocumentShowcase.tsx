@@ -52,13 +52,6 @@ export function DocumentShowcase() {
   const stackRef = useRef<HTMLDivElement>(null);
   
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const rafRef = useRef<number | null>(null);
-
-  // Física LERP
-  const mouseX = useRef(0);
-  const mouseY = useRef(0);
-  const targetX = useRef(0);
-  const targetY = useRef(0);
   const isHovering = useRef(false);
 
   const startAutoplay = () => {
@@ -83,7 +76,6 @@ export function DocumentShowcase() {
 
   const changeCard = (index: number) => {
     if (index === currentIndex) return;
-    targetY.current = -0.5;
     setCurrentIndex(index);
     resetAutoplay();
   };
@@ -98,46 +90,13 @@ export function DocumentShowcase() {
     changeCard(prevIndex);
   };
 
-  const lerp = (start: number, end: number, factor: number) => {
-    return start + (end - start) * factor;
-  };
-
   useEffect(() => {
-    const animateLoop = () => {
-      if (!isHovering.current) {
-        targetX.current = 0;
-        targetY.current = 0;
-      }
-
-      mouseX.current = lerp(mouseX.current, targetX.current, 0.08);
-      mouseY.current = lerp(mouseY.current, targetY.current, 0.08);
-
-      const moveX = mouseX.current * 15;
-      const moveY = mouseY.current * 15;
-
-      if (stackRef.current) {
-        stackRef.current.style.transform = `translateX(${moveX}px) translateY(${moveY}px)`;
-      }
-
-      rafRef.current = requestAnimationFrame(animateLoop);
-    };
-
-    rafRef.current = requestAnimationFrame(animateLoop);
     startAutoplay();
-
     return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
       stopAutoplay();
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const handleInput = (clientX: number, clientY: number, rect: DOMRect) => {
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    targetX.current = (clientX - centerX) / (rect.width / 2);
-    targetY.current = (clientY - centerY) / (rect.height / 2);
-  };
 
   // Swipes
   const touchStartX = useRef(0);
@@ -156,21 +115,10 @@ export function DocumentShowcase() {
         isHovering.current = false;
         startAutoplay();
       }}
-      onMouseMove={(e) => {
-        if (!isHovering.current || !containerRef.current) return;
-        handleInput(e.clientX, e.clientY, containerRef.current.getBoundingClientRect());
-      }}
       onTouchStart={(e) => {
         isHovering.current = true;
         stopAutoplay();
         touchStartX.current = e.touches[0].clientX;
-        if (containerRef.current) {
-          handleInput(e.touches[0].clientX, e.touches[0].clientY, containerRef.current.getBoundingClientRect());
-        }
-      }}
-      onTouchMove={(e) => {
-        if (!isHovering.current || !containerRef.current) return;
-        handleInput(e.touches[0].clientX, e.touches[0].clientY, containerRef.current.getBoundingClientRect());
       }}
       onTouchEnd={(e) => {
         isHovering.current = false;
