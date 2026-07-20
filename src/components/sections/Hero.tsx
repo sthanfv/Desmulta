@@ -44,9 +44,13 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
     <LazyMotion features={domAnimation} strict>
       <section className="min-h-[100svh] flex items-center pt-24 sm:pt-36 md:pt-40 pb-16 sm:pb-24 md:pb-32 px-4 relative overflow-hidden">
       {/* Atmósfera institucional */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/15 blur-[60px] sm:blur-[120px] opacity-50 rounded-full" />
-        <div className="absolute bottom-0 left-0 right-0 h-2/3 bg-gradient-to-t from-background via-background/80 to-transparent z-10" />
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none bg-gradient-to-br from-slate-50 via-white to-amber-50/40 dark:from-background dark:via-background dark:to-background">
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/15 dark:bg-primary/5 blur-[100px] opacity-70 rounded-full translate-x-1/3 -translate-y-1/4" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-500/5 blur-[100px] rounded-full -translate-x-1/2 translate-y-1/3" />
+        {/* Patrón sutil para romper la monotonía del plano */}
+        <div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.01]" style={{ backgroundImage: 'radial-gradient(#000 2px, transparent 2px)', backgroundSize: '32px 32px' }} />
+        
+        <div className="absolute bottom-0 left-0 right-0 h-2/3 bg-gradient-to-t from-background/90 via-background/50 to-transparent z-10" />
       </div>
 
       {/* Grid principal: 1 columna en móvil, 2 columnas en desktop */}
@@ -58,7 +62,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-semibold border border-primary/20 backdrop-blur-sm w-fit"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-semibold border border-primary/20 backdrop-blur-sm w-fit shadow-sm"
           >
             <Shield size={15} className="text-primary" />
             <span className="tracking-wide">Soluciones para multas de tránsito</span>
@@ -69,7 +73,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
             {cityContext ? (
               <>
                 <m.span
-                  className="block text-foreground/90"
+                  className="block text-foreground/90 whitespace-nowrap"
                   initial={{ y: 40, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
