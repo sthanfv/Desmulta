@@ -14,6 +14,12 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { DOCUMENT_TEMPLATES } from '@/lib/legal/document-templates';
+import dynamic from 'next/dynamic';
+
+const MeshBackground = dynamic(
+  () => import('@/components/ui/MeshBackground').then((m) => m.MeshBackground),
+  { ssr: false }
+);
 
 // Interfaz que representa los datos de una compra almacenados en Firestore
 interface PurchaseData {
@@ -460,8 +466,9 @@ Dirección de notificaciones: [Tu Dirección]`}
 export default function ConfirmacionPago() {
   return (
     <div className="min-h-screen bg-[#050505] text-zinc-100 flex items-center justify-center relative selection:bg-yellow-400 selection:text-black overflow-hidden">
+      <MeshBackground />
       {/* Luces sutiles de fondo para darle "vida" */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-yellow-400/5 blur-[150px] pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-yellow-400/5 blur-[150px] pointer-events-none z-0" />
 
       <div className="max-w-3xl w-full mx-4 my-8 relative z-10">
         <div className="bg-[#0f0f0f] border border-zinc-800/80 rounded-[2rem] shadow-2xl relative">

@@ -20,8 +20,8 @@ import { DocumentType } from '@/lib/legal/document-templates';
 import { TarjetaPremium } from '@/components/ui/TarjetaPremium';
 import dynamic from 'next/dynamic';
 
-const MeshBackground = dynamic(
-  () => import('@/components/ui/MeshBackground').then((m) => m.MeshBackground),
+const SideRays = dynamic(
+  () => import('@/components/ui/SideRays'),
   { ssr: false }
 );
 
@@ -137,7 +137,20 @@ export default function PlantillasPage() {
           backgroundSize: '32px 32px',
         }}
       />
-      <MeshBackground />
+      <SideRays
+        speed={1.5}
+        rayColor1="#EAB308"
+        rayColor2="#96c8ff"
+        intensity={1.5}
+        spread={2.5}
+        origin="top-left"
+        tilt={-5}
+        saturation={1.2}
+        blend={0.5}
+        falloff={1.8}
+        opacity={0.8}
+        className="opacity-50 dark:opacity-80"
+      />
 
       {/* Spotlight Desktop (Sigue el ratón, oculto en móvil) */}
       <div
