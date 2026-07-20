@@ -76,6 +76,9 @@ export async function GET(request: NextRequest) {
       comparendos: ['____________________'],
       comparendoDate: '____________________',
       vehicleType: '____________________',
+      shortId: 'CASE_GENERIC',
+      caseId: 'CASE_GENERIC',
+      ticketNumber: '____________________',
     };
 
     // Auditoría
