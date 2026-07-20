@@ -19,8 +19,8 @@ export const Pillars = () => {
           <div className="w-24 h-2 bg-primary mx-auto rounded-full shadow-lg shadow-primary/20" />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 auto-rows-fr">
-          {/* Card 1: Respaldo Normativo (2x2) */}
-          <TarjetaPremium className="reveal md:col-span-2 md:row-span-2 p-8 md:p-12 rounded-[2.5rem] backdrop-blur-sm border-border/50 hover:border-primary/50 transition-all duration-700 group flex items-start h-full">
+          {/* Card 1: Respaldo Normativo */}
+          <TarjetaPremium className="reveal md:col-span-2 p-8 md:p-12 rounded-[2.5rem] backdrop-blur-sm border-border/50 hover:border-primary/50 transition-all duration-700 group flex items-start h-full">
             <div className="relative z-10 flex flex-col sm:flex-row gap-6 items-start w-full">
               <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-500 shadow-inner shrink-0">
                 <ShieldCheck className="w-8 h-8" />
@@ -36,8 +36,8 @@ export const Pillars = () => {
             </div>
           </TarjetaPremium>
 
-          {/* Card 2: OCR Forense Client-Side (1x2) */}
-          <TarjetaPremium className="reveal md:col-span-1 md:row-span-2 p-8 md:p-10 rounded-[2.5rem] backdrop-blur-sm border-border/50 hover:border-primary/50 transition-all duration-700 group flex items-start h-full">
+          {/* Card 2: OCR Forense Client-Side */}
+          <TarjetaPremium className="reveal md:col-span-1 p-8 md:p-10 rounded-[2.5rem] backdrop-blur-sm border-border/50 hover:border-primary/50 transition-all duration-700 group flex items-start h-full">
             <div className="relative z-10 flex flex-col gap-6 items-start w-full">
               <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-500 shadow-inner shrink-0">
                 <FileSearch className="w-8 h-8" />
