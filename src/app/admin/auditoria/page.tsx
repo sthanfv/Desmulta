@@ -499,7 +499,7 @@ export default function AuditPage() {
         title: 'Acceso Autorizado',
         description: 'Modo Dios Activado. Tienes 30 minutos.',
         variant: 'default',
-        className: 'bg-emerald-950 border-emerald-800 text-emerald-100',
+        className: 'bg-emerald-700 dark:bg-emerald-950 border-emerald-600 text-white shadow-xl',
       });
     } else {
       toast({

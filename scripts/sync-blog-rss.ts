@@ -275,15 +275,17 @@ async function syncBlogFromRss() {
           .replace(/<[^>]*>/g, '')
           .trim();
 
-        // Filtro de relevancia: Lista Negra (accidentes/tragedias) y Lista Blanca (movilidad/legal)
+        // Filtro de relevancia: Lista Negra (accidentes/tragedias/sucesos) y Lista Blanca (estrictamente legal/multas)
         const titleLower = title.toLowerCase();
-        const descLower = description.toLowerCase();
         
-        const blacklist = ['fallece', 'fallecido', 'muerto', 'herido', 'choque', 'colision', 'accidente', 'tragedia', 'volcamiento', 'lesionado'];
+        // Ampliamos la lista negra para descartar crónica roja, deportes, farándula, clima, etc.
+        const blacklist = ['fallece', 'fallecido', 'muerto', 'asesinado', 'herido', 'choque', 'colision', 'accidente', 'tragedia', 'volcamiento', 'lesionado', 'shakira', 'mundial', 'fútbol', 'futbol', 'balacera', 'homicidio', 'clima', 'aerolínea', 'vuelo'];
         const contieneBasura = blacklist.some(palabra => titleLower.includes(palabra));
         
-        const whitelist = ['movilidad', 'tránsito', 'transito', 'transporte', 'fotomulta', 'multa', 'comparendo', 'licencia', 'conductor', 'vehículo', 'vehiculo', 'carro', 'moto', 'vía', 'via', 'peaje', 'soat', 'tecnomecánica', 'tecnomecanica', 'infractor', 'simit', 'runt', 'secretaría de movilidad', 'ministerio de transporte', 'conducir', 'parqueo', 'grúa', 'grua', 'pico y placa'];
-        // Filtro estricto: la palabra clave DEBE estar en el título. (Evitar noticias donde solo mencionen "vehículo" en el cuerpo)
+        // Reducimos la lista blanca a palabras clave altamente específicas de defensa legal y tránsito sancionatorio
+        const whitelist = ['fotomulta', 'fotocomparendo', 'multa', 'comparendo', 'infracción', 'infractor', 'simit', 'runt', 'secretaría de movilidad', 'ministerio de transporte', 'soat', 'tecnomecánica', 'pico y placa', 'impugnación', 'tránsito', 'transito', 'caducidad', 'prescripción', 'embargo'];
+        
+        // Filtro estricto: la palabra clave DEBE estar en el título.
         const esRelevante = whitelist.some(palabra => titleLower.includes(palabra));
 
         if (contieneBasura || !esRelevante) {

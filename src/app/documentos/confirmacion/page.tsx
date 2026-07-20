@@ -52,6 +52,20 @@ function ConfirmacionContent() {
 
     const checkStatus = async (): Promise<boolean> => {
       try {
+        // 🛡️ MODO PRUEBA DE UI (Solo para propósitos de diseño visual)
+        if (params.get('test_error') === 'true') {
+          setStatus('APPROVED');
+          setPurchaseData({ status: 'APPROVED', productType: 'poder_especial' });
+          setDownloadError(true);
+          return true;
+        }
+        
+        const testStatus = params.get('test_status');
+        if (testStatus === 'DECLINED' || testStatus === 'ERROR' || testStatus === 'PENDING') {
+          setStatus(testStatus);
+          return true;
+        }
+
         // 🛡️ FIX: Token ya no viaja por URL, se lee desde las Cookies HttpOnly
         const res = await fetch(`/api/payments/status?ref=${ref}`);
         if (!res.ok) return false;
