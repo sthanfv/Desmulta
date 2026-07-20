@@ -11,8 +11,11 @@
   - Se eliminó la librería `gsap` y el componente complejo `CardSwap.tsx`.
   - Se implementó un nuevo componente `DocumentShowcase.tsx` basado en CSS puramente isométrico (`transform-style: preserve-3d`) y físicas LERP ligeras nativas en Vanilla JS/React.
   - Se centralizaron y vincularon los datos reales de plantillas legales de la aplicación dentro de la nueva estructura de carrusel 3D con fade transicional.
+  - Se restauró el texto difuminado descriptivo del documento en lugar de líneas falsas.
+  - Se adaptó la paleta de colores de las cartas al modo oscuro dinámico (bg-card / text-foreground).
+  - Se eliminaron las flechas de navegación izquierda/derecha flotantes para limpiar el UI, delegando la navegación al swipe, auto-play y los indicadores inferiores.
 - **Por qué cambió:**
-  - Petición explícita del usuario para solucionar problemas de renderizado borroso (blur), atascos gráficos en móviles, y alta carga pesada por librerías complejas. La nueva propuesta técnica del usuario rinde infinitamente mejor usando la GPU nativa mediante CSS.
+  - Petición explícita del usuario para solucionar problemas de renderizado, evitar la ceguera por fondos blancos absolutos en modo oscuro y mantener la estética difuminada original del texto interior sin recargar el componente.
 - **Archivos afectados:**
   - `src/components/ui/DocumentShowcase.tsx` [CREADO]
   - `src/components/ui/CardSwap.tsx` [ELIMINADO]

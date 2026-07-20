@@ -201,14 +201,7 @@ export function DocumentShowcase() {
       {/* Aura brillante detrás del stack */}
       <div className="absolute -inset-10 bg-[radial-gradient(circle_at_50%_50%,rgba(255,193,7,0.1),transparent_60%)] z-[-1] opacity-0 dark:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
-      {/* Flecha Izquierda */}
-      <button 
-        onClick={handlePrev}
-        className="absolute -left-4 sm:-left-12 z-20 w-10 h-10 sm:w-12 sm:h-12 bg-white dark:bg-zinc-800 rounded-full shadow-lg flex items-center justify-center text-zinc-500 hover:text-primary hover:scale-110 transition-all active:scale-95 border border-zinc-100 dark:border-zinc-700 focus:outline-none"
-        aria-label="Documento Anterior"
-      >
-        <ChevronLeft size={24} />
-      </button>
+      {/* Flechas eliminadas para mejor UX táctil e indicadores */}
 
       {/* Stack de Cartas */}
       <div 
@@ -225,7 +218,7 @@ export function DocumentShowcase() {
         
         {/* Carta Trasera 2 */}
         <div 
-          className="absolute inset-0 rounded-3xl bg-white border border-black/5 dark:border-white/10"
+          className="absolute inset-0 rounded-3xl bg-card border border-border"
           style={{ 
             transform: 'translateZ(-30px) translateX(25px) translateY(-25px)',
             boxShadow: 'var(--tw-shadow-color, -15px 25px 40px -10px rgba(0,0,0,0.2)), inset 0 1px 0 rgba(255,255,255,0.8)',
@@ -236,7 +229,7 @@ export function DocumentShowcase() {
 
         {/* Carta Trasera 1 */}
         <div 
-          className="absolute inset-0 rounded-3xl bg-white border border-black/5 dark:border-white/10"
+          className="absolute inset-0 rounded-3xl bg-card border border-border"
           style={{ 
             transform: 'translateZ(-15px) translateX(12px) translateY(-12px)',
             boxShadow: 'var(--tw-shadow-color, -15px 25px 40px -10px rgba(0,0,0,0.2)), inset 0 1px 0 rgba(255,255,255,0.8)',
@@ -247,7 +240,7 @@ export function DocumentShowcase() {
 
         {/* Carta Frontal */}
         <div 
-          className="absolute inset-0 rounded-3xl bg-white flex flex-col p-6 sm:p-8 z-10 overflow-hidden border border-black/5 dark:border-white/10"
+          className="absolute inset-0 rounded-3xl bg-card text-card-foreground flex flex-col p-6 sm:p-8 z-10 overflow-hidden border border-border"
           style={{ 
             transform: 'translateZ(0)',
             boxShadow: 'var(--tw-shadow-color, -15px 25px 40px -10px rgba(0,0,0,0.2)), inset 0 1px 0 rgba(255,255,255,0.8)',
@@ -272,19 +265,18 @@ export function DocumentShowcase() {
               dangerouslySetInnerHTML={{ __html: activeTemplate.header }}
             />
             
-            <h3 className="text-2xl sm:text-3xl font-black text-zinc-800 mb-2 leading-tight tracking-tight">
+            <h3 className="text-2xl sm:text-3xl font-black text-foreground mb-2 leading-tight tracking-tight">
               {activeTemplate.title}
             </h3>
             
-            <p className="text-sm text-zinc-600 italic font-medium leading-relaxed">
+            <p className="text-sm text-muted-foreground italic font-medium leading-relaxed">
               {activeTemplate.desc}
             </p>
 
-            {/* Falsas líneas de texto */}
-            <div className="mt-5 space-y-3 opacity-60">
-              <div className="h-2 w-full bg-zinc-300 rounded-full"></div>
-              <div className="h-2 w-5/6 bg-zinc-300 rounded-full"></div>
-              <div className="h-2 w-4/6 bg-zinc-300 rounded-full"></div>
+            {/* Falso cuerpo del documento difuminado */}
+            <div className="mt-5 space-y-2 text-[8px] text-muted-foreground leading-relaxed blur-[1.5px] opacity-25 select-none pointer-events-none hidden sm:block">
+              <p>Yo, mayor de edad, identificado como aparece al pie de mi firma, en ejercicio del Derecho Constitucional de Petición consagrado en el artículo 23 de la Constitución Política y la Ley 1437 de 2011...</p>
+              <p>Solicito respetuosamente se sirva ordenar la actualización de las bases de datos correspondientes al SIMIT y RUNT de las siguientes obligaciones contravencionales que figuran a mi nombre...</p>
             </div>
           </div>
 
@@ -292,10 +284,10 @@ export function DocumentShowcase() {
           <div className={`flex-none mt-6 pt-4 border-t border-zinc-200 relative z-10 transition-opacity duration-300 ${isFading ? 'opacity-0' : 'opacity-100'}`}>
             <div className="flex justify-between items-end mb-4">
               <div>
-                <p className="text-[10px] text-zinc-500 mb-1 font-semibold uppercase tracking-wider">Precio especial</p>
+                <p className="text-[10px] text-muted-foreground mb-1 font-semibold uppercase tracking-wider">Precio especial</p>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-black text-zinc-900">{activeTemplate.price}</span>
-                  <span className="text-xs font-bold text-zinc-500">COP</span>
+                  <span className="text-3xl font-black text-foreground">{activeTemplate.price}</span>
+                  <span className="text-xs font-bold text-muted-foreground">COP</span>
                 </div>
               </div>
             </div>
@@ -311,14 +303,7 @@ export function DocumentShowcase() {
         </div>
       </div>
 
-      {/* Flecha Derecha */}
-      <button 
-        onClick={handleNext}
-        className="absolute -right-4 sm:-right-12 z-20 w-10 h-10 sm:w-12 sm:h-12 bg-white dark:bg-zinc-800 rounded-full shadow-lg flex items-center justify-center text-zinc-500 hover:text-primary hover:scale-110 transition-all active:scale-95 border border-zinc-100 dark:border-zinc-700 focus:outline-none"
-        aria-label="Siguiente Documento"
-      >
-        <ChevronRight size={24} />
-      </button>
+      {/* Flechas eliminadas */}
 
       {/* Indicadores */}
       <div className="absolute -bottom-8 left-0 right-0 flex justify-center gap-2">
