@@ -22,8 +22,17 @@ const mockCreate = vi.fn();
 const mockDoc = vi.fn(() => ({
   create: mockCreate,
 }));
+const mockGet = vi.fn(() => ({ empty: true }));
+const mockLimit = vi.fn(() => ({ get: mockGet }));
+const mockWhere = vi.fn(() => ({
+  where: mockWhere,
+  limit: mockLimit,
+  get: mockGet,
+}));
+
 const mockCollection = vi.fn(() => ({
   doc: mockDoc,
+  where: mockWhere,
 }));
 
 vi.mock('firebase-admin/firestore', () => ({

@@ -47,9 +47,9 @@ export default function StepSuccess({
 }: StepSuccessProps) {
   // Construir URL de autogestión sin enviar PII por query params
   const getAutogestionUrl = () => {
-    if (!sugerencia || !formValues) return '';
+    if (!sugerencia) return '/plantillas';
     const slug = sugerencia.tipo.replace(/_/g, '-');
-    return `/documentos/generador/${slug}`;
+    return `/plantillas?recomendado=${slug}`;
   };
 
   const handleAutogestionClick = () => {
@@ -101,8 +101,8 @@ export default function StepSuccess({
             </h4>
             <p className="text-xs text-muted-foreground text-center font-medium mt-1 leading-snug">
               Nuestro motor legal sugiere aplicar:{' '}
-              <strong className="text-foreground">{labelLimpio}</strong>. Puedes redactar y
-              descargar tu documento al instante en el editor.
+              <strong className="text-foreground">{labelLimpio}</strong>. Explora nuestro catálogo
+              de plantillas legales y elige la que mejor se adapte a tu caso.
             </p>
           </div>
 
@@ -110,7 +110,7 @@ export default function StepSuccess({
             onClick={handleAutogestionClick}
             className="w-full h-12 bg-yellow-500 hover:bg-yellow-600 text-slate-950 font-black uppercase tracking-widest text-xs rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-yellow-500/10 transition-all active:scale-95"
           >
-            Personalizar y Descargar Ahora
+            Explorar Catálogo de Plantillas
             <ChevronRight size={16} />
           </Button>
 

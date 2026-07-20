@@ -154,7 +154,7 @@ function ConfirmacionContent() {
         setDownloadError(false);
         const res = await fetch(`/api/documentos/download?ref=${ref}&format=docx`);
         if (!res.ok) {
-           throw new Error('Fallo en la descarga');
+          throw new Error('Fallo en la descarga');
         }
 
         const disposition = res.headers.get('Content-Disposition');
