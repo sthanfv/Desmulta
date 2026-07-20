@@ -265,7 +265,7 @@ export default function PlantillasPage() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 15 }}
                     transition={{ duration: 0.25, ease: 'easeOut' }}
-                    className="absolute inset-0 z-20 p-8 rounded-[2rem] bg-slate-950/80 dark:bg-zinc-950/80 backdrop-blur-xl border-2 border-primary/30 flex flex-col justify-between shadow-[inset_0_0_30px_rgba(255,193,7,0.05)]"
+                    className="absolute inset-0 z-20 p-6 md:p-8 rounded-[2rem] bg-slate-900 dark:bg-zinc-950 border-2 border-primary/30 flex flex-col justify-between overflow-y-auto shadow-[inset_0_0_30px_rgba(255,193,7,0.05)]"
                   >
                     {/* Botón de cerrar explícito en la capa (móvil y PC) */}
                     <button

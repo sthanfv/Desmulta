@@ -12,13 +12,11 @@
   - Se implementó un nuevo componente `DocumentShowcase.tsx` basado en CSS puramente isométrico (`transform-style: preserve-3d`) y físicas LERP ligeras nativas en Vanilla JS/React.
   - Se centralizaron y vincularon los datos reales de plantillas legales de la aplicación dentro de la nueva estructura.
   - Se restauró el texto difuminado descriptivo del documento original.
-  - Se adaptó la paleta de colores al modo oscuro dinámico (bg-card / text-foreground).
-  - Se eliminaron las flechas de navegación laterales.
-  - Se refactorizó la renderización del contenido a un contenedor flex (`flex-row`) con `translateX` para generar un desplazamiento horizontal real (carrusel) suave y fluido (duration-700, cubic-bezier).
   - Se restauró la tarjeta a su aspect-ratio original (`aspect-[3/4.2]`).
-  - Se aplicó una compresión agresiva (micro-diseño) a todos los márgenes internos, tipografías y el padding de la tarjeta (reduciéndolos proporcionalmente) para garantizar que los elementos grandes (precios y botón dorado) y el texto descriptivo falso (reducido a `max-h-[3.5rem]`) puedan renderizarse juntos sin desbordar el contenedor estricto de A4.
+  - Para garantizar que el botón dorado y el precio NUNCA se desborden de la altura estricta A4, se extrajo el texto falso difuminado del flujo de Flexbox usando `position: absolute`, permitiendo que el footer suba de forma natural independientemente de cuán ancha sea la pantalla del móvil.
+  - Se corrigió un severo error visual de superposición de texto en la página `/plantillas` (El tooltip de Información Premium solía tener fondo semi-transparente `bg-slate-950/80` causando choque de lectura con las tarjetas de abajo; ahora tiene un fondo sólido y scroll propio).
 - **Por qué cambió:**
-  - El contenedor principal (tamaño A4) estaba expulsando y cortando la zona del footer (botón) debido a la acumulación vertical de textos que superaba los límites matemáticos del aspect ratio de la tarjeta original. Al encoger proporcionalmente todo lo interno, ahora entra perfectamente en su tamaño real y sin cortarse.
+  - El usuario notificó (con capturas de pantalla) que el botón en el home continuaba siendo empujado fuera de la caja debido a que los márgenes en móviles más pequeños no eran suficientes para alojar todos los bloques de texto. Extraer el bloque decorativo del flujo principal solucionó el problema matemático. Además, la captura reveló el texto superpuesto en `/plantillas`, lo cual se parcheó proactivamente eliminando las transparencias.
 - **Archivos afectados:**
   - `src/components/ui/DocumentShowcase.tsx` [CREADO]
   - `src/components/ui/CardSwap.tsx` [ELIMINADO]
