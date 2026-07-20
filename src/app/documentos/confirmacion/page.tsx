@@ -120,11 +120,22 @@ function ConfirmacionContent() {
         if (!res.ok) {
           throw new Error('Fallo en la descarga');
         }
+
+        // Recuperar el nombre original (ej: Documento_Desmulta_CASE181796.pdf)
+        const disposition = res.headers.get('Content-Disposition');
+        let filename = `Documento_${ref}.pdf`;
+        if (disposition && disposition.includes('filename=')) {
+          const match = disposition.match(/filename="?([^"]+)"?/);
+          if (match && match[1]) {
+            filename = match[1];
+          }
+        }
+
         const blob = await res.blob();
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `Documento_${ref}.pdf`;
+        a.download = filename;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
@@ -139,10 +150,36 @@ function ConfirmacionContent() {
 
     const handleDownloadWord = async () => {
       try {
-        window.location.href = `/api/documentos/download?ref=${ref}&format=docx`;
+        setDownloading(true);
+        setDownloadError(false);
+        const res = await fetch(`/api/documentos/download?ref=${ref}&format=docx`);
+        if (!res.ok) {
+           throw new Error('Fallo en la descarga');
+        }
+
+        const disposition = res.headers.get('Content-Disposition');
+        let filename = `Documento_${ref}.docx`;
+        if (disposition && disposition.includes('filename=')) {
+          const match = disposition.match(/filename="?([^"]+)"?/);
+          if (match && match[1]) {
+            filename = match[1];
+          }
+        }
+
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
       } catch (err) {
         console.error('Error iniciando descarga Word:', err);
-        alert('Ocurrió un error al descargar el archivo de Word. Por favor, recarga la página.');
+        setDownloadError(true);
+      } finally {
+        setDownloading(false);
       }
     };
 
