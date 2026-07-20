@@ -480,29 +480,33 @@ export function AdminDashboard() {
                   <span className="text-[10px] text-yellow-500 bg-yellow-500/10 px-1.5 py-0.5 rounded">.DOCX</span>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-border/40" />
-                <DropdownMenuItem onClick={() => window.open('/api/admin/documentos/generate-generic?type=poder_especial', '_blank')} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
-                  <span className="font-medium text-sm">Poder Especial</span>
-                  <span className="text-muted-foreground text-xs">$11,000</span>
+                <DropdownMenuItem onClick={() => window.open('/api/admin/documentos/generate-generic?type=peticion_general', '_blank')} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
+                  <span className="font-medium text-sm">Petición General</span>
+                  <span className="text-muted-foreground text-xs">$39,000</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => window.open('/api/admin/documentos/generate-generic?type=tutela', '_blank')} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
-                  <span className="font-medium text-sm">Acción de Tutela</span>
-                  <span className="text-muted-foreground text-xs">$27,000</span>
+                <DropdownMenuItem onClick={() => window.open('/api/admin/documentos/generate-generic?type=prescripcion_directa', '_blank')} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
+                  <span className="font-medium text-sm">Prescripción Directa</span>
+                  <span className="text-muted-foreground text-xs">$59,000</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => window.open('/api/admin/documentos/generate-generic?type=derecho_peticion', '_blank')} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
-                  <span className="font-medium text-sm">Derecho de Petición</span>
-                  <span className="text-muted-foreground text-xs">$9,500</span>
+                <DropdownMenuItem onClick={() => window.open('/api/admin/documentos/generate-generic?type=doble_prescripcion', '_blank')} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
+                  <span className="font-medium text-sm">Doble Prescripción</span>
+                  <span className="text-muted-foreground text-xs">$79,000</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => window.open('/api/admin/documentos/generate-generic?type=impugnacion', '_blank')} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
-                  <span className="font-medium text-sm">Impugnación / Audiencia</span>
-                  <span className="text-muted-foreground text-xs">$15,000</span>
+                <DropdownMenuItem onClick={() => window.open('/api/admin/documentos/generate-generic?type=nulidad_notificacion', '_blank')} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
+                  <span className="font-medium text-sm">Nulidad por Notificación</span>
+                  <span className="text-muted-foreground text-xs">$49,000</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => window.open('/api/admin/documentos/generate-generic?type=solicitud_revocatoria', '_blank')} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
-                  <span className="font-medium text-sm">Solicitud de Revocatoria</span>
-                  <span className="text-muted-foreground text-xs">$15,000</span>
+                <DropdownMenuItem onClick={() => window.open('/api/admin/documentos/generate-generic?type=tutela_silencio', '_blank')} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
+                  <span className="font-medium text-sm">Tutela (Silencio Admin)</span>
+                  <span className="text-muted-foreground text-xs">$39,000</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => window.open('/api/admin/documentos/generate-generic?type=recurso_apelacion', '_blank')} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
-                  <span className="font-medium text-sm">Recurso de Apelación</span>
-                  <span className="text-muted-foreground text-xs">$18,000</span>
+                <DropdownMenuItem onClick={() => window.open('/api/admin/documentos/generate-generic?type=caducidad_1_anio', '_blank')} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
+                  <span className="font-medium text-sm">Caducidad 1 Año</span>
+                  <span className="text-muted-foreground text-xs">$59,000</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => window.open('/api/admin/documentos/generate-generic?type=nulidad_falta_identidad', '_blank')} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
+                  <span className="font-medium text-sm">Nulidad por Identidad</span>
+                  <span className="text-muted-foreground text-xs">$49,000</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
