@@ -31,6 +31,7 @@ npm run dev # -> http://localhost:9005
 | **OCR** | Tesseract.js 7 (100% Client-side Worker) |
 | **Seguridad** | RSA-OAEP Encryption + SHA-256 Hashing |
 | **QA** | Vitest + Playwright E2E |
+| **Analíticas UX** | Microsoft Clarity (Heatmaps & Session Replay) |
 
 ---
 
