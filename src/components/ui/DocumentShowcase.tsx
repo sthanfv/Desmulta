@@ -226,7 +226,7 @@ export function DocumentShowcase() {
 
         {/* Carta Frontal */}
         <div 
-          className="absolute inset-0 rounded-3xl bg-card text-card-foreground flex flex-col p-5 sm:p-6 z-10 overflow-hidden border border-border"
+          className="absolute inset-0 rounded-3xl bg-card text-card-foreground flex flex-col p-4 sm:p-5 z-10 overflow-hidden border border-border"
           style={{ 
             transform: 'translateZ(0)',
             boxShadow: 'var(--tw-shadow-color, -15px 25px 40px -10px rgba(0,0,0,0.2)), inset 0 1px 0 rgba(255,255,255,0.8)',
@@ -243,52 +243,52 @@ export function DocumentShowcase() {
               {templates.map((template, idx) => (
                 <div key={idx} className="w-full h-full shrink-0 flex flex-col">
                   {/* Tag Éxito */}
-                  <div className="flex-none mb-3">
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold border border-emerald-200 dark:border-emerald-500/20 animate-pulse">
-                      <Shield size={12} className="fill-emerald-600/20 dark:fill-emerald-400/20" />
+                  <div className="flex-none mb-2">
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[9px] font-bold border border-emerald-200 dark:border-emerald-500/20 animate-pulse">
+                      <Shield size={10} className="fill-emerald-600/20 dark:fill-emerald-400/20" />
                       {template.successRate}
                     </div>
                   </div>
 
                   {/* Textos */}
-                  <div className="flex-grow flex flex-col justify-center">
+                  <div className="flex-grow flex flex-col justify-center min-h-0">
                     <div 
-                      className="text-[9px] text-muted-foreground font-mono tracking-widest uppercase mb-2 leading-relaxed font-semibold"
+                      className="text-[8px] text-muted-foreground font-mono tracking-widest uppercase mb-1.5 leading-relaxed font-semibold"
                       dangerouslySetInnerHTML={{ __html: template.header }}
                     />
                     
-                    <h3 className="text-xl sm:text-2xl font-black text-foreground mb-1 leading-tight tracking-tight">
+                    <h3 className="text-lg sm:text-xl font-black text-foreground mb-1 leading-tight tracking-tight">
                       {template.title}
                     </h3>
                     
-                    <p className="text-xs sm:text-sm text-muted-foreground italic font-medium leading-relaxed line-clamp-2">
+                    <p className="text-[11px] sm:text-xs text-muted-foreground italic font-medium leading-tight line-clamp-2">
                       {template.desc}
                     </p>
 
                     {/* Falso cuerpo del documento difuminado */}
-                    <div className="mt-3 text-[8px] text-muted-foreground leading-relaxed blur-[1.5px] opacity-25 select-none pointer-events-none hidden sm:block">
+                    <div className="mt-2 text-[7px] text-muted-foreground leading-tight blur-[1px] opacity-25 select-none pointer-events-none hidden sm:block max-h-[3.5rem] overflow-hidden">
                       <p>Yo, mayor de edad, identificado como aparece al pie de mi firma, en ejercicio del Derecho Constitucional de Petición consagrado en el artículo 23 de la Constitución Política y la Ley 1437 de 2011. Solicito respetuosamente se sirva ordenar la actualización de las bases de datos correspondientes al SIMIT y RUNT...</p>
                     </div>
                   </div>
 
                   {/* Footer Carta */}
-                  <div className="flex-none mt-3 pt-3 border-t border-border">
-                    <div className="flex justify-between items-end mb-3">
+                  <div className="flex-none mt-2 pt-2 border-t border-border">
+                    <div className="flex justify-between items-end mb-2">
                       <div>
-                        <p className="text-[9px] text-muted-foreground mb-1 font-semibold uppercase tracking-wider">Precio especial</p>
+                        <p className="text-[8px] text-muted-foreground mb-0.5 font-semibold uppercase tracking-wider">Precio especial</p>
                         <div className="flex items-baseline gap-1">
-                          <span className="text-2xl sm:text-3xl font-black text-foreground">{template.price}</span>
-                          <span className="text-[10px] font-bold text-muted-foreground">COP</span>
+                          <span className="text-xl sm:text-2xl font-black text-foreground">{template.price}</span>
+                          <span className="text-[9px] font-bold text-muted-foreground">COP</span>
                         </div>
                       </div>
                     </div>
                     
                     <button 
                       onClick={() => router.push('/plantillas')}
-                      className="w-full py-2.5 px-4 bg-primary hover:bg-primary/90 text-primary-foreground font-black text-sm rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 group/btn focus:outline-none"
+                      className="w-full py-2 px-3 bg-primary hover:bg-primary/90 text-primary-foreground font-black text-xs sm:text-sm rounded-lg shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-1.5 group/btn focus:outline-none"
                     >
                       <span>Ver Solución Legal</span>
-                      <FileText size={16} className="group-hover/btn:-translate-y-1 group-hover/btn:rotate-6 transition-transform" />
+                      <FileText size={14} className="group-hover/btn:-translate-y-1 group-hover/btn:rotate-6 transition-transform" />
                     </button>
                   </div>
                 </div>

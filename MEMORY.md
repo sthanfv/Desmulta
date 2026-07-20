@@ -15,9 +15,10 @@
   - Se adaptó la paleta de colores al modo oscuro dinámico (bg-card / text-foreground).
   - Se eliminaron las flechas de navegación laterales.
   - Se refactorizó la renderización del contenido a un contenedor flex (`flex-row`) con `translateX` para generar un desplazamiento horizontal real (carrusel) suave y fluido (duration-700, cubic-bezier).
-  - Se ajustó la base de la tarjeta a un estricto Aspect Ratio A4 (`aspect-[3/4.2]`), comprimiendo los paddings y tipografías internas para encajar perfectamente el contenido (precios y botón) sin rebasar ni distorsionar las dimensiones originales.
+  - Se restauró la tarjeta a su aspect-ratio original (`aspect-[3/4.2]`).
+  - Se aplicó una compresión agresiva (micro-diseño) a todos los márgenes internos, tipografías y el padding de la tarjeta (reduciéndolos proporcionalmente) para garantizar que los elementos grandes (precios y botón dorado) y el texto descriptivo falso (reducido a `max-h-[3.5rem]`) puedan renderizarse juntos sin desbordar el contenedor estricto de A4.
 - **Por qué cambió:**
-  - El usuario notificó que los precios y el botón del footer estaban siendo recortados debido a las reglas estrictas de aspect-ratio en pantallas determinadas. Asimismo, solicitó un desplazamiento horizontal fluido y real al cambiar de documento, reemplazando el "fade" anterior por un scroll físico simulado mediante CSS `transform`.
+  - El contenedor principal (tamaño A4) estaba expulsando y cortando la zona del footer (botón) debido a la acumulación vertical de textos que superaba los límites matemáticos del aspect ratio de la tarjeta original. Al encoger proporcionalmente todo lo interno, ahora entra perfectamente en su tamaño real y sin cortarse.
 - **Archivos afectados:**
   - `src/components/ui/DocumentShowcase.tsx` [CREADO]
   - `src/components/ui/CardSwap.tsx` [ELIMINADO]
