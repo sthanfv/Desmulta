@@ -49,7 +49,7 @@ export function TarjetaPremium({
       onMouseMove={handleMouseMove}
       onClick={onClick}
       style={style}
-      className={`card-elevated relative overflow-hidden bg-card border border-border rounded-3xl group transition-colors duration-300 ${className}`}
+      className={`card-elevated relative overflow-hidden bg-white/5 dark:bg-white/[0.02] backdrop-blur-2xl border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] rounded-3xl group transition-colors duration-300 ${className}`}
       {...props}
     >
       {/* Efecto Linterna (Solo en PC con puntero real para optimizar móvil) */}

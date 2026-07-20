@@ -14,7 +14,7 @@ export const Pillars = () => {
       <div className="max-w-6xl mx-auto">
         <div className="text-center space-y-6 mb-16 md:mb-24">
           <h2 className="text-4xl md:text-6xl lg:text-7xl font-black text-foreground tracking-tighter reveal text-balance">
-            Pilares de Autoridad Legal y Técnica
+            Por qué elegirnos para borrar sus multas
           </h2>
           <div className="w-24 h-2 bg-primary mx-auto rounded-full shadow-lg shadow-primary/20" />
         </div>
@@ -27,12 +27,10 @@ export const Pillars = () => {
               </div>
               <div className="space-y-3">
                 <h3 className="text-xl md:text-2xl font-black text-foreground">
-                  Respaldo Normativo
+                  Conocemos la Ley
                 </h3>
                 <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
-                  Operamos bajo protocolos de gestión administrativa fundamentados en la normativa
-                  vigente. Nuestro conocimiento del marco legal es la herramienta más sólida para
-                  analizar su caso.
+                  Operamos 100% bajo la ley para analizar y resolver su caso. Nuestro conocimiento de las normas de tránsito es su mejor y más sólida defensa.
                 </p>
               </div>
             </div>
@@ -46,12 +44,10 @@ export const Pillars = () => {
               </div>
               <div className="space-y-3">
                 <h3 className="text-xl md:text-2xl font-black text-foreground">
-                  OCR Forense Client-Side
+                  Privacidad Total
                 </h3>
                 <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
-                  Analizamos tu captura de pantalla del SIMIT de forma local en tu navegador
-                  utilizando visión artificial. Tu imagen nunca viaja a servidores externos,
-                  garantizando privacidad absoluta desde el primer segundo.
+                  Analizamos la foto de su multa usando tecnología segura directamente en su celular o computador. Su información nunca viaja a servidores externos, garantizando que nadie más la vea.
                 </p>
               </div>
             </div>
@@ -65,11 +61,10 @@ export const Pillars = () => {
               </div>
               <div className="space-y-3">
                 <h3 className="text-xl md:text-2xl font-black text-foreground">
-                  Gestión Especializada
+                  Atención Personalizada
                 </h3>
                 <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
-                  Trato directo y profesional centrado en la resolución administrativa personalizada
-                  de su historial vial.
+                  Trato humano, directo y altamente profesional enfocado en solucionar su historial vial lo más rápido posible.
                 </p>
               </div>
             </div>
@@ -83,11 +78,10 @@ export const Pillars = () => {
               </div>
               <div className="space-y-3">
                 <h3 className="text-xl md:text-2xl font-black text-foreground">
-                  Eficiencia Comprobada
+                  Resultados Reales
                 </h3>
                 <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
-                  Conocemos los términos exactos que la ley impone a cada organismo de tránsito — y
-                  sabemos cuándo no los cumplen.
+                  Sabemos exactamente cuándo los tránsitos cometen errores en el proceso de cobro, y usamos esas fallas legales a su favor para eliminar la deuda.
                 </p>
               </div>
             </div>

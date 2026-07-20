@@ -61,7 +61,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-semibold border border-primary/20 backdrop-blur-sm w-fit"
           >
             <Shield size={15} className="text-primary" />
-            <span className="tracking-wide">Gestión administrativa vial</span>
+            <span className="tracking-wide">Soluciones para multas de tránsito</span>
           </m.div>
 
           {/* Titular */}
@@ -93,7 +93,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                 >
-                  Saneamos su historial.
+                  Borramos sus multas.
                 </m.span>
                 <m.span
                   className="block text-primary font-black"
@@ -101,7 +101,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
                 >
-                  Estratégicamente.
+                  De forma 100% legal.
                 </m.span>
               </>
             )}
@@ -115,8 +115,8 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
             className="text-base sm:text-lg text-muted-foreground font-medium leading-[1.7] max-w-lg"
           >
             {cityContext
-              ? `¿Tiene comparendos pendientes en ${cityContext}? Le explicamos qué dice la ley sobre su caso específico. Sin cobro por el diagnóstico.`
-              : '¿Tiene multas o comparendos en el SIMIT? Analizamos su caso sin costo y le decimos si hay argumentos legales para actuar — prescripción, caducidad o vicios de notificación.'}
+              ? `¿Tiene multas en ${cityContext}? Le decimos si podemos borrarlas por tiempo cumplido o errores en el proceso. Análisis gratuito.`
+              : '¿Tiene multas en el SIMIT? Analizamos su caso sin costo y le decimos si podemos borrarlas por tiempo cumplido o errores en el proceso.'}
           </m.p>
 
           {/* CTA */}
@@ -128,11 +128,11 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
             <Button
               onClick={onConsultar}
               size="lg"
-              className="w-full sm:w-auto h-14 sm:h-16 px-6 sm:px-12 text-base sm:text-lg font-semibold rounded-2xl shadow-md hover:shadow-lg hover:scale-[1.01] active:scale-95 transition-all"
+              className="w-full sm:w-auto h-14 sm:h-16 px-6 sm:px-12 text-base sm:text-lg font-semibold rounded-2xl shadow-md hover:shadow-2xl hover:-translate-y-1 active:scale-95 transition-all group"
             >
               <span className="flex items-center gap-3">
-                Iniciar estudio sin costo
-                <ArrowUp className="w-5 h-5 rotate-45" />
+                Consultar mis multas gratis
+                <ArrowUp className="w-5 h-5 rotate-45 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
               </span>
             </Button>
           </m.div>
