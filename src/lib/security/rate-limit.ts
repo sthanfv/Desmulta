@@ -132,7 +132,7 @@ export async function rateLimit(
   collectionName: string = 'security_rate_limits'
 ) {
   // Mapeo dinámico de colecciones antiguas a las nuevas claves de Upstash
-  let type: RateLimitType = 'leads';
+  let type: RateLimitType | null = null;
 
   if (collectionName === 'ocrRateLimits') type = 'ocr';
   else if (collectionName === 'crash_reports_cooldown') type = 'crashReport';
@@ -147,10 +147,28 @@ export async function rateLimit(
   else if (collectionName === 'web_push_revoke_rl') type = 'webPushRevoke';
   else if (collectionName === 'expediente_action_rl') type = 'operatorPin';
   else if (collectionName === 'abandonmentRateLimits') type = 'abandonment';
+  else if (collectionName === 'security_rate_limits' && identifier.startsWith('vip-auth-cedula:'))
+    type = 'vipAuth';
+  else if (collectionName === 'security_rate_limits' && identifier.startsWith('vip-verify:'))
+    type = 'vipAuth';
+  else if (collectionName === 'security_rate_limits' && identifier.startsWith('reveal-pii:'))
+    type = 'godMode'; // O crear uno nuevo para reveal-pii
   else if (identifier.startsWith('god-mode-auth:')) type = 'godMode';
   else if (identifier.startsWith('operator-pin:')) type = 'operatorPin';
   else if (identifier.startsWith('estado_login_')) type = 'loginCedula';
   else if (identifier.startsWith('vip-auth:')) type = 'vipAuth';
+  else if (identifier.startsWith('crash_proxy:')) type = 'crashReport';
+  else if (identifier.startsWith('web-push:')) type = 'webPushRegister';
+
+  if (!type) {
+    if (collectionName === 'security_rate_limits' && !identifier.includes(':')) {
+      type = 'leads'; // Fallback solo si es el por defecto simple (legacy)
+    } else {
+      throw new Error(
+        `[rate-limit] No se encontró bucket mapeado para collectionName=${collectionName}, identifier=${identifier}. Esto es un problema de seguridad (A-3).`
+      );
+    }
+  }
 
   const res = await checkRateLimit(type, identifier);
   return {

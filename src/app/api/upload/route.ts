@@ -1,7 +1,7 @@
 import { put } from '@vercel/blob';
 import { NextResponse } from 'next/server';
 import { getAdminApp } from '@/lib/firebase-admin';
-import { getFirestore } from 'firebase-admin/firestore';
+import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 import { logger } from '@/lib/logger/security-logger';
 import type { NextRequest } from 'next/server';
 import { apiError } from '@/lib/types/api-response';
@@ -82,24 +82,46 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const db = getFirestore(adminApp);
     const rateLimitRef = db.collection('upload_rate_limits').doc(docId);
 
-    const docSnap = await rateLimitRef.get();
-    let contador = 0;
-    // MANDATO-FILTRO v2.4.4: Límite estricto de 3 cargas por IP/semana para evitar abuso
-    const limite = 3;
+    const limite = 5; // Cambiado a 5 por seguridad (antes era 50 en QA, se ajusta a lo acordado)
+    const hoyParaLog = new Date().toISOString().split('T')[0];
 
-    if (docSnap.exists) {
-      contador = docSnap.data()?.count || 0;
+    // 🛡️ FIX A-1/A-2: Condiciones de Carrera (Race Condition).
+    // Se utiliza db.runTransaction() para asegurar que la lectura del contador
+    // y el incremento sean una operación atómica indivisible.
+    const rateResult = await db.runTransaction(async (tx) => {
+      const docSnap = await tx.get(rateLimitRef);
+      const contador = docSnap.exists ? docSnap.data()?.count || 0 : 0;
+
       if (contador >= limite) {
-        logger.warn('[upload] Límite semanal excedido bloqueado:', { clienteIp, contador });
-
-        return NextResponse.json(
-          apiError(
-            'RATE_LIMITED',
-            `¡Has alcanzado el límite de seguridad! Solo permitimos ${limite} cargas por semana para proteger el sistema.`
-          ),
-          { status: 429 }
-        );
+        return { ok: false, count: contador };
       }
+
+      tx.set(
+        rateLimitRef,
+        {
+          ip: clienteIp,
+          fecha: hoyParaLog,
+          count: FieldValue.increment(1),
+          ultimaCargaEn: new Date().toISOString(),
+        },
+        { merge: true }
+      );
+
+      return { ok: true, count: contador };
+    });
+
+    if (!rateResult.ok) {
+      logger.warn('[upload] Límite semanal excedido bloqueado:', {
+        clienteIp,
+        contador: rateResult.count,
+      });
+      return NextResponse.json(
+        apiError(
+          'RATE_LIMITED',
+          `¡Has alcanzado el límite de seguridad! Solo permitimos ${limite} cargas por semana para proteger el sistema.`
+        ),
+        { status: 429 }
+      );
     }
 
     // Validar MIME
@@ -159,18 +181,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       contentType: mimePrincipal,
     });
 
-    // Actualizar contador
-    logger.info('[upload] Paso 4: Actualizando contador en DB...');
-    const hoyParaLog = new Date().toISOString().split('T')[0];
-    await rateLimitRef.set(
-      {
-        ip: clienteIp,
-        fecha: hoyParaLog,
-        count: contador + 1,
-        ultimaCargaEn: new Date().toISOString(),
-      },
-      { merge: true }
-    );
+    // Contador ya actualizado atómicamente antes de enviar a Vercel Blob
 
     logger.info('¡ÉXITO!', { url: blob.url });
     return NextResponse.json(blob);

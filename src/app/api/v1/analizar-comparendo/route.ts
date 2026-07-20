@@ -5,7 +5,7 @@ import { Redis } from '@upstash/redis';
 import { Client as QStashClient } from '@upstash/qstash';
 
 const redis = Redis.fromEnv();
-const MAX_GEMINI_DAILY = 500; // Límite de seguridad
+const MAX_GEMINI_DAILY = 5000; // Límite de seguridad ajustado a petición del usuario para clientes Enterprise
 
 import { logger } from '@/lib/logger/security-logger';
 import { apiError } from '@/lib/types/api-response';
@@ -48,10 +48,10 @@ const AnalizarComparendoSchema = z
       .string()
       .url('El webhook debe ser una URL válida.')
       .optional()
-      .superRefine((val, ctx) => {
+      .superRefine(async (val, ctx) => {
         if (!val) return;
         try {
-          validateWebhookUrl(val);
+          await validateWebhookUrl(val);
         } catch (e) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  const parsed = AnalizarComparendoSchema.safeParse(body);
+  const parsed = await AnalizarComparendoSchema.safeParseAsync(body);
   if (!parsed.success) {
     return NextResponse.json(
       apiError('VALIDATION_ERROR', 'Datos de entrada inválidos.', parsed.error.flatten()),

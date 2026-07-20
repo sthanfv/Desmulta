@@ -111,6 +111,11 @@ export async function POST(request: Request) {
       // Por defecto a desmulta-colombia si no está la env
       const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'desmulta-colombia';
 
+      const pdfApiSecret = process.env.PDF_API_SECRET;
+      if (!pdfApiSecret) {
+        throw new Error('PDF_API_SECRET no está configurada. Operación bloqueada (Fail-Closed).');
+      }
+
       // En functions v2 la url es dada por cloud run, pero usaremos un custom domain o la url estandar si está disponible. Mejor usamos la var de entorno si está, o el formato genérico de v1 fallback.
       const finalUrl =
         process.env.PDF_CLOUD_FUNCTION_URL ||
@@ -122,7 +127,7 @@ export async function POST(request: Request) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${process.env.PDF_API_SECRET || 'dev_secret'}`,
+          Authorization: `Bearer ${pdfApiSecret}`,
         },
         body: JSON.stringify({ htmlContent }),
       });

@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
     const dailyCount = await redis.incr(`gemini:daily:${dateStr}`);
     if (dailyCount === 1) await redis.expire(`gemini:daily:${dateStr}`, 86400);
 
-    if (dailyCount > 500) {
+    if (dailyCount > 5000) {
       throw new Error('CUOTA DIARIA DE GEMINI EXCEDIDA');
     }
 
@@ -185,7 +185,7 @@ export async function POST(request: NextRequest) {
 
     if (webhookUrl) {
       try {
-        validateWebhookUrl(webhookUrl);
+        await validateWebhookUrl(webhookUrl);
 
         await fetch(webhookUrl, {
           method: 'POST',

@@ -314,7 +314,6 @@ export const telegramWebhook = onRequest(
       ...parseAllowedIds(process.env.TELEGRAM_CHAT_ID),
       ...parseAllowedIds(process.env.TELEGRAM_DEV_CHAT_ID),
       ...parseAllowedIds(process.env.TELEGRAM_SECURITY_CHAT_ID),
-      6343332379, // ID del Administrador Maestro (Sthan)
     ];
 
     const incomingChatId =

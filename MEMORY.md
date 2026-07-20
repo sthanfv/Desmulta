@@ -5,6 +5,30 @@
 > Se analizó el equipo local (DESKTOP-N9CGIFT) identificando un procesador antiguo `AMD PRO A10-8750B R7` (4 núcleos) y 16GB de RAM. Esta severa limitación en procesamiento de un solo hilo causa sobrecargas y Cold Starts extremadamente lentos.
 > **Regla permanente:** Está **ESTRICTAMENTE PROHIBIDO** ejecutar suites de validación masivas (`npm run validate` total) o pruebas E2E pesadas (Playwright) para cambios menores, ya que estresa severamente la máquina. Aplicar validación quirúrgica (linters específicos y pruebas aisladas) a menos que se trate de una reestructuración arquitectónica masiva autorizada por el usuario. Cuando las pruebas E2E sean necesarias, usar estrategias pasivas y timeouts elevados (`60000ms`).
 
+## 2026-07-20: Cierre de Auditoría de Seguridad SSRF y Rate-Limits
+
+- **Qué cambió:**
+  - **[Prevención SSRF (A-4)]**: Se refactorizó `src/lib/security/ssrf-guard.ts` integrando resolución DNS asíncrona (`dns.promises.lookup`) para bloquear dominios que resuelvan a IPs privadas (IPv4/IPv6), previniendo ataques DNS rebinding.
+  - **[Prevención Inyección PII/HTML (A-6, A-8)]**: Se fortaleció `piiScrubber.ts` ampliando el regex de cédulas (`\\b\\d{5,12}\\b`) y se sanitizó `caseData` en `pdf-delivery.ts` para escapar caracteres HTML antes de renderizar la plantilla de Resend.
+  - **[Condiciones de Carrera y Límites (A-1, A-2)]**: Se modificaron `documentos/download/route.ts` y `upload/route.ts` para utilizar `db.runTransaction()`, garantizando atomicidad en el consumo de cuotas. El límite de uploads semanales se redujo a 5 por IP.
+  - **[Motor OCR y Async Zod]**: En `analizar-comparendo/route.ts`, se ajustó el límite diario de Gemini a 5000 y se migró a `.safeParseAsync` para soportar las validaciones DNS asíncronas.
+  - **[Hardcoded Secrets Remediados (A-4, A-5)]**: Se removió el ID de Telegram estático del Administrador Maestro en `telegramWebhook.ts` y se reemplazó el fallback `'dev_secret'` en `export-pdf/route.ts` por una validación estricta (Fail-Closed).
+  - **[Rate Limit Compatibility Wrapper (A-3)]**: Se actualizó `src/lib/security/rate-limit.ts` para lanzar un error (Fail-Closed) cuando los identificadores no mapeen a ningún bucket conocido. Posteriormente, se auditó exhaustivamente y se añadieron explícitamente los mapeos faltantes para `crash_proxy:` y `web-push:`, asegurando que no caigan en falsos positivos del Fail-Closed.
+- **Por qué cambió:**
+  - Cumplimiento estricto de las 8 remediaciones priorizadas en la última auditoría (`AUDITORIA_DESMULTA_2026-07-20.md`), asegurando el sistema contra vectores SSRF, Spam, inyecciones XSS y condiciones de carrera.
+- **Archivos afectados:**
+  - `src/lib/security/ssrf-guard.ts` [MODIFICADO]
+  - `src/lib/security/piiScrubber.ts` [MODIFICADO]
+  - `src/app/api/documentos/download/route.ts` [MODIFICADO]
+  - `src/app/api/upload/route.ts` [MODIFICADO]
+  - `src/app/api/v1/analizar-comparendo/route.ts` [MODIFICADO]
+  - `src/app/api/qstash/ocr-worker/route.ts` [MODIFICADO]
+  - `functions/src/telegramWebhook.ts` [MODIFICADO]
+  - `src/app/api/admin/export-pdf/route.ts` [MODIFICADO]
+  - `src/lib/security/rate-limit.ts` [MODIFICADO]
+  - `src/lib/payments/pdf-delivery.ts` [MODIFICADO]
+- **Estado actual:** ✅ Completo. `npm run validate` ejecutado exitosamente en terminal (build/lint ok).
+
 ## 2026-07-20: Estrategia de "Value-Based Pricing" para Documentos Web
 
 - **Qué cambió:**

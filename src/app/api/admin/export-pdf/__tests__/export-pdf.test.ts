@@ -70,6 +70,7 @@ describe('Export PDF API - Smoke Test & Anti-Leak Validation', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockFetch.mockReset();
+    process.env.PDF_API_SECRET = 'test_secret';
   });
 
   const generateRequest = (body: unknown) => {

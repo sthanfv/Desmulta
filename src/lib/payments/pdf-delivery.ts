@@ -77,6 +77,17 @@ export async function generarYEnviarPDF(purchase: PurchaseDocument, db: Firestor
   const pdfBytes = await generateMandatePDF(payload);
   const pdfBase64 = Buffer.from(pdfBytes).toString('base64');
 
+  // Sanitizar caseData para prevenir inyección HTML en correos (Fix A-6)
+  const sanitizeHtml = (str: string) =>
+    str.replace(
+      /[&<>"']/g,
+      (m) =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m as never] || m
+    );
+  const safeCaseData = Object.fromEntries(
+    Object.entries(caseData).map(([k, v]) => [k, typeof v === 'string' ? sanitizeHtml(v) : v])
+  ) as typeof caseData;
+
   // 4. Enviar el PDF por email al cliente (Resend)
   await resend.emails.send({
     from: 'Desmulta <documentos@desmulta.online>',
@@ -86,7 +97,7 @@ export async function generarYEnviarPDF(purchase: PurchaseDocument, db: Firestor
       <h1>Tu documento legal está adjunto</h1>
       <p>Estimado/a cliente,</p>
       <p>Adjunto encontrarás tu <strong>${template.titulo}</strong> generado por Desmulta.</p>
-      <p><strong>Instrucciones:</strong> ${template.protocolo2213(caseData).join(' ')}</p>
+      <p><strong>Instrucciones:</strong> ${template.protocolo2213(safeCaseData).join(' ')}</p>
       <p>Si tienes dudas, escríbenos a contactodesmulta@protonmail.com</p>
     `,
     attachments: [

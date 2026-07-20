@@ -45,7 +45,21 @@ const schema = z.object({
   cedula: z.string().min(5).max(12),
   celular: z.string().min(10).max(12),
   caseData: z.object({
-    infractorName: z.string().min(1),
+    // 🛡️ FIX A-6: Prevención de inyección HTML/XSS en el payload del correo transaccional (Resend).
+    // Sanear los caracteres peligrosos de inyección desde el Zod Schema usando transform y refine.
+    infractorName: z
+      .string()
+      .min(1)
+      .max(60)
+      .transform((val) =>
+        val
+          .replace(/[<>'"\\\/\[\]{}|`]/g, '')
+          .replace(/\s+/g, ' ')
+          .trim()
+      )
+      .refine((val) => /^[a-záéíóúüñA-ZÁÉÍÓÚÜÑ\s\-\.]+$/.test(val), {
+        message: 'El nombre solo puede contener letras, espacios, guiones y puntos.',
+      }),
     infractorId: z.string().min(1),
     licensePlate: z.string().optional().default('N/A'),
     ticketNumber: z.string().optional(),

@@ -51,41 +51,53 @@ export async function GET(req: NextRequest) {
 
     if (tokenId) {
       // ── FLUJO 1: DESCARGA POR TOKEN (CORREO ELECTRÓNICO) ──
-      const tokenSnap = await db.collection('pdf_tokens').doc(tokenId).get();
-      if (!tokenSnap.exists) {
-        return new NextResponse('Enlace inválido o documento no encontrado', { status: 404 });
+      const tokenRef = db.collection('pdf_tokens').doc(tokenId);
+      // 🛡️ FIX C-2: Control atómico de cuotas.
+      // Usa db.runTransaction() para evitar Race Conditions si ocurren descargas concurrentes sobre el mismo token.
+      const tokenResult = await db.runTransaction(async (tx) => {
+        const tokenSnap = await tx.get(tokenRef);
+        if (!tokenSnap.exists) return { ok: false, reason: 'not_found' };
+
+        const data = tokenSnap.data();
+        if (!data) return { ok: false, reason: 'not_found' };
+
+        const expiresAt = data.expiresAt?.toDate
+          ? data.expiresAt.toDate()
+          : new Date(data.expiresAt);
+
+        if (new Date() > expiresAt) {
+          return { ok: false, reason: 'expired' };
+        }
+
+        if (data.downloadCount >= data.maxDownloads) {
+          return { ok: false, reason: 'limit_reached' };
+        }
+
+        tx.update(tokenRef, { downloadCount: FieldValue.increment(1) });
+        return { ok: true, data };
+      });
+
+      if (!tokenResult.ok) {
+        if (tokenResult.reason === 'not_found') {
+          return new NextResponse('Enlace inválido o documento no encontrado', { status: 404 });
+        }
+        if (tokenResult.reason === 'expired') {
+          return new NextResponse('El enlace de descarga ha expirado (límite 72 horas)', {
+            status: 403,
+          });
+        }
+        if (tokenResult.reason === 'limit_reached') {
+          return new NextResponse(
+            'Se ha alcanzado el límite máximo de descargas para este documento',
+            { status: 403 }
+          );
+        }
       }
-      const tokenData = tokenSnap.data();
+
+      const tokenData = tokenResult.data;
       if (!tokenData) {
-        return new NextResponse('Datos de token no encontrados', { status: 404 });
+        return new NextResponse('Error interno del servidor al leer token', { status: 500 });
       }
-
-      // Verificar expiración
-      const expiresAt = tokenData.expiresAt?.toDate
-        ? tokenData.expiresAt.toDate()
-        : new Date(tokenData.expiresAt);
-      if (new Date() > expiresAt) {
-        return new NextResponse('El enlace de descarga ha expirado (límite 72 horas)', {
-          status: 403,
-        });
-      }
-
-      // Verificar límite de descargas
-      if (tokenData.downloadCount >= tokenData.maxDownloads) {
-        return new NextResponse(
-          'Se ha alcanzado el límite máximo de descargas para este documento',
-          { status: 403 }
-        );
-      }
-
-      // Incrementar contador de descargas
-      await db
-        .collection('pdf_tokens')
-        .doc(tokenId)
-        .update({
-          downloadCount: FieldValue.increment(1),
-        });
-
       purchaseId = tokenData.purchaseId;
       productType = tokenData.productType;
 
@@ -123,70 +135,75 @@ export async function GET(req: NextRequest) {
         return new NextResponse('No autorizado. Token de descarga requerido.', { status: 401 });
       }
 
-      const purchaseSnap = await db.collection('purchases').doc(refId).get();
-      if (!purchaseSnap.exists) {
-        return new NextResponse('Compra no encontrada', { status: 404 });
+      const purchaseRef = db.collection('purchases').doc(refId);
+      // 🛡️ FIX C-2: Control atómico de cuotas.
+      // Usa db.runTransaction() para evitar Race Conditions (TOCTOU) si ocurren múltiples descargas concurrentes.
+      const purchaseResult = await db.runTransaction(async (tx) => {
+        const purchaseSnap = await tx.get(purchaseRef);
+        if (!purchaseSnap.exists) return { ok: false, reason: 'not_found' };
+
+        const data = purchaseSnap.data();
+        if (!data) return { ok: false, reason: 'not_found' };
+
+        // Validar el token de descarga
+        const expected = Buffer.from(data.downloadToken || '');
+        const provided = Buffer.from(downloadToken || '');
+        const isLengthOk = expected.length === provided.length;
+        const isTokenValid = isLengthOk && timingSafeEqual(expected, provided);
+
+        if (!isTokenValid) return { ok: false, reason: 'invalid_token' };
+        if (data.status !== 'APPROVED') return { ok: false, reason: 'not_approved' };
+
+        const expiresAt = data.downloadTokenExpiresAt?.toDate
+          ? data.downloadTokenExpiresAt.toDate()
+          : data.downloadTokenExpiresAt
+            ? new Date(data.downloadTokenExpiresAt)
+            : null;
+
+        if (expiresAt && new Date() > expiresAt) return { ok: false, reason: 'expired' };
+
+        const downloadCount = data.downloadCount || 0;
+        const maxDownloads = data.maxDownloads || 5;
+        if (downloadCount >= maxDownloads) return { ok: false, reason: 'limit_reached' };
+
+        tx.update(purchaseRef, { downloadCount: FieldValue.increment(1) });
+        return { ok: true, data };
+      });
+
+      if (!purchaseResult.ok) {
+        if (purchaseResult.reason === 'not_found') {
+          return new NextResponse('Compra no encontrada', { status: 404 });
+        }
+        if (purchaseResult.reason === 'invalid_token') {
+          logger.security(
+            '[documentos/download] Intento de descarga con token inválido (IDOR bloqueado)',
+            { refId }
+          );
+          return new NextResponse('No autorizado. Token de descarga inválido.', { status: 401 });
+        }
+        if (purchaseResult.reason === 'not_approved') {
+          return new NextResponse(
+            'El pago no ha sido aprobado. No se puede descargar el documento.',
+            { status: 403 }
+          );
+        }
+        if (purchaseResult.reason === 'expired') {
+          return new NextResponse('El enlace de descarga ha expirado (límite 72 horas).', {
+            status: 403,
+          });
+        }
+        if (purchaseResult.reason === 'limit_reached') {
+          return new NextResponse(
+            'Se ha alcanzado el límite máximo de descargas para este documento.',
+            { status: 403 }
+          );
+        }
       }
-      const purchase = purchaseSnap.data();
 
-      // Validar el token de descarga
-      const expected = Buffer.from(purchase?.downloadToken || '');
-      const provided = Buffer.from(downloadToken || '');
-      const isLengthOk = expected.length === provided.length;
-      const isTokenValid = isLengthOk && timingSafeEqual(expected, provided);
-
-      if (!purchase || !isTokenValid) {
-        logger.security(
-          '[documentos/download] Intento de descarga con token inválido (IDOR bloqueado)',
-          {
-            refId,
-            // 🛡️ FIX R-01: Remover logging del token provisto en texto plano
-          }
-        );
-        return new NextResponse('No autorizado. Token de descarga inválido.', { status: 401 });
+      const purchase = purchaseResult.data;
+      if (!purchase) {
+        return new NextResponse('Error interno al recuperar compra', { status: 500 });
       }
-
-      purchaseId = refId;
-      productType = purchase.productType || '';
-
-      // Seguridad: Solo permitir descarga directa si el pago fue aprobado
-      if (purchase.status !== 'APPROVED') {
-        return new NextResponse(
-          'El pago no ha sido aprobado. No se puede descargar el documento.',
-          { status: 403 }
-        );
-      }
-
-      // 🛡️ FIX: Validar expiración del downloadToken (Hallazgo 5)
-      const expiresAt = purchase.downloadTokenExpiresAt?.toDate
-        ? purchase.downloadTokenExpiresAt.toDate()
-        : purchase.downloadTokenExpiresAt
-          ? new Date(purchase.downloadTokenExpiresAt)
-          : null;
-
-      if (expiresAt && new Date() > expiresAt) {
-        return new NextResponse('El enlace de descarga ha expirado (límite 72 horas).', {
-          status: 403,
-        });
-      }
-
-      // 🛡️ FIX: Validar límite de descargas (Hallazgo 5)
-      const downloadCount = purchase.downloadCount || 0;
-      const maxDownloads = purchase.maxDownloads || 5;
-      if (downloadCount >= maxDownloads) {
-        return new NextResponse(
-          'Se ha alcanzado el límite máximo de descargas para este documento.',
-          { status: 403 }
-        );
-      }
-
-      // Incrementar contador de descargas
-      await db
-        .collection('purchases')
-        .doc(refId)
-        .update({
-          downloadCount: FieldValue.increment(1),
-        });
 
       if (!purchase.caseData) {
         return new NextResponse('Datos del caso no encontrados en la compra', { status: 404 });

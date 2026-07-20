@@ -24,15 +24,21 @@ interface SideRaysProps {
 
 const hexToRgb = (hex: string): [number, number, number] => {
   const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return m ? [parseInt(m[1], 16) / 255, parseInt(m[2], 16) / 255, parseInt(m[3], 16) / 255] : [1, 1, 1];
+  return m
+    ? [parseInt(m[1], 16) / 255, parseInt(m[2], 16) / 255, parseInt(m[3], 16) / 255]
+    : [1, 1, 1];
 };
 
 const originToFlip = (origin: Origin): [number, number] => {
   switch (origin) {
-    case 'top-left': return [1, 0];
-    case 'bottom-right': return [0, 1];
-    case 'bottom-left': return [1, 1];
-    default: return [0, 0];
+    case 'top-left':
+      return [1, 0];
+    case 'bottom-right':
+      return [0, 1];
+    case 'bottom-left':
+      return [1, 1];
+    default:
+      return [0, 0];
   }
 };
 
@@ -48,7 +54,7 @@ const SideRays = ({
   blend = 0.75,
   falloff = 1.6,
   opacity = 1.0,
-  className = ''
+  className = '',
 }: SideRaysProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const uniformsRef = useRef<Record<string, { value: number | number[] }> | null>(null);
@@ -75,7 +81,7 @@ const SideRays = ({
     if (!containerRef.current) return;
 
     observerRef.current = new IntersectionObserver(
-      entries => {
+      (entries) => {
         const entry = entries[0];
         setIsVisible(entry.isIntersecting);
       },
@@ -104,13 +110,13 @@ const SideRays = ({
     const initializeWebGL = async () => {
       if (!containerRef.current) return;
 
-      await new Promise<void>(resolve => setTimeout(resolve, 10));
+      await new Promise<void>((resolve) => setTimeout(resolve, 10));
 
       if (!containerRef.current) return;
 
       const renderer = new Renderer({
         dpr: Math.min(window.devicePixelRatio, 2),
-        alpha: true
+        alpha: true,
       });
       rendererRef.current = renderer;
 
@@ -205,7 +211,7 @@ void main() {
         iSaturation: { value: saturation },
         iBlend: { value: blend },
         iFalloff: { value: falloff },
-        iOpacity: { value: opacity }
+        iOpacity: { value: opacity },
       };
       uniformsRef.current = uniforms;
 
@@ -265,7 +271,22 @@ void main() {
         cleanupFunctionRef.current = null;
       }
     };
-  }, [isVisible, speed, rayColor1, rayColor2, intensity, spread, origin, tilt, saturation, blend, falloff, opacity, reducedMotion, isLowTier]);
+  }, [
+    isVisible,
+    speed,
+    rayColor1,
+    rayColor2,
+    intensity,
+    spread,
+    origin,
+    tilt,
+    saturation,
+    blend,
+    falloff,
+    opacity,
+    reducedMotion,
+    isLowTier,
+  ]);
 
   useEffect(() => {
     if (!uniformsRef.current) return;
@@ -283,7 +304,19 @@ void main() {
     u.iBlend.value = blend;
     u.iFalloff.value = falloff;
     u.iOpacity.value = opacity;
-  }, [speed, rayColor1, rayColor2, intensity, spread, origin, tilt, saturation, blend, falloff, opacity]);
+  }, [
+    speed,
+    rayColor1,
+    rayColor2,
+    intensity,
+    spread,
+    origin,
+    tilt,
+    saturation,
+    blend,
+    falloff,
+    opacity,
+  ]);
 
   if (reducedMotion || isLowTier) {
     return <div className="fixed inset-0 -z-20 bg-background" />;

@@ -100,20 +100,23 @@ onCaseStatusChange          onConsultationStatusChange
 
 ---
 
-## 4. Seguridad — 10 Capas
+## 4. Seguridad — Capas de Defensa en Profundidad
 
 | Capa | Mecanismo | Archivo clave |
 |---|---|---|
 | Red | HSTS + CSP nonce + X-Frame-Options | `src/middleware.ts` |
+| SSRF Guard | Validación de Webhooks asíncrona (`dns.lookup`) con bloqueo IPv6 Literal y Metadata Cloud. *(Ver [docs/SSRF_ARCHITECTURE.md](SSRF_ARCHITECTURE.md))* | `src/lib/security/ssrf-guard.ts` |
 | CSRF / Origin | Validación de cabecera Origin contra SITE_URL en endpoints admin | `/api/gallery` y `/api/admin/export-pdf` |
 | Auth Admin | JWT ECDSA + httpOnly cookie | `src/lib/require-admin-session.ts` |
 | Doble Factor (2FA) | Código OTP de 6 dígitos enviado por email (Expiración de 2 minutos) con Cookie HttpOnly | `src/app/admin/otp-actions.ts` |
 | Auth VIP | JWT HS256 + httpOnly + sameSite:lax (Zero-PII: Solo Hashes) | `src/lib/security/vip-jwt.ts` |
-| Rate limit | Upstash Redis en memoria (Fail-CLOSED), granularidad en galería | `src/lib/security/rate-limit.ts` |
-| Validación | Zod en todos los endpoints | Cada `route.ts` |
+| Rate limit | Upstash Redis en memoria (Fail-CLOSED puro), lanzando excepciones para cubetas desconocidas | `src/lib/security/rate-limit.ts` |
+| Idempotencia y Atomicidad | Prevención de *Race Conditions* en descargas y cuotas semanales usando `db.runTransaction()` | `src/app/api/documentos/download/route.ts` |
+| Prevención de Inyección HTML | Sanitización estricta por `.transform()` y `.refine()` de Zod para correos transaccionales (Resend) | `src/app/api/payments/create-order/route.ts` |
+| Validación de Payloads | Zod en todos los endpoints, aplicando asincronía (`safeParseAsync`) para resoluciones de red | Cada `route.ts` |
 | Upload | Magic bytes + MIME whitelist + 10MB | `src/app/api/upload/route.ts` |
 | Anti-bot | Cloudflare Turnstile server-side | `src/lib/turnstile.ts` |
-| Cifrado | RSA E2EE formulario + PBKDF2 (600k iteraciones) + AES-256-GCM para PII en reposo | `src/lib/security/server-crypto.ts` |
+| Cifrado y Hash PII | RSA E2EE formulario + PBKDF2 (600k iteraciones) + AES-256-GCM para PII en reposo | `src/lib/security/server-crypto.ts` |
 
 ### Excepciones de Seguridad Conocidas
 *   **style-src unsafe-inline (CSP):** Se permite la directiva `'unsafe-inline'` en `style-src` debido a los requerimientos de hidratación dinámica de Framer Motion y Tailwind CSS en Next.js. Es una excepción aceptada en beneficio del dinamismo visual de la interfaz de usuario de cara al cliente y en ausencia de un motor de hashes/nonces dinámicos a tiempo de compilación.

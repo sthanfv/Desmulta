@@ -20,10 +20,7 @@ import { DocumentType } from '@/lib/legal/document-templates';
 import { TarjetaPremium } from '@/components/ui/TarjetaPremium';
 import dynamic from 'next/dynamic';
 
-const SideRays = dynamic(
-  () => import('@/components/ui/SideRays'),
-  { ssr: false }
-);
+const SideRays = dynamic(() => import('@/components/ui/SideRays'), { ssr: false });
 
 // Mapeo de iconos para cada tipo de documento
 const getIconForDoc = (type: DocumentType) => {

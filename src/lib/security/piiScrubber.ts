@@ -13,7 +13,7 @@ export function sanitizePII(payload: string): string {
 
   return payload
     .replace(/[A-Z]{3}-?\d{3}/gi, '[PLACA_OCULTA]') // Placas colombianas (ej. ABC123, ABC-123)
-    .replace(/\b\d{8,10}\b/g, '[DOC_OCULTO]') // Cédulas colombianas (8-10 dígitos)
+    .replace(/\b\d{5,12}\b/g, '[DOC_OCULTO]') // Cédulas colombianas (5-12 dígitos)
     .replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, '[EMAIL_OCULTO]') // Emails
     .replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi, '[TOKEN_OCULTO]') // UUIDs
     .replace(
