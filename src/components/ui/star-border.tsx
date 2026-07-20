@@ -39,7 +39,7 @@ export const StarBorder = <T extends React.ElementType = 'div'>({
           ...(rest.style as object),
         } as React.CSSProperties
       }
-      {...(rest as any)}
+      {...(rest as React.ComponentPropsWithoutRef<T>)}
     >
       {/* Bot beam */}
       <div

@@ -204,9 +204,18 @@ export default function GeneradorDinamico({ params }: GeneradorDinamicoProps) {
 
       // 🛡️ FIX: sessionStorage eliminado. El downloadToken se maneja vía Cookie HttpOnly desde el backend.
 
+      interface WompiResult {
+        transaction: { status: string };
+      }
+      interface ExtendedWindow extends Window {
+        WidgetCheckout?: new (options: any) => { open: (cb: (res: WompiResult) => void) => void };
+      }
+      const extWindow = window as unknown as ExtendedWindow;
+
       const initWompiWidget = () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const checkout = new (window as any).WidgetCheckout({
+        if (!extWindow.WidgetCheckout) return;
+        
+        const checkout = new extWindow.WidgetCheckout({
           currency: 'COP',
           amountInCents: data.amountCop,
           reference: data.wompiReference,
@@ -214,8 +223,7 @@ export default function GeneradorDinamico({ params }: GeneradorDinamicoProps) {
           signature: { integrity: data.signature },
         });
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        checkout.open((result: any) => {
+        checkout.open((result) => {
           const transaction = result.transaction;
           if (transaction.status === 'APPROVED') {
             window.location.href = `/documentos/confirmacion?ref=${data.wompiReference}`;
@@ -226,8 +234,7 @@ export default function GeneradorDinamico({ params }: GeneradorDinamicoProps) {
         });
       };
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      if (!(window as any).WidgetCheckout) {
+      if (!extWindow.WidgetCheckout) {
         const script = document.createElement('script');
         script.src = 'https://checkout.wompi.co/widget.js';
         script.async = true;
