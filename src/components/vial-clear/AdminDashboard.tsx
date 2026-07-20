@@ -480,31 +480,31 @@ export function AdminDashboard() {
                   <span className="text-[10px] text-yellow-500 bg-yellow-500/10 px-1.5 py-0.5 rounded">.DOCX</span>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-border/40" />
-                <DropdownMenuItem onClick={() => window.open('/api/admin/documentos/generate-generic?type=peticion_general', '_blank')} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
+                <DropdownMenuItem onClick={() => setPinAuth({ isOpen: true, actionName: 'Generar Petición General', onSuccess: () => window.open('/api/admin/documentos/generate-generic?type=peticion_general', '_blank') })} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
                   <span className="font-medium text-sm">Petición General</span>
                   <span className="text-muted-foreground text-xs">$39,000</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => window.open('/api/admin/documentos/generate-generic?type=prescripcion_directa', '_blank')} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
+                <DropdownMenuItem onClick={() => setPinAuth({ isOpen: true, actionName: 'Generar Prescripción Directa', onSuccess: () => window.open('/api/admin/documentos/generate-generic?type=prescripcion_directa', '_blank') })} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
                   <span className="font-medium text-sm">Prescripción Directa</span>
                   <span className="text-muted-foreground text-xs">$59,000</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => window.open('/api/admin/documentos/generate-generic?type=doble_prescripcion', '_blank')} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
+                <DropdownMenuItem onClick={() => setPinAuth({ isOpen: true, actionName: 'Generar Doble Prescripción', onSuccess: () => window.open('/api/admin/documentos/generate-generic?type=doble_prescripcion', '_blank') })} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
                   <span className="font-medium text-sm">Doble Prescripción</span>
                   <span className="text-muted-foreground text-xs">$79,000</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => window.open('/api/admin/documentos/generate-generic?type=nulidad_notificacion', '_blank')} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
+                <DropdownMenuItem onClick={() => setPinAuth({ isOpen: true, actionName: 'Generar Nulidad Notificación', onSuccess: () => window.open('/api/admin/documentos/generate-generic?type=nulidad_notificacion', '_blank') })} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
                   <span className="font-medium text-sm">Nulidad por Notificación</span>
                   <span className="text-muted-foreground text-xs">$49,000</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => window.open('/api/admin/documentos/generate-generic?type=tutela_silencio', '_blank')} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
+                <DropdownMenuItem onClick={() => setPinAuth({ isOpen: true, actionName: 'Generar Tutela', onSuccess: () => window.open('/api/admin/documentos/generate-generic?type=tutela_silencio', '_blank') })} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
                   <span className="font-medium text-sm">Tutela (Silencio Admin)</span>
                   <span className="text-muted-foreground text-xs">$39,000</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => window.open('/api/admin/documentos/generate-generic?type=caducidad_1_anio', '_blank')} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
+                <DropdownMenuItem onClick={() => setPinAuth({ isOpen: true, actionName: 'Generar Caducidad 1 Año', onSuccess: () => window.open('/api/admin/documentos/generate-generic?type=caducidad_1_anio', '_blank') })} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
                   <span className="font-medium text-sm">Caducidad 1 Año</span>
                   <span className="text-muted-foreground text-xs">$59,000</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => window.open('/api/admin/documentos/generate-generic?type=nulidad_falta_identidad', '_blank')} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
+                <DropdownMenuItem onClick={() => setPinAuth({ isOpen: true, actionName: 'Generar Nulidad Identidad', onSuccess: () => window.open('/api/admin/documentos/generate-generic?type=nulidad_falta_identidad', '_blank') })} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
                   <span className="font-medium text-sm">Nulidad por Identidad</span>
                   <span className="text-muted-foreground text-xs">$49,000</span>
                 </DropdownMenuItem>
