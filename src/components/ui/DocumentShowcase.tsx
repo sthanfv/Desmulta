@@ -112,11 +112,11 @@ export function DocumentShowcase() {
       mouseX.current = lerp(mouseX.current, targetX.current, 0.08);
       mouseY.current = lerp(mouseY.current, targetY.current, 0.08);
 
-      const rotX = 15 + mouseY.current * -10;
-      const rotY = -10 + mouseX.current * 10;
+      const moveX = mouseX.current * 15;
+      const moveY = mouseY.current * 15;
 
       if (stackRef.current) {
-        stackRef.current.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+        stackRef.current.style.transform = `translateX(${moveX}px) translateY(${moveY}px)`;
       }
 
       rafRef.current = requestAnimationFrame(animateLoop);
@@ -147,7 +147,6 @@ export function DocumentShowcase() {
   return (
     <div 
       className="w-full flex justify-center items-center relative group cursor-grab active:cursor-grabbing pb-12"
-      style={{ perspective: '1200px', transformStyle: 'preserve-3d' }}
       ref={containerRef}
       onMouseEnter={() => {
         isHovering.current = true;
@@ -193,7 +192,7 @@ export function DocumentShowcase() {
       <div 
         ref={stackRef}
         className="relative w-full max-w-[320px] aspect-[3/4.2] will-change-transform"
-        style={{ transformStyle: 'preserve-3d', transform: 'rotateX(15deg) rotateY(-10deg)' }}
+        style={{ transform: 'translateX(0px) translateY(0px)' }}
       >
         {/* SVG Texture Pattern */}
         <svg className="hidden">
@@ -206,8 +205,9 @@ export function DocumentShowcase() {
         <div 
           className="absolute inset-0 rounded-3xl bg-card border border-border"
           style={{ 
-            transform: 'translateZ(-30px) translateX(25px) translateY(-25px)',
-            boxShadow: 'var(--tw-shadow-color, -15px 25px 40px -10px rgba(0,0,0,0.2)), inset 0 1px 0 rgba(255,255,255,0.8)',
+            transform: 'rotate(10deg) translateX(10px) translateY(5px)',
+            transformOrigin: 'bottom left',
+            boxShadow: 'var(--tw-shadow-color, 0 10px 30px -10px rgba(0,0,0,0.15)), inset 0 1px 0 rgba(255,255,255,0.8)',
           }}
         >
           <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ filter: 'url(#noiseFilter)' }} />
@@ -217,8 +217,9 @@ export function DocumentShowcase() {
         <div 
           className="absolute inset-0 rounded-3xl bg-card border border-border"
           style={{ 
-            transform: 'translateZ(-15px) translateX(12px) translateY(-12px)',
-            boxShadow: 'var(--tw-shadow-color, -15px 25px 40px -10px rgba(0,0,0,0.2)), inset 0 1px 0 rgba(255,255,255,0.8)',
+            transform: 'rotate(5deg) translateX(5px) translateY(2px)',
+            transformOrigin: 'bottom left',
+            boxShadow: 'var(--tw-shadow-color, 0 15px 35px -10px rgba(0,0,0,0.15)), inset 0 1px 0 rgba(255,255,255,0.8)',
           }}
         >
            <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ filter: 'url(#noiseFilter)' }} />
@@ -228,8 +229,9 @@ export function DocumentShowcase() {
         <div 
           className="absolute inset-0 rounded-3xl bg-card text-card-foreground flex flex-col p-3 sm:p-4 z-10 overflow-hidden border border-border"
           style={{ 
-            transform: 'translateZ(0)',
-            boxShadow: 'var(--tw-shadow-color, -15px 25px 40px -10px rgba(0,0,0,0.2)), inset 0 1px 0 rgba(255,255,255,0.8)',
+            transform: 'rotate(0deg)',
+            transformOrigin: 'bottom left',
+            boxShadow: 'var(--tw-shadow-color, 0 25px 50px -12px rgba(0,0,0,0.25)), inset 0 1px 0 rgba(255,255,255,0.8)',
           }}
         >
           <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ filter: 'url(#noiseFilter)' }} />
@@ -266,7 +268,7 @@ export function DocumentShowcase() {
                     </p>
 
                     {/* Falso cuerpo del documento difuminado (Background absoluto para no empujar el flex) */}
-                    <div className="absolute top-full -mt-2 left-0 right-0 text-[6px] sm:text-[7px] text-muted-foreground leading-tight blur-[1px] opacity-25 select-none pointer-events-none hidden sm:block overflow-hidden z-0" style={{ height: '50px' }}>
+                    <div className="absolute bottom-0 translate-y-2 left-0 right-0 text-[6px] sm:text-[7px] text-muted-foreground leading-tight blur-[1px] opacity-25 select-none pointer-events-none hidden sm:block overflow-hidden z-0" style={{ height: '50px' }}>
                       <p>Yo, mayor de edad, identificado como aparece al pie de mi firma, en ejercicio del Derecho Constitucional de Petición consagrado en el artículo 23 de la Constitución Política y la Ley 1437 de 2011. Solicito respetuosamente se sirva ordenar la actualización de las bases de datos correspondientes al SIMIT y RUNT...</p>
                     </div>
                   </div>
@@ -278,7 +280,6 @@ export function DocumentShowcase() {
                         <p className="text-[8px] text-muted-foreground mb-0.5 font-semibold uppercase tracking-wider">Precio especial</p>
                         <div className="flex items-baseline gap-1">
                           <span className="text-xl sm:text-2xl font-black text-foreground">{template.price}</span>
-                          <span className="text-[9px] font-bold text-muted-foreground">COP</span>
                         </div>
                       </div>
                     </div>
