@@ -46,6 +46,7 @@ import { SalesAdminView } from '@/components/vial-clear/SalesAdminView';
 import { useAdminAnalytics } from '@/hooks/useAdminAnalytics';
 import { ThemeToggle } from '@/components/vial-clear/ThemeToggle';
 import { ModalAuthPin } from '@/components/vial-clear/ModalAuthPin';
+import { ModalAuthGodMode } from '@/components/vial-clear/ModalAuthGodMode';
 // Removed HiddenAuditPanel
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -185,6 +186,13 @@ export function AdminDashboard() {
   const [isCleaningSimit, setIsCleaningSimit] = useState(false);
   const [analyticsEnabled, setAnalyticsEnabled] = useState(false);
   const [pinAuth, setPinAuth] = useState<{
+    isOpen: boolean;
+    actionName: string;
+    onSuccess: () => void;
+    onCancel?: () => void;
+  }>({ isOpen: false, actionName: '', onSuccess: () => {} });
+
+  const [godModeAuth, setGodModeAuth] = useState<{
     isOpen: boolean;
     actionName: string;
     onSuccess: () => void;
@@ -509,31 +517,31 @@ export function AdminDashboard() {
                   <span className="text-[10px] text-yellow-500 bg-yellow-500/10 px-1.5 py-0.5 rounded">.DOCX</span>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-border/40" />
-                <DropdownMenuItem onClick={() => setPinAuth({ isOpen: true, actionName: 'Generar Petición General', onSuccess: () => handleDownloadGeneric('peticion_general') })} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
+                <DropdownMenuItem onClick={() => setGodModeAuth({ isOpen: true, actionName: 'Generar Petición General', onSuccess: () => handleDownloadGeneric('peticion_general') })} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
                   <span className="font-medium text-sm">Petición General</span>
                   <span className="text-muted-foreground text-xs">$39,000</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setPinAuth({ isOpen: true, actionName: 'Generar Prescripción Directa', onSuccess: () => handleDownloadGeneric('prescripcion_directa') })} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
+                <DropdownMenuItem onClick={() => setGodModeAuth({ isOpen: true, actionName: 'Generar Prescripción Directa', onSuccess: () => handleDownloadGeneric('prescripcion_directa') })} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
                   <span className="font-medium text-sm">Prescripción Directa</span>
                   <span className="text-muted-foreground text-xs">$59,000</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setPinAuth({ isOpen: true, actionName: 'Generar Doble Prescripción', onSuccess: () => handleDownloadGeneric('doble_prescripcion') })} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
+                <DropdownMenuItem onClick={() => setGodModeAuth({ isOpen: true, actionName: 'Generar Doble Prescripción', onSuccess: () => handleDownloadGeneric('doble_prescripcion') })} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
                   <span className="font-medium text-sm">Doble Prescripción</span>
                   <span className="text-muted-foreground text-xs">$79,000</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setPinAuth({ isOpen: true, actionName: 'Generar Nulidad Notificación', onSuccess: () => handleDownloadGeneric('nulidad_notificacion') })} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
+                <DropdownMenuItem onClick={() => setGodModeAuth({ isOpen: true, actionName: 'Generar Nulidad Notificación', onSuccess: () => handleDownloadGeneric('nulidad_notificacion') })} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
                   <span className="font-medium text-sm">Nulidad por Notificación</span>
                   <span className="text-muted-foreground text-xs">$49,000</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setPinAuth({ isOpen: true, actionName: 'Generar Tutela', onSuccess: () => handleDownloadGeneric('tutela_silencio') })} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
+                <DropdownMenuItem onClick={() => setGodModeAuth({ isOpen: true, actionName: 'Generar Tutela', onSuccess: () => handleDownloadGeneric('tutela_silencio') })} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
                   <span className="font-medium text-sm">Tutela (Silencio Admin)</span>
                   <span className="text-muted-foreground text-xs">$39,000</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setPinAuth({ isOpen: true, actionName: 'Generar Caducidad 1 Año', onSuccess: () => handleDownloadGeneric('caducidad_1_anio') })} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
+                <DropdownMenuItem onClick={() => setGodModeAuth({ isOpen: true, actionName: 'Generar Caducidad 1 Año', onSuccess: () => handleDownloadGeneric('caducidad_1_anio') })} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
                   <span className="font-medium text-sm">Caducidad 1 Año</span>
                   <span className="text-muted-foreground text-xs">$59,000</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setPinAuth({ isOpen: true, actionName: 'Generar Nulidad Identidad', onSuccess: () => handleDownloadGeneric('nulidad_falta_identidad') })} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
+                <DropdownMenuItem onClick={() => setGodModeAuth({ isOpen: true, actionName: 'Generar Nulidad Identidad', onSuccess: () => handleDownloadGeneric('nulidad_falta_identidad') })} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
                   <span className="font-medium text-sm">Nulidad por Identidad</span>
                   <span className="text-muted-foreground text-xs">$49,000</span>
                 </DropdownMenuItem>
@@ -951,6 +959,14 @@ export function AdminDashboard() {
         onSuccess={pinAuth.onSuccess}
         onCancel={pinAuth.onCancel}
         onClose={() => setPinAuth((prev) => ({ ...prev, isOpen: false }))}
+      />
+
+      <ModalAuthGodMode
+        isOpen={godModeAuth.isOpen}
+        actionName={godModeAuth.actionName}
+        onSuccess={godModeAuth.onSuccess}
+        onCancel={godModeAuth.onCancel}
+        onClose={() => setGodModeAuth((prev) => ({ ...prev, isOpen: false }))}
       />
 
       {/* HiddenAuditPanel was moved to /admin/auditoria */}
