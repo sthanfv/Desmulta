@@ -583,17 +583,17 @@ export const SuccessCases = ({ showcaseData }: SuccessCasesProps) => {
     <LazyMotion features={domAnimation}>
       <section
         ref={sectionRef}
-        className="py-24 px-4 relative"
+        className="py-32 md:py-48 px-4 relative"
         aria-label="Casos de éxito verificados"
       >
         <div className="max-w-4xl mx-auto text-center space-y-16">
           {/* Encabezado */}
           <div className="space-y-4">
-            <h2 className="text-2xl md:text-5xl font-black text-foreground tracking-tight">
+            <h2 className="text-4xl md:text-6xl lg:text-7xl font-black text-foreground tracking-tighter text-balance">
               Nuestros <span className="text-primary italic">Casos de Éxito</span>
             </h2>
             <div className="flex flex-col items-center gap-2">
-              <div className="text-4xl md:text-7xl font-black text-foreground tracking-tighter drop-shadow-sm">
+              <div className="text-5xl md:text-8xl lg:text-[7rem] font-black text-foreground tracking-tighter drop-shadow-sm">
                 {(() => {
                   const rawVal = showcaseData.counterValue || '1800+';
                   const numVal = parseInt(rawVal.replace(/[^0-9]/g, ''), 10) || 0;

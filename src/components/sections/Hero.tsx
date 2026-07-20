@@ -42,7 +42,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
 
   return (
     <LazyMotion features={domAnimation} strict>
-      <section className="min-h-[100svh] flex items-center pt-20 sm:pt-32 md:pt-36 pb-12 sm:pb-20 md:pb-24 px-4 relative overflow-hidden">
+      <section className="min-h-[100svh] flex items-center pt-24 sm:pt-36 md:pt-40 pb-16 sm:pb-24 md:pb-32 px-4 relative overflow-hidden">
       {/* Atmósfera institucional */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/15 blur-[60px] sm:blur-[120px] opacity-50 rounded-full" />
@@ -65,7 +65,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
           </m.div>
 
           {/* Titular */}
-          <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-bold text-foreground tracking-tighter leading-[1.1] sm:leading-[0.95]">
+          <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[7rem] font-black text-foreground tracking-tighter leading-[1.05] sm:leading-[0.9] text-balance">
             {cityContext ? (
               <>
                 <m.span
@@ -96,7 +96,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
                   Saneamos su historial.
                 </m.span>
                 <m.span
-                  className="block text-primary font-bold"
+                  className="block text-primary font-black"
                   initial={{ y: 40, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}

@@ -15,13 +15,13 @@ interface CTAProps {
  */
 export const CTA = ({ onConsultar, onOpenSimitTutorial }: CTAProps) => {
   return (
-    <section className="py-16 sm:py-24 md:py-28 px-4 mb-12 sm:mb-20">
+    <section className="py-24 sm:py-32 md:py-48 px-4 mb-12 sm:mb-20">
       <div className="max-w-5xl mx-auto relative">
         <div className="relative bg-primary text-primary-foreground p-8 sm:p-14 md:p-20 rounded-3xl overflow-hidden text-center space-y-8 shadow-xl shadow-primary/10">
           {/* Luz ambiental sutil — opacity muy baja */}
           <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-white/8 rounded-full blur-[80px] pointer-events-none" />
 
-          <h2 className="text-2xl md:text-4xl font-bold tracking-tight leading-[1.1] relative z-10">
+          <h2 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tighter leading-[1.05] relative z-10 text-balance">
             Su diagnóstico es gratuito.
             <br />
             <span className="text-xl md:text-3xl opacity-90 mt-2 block font-semibold">
