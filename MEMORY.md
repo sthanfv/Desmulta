@@ -15,7 +15,7 @@
   - Se adaptó la paleta de colores al modo oscuro dinámico (bg-card / text-foreground).
   - Se eliminaron las flechas de navegación laterales.
   - Se refactorizó la renderización del contenido a un contenedor flex (`flex-row`) con `translateX` para generar un desplazamiento horizontal real (carrusel) suave y fluido (duration-700, cubic-bezier).
-  - Se ajustó la altura base de la tarjeta (de aspect ratio estricto a una altura mínima controlada) para prevenir el desbordamiento oculto del botón y los precios.
+  - Se ajustó la base de la tarjeta a un estricto Aspect Ratio A4 (`aspect-[3/4.2]`), comprimiendo los paddings y tipografías internas para encajar perfectamente el contenido (precios y botón) sin rebasar ni distorsionar las dimensiones originales.
 - **Por qué cambió:**
   - El usuario notificó que los precios y el botón del footer estaban siendo recortados debido a las reglas estrictas de aspect-ratio en pantallas determinadas. Asimismo, solicitó un desplazamiento horizontal fluido y real al cambiar de documento, reemplazando el "fade" anterior por un scroll físico simulado mediante CSS `transform`.
 - **Archivos afectados:**
