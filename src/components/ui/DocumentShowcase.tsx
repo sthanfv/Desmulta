@@ -209,7 +209,7 @@ export function DocumentShowcase() {
           {/* Contenedor del Carrusel Interno (Scroll Horizontal Suave) */}
           <div className="flex-grow flex flex-col relative z-10 w-full h-full overflow-hidden">
             <div
-              className="flex w-full h-full transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]"
+              className="flex w-full h-full transition-transform duration-700 ease-out"
               style={{ transform: `translateX(-${currentIndex * 100}%)` }}
             >
               {templates.map((template, idx) => (

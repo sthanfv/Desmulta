@@ -208,7 +208,7 @@ export default function GeneradorDinamico({ params }: GeneradorDinamicoProps) {
         transaction: { status: string };
       }
       interface ExtendedWindow extends Window {
-        WidgetCheckout?: new (options: any) => { open: (cb: (res: WompiResult) => void) => void };
+        WidgetCheckout?: new (options: Record<string, unknown>) => { open: (cb: (res: WompiResult) => void) => void };
       }
       const extWindow = window as unknown as ExtendedWindow;
 

@@ -94,6 +94,7 @@ export async function GET(request: NextRequest) {
     logger.security(`[admin/generate-generic] MODO DIOS: ${adminEmail} generó plantilla gratis ${type} en ${format}`);
 
     if (format === 'pdf') {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const pdfBytes = await generateMandatePDF(genericPayload as any);
       return new NextResponse(Buffer.from(pdfBytes), {
         status: 200,
@@ -103,6 +104,7 @@ export async function GET(request: NextRequest) {
         },
       });
     } else {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const docxBytes = await generateMandateDOCX(genericPayload as any);
       return new NextResponse(Buffer.from(docxBytes), {
         status: 200,

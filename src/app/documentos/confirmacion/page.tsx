@@ -115,7 +115,7 @@ function ConfirmacionContent() {
       clearInterval(intervalId);
       clearTimeout(timeout);
     };
-  }, [ref]);
+  }, [ref, params]);
 
   if (status === 'loading') {
     return (

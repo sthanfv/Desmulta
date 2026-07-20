@@ -211,7 +211,7 @@ export function AdminDashboard() {
       a.click();
       a.remove();
       window.URL.revokeObjectURL(url);
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: 'Error de red',
         description: 'Fallo al procesar la descarga de la plantilla.',
