@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
       }
       // 🛡️ FIX V2-C2: Descarga de un solo uso, invalidar sesión inmediatamente
       await redis.del(`dl:${dlSession}`);
-      
+
       const parsed = typeof sessionData === 'string' ? JSON.parse(sessionData) : sessionData;
       tokenId = parsed.token || '';
       refId = parsed.ref || refId;
@@ -32,7 +32,9 @@ export async function GET(req: NextRequest) {
       // Fallback para descargas directas desde confirmación usando la cookie dt_ref
       downloadToken = req.cookies.get(`dt_${refId}`)?.value || '';
     } else {
-      return new NextResponse('No autorizado. Falta sesión de descarga o referencia.', { status: 401 });
+      return new NextResponse('No autorizado. Falta sesión de descarga o referencia.', {
+        status: 401,
+      });
     }
 
     const format = req.nextUrl.searchParams.get('format') || 'pdf';

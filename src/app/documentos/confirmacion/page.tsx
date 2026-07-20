@@ -3,7 +3,16 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { CheckCircle2, XCircle, Loader2, Clock, ShieldAlert } from 'lucide-react';
+import {
+  CheckCircle2,
+  XCircle,
+  Loader2,
+  Clock,
+  ShieldAlert,
+  MessageCircle,
+  Mail,
+  AlertTriangle,
+} from 'lucide-react';
 import { DOCUMENT_TEMPLATES } from '@/lib/legal/document-templates';
 
 // Interfaz que representa los datos de una compra almacenados en Firestore
@@ -29,6 +38,8 @@ function ConfirmacionContent() {
     'loading' | 'APPROVED' | 'DECLINED' | 'PENDING' | 'ERROR' | 'VOIDED'
   >('loading');
   const [purchaseData, setPurchaseData] = useState<PurchaseData | null>(null);
+  const [downloadError, setDownloadError] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
     if (!ref) return;
@@ -103,12 +114,26 @@ function ConfirmacionContent() {
 
     const handleDownload = async () => {
       try {
-        // Usar el cerebro premium del servidor para descargar el archivo unificado
-        // 🛡️ FIX: Token autorizado mediante Cookie HttpOnly automáticamente por el navegador
-        window.location.href = `/api/documentos/download?ref=${ref}&format=pdf`;
+        setDownloading(true);
+        setDownloadError(false);
+        const res = await fetch(`/api/documentos/download?ref=${ref}&format=pdf`);
+        if (!res.ok) {
+          throw new Error('Fallo en la descarga');
+        }
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Documento_${ref}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
       } catch (err) {
         console.error('Error iniciando descarga PDF:', err);
-        alert('Ocurrió un error al descargar el PDF. Por favor, recarga la página.');
+        setDownloadError(true);
+      } finally {
+        setDownloading(false);
       }
     };
 
@@ -209,36 +234,68 @@ function ConfirmacionContent() {
         <h2 className="text-4xl md:text-5xl font-black text-white mb-4 tracking-tight drop-shadow-[0_0_10px_rgba(250,204,21,0.1)]">
           ¡Aprobado!
         </h2>
-        <p className="text-zinc-400 mt-2 max-w-md mx-auto text-lg mb-10">
+        <p className="text-zinc-400 mt-2 max-w-md mx-auto text-lg mb-6">
           Tu documento legal ha sido redactado con tus datos y está listo para descargar.
         </p>
 
+        {/* 🛡️ AVISO DE CORREO (Safety Net 1) */}
+        <div className="mb-10 bg-blue-900/20 border border-blue-500/30 p-4 rounded-2xl flex items-center gap-3 text-left max-w-md w-full mx-auto">
+          <Mail className="w-6 h-6 text-blue-400 shrink-0" />
+          <p className="text-sm text-blue-200">
+            <strong>Copia de seguridad enviada.</strong> Si no puedes descargar ahora, revisa tu
+            correo (incluyendo Spam) para descargar tu documento en cualquier momento.
+          </p>
+        </div>
+
         {isSelfService ? (
           <div className="w-full space-y-8">
-            {/* Botones - AMBOS AMARILLOS */}
-            <div className="flex flex-col sm:flex-row gap-5 justify-center items-center mt-4">
-              <div className="flex flex-col gap-2 w-full sm:w-auto">
-                <button
-                  onClick={handleDownload}
-                  className="w-full sm:w-auto bg-yellow-400 hover:bg-yellow-500 text-black font-extrabold py-3 px-8 rounded-full transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(250,204,21,0.4)] flex items-center justify-center gap-3 text-lg"
+            {/* 🛡️ RESCATE WHATSAPP (Safety Net 2) */}
+            {downloadError ? (
+              <div className="bg-red-900/20 border border-red-500/30 rounded-3xl p-6 md:p-8 text-center animate-in fade-in zoom-in">
+                <AlertTriangle className="w-12 h-12 text-red-400 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-red-400 mb-2">Error de Descarga</h3>
+                <p className="text-zinc-300 text-sm mb-6 max-w-md mx-auto">
+                  Tuvimos un problema técnico al entregar tu PDF, pero tu pago está{' '}
+                  <strong>seguro y confirmado</strong>. Por favor, contáctanos inmediatamente por
+                  WhatsApp para enviarte el documento de forma manual.
+                </p>
+                <a
+                  href={`https://wa.me/573000000000?text=Hola,%20pagué%20mi%20documento%20con%20referencia%20${ref}%20pero%20tuve%20un%20error%20al%20descargarlo.%20¿Me%20ayudan?`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-extrabold py-4 px-8 rounded-full transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(34,197,94,0.4)] flex items-center justify-center gap-3 text-lg mx-auto"
                 >
-                  📄 Descargar PDF
-                </button>
+                  <MessageCircle className="w-6 h-6" />
+                  Contactar Soporte Técnico
+                </a>
+              </div>
+            ) : (
+              <div className="flex flex-col sm:flex-row gap-5 justify-center items-center mt-4">
+                <div className="flex flex-col gap-2 w-full sm:w-auto">
+                  <button
+                    onClick={handleDownload}
+                    disabled={downloading}
+                    className="w-full sm:w-auto bg-yellow-400 hover:bg-yellow-500 text-black font-extrabold py-3 px-8 rounded-full transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(250,204,21,0.4)] flex items-center justify-center gap-3 text-lg disabled:opacity-50 disabled:cursor-wait"
+                  >
+                    {downloading ? <Loader2 className="w-6 h-6 animate-spin" /> : '📄'}
+                    {downloading ? 'Descargando...' : 'Descargar PDF'}
+                  </button>
+                  <button
+                    onClick={handleDownloadWord}
+                    className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-extrabold py-3 px-8 rounded-full transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(37,99,235,0.4)] flex items-center justify-center gap-3 text-sm opacity-90"
+                  >
+                    📝 Descargar en Word
+                  </button>
+                </div>
+
                 <button
-                  onClick={handleDownloadWord}
-                  className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-extrabold py-3 px-8 rounded-full transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(37,99,235,0.4)] flex items-center justify-center gap-3 text-sm opacity-90"
+                  onClick={handleDownloadInstructions}
+                  className="w-full sm:w-auto bg-zinc-800 hover:bg-zinc-700 text-white font-extrabold py-4 px-8 rounded-full transition-all hover:scale-105 flex items-center justify-center gap-3 text-lg h-full self-start sm:mt-0 mt-2"
                 >
-                  📝 Descargar en Word
+                  📋 Guía de Envío
                 </button>
               </div>
-
-              <button
-                onClick={handleDownloadInstructions}
-                className="w-full sm:w-auto bg-zinc-800 hover:bg-zinc-700 text-white font-extrabold py-4 px-8 rounded-full transition-all hover:scale-105 flex items-center justify-center gap-3 text-lg h-full self-start sm:mt-0 mt-2"
-              >
-                📋 Guía de Envío
-              </button>
-            </div>
+            )}
 
             <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 md:p-8 text-left">
               <h3 className="font-bold text-yellow-400 text-xl mb-6 flex items-center gap-2">
@@ -325,10 +382,26 @@ Dirección de notificaciones: [Tu Dirección]`}
       <div className="flex flex-col items-center justify-center min-h-[50vh] text-center p-6 relative z-10">
         <XCircle className="w-20 h-20 text-red-500 mb-6" />
         <h2 className="text-4xl font-black text-white mb-3">Pago Rechazado</h2>
-        <p className="text-zinc-400 mt-2 max-w-md text-lg">
+        <p className="text-zinc-400 mt-2 max-w-md text-lg mb-8">
           Lo sentimos, tu entidad bancaria ha rechazado el pago o la transacción ha fallado. Por
           favor, intenta nuevamente.
         </p>
+
+        {/* 🛡️ RESCATE WHATSAPP PAGO RECHAZADO */}
+        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 w-full max-w-md">
+          <p className="text-sm text-zinc-300 mb-4">
+            ¿Sientes que te cobraron pero sale rechazado? Estamos aquí para ayudarte.
+          </p>
+          <a
+            href={`https://wa.me/573000000000?text=Hola,%20tuve%20un%20problema%20con%20el%20pago%20de%20referencia%20${ref}.%20El%20dinero%20se%20debitó%20pero%20dice%20Rechazado.`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full bg-green-500/10 hover:bg-green-500/20 text-green-400 border border-green-500/30 font-bold py-3 px-6 rounded-full transition-all flex items-center justify-center gap-2"
+          >
+            <MessageCircle className="w-5 h-5" />
+            Soporte por WhatsApp
+          </a>
+        </div>
       </div>
     );
   }

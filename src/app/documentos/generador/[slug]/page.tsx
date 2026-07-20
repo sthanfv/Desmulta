@@ -157,6 +157,7 @@ export default function GeneradorDinamico({ params }: GeneradorDinamicoProps) {
   };
 
   const handlePay = async () => {
+    if (loading) return;
     if (
       !formData.nombre ||
       !formData.cedula ||

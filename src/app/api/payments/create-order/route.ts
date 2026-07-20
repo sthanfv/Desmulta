@@ -88,13 +88,12 @@ export async function POST(req: NextRequest) {
   const { productType, customerEmail, cedula, celular, caseData } = parsed.data;
   const amountCop = PRODUCT_PRICES[productType];
 
-  // 3. Generar referencia única para esta transacción
-  // 🛡️ FIX: la referencia ya NO depende de shortId+timestamp (colisionable).
-  // crypto.randomUUID() da ~122 bits de entropía, eliminando la posibilidad de colisiones accidentales o provocadas.
-  const wompiReference = `DSM-${crypto.randomUUID()}`;
+  const db = getFirestore(getAdminApp());
 
-  // 4. Crear firma de integridad para Wompi
-  // Fórmula Wompi: SHA256(reference + amountInCents + currency + integritySecret)
+  // 3. Generar llave de idempotencia y verificar existencia de orden previa
+  const requestFingerprint = `${cedula}-${productType}-${caseData.shortId}`;
+  const idempotencyKey = createHash('sha256').update(requestFingerprint).digest('hex');
+
   const integritySecret = process.env.WOMPI_INTEGRITY_SECRET;
   if (!integritySecret) {
     return NextResponse.json(
@@ -102,11 +101,54 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     );
   }
+
+  try {
+    const recentOrders = await db
+      .collection('purchases')
+      .where('idempotencyKey', '==', idempotencyKey)
+      .where('status', '==', 'PENDING')
+      .limit(1)
+      .get();
+
+    if (!recentOrders.empty) {
+      // Reutilizar la orden existente para evitar peticiones duplicadas
+      const existingOrder = recentOrders.docs[0].data();
+      const existingRef = existingOrder.wompiReference;
+      const existingDownloadToken = existingOrder.downloadToken;
+
+      const integrityString = `${existingRef}${amountCop}COP${integritySecret}`;
+      const signature = createHash('sha256').update(integrityString).digest('hex');
+
+      const response = NextResponse.json({
+        wompiReference: existingRef,
+        amountCop,
+        signature,
+        publicKey: process.env.NEXT_PUBLIC_WOMPI_PUBLIC_KEY,
+        redirectUrl: `${req.nextUrl.origin}/documentos/confirmacion?ref=${existingRef}`,
+      });
+
+      response.cookies.set(`dt_${existingRef}`, existingDownloadToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 72 * 60 * 60,
+        path: '/',
+      });
+      return response;
+    }
+  } catch (error) {
+    console.error('[create-order] Error al verificar idempotencia:', error);
+  }
+
+  // 4. Generar nueva referencia si no existe una PENDING
+  // crypto.randomUUID() da ~122 bits de entropía
+  const wompiReference = `DSM-${crypto.randomUUID()}`;
+
+  // 5. Crear firma de integridad para Wompi
   const integrityString = `${wompiReference}${amountCop}COP${integritySecret}`;
   const signature = createHash('sha256').update(integrityString).digest('hex');
 
   // 5. Guardar la compra PENDIENTE en Firestore ANTES de redirigir a Wompi
-  const db = getFirestore(getAdminApp());
   const hashedCedula = hashPII(cedula);
   const hashedCelular = hashPII(celular);
   const downloadToken = crypto.randomUUID();

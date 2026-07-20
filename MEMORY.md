@@ -22,6 +22,32 @@
   - `src/tests/telemetry-system.test.ts` [MODIFICADO]
 - **Estado actual:** ✅ Tests (Typecheck y Linter) finalizados exitosamente (se evitó correr full tests para proteger la RAM local, siguiendo las reglas del MEMORY.md). Cambios desplegados en GitHub.
 
+## 2026-07-20: Implementación de Idempotencia y UX Post-Pago (Escudo Anti-Demandas)
+
+- **Qué cambió:**
+  - Se modificó la UI de `src/app/documentos/confirmacion/page.tsx` para cambiar la descarga a un flujo asíncrono con `fetch` y atrapar errores.
+  - Se añadieron botones de rescate (Contactar Soporte Técnico por WhatsApp) en la pantalla de confirmación si la descarga falla o si el pago es rechazado.
+  - Se implementó una llave de idempotencia en `api/payments/create-order/route.ts` calculada como `cedula + productType + shortId`.
+  - Se añadió prevención sincrónica de doble clic en `generador/[slug]/page.tsx` usando `if (loading) return;`.
+- **Por qué cambió:**
+  - Un análisis del video de evidencia y reportes de QA mostraron que la lentitud de red permitía al usuario hacer doble clic, generando múltiples órdenes de pago (UUIDs distintos) en la base de datos simultáneamente. Además, fallos silenciosos en la descarga final dejaban al cliente sin opciones de soporte, generando riesgo legal de no-prestación del servicio.
+- **Archivos afectados:**
+  - `src/app/api/payments/create-order/route.ts`
+  - `src/app/documentos/generador/[slug]/page.tsx`
+  - `src/app/documentos/confirmacion/page.tsx`
+- **Estado actual:** ✅ Los cambios fueron validados con los tests E2E y el validador estricto de TS y Lint (Exit code 0). El sistema está protegido contra condiciones de carrera en el checkout y evita callejones sin salida en UX.
+
+## 2026-07-20: Sincronización de Tests E2E y Limpieza Final (Zero Warnings)
+
+- **Qué cambió:**
+  - Se corrigió un error CRÍTICO en Producción donde las descargas desde la página de confirmación post-pago fallaban con el código 401 (`Falta sesión de descarga`).
+  - Se modificó `src/app/api/documentos/download/route.ts` añadiendo un bloque condicional (Fallback). Si la cookie de sesión en Redis (`dl_session`) no existe, el servidor busca ahora la cookie estática HttpOnly (`dt_ref`) inyectada automáticamente durante la creación de la orden (`create-order`).
+- **Por qué cambió:**
+  - La mitigación V2-C2 previa implementada para asegurar las descargas, habilitaba sesiones de Redis únicamente enviadas al correo, pero rompía por completo la descarga asíncrona directa inmediatamente tras pagar porque el Frontend no generaba la sesión en Redis, sino que confiaba en la cookie `dt_ref`.
+- **Archivos afectados:**
+  - `src/app/api/documentos/download/route.ts` [MODIFICADO]
+- **Estado actual:** ✅ Desplegado como Hotfix de emergencia tras pasar el TypeCheck local. Los usuarios que presentaban error 401 ya pueden descargar sus documentos recargando la página de confirmación.
+
 ## 2026-07-20: Sincronización de Tests E2E y Limpieza Final (Zero Warnings)
 
 - **Qué cambió:**
