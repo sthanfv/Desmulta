@@ -14,9 +14,10 @@
   - Se restauró el texto difuminado descriptivo del documento original.
   - Se restauró la tarjeta a su aspect-ratio original (`aspect-[3/4.2]`).
   - Para garantizar que el botón dorado y el precio NUNCA se desborden de la altura estricta A4, se extrajo el texto falso difuminado del flujo de Flexbox usando `position: absolute`, permitiendo que el footer suba de forma natural independientemente de cuán ancha sea la pantalla del móvil.
-  - Se corrigió un severo error visual de superposición de texto en la página `/plantillas` (El tooltip de Información Premium solía tener fondo semi-transparente `bg-slate-950/80` causando choque de lectura con las tarjetas de abajo; ahora tiene un fondo sólido y scroll propio).
+  - Se corrigió la superposición de texto en el tooltip de información de la página `/plantillas`. Se revirtió el fondo oscuro opaco y se implementó un diseño "Glassmorphism" adaptativo (semi-transparente). En modo claro usa `bg-white/90` con texto oscuro, y en modo oscuro `bg-zinc-950/90` con texto claro, asegurando legibilidad impecable sin perder el efecto translúcido original.
+  - Se eliminó el fondo blanco puro y plano de la página `/plantillas`, reemplazándolo por una base sutil `bg-slate-50` y un patrón arquitectónico de puntos tenues para aportar textura y profundidad.
 - **Por qué cambió:**
-  - El usuario notificó (con capturas de pantalla) que el botón en el home continuaba siendo empujado fuera de la caja debido a que los márgenes en móviles más pequeños no eran suficientes para alojar todos los bloques de texto. Extraer el bloque decorativo del flujo principal solucionó el problema matemático. Además, la captura reveló el texto superpuesto en `/plantillas`, lo cual se parcheó proactivamente eliminando las transparencias.
+  - El usuario aclaró que deseaba conservar la transparencia del tooltip en `/plantillas` pero sin que se viera como un parche de "modo oscuro" estando en la página clara (lo cual causaba que el texto negro chocara visualmente). Se ajustaron los colores dinámicamente para que la transparencia luzca natural según el tema. Adicionalmente, el usuario indicó que el fondo blanco global era demasiado plano, por lo que se introdujo textura visual (dots) respetando el minimalismo de la plataforma.
 - **Archivos afectados:**
   - `src/components/ui/DocumentShowcase.tsx` [CREADO]
   - `src/components/ui/CardSwap.tsx` [ELIMINADO]

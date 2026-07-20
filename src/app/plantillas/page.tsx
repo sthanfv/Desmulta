@@ -121,9 +121,14 @@ export default function PlantillasPage() {
 
   return (
     <div
-      className="min-h-screen bg-background selection:bg-primary/30 selection:text-primary-foreground py-16 px-4 md:px-8 pt-24 relative overflow-hidden group/layout"
+      className="min-h-screen bg-slate-50 dark:bg-background selection:bg-primary/30 selection:text-primary-foreground py-16 px-4 md:px-8 pt-24 relative overflow-hidden group/layout"
       onMouseMove={handleMouseMove}
     >
+      {/* Patrón de puntos para eliminar el blanco plano */}
+      <div 
+        className="absolute inset-0 z-0 opacity-[0.03] dark:opacity-[0.02] pointer-events-none mix-blend-multiply dark:mix-blend-screen" 
+        style={{ backgroundImage: 'radial-gradient(#000 2px, transparent 2px)', backgroundSize: '32px 32px' }} 
+      />
       <MeshBackground />
 
       {/* Spotlight Desktop (Sigue el ratón, oculto en móvil) */}
@@ -265,7 +270,7 @@ export default function PlantillasPage() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 15 }}
                     transition={{ duration: 0.25, ease: 'easeOut' }}
-                    className="absolute inset-0 z-20 p-6 md:p-8 rounded-[2rem] bg-slate-900 dark:bg-zinc-950 border-2 border-primary/30 flex flex-col justify-between overflow-y-auto shadow-[inset_0_0_30px_rgba(255,193,7,0.05)]"
+                    className="absolute inset-0 z-20 p-6 md:p-8 rounded-[2rem] bg-white/90 dark:bg-zinc-950/90 backdrop-blur-xl border-2 border-primary/30 flex flex-col justify-between shadow-[inset_0_0_30px_rgba(255,193,7,0.05)] overflow-y-auto"
                   >
                     {/* Botón de cerrar explícito en la capa (móvil y PC) */}
                     <button
@@ -275,7 +280,7 @@ export default function PlantillasPage() {
                         e.stopPropagation();
                         setActiveTooltip(null);
                       }}
-                      className="absolute top-6 right-6 w-11 h-11 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white transition-all active:scale-90 flex items-center justify-center"
+                      className="absolute top-6 right-6 w-11 h-11 rounded-full bg-slate-900/5 hover:bg-slate-900/10 dark:bg-white/5 dark:hover:bg-white/10 border border-slate-900/10 dark:border-white/10 text-slate-600 hover:text-slate-900 dark:text-white/60 dark:hover:text-white transition-all active:scale-90 flex items-center justify-center"
                       aria-label="Cerrar explicación"
                     >
                       <X size={15} />
@@ -283,21 +288,21 @@ export default function PlantillasPage() {
 
                     <div className="space-y-4">
                       <div className="flex items-center gap-2 text-primary">
-                        <Lightbulb className="w-5 h-5 text-yellow-400 animate-pulse" />
-                        <span className="text-[10px] font-black uppercase tracking-widest text-yellow-400 font-mono">
+                        <Lightbulb className="w-5 h-5 text-yellow-500 dark:text-yellow-400 animate-pulse" />
+                        <span className="text-[10px] font-black uppercase tracking-widest text-yellow-600 dark:text-yellow-400 font-mono">
                           ¿Cuándo usar este recurso?
                         </span>
                       </div>
-                      <h4 className="text-xl font-bold text-white font-serif tracking-tight leading-snug">
+                      <h4 className="text-xl font-bold text-slate-900 dark:text-white font-serif tracking-tight leading-snug">
                         {tpl.title}
                       </h4>
-                      <p className="text-xs md:text-sm text-zinc-300 leading-relaxed font-medium">
+                      <p className="text-xs md:text-sm text-slate-700 dark:text-zinc-300 leading-relaxed font-medium">
                         {tpl.scenario}
                       </p>
                     </div>
 
-                    <div className="pt-4 border-t border-white/10 flex items-center justify-between">
-                      <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-widest">
+                    <div className="pt-4 border-t border-slate-900/10 dark:border-white/10 flex items-center justify-between">
+                      <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">
                         {tpl.exito} efectividad promedio
                       </span>
                       <button
@@ -307,7 +312,7 @@ export default function PlantillasPage() {
                           e.stopPropagation();
                           setActiveTooltip(null);
                         }}
-                        className="px-4 py-2 bg-primary hover:bg-primary/95 text-black text-xs font-black uppercase tracking-wider rounded-xl transition-all active:scale-95 shadow-md shadow-primary/10"
+                        className="px-4 py-2 bg-primary hover:bg-primary/95 text-primary-foreground text-xs font-black uppercase tracking-wider rounded-xl transition-all active:scale-95 shadow-md shadow-primary/10"
                       >
                         Entendido
                       </button>
