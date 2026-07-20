@@ -159,3 +159,14 @@ Esta herramienta oculta está diseñada exclusivamente para que los administrado
 - **Ruta Oculta de Acceso:** `https://desmulta.online/admin/toasts-sandbox` *(Requiere haber iniciado sesión en el administrador)*.
 - **Uso:** Al ingresar a esta ruta secreta, encontrarás un panel de control con botones para disparar cada tipo de notificación (Éxito, Error de Validación, Bloqueo de Seguridad por Abuso/Rate Limit, Informativos y Alertas de Acción).
 - **Importante:** Esta ruta no tiene ningún enlace o botón en el menú de navegación para evitar que operadores no técnicos o clientes la encuentren por accidente.
+
+---
+
+## 11. Descarga Gratuita de Plantillas (Modo Dios y Contingencias)
+
+El panel administrativo incluye un menú desplegable en la cabecera (marcado con un ícono de descarga y la etiqueta "Modo Dios .DOCX") diseñado para **contingencias de soporte al cliente** (por ejemplo, si un cliente pagó pero perdió su archivo por un problema de internet, o requieres una plantilla base de inmediato).
+
+- **Catálogo Real**: Este menú lista los documentos legales con sus precios reales extraídos directamente de la base de datos de producción.
+- **Seguridad (PIN Operacional)**: Al seleccionar un documento, el sistema no lo descargará de inmediato. Por seguridad extrema, levantará una pantalla de `AUTENTICACIÓN REQUERIDA`, donde debes ingresar el PIN del Modo Dios de 4 dígitos.
+- **Descarga Fluida (Sin redirecciones)**: Una vez digitas correctamente el PIN, el sistema descarga el archivo `.docx` genérico de manera "silenciosa" en tu navegador y te lo guarda en tus descargas locales, sin abrir pestañas nuevas que rompan la seguridad.
+- **Auditoría Inmutable**: Cada vez que se descarga un documento gratuito a través del Modo Dios, el sistema registra obligatoriamente en la colección `audit_logs` de Firebase el correo del administrador, la fecha, la IP, y el tipo de documento generado. Así se mantiene un control absoluto sobre el inventario.
