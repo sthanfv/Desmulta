@@ -14,6 +14,7 @@
   - **[Motor OCR y Async Zod]**: En `analizar-comparendo/route.ts`, se ajustó el límite diario de Gemini a 5000 y se migró a `.safeParseAsync` para soportar las validaciones DNS asíncronas.
   - **[Hardcoded Secrets Remediados (A-4, A-5)]**: Se removió el ID de Telegram estático del Administrador Maestro en `telegramWebhook.ts` y se reemplazó el fallback `'dev_secret'` en `export-pdf/route.ts` por una validación estricta (Fail-Closed).
   - **[Rate Limit Compatibility Wrapper (A-3)]**: Se actualizó `src/lib/security/rate-limit.ts` para lanzar un error (Fail-Closed) cuando los identificadores no mapeen a ningún bucket conocido. Posteriormente, se auditó exhaustivamente y se añadieron explícitamente los mapeos faltantes para `crash_proxy:` y `web-push:`, asegurando que no caigan en falsos positivos del Fail-Closed.
+  - **[Mejora de Tipado (Recomendación 5)]**: Se erradicó el uso de `(navigator as any)` en `MeshBackground.tsx` y `SideRays.tsx`, reemplazándolo por una extensión de interfaz formal (`ExtendedNavigator`) para las propiedades no estándar como `deviceMemory`.
 - **Por qué cambió:**
   - Cumplimiento estricto de las 8 remediaciones priorizadas en la última auditoría (`AUDITORIA_DESMULTA_2026-07-20.md`), asegurando el sistema contra vectores SSRF, Spam, inyecciones XSS y condiciones de carrera.
 - **Archivos afectados:**

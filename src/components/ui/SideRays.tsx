@@ -7,6 +7,10 @@ import { useReducedMotion } from 'framer-motion';
 
 type Origin = 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
 
+interface ExtendedNavigator extends Navigator {
+  deviceMemory?: number;
+}
+
 interface SideRaysProps {
   speed?: number;
   rayColor1?: string;
@@ -69,7 +73,8 @@ const SideRays = ({
 
   useEffect(() => {
     if (typeof navigator !== 'undefined') {
-      const isLowMemory = (navigator as any).deviceMemory && (navigator as any).deviceMemory < 4;
+      const nav = navigator as ExtendedNavigator;
+      const isLowMemory = nav.deviceMemory && nav.deviceMemory < 4;
       const isLowCores = navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4;
       if (isLowMemory || isLowCores) {
         setIsLowTier(true);

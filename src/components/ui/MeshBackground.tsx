@@ -11,13 +11,18 @@ import { useReducedMotion } from 'framer-motion';
  * - En móvil se desactiva en CSS vía media queries para rendimiento óptimo.
  * - En escritorio genera un entorno inmersivo de luz líquida y ruido de alta frecuencia.
  */
+interface ExtendedNavigator extends Navigator {
+  deviceMemory?: number;
+}
+
 export function MeshBackground() {
   const reducedMotion = useReducedMotion();
   const [isLowTier, setIsLowTier] = useState(false);
 
   useEffect(() => {
     if (typeof navigator !== 'undefined') {
-      const isLowMemory = (navigator as any).deviceMemory && (navigator as any).deviceMemory < 4;
+      const nav = navigator as ExtendedNavigator;
+      const isLowMemory = nav.deviceMemory && nav.deviceMemory < 4;
       const isLowCores = navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4;
       if (isLowMemory || isLowCores) {
         setIsLowTier(true);
