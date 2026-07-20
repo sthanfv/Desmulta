@@ -190,6 +190,35 @@ export function AdminDashboard() {
     onSuccess: () => void;
     onCancel?: () => void;
   }>({ isOpen: false, actionName: '', onSuccess: () => {} });
+
+  const handleDownloadGeneric = async (type: string) => {
+    try {
+      const res = await fetch(`/api/admin/documentos/generate-generic?type=${type}`);
+      if (!res.ok) {
+        toast({
+          title: 'Acceso Denegado',
+          description: 'No autorizado. La sesión de Modo Dios expiró o es inválida.',
+          variant: 'destructive',
+        });
+        return;
+      }
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `plantilla_${type}.docx`; // Por defecto, o el formato que retorne
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      toast({
+        title: 'Error de red',
+        description: 'Fallo al procesar la descarga de la plantilla.',
+        variant: 'destructive',
+      });
+    }
+  };
   // Removed isAuditOpen state
 
   const showcaseRef = useMemoFirebase(
@@ -480,31 +509,31 @@ export function AdminDashboard() {
                   <span className="text-[10px] text-yellow-500 bg-yellow-500/10 px-1.5 py-0.5 rounded">.DOCX</span>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-border/40" />
-                <DropdownMenuItem onClick={() => setPinAuth({ isOpen: true, actionName: 'Generar Petición General', onSuccess: () => window.open('/api/admin/documentos/generate-generic?type=peticion_general', '_blank') })} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
+                <DropdownMenuItem onClick={() => setPinAuth({ isOpen: true, actionName: 'Generar Petición General', onSuccess: () => handleDownloadGeneric('peticion_general') })} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
                   <span className="font-medium text-sm">Petición General</span>
                   <span className="text-muted-foreground text-xs">$39,000</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setPinAuth({ isOpen: true, actionName: 'Generar Prescripción Directa', onSuccess: () => window.open('/api/admin/documentos/generate-generic?type=prescripcion_directa', '_blank') })} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
+                <DropdownMenuItem onClick={() => setPinAuth({ isOpen: true, actionName: 'Generar Prescripción Directa', onSuccess: () => handleDownloadGeneric('prescripcion_directa') })} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
                   <span className="font-medium text-sm">Prescripción Directa</span>
                   <span className="text-muted-foreground text-xs">$59,000</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setPinAuth({ isOpen: true, actionName: 'Generar Doble Prescripción', onSuccess: () => window.open('/api/admin/documentos/generate-generic?type=doble_prescripcion', '_blank') })} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
+                <DropdownMenuItem onClick={() => setPinAuth({ isOpen: true, actionName: 'Generar Doble Prescripción', onSuccess: () => handleDownloadGeneric('doble_prescripcion') })} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
                   <span className="font-medium text-sm">Doble Prescripción</span>
                   <span className="text-muted-foreground text-xs">$79,000</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setPinAuth({ isOpen: true, actionName: 'Generar Nulidad Notificación', onSuccess: () => window.open('/api/admin/documentos/generate-generic?type=nulidad_notificacion', '_blank') })} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
+                <DropdownMenuItem onClick={() => setPinAuth({ isOpen: true, actionName: 'Generar Nulidad Notificación', onSuccess: () => handleDownloadGeneric('nulidad_notificacion') })} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
                   <span className="font-medium text-sm">Nulidad por Notificación</span>
                   <span className="text-muted-foreground text-xs">$49,000</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setPinAuth({ isOpen: true, actionName: 'Generar Tutela', onSuccess: () => window.open('/api/admin/documentos/generate-generic?type=tutela_silencio', '_blank') })} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
+                <DropdownMenuItem onClick={() => setPinAuth({ isOpen: true, actionName: 'Generar Tutela', onSuccess: () => handleDownloadGeneric('tutela_silencio') })} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
                   <span className="font-medium text-sm">Tutela (Silencio Admin)</span>
                   <span className="text-muted-foreground text-xs">$39,000</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setPinAuth({ isOpen: true, actionName: 'Generar Caducidad 1 Año', onSuccess: () => window.open('/api/admin/documentos/generate-generic?type=caducidad_1_anio', '_blank') })} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
+                <DropdownMenuItem onClick={() => setPinAuth({ isOpen: true, actionName: 'Generar Caducidad 1 Año', onSuccess: () => handleDownloadGeneric('caducidad_1_anio') })} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
                   <span className="font-medium text-sm">Caducidad 1 Año</span>
                   <span className="text-muted-foreground text-xs">$59,000</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setPinAuth({ isOpen: true, actionName: 'Generar Nulidad Identidad', onSuccess: () => window.open('/api/admin/documentos/generate-generic?type=nulidad_falta_identidad', '_blank') })} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
+                <DropdownMenuItem onClick={() => setPinAuth({ isOpen: true, actionName: 'Generar Nulidad Identidad', onSuccess: () => handleDownloadGeneric('nulidad_falta_identidad') })} className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1">
                   <span className="font-medium text-sm">Nulidad por Identidad</span>
                   <span className="text-muted-foreground text-xs">$49,000</span>
                 </DropdownMenuItem>
