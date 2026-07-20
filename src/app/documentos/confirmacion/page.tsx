@@ -265,19 +265,19 @@ function ConfirmacionContent() {
       <div className="flex flex-col items-center justify-center min-h-[70vh] text-center p-6 relative z-10 animate-in fade-in zoom-in duration-500">
         {/* Branding Desmulta */}
         <div className="flex items-center gap-2 mb-10 opacity-80">
-          <ShieldAlert className="w-6 h-6 text-yellow-400" />
-          <span className="text-xl font-black tracking-widest text-white">DESMULTA</span>
+          <ShieldAlert className="w-6 h-6 text-yellow-500 dark:text-yellow-400" />
+          <span className="text-xl font-black tracking-widest text-slate-900 dark:text-white">DESMULTA</span>
         </div>
 
         <div className="relative">
           <div className="absolute inset-0 bg-yellow-400 blur-3xl opacity-20 rounded-full w-24 h-24 mx-auto animate-pulse" />
-          <CheckCircle2 className="w-24 h-24 text-yellow-400 mb-6 relative z-10 drop-shadow-xl" />
+          <CheckCircle2 className="w-24 h-24 text-yellow-500 dark:text-yellow-400 mb-6 relative z-10 drop-shadow-xl" />
         </div>
 
-        <h2 className="text-4xl md:text-5xl font-black text-white mb-4 tracking-tight drop-shadow-[0_0_10px_rgba(250,204,21,0.1)]">
+        <h2 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-4 tracking-tight drop-shadow-[0_0_10px_rgba(250,204,21,0.1)]">
           ¡Aprobado!
         </h2>
-        <p className="text-zinc-400 mt-2 max-w-md mx-auto text-lg mb-6">
+        <p className="text-slate-600 dark:text-zinc-400 mt-2 max-w-md mx-auto text-lg mb-6">
           Tu documento legal ha sido redactado con tus datos y está listo para descargar.
         </p>
 
@@ -294,10 +294,10 @@ function ConfirmacionContent() {
           <div className="w-full space-y-8">
             {/* 🛡️ RESCATE WHATSAPP (Safety Net 2) */}
             {downloadError ? (
-              <div className="bg-red-900/20 border border-red-500/30 rounded-3xl p-6 md:p-8 text-center animate-in fade-in zoom-in">
-                <AlertTriangle className="w-12 h-12 text-red-400 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-red-400 mb-2">Error de Descarga</h3>
-                <p className="text-zinc-300 text-sm mb-6 max-w-md mx-auto">
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-500/30 rounded-3xl p-6 md:p-8 text-center animate-in fade-in zoom-in">
+                <AlertTriangle className="w-12 h-12 text-red-500 dark:text-red-400 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-red-600 dark:text-red-400 mb-2">Error de Descarga</h3>
+                <p className="text-slate-700 dark:text-zinc-300 text-sm mb-6 max-w-md mx-auto">
                   Tuvimos un problema técnico al entregar tu PDF, pero tu pago está{' '}
                   <strong>seguro y confirmado</strong>. Por favor, contáctanos inmediatamente por
                   WhatsApp para enviarte el documento de forma manual.
@@ -340,11 +340,11 @@ function ConfirmacionContent() {
               </div>
             )}
 
-            <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 md:p-8 text-left">
-              <h3 className="font-bold text-yellow-400 text-xl mb-6 flex items-center gap-2">
+            <div className="bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-3xl p-6 md:p-8 text-left">
+              <h3 className="font-bold text-yellow-600 dark:text-yellow-400 text-xl mb-6 flex items-center gap-2">
                 Instrucciones de Radicación
               </h3>
-              <ol className="list-decimal pl-5 space-y-4 text-zinc-300 mb-8 text-lg">
+              <ol className="list-decimal pl-5 space-y-4 text-slate-700 dark:text-zinc-300 mb-8 text-lg">
                 <li>
                   <strong>Descarga el PDF</strong> haciendo clic en el botón amarillo.
                 </li>
@@ -360,21 +360,21 @@ function ConfirmacionContent() {
                 </li>
               </ol>
 
-              <div className="bg-black border border-zinc-800 rounded-2xl p-5">
-                <h4 className="font-bold text-zinc-500 mb-4 text-sm uppercase tracking-wider">
+              <div className="bg-white dark:bg-black border border-slate-200 dark:border-zinc-800 rounded-2xl p-5 shadow-sm dark:shadow-none">
+                <h4 className="font-bold text-slate-500 dark:text-zinc-500 mb-4 text-sm uppercase tracking-wider">
                   Copia y pega esto en tu correo:
                 </h4>
                 <div className="mb-5">
-                  <span className="text-xs font-bold text-yellow-500 uppercase">Asunto:</span>
-                  <div className="bg-zinc-900 border border-zinc-800 p-4 rounded-xl text-[15px] font-medium text-zinc-200 select-all mt-2 tracking-wide shadow-inner">
+                  <span className="text-xs font-bold text-yellow-600 dark:text-yellow-500 uppercase">Asunto:</span>
+                  <div className="bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-4 rounded-xl text-[15px] font-medium text-slate-800 dark:text-zinc-200 select-all mt-2 tracking-wide shadow-inner">
                     DERECHO DE PETICIÓN (ART 23 CP) - C.C. [Tu Cédula] - [Tu Placa]
                   </div>
                 </div>
                 <div>
-                  <span className="text-xs font-bold text-yellow-500 uppercase">
+                  <span className="text-xs font-bold text-yellow-600 dark:text-yellow-500 uppercase">
                     Cuerpo del Mensaje:
                   </span>
-                  <div className="bg-zinc-900 border border-zinc-800 p-5 rounded-xl text-[15px] font-medium text-zinc-200 select-all whitespace-pre-wrap mt-2 leading-relaxed shadow-inner">
+                  <div className="bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-5 rounded-xl text-[15px] font-medium text-slate-800 dark:text-zinc-200 select-all whitespace-pre-wrap mt-2 leading-relaxed shadow-inner">
                     {`Señores
 ${purchaseData?.caseData?.autoridadTransito || 'Secretaría de Tránsito'}
 
@@ -424,22 +424,22 @@ Dirección de notificaciones: [Tu Dirección]`}
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] text-center p-6 relative z-10">
         <XCircle className="w-20 h-20 text-red-500 mb-6" />
-        <h2 className="text-4xl font-black text-white mb-3">Pago Rechazado</h2>
-        <p className="text-zinc-400 mt-2 max-w-md text-lg mb-8">
+        <h2 className="text-4xl font-black text-slate-900 dark:text-white mb-3">Pago Rechazado</h2>
+        <p className="text-slate-600 dark:text-zinc-400 mt-2 max-w-md text-lg mb-8">
           Lo sentimos, tu entidad bancaria ha rechazado el pago o la transacción ha fallado. Por
           favor, intenta nuevamente.
         </p>
 
         {/* 🛡️ RESCATE WHATSAPP PAGO RECHAZADO */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 w-full max-w-md">
-          <p className="text-sm text-zinc-300 mb-4">
+        <div className="bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-2xl p-6 w-full max-w-md">
+          <p className="text-sm text-slate-700 dark:text-zinc-300 mb-4">
             ¿Sientes que te cobraron pero sale rechazado? Estamos aquí para ayudarte.
           </p>
           <a
             href={`https://wa.me/573000000000?text=Hola,%20tuve%20un%20problema%20con%20el%20pago%20de%20referencia%20${ref}.%20El%20dinero%20se%20debitó%20pero%20dice%20Rechazado.`}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full bg-green-500/10 hover:bg-green-500/20 text-green-400 border border-green-500/30 font-bold py-3 px-6 rounded-full transition-all flex items-center justify-center gap-2"
+            className="w-full bg-green-50 dark:bg-green-500/10 hover:bg-green-100 dark:hover:bg-green-500/20 text-green-600 dark:text-green-400 border border-green-200 dark:border-green-500/30 font-bold py-3 px-6 rounded-full transition-all flex items-center justify-center gap-2"
           >
             <MessageCircle className="w-5 h-5" />
             Soporte por WhatsApp
@@ -451,13 +451,13 @@ Dirección de notificaciones: [Tu Dirección]`}
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[50vh] text-center p-6 relative z-10">
-      <Clock className="w-20 h-20 text-yellow-400 mb-6 animate-pulse" />
-      <h2 className="text-4xl font-black text-white mb-3">Procesando pago...</h2>
-      <p className="text-zinc-300 mt-2 max-w-md text-lg">
+      <Clock className="w-20 h-20 text-yellow-500 dark:text-yellow-400 mb-6 animate-pulse" />
+      <h2 className="text-4xl font-black text-slate-900 dark:text-white mb-3">Procesando pago...</h2>
+      <p className="text-slate-700 dark:text-zinc-300 mt-2 max-w-md text-lg">
         Estamos esperando la confirmación de Wompi y tu banco.
       </p>
-      <div className="mt-8 bg-zinc-900 border border-zinc-800 rounded-full py-3 px-6 inline-block">
-        <p className="text-sm text-zinc-400">Esta página se actualizará automáticamente.</p>
+      <div className="mt-8 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-full py-3 px-6 inline-block shadow-sm dark:shadow-none">
+        <p className="text-sm text-slate-500 dark:text-zinc-400">Esta página se actualizará automáticamente.</p>
       </div>
     </div>
   );
@@ -465,22 +465,32 @@ Dirección de notificaciones: [Tu Dirección]`}
 
 export default function ConfirmacionPago() {
   return (
-    <div className="min-h-screen bg-[#050505] text-zinc-100 flex items-center justify-center relative selection:bg-yellow-400 selection:text-black overflow-hidden">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#050505] text-slate-900 dark:text-zinc-100 flex items-center justify-center relative selection:bg-yellow-400 selection:text-black overflow-hidden transition-colors duration-500">
       <MeshBackground />
+      
+      {/* Patrón de puntos para modo oscuro (solicitado) */}
+      <div
+        className="absolute inset-0 z-0 hidden dark:block opacity-5 pointer-events-none"
+        style={{
+          backgroundImage: 'radial-gradient(#f59e0b 1px, transparent 1px)',
+          backgroundSize: '32px 32px',
+        }}
+      />
+
       {/* Luces sutiles de fondo para darle "vida" */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-yellow-400/5 blur-[150px] pointer-events-none z-0" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-yellow-400/10 dark:bg-yellow-400/5 blur-[100px] md:blur-[150px] pointer-events-none z-0" />
 
       <div className="max-w-3xl w-full mx-4 my-8 relative z-10">
-        <div className="bg-[#0f0f0f] border border-zinc-800/80 rounded-[2rem] shadow-2xl relative">
+        <div className="bg-white dark:bg-[#0f0f0f] border border-slate-200 dark:border-zinc-800/80 rounded-[2rem] shadow-2xl relative transition-colors duration-500">
           {/* Acento superior amarillo muy sutil */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-yellow-400 rounded-b-xl opacity-50" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-yellow-400 rounded-b-xl opacity-80 dark:opacity-50" />
 
           <div className="p-8 sm:p-12">
             <Suspense
               fallback={
                 <div className="flex flex-col items-center justify-center min-h-[50vh]">
-                  <Loader2 className="w-12 h-12 text-yellow-400 animate-spin" />
-                  <p className="text-zinc-500 mt-6 font-medium tracking-wide uppercase text-sm">
+                  <Loader2 className="w-12 h-12 text-yellow-500 dark:text-yellow-400 animate-spin" />
+                  <p className="text-slate-500 dark:text-zinc-500 mt-6 font-medium tracking-wide uppercase text-sm">
                     Validando transacción...
                   </p>
                 </div>

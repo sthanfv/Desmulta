@@ -146,7 +146,7 @@ export default function PlantillasPage() {
         blend={0.5}
         falloff={1.8}
         opacity={0.8}
-        className="opacity-50 dark:opacity-80"
+        className="opacity-40 mix-blend-multiply dark:mix-blend-screen dark:opacity-80 transition-opacity duration-500"
       />
 
       {/* Spotlight Desktop (Sigue el ratón, oculto en móvil) */}
