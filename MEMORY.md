@@ -92,6 +92,21 @@
 
 ## 2026-07-20: Estrategia de "Value-Based Pricing" para Documentos Web
 
+### Últimos Cambios (Fase de BFCache y SSG) - [20/07/2026]
+
+1. **Restauración de BFCache y Conversión a SSG:**
+   - **Contexto:** Las páginas públicas (como `/`) estaban marcadas como dinámicas y recibían la cabecera `Cache-Control: no-store` debido a la lectura de `headers()` para generar un `nonce` criptográfico y leer la geolocalización. Esto deshabilitaba completamente el **BFCache** (Back/Forward Cache), perjudicando la experiencia del usuario al navegar hacia atrás.
+   - **Acción:** 
+     - Se eliminó el uso de `headers()` en `layout.tsx` y `page.tsx`.
+     - En `middleware.ts`, se eliminó la inyección del `nonce` para páginas públicas.
+     - En `security-headers.ts`, se relajó la política de `script-src` usando `'unsafe-inline'` para permitir el renderizado sin nonce, apoyándonos en las reglas de dominios permitidos (whitelisting) para mantener la seguridad.
+   - **Resultado:** La ruta principal `/` ahora se compila exitosamente de forma Estática (`○`). El CDN la cacheará, mejorando el TTFB a niveles mínimos de milisegundos, y el navegador retendrá el HTML en RAM, haciendo que el botón "Atrás" cargue instantáneamente.
+   - **Seguridad Preservada:** El barrido agresivo de caché (`no-store`) y la verificación estricta se mantienen sin alteraciones en el área privada (`/admin` y `/api`), protegiendo contra envenenamiento de caché (Cache Poisoning) justo donde más importa.
+
+---
+
+### Últimos Cambios (Fase de Erradicación del Total Blocking Time - TBT) - [20/07/2026]
+
 - **Qué cambió:**
   - Se incrementaron estratégicamente los precios base comerciales de todas las plantillas web entre un 20% y 35% en el backend (`product-prices.ts`).
   - Se alinearon las 14 instancias del Frontend donde los precios estaban codificados estáticamente para reflejar el nuevo backend (Hero, Plantillas, Calculadora y el modal del Generador).

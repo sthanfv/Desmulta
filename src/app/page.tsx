@@ -13,7 +13,7 @@
 
 import HomeClient from '@/app/_components/HomeClient';
 import { getShowcaseConfig, getFooterConfig } from '@/lib/site-config';
-import { headers } from 'next/headers';
+
 import { safeJsonLdStringify } from '@/lib/utils/json-ld';
 import type { Metadata } from 'next';
 
@@ -116,23 +116,15 @@ const homepageJsonLd = {
 };
 
 export default async function VialClearPage() {
-  // Fetching en paralelo: Datos de Firestore + Headers de Geolocalización
-  const [showcaseData, footerData, headersList] = await Promise.all([
+  // Al eliminar headers(), esta página se puede compilar estáticamente (SSG)
+  const [showcaseData, footerData] = await Promise.all([
     getShowcaseConfig(),
     getFooterConfig(),
-    headers(),
   ]);
 
-  const rawCity = headersList.get('x-ciudad-usuario') || 'Colombia';
-  let ciudad = 'Colombia';
+  const ciudad = 'Colombia'; // Fallback estático para BFCache
 
-  try {
-    ciudad = decodeURIComponent(rawCity);
-  } catch {
-    ciudad = 'Colombia'; // Fallback de seguridad
-  }
-
-  const nonce = headersList.get('x-nonce') || '';
+  const nonce = '';
 
   return (
     <>

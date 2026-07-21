@@ -283,16 +283,11 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // ── 6. Páginas públicas — CSP con nonce ──────────────────────────────────
-  const nonce = generateNonce();
-
-  // CSP: se añade el nonce SOLO en script-src en producción.
-  // IMPORTANTE: NO inyectar nonce en style-src porque los navegadores modernos
-  // ignoran 'unsafe-inline' si hay un nonce presente, rompiendo Framer Motion.
+  // ── 6. Páginas públicas — CSP (Sin Nonce estricto para permitir BFCache) ───────────
+  // Para optimizar el rendimiento y permitir la generación estática (SSG) de la página pública,
+  // relajamos la política usando 'unsafe-inline' en el script-src (establecido en security-headers.ts).
+  
   let cspWithNonce = cspHeader;
-  if (isProduction) {
-    cspWithNonce = cspWithNonce.replace("script-src 'self'", `script-src 'nonce-${nonce}' 'self'`);
-  }
 
   // Asegurar que base-uri esté en la CSP (previene base-tag injection)
   if (!cspWithNonce.includes('base-uri')) {
@@ -308,7 +303,6 @@ export async function middleware(request: NextRequest) {
   });
 
   response.headers.set('x-ciudad-usuario', ciudadUsuario);
-  response.headers.set('x-nonce', nonce);
 
   // Cabeceras de seguridad
   response.headers.set('Content-Security-Policy', cspWithNonce);

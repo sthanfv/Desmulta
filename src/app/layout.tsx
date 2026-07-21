@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from 'next';
-import { headers } from 'next/headers';
 import { Geist } from 'next/font/google';
 
 const geistSans = Geist({
@@ -107,7 +106,6 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const nonce = (await headers()).get('x-nonce') || '';
 
   return (
     <html lang="es" suppressHydrationWarning className={`${geistSans.variable} font-sans`}>
@@ -140,7 +138,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               {/* PushProvider inyectado globalmente — escucha notificaciones en primer y segundo plano */}
               <SystemHealthProvider>
                 <PushProvider>
-                  <MotionProvider nonce={nonce}>
+                  <MotionProvider>
                     <PWAAutoUpdater />
                     <main id="main-content" className="overflow-x-hidden w-full relative">
                       {children}
@@ -156,7 +154,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
         {/* Google Analytics (MANDATO-FILTRO) */}
         {process.env.NEXT_PUBLIC_GA_ID && (
-          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} nonce={nonce} />
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
         )}
 
         {/* Vercel Speed Insights */}
@@ -167,7 +165,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
         {/* Meta Pixel Code (MANDATO-FILTRO) */}
         {process.env.NEXT_PUBLIC_META_PIXEL_ID && (
-          <Script id="facebook-pixel" strategy="lazyOnload" nonce={nonce}>
+          <Script id="facebook-pixel" strategy="lazyOnload">
             {`
               !function(f,b,e,v,n,t,s)
               {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -185,7 +183,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
         {/* Microsoft Clarity - Auditoría de Comportamiento UX (Cero PII) */}
         {process.env.NEXT_PUBLIC_CLARITY_ID && (
-          <Script id="microsoft-clarity" strategy="lazyOnload" nonce={nonce}>
+          <Script id="microsoft-clarity" strategy="lazyOnload">
             {`
               (function(c,l,a,r,i,t,y){
                   c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
