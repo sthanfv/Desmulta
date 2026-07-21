@@ -14,7 +14,7 @@ const scriptUnsafeInline = " 'unsafe-inline'";
 // a favor de la funcionalidad Core del producto, mientras script-src sigue protegido con nonce.
 const styleUnsafe = " 'unsafe-inline'";
 
-const devHashes = isDev ? '' : " 'sha256-osMMQj3FsFuFoINhDY6u/ERO7gP52tI8DTruJmDXHD8='";
+const devHashes = '';
 
 const devConnect = isDev
   ? ' ws://localhost:* ws://127.0.0.1:* wss://localhost:* wss://127.0.0.1:*'
@@ -22,7 +22,7 @@ const devConnect = isDev
 
 export const cspHeader =
   `default-src 'self' https://*.mixkit.co https://mixkit.co https://assets.mixkit.co https://*.vercel.live https://vercel.live https://challenges.cloudflare.com;
-  script-src 'self'${unsafeEval}${scriptUnsafeInline} 'unsafe-hashes'${devHashes} 'wasm-unsafe-eval' blob: https://*.vercel.live https://vercel.live https://www.googletagmanager.com https://connect.facebook.net https://challenges.cloudflare.com https://va.vercel-scripts.com https://apis.google.com https://cdn.jsdelivr.net https://www.google-analytics.com https://www.gstatic.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://checkout.wompi.co https://*.clarity.ms https://www.clarity.ms;
+  script-src 'self'${unsafeEval}${scriptUnsafeInline} 'wasm-unsafe-eval' blob: https://*.vercel.live https://vercel.live https://www.googletagmanager.com https://connect.facebook.net https://challenges.cloudflare.com https://va.vercel-scripts.com https://apis.google.com https://cdn.jsdelivr.net https://www.google-analytics.com https://www.gstatic.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://checkout.wompi.co https://*.clarity.ms https://www.clarity.ms;
   style-src 'self'${styleUnsafe} https://fonts.googleapis.com https://challenges.cloudflare.com;
   font-src 'self' https://fonts.gstatic.com data:;
   img-src 'self' data: blob: https://desmulta.online https://*.public.blob.vercel-storage.com https://*.vercel-storage.com https://firebasestorage.googleapis.com https://images.unsplash.com https://vercel.com https://challenges.cloudflare.com https://c.clarity.ms https://*.clarity.ms https://c.bing.com;
