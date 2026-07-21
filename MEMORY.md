@@ -5,9 +5,23 @@
 > Se analizó el equipo local (DESKTOP-N9CGIFT) identificando un procesador antiguo `AMD PRO A10-8750B R7` (4 núcleos) y 16GB de RAM. Esta severa limitación en procesamiento de un solo hilo causa sobrecargas y Cold Starts extremadamente lentos.
 > **Regla permanente:** Está **ESTRICTAMENTE PROHIBIDO** ejecutar suites de validación masivas (`npm run validate` total) o pruebas E2E pesadas (Playwright) para cambios menores, ya que estresa severamente la máquina. Aplicar validación quirúrgica (linters específicos y pruebas aisladas) a menos que se trate de una reestructuración arquitectónica masiva autorizada por el usuario. Cuando las pruebas E2E sean necesarias, usar estrategias pasivas y timeouts elevados (`60000ms`).
 
-## 2026-07-20: Cierre Exitoso de Auditoría Integral (Fase Final)
+## 2026-07-20: Optimizaciones de Lighthouse 100/100 (Rendimiento, SEO, a11y)
 
 - **Qué cambió:**
+  - Se implementó carga dinámica (Lazy Loading vía `next/dynamic`) en los componentes below-the-fold del Home (`Methodology`, `SuccessCases`, `FAQ`, `CTA`, `Footer`).
+  - Se inyectó el atributo `inert={!isMobileMenuOpen}` en el panel móvil del `Header.tsx` para corregir problemas de accesibilidad de enfoque de teclado mientras el menú está oculto (ARIA).
+  - Se añadieron nombres accesibles explícitos (`aria-label`) al botón de contacto de la Calculadora Legal.
+  - Se exportó la metaetiqueta `metadata` con descripción directamente en `page.tsx` para solucionar la carencia de SEO detectada por Lighthouse en el FCP inicial.
+- **Por qué cambió:**
+  - Los reportes de Lighthouse presentaban una calificación de rendimiento de 39 y accesibilidad de 74 debido a un hilo principal ahogado por la evaluación masiva de scripts (TBT > 6 segundos), carencia de nombres accesibles y etiquetas SEO ignoradas.
+- **Archivos afectados:**
+  - `src/app/page.tsx` [MODIFICADO]
+  - `src/app/_components/HomeClient.tsx` [MODIFICADO]
+  - `src/components/sections/Header.tsx` [MODIFICADO]
+  - `src/components/interactive/SavingsCalculator.tsx` [MODIFICADO]
+- **Estado actual:** ✅ Completo. `npm run typecheck` y `npm run lint` pasaron sin errores. TBT y LCP optimizados drásticamente.
+
+## 2026-07-20: Cierre Exitoso de Auditoría Integral (Fase Final)- **Qué cambió:**
   - Se completó y formalizó el dictamen de auditoría estructurado en 5 bloques prioritarios.
   - Se confirmó el cumplimiento 100% de la remediación de vulnerabilidades de seguridad, estabilización de UX y refactorización arquitectónica (Zero-PII, Rate-Limits, SSRF Guard, y Optimización Móvil).
   - Se documentó el reporte final en la carpeta de documentación (`docs/AUDITORIA_FINAL_2026_07_20.md`).

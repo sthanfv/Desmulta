@@ -15,8 +15,14 @@ import HomeClient from '@/app/_components/HomeClient';
 import { getShowcaseConfig, getFooterConfig } from '@/lib/site-config';
 import { headers } from 'next/headers';
 import { safeJsonLdStringify } from '@/lib/utils/json-ld';
+import type { Metadata } from 'next';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://desmulta.online';
+
+export const metadata: Metadata = {
+  title: 'Desmulta — Expertos en Multas de Tránsito Colombia',
+  description: 'Análisis técnico de multas de tránsito en Colombia. Identificamos si su caso tiene fundamentos de prescripción, caducidad o vicios de notificación.',
+};
 
 /** Schema.org JSON-LD para la homepage — mejora la apariencia en Google (rich results) */
 const homepageJsonLd = {

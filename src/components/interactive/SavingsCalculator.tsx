@@ -337,6 +337,7 @@ export function SavingsCalculator() {
                         leadState === 'sending' || !leadContacto.trim() || leadContacto.length < 10
                       }
                       className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                      aria-label="Enviar solicitud de estudio gratuito"
                     >
                       {leadState === 'sending' ? (
                         <Loader2 className="w-5 h-5 animate-spin" />

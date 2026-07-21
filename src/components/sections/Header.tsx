@@ -219,6 +219,7 @@ export const Header = ({ onOpenModal }: HeaderProps) => {
               : 'opacity-0 scale-y-95 -translate-y-4 pointer-events-none'
           }`}
           aria-hidden={!isMobileMenuOpen}
+          inert={!isMobileMenuOpen ? true : undefined}
         >
           <div className="glass rounded-3xl p-5 flex flex-col gap-4 shadow-2xl border-white/5 border">
             <Link

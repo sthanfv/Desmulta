@@ -75,12 +75,11 @@ import { initiateAnonymousSignIn, useAuth } from '@/firebase';
 import { Header } from '@/components/sections/Header';
 import { Hero } from '@/components/sections/Hero';
 import { Pillars } from '@/components/sections/Pillars';
-import { Methodology } from '@/components/sections/Methodology';
-
-import { SuccessCases } from '@/components/sections/SuccessCases';
-import { FAQ } from '@/components/sections/FAQ';
-import { CTA } from '@/components/sections/CTA';
-import { Footer } from '@/components/sections/Footer';
+const Methodology = dynamic(() => import('@/components/sections/Methodology').then(m => m.Methodology));
+const SuccessCases = dynamic(() => import('@/components/sections/SuccessCases').then(m => m.SuccessCases));
+const FAQ = dynamic(() => import('@/components/sections/FAQ').then(m => m.FAQ));
+const CTA = dynamic(() => import('@/components/sections/CTA').then(m => m.CTA));
+const Footer = dynamic(() => import('@/components/sections/Footer').then(m => m.Footer));
 
 import { WelcomeModal } from '@/components/vial-clear/WelcomeModal';
 
