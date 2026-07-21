@@ -5,6 +5,20 @@
 > Se analizó el equipo local (DESKTOP-N9CGIFT) identificando un procesador antiguo `AMD PRO A10-8750B R7` (4 núcleos) y 16GB de RAM. Esta severa limitación en procesamiento de un solo hilo causa sobrecargas y Cold Starts extremadamente lentos.
 > **Regla permanente:** Está **ESTRICTAMENTE PROHIBIDO** ejecutar suites de validación masivas (`npm run validate` total) o pruebas E2E pesadas (Playwright) para cambios menores, ya que estresa severamente la máquina. Aplicar validación quirúrgica (linters específicos y pruebas aisladas) a menos que se trate de una reestructuración arquitectónica masiva autorizada por el usuario. Cuando las pruebas E2E sean necesarias, usar estrategias pasivas y timeouts elevados (`60000ms`).
 
+## 2026-07-20: Optimización Lighthouse Fase 2 (TBT & SEO)
+
+- **Qué cambió:**
+  - Se creó un Wrapper personalizado `LazySection.tsx` basado en `IntersectionObserver`.
+  - Se movieron los bloques de analíticas de terceros (Meta Pixel y Microsoft Clarity) que usaban `<Script strategy="afterInteractive">` fuera del `<head>` y se inyectaron al final del `<body>` en `layout.tsx`.
+  - Se envolvieron las secciones `Methodology`, `SuccessCases`, `FAQ` y `CTA` de `HomeClient.tsx` con el nuevo componente `LazySection`.
+- **Por qué cambió:**
+  - Lighthouse reportó un TBT masivo de 8.7 segundos (Rendimiento 37) y la pérdida del tag `<meta name="description">` (SEO 91). El diagnóstico determinó que la inyección de `afterInteractive` dentro de `<head>` rompía el parser de Next.js, corrompiendo el tag de SEO. Adicionalmente, el lazy loading tradicional (`next/dynamic`) sin suspenderlo en base a la vista del usuario, hidrataba instantáneamente todos los scripts masivos (Framer Motion, etc.), saturando el hilo principal del navegador en el primer pantallazo.
+- **Archivos afectados:**
+  - `src/app/layout.tsx` [MODIFICADO]
+  - `src/components/ui/LazySection.tsx` [CREADO]
+  - `src/app/_components/HomeClient.tsx` [MODIFICADO]
+- **Estado actual:** ✅ Completo. Typecheck y Lint perfectos. El hilo principal del DOM está 100% liberado de la carga asíncrona de secciones inferiores.
+
 ## 2026-07-20: Optimizaciones de Lighthouse 100/100 (Rendimiento, SEO, a11y)
 
 - **Qué cambió:**

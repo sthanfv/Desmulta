@@ -63,6 +63,7 @@ import { ShieldCheck, Info, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { ResponsiveModal } from '@/components/ui/responsive-modal';
+import { LazySection } from '@/components/ui/LazySection';
 
 // Custom Hooks
 import { useScrollTop } from '@/hooks/useScrollTop';
@@ -193,19 +194,19 @@ export default function HomeClient({
         <Pillars />
       </div>
 
-      <div>
+      <LazySection className="defer-render" minHeight="400px">
         <Methodology />
-      </div>
+      </LazySection>
 
-      <div className="defer-render">
+      <LazySection className="defer-render" minHeight="500px">
         <SuccessCases showcaseData={showcaseData} />
-      </div>
+      </LazySection>
 
-      <div className="defer-render">
+      <LazySection className="defer-render" minHeight="500px">
         <FAQ mounted={mounted} />
-      </div>
+      </LazySection>
 
-      <div className="defer-render">
+      <LazySection className="defer-render" minHeight="500px">
         <CTA
           onConsultar={() => {
             setFormMode('full');
@@ -213,7 +214,7 @@ export default function HomeClient({
           }}
           onOpenSimitTutorial={() => setIsSimitTutorialOpen(true)}
         />
-      </div>
+      </LazySection>
 
       <div className="defer-render">
         <Footer

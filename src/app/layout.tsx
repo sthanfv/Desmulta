@@ -121,36 +121,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link rel="preconnect" href="https://firebaseinstallations.googleapis.com" />
         <link rel="dns-prefetch" href="https://firebaseinstallations.googleapis.com" />
 
-        {/* Meta Pixel Code (MANDATO-FILTRO) */}
-        {process.env.NEXT_PUBLIC_META_PIXEL_ID && (
-          <Script id="facebook-pixel" strategy="afterInteractive" nonce={nonce}>
-            {`
-              !function(f,b,e,v,n,t,s)
-              {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-              n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-              if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-              n.queue=[];t=b.createElement(e);t.async=!0;
-              t.src=v;s=b.getElementsByTagName(e)[0];
-              s.parentNode.insertBefore(t,s)}(window, document,'script',
-              'https://connect.facebook.net/en_US/fbevents.js');
-              fbq('init', '${process.env.NEXT_PUBLIC_META_PIXEL_ID}');
-              fbq('track', 'PageView');
-            `}
-          </Script>
-        )}
-
-        {/* Microsoft Clarity - Auditoría de Comportamiento UX (Cero PII) */}
-        {process.env.NEXT_PUBLIC_CLARITY_ID && (
-          <Script id="microsoft-clarity" strategy="afterInteractive" nonce={nonce}>
-            {`
-              (function(c,l,a,r,i,t,y){
-                  c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-                  t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-                  y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-              })(window, document, "clarity", "script", "${process.env.NEXT_PUBLIC_CLARITY_ID}");
-            `}
-          </Script>
-        )}
       </head>
       <body
         suppressHydrationWarning
@@ -194,6 +164,37 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
         {/* Telemetría Edge: Vercel Analytics */}
         <Analytics />
+
+        {/* Meta Pixel Code (MANDATO-FILTRO) */}
+        {process.env.NEXT_PUBLIC_META_PIXEL_ID && (
+          <Script id="facebook-pixel" strategy="afterInteractive" nonce={nonce}>
+            {`
+              !function(f,b,e,v,n,t,s)
+              {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+              n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+              if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+              n.queue=[];t=b.createElement(e);t.async=!0;
+              t.src=v;s=b.getElementsByTagName(e)[0];
+              s.parentNode.insertBefore(t,s)}(window, document,'script',
+              'https://connect.facebook.net/en_US/fbevents.js');
+              fbq('init', '${process.env.NEXT_PUBLIC_META_PIXEL_ID}');
+              fbq('track', 'PageView');
+            `}
+          </Script>
+        )}
+
+        {/* Microsoft Clarity - Auditoría de Comportamiento UX (Cero PII) */}
+        {process.env.NEXT_PUBLIC_CLARITY_ID && (
+          <Script id="microsoft-clarity" strategy="afterInteractive" nonce={nonce}>
+            {`
+              (function(c,l,a,r,i,t,y){
+                  c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                  t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                  y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+              })(window, document, "clarity", "script", "${process.env.NEXT_PUBLIC_CLARITY_ID}");
+            `}
+          </Script>
+        )}
       </body>
     </html>
   );
