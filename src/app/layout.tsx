@@ -167,7 +167,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
         {/* Meta Pixel Code (MANDATO-FILTRO) */}
         {process.env.NEXT_PUBLIC_META_PIXEL_ID && (
-          <Script id="facebook-pixel" strategy="afterInteractive" nonce={nonce}>
+          <Script id="facebook-pixel" strategy="lazyOnload" nonce={nonce}>
             {`
               !function(f,b,e,v,n,t,s)
               {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -185,7 +185,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
         {/* Microsoft Clarity - Auditoría de Comportamiento UX (Cero PII) */}
         {process.env.NEXT_PUBLIC_CLARITY_ID && (
-          <Script id="microsoft-clarity" strategy="afterInteractive" nonce={nonce}>
+          <Script id="microsoft-clarity" strategy="lazyOnload" nonce={nonce}>
             {`
               (function(c,l,a,r,i,t,y){
                   c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
