@@ -366,7 +366,7 @@ export function SavingsCalculator() {
                 />
               </div>
               <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                El código de mi multa empieza con la letra &quot;F&quot;
+                La multa incluyó inmovilización del vehículo o suspensión de licencia (Infracciones Especiales)
               </span>
             </label>
           </Tabs>
