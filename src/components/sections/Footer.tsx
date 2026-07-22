@@ -115,7 +115,16 @@ export const Footer = ({ footerData, onOpenWhatsAppWarning }: FooterProps) => {
                   { label: 'Preguntas Frecuentes', href: '#faq' },
                   { label: 'Términos y Condiciones', href: '/terminos' },
                   { label: 'Políticas de Privacidad', href: '/privacidad' },
-                  // { label: 'API para Empresas', href: '/api-docs' },
+                  /*
+                   * NOTA DEL DESARROLLADOR / CREADOR:
+                   * El enlace a la 'API para Empresas' ha sido ocultado intencionalmente para el público.
+                   * Decisión tomada porque los dos motores principales (analizar-comparendo y calcular-multa)
+                   * aún deben ser reconstruidos y optimizados a nivel empresarial.
+                   * Se mantiene oculto para evitar que terceros descubran o interactúen con la API
+                   * antes de que su arquitectura de precisión esté 100% terminada.
+                   *
+                   * { label: 'API para Empresas', href: '/api-docs' },
+                   */
                 ].map((link, i) => (
                   <Link
                     key={i}

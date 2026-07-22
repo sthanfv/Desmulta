@@ -112,12 +112,41 @@ export async function POST(request: NextRequest) {
   // ══════════════════════════════════════════════════════════════════════
   try {
     const textoSeguro = textoOCR ? sanitizeOcrText(textoOCR) : '';
-    const resultado = calcularMultaCompleta(
-      valorMulta,
-      fechaInfraccion,
-      tieneCobroCoactivo,
-      textoSeguro
-    );
+
+    // --- INICIO DE CONEXIÓN A MICROSERVICIO GO ---
+    /*
+     * NOTA DEL DESARROLLADOR:
+     * El cálculo nativo (`calcularMultaCompleta`) en TypeScript ha sido DESCONECTADO (DEPRECATED).
+     * Por motivos de rendimiento extremo y cálculos avanzados (Proyecciones y Descuentos),
+     * el motor financiero ahora vive en un microservicio de Golang independiente.
+     */
+
+    // const resultado = calcularMultaCompleta(
+    //   valorMulta,
+    //   fechaInfraccion,
+    //   tieneCobroCoactivo,
+    //   textoSeguro
+    // );
+
+    // Petición HTTP al microservicio en Go
+    // TODO: Cambiar localhost por URL de producción al desplegar en Koyeb/Render
+    const goResponse = await fetch('http://localhost:8080/api/v1/calcular-multa', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        valorMulta,
+        fechaInfraccion,
+        tieneCobroCoactivo
+      })
+    });
+
+    if (!goResponse.ok) {
+      throw new Error(`El motor de Golang falló o está apagado (HTTP ${goResponse.status})`);
+    }
+
+    const goJson = await goResponse.json();
+    const resultado = goJson.data; // Go devuelve exactamente la misma interfaz en 'data'
+    // --- FIN DE CONEXIÓN A GO ---
 
     const causales = determinarCausales(resultado.prescripcion.estadoLegal, null);
 

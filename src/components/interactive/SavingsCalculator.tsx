@@ -15,7 +15,6 @@ import {
 } from 'lucide-react';
 import { TarjetaPremium } from '@/components/ui/TarjetaPremium';
 import { StarBorder } from '@/components/ui/star-border';
-import { calcularViabilidadLegal, calcularInteresesHistoricos } from '@/lib/calculadora-legal';
 
 export function SavingsCalculator() {
   // Estados Financieros
@@ -25,9 +24,9 @@ export function SavingsCalculator() {
 
   // Estados Legales y de Conversión
   const [coactivo, setCoactivo] = useState(false);
-  const [resultado, setResultado] = useState<ReturnType<typeof calcularViabilidadLegal> | null>(
-    null
-  );
+  const [resultado, setResultado] = useState<any>(null);
+  const [proyecciones, setProyecciones] = useState<any>(null);
+  const [descuentos, setDescuentos] = useState<any>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const [leadState, setLeadState] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
@@ -51,11 +50,33 @@ export function SavingsCalculator() {
     simulatedDate.setMonth(simulatedDate.getMonth() - mesesMora);
     const fechaInfraccionISO = simulatedDate.toISOString().split('T')[0];
 
-    const interesCalculado = calcularInteresesHistoricos(montoBase, fechaInfraccionISO, coactivo);
-    setIntereses(interesCalculado);
-
-    const res = calcularViabilidadLegal(fechaInfraccionISO, coactivo);
-    setResultado(res);
+    const fetchData = async () => {
+      try {
+        const response = await fetch('/api/public/calcular-multa', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            valorMulta: montoBase,
+            fechaInfraccion: fechaInfraccionISO,
+            tieneCobroCoactivo: coactivo
+          })
+        });
+        if (response.ok) {
+          const json = await response.json();
+          const { prescripcion, financiero } = json.data;
+          setIntereses(financiero.interesesAcumulados);
+          setResultado(prescripcion);
+          setProyecciones(financiero.proyecciones);
+          setDescuentos(financiero.descuentos);
+        }
+      } catch (error) {
+        console.error('Error fetching API', error);
+      }
+    };
+    
+    // Debounce para no colapsar la API cuando el usuario mueve rápido el slider
+    const timeoutId = setTimeout(fetchData, 300);
+    return () => clearTimeout(timeoutId);
   }, [montoBase, mesesMora, coactivo]);
 
   const total = montoBase + intereses;
@@ -244,6 +265,35 @@ export function SavingsCalculator() {
                       {formatCurrency(total)}
                     </span>
                   </div>
+
+                  {/* SÚPER PODERES DE GO - DISEÑO VISUAL */}
+                  {descuentos?.aplicaDescuento && (
+                    <div className="bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-xl mt-4">
+                      <h4 className="font-bold text-emerald-600 mb-2">🎁 Ley 1383 (Descuento Activo)</h4>
+                      <p className="text-sm text-emerald-700/80 mb-3">Estás a tiempo. Paga hoy mismo y ahorra dinero:</p>
+                      <div className="flex justify-between items-center bg-emerald-500/20 px-3 py-2 rounded-lg font-bold text-emerald-700">
+                        <span>50% Descuento</span>
+                        <span>{formatCurrency(descuentos.valorCon50Pct)}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {!descuentos?.aplicaDescuento && proyecciones && (
+                    <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-xl mt-4">
+                      <h4 className="font-bold text-red-600 mb-2">🔮 Riesgo Financiero (Deuda Futura)</h4>
+                      <p className="text-sm text-red-700/80 mb-3">Si no resuelves esto, tu deuda seguirá sumando intereses de mora:</p>
+                      <div className="space-y-1">
+                        <div className="flex justify-between items-center text-sm font-medium text-red-600 bg-red-500/10 px-3 py-1.5 rounded">
+                          <span>En 3 meses:</span>
+                          <span>{formatCurrency(proyecciones.en3Meses)}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm font-bold text-red-700 bg-red-500/20 px-3 py-1.5 rounded">
+                          <span>En 1 año:</span>
+                          <span>{formatCurrency(proyecciones.en12Meses)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   {resultado && (
                     <div
