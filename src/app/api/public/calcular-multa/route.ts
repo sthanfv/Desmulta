@@ -4,6 +4,11 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
+    // TODO: (SEGURIDAD) - Implementar un Rate Limiter (ej: Upstash Redis o memoria) aquí 
+    // antes del lanzamiento oficial. 
+    // Actualmente el endpoint está abierto y un ataque de spam tumbaría o le costaría dinero 
+    // al motor de Go. Se dejó abierto temporalmente para no bloquear las pruebas en producción.
+
     // Reenvío al motor cuántico de Golang (Fase 1.5 - Ahora en Producción)
     const engineUrl = process.env.GO_ENGINE_URL || 'https://desmulta-calculadora-go.onrender.com/api/v1/calcular-multa';
     const secretToken = process.env.GO_ENGINE_SECRET || 'dev_secret_123';
