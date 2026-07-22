@@ -11,11 +11,11 @@ import { cn } from '@/lib/utils';
  */
 export const Methodology = () => {
   return (
-    <section id="metodologia" className="py-24 md:py-40 px-4">
+    <section id="metodologia" className="py-16 md:py-24 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="glass p-6 sm:p-12 md:p-20 rounded-[2rem] md:rounded-[3rem] relative overflow-hidden border-white/10 shadow-3xl bg-white/5 dark:bg-white/[0.02]">
           <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
-          <div className="relative grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+          <div className="relative grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
             <div className="space-y-12">
               <div className="space-y-4">
                 <h2 className="text-4xl md:text-6xl font-black text-foreground leading-tight tracking-tighter reveal text-balance">

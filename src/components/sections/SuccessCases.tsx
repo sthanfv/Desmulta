@@ -583,7 +583,7 @@ export const SuccessCases = ({ showcaseData }: SuccessCasesProps) => {
     <LazyMotion features={domAnimation}>
       <section
         ref={sectionRef}
-        className="py-32 md:py-48 px-4 relative"
+        className="py-16 md:py-24 px-4 relative"
         aria-label="Casos de éxito verificados"
       >
         <div className="max-w-4xl mx-auto text-center space-y-16">
