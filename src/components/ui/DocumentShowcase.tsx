@@ -206,6 +206,9 @@ export function DocumentShowcase() {
             style={{ filter: 'url(#noiseFilter)' }}
           />
 
+          {/* Brillo amarillo (Glow) estilo premium, visible solo en light mode */}
+          <div className="absolute -top-16 -right-16 w-56 h-56 bg-primary/20 dark:hidden rounded-full blur-[60px] pointer-events-none" />
+
           {/* Contenedor del Carrusel Interno (Scroll Horizontal Suave) */}
           <div className="flex-grow flex flex-col relative z-10 w-full h-full overflow-hidden">
             <div

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { ShieldCheck, BookOpen, Camera } from 'lucide-react';
+import { ShieldCheck, BookOpen, Camera, Search, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import dynamic from 'next/dynamic';
 import {
@@ -221,12 +221,15 @@ export const Header = ({ onOpenModal }: HeaderProps) => {
           aria-hidden={!isMobileMenuOpen}
           inert={!isMobileMenuOpen ? true : undefined}
         >
-          <div className="glass rounded-3xl p-5 flex flex-col gap-4 shadow-2xl border-white/5 border">
+          <div className="glass rounded-3xl p-5 flex flex-col gap-2 shadow-2xl border-white/5 border">
             <Link
               href="/estado"
               onClick={closeMenu}
               className="flex items-center gap-3 px-4 py-3 text-sm font-bold text-foreground hover:bg-primary/10 rounded-2xl transition-colors"
             >
+              <div className="bg-primary/10 p-2 rounded-xl text-primary flex-shrink-0">
+                <Search className="w-5 h-5" />
+              </div>
               <span>Consultar Expediente</span>
             </Link>
 
@@ -235,17 +238,24 @@ export const Header = ({ onOpenModal }: HeaderProps) => {
               onClick={closeMenu}
               className="flex items-center gap-3 px-4 py-3 text-sm font-bold text-foreground hover:bg-primary/10 rounded-2xl transition-colors"
             >
-              <div className="bg-primary/10 p-2 rounded-xl text-primary">
+              <div className="bg-primary/10 p-2 rounded-xl text-primary flex-shrink-0">
                 <BookOpen className="w-5 h-5" />
               </div>
               <span>Guía Legal Completa</span>
             </Link>
 
-            <div className="px-2 py-3 border-t border-border/10 flex justify-between items-center">
-              <span className="text-sm font-semibold text-muted-foreground">
-                Últimas Actualizaciones
-              </span>
-              <ChangelogWidget usePortal={true} />
+            <div className="flex items-center justify-between px-4 py-3 hover:bg-primary/5 rounded-2xl transition-colors">
+              <div className="flex items-center gap-3">
+                <div className="bg-primary/10 p-2 rounded-xl text-primary flex-shrink-0">
+                  <Activity className="w-5 h-5" />
+                </div>
+                <span className="text-sm font-bold text-foreground">
+                  Últimas Actualizaciones
+                </span>
+              </div>
+              <div className="scale-90 origin-right">
+                <ChangelogWidget usePortal={true} />
+              </div>
             </div>
 
             <div className="flex flex-col gap-2 mt-2">
