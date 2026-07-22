@@ -1,9 +1,7 @@
 'use client';
 
-import { LazyMotion, MotionConfig } from 'framer-motion';
+import { LazyMotion, domAnimation, MotionConfig } from 'framer-motion';
 import { ReactNode } from 'react';
-
-const loadFeatures = () => import('@/lib/framer-features').then(res => res.default);
 
 /**
  * MotionProvider — Proveedor global de animaciones optimizadas.
@@ -12,7 +10,7 @@ const loadFeatures = () => import('@/lib/framer-features').then(res => res.defau
 export function MotionProvider({ children, nonce }: { children: ReactNode; nonce?: string }) {
   return (
     <MotionConfig nonce={nonce}>
-      <LazyMotion features={loadFeatures} strict>
+      <LazyMotion features={domAnimation} strict>
         {children}
       </LazyMotion>
     </MotionConfig>
