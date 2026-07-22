@@ -161,7 +161,7 @@ export function DocumentShowcase() {
 
         {/* Carta Trasera 2 */}
         <div
-          className="absolute inset-0 rounded-3xl bg-card border border-border"
+          className="absolute inset-0 rounded-3xl bg-card border border-border overflow-hidden"
           style={{
             transform: 'rotate(10deg) translateX(10px) translateY(5px)',
             transformOrigin: 'bottom left',
@@ -173,11 +173,12 @@ export function DocumentShowcase() {
             className="absolute inset-0 opacity-[0.03] pointer-events-none"
             style={{ filter: 'url(#noiseFilter)' }}
           />
+          <div className="absolute -top-12 -right-12 w-40 h-40 bg-primary/10 dark:hidden rounded-full blur-[50px] pointer-events-none" />
         </div>
 
         {/* Carta Trasera 1 */}
         <div
-          className="absolute inset-0 rounded-3xl bg-card border border-border"
+          className="absolute inset-0 rounded-3xl bg-card border border-border overflow-hidden"
           style={{
             transform: 'rotate(5deg) translateX(5px) translateY(2px)',
             transformOrigin: 'bottom left',
@@ -189,6 +190,7 @@ export function DocumentShowcase() {
             className="absolute inset-0 opacity-[0.03] pointer-events-none"
             style={{ filter: 'url(#noiseFilter)' }}
           />
+          <div className="absolute -top-12 -right-12 w-40 h-40 bg-primary/10 dark:hidden rounded-full blur-[50px] pointer-events-none" />
         </div>
 
         {/* Carta Frontal */}
