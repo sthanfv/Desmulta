@@ -12,9 +12,13 @@ import {
   AlertTriangle,
   CheckCircle2,
   ArrowRight,
+  Activity,
+  AlertOctagon,
 } from 'lucide-react';
 import { z } from 'zod';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { BarChart, Bar, XAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Cell } from 'recharts';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { TarjetaPremium } from '@/components/ui/TarjetaPremium';
 import { StarBorder } from '@/components/ui/star-border';
 
@@ -34,6 +38,8 @@ export function SavingsCalculator() {
   const [resultado, setResultado] = useState<any>(null);
   const [proyecciones, setProyecciones] = useState<any>(null);
   const [descuentos, setDescuentos] = useState<any>(null);
+  const [historialIntereses, setHistorialIntereses] = useState<any[]>([]);
+  const [riesgoEmbargo, setRiesgoEmbargo] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const [leadState, setLeadState] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
@@ -100,6 +106,8 @@ export function SavingsCalculator() {
           setResultado(prescripcion);
           setProyecciones(financiero.proyecciones);
           setDescuentos(financiero.descuentos);
+          setHistorialIntereses(financiero.historialIntereses || []);
+          setRiesgoEmbargo(prescripcion.riesgoEmbargo || null);
         }
       } catch (error) {
         console.error('Error fetching API', error);
@@ -375,6 +383,33 @@ export function SavingsCalculator() {
                     </div>
                   )}
 
+                  {historialIntereses && historialIntereses.length > 0 && (
+                    <div className="bg-foreground/5 p-4 rounded-xl mt-4 border border-foreground/10">
+                      <h4 className="font-bold mb-1 flex items-center gap-2">
+                        <Activity className="w-4 h-4 text-primary" />
+                        Crecimiento Cronológico
+                      </h4>
+                      <p className="text-xs text-muted-foreground mb-4">Intereses acumulados año a año según Tasa de Usura.</p>
+                      <div className="h-32 w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart data={historialIntereses}>
+                            <XAxis dataKey="anio" fontSize={10} tickLine={false} axisLine={false} />
+                            <RechartsTooltip 
+                              formatter={(value: any) => formatCurrency(Number(value))}
+                              labelFormatter={(label) => `Año ${label}`}
+                              contentStyle={{ borderRadius: '8px', fontSize: '12px', border: 'none', backgroundColor: '#1f2937', color: '#fff' }}
+                            />
+                            <Bar dataKey="acumulado" radius={[4, 4, 0, 0]}>
+                              {historialIntereses.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={index === historialIntereses.length - 1 ? '#ef4444' : '#f87171'} />
+                              ))}
+                            </Bar>
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+                  )}
+
                   {resultado && (
                     <div
                       className={`p-4 rounded-2xl border flex items-start gap-3 ${
@@ -412,6 +447,31 @@ export function SavingsCalculator() {
                         <div className="mt-2 inline-block px-2 py-1 rounded bg-foreground/10 text-[10px] font-bold uppercase tracking-wider">
                           Éxito Histórico: {resultado.probabilidadExito.split('%')[0]}%
                         </div>
+                        
+                        {/* Semáforo de Probabilidad de Cobro Coactivo (Con Disclaimer Legal) */}
+                        {riesgoEmbargo && (
+                          <div className="mt-4 pt-3 border-t border-foreground/10">
+                            <TooltipProvider delayDuration={200}>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <div className="flex items-center gap-2 cursor-help w-fit bg-white dark:bg-black/40 border px-3 py-2 rounded-lg shadow-sm">
+                                    <AlertOctagon className={`w-4 h-4 ${riesgoEmbargo === 'Alto' ? 'text-red-500' : riesgoEmbargo === 'Medio' ? 'text-amber-500' : 'text-emerald-500'}`} />
+                                    <span className="text-xs font-bold text-slate-700 dark:text-slate-200">
+                                      Probabilidad de Acción de Cobro: 
+                                      <span className={`ml-1 ${riesgoEmbargo === 'Alto' ? 'text-red-600 dark:text-red-400' : riesgoEmbargo === 'Medio' ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                                        {riesgoEmbargo.toUpperCase()}
+                                      </span>
+                                    </span>
+                                  </div>
+                                </TooltipTrigger>
+                                <TooltipContent className="max-w-xs text-xs p-3">
+                                  <p className="font-bold mb-1">Algoritmo Predictivo</p>
+                                  <p>Cálculo referencial y educativo basado en los tiempos de caducidad (Ley 769 de 2002). <strong>Desmulta no es una autoridad ni ofrece asesoría legal.</strong> Solo el SIMIT o la Secretaría de Movilidad determinan y ejecutan medidas cautelares como el embargo.</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
