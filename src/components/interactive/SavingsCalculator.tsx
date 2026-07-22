@@ -314,7 +314,7 @@ export function SavingsCalculator() {
                 className="w-full mt-2 py-3 px-4 bg-primary text-primary-foreground font-bold rounded-xl hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
               >
                 <Calculator className="w-5 h-5" />
-                Iniciar Motor Cuántico
+                Calcular Viabilidad
               </button>
             </TabsContent>
 
