@@ -24,7 +24,11 @@ import { StarBorder } from '@/components/ui/star-border';
 
 const manualSchema = z.object({
   valor: z.number({ invalid_type_error: "Debe ser numérico" }).min(0, "Mínimo $0").max(100000000, "Máximo $100M"),
-  meses: z.number({ invalid_type_error: "Debe ser numérico" }).min(0, "Mínimo 0 meses").max(600, "Máximo 600 meses")
+  fecha: z.string().refine((val) => {
+    if (!val) return false;
+    const d = new Date(val);
+    return !isNaN(d.getTime()) && d <= new Date();
+  }, "La fecha debe ser válida y no futura")
 });
 
 export function SavingsCalculator() {
@@ -51,19 +55,27 @@ export function SavingsCalculator() {
 
   // Estados Manuales Zod
   const [manualMonto, setManualMonto] = useState('');
-  const [manualMeses, setManualMeses] = useState('');
-  const [manualErrors, setManualErrors] = useState<{valor?: string, meses?: string}>({});
+  const [manualFecha, setManualFecha] = useState('');
+  const [manualErrors, setManualErrors] = useState<{valor?: string, fecha?: string}>({});
+  const [fechaExactaGlobal, setFechaExactaGlobal] = useState<string | null>(null);
 
   const handleManualChange = () => {
      // Sanitizar y parsear a número
      const parsedMonto = parseInt(manualMonto.replace(/\D/g, ''), 10) || 0;
-     const parsedMeses = parseInt(manualMeses.replace(/\D/g, ''), 10) || 0;
      
-     const result = manualSchema.safeParse({ valor: parsedMonto, meses: parsedMeses });
+     const result = manualSchema.safeParse({ valor: parsedMonto, fecha: manualFecha });
      if (result.success) {
        setManualErrors({});
        setMontoBase(result.data.valor);
-       setMesesMora(result.data.meses);
+       setFechaExactaGlobal(result.data.fecha);
+       
+       // Sincronizar el slider visualmente (aproximado en meses)
+       const d = new Date(result.data.fecha);
+       const now = new Date();
+       let diffMonths = (now.getFullYear() - d.getFullYear()) * 12 + now.getMonth() - d.getMonth();
+       if (diffMonths < 0) diffMonths = 0;
+       setMesesMora(diffMonths);
+       
        setIsExpanded(true);
      } else {
        const errors: any = {};
@@ -79,9 +91,14 @@ export function SavingsCalculator() {
   }, [isExpanded]);
 
   useEffect(() => {
-    const simulatedDate = new Date();
-    simulatedDate.setMonth(simulatedDate.getMonth() - mesesMora);
-    const fechaInfraccionISO = simulatedDate.toISOString().split('T')[0];
+    let fechaInfraccionISO = '';
+    if (fechaExactaGlobal) {
+      fechaInfraccionISO = fechaExactaGlobal;
+    } else {
+      const simulatedDate = new Date();
+      simulatedDate.setMonth(simulatedDate.getMonth() - mesesMora);
+      fechaInfraccionISO = simulatedDate.toISOString().split('T')[0];
+    }
 
     const fetchData = async () => {
       try {
@@ -112,7 +129,7 @@ export function SavingsCalculator() {
     // Debounce para no colapsar la API cuando el usuario mueve rápido el slider
     const timeoutId = setTimeout(fetchData, 300);
     return () => clearTimeout(timeoutId);
-  }, [montoBase, mesesMora, coactivo]);
+  }, [montoBase, mesesMora, coactivo, fechaExactaGlobal]);
 
   const total = montoBase + intereses;
 
@@ -254,7 +271,7 @@ export function SavingsCalculator() {
                   value={[mesesMora]}
                   onValueChange={(val) => {
                     setMesesMora(val[0]);
-                    setManualMeses(val[0].toString()); // Sincroniza hacia el manual
+                    setFechaExactaGlobal(null); // Al mover el slider, volvemos a la fecha relativa
                     setIsExpanded(true);
                   }}
                   min={0}
@@ -275,34 +292,32 @@ export function SavingsCalculator() {
                 <input 
                   type="text" 
                   inputMode="numeric"
-                  placeholder="Ej: 1500000"
+                  placeholder="Ej: 1.500.000"
                   value={manualMonto}
                   onChange={(e) => {
-                    const val = e.target.value.replace(/\D/g, ''); 
-                    setManualMonto(val);
+                    const raw = e.target.value.replace(/\D/g, ''); 
+                    if (!raw) {
+                      setManualMonto('');
+                      return;
+                    }
+                    const formatted = new Intl.NumberFormat('es-CO').format(parseInt(raw, 10));
+                    setManualMonto(formatted);
                   }}
-                  onBlur={handleManualChange}
                   className="w-full bg-foreground/5 dark:bg-black/50 border border-foreground/15 rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
                 />
                 {manualErrors.valor && <p className="text-xs font-bold text-red-500">{manualErrors.valor}</p>}
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                  Meses exactos de mora
+                  Fecha exacta del comparendo
                 </label>
                 <input 
-                  type="text" 
-                  inputMode="numeric"
-                  placeholder="Ej: 24 (equivale a 2 años)"
-                  value={manualMeses}
-                  onChange={(e) => {
-                    const val = e.target.value.replace(/\D/g, '');
-                    setManualMeses(val);
-                  }}
-                  onBlur={handleManualChange}
+                  type="date"
+                  value={manualFecha}
+                  onChange={(e) => setManualFecha(e.target.value)}
                   className="w-full bg-foreground/5 dark:bg-black/50 border border-foreground/15 rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
                 />
-                {manualErrors.meses && <p className="text-xs font-bold text-red-500">{manualErrors.meses}</p>}
+                {manualErrors.fecha && <p className="text-xs font-bold text-red-500">{manualErrors.fecha}</p>}
               </div>
               <button 
                 onClick={handleManualChange}
