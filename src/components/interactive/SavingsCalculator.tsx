@@ -13,8 +13,15 @@ import {
   CheckCircle2,
   ArrowRight,
 } from 'lucide-react';
+import { z } from 'zod';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { TarjetaPremium } from '@/components/ui/TarjetaPremium';
 import { StarBorder } from '@/components/ui/star-border';
+
+const manualSchema = z.object({
+  valor: z.number({ invalid_type_error: "Debe ser numérico" }).min(0, "Mínimo $0").max(100000000, "Máximo $100M"),
+  meses: z.number({ invalid_type_error: "Debe ser numérico" }).min(0, "Mínimo 0 meses").max(600, "Máximo 600 meses")
+});
 
 export function SavingsCalculator() {
   // Estados Financieros
@@ -35,6 +42,31 @@ export function SavingsCalculator() {
   const [leadHp, setLeadHp] = useState(''); // Honeypot
 
   const [isExpanded, setIsExpanded] = useState(false);
+
+  // Estados Manuales Zod
+  const [manualMonto, setManualMonto] = useState('');
+  const [manualMeses, setManualMeses] = useState('');
+  const [manualErrors, setManualErrors] = useState<{valor?: string, meses?: string}>({});
+
+  const handleManualChange = () => {
+     // Sanitizar y parsear a número
+     const parsedMonto = parseInt(manualMonto.replace(/\D/g, ''), 10) || 0;
+     const parsedMeses = parseInt(manualMeses.replace(/\D/g, ''), 10) || 0;
+     
+     const result = manualSchema.safeParse({ valor: parsedMonto, meses: parsedMeses });
+     if (result.success) {
+       setManualErrors({});
+       setMontoBase(result.data.valor);
+       setMesesMora(result.data.meses);
+       setIsExpanded(true);
+     } else {
+       const errors: any = {};
+       result.error.issues.forEach(issue => {
+         errors[issue.path[0]] = issue.message;
+       });
+       setManualErrors(errors);
+     }
+  };
 
   useEffect(() => {
     if (isExpanded) {
@@ -160,70 +192,118 @@ export function SavingsCalculator() {
             </div>
           </div>
 
-          {/* --- CONTROLES FINANCIEROS Y TIEMPO --- */}
-          <div className="space-y-6">
-            <div className="space-y-3">
-              <div className="flex justify-between items-end">
-                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                  Valor original de la multa
-                </label>
-                <span className="font-black text-primary text-xl tracking-tight">
-                  {formatCurrency(montoBase)}
-                </span>
-              </div>
-              <Slider
-                value={[montoBase]}
-                onValueChange={(val) => {
-                  setMontoBase(val[0]);
-                  setIsExpanded(true);
-                }}
-                min={0}
-                max={5000000}
-                step={50000}
-                className="py-2"
-                aria-label="Valor original de la multa"
-                aria-valuetext={`${montoBase} pesos`}
-              />
-            </div>
+          {/* --- CONTROLES FINANCIEROS Y TIEMPO (DOBLE INTERFAZ) --- */}
+          <Tabs defaultValue="slider" className="w-full space-y-6">
+            <TabsList className="grid w-full grid-cols-2 bg-foreground/10 p-1 rounded-xl">
+              <TabsTrigger value="slider" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold rounded-lg transition-all">Modo Rápido</TabsTrigger>
+              <TabsTrigger value="manual" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold rounded-lg transition-all">Modo Preciso</TabsTrigger>
+            </TabsList>
 
-            <div className="space-y-3">
-              <div className="flex justify-between items-end">
-                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex flex-col">
-                  <span>Tiempo de mora</span>
-                  <span className="text-xs text-slate-500 font-normal">
-                    Aprox.{' '}
-                    {new Date(new Date().setMonth(new Date().getMonth() - mesesMora)).getFullYear()}
-                  </span>
-                </label>
-                <div className="flex flex-col items-end">
-                  <span className="font-black text-slate-900 dark:text-white text-xl tracking-tight">
-                    {Math.floor(mesesMora / 12) > 0 &&
-                      `${Math.floor(mesesMora / 12)} ${Math.floor(mesesMora / 12) === 1 ? 'año' : 'años'} `}
-                    {mesesMora % 12 > 0 &&
-                      `${mesesMora % 12} ${mesesMora % 12 === 1 ? 'mes' : 'meses'}`}
-                    {mesesMora === 0 && '0 meses'}
-                  </span>
-                  <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                    ({mesesMora} {mesesMora === 1 ? 'mes' : 'meses'})
+            <TabsContent value="slider" className="space-y-6 mt-4">
+              <div className="space-y-3">
+                <div className="flex justify-between items-end">
+                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                    Valor original de la multa
+                  </label>
+                  <span className="font-black text-primary text-xl tracking-tight">
+                    {formatCurrency(montoBase)}
                   </span>
                 </div>
+                <Slider
+                  value={[montoBase]}
+                  onValueChange={(val) => {
+                    setMontoBase(val[0]);
+                    setManualMonto(val[0].toString()); // Sincroniza hacia el manual
+                    setIsExpanded(true);
+                  }}
+                  min={0}
+                  max={5000000}
+                  step={50000}
+                  className="py-2"
+                  aria-label="Valor original de la multa"
+                  aria-valuetext={`${montoBase} pesos`}
+                />
               </div>
-              <Slider
-                value={[mesesMora]}
-                onValueChange={(val) => {
-                  setMesesMora(val[0]);
-                  setIsExpanded(true);
-                }}
-                min={0}
-                max={312} // 26 años (desde el año 2000)
-                step={1}
-                className="py-2"
-                aria-label="Tiempo de mora en meses"
-                aria-valuetext={`${mesesMora} meses`}
-              />
-            </div>
 
-            <label className="flex items-center gap-3 p-3 rounded-xl border border-foreground/10 bg-foreground/5 hover:bg-foreground/10 transition-colors cursor-pointer group">
+              <div className="space-y-3">
+                <div className="flex justify-between items-end">
+                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex flex-col">
+                    <span>Tiempo de mora</span>
+                    <span className="text-xs text-slate-500 font-normal">
+                      Aprox.{' '}
+                      {new Date(new Date().setMonth(new Date().getMonth() - mesesMora)).getFullYear()}
+                    </span>
+                  </label>
+                  <div className="flex flex-col items-end">
+                    <span className="font-black text-slate-900 dark:text-white text-xl tracking-tight">
+                      {Math.floor(mesesMora / 12) > 0 &&
+                        `${Math.floor(mesesMora / 12)} ${Math.floor(mesesMora / 12) === 1 ? 'año' : 'años'} `}
+                      {mesesMora % 12 > 0 &&
+                        `${mesesMora % 12} ${mesesMora % 12 === 1 ? 'mes' : 'meses'}`}
+                      {mesesMora === 0 && '0 meses'}
+                    </span>
+                    <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                      ({mesesMora} {mesesMora === 1 ? 'mes' : 'meses'})
+                    </span>
+                  </div>
+                </div>
+                <Slider
+                  value={[mesesMora]}
+                  onValueChange={(val) => {
+                    setMesesMora(val[0]);
+                    setManualMeses(val[0].toString()); // Sincroniza hacia el manual
+                    setIsExpanded(true);
+                  }}
+                  min={0}
+                  max={312}
+                  step={1}
+                  className="py-2"
+                  aria-label="Tiempo de mora en meses"
+                  aria-valuetext={`${mesesMora} meses`}
+                />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="manual" className="space-y-4 mt-4">
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                  Valor exacto de la multa (sin puntos)
+                </label>
+                <input 
+                  type="text" 
+                  inputMode="numeric"
+                  placeholder="Ej: 1500000"
+                  value={manualMonto}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, ''); 
+                    setManualMonto(val);
+                  }}
+                  onBlur={handleManualChange}
+                  className="w-full bg-foreground/5 dark:bg-black/50 border border-foreground/15 rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                />
+                {manualErrors.valor && <p className="text-xs font-bold text-red-500">{manualErrors.valor}</p>}
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                  Meses exactos de mora
+                </label>
+                <input 
+                  type="text" 
+                  inputMode="numeric"
+                  placeholder="Ej: 24 (equivale a 2 años)"
+                  value={manualMeses}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, '');
+                    setManualMeses(val);
+                  }}
+                  onBlur={handleManualChange}
+                  className="w-full bg-foreground/5 dark:bg-black/50 border border-foreground/15 rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                />
+                {manualErrors.meses && <p className="text-xs font-bold text-red-500">{manualErrors.meses}</p>}
+              </div>
+            </TabsContent>
+
+            <label className="flex items-center gap-3 p-3 rounded-xl border border-foreground/10 bg-foreground/5 hover:bg-foreground/10 transition-colors cursor-pointer group mt-4">
               <div className="relative flex items-center justify-center">
                 <Checkbox
                   id="coactivo"
@@ -242,7 +322,7 @@ export function SavingsCalculator() {
                 El SIMIT indica &quot;Cobro Coactivo&quot;
               </span>
             </label>
-          </div>
+          </Tabs>
 
           {/* --- PANEL DE RESULTADOS Y CONVERSIÓN --- */}
           <div

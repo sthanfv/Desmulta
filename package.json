@@ -10,7 +10,7 @@
   "__PASO_5_STEP_5__": "[ES] CRÍTICO: El nombre del commit SIEMPRE en ESPAÑOL / [EN] CRITICAL: Commit messages MUST always be in SPANISH",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 9005",
+    "dev": "cross-env NODE_OPTIONS=--max-old-space-size=4096 next dev -p 9005",
     "build": "cross-env NODE_ENV=production NODE_OPTIONS=--max-old-space-size=4096 next build",
     "analyze": "cross-env ANALYZE=true NODE_OPTIONS=--max-old-space-size=4096 next build",
     "start": "next start",
