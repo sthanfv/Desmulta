@@ -115,7 +115,7 @@ export const Footer = ({ footerData, onOpenWhatsAppWarning }: FooterProps) => {
                   { label: 'Preguntas Frecuentes', href: '#faq' },
                   { label: 'Términos y Condiciones', href: '/terminos' },
                   { label: 'Políticas de Privacidad', href: '/privacidad' },
-                  { label: 'API para Empresas', href: '/api-docs' },
+                  // { label: 'API para Empresas', href: '/api-docs' },
                 ].map((link, i) => (
                   <Link
                     key={i}
