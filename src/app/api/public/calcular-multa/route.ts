@@ -4,9 +4,10 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    // Reenvío al motor cuántico de Golang (Fase 1.5)
-    // Cuando se suba a producción, cambiar localhost por la URL de Koyeb/Render
-    const goResponse = await fetch('http://localhost:8080/api/v1/calcular-multa', {
+    // Reenvío al motor cuántico de Golang (Fase 1.5 - Ahora en Producción)
+    const engineUrl = process.env.GO_ENGINE_URL || 'https://desmulta-calculadora-go.onrender.com/api/v1/calcular-multa';
+    
+    const goResponse = await fetch(engineUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
