@@ -168,7 +168,7 @@ export default function HomeClient({
       />
 
       {/* Herramienta de diagnóstico táctil y OCR */}
-      <TouchDebugger />
+      {process.env.NODE_ENV === 'development' && <TouchDebugger />}
 
       {/* Fondo animado diferido — no bloquea el First Contentful Paint */}
       <MeshBackground />
@@ -194,19 +194,19 @@ export default function HomeClient({
         <Pillars />
       </div>
 
-      <LazySection className="defer-render" minHeight="400px">
+      <div className="defer-render">
         <Methodology />
-      </LazySection>
+      </div>
 
-      <LazySection className="defer-render" minHeight="500px">
+      <div className="defer-render">
         <SuccessCases showcaseData={showcaseData} />
-      </LazySection>
+      </div>
 
-      <LazySection className="defer-render" minHeight="500px">
+      <div className="defer-render">
         <FAQ mounted={mounted} />
-      </LazySection>
+      </div>
 
-      <LazySection className="defer-render" minHeight="500px">
+      <div className="defer-render">
         <CTA
           onConsultar={() => {
             setFormMode('full');
@@ -214,7 +214,7 @@ export default function HomeClient({
           }}
           onOpenSimitTutorial={() => setIsSimitTutorialOpen(true)}
         />
-      </LazySection>
+      </div>
 
       <div className="defer-render">
         <Footer
