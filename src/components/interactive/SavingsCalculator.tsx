@@ -14,6 +14,7 @@ import {
   ArrowRight,
   Activity,
   AlertOctagon,
+  ChevronUp,
 } from 'lucide-react';
 import { z } from 'zod';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -45,6 +46,8 @@ export function SavingsCalculator() {
   const [historialIntereses, setHistorialIntereses] = useState<any[]>([]);
   const [riesgoEmbargo, setRiesgoEmbargo] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [estrategia, setEstrategia] = useState<any>(null);
+  const [isEmbriaguez, setIsEmbriaguez] = useState(false);
 
   const [leadState, setLeadState] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
   const [leadNombre, setLeadNombre] = useState('');
@@ -108,18 +111,20 @@ export function SavingsCalculator() {
           body: JSON.stringify({
             valorMulta: montoBase,
             fechaInfraccion: fechaInfraccionISO,
-            tieneCobroCoactivo: coactivo
+            tieneCobroCoactivo: coactivo,
+            tipoInfraccion: isEmbriaguez ? 'F' : ''
           })
         });
         if (response.ok) {
           const json = await response.json();
-          const { prescripcion, financiero } = json.data;
+          const { prescripcion, financiero, estrategiaLegal } = json.data;
           setIntereses(financiero.interesesAcumulados);
           setResultado(prescripcion);
           setProyecciones(financiero.proyecciones);
           setDescuentos(financiero.descuentos);
           setHistorialIntereses(financiero.historialIntereses || []);
           setRiesgoEmbargo(prescripcion.riesgoEmbargo || null);
+          setEstrategia(estrategiaLegal);
         }
       } catch (error) {
         console.error('Error fetching API', error);
@@ -129,7 +134,7 @@ export function SavingsCalculator() {
     // Debounce para no colapsar la API cuando el usuario mueve rápido el slider
     const timeoutId = setTimeout(fetchData, 300);
     return () => clearTimeout(timeoutId);
-  }, [montoBase, mesesMora, coactivo, fechaExactaGlobal]);
+  }, [montoBase, mesesMora, coactivo, fechaExactaGlobal, isEmbriaguez]);
 
   const total = montoBase + intereses;
 
@@ -347,6 +352,23 @@ export function SavingsCalculator() {
                 El SIMIT indica &quot;Cobro Coactivo&quot;
               </span>
             </label>
+
+            <label className="flex items-center gap-3 p-3 rounded-xl border border-foreground/10 bg-foreground/5 hover:bg-foreground/10 transition-colors cursor-pointer group mt-2">
+              <div className="relative flex items-center justify-center">
+                <Checkbox
+                  id="embriaguez"
+                  checked={isEmbriaguez}
+                  onCheckedChange={(checked) => {
+                    setIsEmbriaguez(checked === true);
+                    setIsExpanded(true);
+                  }}
+                  className="w-5 h-5 rounded border-gray-300 dark:border-gray-600 data-[state=checked]:bg-red-500 data-[state=checked]:text-white focus:ring-red-500 focus:ring-offset-gray-900"
+                />
+              </div>
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                Infracción por Embriaguez (Tipo F)
+              </span>
+            </label>
           </Tabs>
 
           {/* --- PANEL DE RESULTADOS Y CONVERSIÓN --- */}
@@ -370,6 +392,24 @@ export function SavingsCalculator() {
                       {formatCurrency(total)}
                     </span>
                   </div>
+
+                  {/* SÚPER PODERES DE GO - MONETIZACIÓN & ESTRATEGIA LEGAL */}
+                  {estrategia?.bloqueoEmbriaguez && (
+                    <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-xl mt-4">
+                      <h4 className="font-bold text-red-600 flex items-center gap-2 mb-1"><AlertOctagon className="w-4 h-4"/> Sin Descuentos (Ley 1696)</h4>
+                      <p className="text-sm text-red-700/80">Las multas por embriaguez tienen prohibición expresa de recibir cualquier tipo de amnistía o descuento por ley.</p>
+                    </div>
+                  )}
+
+                  {estrategia?.esSalvablePorPrescripcion && (
+                    <div className="bg-primary/10 border border-primary/20 p-4 rounded-xl mt-4 relative overflow-hidden">
+                      <div className="absolute top-0 right-0 p-2 opacity-10">
+                        <ShieldCheck className="w-24 h-24" />
+                      </div>
+                      <h4 className="font-black text-primary text-lg mb-1 relative z-10">¡Oportunidad de Defensa!</h4>
+                      <p className="text-sm text-foreground/80 relative z-10">Detectamos que esta deuda cumple con los tiempos de caducidad. No la pagues aún. Solicita un estudio para borrarla del SIMIT mediante la ley.</p>
+                    </div>
+                  )}
 
                   {/* SÚPER PODERES DE GO - DISEÑO VISUAL */}
                   {descuentos?.aplicaDescuento && (
@@ -571,6 +611,14 @@ export function SavingsCalculator() {
                   )}
                 </div>
               </div>
+              
+              <button 
+                onClick={() => setIsExpanded(false)}
+                className="w-full mt-6 py-2 flex items-center justify-center gap-2 text-muted-foreground hover:text-foreground hover:bg-foreground/5 rounded-xl transition-all"
+              >
+                <ChevronUp className="w-5 h-5" />
+                <span className="text-sm font-bold">Ocultar resultados</span>
+              </button>
             </div>
           </div>
 
