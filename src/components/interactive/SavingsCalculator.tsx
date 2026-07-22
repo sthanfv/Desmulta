@@ -27,8 +27,8 @@ const manualSchema = z.object({
   fecha: z.string().refine((val) => {
     if (!val) return false;
     const d = new Date(val);
-    return !isNaN(d.getTime()) && d <= new Date();
-  }, "La fecha debe ser válida y no futura")
+    return !isNaN(d.getTime()) && d <= new Date() && d >= new Date('2002-08-08');
+  }, "Fecha inválida. Debe ser entre Ago 2002 y Hoy.")
 });
 
 export function SavingsCalculator() {
