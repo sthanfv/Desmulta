@@ -366,7 +366,7 @@ export function SavingsCalculator() {
                 />
               </div>
               <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                Infracción por Embriaguez (Tipo F)
+                El código de mi multa empieza con la letra &quot;F&quot;
               </span>
             </label>
           </Tabs>
@@ -407,7 +407,7 @@ export function SavingsCalculator() {
                         <ShieldCheck className="w-24 h-24" />
                       </div>
                       <h4 className="font-black text-primary text-lg mb-1 relative z-10">¡Oportunidad de Defensa!</h4>
-                      <p className="text-sm text-foreground/80 relative z-10">Detectamos que esta deuda cumple con los tiempos de caducidad. No la pagues aún. Solicita un estudio para borrarla del SIMIT mediante la ley.</p>
+                      <p className="text-sm text-foreground/80 relative z-10">Detectamos que esta deuda cumple con los tiempos de caducidad. No la pagues aún. Solicita un estudio para evaluar la viabilidad de iniciar un proceso de defensa legal y buscar su anulación.</p>
                     </div>
                   )}
 
