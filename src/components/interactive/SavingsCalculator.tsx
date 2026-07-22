@@ -75,13 +75,8 @@ export function SavingsCalculator() {
   };
 
   useEffect(() => {
-    if (isExpanded) {
-      const timeoutId = setTimeout(() => {
-        setIsExpanded(false);
-      }, 15000);
-      return () => clearTimeout(timeoutId);
-    }
-  }, [montoBase, mesesMora, coactivo, leadNombre, leadContacto, isExpanded]);
+    // Timeout removido: la UI ya no se cerrará sola.
+  }, [isExpanded]);
 
   useEffect(() => {
     const simulatedDate = new Date();
