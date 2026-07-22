@@ -6,10 +6,14 @@ export async function POST(request: NextRequest) {
 
     // Reenvío al motor cuántico de Golang (Fase 1.5 - Ahora en Producción)
     const engineUrl = process.env.GO_ENGINE_URL || 'https://desmulta-calculadora-go.onrender.com/api/v1/calcular-multa';
+    const secretToken = process.env.GO_ENGINE_SECRET || 'dev_secret_123';
     
     const goResponse = await fetch(engineUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'X-Engine-Token': secretToken
+      },
       body: JSON.stringify(body)
     });
 
