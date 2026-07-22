@@ -94,3 +94,9 @@ eslint_output2.txt
 eslint_output3.txt
 lint_output.txt
 test_output.txt
+
+# Documentación interna (Protección Comercial de Propiedad Intelectual)
+MEMORY.md
+README.md
+ARCHITECTURE.md
+docs/
