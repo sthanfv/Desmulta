@@ -207,16 +207,17 @@ export function DocumentShowcase() {
           />
 
           {/* Brillo amarillo (Glow) estilo premium, visible solo en light mode */}
-          <div className="absolute -top-16 -right-16 w-56 h-56 bg-primary/20 dark:hidden rounded-full blur-[60px] pointer-events-none" />
+          <div className="absolute -top-12 -right-12 w-40 h-40 bg-primary/10 dark:hidden rounded-full blur-[50px] pointer-events-none" />
 
-          {/* Contenedor del Carrusel Interno (Scroll Horizontal Suave) */}
-          <div className="flex-grow flex flex-col relative z-10 w-full h-full overflow-hidden">
-            <div
-              className="flex w-full h-full transition-transform duration-700 ease-out"
-              style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-            >
-              {templates.map((template, idx) => (
-                <div key={idx} className="w-full h-full shrink-0 flex flex-col">
+          {/* Contenedor del Carrusel Interno (Fade) */}
+          <div className="flex-grow relative z-10 w-full h-full overflow-hidden">
+            {templates.map((template, idx) => (
+              <div
+                key={idx}
+                className={`absolute inset-0 w-full h-full flex flex-col transition-opacity duration-700 ease-in-out ${
+                  idx === currentIndex ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'
+                }`}
+              >
                   {/* Tag Éxito */}
                   <div className="flex-none mb-1">
                     <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[8px] sm:text-[9px] font-bold border border-emerald-200 dark:border-emerald-500/20 animate-pulse">
@@ -281,9 +282,8 @@ export function DocumentShowcase() {
                       />
                     </button>
                   </div>
-                </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
