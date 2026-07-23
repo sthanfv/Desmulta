@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { z } from 'zod';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { BarChart, Bar, XAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Cell } from 'recharts';
+import { AreaChart, Area, XAxis, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { TarjetaPremium } from '@/components/ui/TarjetaPremium';
 import { StarBorder } from '@/components/ui/star-border';
@@ -145,6 +145,19 @@ export function SavingsCalculator() {
   }, [montoBase, mesesMora, coactivo, fechaExactaGlobal, isEmbriaguez]);
 
   const total = montoBase + intereses;
+
+  // Transformar historial para efecto Bola de Nieve (Deuda Total Acumulada)
+  const chartData = React.useMemo(() => {
+    if (!historialIntereses || historialIntereses.length <= 1) return [];
+    let sum = montoBase;
+    return historialIntereses.map(h => {
+      sum += h.acumulado;
+      return {
+        anio: h.anio,
+        deudaTotal: sum
+      };
+    });
+  }, [historialIntereses, montoBase]);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('es-CO', {
@@ -456,28 +469,30 @@ export function SavingsCalculator() {
                     </div>
                   )}
 
-                  {historialIntereses && historialIntereses.length > 1 && (
+                  {chartData.length > 1 && (
                     <div className="bg-foreground/5 p-4 rounded-xl mt-4 border border-foreground/10">
                       <h4 className="font-bold mb-1 flex items-center gap-2">
-                        <Activity className="w-4 h-4 text-primary" />
-                        Crecimiento Cronológico
+                        <Activity className="w-4 h-4 text-red-500" />
+                        Efecto Bola de Nieve
                       </h4>
-                      <p className="text-xs text-muted-foreground mb-4">Intereses acumulados año a año según Tasa de Usura.</p>
+                      <p className="text-xs text-muted-foreground mb-4">Así creció tu deuda real (Capital + Intereses) año tras año.</p>
                       <div className="h-32 w-full">
                         <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={historialIntereses}>
+                          <AreaChart data={chartData}>
+                            <defs>
+                              <linearGradient id="colorDeuda" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8}/>
+                                <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                              </linearGradient>
+                            </defs>
                             <XAxis dataKey="anio" fontSize={10} tickLine={false} axisLine={false} />
                             <RechartsTooltip 
-                              formatter={(value: any) => formatCurrency(Number(value))}
+                              formatter={(value: any) => [formatCurrency(Number(value)), "Deuda Total"]}
                               labelFormatter={(label) => `Año ${label}`}
                               contentStyle={{ borderRadius: '8px', fontSize: '12px', border: 'none', backgroundColor: '#1f2937', color: '#fff' }}
                             />
-                            <Bar dataKey="acumulado" radius={[4, 4, 0, 0]}>
-                              {historialIntereses.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={index === historialIntereses.length - 1 ? '#ef4444' : '#f87171'} />
-                              ))}
-                            </Bar>
-                          </BarChart>
+                            <Area type="monotone" dataKey="deudaTotal" stroke="#ef4444" strokeWidth={3} fillOpacity={1} fill="url(#colorDeuda)" />
+                          </AreaChart>
                         </ResponsiveContainer>
                       </div>
                     </div>
