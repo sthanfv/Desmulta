@@ -1589,3 +1589,7 @@ Se leyó `C:\Users\Sthan\Escritorio\para antigravity\auditoria-forense-v2-delta.
 ### Estado actual del sistema
 ✅ Compilación TypeScript limpia | ✅ 479 de 479 tests exitosos en Vitest | ✅ Build de producción exitoso de Next.js | 🔒 Todas las vulnerabilidades identificadas de IP Spoofing y fugas de secretos cerradas.
 
+
+## 2026-07-22 - Fix Scroll y PWA Blur
+- Eliminado spotlight (useMouseFollow) para quitar lag y repaints masivos.
+- Eliminado overscroll-behavior en globals.css

@@ -56,9 +56,6 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    overscroll-behavior: auto; /* 🛡️ FIX: Permitir scroll chaining nativo y fluido en computadores de escritorio */
-    -webkit-tap-highlight-color: transparent;
-    user-select: auto;
     min-height: 100svh;
   }
 
@@ -449,46 +446,7 @@
   }
 }
 
-/* ─── ADN NATIVO PWA ─── */
-body {
-  overscroll-behavior-y: auto; /* 🛡️ FIX: Respuesta inmediata a la ruedita del mouse en escritorio */
-  background-color: hsl(var(--background));
-  @apply pwa-native-feel;
-}
-
-@media (max-width: 767px) {
-  body {
-    overscroll-behavior-y: none; /* Evitar pull-to-refresh en teléfonos */
-  }
-}
-
-@layer utilities {
-  .pwa-native-feel {
-    -webkit-tap-highlight-color: transparent;
-    user-select: none;
-    -webkit-user-select: none;
-    /*
-     * FIX ANDROID SCROLL:
-     * Cambiado de `manipulation` a `pan-y pinch-zoom`.
-     *
-     * `touch-action: manipulation` desactiva el double-tap-to-zoom pero también
-     * puede interferir con el scroll vertical dentro de drawers/modales en Chrome
-     * para Android, ya que el browser no distingue entre "el usuario quiere hacer
-     * scroll en el drawer" y "el usuario quiere cerrar el drawer con swipe".
-     *
-     * `pan-y pinch-zoom` mantiene:
-     *   - Scroll vertical nativo (pan-y)
-     *   - Pinch-to-zoom (pinch-zoom)
-     *   - Desactiva double-tap-to-zoom implícitamente (mismo efecto que manipulation)
-     *   - NO bloquea el scroll en contenedores hijos que lo necesiten
-     *
-     * Los elementos individuales (botones, inputs) siguen recibiendo taps correctos.
-     * El contenedor scrollable del drawer añade su propio touch-action: pan-y inline.
-     */
-    touch-action: pan-y pinch-zoom;
-    -webkit-touch-callout: none;
-  }
-}
+/* Removido código problemático PWA native feel */
 
 .defer-render {
   will-change: transform, opacity;

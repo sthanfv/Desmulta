@@ -109,7 +109,6 @@ export default function HomeClient({
 
   // --- Hooks Personalizados ---
   const showScrollTop = useScrollTop(400);
-  const handleMouseMove = useMouseFollow();
   useRevealObserver(0.1);
   useClipboardProtection();
 
@@ -149,24 +148,7 @@ export default function HomeClient({
   return (
     <div
       className="min-h-screen bg-background selection:bg-primary/30 selection:text-primary-foreground overflow-x-hidden relative group/layout rounded-t-xl sm:rounded-t-[2.5rem] md:rounded-[3rem] shadow-2xl sm:border-x sm:border-t border-white/5"
-      onMouseMove={handleMouseMove}
     >
-      {/* Spotlight Desktop (Sigue el ratón, oculto en móvil) */}
-      <div
-        className="pointer-events-none fixed inset-0 z-0 opacity-0 transition duration-300 group-hover/layout:opacity-100 hidden md:block"
-        style={{
-          background:
-            'radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,193,7,0.03), transparent 40%)',
-        }}
-      />
-
-      {/* Spotlight Móvil: Luz arquitectónica (Voltaje aumentado al 15% para que sea visible) */}
-      <div
-        className="pointer-events-none fixed inset-0 z-0 block md:hidden transition-colors duration-700 
-                   bg-[radial-gradient(120%_50%_at_50%_0%,rgba(0,0,0,0.08)_0%,transparent_100%)] 
-                   dark:bg-[radial-gradient(120%_50%_at_50%_0%,rgba(255,193,7,0.15)_0%,transparent_100%)]"
-      />
-
       {/* Herramienta de diagnóstico táctil y OCR */}
       {process.env.NODE_ENV === 'development' && <TouchDebugger />}
 
