@@ -58,7 +58,7 @@ export function SavingsCalculator() {
 
   // Estados Manuales Zod
   const [manualMonto, setManualMonto] = useState('');
-  const [manualFecha, setManualFecha] = useState('');
+  const [manualFechaText, setManualFechaText] = useState(''); // DD/MM/YYYY
   const [manualErrors, setManualErrors] = useState<{valor?: string, fecha?: string}>({});
   const [fechaExactaGlobal, setFechaExactaGlobal] = useState<string | null>(null);
 
@@ -66,7 +66,15 @@ export function SavingsCalculator() {
      // Sanitizar y parsear a número
      const parsedMonto = parseInt(manualMonto.replace(/\D/g, ''), 10) || 0;
      
-     const result = manualSchema.safeParse({ valor: parsedMonto, fecha: manualFecha });
+     // Convertir DD/MM/YYYY a YYYY-MM-DD para validación
+     const parts = manualFechaText.split('/');
+     let isoDate = '';
+     if (parts.length === 3 && parts[2].length === 4) {
+       isoDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+     } else {
+       isoDate = 'invalid'; // Forzar error Zod
+     }
+     const result = manualSchema.safeParse({ valor: parsedMonto, fecha: isoDate });
      if (result.success) {
        setManualErrors({});
        setMontoBase(result.data.valor);
@@ -314,12 +322,20 @@ export function SavingsCalculator() {
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                  Fecha exacta del comparendo
+                  Fecha exacta del comparendo (DD/MM/AAAA)
                 </label>
                 <input 
-                  type="date"
-                  value={manualFecha}
-                  onChange={(e) => setManualFecha(e.target.value)}
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="Ej: 11/04/2026"
+                  value={manualFechaText}
+                  onChange={(e) => {
+                    let val = e.target.value.replace(/\D/g, '');
+                    if (val.length > 2) val = val.slice(0, 2) + '/' + val.slice(2);
+                    if (val.length > 5) val = val.slice(0, 5) + '/' + val.slice(5, 9);
+                    setManualFechaText(val);
+                  }}
+                  maxLength={10}
                   className="w-full bg-foreground/5 dark:bg-black/50 border border-foreground/15 rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
                 />
                 {manualErrors.fecha && <p className="text-xs font-bold text-red-500">{manualErrors.fecha}</p>}
@@ -440,7 +456,7 @@ export function SavingsCalculator() {
                     </div>
                   )}
 
-                  {historialIntereses && historialIntereses.length > 0 && (
+                  {historialIntereses && historialIntereses.length > 1 && (
                     <div className="bg-foreground/5 p-4 rounded-xl mt-4 border border-foreground/10">
                       <h4 className="font-bold mb-1 flex items-center gap-2">
                         <Activity className="w-4 h-4 text-primary" />
@@ -559,7 +575,7 @@ export function SavingsCalculator() {
                       setLeadNombre(e.target.value);
                       setIsExpanded(true);
                     }}
-                    className="w-full bg-foreground/5 dark:bg-black/50 border border-foreground/15 rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                    className="w-full bg-foreground/5 dark:bg-black/50 border border-foreground/15 rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:ring-2 focus:ring-inset focus:ring-primary focus:border-transparent outline-none transition-all"
                     aria-label="Tu nombre (opcional)"
                   />
 
@@ -575,7 +591,7 @@ export function SavingsCalculator() {
                         setLeadContacto(e.target.value);
                         setIsExpanded(true);
                       }}
-                      className="flex-1 bg-foreground/5 dark:bg-black/50 border border-foreground/15 rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                      className="flex-1 bg-foreground/5 dark:bg-black/50 border border-foreground/15 rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:ring-2 focus:ring-inset focus:ring-primary focus:border-transparent outline-none transition-all"
                       aria-label="Tu número de WhatsApp para contacto"
                     />
                     <button
@@ -625,7 +641,7 @@ export function SavingsCalculator() {
           <div className="flex flex-col items-center gap-1.5 justify-center text-[10px] text-muted-foreground font-medium text-center pt-2">
             <div className="flex items-center gap-1.5">
               <Info className="w-3 h-3 flex-shrink-0" />
-              <span>Simulador SIMIT: Interés Simple con Límite de Prescripción (Art 159).</span>
+              <span>Simulador SIMIT (Cálculo Aproximado): Interés Simple con Límite (Art 159).</span>
             </div>
             <span className="text-[9px] opacity-75">
               *Los intereses se congelan legalmente a los 3 años (o 6 si hay coactivo).
