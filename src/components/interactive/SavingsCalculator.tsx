@@ -22,6 +22,7 @@ import { AreaChart, Area, XAxis, Tooltip as RechartsTooltip, ResponsiveContainer
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { TarjetaPremium } from '@/components/ui/TarjetaPremium';
 import { StarBorder } from '@/components/ui/star-border';
+import CountUp from '@/components/ui/CountUp';
 
 const manualSchema = z.object({
   valor: z.number({ invalid_type_error: "Debe ser numérico" }).min(0, "Mínimo $0").max(100000000, "Máximo $100M"),
@@ -252,7 +253,7 @@ export function SavingsCalculator() {
                     Valor original de la multa
                   </label>
                   <span className="font-black text-primary text-xl tracking-tight">
-                    {formatCurrency(montoBase)}
+                    $ <CountUp from={0} to={montoBase} separator="." duration={0.8} />
                   </span>
                 </div>
                 <Slider
@@ -411,14 +412,16 @@ export function SavingsCalculator() {
                 <div className="space-y-4">
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-muted-foreground">Intereses proyectados</span>
-                    <span className="font-bold text-red-500">+{formatCurrency(intereses)}</span>
+                    <span className="font-bold text-red-500">
+                      +$ <CountUp from={0} to={intereses} separator="." duration={1.5} />
+                    </span>
                   </div>
                   <div className="flex justify-between items-end bg-foreground/5 dark:bg-black/40 p-4 rounded-2xl border border-foreground/10">
                     <span className="text-base font-medium text-muted-foreground">
                       Deuda Total Actual
                     </span>
                     <span className="font-black text-2xl text-foreground tracking-tight">
-                      {formatCurrency(total)}
+                      $ <CountUp from={0} to={total} separator="." duration={1.5} />
                     </span>
                   </div>
 

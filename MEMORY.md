@@ -1593,3 +1593,8 @@ Se leyó `C:\Users\Sthan\Escritorio\para antigravity\auditoria-forense-v2-delta.
 ## 2026-07-22 - Fix Scroll y PWA Blur
 - Eliminado spotlight (useMouseFollow) para quitar lag y repaints masivos.
 - Eliminado overscroll-behavior en globals.css
+
+## 2026-07-23 - Animacion de Numeros en Calculadora
+- Que cambio: Se reemplazo la renderizacion estatica de formatCurrency por el componente animado <CountUp> en la calculadora.
+- Por que cambio: Para que los numeros suban fluidamente simulando el efecto bola de nieve en intereses y deuda total, logrando mayor impacto visual sin depender de FPS altos.
+- Archivos: src/components/interactive/SavingsCalculator.tsx
