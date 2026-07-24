@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit } from '@/lib/security/rate-limit';
+import crypto from 'crypto';
 import { z } from 'zod';
 
 /**
@@ -51,13 +52,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const bodyStr = JSON.stringify(parsed.data);
+    const timestamp = Date.now().toString();
+    const signature = crypto
+      .createHmac('sha256', secretToken)
+      .update(timestamp + bodyStr)
+      .digest('hex');
+
     const goResponse = await fetch(engineUrl, {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
-        'X-Engine-Token': secretToken
+        'X-Engine-Timestamp': timestamp,
+        'X-Engine-Signature': signature
       },
-      body: JSON.stringify(parsed.data)
+      body: bodyStr
     });
 
     if (!goResponse.ok) {

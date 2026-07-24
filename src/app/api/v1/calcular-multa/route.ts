@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
 import { z } from 'zod';
 import { logger } from '@/lib/logger/security-logger';
 import { apiError } from '@/lib/types/api-response';
@@ -127,17 +128,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const bodyStr = JSON.stringify({
+      valorMulta,
+      fechaInfraccion,
+      tieneCobroCoactivo
+    });
+    
+    const timestamp = Date.now().toString();
+    const signature = crypto
+      .createHmac('sha256', engineSecret)
+      .update(timestamp + bodyStr)
+      .digest('hex');
+
     const goResponse = await fetch(engineUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Engine-Token': engineSecret,
+        'X-Engine-Timestamp': timestamp,
+        'X-Engine-Signature': signature,
       },
-      body: JSON.stringify({
-        valorMulta,
-        fechaInfraccion,
-        tieneCobroCoactivo
-      })
+      body: bodyStr
     });
 
     if (!goResponse.ok) {
