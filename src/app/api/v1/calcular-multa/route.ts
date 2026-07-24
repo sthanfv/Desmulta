@@ -113,26 +113,26 @@ export async function POST(request: NextRequest) {
   try {
     const textoSeguro = textoOCR ? sanitizeOcrText(textoOCR) : '';
 
-    // --- INICIO DE CONEXIÓN A MICROSERVICIO GO ---
-    /*
-     * NOTA DEL DESARROLLADOR:
-     * El cálculo nativo (`calcularMultaCompleta`) en TypeScript ha sido DESCONECTADO (DEPRECATED).
-     * Por motivos de rendimiento extremo y cálculos avanzados (Proyecciones y Descuentos),
-     * el motor financiero ahora vive en un microservicio de Golang independiente.
-     */
+    // 🛡️ FIX HALLAZGO #2: Conexión segura al microservicio Go.
+    // - URL y token leídos desde variables de entorno (Fail-Closed).
+    // - Se incluye X-Engine-Token para autenticación S2S.
+    const engineUrl = process.env.GO_ENGINE_URL;
+    const engineSecret = process.env.GO_ENGINE_SECRET;
 
-    // const resultado = calcularMultaCompleta(
-    //   valorMulta,
-    //   fechaInfraccion,
-    //   tieneCobroCoactivo,
-    //   textoSeguro
-    // );
+    if (!engineUrl || !engineSecret) {
+      logger.error('[calcular-multa B2B] CRÍTICO: GO_ENGINE_URL o GO_ENGINE_SECRET no configurados.');
+      return NextResponse.json(
+        apiError('INTERNAL_ERROR', 'Motor de cálculo no disponible temporalmente.'),
+        { status: 503 }
+      );
+    }
 
-    // Petición HTTP al microservicio en Go
-    // TODO: Cambiar localhost por URL de producción al desplegar en Koyeb/Render
-    const goResponse = await fetch('http://localhost:8080/api/v1/calcular-multa', {
+    const goResponse = await fetch(engineUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Engine-Token': engineSecret,
+      },
       body: JSON.stringify({
         valorMulta,
         fechaInfraccion,

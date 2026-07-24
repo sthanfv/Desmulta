@@ -1608,3 +1608,31 @@ Se leyó `C:\Users\Sthan\Escritorio\para antigravity\auditoria-forense-v2-delta.
 - **Qué cambió:** Se eliminó la animación 'animate-ping' del checkbox de Cobro Coactivo y se agruparon los checkboxes de modificadores legales dentro del contenedor colapsable animado de la calculadora.
 - **Por qué cambió:** Para corregir un glitch visual cuadrado alrededor del check, y para ahorrar espacio vertical ocultando las opciones avanzadas cuando el usuario no está usando la calculadora.
 - **Archivos afectados:** src/components/interactive/SavingsCalculator.tsx.
+
+## 2026-07-23 - Remediación de Seguridad — Auditoría Forense Ética (12 Hallazgos)
+- **Qué cambió:**
+  - **#1 (Crítica):** Se eliminó el fallback hardcodeado `dev_secret_123` y la URL del motor Go del proxy público (`/api/public/calcular-multa`). Ahora es Fail-Closed: si `GO_ENGINE_URL` o `GO_ENGINE_SECRET` no están configurados, retorna 503.
+  - **#2 (Crítica):** Se corrigió la ruta B2B (`/api/v1/calcular-multa`) que apuntaba a `localhost:8080` sin token. Ahora usa variables de entorno y envía `X-Engine-Token`.
+  - **#3 (Alta):** Se restringió CORS en Go de `*` a solo `desmulta.online`.
+  - **#4 (Alta):** Se eliminó la fuga de mensajes de error internos al cliente en el proxy público. Los errores ahora se registran en logs internos.
+  - **#5 (Alta):** Se migró la comparación del token S2S en Go a `crypto/subtle.ConstantTimeCompare` (previene timing attacks).
+  - **#6 (Media):** Se añadió validación Zod al proxy público antes de reenviar al motor Go (previene Mass Assignment).
+  - **#7 (Media):** Se sanitizó `dangerouslySetInnerHTML` en `DocumentShowcase.tsx` como prevención contra XSS futuro.
+  - **#8 (Media):** Se documentó la decisión de mantener `unsafe-inline` en script-src de CSP (necesario para GA, Meta Pixel, Clarity). Se agregó comentario explícito.
+  - **#9 (Media):** Se eliminó la fuga de mensajes de error internos al cliente en `verify-otp`.
+  - **#10 (Baja):** Cubierto por #1 (eliminación de URL hardcodeada).
+  - **#11 (Baja):** Se movió `/ping` en Go detrás del middleware de autenticación.
+  - **#12 (Baja):** Se limitó la enumeración de storage en TouchDebugger a solo claves propias de Desmulta.
+- **Por qué cambió:** Auditoría ética de seguridad (Pentesting) solicitada por el usuario, siguiendo metodología OWASP Top 10 / PTES.
+- **Archivos afectados (Frontend Next.js):**
+  - `src/app/api/public/calcular-multa/route.ts` (reescrito completo)
+  - `src/app/api/v1/calcular-multa/route.ts` (corregido S2S)
+  - `src/app/api/auth/verify-otp/route.ts` (error leak)
+  - `src/lib/security-headers.ts` (CSP documentada)
+  - `src/components/ui/DocumentShowcase.tsx` (XSS sanitización)
+  - `src/components/dev/TouchDebugger.tsx` (storage filtrado)
+- **Archivos afectados (Motor Go):**
+  - `main.go` (4 hallazgos: secret, CORS, timing, ping)
+  - `ARCHITECTURE.md` (documentación actualizada)
+  - `MEMORY.md` (bitácora actualizada)
+- **Estado:** TypeScript typecheck ✅ | Go tests 14/14 PASS 88.2% ✅ | Build en validación.

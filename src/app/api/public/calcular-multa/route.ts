@@ -1,5 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit } from '@/lib/security/rate-limit';
+import { z } from 'zod';
+
+/**
+ * Schema de validación para el proxy público de la calculadora.
+ *
+ * 🛡️ FIX HALLAZGO #6: Valida y filtra el body antes de reenviarlo al motor Go.
+ * Previene Mass Assignment y Parameter Pollution al pasar solo campos conocidos.
+ */
+const ProxySchema = z.object({
+  valorMulta: z.number().min(0).max(100_000_000),
+  fechaInfraccion: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  tieneCobroCoactivo: z.boolean().default(false),
+  tipoInfraccion: z.string().max(5).default(''),
+});
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,23 +28,45 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = await request.json();
+    const rawBody = await request.json();
 
-    // Reenvío al motor cuántico de Golang (Fase 1.5 - Ahora en Producción)
-    const engineUrl = process.env.GO_ENGINE_URL || 'https://desmulta-calculadora-go.onrender.com/api/v1/calcular-multa';
-    const secretToken = process.env.GO_ENGINE_SECRET || 'dev_secret_123';
-    
+    // 🛡️ FIX HALLAZGO #6: Validar y filtrar antes de reenviar al motor Go
+    const parsed = ProxySchema.safeParse(rawBody);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Datos de entrada inválidos para el cálculo.' },
+        { status: 400 }
+      );
+    }
+
+    // 🛡️ FIX HALLAZGO #1 + #10: Sin fallbacks hardcodeados. Fail-Closed si falta configuración.
+    const engineUrl = process.env.GO_ENGINE_URL;
+    const secretToken = process.env.GO_ENGINE_SECRET;
+
+    if (!engineUrl || !secretToken) {
+      console.error('[calcular-multa proxy] CRÍTICO: GO_ENGINE_URL o GO_ENGINE_SECRET no configurados.');
+      return NextResponse.json(
+        { error: 'Servicio de cálculo no disponible temporalmente.' },
+        { status: 503 }
+      );
+    }
+
     const goResponse = await fetch(engineUrl, {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
         'X-Engine-Token': secretToken
       },
-      body: JSON.stringify(body)
+      body: JSON.stringify(parsed.data)
     });
 
     if (!goResponse.ok) {
-      throw new Error(`El motor de Golang falló o está apagado (HTTP ${goResponse.status})`);
+      // 🛡️ FIX HALLAZGO #4: No revelar detalles internos al cliente.
+      console.error(`[calcular-multa proxy] Motor Go respondió HTTP ${goResponse.status}`);
+      return NextResponse.json(
+        { error: 'Error temporal al procesar el cálculo. Intenta nuevamente en unos segundos.' },
+        { status: 502 }
+      );
     }
 
     const goJson = await goResponse.json();
@@ -39,9 +75,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(goJson, { status: 200 });
 
   } catch (error: unknown) {
+    // 🛡️ FIX HALLAZGO #4: Registrar el error internamente, nunca exponerlo al cliente.
     const mensaje = error instanceof Error ? error.message : String(error);
+    console.error('[calcular-multa proxy] Error interno:', mensaje);
     return NextResponse.json(
-      { error: 'Error interno al procesar el cálculo. ' + mensaje },
+      { error: 'Error temporal al procesar el cálculo. Intenta nuevamente en unos segundos.' },
       { status: 500 }
     );
   }

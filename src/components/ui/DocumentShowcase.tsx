@@ -232,7 +232,12 @@ export function DocumentShowcase() {
                   <div className="flex-grow flex flex-col justify-center relative min-h-0">
                     <div
                       className="text-[7px] sm:text-[8px] text-muted-foreground font-mono tracking-widest uppercase mb-1 leading-relaxed font-semibold relative z-10"
-                      dangerouslySetInnerHTML={{ __html: template.header }}
+                      dangerouslySetInnerHTML={{
+                        // 🛡️ FIX HALLAZGO #7: Sanitización preventiva contra XSS si la fuente cambia a futuro.
+                        __html: template.header
+                          .replace(/</g, '&lt;')
+                          .replace(/>/g, '&gt;'),
+                      }}
                     />
 
                     <h3 className="text-base sm:text-xl font-black text-foreground mb-1 leading-tight tracking-tight relative z-10">

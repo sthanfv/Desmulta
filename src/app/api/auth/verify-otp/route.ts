@@ -227,8 +227,12 @@ export async function POST(request: NextRequest) {
 
     return finalResponse;
   } catch (error: unknown) {
+    // 🛡️ FIX HALLAZGO #9: Registrar error internamente, nunca exponer detalles al cliente.
     const msg = error instanceof Error ? error.message : 'Error interno en verify-otp.';
     logger.error('[verify-otp] Error durante la verificación OTP.', { error: msg });
-    return NextResponse.json({ error: msg }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Error interno al verificar el código. Intenta nuevamente.' },
+      { status: 500 }
+    );
   }
 }

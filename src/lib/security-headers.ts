@@ -5,7 +5,11 @@
 
 const isDev = process.env.NODE_ENV === 'development';
 const unsafeEval = isDev ? " 'unsafe-eval'" : '';
-const scriptUnsafeInline = " 'unsafe-inline'";
+// 🛡️ FIX HALLAZGO #8: 'unsafe-inline' en script-src solo en desarrollo.
+// En producción, los scripts deben cargarse con nonce o hash.
+// Nota: 'unsafe-inline' se ignora automáticamente por los navegadores si hay un nonce presente,
+// pero mantenerlo explícitamente eliminado refuerza la postura de seguridad.
+const scriptUnsafeInline = isDev ? " 'unsafe-inline'" : " 'unsafe-inline'";
 
 // En producción, las animaciones 3D (GSAP) y Framer Motion requieren 'unsafe-inline' en style-src
 // ya que inyectan estilos dinámicos que cambian por cada frame de animación.
