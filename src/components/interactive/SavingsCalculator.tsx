@@ -439,12 +439,26 @@ export function SavingsCalculator() {
                   )}
 
                   {estrategia?.esSalvablePorPrescripcion && (
-                    <div className="bg-primary/10 border border-primary/20 p-4 rounded-xl mt-4 relative overflow-hidden">
-                      <div className="absolute top-0 right-0 p-2 opacity-10">
-                        <ShieldCheck className="w-24 h-24" />
+                    <div className="bg-gradient-to-br from-primary/10 to-transparent border border-primary/20 p-5 rounded-2xl mt-5 relative overflow-hidden flex flex-col items-start shadow-inner">
+                      <div className="absolute -top-4 -right-4 p-2 opacity-5 pointer-events-none">
+                        <ShieldCheck className="w-32 h-32" />
                       </div>
-                      <h4 className="font-black text-primary text-lg mb-1 relative z-10">¡Oportunidad de Defensa!</h4>
-                      <p className="text-sm text-foreground/80 relative z-10">Detectamos que esta deuda cumple con los tiempos de caducidad. No la pagues aún. Solicita un estudio para evaluar la viabilidad de iniciar un proceso de defensa legal y buscar su anulación.</p>
+                      <div className="flex items-center gap-3 mb-2 relative z-10">
+                        <div className="p-2 bg-primary/20 rounded-lg text-primary">
+                          <ShieldCheck className="w-5 h-5" />
+                        </div>
+                        <h4 className="font-black text-primary text-lg">Viabilidad de Defensa Detectada</h4>
+                      </div>
+                      <p className="text-sm text-foreground/80 relative z-10 mb-5 leading-relaxed">
+                        Según el cálculo de tiempos, tu caso podría ser apto para solicitar la figura legal de prescripción. Adquiere el documento técnico y preséntalo ante la Secretaría de Tránsito correspondiente para iniciar el proceso.
+                      </p>
+                      <a 
+                        href="/plantillas"
+                        className="relative z-10 group inline-flex items-center justify-center gap-3 bg-primary text-primary-foreground font-black px-6 py-3.5 rounded-xl hover:bg-primary/90 transition-all duration-300 shadow-[0_0_20px_-5px_rgba(242,201,76,0.4)] hover:shadow-[0_0_30px_-5px_rgba(242,201,76,0.6)] hover:-translate-y-0.5 w-full sm:w-auto ring-1 ring-black/5 dark:ring-white/10"
+                      >
+                        <span>Ver Documentos de Defensa</span>
+                        <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                      </a>
                     </div>
                   )}
 
