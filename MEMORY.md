@@ -1603,3 +1603,8 @@ Se leyó `C:\Users\Sthan\Escritorio\para antigravity\auditoria-forense-v2-delta.
 - **Qué cambió:** Se eliminó la pesada propiedad CSS ilter: blur(90px) de los blobs de la clase .aurora-blob en globals.css. En su lugar, se reemplazaron los fondos sólidos por adial-gradient con opacidades para emular el difuminado matemáticamente sin usar filtros CSS.
 - **Por qué cambió:** Para erradicar los pequeños parpadeos residuales y el cuello de botella que causaba calcular filtros desenfocados masivos por frame en dispositivos de gama media/baja.
 - **Archivos afectados:** src/app/globals.css.
+
+## 2026-07-23 - UI Fixes Calculadora
+- **Qué cambió:** Se eliminó la animación 'animate-ping' del checkbox de Cobro Coactivo y se agruparon los checkboxes de modificadores legales dentro del contenedor colapsable animado de la calculadora.
+- **Por qué cambió:** Para corregir un glitch visual cuadrado alrededor del check, y para ahorrar espacio vertical ocultando las opciones avanzadas cuando el usuario no está usando la calculadora.
+- **Archivos afectados:** src/components/interactive/SavingsCalculator.tsx.

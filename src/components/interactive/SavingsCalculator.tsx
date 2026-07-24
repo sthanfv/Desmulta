@@ -363,42 +363,47 @@ export function SavingsCalculator() {
               </button>
             </TabsContent>
 
-            <label className="flex items-center gap-3 p-3 rounded-xl border border-foreground/10 bg-foreground/5 hover:bg-foreground/10 transition-colors cursor-pointer group mt-4">
-              <div className="relative flex items-center justify-center">
-                <Checkbox
-                  id="coactivo"
-                  checked={coactivo}
-                  onCheckedChange={(checked) => {
-                    setCoactivo(checked === true);
-                    setIsExpanded(true);
-                  }}
-                  className="w-5 h-5 rounded border-gray-300 dark:border-gray-600 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground focus:ring-primary focus:ring-offset-gray-900"
-                />
-                <div className="absolute pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
-                  <div className="w-5 h-5 bg-primary/20 rounded absolute inset-0 animate-ping"></div>
-                </div>
-              </div>
-              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                El SIMIT indica &quot;Cobro Coactivo&quot;
-              </span>
-            </label>
+            <div
+              className={`grid transition-all duration-500 ease-in-out ${
+                isExpanded || coactivo || isEmbriaguez ? 'grid-rows-[1fr] opacity-100 mt-4' : 'grid-rows-[0fr] opacity-0 mt-0'
+              }`}
+            >
+              <div className="overflow-hidden flex flex-col gap-2">
+                <label className="flex items-center gap-3 p-3 rounded-xl border border-foreground/10 bg-foreground/5 hover:bg-foreground/10 transition-colors cursor-pointer group">
+                  <div className="relative flex items-center justify-center">
+                    <Checkbox
+                      id="coactivo"
+                      checked={coactivo}
+                      onCheckedChange={(checked) => {
+                        setCoactivo(checked === true);
+                        setIsExpanded(true);
+                      }}
+                      className="w-5 h-5 rounded border-gray-300 dark:border-gray-600 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground focus:ring-primary focus:ring-offset-gray-900"
+                    />
+                  </div>
+                  <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                    El SIMIT indica &quot;Cobro Coactivo&quot;
+                  </span>
+                </label>
 
-            <label className="flex items-center gap-3 p-3 rounded-xl border border-foreground/10 bg-foreground/5 hover:bg-foreground/10 transition-colors cursor-pointer group mt-2">
-              <div className="relative flex items-center justify-center">
-                <Checkbox
-                  id="embriaguez"
-                  checked={isEmbriaguez}
-                  onCheckedChange={(checked) => {
-                    setIsEmbriaguez(checked === true);
-                    setIsExpanded(true);
-                  }}
-                  className="w-5 h-5 rounded border-gray-300 dark:border-gray-600 data-[state=checked]:bg-red-500 data-[state=checked]:text-white focus:ring-red-500 focus:ring-offset-gray-900"
-                />
+                <label className="flex items-center gap-3 p-3 rounded-xl border border-foreground/10 bg-foreground/5 hover:bg-foreground/10 transition-colors cursor-pointer group">
+                  <div className="relative flex items-center justify-center">
+                    <Checkbox
+                      id="embriaguez"
+                      checked={isEmbriaguez}
+                      onCheckedChange={(checked) => {
+                        setIsEmbriaguez(checked === true);
+                        setIsExpanded(true);
+                      }}
+                      className="w-5 h-5 rounded border-gray-300 dark:border-gray-600 data-[state=checked]:bg-red-500 data-[state=checked]:text-white focus:ring-red-500 focus:ring-offset-gray-900"
+                    />
+                  </div>
+                  <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                    La multa incluyó inmovilización del vehículo o suspensión de licencia (Infracciones Especiales)
+                  </span>
+                </label>
               </div>
-              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                La multa incluyó inmovilización del vehículo o suspensión de licencia (Infracciones Especiales)
-              </span>
-            </label>
+            </div>
           </Tabs>
 
           {/* --- PANEL DE RESULTADOS Y CONVERSIÓN --- */}
