@@ -4,7 +4,7 @@ import { checkRateLimit } from '@/lib/security/rate-limit';
 export async function POST(request: NextRequest) {
   try {
     // 🛡️ SEGURIDAD: Rate Limiter (Evita DDoS y spam hacia el motor de Go)
-    const ip = request.headers.get('x-forwarded-for') ?? request.ip ?? '127.0.0.1';
+    const ip = request.headers.get('x-forwarded-for') ?? '127.0.0.1';
     const rateLimit = await checkRateLimit('consultation', ip);
     
     if (rateLimit.blocked) {
