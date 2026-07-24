@@ -264,7 +264,7 @@ export function SavingsCalculator() {
                     setIsExpanded(true);
                   }}
                   min={0}
-                  max={5000000}
+                  max={3000000}
                   step={50000}
                   className="py-2"
                   aria-label="Valor original de la multa"
@@ -302,7 +302,7 @@ export function SavingsCalculator() {
                     setIsExpanded(true);
                   }}
                   min={0}
-                  max={312}
+                  max={120}
                   step={1}
                   className="py-2"
                   aria-label="Tiempo de mora en meses"

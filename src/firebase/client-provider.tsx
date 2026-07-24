@@ -42,9 +42,9 @@ export function FirebaseClientProvider({ children }: FirebaseClientProviderProps
       }
     };
 
-    // Estrategia Lazy: Esperar 3.5 segundos (después del FCP) o primera interacción
+    // Estrategia Lazy: Esperar 3.5 segundos o interactuar intencionalmente
     const timer = setTimeout(initAppCheck, 3500);
-    const triggerEvents = ['scroll', 'mousemove', 'touchstart', 'click', 'keydown'];
+    const triggerEvents = ['touchstart', 'click', 'keydown'];
 
     const handleInteract = () => {
       initAppCheck();

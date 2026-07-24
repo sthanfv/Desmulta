@@ -201,13 +201,13 @@ export const Footer = ({ footerData, onOpenWhatsAppWarning }: FooterProps) => {
               </h3>
               <Link
                 href="/multas/codigo"
-                className="w-full md:w-auto inline-flex items-center gap-3 px-6 py-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-primary/30 transition-all group active:scale-95 text-muted-foreground hover:text-white"
+                className="w-full md:w-auto inline-flex items-center gap-3 px-6 py-4 rounded-2xl bg-foreground/5 border border-foreground/10 hover:bg-foreground/10 hover:border-primary/30 transition-all group active:scale-95 text-muted-foreground hover:text-foreground"
               >
                 <div className="w-10 h-10 shrink-0 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-black transition-colors">
                   <BookOpen size={20} />
                 </div>
                 <div className="flex flex-col text-left">
-                  <span className="text-sm font-black uppercase tracking-widest text-white">
+                  <span className="text-sm font-black uppercase tracking-widest text-foreground">
                     Directorio de Códigos
                   </span>
                   <span className="text-xs font-medium">Explora las infracciones defendibles</span>
@@ -222,10 +222,10 @@ export const Footer = ({ footerData, onOpenWhatsAppWarning }: FooterProps) => {
               </h3>
               <Link
                 href="/multas/ciudades"
-                className="w-full md:w-auto inline-flex items-center gap-3 px-6 py-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-green-500/30 transition-all group active:scale-95 text-muted-foreground hover:text-white"
+                className="w-full md:w-auto inline-flex items-center gap-3 px-6 py-4 rounded-2xl bg-foreground/5 border border-foreground/10 hover:bg-foreground/10 hover:border-green-500/30 transition-all group active:scale-95 text-muted-foreground hover:text-foreground"
               >
                 <div className="flex flex-col text-right order-2 md:order-1">
-                  <span className="text-sm font-black uppercase tracking-widest text-white">
+                  <span className="text-sm font-black uppercase tracking-widest text-foreground">
                     Directorio de Cobertura
                   </span>
                   <span className="text-xs font-medium">Encuentra tu ciudad o municipio</span>

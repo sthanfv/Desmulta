@@ -73,12 +73,6 @@ export function WelcomeModal({ onAcknowledge }: WelcomeModalProps) {
         <div className="grid grid-cols-1 gap-4">
           {[
             {
-              icon: <Calculator className="w-5 h-5 text-emerald-500" />,
-              title: 'Calculadora Legal',
-              desc: 'Calcula la prescripción de tus multas según la ley actual.',
-              tag: 'Nuevo',
-            },
-            {
               icon: <ShieldCheck className="w-5 h-5 text-blue-500" />,
               title: 'Defensa Blindada',
               desc: 'Procesos de exoneración respaldados por expertos legales.',
