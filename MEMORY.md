@@ -1598,3 +1598,8 @@ Se leyó `C:\Users\Sthan\Escritorio\para antigravity\auditoria-forense-v2-delta.
 - Que cambio: Se reemplazo la renderizacion estatica de formatCurrency por el componente animado <CountUp> en la calculadora.
 - Por que cambio: Para que los numeros suban fluidamente simulando el efecto bola de nieve en intereses y deuda total, logrando mayor impacto visual sin depender de FPS altos.
 - Archivos: src/components/interactive/SavingsCalculator.tsx
+
+## 2026-07-23 - Optimización Extrema de MeshBackground
+- **Qué cambió:** Se eliminó la pesada propiedad CSS ilter: blur(90px) de los blobs de la clase .aurora-blob en globals.css. En su lugar, se reemplazaron los fondos sólidos por adial-gradient con opacidades para emular el difuminado matemáticamente sin usar filtros CSS.
+- **Por qué cambió:** Para erradicar los pequeños parpadeos residuales y el cuello de botella que causaba calcular filtros desenfocados masivos por frame en dispositivos de gama media/baja.
+- **Archivos afectados:** src/app/globals.css.

@@ -376,7 +376,6 @@
   position: absolute;
   width: 700px;
   height: 700px;
-  filter: blur(90px);
   opacity: 0.18;
   mix-blend-mode: screen;
   animation: aurora-liquid 18s ease-in-out infinite alternate;
@@ -386,19 +385,19 @@
 }
 
 .blob-primary {
-  background: radial-gradient(circle, #ffbf00 0%, #ff8800 100%);
+  background: radial-gradient(circle closest-side, rgba(255, 191, 0, 1) 0%, rgba(255, 136, 0, 0) 100%);
   top: 15%;
   left: 25%;
 }
 .blob-secondary {
-  background: radial-gradient(circle, #0055ff 0%, #45a0f5 100%);
+  background: radial-gradient(circle closest-side, rgba(0, 85, 255, 1) 0%, rgba(69, 160, 245, 0) 100%);
   bottom: 15%;
   right: 15%;
   animation: aurora-liquid 24s ease-in-out 4s infinite alternate;
   opacity: 0.15;
 }
 .blob-tertiary {
-  background: radial-gradient(circle, #7928ca 0%, #ff0080 100%);
+  background: radial-gradient(circle closest-side, rgba(121, 40, 202, 1) 0%, rgba(255, 0, 128, 0) 100%);
   top: 50%;
   left: 60%;
   animation: aurora-liquid 20s ease-in-out 8s infinite alternate;
