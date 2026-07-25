@@ -1675,3 +1675,8 @@ Se leyó `C:\Users\Sthan\Escritorio\para antigravity\auditoria-forense-v2-delta.
 - **Causa Raiz:** La validacion estricta introducida recientemente en Go rechazaba estrictamente 'req.ValorMulta <= 0', pero el proxy de Next.js envia 0 cuando el usuario solo desea el analisis legal sin calculos financieros.  
 - **Solucion:** Se cambio la condicion en main.go a 'req.ValorMulta < 0'. El motor Go maneja el valor 0 de manera segura desactivando el calculo de intereses y retornando la viabilidad prescriptiva correctamente.  
 - **Archivos afectados:** desmulta-calculadora-go/main.go 
+  
+## 2026-07-24 - Mejora de UX (Desfase SIMIT)  
+- **Que cambio:** Se agrego una nota en SavingsCalculator debajo de 'Deuda Total Actual' indicando que la proyeccion es al dia de hoy y que SIMIT suele tardar semanas en actualizarse.  
+- **Por que:** Para manejar la expectativa del usuario al comparar su recibo desactualizado del SIMIT con el calculo en tiempo real de nuestra plataforma, reduciendo la friccion y aumentando la confianza.  
+- **Archivos afectados:** src/components/interactive/SavingsCalculator.tsx 
