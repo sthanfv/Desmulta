@@ -466,12 +466,17 @@ export function SavingsCalculator() {
                       +$ <CountUp from={0} to={intereses} separator="." duration={1.5} />
                     </span>
                   </div>
-                  <div className="flex justify-between items-end bg-foreground/5 dark:bg-black/40 p-4 rounded-2xl border border-foreground/10">
-                    <span className="text-base font-medium text-muted-foreground">
-                      Deuda Total Actual
-                    </span>
-                    <span className="font-black text-2xl text-foreground tracking-tight">
-                      $ <CountUp from={0} to={total} separator="." duration={1.5} />
+                  <div className="flex flex-col bg-foreground/5 dark:bg-black/40 p-4 rounded-2xl border border-foreground/10 gap-1">
+                    <div className="flex justify-between items-end">
+                      <span className="text-base font-medium text-muted-foreground">
+                        Deuda Total Actual
+                      </span>
+                      <span className="font-black text-2xl text-foreground tracking-tight">
+                        $ <CountUp from={0} to={total} separator="." duration={1.5} />
+                      </span>
+                    </div>
+                    <span className="text-[11px] text-muted-foreground/70 leading-tight">
+                      * Proyectada a hoy. Plataformas como SIMIT pueden tardar semanas en actualizar los intereses en pantalla.
                     </span>
                   </div>
 
