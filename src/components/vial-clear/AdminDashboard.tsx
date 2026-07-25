@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -265,6 +265,31 @@ export function AdminDashboard() {
     refreshKanban,
     realtimeNewLeadsCount,
   } = useAdminStats(auth);
+
+  // 📊 Cálculo de Carga de Trabajo por Operador (Round-Robin)
+  const workloadByOperator = useMemo(() => {
+    const combined = [...(leadsParaKanban || []), ...(casosParaKanban || [])];
+    const stats: Record<string, { count: number; name: string }> = {};
+
+    combined.forEach((item) => {
+      // Excluir finalizados o descartados
+      if (item.estado === 'FINALIZADO' || item.estado === 'DESCARTADO') return;
+      
+      if (item.assignedToEmail) {
+        const email = item.assignedToEmail;
+        if (!stats[email]) {
+          stats[email] = { count: 0, name: email.split('@')[0] };
+        }
+        stats[email].count += 1;
+      }
+    });
+
+    const total = Object.values(stats).reduce((acc, curr) => acc + curr.count, 0);
+    return {
+      stats: Object.values(stats).sort((a, b) => b.count - a.count),
+      total: total || 1, // Evitar división por cero
+    };
+  }, [leadsParaKanban, casosParaKanban]);
 
   // 🔒 Auto-logout por inactividad
   useInactivityLogout({
@@ -703,6 +728,36 @@ export function AdminDashboard() {
                 variant="secondary"
               />
             </div>
+
+            {/* 📊 Indicador de Carga de Trabajo */}
+            {workloadByOperator.stats.length > 0 && (
+              <div className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-xl p-4 shadow-sm">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-2">
+                  <BarChart3 className="w-4 h-4" /> Distribución de Carga (Consultas Activas)
+                </h3>
+                <div className="space-y-3">
+                  {workloadByOperator.stats.map((op: { name: string; count: number }) => {
+                    const percentage = Math.round((op.count / workloadByOperator.total) * 100);
+                    return (
+                      <div key={op.name} className="flex items-center gap-3">
+                        <div className="w-24 truncate text-sm font-medium text-slate-700 dark:text-slate-300" title={op.name}>
+                          {op.name}
+                        </div>
+                        <div className="flex-1 h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-blue-500 rounded-full" 
+                            style={{ width: `${percentage}%` }}
+                          />
+                        </div>
+                        <div className="w-16 text-right text-xs font-semibold text-slate-500">
+                          {op.count} <span className="opacity-50">({percentage}%)</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
             <TableroFlujoTrabajo
               leadsReales={leadsParaKanban}
               casosReales={casosParaKanban}

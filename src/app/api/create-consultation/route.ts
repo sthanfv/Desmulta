@@ -8,6 +8,7 @@ import { decryptE2EPayload, hashPII, encryptSymmetric } from '@/lib/security/ser
 import { z } from 'zod';
 import { checkRateLimit } from '@/lib/security/rate-limit';
 import { apiError } from '@/lib/types/api-response';
+import { getNextOperator } from '@/lib/operator-assignment';
 
 /**
  * ⚠️ FIX CRÍTICO v8.11.0:
@@ -374,11 +375,19 @@ export async function POST(request: NextRequest) {
         .map((part) => (part.length > 0 ? part[0] + '*'.repeat(Math.max(0, part.length - 1)) : ''))
         .join(' ');
 
+      // 🔄 Round-Robin: asignar operador automáticamente
+      const assignment = await getNextOperator(transaction, db);
+
       const finalDataToSave = {
         ...dataToSave,
         shortId: idSecuencial,
         internalRef: internalCounter,
         trackingUuid,
+        // Sistema de asignación automática de operadores
+        ...(assignment.assignedTo ? {
+          assignedTo: assignment.assignedTo,
+          assignedToEmail: assignment.assignedToEmail,
+        } : {}),
       };
 
       transaction.set(consultationRef, finalDataToSave);

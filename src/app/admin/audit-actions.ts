@@ -3,6 +3,7 @@
 import { getAdminApp } from '@/lib/firebase-admin';
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
+import { syncOperatorRoster } from '@/lib/sync-operator-roster';
 import { logger } from '@/lib/logger/security-logger';
 import { headers, cookies } from 'next/headers';
 import { SignJWT, jwtVerify } from 'jose';
@@ -400,6 +401,9 @@ export async function grantAdminAccessByEmail(targetEmail: string) {
       details: { targetEmail },
     });
 
+    // 🔄 Sincronizar roster de operadores tras agregar nuevo admin
+    await syncOperatorRoster();
+
     return { success: true };
   } catch (error: unknown) {
     logger.error('Error grantAdminAccessByEmail', {
@@ -437,6 +441,9 @@ export async function revokeAdminAccess(uid: string, targetEmail: string) {
       resource: `users/${uid}`,
       details: { targetEmail },
     });
+
+    // 🔄 Sincronizar roster de operadores tras revocar admin
+    await syncOperatorRoster();
 
     return { success: true };
   } catch (error: unknown) {

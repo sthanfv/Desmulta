@@ -98,6 +98,8 @@ export function useAdminStats(auth: Auth | null) {
           trackingUuid: l.trackingUuid,
           tipo: 'lead',
           _lastPushAttempt: l._lastPushAttempt,
+          assignedTo: (l as unknown as Record<string, unknown>).assignedTo as string | undefined,
+          assignedToEmail: (l as unknown as Record<string, unknown>).assignedToEmail as string | undefined,
         } as KanbanItem;
       });
     },
@@ -122,6 +124,8 @@ export function useAdminStats(auth: Auth | null) {
           trackingUuid: c.trackingUuid,
           tipo: 'caso',
           _lastPushAttempt: c._lastPushAttempt,
+          assignedTo: (c as unknown as Record<string, unknown>).assignedTo as string | undefined,
+          assignedToEmail: (c as unknown as Record<string, unknown>).assignedToEmail as string | undefined,
         } as KanbanItem;
       });
     },

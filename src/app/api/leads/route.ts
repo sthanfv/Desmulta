@@ -4,6 +4,7 @@ import { getAdminApp } from '@/lib/firebase-admin';
 import { SimitLeadSchema } from '@/lib/definitions';
 import { logger } from '@/lib/logger/security-logger';
 import { rateLimit } from '@/lib/security/rate-limit';
+import { getNextOperator } from '@/lib/operator-assignment';
 
 /**
  * Anonimiza una IP para cumplimiento Zero-PII antes de persistir.
@@ -63,7 +64,7 @@ export async function POST(req: NextRequest) {
     // Limpiamos honeypot antes de guardar
     const { website_hp: _website_hp, ...cleanLeadData } = leadData;
 
-    // 5. Escribir en Firestore
+    // 5. Escribir en Firestore con asignación Round-Robin
     const app = getAdminApp();
     if (!app) {
       throw new Error('Firebase Admin no inicializado');
@@ -73,12 +74,22 @@ export async function POST(req: NextRequest) {
     const leadRef = db.collection('simit_leads').doc();
     const serverTimestamp = FieldValue.serverTimestamp();
 
-    await leadRef.set({
-      ...cleanLeadData,
-      createdAt: serverTimestamp,
-      // ZERO-PII: solo se guarda IP anonimizada. Nunca la IP completa.
-      ip_address_anon: anonymizeIp(rawIp),
-      status: 'NEW',
+    // 🔄 Transacción atómica: Round-Robin + escritura del lead
+    await db.runTransaction(async (transaction) => {
+      const assignment = await getNextOperator(transaction, db);
+
+      transaction.set(leadRef, {
+        ...cleanLeadData,
+        createdAt: serverTimestamp,
+        // ZERO-PII: solo se guarda IP anonimizada. Nunca la IP completa.
+        ip_address_anon: anonymizeIp(rawIp),
+        status: 'NEW',
+        // Sistema de asignación automática de operadores
+        ...(assignment.assignedTo ? {
+          assignedTo: assignment.assignedTo,
+          assignedToEmail: assignment.assignedToEmail,
+        } : {}),
+      });
     });
 
     logger.info(`[API Leads] Nuevo lead registrado exitosamente: ${leadRef.id}`);

@@ -54,6 +54,9 @@ export interface KanbanItem {
     reason?: string;
     at: string;
   };
+  // Sistema de asignación automática de operadores (Round-Robin)
+  assignedTo?: string;
+  assignedToEmail?: string;
 }
 
 import { COLUMNAS_UNIFICADAS, COLUMNAS_LEADS } from '@/lib/constants/kanban-columns';
@@ -88,6 +91,7 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
   const searchParams = useSearchParams();
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [filterAssignee, setFilterAssignee] = useState<'mine' | 'all'>('mine');
 
   // Enlace mágico desde Telegram: Auto-rellenar búsqueda
   useEffect(() => {
@@ -408,6 +412,12 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
   const filteredItems = useMemo(() => {
     let result = allItems;
 
+    // 1. Filtro de asignación (Round-Robin)
+    if (filterAssignee === 'mine' && auth?.currentUser?.uid) {
+      result = result.filter((item) => item.assignedTo === auth.currentUser?.uid);
+    }
+
+    // 2. Filtro de búsqueda textual
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       result = result.filter((item) => {
@@ -441,7 +451,7 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
     }
 
     return result;
-  }, [searchQuery, filterCiudad, filterEstado, filterFechaInicio, filterFechaFin, allItems]);
+  }, [searchQuery, filterCiudad, filterEstado, filterFechaInicio, filterFechaFin, allItems, filterAssignee, auth?.currentUser?.uid]);
 
   const exportToExcel = useCallback(async () => {
     try {
@@ -721,6 +731,25 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
                   )}
                 </div>
               )}
+
+              {/* Botón de Filtro Mis Asignaciones / Todas */}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => setFilterAssignee((prev) => (prev === 'mine' ? 'all' : 'mine'))}
+                    className={`px-6 py-4 rounded-[1.5rem] font-bold text-sm shadow-inner transition-all flex items-center justify-center gap-2 ${
+                      filterAssignee === 'mine'
+                        ? 'bg-blue-500 hover:bg-blue-600 text-white shadow-lg shadow-blue-500/20'
+                        : 'bg-slate-50 hover:bg-slate-100 dark:bg-slate-900/50 dark:hover:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-white/10'
+                    }`}
+                  >
+                    {filterAssignee === 'mine' ? 'Mis Asignaciones' : 'Todas las Consultas'}
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Alternar entre tus consultas asignadas y la vista global</p>
+                </TooltipContent>
+              </Tooltip>
 
               <Tooltip>
                 <TooltipTrigger asChild>
