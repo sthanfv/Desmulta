@@ -1664,3 +1664,8 @@ Se leyó `C:\Users\Sthan\Escritorio\para antigravity\auditoria-forense-v2-delta.
 - **Que cambio:** Refactor de main.go extrayendo SetupApp() para que main_test.go corra los validadores numericos y rate limits en modo prueba (GO-R1 y GO-R6). Ademas, se limpiaron variables no utilizadas (LazySection, useMouseFollow, sanitizeOcrText, textoOCR) en HomeClient.tsx y calcular-multa/route.ts.  
 - **Por que cambio:** Porque el entorno de pruebas de Go omitia la inicializacion real de la API, dando un falso positivo en cobertura de validaciones numericas estrictas. Las limpiezas de UI se debieron a advertencias de ESLint (--max-warnings 0) que bloqueaban CI/CD.  
 - **Archivos afectados:** desmulta-calculadora-go/main.go, desmulta-calculadora-go/main_test.go, src/app/_components/HomeClient.tsx, src/app/api/v1/calcular-multa/route.ts 
+  
+## 2026-07-24 - Reversion Parcial de CSP (script-src)  
+- **Que cambio:** Se restauro el uso de 'unsafe-inline' en el script-src de la directiva Content-Security-Policy en produccion.  
+- **Por que cambio:** Al aplicar la remediacion estricta del hallazgo #8 y eliminar unsafe-inline, se bloquearon los scripts de Vercel Analytics, Speed Insights, Microsoft Clarity, GTM y la propia hidratacion de Next.js. Implementar un nonce dinamico estricto deshabilitaria el BFCache y el SSG (Static Site Generation), impactando severamente el SEO y los Web Vitals. Se asume el riesgo aceptado a cambio de mantener el rendimiento.  
+- **Archivos afectados:** src/lib/security-headers.ts 

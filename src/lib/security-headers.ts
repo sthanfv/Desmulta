@@ -5,12 +5,15 @@
 
 const isDev = process.env.NODE_ENV === 'development';
 const unsafeEval = isDev ? " 'unsafe-eval'" : '';
-// 🛡️ FIX HALLAZGO #8: 'unsafe-inline' en script-src solo en desarrollo.
-// En producción, los scripts deben cargarse con nonce o hash.
-// Nota: 'unsafe-inline' se ignora automáticamente por los navegadores si hay un nonce presente,
-// pero mantenerlo explícitamente eliminado refuerza la postura de seguridad.
-const scriptUnsafeInline = isDev ? " 'unsafe-inline'" : '';
-
+// 🛡️ FIX HALLAZGO #8: Análisis de 'unsafe-inline' en script-src.
+// MANDATO-FILTRO: Restaurado 'unsafe-inline' en producción.
+// RAZÓN LEGAL/TÉCNICA (Riesgo Aceptado): Eliminar 'unsafe-inline' bloquea los
+// scripts inyectados por Vercel (Analytics, Speed Insights), Microsoft Clarity,
+// Google Tag Manager y la hidratación de Next.js.
+// Implementar un sistema de nonces estricto requeriría deshabilitar la
+// Generación Estática (SSG) en todas las páginas, lo que degrada críticamente
+// el SEO y los Core Web Vitals. Se asume el riesgo mitigado por el resto de la CSP.
+const scriptUnsafeInline = " 'unsafe-inline'";
 // En producción, las animaciones 3D (GSAP) y Framer Motion requieren 'unsafe-inline' en style-src
 // ya que inyectan estilos dinámicos que cambian por cada frame de animación.
 // 🛡️ REVERSIÓN PARCIAL (Hallazgo 13): Reactivado porque bloquear inline-styles
