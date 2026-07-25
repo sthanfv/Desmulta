@@ -1669,3 +1669,9 @@ Se leyó `C:\Users\Sthan\Escritorio\para antigravity\auditoria-forense-v2-delta.
 - **Que cambio:** Se restauro el uso de 'unsafe-inline' en el script-src de la directiva Content-Security-Policy en produccion.  
 - **Por que cambio:** Al aplicar la remediacion estricta del hallazgo #8 y eliminar unsafe-inline, se bloquearon los scripts de Vercel Analytics, Speed Insights, Microsoft Clarity, GTM y la propia hidratacion de Next.js. Implementar un nonce dinamico estricto deshabilitaria el BFCache y el SSG (Static Site Generation), impactando severamente el SEO y los Web Vitals. Se asume el riesgo aceptado a cambio de mantener el rendimiento.  
 - **Archivos afectados:** src/lib/security-headers.ts 
+  
+## 2026-07-24 - Correccion 502/400 (Motor Go)  
+- **Problema:** Los usuarios reportaron un error 502 en Next.js (traducido de un 400 del motor de Go) al enviar consultas sin un valor de multa.  
+- **Causa Raiz:** La validacion estricta introducida recientemente en Go rechazaba estrictamente 'req.ValorMulta <= 0', pero el proxy de Next.js envia 0 cuando el usuario solo desea el analisis legal sin calculos financieros.  
+- **Solucion:** Se cambio la condicion en main.go a 'req.ValorMulta < 0'. El motor Go maneja el valor 0 de manera segura desactivando el calculo de intereses y retornando la viabilidad prescriptiva correctamente.  
+- **Archivos afectados:** desmulta-calculadora-go/main.go 
