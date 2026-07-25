@@ -17,7 +17,7 @@ import {
   ChevronUp,
 } from 'lucide-react';
 import { z } from 'zod';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { AreaChart, Area, XAxis, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { TarjetaPremium } from '@/components/ui/TarjetaPremium';
@@ -25,13 +25,39 @@ import { StarBorder } from '@/components/ui/star-border';
 import CountUp from '@/components/ui/CountUp';
 
 const manualSchema = z.object({
-  valor: z.number({ invalid_type_error: "Debe ser numérico" }).min(0, "Mínimo $0").max(100000000, "Máximo $100M"),
+  valor: z
+    .number({ invalid_type_error: 'Debe ser numérico' })
+    .min(0, 'Mínimo $0')
+    .max(100000000, 'Máximo $100M'),
   fecha: z.string().refine((val) => {
     if (!val) return false;
     const d = new Date(val);
     return !isNaN(d.getTime()) && d <= new Date() && d >= new Date('2002-08-08');
-  }, "Fecha inválida. Debe ser entre Ago 2002 y Hoy.")
+  }, 'Fecha inválida. Debe ser entre Ago 2002 y Hoy.'),
 });
+
+interface HistorialInteres {
+  anio: number;
+  acumulado: number;
+}
+interface ProyeccionesData {
+  en3Meses: number;
+  en12Meses: number;
+}
+interface DescuentosData {
+  aplicaDescuento: boolean;
+  valorCon50Pct: number;
+}
+interface EstrategiaData {
+  bloqueoEmbriaguez: boolean;
+  esSalvablePorPrescripcion: boolean;
+}
+interface ResultadoPrescripcion {
+  probabilidadExito: string | number;
+  estado: string;
+  estadoLegal: string;
+  disclaimerLegal: string;
+}
 
 export function SavingsCalculator() {
   // Estados Financieros
@@ -41,13 +67,13 @@ export function SavingsCalculator() {
 
   // Estados Legales y de Conversión
   const [coactivo, setCoactivo] = useState(false);
-  const [resultado, setResultado] = useState<any>(null);
-  const [proyecciones, setProyecciones] = useState<any>(null);
-  const [descuentos, setDescuentos] = useState<any>(null);
-  const [historialIntereses, setHistorialIntereses] = useState<any[]>([]);
+  const [resultado, setResultado] = useState<ResultadoPrescripcion | null>(null);
+  const [proyecciones, setProyecciones] = useState<ProyeccionesData | null>(null);
+  const [descuentos, setDescuentos] = useState<DescuentosData | null>(null);
+  const [historialIntereses, setHistorialIntereses] = useState<HistorialInteres[]>([]);
   const [riesgoEmbargo, setRiesgoEmbargo] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [estrategia, setEstrategia] = useState<any>(null);
+  const [estrategia, setEstrategia] = useState<EstrategiaData | null>(null);
   const [isEmbriaguez, setIsEmbriaguez] = useState(false);
 
   const [leadState, setLeadState] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
@@ -60,42 +86,42 @@ export function SavingsCalculator() {
   // Estados Manuales Zod
   const [manualMonto, setManualMonto] = useState('');
   const [manualFechaText, setManualFechaText] = useState(''); // DD/MM/YYYY
-  const [manualErrors, setManualErrors] = useState<{valor?: string, fecha?: string}>({});
+  const [manualErrors, setManualErrors] = useState<{ valor?: string; fecha?: string }>({});
   const [fechaExactaGlobal, setFechaExactaGlobal] = useState<string | null>(null);
 
   const handleManualChange = () => {
-     // Sanitizar y parsear a número
-     const parsedMonto = parseInt(manualMonto.replace(/\D/g, ''), 10) || 0;
-     
-     // Convertir DD/MM/YYYY a YYYY-MM-DD para validación
-     const parts = manualFechaText.split('/');
-     let isoDate = '';
-     if (parts.length === 3 && parts[2].length === 4) {
-       isoDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
-     } else {
-       isoDate = 'invalid'; // Forzar error Zod
-     }
-     const result = manualSchema.safeParse({ valor: parsedMonto, fecha: isoDate });
-     if (result.success) {
-       setManualErrors({});
-       setMontoBase(result.data.valor);
-       setFechaExactaGlobal(result.data.fecha);
-       
-       // Sincronizar el slider visualmente (aproximado en meses)
-       const d = new Date(result.data.fecha);
-       const now = new Date();
-       let diffMonths = (now.getFullYear() - d.getFullYear()) * 12 + now.getMonth() - d.getMonth();
-       if (diffMonths < 0) diffMonths = 0;
-       setMesesMora(diffMonths);
-       
-       setIsExpanded(true);
-     } else {
-       const errors: any = {};
-       result.error.issues.forEach(issue => {
-         errors[issue.path[0]] = issue.message;
-       });
-       setManualErrors(errors);
-     }
+    // Sanitizar y parsear a número
+    const parsedMonto = parseInt(manualMonto.replace(/\D/g, ''), 10) || 0;
+
+    // Convertir DD/MM/YYYY a YYYY-MM-DD para validación
+    const parts = manualFechaText.split('/');
+    let isoDate = '';
+    if (parts.length === 3 && parts[2].length === 4) {
+      isoDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+    } else {
+      isoDate = 'invalid'; // Forzar error Zod
+    }
+    const result = manualSchema.safeParse({ valor: parsedMonto, fecha: isoDate });
+    if (result.success) {
+      setManualErrors({});
+      setMontoBase(result.data.valor);
+      setFechaExactaGlobal(result.data.fecha);
+
+      // Sincronizar el slider visualmente (aproximado en meses)
+      const d = new Date(result.data.fecha);
+      const now = new Date();
+      let diffMonths = (now.getFullYear() - d.getFullYear()) * 12 + now.getMonth() - d.getMonth();
+      if (diffMonths < 0) diffMonths = 0;
+      setMesesMora(diffMonths);
+
+      setIsExpanded(true);
+    } else {
+      const errors: Record<string, string> = {};
+      result.error.issues.forEach((issue) => {
+        errors[issue.path[0]] = issue.message;
+      });
+      setManualErrors(errors);
+    }
   };
 
   useEffect(() => {
@@ -121,8 +147,8 @@ export function SavingsCalculator() {
             valorMulta: montoBase,
             fechaInfraccion: fechaInfraccionISO,
             tieneCobroCoactivo: coactivo,
-            tipoInfraccion: isEmbriaguez ? 'F' : ''
-          })
+            tipoInfraccion: isEmbriaguez ? 'F' : '',
+          }),
         });
         if (response.ok) {
           const json = await response.json();
@@ -139,7 +165,7 @@ export function SavingsCalculator() {
         console.error('Error fetching API', error);
       }
     };
-    
+
     // Debounce para no colapsar la API cuando el usuario mueve rápido el slider
     const timeoutId = setTimeout(fetchData, 300);
     return () => clearTimeout(timeoutId);
@@ -151,11 +177,11 @@ export function SavingsCalculator() {
   const chartData = React.useMemo(() => {
     if (!historialIntereses || historialIntereses.length <= 1) return [];
     let sum = montoBase;
-    return historialIntereses.map(h => {
+    return historialIntereses.map((h) => {
       sum += h.acumulado;
       return {
         anio: h.anio,
-        deudaTotal: sum
+        deudaTotal: sum,
       };
     });
   }, [historialIntereses, montoBase]);
@@ -242,8 +268,18 @@ export function SavingsCalculator() {
           {/* --- CONTROLES FINANCIEROS Y TIEMPO (DOBLE INTERFAZ) --- */}
           <Tabs defaultValue="slider" className="w-full space-y-6">
             <TabsList className="grid w-full grid-cols-2 bg-foreground/10 p-1 rounded-xl">
-              <TabsTrigger value="slider" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold rounded-lg transition-all">Modo Rápido</TabsTrigger>
-              <TabsTrigger value="manual" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold rounded-lg transition-all">Modo Preciso</TabsTrigger>
+              <TabsTrigger
+                value="slider"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold rounded-lg transition-all"
+              >
+                Modo Rápido
+              </TabsTrigger>
+              <TabsTrigger
+                value="manual"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold rounded-lg transition-all"
+              >
+                Modo Preciso
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="slider" className="space-y-6 mt-4">
@@ -278,7 +314,9 @@ export function SavingsCalculator() {
                     <span>Tiempo de mora</span>
                     <span className="text-xs text-slate-500 font-normal">
                       Aprox.{' '}
-                      {new Date(new Date().setMonth(new Date().getMonth() - mesesMora)).getFullYear()}
+                      {new Date(
+                        new Date().setMonth(new Date().getMonth() - mesesMora)
+                      ).getFullYear()}
                     </span>
                   </label>
                   <div className="flex flex-col items-end">
@@ -316,13 +354,13 @@ export function SavingsCalculator() {
                 <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
                   Valor exacto de la multa (sin puntos)
                 </label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   inputMode="numeric"
                   placeholder="Ej: 1.500.000"
                   value={manualMonto}
                   onChange={(e) => {
-                    const raw = e.target.value.replace(/\D/g, ''); 
+                    const raw = e.target.value.replace(/\D/g, '');
                     if (!raw) {
                       setManualMonto('');
                       return;
@@ -332,13 +370,15 @@ export function SavingsCalculator() {
                   }}
                   className="w-full bg-foreground/5 dark:bg-black/50 border border-foreground/15 rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
                 />
-                {manualErrors.valor && <p className="text-xs font-bold text-red-500">{manualErrors.valor}</p>}
+                {manualErrors.valor && (
+                  <p className="text-xs font-bold text-red-500">{manualErrors.valor}</p>
+                )}
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
                   Fecha exacta del comparendo (DD/MM/AAAA)
                 </label>
-                <input 
+                <input
                   type="text"
                   inputMode="numeric"
                   placeholder="Ej: 11/04/2026"
@@ -352,9 +392,11 @@ export function SavingsCalculator() {
                   maxLength={10}
                   className="w-full bg-foreground/5 dark:bg-black/50 border border-foreground/15 rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
                 />
-                {manualErrors.fecha && <p className="text-xs font-bold text-red-500">{manualErrors.fecha}</p>}
+                {manualErrors.fecha && (
+                  <p className="text-xs font-bold text-red-500">{manualErrors.fecha}</p>
+                )}
               </div>
-              <button 
+              <button
                 onClick={handleManualChange}
                 className="w-full mt-2 py-3 px-4 bg-primary text-primary-foreground font-bold rounded-xl hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
               >
@@ -365,7 +407,9 @@ export function SavingsCalculator() {
 
             <div
               className={`grid transition-all duration-500 ease-in-out ${
-                isExpanded || coactivo || isEmbriaguez ? 'grid-rows-[1fr] opacity-100 mt-4' : 'grid-rows-[0fr] opacity-0 mt-0'
+                isExpanded || coactivo || isEmbriaguez
+                  ? 'grid-rows-[1fr] opacity-100 mt-4'
+                  : 'grid-rows-[0fr] opacity-0 mt-0'
               }`}
             >
               <div className="overflow-hidden flex flex-col gap-2">
@@ -399,7 +443,8 @@ export function SavingsCalculator() {
                     />
                   </div>
                   <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                    La multa incluyó inmovilización del vehículo o suspensión de licencia (Infracciones Especiales)
+                    La multa incluyó inmovilización del vehículo o suspensión de licencia
+                    (Infracciones Especiales)
                   </span>
                 </label>
               </div>
@@ -433,8 +478,13 @@ export function SavingsCalculator() {
                   {/* SÚPER PODERES DE GO - MONETIZACIÓN & ESTRATEGIA LEGAL */}
                   {estrategia?.bloqueoEmbriaguez && (
                     <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-xl mt-4">
-                      <h4 className="font-bold text-red-600 flex items-center gap-2 mb-1"><AlertOctagon className="w-4 h-4"/> Sin Descuentos (Ley 1696)</h4>
-                      <p className="text-sm text-red-700/80">Las multas por embriaguez tienen prohibición expresa de recibir cualquier tipo de amnistía o descuento por ley.</p>
+                      <h4 className="font-bold text-red-600 flex items-center gap-2 mb-1">
+                        <AlertOctagon className="w-4 h-4" /> Sin Descuentos (Ley 1696)
+                      </h4>
+                      <p className="text-sm text-red-700/80">
+                        Las multas por embriaguez tienen prohibición expresa de recibir cualquier
+                        tipo de amnistía o descuento por ley.
+                      </p>
                     </div>
                   )}
 
@@ -447,12 +497,16 @@ export function SavingsCalculator() {
                         <div className="p-2 bg-primary/20 rounded-lg text-primary">
                           <ShieldCheck className="w-5 h-5" />
                         </div>
-                        <h4 className="font-black text-primary text-lg">Viabilidad de Defensa Detectada</h4>
+                        <h4 className="font-black text-primary text-lg">
+                          Viabilidad de Defensa Detectada
+                        </h4>
                       </div>
                       <p className="text-sm text-foreground/80 relative z-10 mb-5 leading-relaxed">
-                        Según el cálculo de tiempos, tu caso podría ser apto para solicitar la figura legal de prescripción. Adquiere el documento técnico y preséntalo ante la Secretaría de Tránsito correspondiente para iniciar el proceso.
+                        Según el cálculo de tiempos, tu caso podría ser apto para solicitar la
+                        figura legal de prescripción. Adquiere el documento técnico y preséntalo
+                        ante la Secretaría de Tránsito correspondiente para iniciar el proceso.
                       </p>
-                      <a 
+                      <a
                         href="/plantillas"
                         className="relative z-10 group inline-flex items-center justify-center gap-3 bg-primary text-primary-foreground font-black px-6 py-3.5 rounded-xl hover:bg-primary/90 transition-all duration-300 shadow-[0_0_20px_-5px_rgba(242,201,76,0.4)] hover:shadow-[0_0_30px_-5px_rgba(242,201,76,0.6)] hover:-translate-y-0.5 w-full sm:w-auto ring-1 ring-black/5 dark:ring-white/10"
                       >
@@ -465,8 +519,12 @@ export function SavingsCalculator() {
                   {/* SÚPER PODERES DE GO - DISEÑO VISUAL */}
                   {descuentos?.aplicaDescuento && (
                     <div className="bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-xl mt-4">
-                      <h4 className="font-bold text-emerald-600 mb-2">🎁 Ley 1383 (Descuento Activo)</h4>
-                      <p className="text-sm text-emerald-700/80 mb-3">Estás a tiempo. Paga hoy mismo y ahorra dinero:</p>
+                      <h4 className="font-bold text-emerald-600 mb-2">
+                        🎁 Ley 1383 (Descuento Activo)
+                      </h4>
+                      <p className="text-sm text-emerald-700/80 mb-3">
+                        Estás a tiempo. Paga hoy mismo y ahorra dinero:
+                      </p>
                       <div className="flex justify-between items-center bg-emerald-500/20 px-3 py-2 rounded-lg font-bold text-emerald-700">
                         <span>50% Descuento</span>
                         <span>{formatCurrency(descuentos.valorCon50Pct)}</span>
@@ -476,8 +534,12 @@ export function SavingsCalculator() {
 
                   {!descuentos?.aplicaDescuento && proyecciones && (
                     <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-xl mt-4">
-                      <h4 className="font-bold text-red-600 mb-2">🔮 Riesgo Financiero (Deuda Futura)</h4>
-                      <p className="text-sm text-red-700/80 mb-3">Si no resuelves esto, tu deuda seguirá sumando intereses de mora:</p>
+                      <h4 className="font-bold text-red-600 mb-2">
+                        🔮 Riesgo Financiero (Deuda Futura)
+                      </h4>
+                      <p className="text-sm text-red-700/80 mb-3">
+                        Si no resuelves esto, tu deuda seguirá sumando intereses de mora:
+                      </p>
                       <div className="space-y-1">
                         <div className="flex justify-between items-center text-sm font-medium text-red-600 bg-red-500/10 px-3 py-1.5 rounded">
                           <span>En 3 meses:</span>
@@ -497,23 +559,41 @@ export function SavingsCalculator() {
                         <Activity className="w-4 h-4 text-red-500" />
                         Efecto Bola de Nieve
                       </h4>
-                      <p className="text-xs text-muted-foreground mb-4">Así creció tu deuda real (Capital + Intereses) año tras año.</p>
+                      <p className="text-xs text-muted-foreground mb-4">
+                        Así creció tu deuda real (Capital + Intereses) año tras año.
+                      </p>
                       <div className="h-32 w-full">
                         <ResponsiveContainer width="100%" height="100%">
                           <AreaChart data={chartData}>
                             <defs>
                               <linearGradient id="colorDeuda" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8}/>
-                                <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                                <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8} />
+                                <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
                               </linearGradient>
                             </defs>
                             <XAxis dataKey="anio" fontSize={10} tickLine={false} axisLine={false} />
-                            <RechartsTooltip 
-                              formatter={(value: any) => [formatCurrency(Number(value)), "Deuda Total"]}
+                            <RechartsTooltip
+                              formatter={(value: unknown) => [
+                                formatCurrency(Number(value)),
+                                'Deuda Total',
+                              ]}
                               labelFormatter={(label) => `Año ${label}`}
-                              contentStyle={{ borderRadius: '8px', fontSize: '12px', border: 'none', backgroundColor: '#1f2937', color: '#fff' }}
+                              contentStyle={{
+                                borderRadius: '8px',
+                                fontSize: '12px',
+                                border: 'none',
+                                backgroundColor: '#1f2937',
+                                color: '#fff',
+                              }}
                             />
-                            <Area type="monotone" dataKey="deudaTotal" stroke="#ef4444" strokeWidth={3} fillOpacity={1} fill="url(#colorDeuda)" />
+                            <Area
+                              type="monotone"
+                              dataKey="deudaTotal"
+                              stroke="#ef4444"
+                              strokeWidth={3}
+                              fillOpacity={1}
+                              fill="url(#colorDeuda)"
+                            />
                           </AreaChart>
                         </ResponsiveContainer>
                       </div>
@@ -555,9 +635,9 @@ export function SavingsCalculator() {
                           {resultado.disclaimerLegal}
                         </p>
                         <div className="mt-2 inline-block px-2 py-1 rounded bg-foreground/10 text-[10px] font-bold uppercase tracking-wider">
-                          Éxito Histórico: {resultado.probabilidadExito.split('%')[0]}%
+                          Éxito Histórico: {String(resultado.probabilidadExito).split('%')[0]}%
                         </div>
-                        
+
                         {/* Semáforo de Probabilidad de Cobro Coactivo (Con Disclaimer Legal) */}
                         {riesgoEmbargo && (
                           <div className="mt-4 pt-3 border-t border-foreground/10">
@@ -565,10 +645,14 @@ export function SavingsCalculator() {
                               <Tooltip>
                                 <TooltipTrigger asChild>
                                   <div className="flex items-center gap-2 cursor-help w-fit bg-white dark:bg-black/40 border px-3 py-2 rounded-lg shadow-sm">
-                                    <AlertOctagon className={`w-4 h-4 ${riesgoEmbargo === 'Alto' ? 'text-red-500' : riesgoEmbargo === 'Medio' ? 'text-amber-500' : 'text-emerald-500'}`} />
+                                    <AlertOctagon
+                                      className={`w-4 h-4 ${riesgoEmbargo === 'Alto' ? 'text-red-500' : riesgoEmbargo === 'Medio' ? 'text-amber-500' : 'text-emerald-500'}`}
+                                    />
                                     <span className="text-xs font-bold text-slate-700 dark:text-slate-200">
-                                      Probabilidad de Acción de Cobro: 
-                                      <span className={`ml-1 ${riesgoEmbargo === 'Alto' ? 'text-red-600 dark:text-red-400' : riesgoEmbargo === 'Medio' ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                                      Probabilidad de Acción de Cobro:
+                                      <span
+                                        className={`ml-1 ${riesgoEmbargo === 'Alto' ? 'text-red-600 dark:text-red-400' : riesgoEmbargo === 'Medio' ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}
+                                      >
                                         {riesgoEmbargo.toUpperCase()}
                                       </span>
                                     </span>
@@ -576,7 +660,15 @@ export function SavingsCalculator() {
                                 </TooltipTrigger>
                                 <TooltipContent className="max-w-xs text-xs p-3">
                                   <p className="font-bold mb-1">Algoritmo Predictivo</p>
-                                  <p>Cálculo referencial y educativo basado en los tiempos de caducidad (Ley 769 de 2002). <strong>Desmulta no es una autoridad ni ofrece asesoría legal.</strong> Solo el SIMIT o la Secretaría de Movilidad determinan y ejecutan medidas cautelares como el embargo.</p>
+                                  <p>
+                                    Cálculo referencial y educativo basado en los tiempos de
+                                    caducidad (Ley 769 de 2002).{' '}
+                                    <strong>
+                                      Desmulta no es una autoridad ni ofrece asesoría legal.
+                                    </strong>{' '}
+                                    Solo el SIMIT o la Secretaría de Movilidad determinan y ejecutan
+                                    medidas cautelares como el embargo.
+                                  </p>
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
@@ -664,8 +756,8 @@ export function SavingsCalculator() {
                   )}
                 </div>
               </div>
-              
-              <button 
+
+              <button
                 onClick={() => setIsExpanded(false)}
                 className="w-full mt-6 py-2 flex items-center justify-center gap-2 text-muted-foreground hover:text-foreground hover:bg-foreground/5 rounded-xl transition-all"
               >
@@ -678,7 +770,9 @@ export function SavingsCalculator() {
           <div className="flex flex-col items-center gap-1.5 justify-center text-[10px] text-muted-foreground font-medium text-center pt-2">
             <div className="flex items-center gap-1.5">
               <Info className="w-3 h-3 flex-shrink-0" />
-              <span>Simulador SIMIT (Cálculo Aproximado): Interés Simple con Límite (Art 159).</span>
+              <span>
+                Simulador SIMIT (Cálculo Aproximado): Interés Simple con Límite (Art 159).
+              </span>
             </div>
             <span className="text-[9px] opacity-75">
               *Los intereses se congelan legalmente a los 3 años (o 6 si hay coactivo).

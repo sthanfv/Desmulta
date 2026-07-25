@@ -163,7 +163,7 @@ export const onConsultationCreated = onDocumentCreated({
       await db.collection('consultations').doc(docId).update({
         welcomeEmailSent: true
       });
-      logger.info(`[onConsultationCreated] Email enviado a ${emailCiudadano}`);
+      logger.info(`[onConsultationCreated] Email enviado exitosamente para el radicado ${safeShortId}`);
     } catch (err) {
       logger.error(`[onConsultationCreated] Error enviando email:`, err);
     }

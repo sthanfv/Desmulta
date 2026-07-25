@@ -3,11 +3,28 @@ import crypto from 'crypto';
 import { Redis } from '@upstash/redis';
 import { getAdminApp } from '@/lib/firebase-admin';
 import { getFirestore } from 'firebase-admin/firestore';
+import { checkRateLimit } from '@/lib/security/rate-limit';
+import { getSecureIp } from '@/lib/security/ip-utils';
 
 const redis = Redis.fromEnv();
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = getSecureIp(req);
+    const rateLimit = await checkRateLimit('authorizeDownload', ip);
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        { error: 'Demasiados intentos. Por favor espere.' },
+        {
+          status: 429,
+          headers: {
+            'X-RateLimit-Limit': rateLimit.limit.toString(),
+            'X-RateLimit-Remaining': rateLimit.remaining.toString(),
+          },
+        }
+      );
+    }
+
     const body = await req.json();
     const { token, ref, downloadToken } = body;
 

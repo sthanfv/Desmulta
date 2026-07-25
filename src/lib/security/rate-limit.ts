@@ -44,6 +44,7 @@ export const rateLimiters = {
   godMode: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(3, '30 m') }),
   operatorPin: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(5, '15 m') }),
   exportPdf: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(10, '30 m') }),
+  authorizeDownload: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(10, '1 m') }),
 
   // --- C. Portal de Clientes VIP y Telemetría ---
   loginCedula: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(5, '1 h') }),

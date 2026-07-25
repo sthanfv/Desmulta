@@ -63,13 +63,11 @@ import { ShieldCheck, Info, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { ResponsiveModal } from '@/components/ui/responsive-modal';
-import { LazySection } from '@/components/ui/LazySection';
 
 // Custom Hooks
 import { useScrollTop } from '@/hooks/useScrollTop';
 import { useRevealObserver } from '@/hooks/useRevealObserver';
 import { useClipboardProtection } from '@/hooks/useClipboardProtection';
-import { useMouseFollow } from '@/hooks/useMouseFollow';
 import { initiateAnonymousSignIn, useAuth } from '@/firebase';
 
 // Secciones Modularizadas (síncronas — forman parte del SSR inicial)
@@ -146,9 +144,7 @@ export default function HomeClient({
   };
 
   return (
-    <div
-      className="min-h-screen bg-background selection:bg-primary/30 selection:text-primary-foreground overflow-x-hidden relative group/layout rounded-t-xl sm:rounded-t-[2.5rem] md:rounded-[3rem] shadow-2xl sm:border-x sm:border-t border-white/5"
-    >
+    <div className="min-h-screen bg-background selection:bg-primary/30 selection:text-primary-foreground overflow-x-hidden relative group/layout rounded-t-xl sm:rounded-t-[2.5rem] md:rounded-[3rem] shadow-2xl sm:border-x sm:border-t border-white/5">
       {/* Herramienta de diagnóstico táctil y OCR */}
       {process.env.NODE_ENV === 'development' && <TouchDebugger />}
 

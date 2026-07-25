@@ -22,6 +22,7 @@ import { getFirestore, Timestamp, FieldValue } from 'firebase-admin/firestore';
 import { resend } from '@/lib/resend';
 import { buildFollowUpEmail } from '@/lib/email-templates';
 import { logger } from '@/lib/logger/security-logger';
+import { getSecureIp } from '@/lib/security/ip-utils';
 
 // ── Constantes ────────────────────────────────────────────────────────────────
 
@@ -45,7 +46,7 @@ export async function GET(req: NextRequest) {
   const expected = Buffer.from(`Bearer ${cronSecret}`);
   if (provided.length !== expected.length || !timingSafeEqual(provided, expected)) {
     logger.warn('[followup-cron] Intento de acceso no autorizado.', {
-      ip: req.headers.get('x-forwarded-for') ?? 'unknown',
+      ip: getSecureIp(req),
     });
     return NextResponse.json({ error: 'No autorizado.' }, { status: 401 });
   }
@@ -83,6 +84,7 @@ export async function GET(req: NextRequest) {
     let skipped = 0;
     const batch = db.batch();
     const emailPromises: Promise<unknown>[] = [];
+    const docsToUpdate: FirebaseFirestore.DocumentReference[] = [];
 
     snapshot.forEach((doc) => {
       const data = doc.data();
@@ -119,18 +121,23 @@ export async function GET(req: NextRequest) {
         })
       );
 
-      // Marcar lead en batch (una sola escritura masiva)
-      batch.update(doc.ref, {
-        followUpSentAt: FieldValue.serverTimestamp(),
-        updatedAt: FieldValue.serverTimestamp(),
-      });
-
-      processed++;
+      docsToUpdate.push(doc.ref);
     });
 
     // 4. Ejecutar envíos de email en paralelo (con manejo de errores individuales)
     const results = await Promise.allSettled(emailPromises);
     const emailErrors = results.filter((r) => r.status === 'rejected').length;
+
+    // Agregar al batch SOLO los que fueron exitosos
+    results.forEach((result, i) => {
+      if (result.status === 'fulfilled') {
+        batch.update(docsToUpdate[i], {
+          followUpSentAt: FieldValue.serverTimestamp(),
+          updatedAt: FieldValue.serverTimestamp(),
+        });
+        processed++;
+      }
+    });
 
     // 5. Confirmar marcas en Firestore (solo si hubo al menos uno procesado)
     if (processed > 0) {

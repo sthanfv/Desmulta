@@ -44,7 +44,8 @@ export const Pillars = () => {
               <div className="space-y-3 text-center">
                 <h3 className="text-xl md:text-2xl font-black text-foreground">Privacidad Total</h3>
                 <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
-                  Analizamos la foto de su multa de forma segura. Su información nunca viaja a servidores externos, garantizando su privacidad.
+                  Analizamos la foto de su multa de forma segura. Su información nunca viaja a
+                  servidores externos, garantizando su privacidad.
                 </p>
               </div>
             </div>

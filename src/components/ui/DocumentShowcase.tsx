@@ -217,78 +217,78 @@ export function DocumentShowcase() {
               <div
                 key={idx}
                 className={`absolute inset-0 w-full h-full flex flex-col transition-opacity duration-700 ease-in-out ${
-                  idx === currentIndex ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'
+                  idx === currentIndex
+                    ? 'opacity-100 z-10 pointer-events-auto'
+                    : 'opacity-0 z-0 pointer-events-none'
                 }`}
               >
-                  {/* Tag Éxito */}
-                  <div className="flex-none mb-1">
-                    <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[8px] sm:text-[9px] font-bold border border-emerald-200 dark:border-emerald-500/20 animate-pulse">
-                      <Shield size={10} className="fill-emerald-600/20 dark:fill-emerald-400/20" />
-                      {template.successRate}
-                    </div>
+                {/* Tag Éxito */}
+                <div className="flex-none mb-1">
+                  <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[8px] sm:text-[9px] font-bold border border-emerald-200 dark:border-emerald-500/20 animate-pulse">
+                    <Shield size={10} className="fill-emerald-600/20 dark:fill-emerald-400/20" />
+                    {template.successRate}
                   </div>
+                </div>
 
-                  {/* Textos */}
-                  <div className="flex-grow flex flex-col justify-center relative min-h-0">
-                    <div
-                      className="text-[7px] sm:text-[8px] text-muted-foreground font-mono tracking-widest uppercase mb-1 leading-relaxed font-semibold relative z-10"
-                      dangerouslySetInnerHTML={{
-                        // 🛡️ FIX HALLAZGO #7: Sanitización preventiva contra XSS si la fuente cambia a futuro.
-                        __html: template.header
-                          .replace(/</g, '&lt;')
-                          .replace(/>/g, '&gt;'),
-                      }}
-                    />
+                {/* Textos */}
+                <div className="flex-grow flex flex-col justify-center relative min-h-0">
+                  <div
+                    className="text-[7px] sm:text-[8px] text-muted-foreground font-mono tracking-widest uppercase mb-1 leading-relaxed font-semibold relative z-10"
+                    dangerouslySetInnerHTML={{
+                      // 🛡️ FIX HALLAZGO #7: Sanitización preventiva contra XSS si la fuente cambia a futuro.
+                      __html: template.header.replace(/</g, '&lt;').replace(/>/g, '&gt;'),
+                    }}
+                  />
 
-                    <h3 className="text-base sm:text-xl font-black text-foreground mb-1 leading-tight tracking-tight relative z-10">
-                      {template.title}
-                    </h3>
+                  <h3 className="text-base sm:text-xl font-black text-foreground mb-1 leading-tight tracking-tight relative z-10">
+                    {template.title}
+                  </h3>
 
-                    <p className="text-[10px] sm:text-xs text-muted-foreground italic font-medium leading-tight line-clamp-2 relative z-10">
-                      {template.desc}
+                  <p className="text-[10px] sm:text-xs text-muted-foreground italic font-medium leading-tight line-clamp-2 relative z-10">
+                    {template.desc}
+                  </p>
+
+                  {/* Falso cuerpo del documento difuminado (Background absoluto para no empujar el flex) */}
+                  <div
+                    className="absolute bottom-0 translate-y-2 left-0 right-0 text-[6px] sm:text-[7px] text-muted-foreground leading-tight blur-[1px] opacity-25 select-none pointer-events-none hidden sm:block overflow-hidden z-0"
+                    style={{ height: '50px' }}
+                  >
+                    <p>
+                      Yo, mayor de edad, identificado como aparece al pie de mi firma, en ejercicio
+                      del Derecho Constitucional de Petición consagrado en el artículo 23 de la
+                      Constitución Política y la Ley 1437 de 2011. Solicito respetuosamente se sirva
+                      ordenar la actualización de las bases de datos correspondientes al SIMIT y
+                      RUNT...
                     </p>
-
-                    {/* Falso cuerpo del documento difuminado (Background absoluto para no empujar el flex) */}
-                    <div
-                      className="absolute bottom-0 translate-y-2 left-0 right-0 text-[6px] sm:text-[7px] text-muted-foreground leading-tight blur-[1px] opacity-25 select-none pointer-events-none hidden sm:block overflow-hidden z-0"
-                      style={{ height: '50px' }}
-                    >
-                      <p>
-                        Yo, mayor de edad, identificado como aparece al pie de mi firma, en
-                        ejercicio del Derecho Constitucional de Petición consagrado en el artículo
-                        23 de la Constitución Política y la Ley 1437 de 2011. Solicito
-                        respetuosamente se sirva ordenar la actualización de las bases de datos
-                        correspondientes al SIMIT y RUNT...
-                      </p>
-                    </div>
                   </div>
+                </div>
 
-                  {/* Footer Carta */}
-                  <div className="flex-none mt-2 pt-2 border-t border-border">
-                    <div className="flex justify-between items-end mb-2">
-                      <div>
-                        <p className="text-[8px] text-muted-foreground mb-0.5 font-semibold uppercase tracking-wider">
-                          Precio especial
-                        </p>
-                        <div className="flex items-baseline gap-1">
-                          <span className="text-xl sm:text-2xl font-black text-foreground">
-                            {template.price}
-                          </span>
-                        </div>
+                {/* Footer Carta */}
+                <div className="flex-none mt-2 pt-2 border-t border-border">
+                  <div className="flex justify-between items-end mb-2">
+                    <div>
+                      <p className="text-[8px] text-muted-foreground mb-0.5 font-semibold uppercase tracking-wider">
+                        Precio especial
+                      </p>
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-xl sm:text-2xl font-black text-foreground">
+                          {template.price}
+                        </span>
                       </div>
                     </div>
-
-                    <button
-                      onClick={() => router.push('/plantillas')}
-                      className="w-full py-2 px-3 bg-primary hover:bg-primary/90 text-primary-foreground font-black text-xs sm:text-sm rounded-lg shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-1.5 group/btn focus:outline-none"
-                    >
-                      <span>Ver Solución Legal</span>
-                      <FileText
-                        size={14}
-                        className="group-hover/btn:-translate-y-1 group-hover/btn:rotate-6 transition-transform"
-                      />
-                    </button>
                   </div>
+
+                  <button
+                    onClick={() => router.push('/plantillas')}
+                    className="w-full py-2 px-3 bg-primary hover:bg-primary/90 text-primary-foreground font-black text-xs sm:text-sm rounded-lg shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-1.5 group/btn focus:outline-none"
+                  >
+                    <span>Ver Solución Legal</span>
+                    <FileText
+                      size={14}
+                      className="group-hover/btn:-translate-y-1 group-hover/btn:rotate-6 transition-transform"
+                    />
+                  </button>
+                </div>
               </div>
             ))}
           </div>

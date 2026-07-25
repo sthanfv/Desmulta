@@ -480,14 +480,16 @@ export function TouchDebugger() {
         const entries: { key: string; value: string; type: 'local' | 'session' }[] = [];
         // 🛡️ FIX HALLAZGO #12: Solo enumerar claves propias de Desmulta (no de terceros).
         const SAFE_PREFIXES = ['desmulta', 'pwa', 'theme', 'consultation'];
-        const isOwnKey = (k: string) => SAFE_PREFIXES.some(p => k.startsWith(p));
+        const isOwnKey = (k: string) => SAFE_PREFIXES.some((p) => k.startsWith(p));
         for (let i = 0; i < localStorage.length; i++) {
           const k = localStorage.key(i);
-          if (k && isOwnKey(k)) entries.push({ key: k, value: localStorage.getItem(k) || '', type: 'local' });
+          if (k && isOwnKey(k))
+            entries.push({ key: k, value: localStorage.getItem(k) || '', type: 'local' });
         }
         for (let i = 0; i < sessionStorage.length; i++) {
           const k = sessionStorage.key(i);
-          if (k && isOwnKey(k)) entries.push({ key: k, value: sessionStorage.getItem(k) || '', type: 'session' });
+          if (k && isOwnKey(k))
+            entries.push({ key: k, value: sessionStorage.getItem(k) || '', type: 'session' });
         }
         setStorageEntries(entries);
       } catch (_e) {
@@ -657,10 +659,11 @@ export function TouchDebugger() {
           const entries: { key: string; value: string; type: 'local' | 'session' }[] = [];
           // 🛡️ FIX HALLAZGO #12: Solo enumerar claves propias.
           const SAFE_PREFIXES = ['desmulta', 'pwa', 'theme', 'consultation'];
-          const isOwnKey = (k: string) => SAFE_PREFIXES.some(p => k.startsWith(p));
+          const isOwnKey = (k: string) => SAFE_PREFIXES.some((p) => k.startsWith(p));
           for (let i = 0; i < localStorage.length; i++) {
             const k = localStorage.key(i);
-            if (k && isOwnKey(k)) entries.push({ key: k, value: localStorage.getItem(k) || '', type: 'local' });
+            if (k && isOwnKey(k))
+              entries.push({ key: k, value: localStorage.getItem(k) || '', type: 'local' });
           }
           for (let i = 0; i < sessionStorage.length; i++) {
             const k = sessionStorage.key(i);

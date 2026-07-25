@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { m } from 'framer-motion';
-import { ShieldCheck, ArrowRight, Calculator } from 'lucide-react';
+import { ShieldCheck, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ResponsiveModal } from '@/components/ui/responsive-modal';
 
@@ -93,16 +93,6 @@ export function WelcomeModal({ onAcknowledge }: WelcomeModalProps) {
                   <m.h4 className="font-bold text-foreground text-sm uppercase tracking-tight">
                     {item.title}
                   </m.h4>
-                  {item.tag && (
-                    <m.span
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ delay: 0.5 + idx * 0.1 }}
-                      className="text-[9px] font-black bg-emerald-500/10 text-emerald-500 px-2 py-0.5 rounded-full uppercase tracking-tighter border border-emerald-500/20"
-                    >
-                      {item.tag}
-                    </m.span>
-                  )}
                 </div>
                 <p className="text-xs text-muted-foreground/80 leading-snug">{item.desc}</p>
               </div>

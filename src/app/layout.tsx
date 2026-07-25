@@ -106,7 +106,6 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-
   return (
     <html lang="es" suppressHydrationWarning className={`${geistSans.variable} font-sans`}>
       <head>
@@ -118,7 +117,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {/* Firebase — autenticación anónima al cargar la app */}
         <link rel="preconnect" href="https://firebaseinstallations.googleapis.com" />
         <link rel="dns-prefetch" href="https://firebaseinstallations.googleapis.com" />
-
       </head>
       <body
         suppressHydrationWarning
@@ -153,9 +151,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         </ErrorBoundary>
 
         {/* Google Analytics (MANDATO-FILTRO) */}
-        {process.env.NEXT_PUBLIC_GA_ID && (
-          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
-        )}
+        {process.env.NEXT_PUBLIC_GA_ID && <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />}
 
         {/* Vercel Speed Insights */}
         <SpeedInsights />

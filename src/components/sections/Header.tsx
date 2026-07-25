@@ -249,9 +249,7 @@ export const Header = ({ onOpenModal }: HeaderProps) => {
                 <div className="bg-primary/10 p-2 rounded-xl text-primary flex-shrink-0">
                   <Activity className="w-5 h-5" />
                 </div>
-                <span className="text-sm font-bold text-foreground">
-                  Últimas Actualizaciones
-                </span>
+                <span className="text-sm font-bold text-foreground">Últimas Actualizaciones</span>
               </div>
               <div className="scale-90 origin-right">
                 <ChangelogWidget usePortal={true} />

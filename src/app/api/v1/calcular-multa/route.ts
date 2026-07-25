@@ -3,7 +3,7 @@ import crypto from 'crypto';
 import { z } from 'zod';
 import { logger } from '@/lib/logger/security-logger';
 import { apiError } from '@/lib/types/api-response';
-import { calcularMultaCompleta } from '@/lib/calculadora-legal';
+
 import { determinarCausales } from '@/lib/legal/comparendo-extractor';
 import { validateApiKey, API_KEY_HEADER, handleApiKeyError } from '@/lib/security/api-key-guard';
 
@@ -63,18 +63,6 @@ const CalcularMultaSchema = z.object({
     .optional(),
 });
 
-/**
- * Sanitización preventiva del texto OCR
- * Limpia caracteres de control y normaliza saltos de línea para prevenir
- * inyecciones en el motor de evaluación (regex/eval) o futuros LLMs.
- */
-function sanitizeOcrText(raw: string): string {
-  return raw
-    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '') // Caracteres de control
-    .replace(/\r\n|\r/g, '\n') // Normalizar saltos
-    .slice(0, 20_000) // Respetar límite Zod
-    .trim();
-}
 
 export async function POST(request: NextRequest) {
   // ══════════════════════════════════════════════════════════════════════
@@ -106,14 +94,12 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { valorMulta, fechaInfraccion, tieneCobroCoactivo, textoOCR } = parsed.data;
+  const { valorMulta, fechaInfraccion, tieneCobroCoactivo } = parsed.data;
 
   // ══════════════════════════════════════════════════════════════════════
   // CAPA 3: Ejecución del cálculo
   // ══════════════════════════════════════════════════════════════════════
   try {
-    const textoSeguro = textoOCR ? sanitizeOcrText(textoOCR) : '';
-
     // 🛡️ FIX HALLAZGO #2: Conexión segura al microservicio Go.
     // - URL y token leídos desde variables de entorno (Fail-Closed).
     // - Se incluye X-Engine-Token para autenticación S2S.
@@ -121,7 +107,9 @@ export async function POST(request: NextRequest) {
     const engineSecret = process.env.GO_ENGINE_SECRET;
 
     if (!engineUrl || !engineSecret) {
-      logger.error('[calcular-multa B2B] CRÍTICO: GO_ENGINE_URL o GO_ENGINE_SECRET no configurados.');
+      logger.error(
+        '[calcular-multa B2B] CRÍTICO: GO_ENGINE_URL o GO_ENGINE_SECRET no configurados.'
+      );
       return NextResponse.json(
         apiError('INTERNAL_ERROR', 'Motor de cálculo no disponible temporalmente.'),
         { status: 503 }
@@ -131,9 +119,9 @@ export async function POST(request: NextRequest) {
     const bodyStr = JSON.stringify({
       valorMulta,
       fechaInfraccion,
-      tieneCobroCoactivo
+      tieneCobroCoactivo,
     });
-    
+
     const timestamp = Date.now().toString();
     const signature = crypto
       .createHmac('sha256', engineSecret)
@@ -147,7 +135,7 @@ export async function POST(request: NextRequest) {
         'X-Engine-Timestamp': timestamp,
         'X-Engine-Signature': signature,
       },
-      body: bodyStr
+      body: bodyStr,
     });
 
     if (!goResponse.ok) {

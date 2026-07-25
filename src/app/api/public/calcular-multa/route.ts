@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     // 🛡️ SEGURIDAD: Rate Limiter (Evita DDoS y spam hacia el motor de Go)
     const ip = request.headers.get('x-forwarded-for') ?? '127.0.0.1';
     const rateLimit = await checkRateLimit('consultation', ip);
-    
+
     if (rateLimit.blocked) {
       return NextResponse.json(
         { error: 'Demasiadas consultas. Por favor espera un momento e inténtalo de nuevo.' },
@@ -45,7 +45,9 @@ export async function POST(request: NextRequest) {
     const secretToken = process.env.GO_ENGINE_SECRET;
 
     if (!engineUrl || !secretToken) {
-      console.error('[calcular-multa proxy] CRÍTICO: GO_ENGINE_URL o GO_ENGINE_SECRET no configurados.');
+      console.error(
+        '[calcular-multa proxy] CRÍTICO: GO_ENGINE_URL o GO_ENGINE_SECRET no configurados.'
+      );
       return NextResponse.json(
         { error: 'Servicio de cálculo no disponible temporalmente.' },
         { status: 503 }
@@ -61,12 +63,12 @@ export async function POST(request: NextRequest) {
 
     const goResponse = await fetch(engineUrl, {
       method: 'POST',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'X-Engine-Timestamp': timestamp,
-        'X-Engine-Signature': signature
+        'X-Engine-Signature': signature,
       },
-      body: bodyStr
+      body: bodyStr,
     });
 
     if (!goResponse.ok) {
@@ -79,10 +81,9 @@ export async function POST(request: NextRequest) {
     }
 
     const goJson = await goResponse.json();
-    
+
     // Retornamos directamente lo que dijo Go
     return NextResponse.json(goJson, { status: 200 });
-
   } catch (error: unknown) {
     // 🛡️ FIX HALLAZGO #4: Registrar el error internamente, nunca exponerlo al cliente.
     const mensaje = error instanceof Error ? error.message : String(error);

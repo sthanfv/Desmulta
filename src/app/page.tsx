@@ -21,7 +21,8 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://desmulta.online';
 
 export const metadata: Metadata = {
   title: 'Desmulta — Expertos en Multas de Tránsito Colombia',
-  description: 'Análisis técnico de multas de tránsito en Colombia. Identificamos si su caso tiene fundamentos de prescripción, caducidad o vicios de notificación.',
+  description:
+    'Análisis técnico de multas de tránsito en Colombia. Identificamos si su caso tiene fundamentos de prescripción, caducidad o vicios de notificación.',
 };
 
 /** Schema.org JSON-LD para la homepage — mejora la apariencia en Google (rich results) */
@@ -117,10 +118,7 @@ const homepageJsonLd = {
 
 export default async function VialClearPage() {
   // Al eliminar headers(), esta página se puede compilar estáticamente (SSG)
-  const [showcaseData, footerData] = await Promise.all([
-    getShowcaseConfig(),
-    getFooterConfig(),
-  ]);
+  const [showcaseData, footerData] = await Promise.all([getShowcaseConfig(), getFooterConfig()]);
 
   const ciudad = 'Colombia'; // Fallback estático para BFCache
 

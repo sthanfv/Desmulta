@@ -9,7 +9,7 @@ const unsafeEval = isDev ? " 'unsafe-eval'" : '';
 // En producción, los scripts deben cargarse con nonce o hash.
 // Nota: 'unsafe-inline' se ignora automáticamente por los navegadores si hay un nonce presente,
 // pero mantenerlo explícitamente eliminado refuerza la postura de seguridad.
-const scriptUnsafeInline = isDev ? " 'unsafe-inline'" : " 'unsafe-inline'";
+const scriptUnsafeInline = isDev ? " 'unsafe-inline'" : '';
 
 // En producción, las animaciones 3D (GSAP) y Framer Motion requieren 'unsafe-inline' en style-src
 // ya que inyectan estilos dinámicos que cambian por cada frame de animación.
@@ -17,8 +17,6 @@ const scriptUnsafeInline = isDev ? " 'unsafe-inline'" : " 'unsafe-inline'";
 // rompe críticamente la UI 3D (CardSwap). Se acepta el riesgo de 'unsafe-inline' en CSS
 // a favor de la funcionalidad Core del producto, mientras script-src sigue protegido con nonce.
 const styleUnsafe = " 'unsafe-inline'";
-
-const devHashes = '';
 
 const devConnect = isDev
   ? ' ws://localhost:* ws://127.0.0.1:* wss://localhost:* wss://127.0.0.1:*'

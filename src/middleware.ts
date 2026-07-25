@@ -23,18 +23,6 @@ import { verifyVipSession } from '@/lib/security/vip-jwt';
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 /**
- * Genera un nonce criptográficamente aleatorio en base64 URL-safe
- * (sin +, / ni =, que pueden causar problemas en encabezados HTTP).
- */
-function generateNonce(): string {
-  return Buffer.from(crypto.randomUUID())
-    .toString('base64')
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=/g, '');
-}
-
-/**
  * Cabeceras de seguridad comunes a TODAS las respuestas.
  * Se aplican tanto a páginas como a endpoints /api.
  */
@@ -286,7 +274,7 @@ export async function middleware(request: NextRequest) {
   // ── 6. Páginas públicas — CSP (Sin Nonce estricto para permitir BFCache) ───────────
   // Para optimizar el rendimiento y permitir la generación estática (SSG) de la página pública,
   // relajamos la política usando 'unsafe-inline' en el script-src (establecido en security-headers.ts).
-  
+
   let cspWithNonce = cspHeader;
 
   // Asegurar que base-uri esté en la CSP (previene base-tag injection)
