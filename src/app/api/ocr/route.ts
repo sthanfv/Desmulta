@@ -7,6 +7,8 @@ import { apiError } from '@/lib/types/api-response';
 import { OcrCircuitBreakerFs } from '@/lib/security/circuit-breaker-firestore';
 import { Redis } from '@upstash/redis';
 import { PROMPT_EXTRACCION_ESTRUCTURADA_STRICT } from '@/lib/ai/gemini-prompts';
+import { adminDb } from '@/lib/firebase-admin';
+import * as admin from 'firebase-admin';
 
 const redis = Redis.fromEnv();
 
@@ -249,6 +251,21 @@ export async function POST(request: NextRequest) {
       } catch (redisIncrError) {
         logger.warn('[OCR] Error al incrementar límite diario de Gemini en Redis', {
           error: String(redisIncrError),
+        });
+      }
+
+      // Incrementar el consumo en Firestore para el panel de administración
+      try {
+        const todayStr = new Date().toISOString().split('T')[0];
+        await adminDb.collection('system_metrics').doc(`daily_${todayStr}`).set({
+          date: todayStr,
+          type: 'daily',
+          gemini_requests: admin.firestore.FieldValue.increment(1),
+          last_updated: admin.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+      } catch (fsError) {
+        logger.warn('[OCR] Error guardando uso de Gemini en Firestore', {
+          error: String(fsError),
         });
       }
 

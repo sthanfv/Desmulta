@@ -1107,6 +1107,9 @@ const getCachedAnalyticsStats = unstable_cache(
     let step0 = 0,
       step1 = 0,
       step2 = 0;
+      
+    let geminiRequestsToday = 0;
+    const todayStr = new Date().toISOString().split('T')[0];
 
     dailyMetricsSnap.forEach((doc) => {
       const data = doc.data();
@@ -1116,6 +1119,11 @@ const getCachedAnalyticsStats = unstable_cache(
       step0 += data.funnel_step_0 || 0;
       step1 += data.funnel_step_1 || 0;
       step2 += data.funnel_step_2 || 0;
+      
+      // Consumo Gemini (Hoy)
+      if (date === todayStr) {
+        geminiRequestsToday += data.gemini_requests || 0;
+      }
 
       // Crecimiento (últimos 7 días)
       if (date >= sevenDaysAgoStr && growthMap.has(date)) {
@@ -1197,11 +1205,12 @@ const getCachedAnalyticsStats = unstable_cache(
       totalCases,
       conversionRate,
       conversionGlobal,
-      averageResolutionTime, // ← ahora es real, no hardcodeado
+      averageResolutionTime,
       growthData,
       statusData,
       infractionData,
       funnelData,
+      geminiRequestsToday,
     };
   },
   ['admin-analytics-stats'],

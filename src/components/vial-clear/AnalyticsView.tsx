@@ -1,6 +1,7 @@
 'use client';
 import React, { useMemo } from 'react';
 import { FirebaseConsumptionWidget } from '@/app/admin/components/FirebaseConsumptionWidget';
+import { GeminiConsumptionWidget } from '@/app/admin/components/GeminiConsumptionWidget';
 import {
   BarChart,
   Bar,
@@ -172,9 +173,11 @@ export function AnalyticsView({ data, isLoading, error }: AnalyticsViewProps) {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
-      {/* ── Widget de Consumo Firebase ── */}
-      <FirebaseConsumptionWidget totalLeads={data.totalLeads} />
-
+      {/* ── Widgets de Consumo (Bases de datos e IA) ── */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <FirebaseConsumptionWidget totalLeads={data.totalLeads} />
+        <GeminiConsumptionWidget requestsToday={data.geminiRequestsToday || 0} />
+      </div>
       {/* ── KPIs ── */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <KPICard

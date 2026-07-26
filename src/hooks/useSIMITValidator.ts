@@ -455,24 +455,20 @@ export const useSIMITValidator = () => {
       const multasSimples = extraerMultasDeTexto(rawText); // Fallback engine
 
       if (comparendosEstructurados && comparendosEstructurados.length > 0) {
-        // Usar los datos estructurados extraídos por Gemini
-        const codigosProcesados = new Set<string>();
-
+        // Usar los datos estructurados extraídos por Gemini (sin deduplicar, queremos todas)
         comparendosEstructurados.forEach((comp: ComparendoEstructurado) => {
           if (comp.esFotomulta && comp.codigoInfraccion) {
             // Es fotomulta: buscar la tarjeta específica
             const codigoNorm = comp.codigoInfraccion.toUpperCase();
-            if (!codigosProcesados.has(codigoNorm)) {
-              codigosProcesados.add(codigoNorm);
-              const entrada = (codigosData as InfoEducativa[]).find(
-                (c) => c.codigo.toUpperCase() === codigoNorm
-              );
-              if (entrada) {
-                infoEducativas.push({
-                  ...entrada,
-                  idUnicoMulta: comp.numeroComparendo || Date.now().toString(), // Inyectar ID para el carrusel
-                });
-              }
+            
+            const entrada = (codigosData as InfoEducativa[]).find(
+              (c) => c.codigo.toUpperCase() === codigoNorm
+            );
+            if (entrada) {
+              infoEducativas.push({
+                ...entrada,
+                idUnicoMulta: comp.numeroComparendo || Date.now().toString() + Math.random().toString(), // Inyectar ID para el carrusel
+              });
             }
           } else {
             // Es resolución / comparendo manual (Línea gris): inyectar tarjeta genérica grave
