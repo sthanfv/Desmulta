@@ -243,7 +243,7 @@ export function AdminDashboard() {
     afterImageUrl: string;
     counterValue: string;
     counterLabel: string;
-  }>(showcaseRef);
+  }>(showcaseRef, { suppressGlobalError: true });
 
   const { data: footerData } = useDoc<{
     whatsapp: string;
@@ -251,7 +251,7 @@ export function AdminDashboard() {
     address: string;
     instagramUrl: string;
     facebookUrl: string;
-  }>(footerRef);
+  }>(footerRef, { suppressGlobalError: true });
 
   const {
     leadsParaKanban,
