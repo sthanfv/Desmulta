@@ -24,7 +24,7 @@ const redis = Redis.fromEnv();
 export const rateLimiters = {
   // --- A. Operaciones Públicas ---
   leads: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(10, '15 m') }),
-  ocr: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(3, '7 d') }),
+  ocr: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(30, '1 h') }),
   consultation: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(5, '5 m') }),
   validarOtp: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(3, '1 m') }),
   qr: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(60, '1 h') }),
