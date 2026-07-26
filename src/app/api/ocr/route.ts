@@ -358,6 +358,17 @@ export async function POST(request: NextRequest) {
 
         const fallbackData = await fallbackResponse.json();
         
+        if (fallbackData.error === 'NO_VALID_DOCUMENT') {
+          logger.warn('[OCR] Imagen rechazada por Lector-OCR (Fallback): no parece un documento de tránsito válido', { ip });
+          return NextResponse.json(
+            apiError(
+              'INVALID_DOCUMENT',
+              'La imagen no parece ser una multa o resolución válida. Intenta con otra foto más clara.'
+            ),
+            { status: 422 }
+          );
+        }
+        
         logger.info('[OCR] Procesamiento con Lector-OCR (Python) exitoso', {
           proveedor: fallbackData.proveedor,
           multasEncontradas: Array.isArray(fallbackData.comparendo) ? fallbackData.comparendo.length : 1

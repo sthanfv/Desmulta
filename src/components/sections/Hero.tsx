@@ -21,6 +21,7 @@ const SavingsCalculator = dynamic(
 import { Lightbox } from '@/components/ui/lightbox';
 import { useExpedienteStore } from '@/store/useExpedienteStore';
 import { ReturningUserBanner } from '@/components/vial-clear/ReturningUserBanner';
+import { useHydration } from '@/hooks/useHydration';
 import type { ShowcaseConfig } from '@/lib/site-config';
 
 interface HeroProps {
@@ -37,6 +38,7 @@ interface HeroProps {
  */
 export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
   const { multas } = useExpedienteStore();
+  const isHydrated = useHydration();
 
   return (
     <LazyMotion features={domAnimation} strict>
@@ -145,12 +147,14 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
               </Button>
             </m.div>
 
-            <div className="-mt-4 relative z-30">
-              <ReturningUserBanner />
-            </div>
+            {isHydrated && (
+              <>
+                <div className="-mt-4 relative z-30">
+                  <ReturningUserBanner />
+                </div>
 
-            {multas.length > 0 && (
-              <m.div
+                {multas.length > 0 && (
+                  <m.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="p-4 rounded-2xl bg-primary/10 border border-primary/20 backdrop-blur-md flex items-center gap-4 group/expediente cursor-pointer hover:bg-primary/15 transition-all"
@@ -174,6 +178,8 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
                 />
               </m.div>
             )}
+          </>
+        )}
 
             {/* Simulador — IZQUIERDA, debajo del texto */}
             <m.div

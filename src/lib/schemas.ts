@@ -220,7 +220,18 @@ export const SimitLeadSchema = z.object({
         message: 'Debe ser un número de celular colombiano válido (10 dígitos, ej: 300 123 4567).',
       })
     ),
-  nombre: z.string().optional(),
+  nombre: z
+    .string()
+    .transform((val) =>
+      val
+        .replace(/[<>'"\\\/\[\]{}|`]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim()
+    )
+    .refine((val) => val === '' || /^[a-záéíóúüñA-ZÁÉÍÓÚÜÑ\s\-\.]+$/.test(val), {
+      message: 'El nombre solo puede contener letras, espacios, guiones y puntos.',
+    })
+    .optional(),
   website_hp: z.string().optional(),
   deuda_total: z.number().optional(),
   ahorro_potencial: z.number().optional(),
