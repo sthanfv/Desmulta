@@ -40,7 +40,6 @@ function getAuthCookieOptions() {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict' as const,
-      maxAge: 60 * 60 * 12, // 12 horas
     },
     serviceAccount: {
       projectId:
@@ -200,7 +199,6 @@ export async function POST(request: NextRequest) {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       path: '/admin',
-      maxAge: 8 * 60 * 60,
     });
 
     // Cookie de bandera pública (no HttpOnly) para que el cliente detecte el estado
@@ -209,7 +207,6 @@ export async function POST(request: NextRequest) {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       path: '/',
-      maxAge: 8 * 60 * 60,
     });
 
     // 7. Registrar evento en la auditoría forense
