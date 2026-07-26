@@ -35,7 +35,11 @@ export async function secureLogout(
       try {
         const dbs = await window.indexedDB.databases();
         dbs.forEach((db) => {
-          if (db.name) window.indexedDB.deleteDatabase(db.name);
+          // FIX HALLAZGO: No borrar bases de datos de Firebase. 
+          // Borrarlas abruptamente corrompe el SDK y causa 'auth/network-request-failed' en el siguiente login.
+          if (db.name && !db.name.startsWith('firebase')) {
+            window.indexedDB.deleteDatabase(db.name);
+          }
         });
       } catch (e: unknown) {
         logger.warn('No se pudo limpiar IndexedDB', e);

@@ -95,7 +95,6 @@ describe('secureLogout (Zero-Trust Caching)', () => {
 
     // Assert 5: Destruye IndexedDB
     expect(global.window.indexedDB.databases).toHaveBeenCalled();
-    expect(global.window.indexedDB.deleteDatabase).toHaveBeenCalledWith('firebaseLocalStorageDb');
     expect(global.window.indexedDB.deleteDatabase).toHaveBeenCalledWith('workbox-expiration');
 
     // Assert 6: Redirección dura a /acceso-panel

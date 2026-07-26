@@ -26,6 +26,7 @@
 *   **UI Dashboard/Kanban**: Filtro de "Mis Asignaciones", indicador de Carga de Trabajo y Panel Analítico Activo.
 *   **Modo Compacto Tarjetas Kanban**: Refactorización del diseño de tarjetas eliminando miniaturas inútiles (se reemplazaron por un icono de clip), cambiando badges largos por avatares pequeños, y usando *hover states* para acciones secundarias.
 *   **Seguridad de Sesión Estricta (Tab-Lock)**: Se refactorizó `/api/auth/session` para emitir cookies de sesión volátiles (sin `maxAge`), y se inyectó un candado en `sessionStorage` durante el inicio de sesión. `AdminDashboard.tsx` verifica este candado al montar; si no existe (ej. pestaña duplicada o reabierta), el usuario es expulsado, garantizando que el ciclo de vida de la sesión esté atado estrictamente a la pestaña activa.
+*   **Fix Crítico: Corrupción de SDK Firebase Auth**: Se ajustó `client-logout.ts` y `pwa-heal.ts` para EVITAR la eliminación forzada de la base de datos IndexedDB `firebaseLocalStorageDb`. Borrar esta base de datos en caliente (operación "Scorched Earth") corrompía el SDK de Firebase en la pestaña actual, lo que ocasionaba un falso error `auth/network-request-failed` en intentos de login posteriores en la misma ventana.
 *   Se corrieron validaciones de `typecheck` (Exitosas ✅).
 
 ### Metas Pendientes / Tareas a Seguir
