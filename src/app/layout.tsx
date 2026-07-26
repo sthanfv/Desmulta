@@ -19,6 +19,7 @@ import { MotionProvider } from '@/components/providers/MotionProvider';
 import { SystemHealthProvider } from '@/components/providers/SystemHealthProvider';
 import { PWAAutoUpdater } from '@/components/providers/PWAAutoUpdater';
 import { PageProgressBar } from '@/components/ui/PageProgressBar';
+import { OCRPrewarmer } from '@/components/providers/OCRPrewarmer';
 
 // Directiva Mobile-First y Adaptive del Sistema Operativo
 export const viewport: Viewport = {
@@ -138,6 +139,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <PushProvider>
                   <MotionProvider>
                     <PWAAutoUpdater />
+                    <OCRPrewarmer />
                     <main id="main-content" className="overflow-x-hidden w-full relative">
                       {children}
                     </main>
