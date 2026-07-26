@@ -213,8 +213,12 @@ export default function HomeClient({
         }}
         customHeader={true}
       >
-        <>
-          <div className="mb-8 md:mb-10 text-center">
+        <div className="relative z-10">
+          {/* Glowing orbs para estética AMOLED premium sin comprometer el contraste */}
+          <div className="absolute -top-40 -left-40 w-96 h-96 bg-primary/5 rounded-full blur-[120px] -z-10 pointer-events-none" />
+          <div className="absolute top-40 -right-40 w-96 h-96 bg-blue-500/5 rounded-full blur-[120px] -z-10 pointer-events-none" />
+          
+          <div className="mb-8 md:mb-10 text-center relative z-10">
             <h2 className="text-3xl md:text-4xl font-black text-foreground tracking-tight">
               {formMode === 'simit' ? 'Envío Rápido SIMIT' : 'Estudio de Viabilidad'}
             </h2>
@@ -224,18 +228,20 @@ export default function HomeClient({
                 : 'Recibiremos su información para un análisis técnico detallado.'}
             </p>
           </div>
-          <ErrorBoundary>
-            {formMode === 'full' && !isPreQualified ? (
-              <PreQualifyWidget onQualify={() => setIsPreQualified(true)} />
-            ) : (
-              <ConsultationForm
-                onSuccess={() => setIsModalOpen(false)}
-                mode={formMode}
-                nonce={nonce}
-              />
-            )}
-          </ErrorBoundary>
-        </>
+          <div className="relative z-10">
+            <ErrorBoundary>
+              {formMode === 'full' && !isPreQualified ? (
+                <PreQualifyWidget onQualify={() => setIsPreQualified(true)} />
+              ) : (
+                <ConsultationForm
+                  onSuccess={() => setIsModalOpen(false)}
+                  mode={formMode}
+                  nonce={nonce}
+                />
+              )}
+            </ErrorBoundary>
+          </div>
+        </div>
       </ResponsiveModal>
 
       {/* Floating Elements (WhatsApp & ScrollTop) */}
