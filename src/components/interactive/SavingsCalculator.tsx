@@ -406,10 +406,10 @@ export function SavingsCalculator() {
             </TabsContent>
 
             <div
-              className={`grid transition-all duration-500 ease-in-out ${
+              className={`transition-all duration-500 ease-in-out ${
                 isExpanded || coactivo || isEmbriaguez
-                  ? 'grid-rows-[1fr] opacity-100 mt-4'
-                  : 'grid-rows-[0fr] opacity-0 mt-0'
+                  ? 'block animate-in fade-in zoom-in-95 mt-4'
+                  : 'hidden mt-0'
               }`}
             >
               <div className="overflow-hidden flex flex-col gap-2">
@@ -453,8 +453,8 @@ export function SavingsCalculator() {
 
           {/* --- PANEL DE RESULTADOS Y CONVERSIÓN --- */}
           <div
-            className={`grid transition-all duration-500 ease-in-out ${
-              resultado && isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+            className={`transition-all duration-500 ease-in-out ${
+              resultado && isExpanded ? 'block animate-in fade-in zoom-in-95' : 'hidden'
             }`}
           >
             <div className="overflow-hidden">
@@ -483,7 +483,7 @@ export function SavingsCalculator() {
 
                   {/* SÚPER PODERES DE GO - MONETIZACIÓN & ESTRATEGIA LEGAL */}
                   <div
-                    className={`grid transition-all duration-500 ease-in-out ${estrategia?.bloqueoEmbriaguez ? 'grid-rows-[1fr] opacity-100 mt-4' : 'grid-rows-[0fr] opacity-0 mt-0'}`}
+                    className={`transition-all duration-500 ease-in-out ${estrategia?.bloqueoEmbriaguez ? 'block animate-in fade-in zoom-in-95 mt-4' : 'hidden mt-0'}`}
                   >
                     <div className="overflow-hidden">
                       <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-xl">
@@ -499,7 +499,7 @@ export function SavingsCalculator() {
                   </div>
 
                   <div
-                    className={`grid transition-all duration-500 ease-in-out ${estrategia?.esSalvablePorPrescripcion ? 'grid-rows-[1fr] opacity-100 mt-5' : 'grid-rows-[0fr] opacity-0 mt-0'}`}
+                    className={`transition-all duration-500 ease-in-out ${estrategia?.esSalvablePorPrescripcion ? 'block animate-in fade-in zoom-in-95 mt-5' : 'hidden mt-0'}`}
                   >
                     <div className="overflow-hidden">
                       <div className="bg-gradient-to-br from-primary/10 to-transparent border border-primary/20 p-5 rounded-2xl relative flex flex-col items-start shadow-inner">
@@ -532,7 +532,7 @@ export function SavingsCalculator() {
 
                   {/* SÚPER PODERES DE GO - DISEÑO VISUAL */}
                   <div
-                    className={`grid transition-all duration-500 ease-in-out ${descuentos?.aplicaDescuento ? 'grid-rows-[1fr] opacity-100 mt-4' : 'grid-rows-[0fr] opacity-0 mt-0'}`}
+                    className={`transition-all duration-500 ease-in-out ${descuentos?.aplicaDescuento ? 'block animate-in fade-in zoom-in-95 mt-4' : 'hidden mt-0'}`}
                   >
                     <div className="overflow-hidden">
                       <div className="bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-xl">
@@ -551,7 +551,7 @@ export function SavingsCalculator() {
                   </div>
 
                   <div
-                    className={`grid transition-all duration-500 ease-in-out ${!descuentos?.aplicaDescuento && proyecciones ? 'grid-rows-[1fr] opacity-100 mt-4' : 'grid-rows-[0fr] opacity-0 mt-0'}`}
+                    className={`transition-all duration-500 ease-in-out ${!descuentos?.aplicaDescuento && proyecciones ? 'block animate-in fade-in zoom-in-95 mt-4' : 'hidden mt-0'}`}
                   >
                     <div className="overflow-hidden">
                       <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-xl">
@@ -578,7 +578,7 @@ export function SavingsCalculator() {
                   </div>
 
                   <div
-                    className={`grid transition-all duration-500 ease-in-out ${chartData.length > 1 ? 'grid-rows-[1fr] opacity-100 mt-4' : 'grid-rows-[0fr] opacity-0 mt-0'}`}
+                    className={`transition-all duration-500 ease-in-out ${chartData.length > 1 ? 'block animate-in fade-in zoom-in-95 mt-4' : 'hidden mt-0'}`}
                   >
                     <div className="overflow-hidden">
                       <div className="bg-foreground/5 p-4 rounded-xl border border-foreground/10">
@@ -634,7 +634,7 @@ export function SavingsCalculator() {
                   </div>
 
                   <div
-                    className={`grid transition-all duration-500 ease-in-out ${resultado ? 'grid-rows-[1fr] opacity-100 mt-4' : 'grid-rows-[0fr] opacity-0 mt-0'}`}
+                    className={`transition-all duration-500 ease-in-out ${resultado ? 'block animate-in fade-in zoom-in-95 mt-4' : 'hidden mt-0'}`}
                   >
                     <div className="overflow-hidden">
                       <div
