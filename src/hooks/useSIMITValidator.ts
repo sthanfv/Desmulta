@@ -71,7 +71,7 @@ const TOKENS_SIMIT_DEBILES = [
 const COINCIDENCIAS_FUERTES_MINIMAS = 3;
 const COINCIDENCIAS_TOTALES_MINIMAS = 6;
 
-const OCR_TIMEOUT_MS = 55000;
+const OCR_TIMEOUT_MS = 65000; // 65 segundos (Debe ser mayor a los 60s de Vercel)
 
 export interface ComparendoEstructurado {
   numeroComparendo: string | null;
