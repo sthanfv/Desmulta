@@ -7,7 +7,8 @@ import { apiError } from '@/lib/types/api-response';
 import { OcrCircuitBreakerFs } from '@/lib/security/circuit-breaker-firestore';
 import { Redis } from '@upstash/redis';
 import { PROMPT_EXTRACCION_ESTRUCTURADA_STRICT } from '@/lib/ai/gemini-prompts';
-import { adminDb } from '@/lib/firebase-admin';
+import { getAdminApp } from '@/lib/firebase-admin';
+import { getFirestore } from 'firebase-admin/firestore';
 import * as admin from 'firebase-admin';
 
 const redis = Redis.fromEnv();
@@ -256,6 +257,8 @@ export async function POST(request: NextRequest) {
 
       // Incrementar el consumo en Firestore para el panel de administración
       try {
+        getAdminApp();
+        const adminDb = getFirestore();
         const todayStr = new Date().toISOString().split('T')[0];
         await adminDb.collection('system_metrics').doc(`daily_${todayStr}`).set({
           date: todayStr,
