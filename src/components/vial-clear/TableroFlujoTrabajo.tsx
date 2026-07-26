@@ -11,6 +11,7 @@ import {
   ChevronRight,
   RefreshCw,
   Download,
+  LayoutGrid,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -697,18 +698,19 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
         {/* BUSCADOR Y FILTROS GLOBALES (v8.0.0) */}
         <TooltipProvider delayDuration={200}>
           <div className="w-full max-w-4xl flex flex-col gap-3">
-            <div className="flex gap-3 w-full">
+            {/* FILA 1: Buscador + Refrescar */}
+            <div className="flex gap-2 w-full">
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className="relative group flex-1">
+                  <div className="relative group flex-1 min-w-0">
                     <input
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Buscar por Nombre, Placa o Cédula..."
-                      className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 p-4 pl-12 rounded-[1.5rem] outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 text-sm font-bold text-slate-900 dark:text-white transition-all shadow-inner"
+                      className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 p-3 sm:p-4 pl-10 sm:pl-12 rounded-xl sm:rounded-[1.5rem] outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 text-sm font-bold text-slate-900 dark:text-white transition-all shadow-inner"
                     />
-                    <AlertCircle className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
+                    <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
@@ -716,106 +718,116 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
                 </TooltipContent>
               </Tooltip>
               {refreshKanban && (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center shrink-0">
                   {(realtimeNewLeadsCount || 0) > 0 ? (
                     <button
                       onClick={handleRefresh}
                       disabled={isRefreshing}
-                      className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-4 rounded-[1.5rem] text-sm font-bold flex items-center gap-2 animate-pulse shadow-lg transition-all"
+                      className="bg-primary hover:bg-primary/90 text-primary-foreground px-3 sm:px-5 py-3 sm:py-4 rounded-xl sm:rounded-[1.5rem] text-xs sm:text-sm font-bold flex items-center gap-2 animate-pulse shadow-lg transition-all whitespace-nowrap"
                     >
-                      <RefreshCw className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`} />
-                      Actualizar Tablero ({realtimeNewLeadsCount} nuevos)
+                      <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                      <span className="hidden sm:inline">Actualizar ({realtimeNewLeadsCount})</span>
+                      <span className="sm:hidden">{realtimeNewLeadsCount}</span>
                     </button>
                   ) : (
                     <button
                       onClick={handleRefresh}
                       disabled={isRefreshing}
-                      className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 hover:border-primary/50 hover:bg-primary/10 text-slate-900 dark:text-white p-4 rounded-[1.5rem] flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed group shadow-inner"
+                      className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 hover:border-primary/50 hover:bg-primary/10 text-slate-900 dark:text-white p-3 sm:p-4 rounded-xl sm:rounded-[1.5rem] flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed group shadow-inner"
                       title="Refrescar tablero"
                     >
                       <RefreshCw
-                        className={`w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors ${isRefreshing ? 'animate-spin text-primary' : ''}`}
+                        className={`w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground group-hover:text-primary transition-colors ${isRefreshing ? 'animate-spin text-primary' : ''}`}
                       />
                     </button>
                   )}
                 </div>
               )}
+            </div>
 
-              {/* Botón de Filtro Mis Asignaciones / Todas */}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={() => setFilterAssignee((prev) => (prev === 'mine' ? 'all' : 'mine'))}
-                    className={`px-6 py-4 rounded-[1.5rem] font-bold text-sm shadow-inner transition-all flex items-center justify-center gap-2 ${
-                      filterAssignee === 'mine'
-                        ? 'bg-blue-500 hover:bg-blue-600 text-white shadow-lg shadow-blue-500/20'
-                        : 'bg-slate-50 hover:bg-slate-100 dark:bg-slate-900/50 dark:hover:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-white/10'
-                    }`}
-                  >
-                    {filterAssignee === 'mine' ? 'Mis Asignaciones' : 'Todas las Consultas'}
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Alternar entre tus consultas asignadas y la vista global</p>
-                </TooltipContent>
-              </Tooltip>
+            {/* FILA 2: Barra de acciones — scroll horizontal en móvil, uniforme */}
+            <div className="w-full overflow-x-auto scrollbar-none -mx-1 px-1">
+              <div className="flex gap-2 w-max sm:w-full sm:grid sm:grid-cols-4">
+                {/* Filtro Mis Asignaciones / Todas */}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={() => setFilterAssignee((prev) => (prev === 'mine' ? 'all' : 'mine'))}
+                      className={`flex flex-col items-center justify-center gap-1 min-w-[4.5rem] px-3 py-2.5 rounded-xl text-[10px] font-bold transition-all ${
+                        filterAssignee === 'mine'
+                          ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/20'
+                          : 'bg-slate-50 dark:bg-slate-900/50 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 hover:border-primary/30 hover:bg-primary/5'
+                      }`}
+                    >
+                      <LayoutGrid className="w-4 h-4 shrink-0" />
+                      <span className="whitespace-nowrap leading-tight">{filterAssignee === 'mine' ? 'Mías' : 'Todas'}</span>
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Alternar entre tus consultas asignadas y la vista global</p>
+                  </TooltipContent>
+                </Tooltip>
 
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={() =>
-                      setPinAuth({
-                        isOpen: true,
-                        actionName: 'Exportar a Excel',
-                        onSuccess: exportToExcel,
-                      })
-                    }
-                    className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 hover:border-green-500/50 hover:bg-green-500/10 text-slate-900 dark:text-white p-4 rounded-[1.5rem] flex items-center justify-center transition-all group shadow-inner"
-                    title="Exportar a Excel"
-                  >
-                    <Download className="w-5 h-5 text-muted-foreground group-hover:text-green-500 transition-colors" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Exportar vista actual a Excel (0 lecturas)</p>
-                </TooltipContent>
-              </Tooltip>
+                {/* Exportar Excel */}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={() =>
+                        setPinAuth({
+                          isOpen: true,
+                          actionName: 'Exportar a Excel',
+                          onSuccess: exportToExcel,
+                        })
+                      }
+                      className="flex flex-col items-center justify-center gap-1 min-w-[4.5rem] px-3 py-2.5 rounded-xl text-[10px] font-bold bg-slate-50 dark:bg-slate-900/50 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 hover:border-green-500/30 hover:bg-green-500/5 hover:text-green-600 dark:hover:text-green-400 transition-all"
+                    >
+                      <Download className="w-4 h-4 shrink-0" />
+                      <span className="whitespace-nowrap leading-tight">Excel</span>
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Exportar vista actual a Excel (0 lecturas)</p>
+                  </TooltipContent>
+                </Tooltip>
 
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={() =>
-                      setPinAuth({
-                        isOpen: true,
-                        actionName: 'Exportar a PDF',
-                        onSuccess: (pin) => exportToPDF(pin),
-                      })
-                    }
-                    className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 hover:border-red-500/50 hover:bg-red-500/10 text-slate-900 dark:text-white p-4 rounded-[1.5rem] flex items-center justify-center transition-all group shadow-inner"
-                    title="Exportar a PDF"
-                  >
-                    <FileArchive className="w-5 h-5 text-muted-foreground group-hover:text-red-500 transition-colors" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Exportar vista actual a PDF (0 lecturas)</p>
-                </TooltipContent>
-              </Tooltip>
+                {/* Exportar PDF */}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={() =>
+                        setPinAuth({
+                          isOpen: true,
+                          actionName: 'Exportar a PDF',
+                          onSuccess: (pin) => exportToPDF(pin),
+                        })
+                      }
+                      className="flex flex-col items-center justify-center gap-1 min-w-[4.5rem] px-3 py-2.5 rounded-xl text-[10px] font-bold bg-slate-50 dark:bg-slate-900/50 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 hover:border-red-500/30 hover:bg-red-500/5 hover:text-red-600 dark:hover:text-red-400 transition-all"
+                    >
+                      <FileArchive className="w-4 h-4 shrink-0" />
+                      <span className="whitespace-nowrap leading-tight">PDF</span>
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Exportar vista actual a PDF (0 lecturas)</p>
+                  </TooltipContent>
+                </Tooltip>
 
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={() => setIsHelpModalOpen(true)}
-                    className="bg-blue-500/10 border border-blue-500/20 hover:border-blue-500/50 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 p-4 rounded-[1.5rem] flex items-center justify-center transition-all group shadow-inner"
-                    title="Guía de herramientas"
-                  >
-                    <Info className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Ver Guía Rápida del Tablero</p>
-                </TooltipContent>
-              </Tooltip>
+                {/* Guía de herramientas */}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={() => setIsHelpModalOpen(true)}
+                      className="flex flex-col items-center justify-center gap-1 min-w-[4.5rem] px-3 py-2.5 rounded-xl text-[10px] font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 hover:border-blue-500/40 hover:bg-blue-500/20 transition-all"
+                    >
+                      <Info className="w-4 h-4 shrink-0" />
+                      <span className="whitespace-nowrap leading-tight">Guía</span>
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Ver Guía Rápida del Tablero</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
             </div>
 
             {/* NUEVOS FILTROS */}
