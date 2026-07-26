@@ -334,7 +334,10 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // 2. Lógica existente de shards (Legacy compatibility)
+      // 2. 🔄 Round-Robin: asignar operador automáticamente (DEBE SER ANTES DE CUALQUIER WRITE)
+      const assignment = await getNextOperator(transaction, db);
+
+      // 3. Lógica existente de shards (Legacy compatibility)
       const shardDoc = await transaction.get(shardRef);
       let shardCount = 1;
 
@@ -344,7 +347,7 @@ export async function POST(request: NextRequest) {
 
       transaction.set(shardRef, { count: shardCount }, { merge: true });
 
-      // 3. Incremento de nuevas métricas del sistema (System Metrics)
+      // 4. Incremento de nuevas métricas del sistema (System Metrics)
       transaction.set(
         globalStatsRef,
         {
@@ -366,7 +369,7 @@ export async function POST(request: NextRequest) {
         { merge: true }
       );
 
-      // 4. Creación de Documentos
+      // 5. Creación de Documentos
       const idSecuencial = `EXP-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
       const internalCounter = `${shardIndex}-${shardCount}`;
 
@@ -374,9 +377,6 @@ export async function POST(request: NextRequest) {
       const obfuscatedName = nameParts
         .map((part) => (part.length > 0 ? part[0] + '*'.repeat(Math.max(0, part.length - 1)) : ''))
         .join(' ');
-
-      // 🔄 Round-Robin: asignar operador automáticamente
-      const assignment = await getNextOperator(transaction, db);
 
       const finalDataToSave = {
         ...dataToSave,
