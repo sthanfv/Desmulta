@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShieldCheck, DatabaseZap, Sparkles, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, Database, HardDrive, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '@/firebase';
 import { secureLogout } from '@/lib/security/client-logout';
 import { useSearchParams } from 'next/navigation';
@@ -57,8 +57,8 @@ function SweeperContent() {
 
   const steps = [
     { icon: ShieldCheck, text: 'Cerrando sesión de forma segura...' },
-    { icon: DatabaseZap, text: 'Borrando información confidencial...' },
-    { icon: Sparkles, text: 'Limpiando memoria de la aplicación...' },
+    { icon: Database, text: 'Borrando información confidencial...' },
+    { icon: HardDrive, text: 'Limpiando memoria de la aplicación...' },
     { icon: CheckCircle2, text: 'Limpieza completada. Hasta pronto.' },
   ];
 

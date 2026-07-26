@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { m } from 'framer-motion';
-import { ShieldCheck, ArrowRight, FileText, Calculator, BrainCircuit } from 'lucide-react';
+import { ShieldCheck, ArrowRight, FileText, Calculator, SearchCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ResponsiveModal } from '@/components/ui/responsive-modal';
 
@@ -73,7 +73,7 @@ export function WelcomeModal({ onAcknowledge }: WelcomeModalProps) {
         <div className="grid grid-cols-1 gap-3 md:gap-4">
           {[
             {
-              icon: <BrainCircuit className="w-5 h-5 text-primary" />,
+              icon: <SearchCheck className="w-5 h-5 text-primary" />,
               title: 'Diagnóstico Inteligente',
               desc: 'Auditoría gratuita que analiza tus multas y detecta posibles nulidades.',
             },

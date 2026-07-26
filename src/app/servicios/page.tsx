@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowLeft, ShieldCheck, CheckCircle2, Zap, Clock, Globe } from 'lucide-react';
+import { ArrowLeft, ShieldCheck, CheckCircle2, Scale, Clock, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DESMULTA_KB } from '@/lib/ai/knowledge-base';
 
@@ -52,7 +52,7 @@ export default function ServiciosPage() {
               className="floating-card bg-card/40 backdrop-blur-sm border border-white/10 p-10 md:p-16 rounded-[3.5rem] relative group overflow-hidden"
             >
               <div className="absolute top-0 right-0 p-12 opacity-[0.03] group-hover:opacity-10 transition-opacity">
-                <Zap size={180} className="text-primary" />
+                <Scale size={180} className="text-primary" />
               </div>
 
               <div className="relative z-10 grid md:grid-cols-2 gap-12 items-center">
