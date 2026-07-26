@@ -384,10 +384,12 @@ export async function POST(request: NextRequest) {
         internalRef: internalCounter,
         trackingUuid,
         // Sistema de asignación automática de operadores
-        ...(assignment.assignedTo ? {
-          assignedTo: assignment.assignedTo,
-          assignedToEmail: assignment.assignedToEmail,
-        } : {}),
+        ...(assignment.assignedTo
+          ? {
+              assignedTo: assignment.assignedTo,
+              assignedToEmail: assignment.assignedToEmail,
+            }
+          : {}),
       };
 
       transaction.set(consultationRef, finalDataToSave);

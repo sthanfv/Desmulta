@@ -85,10 +85,12 @@ export async function POST(req: NextRequest) {
         ip_address_anon: anonymizeIp(rawIp),
         status: 'NEW',
         // Sistema de asignación automática de operadores
-        ...(assignment.assignedTo ? {
-          assignedTo: assignment.assignedTo,
-          assignedToEmail: assignment.assignedToEmail,
-        } : {}),
+        ...(assignment.assignedTo
+          ? {
+              assignedTo: assignment.assignedTo,
+              assignedToEmail: assignment.assignedToEmail,
+            }
+          : {}),
       });
     });
 

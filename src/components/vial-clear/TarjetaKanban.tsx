@@ -62,8 +62,8 @@ export function TarjetaKanban({
         <div className="flex justify-between items-center w-full">
           <div className="flex items-center gap-1.5">
             {/* Dot Type */}
-            <div 
-              className={`w-2 h-2 rounded-full ${esCaso ? 'bg-blue-500' : 'bg-emerald-500'}`} 
+            <div
+              className={`w-2 h-2 rounded-full ${esCaso ? 'bg-blue-500' : 'bg-emerald-500'}`}
               title={esCaso ? 'Caso Formal' : 'Solicitud / Lead'}
             />
             {/* Identifier (Placa/Cedula) */}
@@ -96,12 +96,18 @@ export function TarjetaKanban({
               </span>
             )}
             {data.esRecurrente && (
-              <span className="text-blue-500/70" title={`Recurrente (${data.conteoRetornos || 1}x)`}>
+              <span
+                className="text-blue-500/70"
+                title={`Recurrente (${data.conteoRetornos || 1}x)`}
+              >
                 <Loader2 className="w-3 h-3 animate-spin duration-1000" />
               </span>
             )}
             {data._lastPushAttempt?.status === 'error' && (
-              <span className="text-red-500 animate-pulse" title={`Fallo push: ${data._lastPushAttempt.reason}`}>
+              <span
+                className="text-red-500 animate-pulse"
+                title={`Fallo push: ${data._lastPushAttempt.reason}`}
+              >
                 <AlertCircle className="w-3 h-3" />
               </span>
             )}
@@ -110,10 +116,10 @@ export function TarjetaKanban({
                 <BellOff className="w-3 h-3" />
               </span>
             )}
-            
+
             {/* Operator Avatar */}
             {data.assignedToEmail && (
-              <div 
+              <div
                 className="w-5 h-5 ml-1 rounded-full bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-[9px] font-black flex items-center justify-center uppercase border border-indigo-200 dark:border-indigo-500/30"
                 title={`Asignado a: ${data.assignedToEmail}`}
               >
@@ -134,18 +140,24 @@ export function TarjetaKanban({
                 text={data.nombre || 'Usuario Desmulta'}
               />
             </p>
-            
+
             {/* Metadatos secundarios (Ciudad, Fecha, Teléfono) colapsados en una fila */}
             <div className="flex items-center gap-3 text-[10px] text-slate-400 font-medium mt-0.5">
               {data.ciudad && (
                 <span className="flex items-center gap-0.5 pointer-events-none truncate max-w-[80px]">
-                  <MapPin className="w-3 h-3 shrink-0" /> <span className="truncate">{data.ciudad}</span>
+                  <MapPin className="w-3 h-3 shrink-0" />{' '}
+                  <span className="truncate">{data.ciudad}</span>
                 </span>
               )}
               {data.createdAt && (
-                <span className={`flex items-center gap-0.5 shrink-0 ${data.estado === 'NUEVO' && Date.now() - new Date(data.createdAt).getTime() > 7200000 ? 'text-red-500 animate-pulse' : ''}`}>
+                <span
+                  className={`flex items-center gap-0.5 shrink-0 ${data.estado === 'NUEVO' && Date.now() - new Date(data.createdAt).getTime() > 7200000 ? 'text-red-500 animate-pulse' : ''}`}
+                >
                   <Clock className="w-3 h-3" />
-                  {new Date(data.createdAt).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}
+                  {new Date(data.createdAt).toLocaleTimeString('es-CO', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
                 </span>
               )}
             </div>

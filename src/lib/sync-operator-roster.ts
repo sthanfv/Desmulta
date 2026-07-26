@@ -19,10 +19,7 @@ export async function syncOperatorRoster(): Promise<{ success: boolean; count: n
     const db = getFirestore();
 
     // Leer todos los admins activos (no deshabilitados)
-    const adminsSnap = await db
-      .collection('admins')
-      .where('disabled', '!=', true)
-      .get();
+    const adminsSnap = await db.collection('admins').where('disabled', '!=', true).get();
 
     const activeOperators: string[] = [];
     const operatorEmails: Record<string, string> = {};
@@ -43,9 +40,7 @@ export async function syncOperatorRoster(): Promise<{ success: boolean; count: n
     const currentIndex = currentDoc.exists ? (currentDoc.data()?.nextIndex ?? 0) : 0;
 
     // Ajustar el índice si la lista se encogió (ej: se deshabilitó un admin)
-    const safeIndex = activeOperators.length > 0
-      ? currentIndex % activeOperators.length
-      : 0;
+    const safeIndex = activeOperators.length > 0 ? currentIndex % activeOperators.length : 0;
 
     await rosterRef.set({
       activeOperators,

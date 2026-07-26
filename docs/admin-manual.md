@@ -5,8 +5,9 @@ Este manual describe todas las funciones disponibles en el panel de administraci
 ## 1. Acceso y Seguridad
 
 - **Página de Acceso**: Se ingresa a través de la ruta de administración (requiere iniciar sesión).
-- **Autenticación**: Solo las personas autorizadas como administradores por el equipo pueden entrar.
-- **Cierre de Sesión Automático**: El sistema cerrará la sesión automáticamente después de 30 minutos de inactividad para proteger los datos de los clientes.
+- **Autenticación (2FA OTP)**: Solo las personas autorizadas como administradores por el equipo pueden entrar. El acceso es protegido por Códigos de Un Solo Uso (OTP) enviados al correo oficial.
+- **Cierre de Sesión Automático por Inactividad**: El sistema cerrará la sesión automáticamente después de 15 minutos de inactividad para proteger los datos de los clientes.
+- **Seguridad por Pestaña (Tab-Lock)**: La sesión está vinculada estrictamente a la pestaña activa del navegador. Si cierra la pestaña, la sesión se destruye automáticamente por seguridad, y al reabrirla deberá iniciar sesión nuevamente con un nuevo OTP.
 
 ## 2. Gestión Operativa (Tablero de Control)
 

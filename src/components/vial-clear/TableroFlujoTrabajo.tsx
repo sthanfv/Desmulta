@@ -451,7 +451,16 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
     }
 
     return result;
-  }, [searchQuery, filterCiudad, filterEstado, filterFechaInicio, filterFechaFin, allItems, filterAssignee, auth?.currentUser?.uid]);
+  }, [
+    searchQuery,
+    filterCiudad,
+    filterEstado,
+    filterFechaInicio,
+    filterFechaFin,
+    allItems,
+    filterAssignee,
+    auth?.currentUser?.uid,
+  ]);
 
   const exportToExcel = useCallback(async () => {
     try {

@@ -63,7 +63,6 @@ const CalcularMultaSchema = z.object({
     .optional(),
 });
 
-
 export async function POST(request: NextRequest) {
   // ══════════════════════════════════════════════════════════════════════
   // CAPA 1: Autenticación por API Key (9 sub-capas internas)

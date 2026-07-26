@@ -274,7 +274,7 @@ export function AdminDashboard() {
     combined.forEach((item) => {
       // Excluir finalizados o descartados
       if (item.estado === 'FINALIZADO' || item.estado === 'DESCARTADO') return;
-      
+
       if (item.assignedToEmail) {
         const email = item.assignedToEmail;
         if (!stats[email]) {
@@ -290,6 +290,17 @@ export function AdminDashboard() {
       total: total || 1, // Evitar división por cero
     };
   }, [leadsParaKanban, casosParaKanban]);
+
+  // 🔒 Tab-Lock (Candado de Pestaña)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const isMockAdmin = (window as any).__is_mock_admin__;
+      const hasLock = sessionStorage.getItem('desmulta_tab_lock');
+      if (!hasLock && !isMockAdmin) {
+        window.location.href = '/logout?reason=manual';
+      }
+    }
+  }, []);
 
   // 🔒 Auto-logout por inactividad
   useInactivityLogout({
@@ -740,12 +751,15 @@ export function AdminDashboard() {
                     const percentage = Math.round((op.count / workloadByOperator.total) * 100);
                     return (
                       <div key={op.name} className="flex items-center gap-3">
-                        <div className="w-24 truncate text-sm font-medium text-slate-700 dark:text-slate-300" title={op.name}>
+                        <div
+                          className="w-24 truncate text-sm font-medium text-slate-700 dark:text-slate-300"
+                          title={op.name}
+                        >
                           {op.name}
                         </div>
                         <div className="flex-1 h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-blue-500 rounded-full" 
+                          <div
+                            className="h-full bg-blue-500 rounded-full"
                             style={{ width: `${percentage}%` }}
                           />
                         </div>

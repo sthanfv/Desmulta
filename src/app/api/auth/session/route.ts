@@ -26,7 +26,6 @@ function getAuthCookieOptions() {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict' as const,
-      maxAge: 60 * 60 * 12, // 12 horas
     },
     serviceAccount: {
       projectId:

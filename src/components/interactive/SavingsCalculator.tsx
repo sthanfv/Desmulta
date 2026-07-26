@@ -476,7 +476,8 @@ export function SavingsCalculator() {
                       </span>
                     </div>
                     <span className="text-[11px] text-muted-foreground/70 leading-tight">
-                      * Proyectada a hoy. Plataformas como SIMIT pueden tardar semanas en actualizar los intereses en pantalla.
+                      * Proyectada a hoy. Plataformas como SIMIT pueden tardar semanas en actualizar
+                      los intereses en pantalla.
                     </span>
                   </div>
 
