@@ -249,7 +249,7 @@ export async function POST(request: NextRequest) {
     let resultados = [];
     if (comparendos.length === 0) {
       resultados = [
-        construirAnalisisCompleto(
+        await construirAnalisisCompleto(
           textoCompleto,
           null,
           'google-gemini-2.5-flash',
@@ -257,8 +257,10 @@ export async function POST(request: NextRequest) {
         ),
       ];
     } else {
-      resultados = comparendos.map((comp) =>
-        construirAnalisisCompleto(textoCompleto, comp, 'google-gemini-2.5-flash', 95)
+      resultados = await Promise.all(
+        comparendos.map((comp) =>
+          construirAnalisisCompleto(textoCompleto, comp, 'google-gemini-2.5-flash', 95)
+        )
       );
     }
 

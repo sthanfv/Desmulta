@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { m } from 'framer-motion';
-import { ShieldCheck, ArrowRight } from 'lucide-react';
+import { ShieldCheck, ArrowRight, FileText, Calculator, BrainCircuit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ResponsiveModal } from '@/components/ui/responsive-modal';
 
@@ -39,10 +39,10 @@ export function WelcomeModal({ onAcknowledge }: WelcomeModalProps) {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="uppercase text-2xl md:text-4xl leading-none block font-black tracking-tighter"
+          className="uppercase text-2xl md:text-4xl leading-tight block font-black tracking-tighter pb-1"
         >
-          Bienvenido a <br />
-          <span className="text-primary italic lowercase bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
+          Bienvenido a{' '}
+          <span className="text-primary italic lowercase bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60 pr-1">
             desmulta
           </span>
         </m.div>
@@ -70,12 +70,22 @@ export function WelcomeModal({ onAcknowledge }: WelcomeModalProps) {
           defenderte de fotomultas e infracciones de tránsito de manera transparente y eficiente.
         </p>
 
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 gap-3 md:gap-4">
           {[
             {
-              icon: <ShieldCheck className="w-5 h-5 text-blue-500" />,
-              title: 'Defensa Blindada',
-              desc: 'Procesos de exoneración respaldados por expertos legales.',
+              icon: <BrainCircuit className="w-5 h-5 text-primary" />,
+              title: 'Diagnóstico Inteligente',
+              desc: 'Auditoría gratuita que analiza tus multas y detecta posibles nulidades.',
+            },
+            {
+              icon: <Calculator className="w-5 h-5 text-blue-500" />,
+              title: 'Calculadora Financiera',
+              desc: 'Calcula intereses de mora, Ley Emiliani y deudas reales al instante.',
+            },
+            {
+              icon: <FileText className="w-5 h-5 text-emerald-500" />,
+              title: 'Generador de Defensa',
+              desc: 'Documentos jurídicos (Peticiones, Nulidades) listos para descargar.',
             },
           ].map((item, idx) => (
             <m.div

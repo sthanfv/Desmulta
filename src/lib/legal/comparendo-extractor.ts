@@ -7,6 +7,7 @@ import {
   VIGENCIA_CONSTANTES_ANIO,
 } from '@/lib/config-constants';
 import { PrescriptionEngine, OCRSanitizer } from '@/lib/legal/prescription-engine';
+import crypto from 'crypto';
 
 /**
  * Esquema Zod para el objeto comparendo extraído por Gemini.
@@ -169,26 +170,54 @@ export function determinarCausales(estado: string, comparendo: Comparendo | null
 }
 
 /**
- * Calcula los intereses moratorios usando interés compuesto diario.
+ * Calcula los intereses moratorios usando el microservicio Go de Desmulta.
+ * (La lógica interna en TypeScript ha sido deprecada y reemplazada por el motor B2B Go).
  *
  * @param montoBase - Capital adeudado original en pesos
  * @param fechaInfraccionISO - Fecha de infracción en formato YYYY-MM-DD
+ * @param tieneCobroCoactivo - Si está en cobro coactivo
+ * @returns El resultado completo de Go
  */
-function calcularInteresesInterno(montoBase: number, fechaInfraccionISO: string): number {
-  if (!montoBase || montoBase <= 0) return 0;
+async function invocarMotorGo(
+  valorMulta: number,
+  fechaInfraccion: string,
+  tieneCobroCoactivo: boolean
+) {
+  const engineUrl = process.env.GO_ENGINE_URL;
+  const engineSecret = process.env.GO_ENGINE_SECRET;
 
-  const fechaInfraccion = new Date(`${fechaInfraccionISO}T00:00:00Z`);
-  const hoy = new Date();
-  const hoyUTC = new Date(Date.UTC(hoy.getUTCFullYear(), hoy.getUTCMonth(), hoy.getUTCDate()));
+  if (!engineUrl || !engineSecret) {
+    throw new Error('GO_ENGINE_URL o GO_ENGINE_SECRET no configurados.');
+  }
 
-  if (isNaN(fechaInfraccion.getTime())) return 0;
+  const bodyStr = JSON.stringify({
+    valorMulta,
+    fechaInfraccion,
+    tieneCobroCoactivo,
+  });
 
-  const msPorDia = 1000 * 60 * 60 * 24;
-  const diasTotales = Math.floor((hoyUTC.getTime() - fechaInfraccion.getTime()) / msPorDia);
-  if (diasTotales <= 0) return 0;
+  const timestamp = Date.now().toString();
+  const signature = crypto
+    .createHmac('sha256', engineSecret)
+    .update(timestamp + bodyStr)
+    .digest('hex');
 
-  const tasaDiaria = Math.pow(1 + TASA_EA_VIGENTE, 1 / 365) - 1;
-  return montoBase * (Math.pow(1 + tasaDiaria, diasTotales) - 1);
+  const goResponse = await fetch(engineUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Engine-Timestamp': timestamp,
+      'X-Engine-Signature': signature,
+    },
+    body: bodyStr,
+  });
+
+  if (!goResponse.ok) {
+    throw new Error(`El motor de Golang falló (HTTP ${goResponse.status})`);
+  }
+
+  const goJson = await goResponse.json();
+  return goJson.data;
 }
 
 /**
@@ -210,49 +239,80 @@ function convertirFechaAISO(fechaDDMMYYYY: string): string | null {
  * @param proveedor - Motor OCR que generó el texto
  * @param confianza - Score de confianza del OCR (0-100)
  */
-export function construirAnalisisCompleto(
+export async function construirAnalisisCompleto(
   textoOCR: string,
   comparendo: Comparendo | null,
   proveedor: 'google-gemini-2.5-flash' | 'tesseract-js-fallback' | 'texto-crudo',
   confianza: number = 100
-): AnalisisComparendo {
-  // 1. Extraer fechas del texto para el motor de prescripción
+): Promise<AnalisisComparendo> {
+  // 1. Extraer fechas del texto para el motor de prescripción legacy (fallback)
   const fechasDetectadas = OCRSanitizer.extractDates(textoOCR);
 
-  // 2. Ejecutar el motor de prescripción enriquecido
-  const dictamen = PrescriptionEngine.evaluate(textoOCR, fechasDetectadas, confianza);
-  const estado = dictamen.status ?? 'REQUIERE_REVISION';
-
-  // 3. Determinar causales aplicables
-  const causalesAplicables = determinarCausales(estado, comparendo);
-
-  // 4. Calcular la antigüedad en días y años
   const fechaPrincipal = comparendo?.fechaInfraccion ?? fechasDetectadas[0] ?? null;
-  let diasTranscurridos: number | null = null;
-  let añosTranscurridos: number | null = null;
-  let fechaISO: string | null = null;
+  const valorOriginal = comparendo?.valorMulta ?? 0;
+  const esCoactivo = comparendo?.tieneCobroCoactivo ?? false;
 
+  let fechaISO: string | null = null;
   if (fechaPrincipal) {
     fechaISO = convertirFechaAISO(fechaPrincipal);
-    if (fechaISO) {
-      const fechaDate = new Date(`${fechaISO}T00:00:00Z`);
-      const hoyUTC = new Date();
-      const msPorDia = 1000 * 60 * 60 * 24;
-      diasTranscurridos = Math.floor((hoyUTC.getTime() - fechaDate.getTime()) / msPorDia);
-      añosTranscurridos = Number((diasTranscurridos / 365).toFixed(2));
+  }
+
+  // Si tenemos fecha válida y monto, delegamos TODO al motor Go
+  if (fechaISO) {
+    try {
+      const goResult = await invocarMotorGo(valorOriginal, fechaISO, esCoactivo);
+
+      // Usamos las causales del extractor basándonos en el estado de Go
+      const causalesAplicables = determinarCausales(goResult.prescripcion.estadoLegal, comparendo);
+
+      return {
+        ocr: {
+          proveedor,
+          modoEstructurado: comparendo !== null,
+          confianza,
+        },
+        comparendo,
+        analisisLegal: {
+          estado: goResult.prescripcion.estadoLegal,
+          isViable: goResult.prescripcion.isViable,
+          fechasDetectadas: fechasDetectadas,
+          diasTranscurridos: goResult.prescripcion.diasTotales,
+          añosTranscurridos: goResult.prescripcion.tiempoTranscurrido?.anos ?? null,
+          dictamenTecnico: goResult.prescripcion.disclaimerLegal,
+          causalesAplicables,
+        },
+        calculadora: {
+          valorOriginal: goResult.financiero.valorOriginal,
+          interesesAcumulados: goResult.financiero.interesesAcumulados,
+          valorTotalActual: goResult.financiero.valorTotalActual,
+          tasaEAVigente: goResult.financiero.tasaEAVigente,
+          smmlvVigente: goResult.financiero.smmlvVigente,
+          smdlvVigente: goResult.financiero.smdlvVigente,
+          valorEnSMLMV: goResult.financiero.valorEnSMMLV ?? goResult.financiero.valorEnSMDLV ?? null,
+          vigenciaConstantesAnio: goResult.financiero.vigenciaAnio,
+          fechaCalculo: goResult.financiero.fechaCalculo,
+        },
+      };
+    } catch (error) {
+      console.error('[comparendo-extractor] Error al consumir Go Engine, usando fallback', error);
+      // Fall through to legacy si Go falla
     }
   }
 
-  // 5. Calcular la deuda financiera
-  const valorOriginal = comparendo?.valorMulta ?? null;
-  let interesesAcumulados: number | null = null;
-  let valorTotalActual: number | null = null;
-  let valorEnSMLMV: number | null = null;
+  // 2. FALLBACK LEGACY (Solo si Go Engine falla o no hay fecha válida)
+  const dictamen = PrescriptionEngine.evaluate(textoOCR, fechasDetectadas, confianza);
+  const estado = dictamen.status ?? 'REQUIERE_REVISION';
+  const causalesAplicables = determinarCausales(estado, comparendo);
 
-  if (valorOriginal && valorOriginal > 0 && fechaISO) {
-    interesesAcumulados = Math.round(calcularInteresesInterno(valorOriginal, fechaISO));
-    valorTotalActual = valorOriginal + interesesAcumulados;
-    valorEnSMLMV = Number((valorOriginal / SMMLV_2026).toFixed(2));
+  let diasTranscurridos: number | null = null;
+  let añosTranscurridos: number | null = null;
+
+  if (fechaISO) {
+    const fechaDate = new Date(`${fechaISO}T00:00:00Z`);
+    const hoyUTC = new Date();
+    const msPorDia = 1000 * 60 * 60 * 24;
+    diasTranscurridos = Math.floor((hoyUTC.getTime() - fechaDate.getTime()) / msPorDia);
+    añosTranscurridos = Number((diasTranscurridos / 365).toFixed(2));
   }
 
   return {
@@ -274,12 +334,12 @@ export function construirAnalisisCompleto(
     },
     calculadora: {
       valorOriginal,
-      interesesAcumulados,
-      valorTotalActual,
+      interesesAcumulados: 0,
+      valorTotalActual: valorOriginal,
       tasaEAVigente: TASA_EA_VIGENTE,
       smmlvVigente: SMMLV_2026,
       smdlvVigente: SMDLV_2026,
-      valorEnSMLMV,
+      valorEnSMLMV: null,
       vigenciaConstantesAnio: VIGENCIA_CONSTANTES_ANIO,
       fechaCalculo: new Date().toISOString().split('T')[0],
     },

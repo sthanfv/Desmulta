@@ -35,6 +35,10 @@
 *   **UI/UX Restauración de Avanzar**: Se eliminó la clase restrictiva (`md:hidden`) del botón de "Avanzar columna" en `TarjetaKanban.tsx` para que vuelva a estar visible en la vista de PC, por requerimiento directo del usuario.
 *   **Lenguaje Natural**: Se cambió la terminología técnica ('leads') por vocabulario orientado al cliente ('solicitud inicial') en la generación de historiales de nuevos expedientes en `actions.ts`.
 *   Se corrieron validaciones de `typecheck` y tests (Exitosas).
+*   **Transición a Producción Wompi**: Se actualizaron las variables de entorno de pago (`NEXT_PUBLIC_WOMPI_PUBLIC_KEY`, `WOMPI_PRIVATE_KEY`, `WOMPI_EVENTS_SECRET`, `WOMPI_INTEGRITY_SECRET`) sustituyendo el Sandbox por las credenciales reales provistas por el usuario. El sistema está ahora listo para captar dinero real.
+*   **Integración Total BFF Go Engine (Sistema B2B)**: Se erradicó el uso de la antigua calculadora TypeScript (`calculadora-legal.ts`, ahora deprecada en modo almacén) en todos los endpoints B2B. El endpoint `analizar-comparendo` (OCR con Gemini) fue refactorizado para ser asíncrono y enrutar obligatoriamente el JSON extraído hacia el microservicio en Go a través de la firma segura HMAC-SHA256, unificando la lógica de cálculo y liberando carga de CPU de la web principal.
+*   **Vitrina Frontend Actualizada**: Se añadió a la tienda de documentos (en `plantillas/page.tsx`) el documento de **Nulidad Falta de Identidad (C-038)**. Se excluyeron deliberadamente la Caducidad de 1 año y el Poder Especial por instrucciones del usuario.
+*   **Welcome Modal UI/UX**: Se rediseñó el pop-up de bienvenida de la plataforma (`WelcomeModal.tsx`). Se solucionó un bug visual (la letra "A" cortada por desbordamiento CSS), se importaron nuevos íconos de `lucide-react` y se agregaron viñetas responsivas explicando las 3 características principales: Diagnóstico Inteligente, Calculadora Financiera y Generador de Defensa.
 
 ### Metas Pendientes / Tareas a Seguir
 *   Todo completado con éxito por ahora. Ninguna tarea pendiente a nivel crítico.

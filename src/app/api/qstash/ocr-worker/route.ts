@@ -160,7 +160,7 @@ export async function POST(request: NextRequest) {
 
       if (comparendos.length === 0) {
         // Fallback si no extrajo nada pero era texto válido
-        const analisis = construirAnalisisCompleto(
+        const analisis = await construirAnalisisCompleto(
           textoCompleto,
           null,
           'google-gemini-2.5-flash',
@@ -172,8 +172,10 @@ export async function POST(request: NextRequest) {
           _meta: { plan },
         };
       } else {
-        const resultados = comparendos.map((comp) =>
-          construirAnalisisCompleto(textoCompleto, comp, 'google-gemini-2.5-flash', 95)
+        const resultados = await Promise.all(
+          comparendos.map((comp) =>
+            construirAnalisisCompleto(textoCompleto, comp, 'google-gemini-2.5-flash', 95)
+          )
         );
         finalPayload = {
           success: true,

@@ -92,6 +92,16 @@ const TEMPLATE_CARDS = [
     exito: '99%',
     precio: '$39.000',
   },
+  {
+    id: 'nulidad_falta_identidad',
+    title: 'Nulidad Falta de Identidad (C-038)',
+    description: 'Nulidad absoluta por falta de identificación plena del conductor.',
+    scenario:
+      'Ideal si te impusieron una fotomulta basándose únicamente en la placa de tu vehículo, pero la Secretaría de Tránsito no tiene ninguna prueba (foto de tu rostro, biometría, etc.) que demuestre de forma irrefutable que TÚ ibas conduciendo. Obliga al tránsito a probar tu identidad según la Sentencia C-038 de 2020.',
+    badge: 'Sentencia C-038',
+    exito: '97%',
+    precio: '$49.000',
+  },
 ];
 
 export default function PlantillasPage() {

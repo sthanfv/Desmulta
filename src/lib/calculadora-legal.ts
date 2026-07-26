@@ -1,4 +1,10 @@
 // src/lib/calculadora-legal.ts
+/**
+ * @deprecated [2026-07-26] ESTA CALCULADORA FUE DESCONECTADA Y REEMPLAZADA POR EL MICROSERVICIO EN GO.
+ * Se mantiene temporalmente como archivo histórico y de referencia técnica ("almacén").
+ * NO UTILIZAR EN NUEVOS DESARROLLOS.
+ * Toda la lógica matemática, Ley Emiliani y PrescriptionEngine ha sido centralizada en `desmulta-calculadora-go`.
+ */
 import { TASA_EA_VIGENTE, SMDLV_2026 } from './config-constants';
 import { PrescriptionEngine, OCRSanitizer } from '@/lib/legal/prescription-engine';
 
