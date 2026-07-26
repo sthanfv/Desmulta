@@ -388,7 +388,7 @@ export async function convertToCase(
       history: [
         {
           date: new Date(),
-          description: 'Caso aperturado desde gestión de leads.',
+          description: 'Expediente formalizado exitosamente a partir de tu solicitud inicial.',
           type: 'system' as const,
         },
       ],
