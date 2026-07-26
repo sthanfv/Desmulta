@@ -15,12 +15,19 @@
     },
     "src/app/api/ocr/route.ts": {
       "maxDuration": 60
+    },
+    "src/app/api/internal/keepalive/route.ts": {
+      "maxDuration": 60
     }
   },
   "crons": [
     {
       "path": "/api/internal/followup-cron",
       "schedule": "0 13 * * *"
+    },
+    {
+      "path": "/api/internal/keepalive",
+      "schedule": "*/14 * * * *"
     }
   ]
 }
