@@ -24,10 +24,6 @@
     {
       "path": "/api/internal/followup-cron",
       "schedule": "0 13 * * *"
-    },
-    {
-      "path": "/api/internal/keepalive",
-      "schedule": "*/14 * * * *"
     }
   ]
 }
