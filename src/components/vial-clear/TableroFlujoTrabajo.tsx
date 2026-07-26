@@ -91,7 +91,7 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
   const searchParams = useSearchParams();
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterAssignee, setFilterAssignee] = useState<'mine' | 'all'>('mine');
+  const [filterAssignee, setFilterAssignee] = useState<'mine' | 'all'>('all');
 
   // Enlace mágico desde Telegram: Auto-rellenar búsqueda
   useEffect(() => {

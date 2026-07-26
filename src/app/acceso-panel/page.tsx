@@ -289,8 +289,7 @@ export default function AccesoPanel() {
         description: 'Verificación de doble factor completada.',
       });
 
-      // INYECCIÓN TAB-LOCK: Ligamos la sesión a la pestaña actual
-      sessionStorage.setItem('desmulta_tab_lock', 'true');
+      // INYECCIÓN TAB-LOCK Removida (Soporte multi-pestaña)
 
       // Remediación del race condition post-OTP (Hallazgo 3 — Auditoría Manus AI):
       // En lugar de un delay fijo e impredecible, se usa un mecanismo de reintento con

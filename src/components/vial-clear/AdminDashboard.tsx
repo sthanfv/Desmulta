@@ -291,16 +291,7 @@ export function AdminDashboard() {
     };
   }, [leadsParaKanban, casosParaKanban]);
 
-  // 🔒 Tab-Lock (Candado de Pestaña)
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const isMockAdmin = (window as any).__is_mock_admin__;
-      const hasLock = sessionStorage.getItem('desmulta_tab_lock');
-      if (!hasLock && !isMockAdmin) {
-        window.location.href = '/logout?reason=manual';
-      }
-    }
-  }, []);
+  // 🔒 Tab-Lock Removido por petición del usuario (Soporte Multi-Pestaña)
 
   // 🔒 Auto-logout por inactividad
   useInactivityLogout({

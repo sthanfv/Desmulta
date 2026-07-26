@@ -288,7 +288,7 @@ export function ModalDetalleExpediente({
         ref={modalRef}
         role="dialog"
         aria-modal="true"
-        className="bg-white dark:bg-[#0a0f1c] border border-slate-200/60 dark:border-slate-800 rounded-[2rem] w-full max-w-2xl max-h-[92vh] flex flex-col overflow-hidden shadow-[0_30px_100px_-15px_rgba(0,0,0,0.3)] ring-1 ring-slate-900/5 dark:ring-white/10 animate-in fade-in zoom-in-95 duration-200 relative z-10"
+        className="bg-white dark:bg-[#0a0f1c] border border-slate-200/60 dark:border-slate-800 rounded-[2rem] w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden shadow-[0_30px_100px_-15px_rgba(0,0,0,0.3)] ring-1 ring-slate-900/5 dark:ring-white/10 animate-in fade-in zoom-in-95 duration-200 relative z-10"
       >
         {/* HEADER ULTRALIMPIO */}
         <div className="flex justify-between items-center px-8 py-6 bg-white dark:bg-[#0a0f1c] border-b border-slate-100 dark:border-slate-800/80 sticky top-0 z-20">
@@ -323,26 +323,29 @@ export function ModalDetalleExpediente({
         </div>
 
         {/* CUERPO PRINCIPAL (Scrollable) */}
-        <div className="p-8 space-y-8 overflow-y-auto custom-scrollbar flex-1 bg-slate-50/50 dark:bg-transparent">
-          {/* SECCIÓN 1: IDENTIDAD */}
+        <div className="p-8 overflow-y-auto custom-scrollbar flex-1 bg-slate-50/50 dark:bg-transparent">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div className="lg:col-span-7 space-y-8">
+              {/* SECCIÓN 1: IDENTIDAD */}
           <div className="space-y-3">
             <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] ml-1">
               Identidad del Ciudadano
             </h3>
             <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800/80 rounded-2xl overflow-hidden shadow-sm relative">
               {!isRevealed && (
-                <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/60 dark:bg-black/60 backdrop-blur-md">
+                <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/70 dark:bg-black/70 backdrop-blur-md transition-all">
+                  <ShieldAlert className="w-8 h-8 text-slate-300 dark:text-slate-600 mb-3 opacity-50" />
                   <button
                     onClick={handleReveal}
                     disabled={isProcessing === 'reveal'}
-                    className="flex items-center gap-2 bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl"
+                    className="flex items-center gap-2 bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest hover:scale-105 hover:shadow-xl hover:shadow-slate-900/20 dark:hover:shadow-white/20 active:scale-95 transition-all"
                   >
                     {isProcessing === 'reveal' ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
                     ) : (
                       <Eye className="w-4 h-4" />
                     )}
-                    Revelar Información Sensible
+                    Revelar Datos Sensibles
                   </button>
                 </div>
               )}
@@ -428,7 +431,198 @@ export function ModalDetalleExpediente({
             </div>
           </div>
 
-          {/* SECCIÓN QR DE SEGUIMIENTO */}
+                    {/* SECCIÓN 2: VEHÍCULO */}
+          {(data.placa || esCaptura) && (
+<div className="flex flex-col gap-4">
+              {/* Placa Destacada */}
+              {data.placa && data.placa !== 'N/A' && data.placa !== 'Sin Identificar' && (
+                <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-5 shadow-sm flex flex-col justify-center relative overflow-hidden group">
+                  {!isRevealed && (
+                    <div className="absolute inset-0 z-10 bg-white/60 dark:bg-black/60 backdrop-blur-md" />
+                  )}
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-yellow-400/10 dark:bg-yellow-500/5 rounded-bl-full pointer-events-none transition-transform group-hover:scale-110" />
+                  <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
+                    <Car className="w-3.5 h-3.5" /> Vehículo Implicado
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <p className="text-3xl font-black text-yellow-600 dark:text-yellow-500 tracking-widest uppercase">
+                      {isRevealed ? revealedData?.placa : data.placa}
+                    </p>
+                    <button
+                      onClick={() =>
+                        copyToClipboard(
+                          isRevealed ? revealedData?.placa || '' : data.placa || '',
+                          'placa'
+                        )
+                      }
+                      className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-yellow-600 dark:hover:text-yellow-400 transition-all border border-slate-200 dark:border-slate-700 hover:border-yellow-400 dark:hover:border-yellow-600/50 shadow-sm"
+                    >
+                      {copiedField === 'placa' ? (
+                        <Check className="w-4 h-4 text-green-500" />
+                      ) : (
+                        <Copy className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+              )}
+              
+            </div>
+          )}
+
+
+
+          <div className="flex items-center justify-center gap-2 text-slate-400 dark:text-slate-500 pt-2 border-t border-slate-200/50 dark:border-slate-800/50 mt-8">
+            <Calendar className="w-3.5 h-3.5" />
+            <span className="text-[10px] font-bold tracking-[0.1em] uppercase">
+              Ingreso: {data.createdAt ? new Date(data.createdAt).toLocaleString() : 'Reciente'}
+            </span>
+          </div>
+
+          {/* ÁREA DE EDICIÓN DE PDF (SaaS Style) */}
+          {esCaso && isEditing && (
+            <div className="bg-amber-50/50 dark:bg-amber-500/[0.03] p-6 rounded-2xl border border-amber-200/50 dark:border-amber-500/20 animate-in fade-in slide-in-from-bottom-4 shadow-inner">
+              <div className="flex items-center gap-2 mb-5">
+                <div className="p-2 rounded-lg bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-500">
+                  <FileText className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-extrabold text-amber-950 dark:text-amber-500 uppercase tracking-widest">
+                    Motor Documental
+                  </h3>
+                  <p className="text-[10px] text-amber-700/60 dark:text-amber-500/60 font-bold uppercase tracking-wider">
+                    Configura y emite documentos legales
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-5">
+                {/* Custom Checkboxes tipo Tarjeta */}
+                <div className="grid grid-cols-2 gap-3">
+                  <label className="relative cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="peer sr-only"
+                      checked={selectedDocs.includes('poder')}
+                      onChange={(e) => {
+                        if (e.target.checked) setSelectedDocs((prev) => [...prev, 'poder']);
+                        else setSelectedDocs((prev) => prev.filter((d) => d !== 'poder'));
+                      }}
+                    />
+                    <div className="w-full h-full bg-white dark:bg-[#111827] border-2 border-slate-200 dark:border-slate-800 rounded-xl p-4 transition-all peer-checked:border-amber-500 peer-checked:bg-amber-50/50 dark:peer-checked:bg-amber-500/10 peer-checked:shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-widest">
+                          Poder
+                        </span>
+                        <div className="w-4 h-4 rounded-full border-2 border-slate-300 dark:border-slate-600 peer-checked:border-amber-500 flex items-center justify-center">
+                          {selectedDocs.includes('poder') && (
+                            <div className="w-2 h-2 rounded-full bg-amber-500" />
+                          )}
+                        </div>
+                      </div>
+                      <p className="text-[10px] text-slate-500 font-medium">
+                        Documento de representación legal.
+                      </p>
+                    </div>
+                  </label>
+
+                  <label className="relative cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="peer sr-only"
+                      checked={selectedDocs.includes('peticion')}
+                      onChange={(e) => {
+                        if (e.target.checked) setSelectedDocs((prev) => [...prev, 'peticion']);
+                        else setSelectedDocs((prev) => prev.filter((d) => d !== 'peticion'));
+                      }}
+                    />
+                    <div className="w-full h-full bg-white dark:bg-[#111827] border-2 border-slate-200 dark:border-slate-800 rounded-xl p-4 transition-all peer-checked:border-amber-500 peer-checked:bg-amber-50/50 dark:peer-checked:bg-amber-500/10 peer-checked:shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-widest">
+                          Acción
+                        </span>
+                        <div className="w-4 h-4 rounded-full border-2 border-slate-300 dark:border-slate-600 peer-checked:border-amber-500 flex items-center justify-center">
+                          {selectedDocs.includes('peticion') && (
+                            <div className="w-2 h-2 rounded-full bg-amber-500" />
+                          )}
+                        </div>
+                      </div>
+                      <p className="text-[10px] text-slate-500 font-medium">
+                        Derecho de petición o tutela.
+                      </p>
+                    </div>
+                  </label>
+                </div>
+
+                {selectedDocs.includes('peticion') && (
+                  <div className="animate-in fade-in slide-in-from-top-2">
+                    <p className="text-[10px] font-black text-amber-900/60 dark:text-amber-500/60 uppercase tracking-widest mb-1.5 ml-1">
+                      Fundamento Jurídico
+                    </p>
+                    <select
+                      value={selectedCausal}
+                      onChange={(e) => setSelectedCausal(e.target.value)}
+                      className="w-full bg-white dark:bg-[#111827] border-2 border-slate-200 dark:border-slate-800 p-3.5 rounded-xl text-sm font-semibold text-slate-900 dark:text-white shadow-sm focus:border-amber-500 outline-none transition-all cursor-pointer"
+                    >
+                      <option value="" disabled>
+                        Seleccione la causal de defensa...
+                      </option>
+                      {Object.values(CAUSALES_TRANSITO).map((causal) => (
+                        <option key={causal.id} value={causal.id}>
+                          {causal.titulo}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                <ModalEdicionDatos
+                  datos={editData}
+                  onChange={(campo, valor) => setEditData((prev) => ({ ...prev, [campo]: valor }))}
+                  onGuardar={handleGenerarDocumentos}
+                  onCancelar={() => setIsEditing(false)}
+                  isGuardando={isProcessing === 'pdf'}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+            </div> {/* END LEFT COL */}
+            <div className="lg:col-span-5 space-y-8">
+              {/* EVIDENCIA SIMIT (Alta Fidelidad) */}
+              {(data.placa || esCaptura) && (
+                <div className="flex flex-col gap-4 h-full">
+                  {/* Evidencia SIMIT (Alta Fidelidad) */}
+              {esCaptura && (
+                <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-4 shadow-sm h-full min-h-[140px] flex flex-col group">
+                  <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
+                    Evidencia SIMIT Adjunta
+                  </p>
+                  <div className="w-full flex-1 relative rounded-xl overflow-hidden border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-black/40">
+                    <Image
+                      src={data.evidenceUrl!}
+                      alt="Evidencia SIMIT"
+                      fill
+                      className="object-contain p-2"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
+                    <a
+                      href={data.evidenceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="absolute inset-0 bg-slate-900/60 backdrop-blur-[2px] flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 text-white text-xs font-black gap-2 uppercase tracking-widest"
+                    >
+                      <ExternalLink className="w-5 h-5 mb-1" /> Ampliar Captura
+                    </a>
+                  </div>
+                </div>
+              )}
+                </div>
+              )}
+              
+              {/* SECCIÓN QR DE SEGUIMIENTO */}
           {data.trackingUuid && (
             <div className="space-y-3">
               <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] ml-1">
@@ -564,189 +758,9 @@ export function ModalDetalleExpediente({
               </div>
             </div>
           )}
-
-          {/* SECCIÓN 2: VEHÍCULO Y EVIDENCIA */}
-          {(data.placa || esCaptura) && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Placa Destacada */}
-              {data.placa && data.placa !== 'N/A' && data.placa !== 'Sin Identificar' && (
-                <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-5 shadow-sm flex flex-col justify-center relative overflow-hidden group">
-                  {!isRevealed && (
-                    <div className="absolute inset-0 z-10 bg-white/60 dark:bg-black/60 backdrop-blur-md" />
-                  )}
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-yellow-400/10 dark:bg-yellow-500/5 rounded-bl-full pointer-events-none transition-transform group-hover:scale-110" />
-                  <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
-                    <Car className="w-3.5 h-3.5" /> Vehículo Implicado
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <p className="text-3xl font-black text-yellow-600 dark:text-yellow-500 tracking-widest uppercase">
-                      {isRevealed ? revealedData?.placa : data.placa}
-                    </p>
-                    <button
-                      onClick={() =>
-                        copyToClipboard(
-                          isRevealed ? revealedData?.placa || '' : data.placa || '',
-                          'placa'
-                        )
-                      }
-                      className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-yellow-600 dark:hover:text-yellow-400 transition-all border border-slate-200 dark:border-slate-700 hover:border-yellow-400 dark:hover:border-yellow-600/50 shadow-sm"
-                    >
-                      {copiedField === 'placa' ? (
-                        <Check className="w-4 h-4 text-green-500" />
-                      ) : (
-                        <Copy className="w-4 h-4" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-              )}
-              {/* Evidencia SIMIT (Alta Fidelidad) */}
-              {esCaptura && (
-                <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-4 shadow-sm h-full min-h-[140px] flex flex-col justify-between group">
-                  <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
-                    Evidencia SIMIT Adjunta
-                  </p>
-                  <div className="w-full flex-1 relative rounded-xl overflow-hidden border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-black/40">
-                    <Image
-                      src={data.evidenceUrl!}
-                      alt="Evidencia SIMIT"
-                      fill
-                      className="object-contain p-2"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = 'none';
-                      }}
-                    />
-                    <a
-                      href={data.evidenceUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="absolute inset-0 bg-slate-900/60 backdrop-blur-[2px] flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 text-white text-xs font-black gap-2 uppercase tracking-widest"
-                    >
-                      <ExternalLink className="w-5 h-5 mb-1" /> Ampliar Captura
-                    </a>
-                  </div>
-                </div>
-              )}
-              {/* Documentos de defensa removidos de la interfaz visual del admin */}{' '}
             </div>
-          )}
-
-          <div className="flex items-center justify-center gap-2 text-slate-400 dark:text-slate-500 pt-2 border-t border-slate-200/50 dark:border-slate-800/50 mt-8">
-            <Calendar className="w-3.5 h-3.5" />
-            <span className="text-[10px] font-bold tracking-[0.1em] uppercase">
-              Ingreso: {data.createdAt ? new Date(data.createdAt).toLocaleString() : 'Reciente'}
-            </span>
-          </div>
-
-          {/* ÁREA DE EDICIÓN DE PDF (SaaS Style) */}
-          {esCaso && isEditing && (
-            <div className="bg-amber-50/50 dark:bg-amber-500/[0.03] p-6 rounded-2xl border border-amber-200/50 dark:border-amber-500/20 animate-in fade-in slide-in-from-bottom-4 shadow-inner">
-              <div className="flex items-center gap-2 mb-5">
-                <div className="p-2 rounded-lg bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-500">
-                  <FileText className="w-4 h-4" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-extrabold text-amber-950 dark:text-amber-500 uppercase tracking-widest">
-                    Motor Documental
-                  </h3>
-                  <p className="text-[10px] text-amber-700/60 dark:text-amber-500/60 font-bold uppercase tracking-wider">
-                    Configura y emite documentos legales
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-5">
-                {/* Custom Checkboxes tipo Tarjeta */}
-                <div className="grid grid-cols-2 gap-3">
-                  <label className="relative cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="peer sr-only"
-                      checked={selectedDocs.includes('poder')}
-                      onChange={(e) => {
-                        if (e.target.checked) setSelectedDocs((prev) => [...prev, 'poder']);
-                        else setSelectedDocs((prev) => prev.filter((d) => d !== 'poder'));
-                      }}
-                    />
-                    <div className="w-full h-full bg-white dark:bg-[#111827] border-2 border-slate-200 dark:border-slate-800 rounded-xl p-4 transition-all peer-checked:border-amber-500 peer-checked:bg-amber-50/50 dark:peer-checked:bg-amber-500/10 peer-checked:shadow-sm">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-widest">
-                          Poder
-                        </span>
-                        <div className="w-4 h-4 rounded-full border-2 border-slate-300 dark:border-slate-600 peer-checked:border-amber-500 flex items-center justify-center">
-                          {selectedDocs.includes('poder') && (
-                            <div className="w-2 h-2 rounded-full bg-amber-500" />
-                          )}
-                        </div>
-                      </div>
-                      <p className="text-[10px] text-slate-500 font-medium">
-                        Documento de representación legal.
-                      </p>
-                    </div>
-                  </label>
-
-                  <label className="relative cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="peer sr-only"
-                      checked={selectedDocs.includes('peticion')}
-                      onChange={(e) => {
-                        if (e.target.checked) setSelectedDocs((prev) => [...prev, 'peticion']);
-                        else setSelectedDocs((prev) => prev.filter((d) => d !== 'peticion'));
-                      }}
-                    />
-                    <div className="w-full h-full bg-white dark:bg-[#111827] border-2 border-slate-200 dark:border-slate-800 rounded-xl p-4 transition-all peer-checked:border-amber-500 peer-checked:bg-amber-50/50 dark:peer-checked:bg-amber-500/10 peer-checked:shadow-sm">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-widest">
-                          Acción
-                        </span>
-                        <div className="w-4 h-4 rounded-full border-2 border-slate-300 dark:border-slate-600 peer-checked:border-amber-500 flex items-center justify-center">
-                          {selectedDocs.includes('peticion') && (
-                            <div className="w-2 h-2 rounded-full bg-amber-500" />
-                          )}
-                        </div>
-                      </div>
-                      <p className="text-[10px] text-slate-500 font-medium">
-                        Derecho de petición o tutela.
-                      </p>
-                    </div>
-                  </label>
-                </div>
-
-                {selectedDocs.includes('peticion') && (
-                  <div className="animate-in fade-in slide-in-from-top-2">
-                    <p className="text-[10px] font-black text-amber-900/60 dark:text-amber-500/60 uppercase tracking-widest mb-1.5 ml-1">
-                      Fundamento Jurídico
-                    </p>
-                    <select
-                      value={selectedCausal}
-                      onChange={(e) => setSelectedCausal(e.target.value)}
-                      className="w-full bg-white dark:bg-[#111827] border-2 border-slate-200 dark:border-slate-800 p-3.5 rounded-xl text-sm font-semibold text-slate-900 dark:text-white shadow-sm focus:border-amber-500 outline-none transition-all cursor-pointer"
-                    >
-                      <option value="" disabled>
-                        Seleccione la causal de defensa...
-                      </option>
-                      {Object.values(CAUSALES_TRANSITO).map((causal) => (
-                        <option key={causal.id} value={causal.id}>
-                          {causal.titulo}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-
-                <ModalEdicionDatos
-                  datos={editData}
-                  onChange={(campo, valor) => setEditData((prev) => ({ ...prev, [campo]: valor }))}
-                  onGuardar={handleGenerarDocumentos}
-                  onCancelar={() => setIsEditing(false)}
-                  isGuardando={isProcessing === 'pdf'}
-                />
-              </div>
-            </div>
-          )}
-        </div>
-
+          </div> {/* END GRID */}
+        
         {/* FOOTER & ACTIONS */}
         <div className="p-6 bg-white dark:bg-[#080d18] border-t border-slate-100 dark:border-slate-800/80 flex flex-col gap-3 shrink-0 relative z-20">
           <a
@@ -777,7 +791,7 @@ export function ModalDetalleExpediente({
                   handleAction(() => onCambiarEstado(data.id, 'CONTACTADO', 'lead'), 'contactado')
                 }
                 disabled={isProcessing !== null}
-                className="flex-1 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all hover:bg-blue-100 dark:hover:bg-blue-500/20 border border-blue-200/50 dark:border-blue-500/30 flex justify-center items-center active:scale-[0.98]"
+                className="flex-1 bg-transparent hover:bg-blue-50 dark:hover:bg-blue-500/10 text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all hover:bg-blue-100 dark:hover:bg-blue-500/20 border border-slate-200 dark:border-slate-800 hover:border-blue-200 dark:hover:border-blue-500/30 flex justify-center items-center active:scale-[0.98]"
               >
                 {isProcessing === 'contactado' ? (
                   <Loader2 className="w-4 h-4 animate-spin" />

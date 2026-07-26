@@ -482,207 +482,219 @@ export function SavingsCalculator() {
                   </div>
 
                   {/* SÚPER PODERES DE GO - MONETIZACIÓN & ESTRATEGIA LEGAL */}
-                  {estrategia?.bloqueoEmbriaguez && (
-                    <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-xl mt-4">
-                      <h4 className="font-bold text-red-600 flex items-center gap-2 mb-1">
-                        <AlertOctagon className="w-4 h-4" /> Sin Descuentos (Ley 1696)
-                      </h4>
-                      <p className="text-sm text-red-700/80">
-                        Las multas por embriaguez tienen prohibición expresa de recibir cualquier
-                        tipo de amnistía o descuento por ley.
-                      </p>
-                    </div>
-                  )}
-
-                  {estrategia?.esSalvablePorPrescripcion && (
-                    <div className="bg-gradient-to-br from-primary/10 to-transparent border border-primary/20 p-5 rounded-2xl mt-5 relative overflow-hidden flex flex-col items-start shadow-inner">
-                      <div className="absolute -top-4 -right-4 p-2 opacity-5 pointer-events-none">
-                        <ShieldCheck className="w-32 h-32" />
-                      </div>
-                      <div className="flex items-center gap-3 mb-2 relative z-10">
-                        <div className="p-2 bg-primary/20 rounded-lg text-primary">
-                          <ShieldCheck className="w-5 h-5" />
-                        </div>
-                        <h4 className="font-black text-primary text-lg">
-                          Viabilidad de Defensa Detectada
+                  <div className={`grid transition-all duration-500 ease-in-out ${estrategia?.bloqueoEmbriaguez ? 'grid-rows-[1fr] opacity-100 mt-4' : 'grid-rows-[0fr] opacity-0 mt-0'}`}>
+                    <div className="overflow-hidden">
+                      <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-xl">
+                        <h4 className="font-bold text-red-600 flex items-center gap-2 mb-1">
+                          <AlertOctagon className="w-4 h-4" /> Sin Descuentos (Ley 1696)
                         </h4>
+                        <p className="text-sm text-red-700/80">
+                          Las multas por embriaguez tienen prohibición expresa de recibir cualquier
+                          tipo de amnistía o descuento por ley.
+                        </p>
                       </div>
-                      <p className="text-sm text-foreground/80 relative z-10 mb-5 leading-relaxed">
-                        Según el cálculo de tiempos, tu caso podría ser apto para solicitar la
-                        figura legal de prescripción. Adquiere el documento técnico y preséntalo
-                        ante la Secretaría de Tránsito correspondiente para iniciar el proceso.
-                      </p>
-                      <a
-                        href="/plantillas"
-                        className="relative z-10 group inline-flex items-center justify-center gap-3 bg-primary text-primary-foreground font-black px-6 py-3.5 rounded-xl hover:bg-primary/90 transition-all duration-300 shadow-[0_0_20px_-5px_rgba(242,201,76,0.4)] hover:shadow-[0_0_30px_-5px_rgba(242,201,76,0.6)] hover:-translate-y-0.5 w-full sm:w-auto ring-1 ring-black/5 dark:ring-white/10"
-                      >
-                        <span>Ver Documentos de Defensa</span>
-                        <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                      </a>
                     </div>
-                  )}
+                  </div>
+
+                  <div className={`grid transition-all duration-500 ease-in-out ${estrategia?.esSalvablePorPrescripcion ? 'grid-rows-[1fr] opacity-100 mt-5' : 'grid-rows-[0fr] opacity-0 mt-0'}`}>
+                    <div className="overflow-hidden">
+                      <div className="bg-gradient-to-br from-primary/10 to-transparent border border-primary/20 p-5 rounded-2xl relative flex flex-col items-start shadow-inner">
+                        <div className="absolute -top-4 -right-4 p-2 opacity-5 pointer-events-none">
+                          <ShieldCheck className="w-32 h-32" />
+                        </div>
+                        <div className="flex items-center gap-3 mb-2 relative z-10">
+                          <div className="p-2 bg-primary/20 rounded-lg text-primary">
+                            <ShieldCheck className="w-5 h-5" />
+                          </div>
+                          <h4 className="font-black text-primary text-lg">
+                            Viabilidad de Defensa Detectada
+                          </h4>
+                        </div>
+                        <p className="text-sm text-foreground/80 relative z-10 mb-5 leading-relaxed">
+                          Según el cálculo de tiempos, tu caso podría ser apto para solicitar la
+                          figura legal de prescripción. Adquiere el documento técnico y preséntalo
+                          ante la Secretaría de Tránsito correspondiente para iniciar el proceso.
+                        </p>
+                        <a
+                          href="/plantillas"
+                          className="relative z-10 group inline-flex items-center justify-center gap-3 bg-primary text-primary-foreground font-black px-6 py-3.5 rounded-xl hover:bg-primary/90 transition-all duration-300 shadow-[0_0_20px_-5px_rgba(242,201,76,0.4)] hover:shadow-[0_0_30px_-5px_rgba(242,201,76,0.6)] hover:-translate-y-0.5 w-full sm:w-auto ring-1 ring-black/5 dark:ring-white/10"
+                        >
+                          <span>Ver Documentos de Defensa</span>
+                          <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                        </a>
+                      </div>
+                    </div>
+                  </div>
 
                   {/* SÚPER PODERES DE GO - DISEÑO VISUAL */}
-                  {descuentos?.aplicaDescuento && (
-                    <div className="bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-xl mt-4">
-                      <h4 className="font-bold text-emerald-600 mb-2">
-                        🎁 Ley 1383 (Descuento Activo)
-                      </h4>
-                      <p className="text-sm text-emerald-700/80 mb-3">
-                        Estás a tiempo. Paga hoy mismo y ahorra dinero:
-                      </p>
-                      <div className="flex justify-between items-center bg-emerald-500/20 px-3 py-2 rounded-lg font-bold text-emerald-700">
-                        <span>50% Descuento</span>
-                        <span>{formatCurrency(descuentos.valorCon50Pct)}</span>
-                      </div>
-                    </div>
-                  )}
-
-                  {!descuentos?.aplicaDescuento && proyecciones && (
-                    <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-xl mt-4">
-                      <h4 className="font-bold text-red-600 mb-2">
-                        🔮 Riesgo Financiero (Deuda Futura)
-                      </h4>
-                      <p className="text-sm text-red-700/80 mb-3">
-                        Si no resuelves esto, tu deuda seguirá sumando intereses de mora:
-                      </p>
-                      <div className="space-y-1">
-                        <div className="flex justify-between items-center text-sm font-medium text-red-600 bg-red-500/10 px-3 py-1.5 rounded">
-                          <span>En 3 meses:</span>
-                          <span>{formatCurrency(proyecciones.en3Meses)}</span>
-                        </div>
-                        <div className="flex justify-between items-center text-sm font-bold text-red-700 bg-red-500/20 px-3 py-1.5 rounded">
-                          <span>En 1 año:</span>
-                          <span>{formatCurrency(proyecciones.en12Meses)}</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {chartData.length > 1 && (
-                    <div className="bg-foreground/5 p-4 rounded-xl mt-4 border border-foreground/10">
-                      <h4 className="font-bold mb-1 flex items-center gap-2">
-                        <Activity className="w-4 h-4 text-red-500" />
-                        Efecto Bola de Nieve
-                      </h4>
-                      <p className="text-xs text-muted-foreground mb-4">
-                        Así creció tu deuda real (Capital + Intereses) año tras año.
-                      </p>
-                      <div className="h-32 w-full">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <AreaChart data={chartData}>
-                            <defs>
-                              <linearGradient id="colorDeuda" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8} />
-                                <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
-                              </linearGradient>
-                            </defs>
-                            <XAxis dataKey="anio" fontSize={10} tickLine={false} axisLine={false} />
-                            <RechartsTooltip
-                              formatter={(value: unknown) => [
-                                formatCurrency(Number(value)),
-                                'Deuda Total',
-                              ]}
-                              labelFormatter={(label) => `Año ${label}`}
-                              contentStyle={{
-                                borderRadius: '8px',
-                                fontSize: '12px',
-                                border: 'none',
-                                backgroundColor: '#1f2937',
-                                color: '#fff',
-                              }}
-                            />
-                            <Area
-                              type="monotone"
-                              dataKey="deudaTotal"
-                              stroke="#ef4444"
-                              strokeWidth={3}
-                              fillOpacity={1}
-                              fill="url(#colorDeuda)"
-                            />
-                          </AreaChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </div>
-                  )}
-
-                  {resultado && (
-                    <div
-                      className={`p-4 rounded-2xl border flex items-start gap-3 ${
-                        resultado.estado === 'CADUCIDAD ESTIMADA'
-                          ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400'
-                          : 'bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400'
-                      }`}
-                    >
-                      {resultado.estado === 'CADUCIDAD ESTIMADA' ? (
-                        <ShieldCheck className="w-5 h-5 mt-0.5 shrink-0 text-emerald-500" />
-                      ) : (
-                        <TrendingDown className="w-5 h-5 mt-0.5 shrink-0 text-amber-500" />
-                      )}
-                      <div>
-                        <h4 className="font-bold text-sm">
-                          {resultado.estado === 'CADUCIDAD ESTIMADA'
-                            ? 'Apta para Prescripción'
-                            : 'Requiere Defensa Técnica'}
+                  <div className={`grid transition-all duration-500 ease-in-out ${descuentos?.aplicaDescuento ? 'grid-rows-[1fr] opacity-100 mt-4' : 'grid-rows-[0fr] opacity-0 mt-0'}`}>
+                    <div className="overflow-hidden">
+                      <div className="bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-xl">
+                        <h4 className="font-bold text-emerald-600 mb-2">
+                          🎁 Ley 1383 (Descuento Activo)
                         </h4>
-                        {/* Estado legal enriquecido — visible solo cuando difiere del estado visual */}
-                        {resultado.estadoLegal &&
-                          resultado.estadoLegal !== 'VIGENTE' &&
-                          resultado.estadoLegal !== 'REQUIERE_REVISION' && (
-                            <span className="inline-block mt-1 mb-1 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-foreground/10">
-                              {resultado.estadoLegal === 'PRESCRITO' &&
-                                '⚖️ PRESCRITO (Art. 159 CNT)'}
-                              {resultado.estadoLegal === 'CADUCADO' && '⏱️ CADUCADO (Art. 161 CNT)'}
-                              {resultado.estadoLegal === 'IMPUGNABLE_C038' &&
-                                '📷 IMPUGNABLE (C-038/2020)'}
-                            </span>
-                          )}
-                        <p className="text-xs opacity-90 mt-1 leading-relaxed">
-                          {resultado.disclaimerLegal}
+                        <p className="text-sm text-emerald-700/80 mb-3">
+                          Estás a tiempo. Paga hoy mismo y ahorra dinero:
                         </p>
-                        <div className="mt-2 inline-block px-2 py-1 rounded bg-foreground/10 text-[10px] font-bold uppercase tracking-wider">
-                          Éxito Histórico: {String(resultado.probabilidadExito).split('%')[0]}%
+                        <div className="flex justify-between items-center bg-emerald-500/20 px-3 py-2 rounded-lg font-bold text-emerald-700">
+                          <span>50% Descuento</span>
+                          <span>{descuentos ? formatCurrency(descuentos.valorCon50Pct) : ''}</span>
                         </div>
-
-                        {/* Semáforo de Probabilidad de Cobro Coactivo (Con Disclaimer Legal) */}
-                        {riesgoEmbargo && (
-                          <div className="mt-4 pt-3 border-t border-foreground/10">
-                            <TooltipProvider delayDuration={200}>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <div className="flex items-center gap-2 cursor-help w-fit bg-white dark:bg-black/40 border px-3 py-2 rounded-lg shadow-sm">
-                                    <AlertOctagon
-                                      className={`w-4 h-4 ${riesgoEmbargo === 'Alto' ? 'text-red-500' : riesgoEmbargo === 'Medio' ? 'text-amber-500' : 'text-emerald-500'}`}
-                                    />
-                                    <span className="text-xs font-bold text-slate-700 dark:text-slate-200">
-                                      Probabilidad de Acción de Cobro:
-                                      <span
-                                        className={`ml-1 ${riesgoEmbargo === 'Alto' ? 'text-red-600 dark:text-red-400' : riesgoEmbargo === 'Medio' ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}
-                                      >
-                                        {riesgoEmbargo.toUpperCase()}
-                                      </span>
-                                    </span>
-                                  </div>
-                                </TooltipTrigger>
-                                <TooltipContent className="max-w-xs text-xs p-3">
-                                  <p className="font-bold mb-1">Algoritmo Predictivo</p>
-                                  <p>
-                                    Cálculo referencial y educativo basado en los tiempos de
-                                    caducidad (Ley 769 de 2002).{' '}
-                                    <strong>
-                                      Desmulta no es una autoridad ni ofrece asesoría legal.
-                                    </strong>{' '}
-                                    Solo el SIMIT o la Secretaría de Movilidad determinan y ejecutan
-                                    medidas cautelares como el embargo.
-                                  </p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          </div>
-                        )}
                       </div>
                     </div>
-                  )}
+                  </div>
+
+                  <div className={`grid transition-all duration-500 ease-in-out ${!descuentos?.aplicaDescuento && proyecciones ? 'grid-rows-[1fr] opacity-100 mt-4' : 'grid-rows-[0fr] opacity-0 mt-0'}`}>
+                    <div className="overflow-hidden">
+                      <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-xl">
+                        <h4 className="font-bold text-red-600 mb-2">
+                          🔮 Riesgo Financiero (Deuda Futura)
+                        </h4>
+                        <p className="text-sm text-red-700/80 mb-3">
+                          Si no resuelves esto, tu deuda seguirá sumando intereses de mora:
+                        </p>
+                        <div className="space-y-1">
+                          <div className="flex justify-between items-center text-sm font-medium text-red-600 bg-red-500/10 px-3 py-1.5 rounded">
+                            <span>En 3 meses:</span>
+                            <span>{proyecciones ? formatCurrency(proyecciones.en3Meses) : ''}</span>
+                          </div>
+                          <div className="flex justify-between items-center text-sm font-bold text-red-700 bg-red-500/20 px-3 py-1.5 rounded">
+                            <span>En 1 año:</span>
+                            <span>{proyecciones ? formatCurrency(proyecciones.en12Meses) : ''}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className={`grid transition-all duration-500 ease-in-out ${chartData.length > 1 ? 'grid-rows-[1fr] opacity-100 mt-4' : 'grid-rows-[0fr] opacity-0 mt-0'}`}>
+                    <div className="overflow-hidden">
+                      <div className="bg-foreground/5 p-4 rounded-xl border border-foreground/10">
+                        <h4 className="font-bold mb-1 flex items-center gap-2">
+                          <Activity className="w-4 h-4 text-red-500" />
+                          Efecto Bola de Nieve
+                        </h4>
+                        <p className="text-xs text-muted-foreground mb-4">
+                          Así creció tu deuda real (Capital + Intereses) año tras año.
+                        </p>
+                        <div className="h-32 w-full">
+                          <ResponsiveContainer width="100%" height={128}>
+                            <AreaChart data={chartData}>
+                              <defs>
+                                <linearGradient id="colorDeuda" x1="0" y1="0" x2="0" y2="1">
+                                  <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8} />
+                                  <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
+                                </linearGradient>
+                              </defs>
+                              <XAxis dataKey="anio" fontSize={10} tickLine={false} axisLine={false} />
+                              <RechartsTooltip
+                                formatter={(value: unknown) => [
+                                  formatCurrency(Number(value)),
+                                  'Deuda Total',
+                                ]}
+                                labelFormatter={(label) => `Año ${label}`}
+                                contentStyle={{
+                                  borderRadius: '8px',
+                                  fontSize: '12px',
+                                  border: 'none',
+                                  backgroundColor: '#1f2937',
+                                  color: '#fff',
+                                }}
+                              />
+                              <Area
+                                type="monotone"
+                                dataKey="deudaTotal"
+                                stroke="#ef4444"
+                                strokeWidth={3}
+                                fillOpacity={1}
+                                fill="url(#colorDeuda)"
+                              />
+                            </AreaChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className={`grid transition-all duration-500 ease-in-out ${resultado ? 'grid-rows-[1fr] opacity-100 mt-4' : 'grid-rows-[0fr] opacity-0 mt-0'}`}>
+                    <div className="overflow-hidden">
+                      <div
+                        className={`p-4 rounded-2xl border flex items-start gap-3 ${
+                          resultado?.estado === 'CADUCIDAD ESTIMADA'
+                            ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400'
+                            : 'bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400'
+                        }`}
+                      >
+                        {resultado?.estado === 'CADUCIDAD ESTIMADA' ? (
+                          <ShieldCheck className="w-5 h-5 mt-0.5 shrink-0 text-emerald-500" />
+                        ) : (
+                          <TrendingDown className="w-5 h-5 mt-0.5 shrink-0 text-amber-500" />
+                        )}
+                        <div>
+                          <h4 className="font-bold text-sm">
+                            {resultado?.estado === 'CADUCIDAD ESTIMADA'
+                              ? 'Apta para Prescripción'
+                              : 'Requiere Defensa Técnica'}
+                          </h4>
+                          {/* Estado legal enriquecido — visible solo cuando difiere del estado visual */}
+                          {resultado?.estadoLegal &&
+                            resultado.estadoLegal !== 'VIGENTE' &&
+                            resultado.estadoLegal !== 'REQUIERE_REVISION' && (
+                              <span className="inline-block mt-1 mb-1 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-foreground/10">
+                                {resultado.estadoLegal === 'PRESCRITO' &&
+                                  '⚖️ PRESCRITO (Art. 159 CNT)'}
+                                {resultado.estadoLegal === 'CADUCADO' && '⏱️ CADUCADO (Art. 161 CNT)'}
+                                {resultado.estadoLegal === 'IMPUGNABLE_C038' &&
+                                  '📷 IMPUGNABLE (C-038/2020)'}
+                              </span>
+                            )}
+                          <p className="text-xs opacity-90 mt-1 leading-relaxed">
+                            {resultado?.disclaimerLegal}
+                          </p>
+                          <div className="mt-2 inline-block px-2 py-1 rounded bg-foreground/10 text-[10px] font-bold uppercase tracking-wider">
+                            Éxito Histórico: {String(resultado?.probabilidadExito || '').split('%')[0]}%
+                          </div>
+
+                          {/* Semáforo de Probabilidad de Cobro Coactivo (Con Disclaimer Legal) */}
+                          {riesgoEmbargo && (
+                            <div className="mt-4 pt-3 border-t border-foreground/10">
+                              <TooltipProvider delayDuration={200}>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <div className="flex items-center gap-2 cursor-help w-fit bg-white dark:bg-black/40 border px-3 py-2 rounded-lg shadow-sm">
+                                      <AlertOctagon
+                                        className={`w-4 h-4 ${riesgoEmbargo === 'Alto' ? 'text-red-500' : riesgoEmbargo === 'Medio' ? 'text-amber-500' : 'text-emerald-500'}`}
+                                      />
+                                      <span className="text-xs font-bold text-slate-700 dark:text-slate-200">
+                                        Probabilidad de Acción de Cobro:
+                                        <span
+                                          className={`ml-1 ${riesgoEmbargo === 'Alto' ? 'text-red-600 dark:text-red-400' : riesgoEmbargo === 'Medio' ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}
+                                        >
+                                          {riesgoEmbargo.toUpperCase()}
+                                        </span>
+                                      </span>
+                                    </div>
+                                  </TooltipTrigger>
+                                  <TooltipContent className="max-w-xs text-xs p-3">
+                                    <p className="font-bold mb-1">Algoritmo Predictivo</p>
+                                    <p>
+                                      Cálculo referencial y educativo basado en los tiempos de
+                                      caducidad (Ley 769 de 2002).{' '}
+                                      <strong>
+                                        Desmulta no es una autoridad ni ofrece asesoría legal.
+                                      </strong>{' '}
+                                      Solo el SIMIT o la Secretaría de Movilidad determinan y ejecutan
+                                      medidas cautelares como el embargo.
+                                    </p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 {/* FORMULARIO DE CAPTURA - LEAD AUTOMÁTICO */}
