@@ -11,7 +11,7 @@ graph TD
   subgraph Cliente["Cliente (PWA / Next.js en Vercel)"]
     A1[Formulario Completo] -->|RSA E2EE + Zod| C[POST /api/create-consultation]
     A2[Formulario SIMIT\ntelefono + foto] -->|Zod| C
-    OCR[Tesseract.js OCR\nclient-side] --> A2
+    OCR[Gemini OCR + \nLector-OCR Python\n(Fallback Microservicio)] --> A2
   end
 
   subgraph VIP["Portal VIP (usuarios SIMIT)"]
@@ -156,6 +156,8 @@ BLOB_READ_WRITE_TOKEN=...        # Vercel Blob
 NEXT_PUBLIC_VAPID_KEY=...        # Push notifications web
 PII_ENCRYPTION_KEY=...           # Clave simétrica primaria para cifrado AES
 PII_ENCRYPTION_SALT=...          # Semilla hexadecimal (64 chars) para PBKDF2
+OCR_FALLBACK_URL=...             # URL del microservicio Python Lector-OCR (Render)
+OCR_ENGINE_SECRET=...            # Secreto HMAC-SHA256 para comunicación Vercel -> Python
 ```
 
 ### Firebase Secrets (Cloud Functions)

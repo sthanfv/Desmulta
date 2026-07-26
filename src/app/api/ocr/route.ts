@@ -36,6 +36,22 @@ function getGeminiModel() {
   return genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 }
 
+export async function GET() {
+  // Endpoint ligero para despertar al contenedor de Render (Pre-warming)
+  try {
+    const ocrFallbackUrl = process.env.OCR_FALLBACK_URL;
+    if (ocrFallbackUrl) {
+      // Reemplaza /api/v1/extract por /health para hacer el ping
+      const healthUrl = ocrFallbackUrl.replace('/api/v1/extract', '/health');
+      // No hacemos await para no bloquear, o hacemos un fetch muy rápido
+      fetch(healthUrl).catch(() => {});
+    }
+    return NextResponse.json({ status: 'warmed_up' }, { status: 200 });
+  } catch {
+    return NextResponse.json({ status: 'error' }, { status: 500 });
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { getSecureIp } = await import('@/lib/security/ip-utils');
@@ -272,55 +288,77 @@ export async function POST(request: NextRequest) {
         logger.warn('[OCR] Timeout de 35s alcanzado. Pasando a Tesseract...');
       }
 
-      // --- INICIO BLOQUE TESSERACT DESHABILITADO ---
-      // A petición del administrador, se conserva el código pero NO se usa.
-      // Se prefiere usar exclusivamente la API de Gemini por precisión.
-      /*
+      // --- INICIO BLOQUE LECTOR OCR (PYTHON FALLBACK) ---
+      // 🚀 NUEVA ARQUITECTURA: Se eliminó tesseract.js local para ahorrar memoria y tiempo.
+      // Ahora se llama a un microservicio externo en Python (Lector-OCR) alojado en Render.
       try {
-        // Configurar Tesseract.js en el entorno Node.js apuntando a CDNs para soportar Vercel Serverless
-        const worker = await createWorker('spa', 1, {
-          langPath: 'https://tessdata.projectnaptha.com/4.0.0',
-          workerPath: 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/worker.min.js',
-          corePath: 'https://cdn.jsdelivr.net/npm/tesseract.js-core@5/tesseract-core.wasm.js',
-        });
+        const ocrFallbackUrl = process.env.OCR_FALLBACK_URL;
+        const ocrEngineSecret = process.env.OCR_ENGINE_SECRET;
 
-        // Competir Tesseract contra el reloj restante (10s aprox si Gemini falló rápido)
-        const tesseractTimeout = new Promise<never>((_, reject) => {
-          setTimeout(() => reject(new Error('TESSERACT_TIMEOUT_10S')), 10000);
-        });
-
-        const dataUri = `data:${mimeType};base64,${imageBase64}`;
-
-        const recognizeResult = await Promise.race([worker.recognize(dataUri), tesseractTimeout]);
-
-        const {
-          data: { text },
-        } = recognizeResult;
-        await worker.terminate();
-
-        if (!text || text.trim().length === 0) {
-          throw new Error('Tesseract no detectó texto');
+        if (!ocrFallbackUrl || !ocrEngineSecret) {
+          logger.error('[OCR] CRÍTICO: OCR_FALLBACK_URL o OCR_ENGINE_SECRET no configurados.');
+          throw new Error('Fallback OCR no configurado');
         }
 
-        logger.info('[OCR] Procesamiento con Tesseract exitoso (Fallback)', {
-          caracteres: text.length,
+        const bodyStr = JSON.stringify({
+          imageBase64,
+          mimeType,
+        });
+
+        const timestamp = Date.now().toString();
+        // Generar firma HMAC-SHA256 idéntica a la de la calculadora en Go
+        const crypto = await import('crypto');
+        const signature = crypto.default
+          .createHmac('sha256', ocrEngineSecret)
+          .update(timestamp + bodyStr)
+          .digest('hex');
+
+        logger.info('[OCR] Llamando al microservicio Lector-OCR (Python)...');
+        
+        // Competir contra el tiempo restante que nos da Vercel
+        const fetchPromise = fetch(ocrFallbackUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Engine-Timestamp': timestamp,
+            'X-Engine-Signature': signature,
+          },
+          body: bodyStr,
+        });
+
+        const ocrTimeout = new Promise<never>((_, reject) => {
+          setTimeout(() => reject(new Error('PYTHON_OCR_TIMEOUT_10S')), 10000);
+        });
+
+        const fallbackResponse = await Promise.race([fetchPromise, ocrTimeout]) as Response;
+
+        if (!fallbackResponse.ok) {
+          throw new Error(`El Lector-OCR falló (HTTP ${fallbackResponse.status})`);
+        }
+
+        const fallbackData = await fallbackResponse.json();
+        
+        logger.info('[OCR] Procesamiento con Lector-OCR (Python) exitoso', {
+          proveedor: fallbackData.proveedor,
+          multasEncontradas: Array.isArray(fallbackData.comparendo) ? fallbackData.comparendo.length : 1
         });
 
         return NextResponse.json({
-          texto: text,
-          palabras: [], // Mismo formato que Gemini
-          proveedor: 'tesseract-js-fallback',
+          texto: fallbackData.texto,
+          palabras: [],
+          proveedor: fallbackData.proveedor,
+          // Devolvemos el array de comparendos tal cual lo extrajo el motor de Python
+          comparendo: fallbackData.comparendo,
         });
-      } catch (tesseractError) {
-        const tMsg = tesseractError instanceof Error ? tesseractError.message : 'Error desconocido';
-        logger.error('[OCR] Error al procesar imagen con Tesseract (Fallback fallido)', {
-          error: tMsg,
+      } catch (fallbackError) {
+        const fMsg = fallbackError instanceof Error ? fallbackError.message : 'Error desconocido';
+        logger.error('[OCR] Error al procesar imagen con Lector-OCR (Fallback fallido)', {
+          error: fMsg,
         });
 
-        throw new Error(`Fallback Tesseract falló: ${tMsg}. Error original Gemini: ${gMsg}`);
+        throw new Error(`Fallback Lector-OCR falló: ${fMsg}. Error original Gemini: ${gMsg}`);
       }
-      */
-      // --- FIN BLOQUE TESSERACT DESHABILITADO ---
+      // --- FIN BLOQUE LECTOR OCR (PYTHON FALLBACK) ---
 
       // Propagamos el error de Gemini al manejador principal para devolver el 503/500
       throw geminiError;

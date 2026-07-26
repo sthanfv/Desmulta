@@ -16,12 +16,17 @@ export function OCRPrewarmer() {
     if (typeof window !== 'undefined') {
       const timer = setTimeout(() => {
         // Silenciosamente inicializa el worker después de la carga inicial
+        // y envía un PING a los microservicios en Render para despertarlos de su inactividad (Cold Start)
         if ('requestIdleCallback' in window) {
           window.requestIdleCallback(() => {
             tesseractManager.init().catch(() => {});
+            fetch('/api/ocr').catch(() => {}); // Ping backend OCR (Python)
+            fetch('/api/public/calcular-multa').catch(() => {}); // Ping backend Calculadora (Go)
           });
         } else {
           tesseractManager.init().catch(() => {});
+          fetch('/api/ocr').catch(() => {}); // Ping backend OCR (Python)
+          fetch('/api/public/calcular-multa').catch(() => {}); // Ping backend Calculadora (Go)
         }
       }, 5000);
 

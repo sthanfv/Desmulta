@@ -16,6 +16,21 @@ const ProxySchema = z.object({
   tipoInfraccion: z.string().max(5).default(''),
 });
 
+export async function GET() {
+  // Endpoint ligero para despertar al contenedor de Go en Render (Pre-warming)
+  try {
+    const engineUrl = process.env.GO_ENGINE_URL;
+    if (engineUrl) {
+      // Intentar despertar con un endpoint ligero (health o root)
+      const healthUrl = engineUrl.replace('/api/v1/calcular-multa', '/health');
+      fetch(healthUrl).catch(() => {});
+    }
+    return NextResponse.json({ status: 'warmed_up' }, { status: 200 });
+  } catch {
+    return NextResponse.json({ status: 'error' }, { status: 500 });
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     // 🛡️ SEGURIDAD: Rate Limiter (Evita DDoS y spam hacia el motor de Go)
