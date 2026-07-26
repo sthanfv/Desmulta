@@ -15,6 +15,7 @@
 
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
+import { m } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { InstallPWA } from '@/components/pwa/InstallPWA';
 
@@ -310,42 +311,75 @@ export default function HomeClient({
       <ResponsiveModal
         open={isWhatsAppWarningOpen}
         onOpenChange={setIsWhatsAppWarningOpen}
-        title="Asesoría Directa"
+        title={<span className="font-black tracking-tight text-2xl">Asesoría Directa</span>}
         icon={
-          <div className="w-16 h-16 md:w-20 md:h-20 bg-green-500/10 rounded-3xl flex items-center justify-center mx-auto shadow-inner">
-            <MessageCircle size={32} className="text-[#25D366]" />
-          </div>
+          <m.div 
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', damping: 15 }}
+            className="relative w-20 h-20 md:w-24 md:h-24 mx-auto mb-4"
+          >
+            <div className="absolute inset-0 bg-[#25D366]/20 blur-2xl rounded-full animate-pulse" />
+            <div className="relative w-full h-full bg-gradient-to-br from-[#25D366]/20 to-[#25D366]/5 rounded-[2.5rem] flex items-center justify-center border border-[#25D366]/30 shadow-2xl backdrop-blur-sm">
+              <MessageCircle
+                size={40}
+                className="text-[#25D366] drop-shadow-[0_0_12px_rgba(37,211,102,0.6)]"
+              />
+            </div>
+          </m.div>
         }
       >
-        <div className="space-y-4">
-          <p className="text-muted-foreground text-base md:text-lg leading-relaxed font-medium text-center">
+        <div className="space-y-6 relative z-10 mt-2">
+          {/* Fondo difuminado sutil para dar estilo premium */}
+          <div className="absolute -top-32 -right-32 w-72 h-72 bg-[#25D366]/5 rounded-full blur-[100px] -z-10 pointer-events-none" />
+          
+          <m.p 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-muted-foreground text-base md:text-lg leading-relaxed font-medium text-center"
+          >
             Recuerde que el estudio de viabilidad base es{' '}
-            <span className="text-primary font-black">100% gratuito</span>.
-          </p>
-          <div className="bg-primary/5 border border-primary/20 p-4 md:p-6 rounded-2xl flex items-start gap-4 text-left">
-            <Info className="text-primary shrink-0 mt-1" size={24} />
-            <p className="text-xs md:text-sm text-foreground/80 leading-relaxed">
+            <span className="text-foreground font-black bg-[#25D366]/10 px-2 py-0.5 rounded-md border border-[#25D366]/20">100% gratuito</span>.
+          </m.p>
+
+          <m.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+            className="bg-muted/40 border border-[#25D366]/20 p-5 md:p-6 rounded-3xl flex items-start gap-4 text-left shadow-inner relative overflow-hidden group"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-[#25D366]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="bg-background p-2.5 rounded-2xl shadow-sm border border-border/50 shrink-0 relative z-10">
+              <Info className="text-[#25D366]" size={22} />
+            </div>
+            <p className="text-xs md:text-sm text-foreground/80 leading-relaxed relative z-10">
               El canal directo está diseñado para iniciar la{' '}
-              <strong>contratación de trámites</strong>. La gestión administrativa genera honorarios
+              <strong className="text-foreground">contratación de trámites</strong>. La gestión administrativa genera honorarios
               por resultados.
             </p>
-          </div>
+          </m.div>
 
-          <div className="flex flex-col gap-3 mt-8">
+          <m.div 
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="flex flex-col gap-3 mt-8 pt-4 border-t border-border/50"
+          >
             <Button
               onClick={handleWhatsAppRedirect}
-              className="h-14 md:h-16 rounded-2xl bg-[#25D366] hover:bg-[#20ba59] text-white font-black text-base md:text-lg active:scale-95 transition-all shadow-xl shadow-green-500/20 border-none w-full"
+              className="h-14 md:h-16 rounded-2xl bg-gradient-to-r from-[#25D366] to-[#1ebc5c] hover:to-[#1aa852] text-white font-black text-sm md:text-base active:scale-95 transition-all shadow-[0_0_30px_rgba(37,211,102,0.25)] hover:shadow-[0_0_40px_rgba(37,211,102,0.4)] border-none w-full"
             >
               ENTENDIDO, ABRIR CHAT
             </Button>
             <Button
               variant="ghost"
               onClick={() => setIsWhatsAppWarningOpen(false)}
-              className="h-12 md:h-14 rounded-2xl text-muted-foreground font-bold hover:bg-muted active:scale-95 w-full"
+              className="h-12 md:h-14 rounded-2xl text-muted-foreground font-bold hover:bg-muted active:scale-95 w-full text-xs md:text-sm"
             >
               Prefiero el estudio gratuito
             </Button>
-          </div>
+          </m.div>
         </div>
       </ResponsiveModal>
 
