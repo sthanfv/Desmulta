@@ -104,11 +104,15 @@ async function purgeIndexedDB(): Promise<void> {
 
   try {
     const databases = await indexedDB.databases();
-    databases.forEach((db) => {
-        if (db.name && !db.name.startsWith('firebase')) {
-          indexedDB.deleteDatabase(db.name);
-        }
-      });
+    const firebaseDbs = databases.filter((db) =>
+      INDEXED_DB_PREFIXES.some((prefix) => db.name?.startsWith(prefix))
+    );
+
+    for (const db of firebaseDbs) {
+      if (db.name) {
+        indexedDB.deleteDatabase(db.name);
+      }
+    }
   } catch {
     // Silenciar errores de IndexedDB — no son críticos para la sanación
   }

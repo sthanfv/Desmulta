@@ -96,9 +96,9 @@ describe('🧹 Motor de Auto-Sanación PWA (healPwaCache)', () => {
     const { healPwaCache } = await import('@/lib/utils/pwa-heal');
     await healPwaCache();
 
-    // Firebase SDK bases — NO deben eliminarse para evitar corrupción (auth/network-request-failed)
-    expect(mockDeleteDatabase).not.toHaveBeenCalledWith('firebaseLocalStorageDb');
-    expect(mockDeleteDatabase).not.toHaveBeenCalledWith('firebase-heartbeat-database');
+    // Firebase SDK bases — deben eliminarse
+    expect(mockDeleteDatabase).toHaveBeenCalledWith('firebaseLocalStorageDb');
+    expect(mockDeleteDatabase).toHaveBeenCalledWith('firebase-heartbeat-database');
 
     // Bases externas — NO deben tocarse
     expect(mockDeleteDatabase).not.toHaveBeenCalledWith('otra-base-no-firebase');
