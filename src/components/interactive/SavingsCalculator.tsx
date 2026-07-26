@@ -482,7 +482,9 @@ export function SavingsCalculator() {
                   </div>
 
                   {/* SÚPER PODERES DE GO - MONETIZACIÓN & ESTRATEGIA LEGAL */}
-                  <div className={`grid transition-all duration-500 ease-in-out ${estrategia?.bloqueoEmbriaguez ? 'grid-rows-[1fr] opacity-100 mt-4' : 'grid-rows-[0fr] opacity-0 mt-0'}`}>
+                  <div
+                    className={`grid transition-all duration-500 ease-in-out ${estrategia?.bloqueoEmbriaguez ? 'grid-rows-[1fr] opacity-100 mt-4' : 'grid-rows-[0fr] opacity-0 mt-0'}`}
+                  >
                     <div className="overflow-hidden">
                       <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-xl">
                         <h4 className="font-bold text-red-600 flex items-center gap-2 mb-1">
@@ -496,7 +498,9 @@ export function SavingsCalculator() {
                     </div>
                   </div>
 
-                  <div className={`grid transition-all duration-500 ease-in-out ${estrategia?.esSalvablePorPrescripcion ? 'grid-rows-[1fr] opacity-100 mt-5' : 'grid-rows-[0fr] opacity-0 mt-0'}`}>
+                  <div
+                    className={`grid transition-all duration-500 ease-in-out ${estrategia?.esSalvablePorPrescripcion ? 'grid-rows-[1fr] opacity-100 mt-5' : 'grid-rows-[0fr] opacity-0 mt-0'}`}
+                  >
                     <div className="overflow-hidden">
                       <div className="bg-gradient-to-br from-primary/10 to-transparent border border-primary/20 p-5 rounded-2xl relative flex flex-col items-start shadow-inner">
                         <div className="absolute -top-4 -right-4 p-2 opacity-5 pointer-events-none">
@@ -527,7 +531,9 @@ export function SavingsCalculator() {
                   </div>
 
                   {/* SÚPER PODERES DE GO - DISEÑO VISUAL */}
-                  <div className={`grid transition-all duration-500 ease-in-out ${descuentos?.aplicaDescuento ? 'grid-rows-[1fr] opacity-100 mt-4' : 'grid-rows-[0fr] opacity-0 mt-0'}`}>
+                  <div
+                    className={`grid transition-all duration-500 ease-in-out ${descuentos?.aplicaDescuento ? 'grid-rows-[1fr] opacity-100 mt-4' : 'grid-rows-[0fr] opacity-0 mt-0'}`}
+                  >
                     <div className="overflow-hidden">
                       <div className="bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-xl">
                         <h4 className="font-bold text-emerald-600 mb-2">
@@ -544,7 +550,9 @@ export function SavingsCalculator() {
                     </div>
                   </div>
 
-                  <div className={`grid transition-all duration-500 ease-in-out ${!descuentos?.aplicaDescuento && proyecciones ? 'grid-rows-[1fr] opacity-100 mt-4' : 'grid-rows-[0fr] opacity-0 mt-0'}`}>
+                  <div
+                    className={`grid transition-all duration-500 ease-in-out ${!descuentos?.aplicaDescuento && proyecciones ? 'grid-rows-[1fr] opacity-100 mt-4' : 'grid-rows-[0fr] opacity-0 mt-0'}`}
+                  >
                     <div className="overflow-hidden">
                       <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-xl">
                         <h4 className="font-bold text-red-600 mb-2">
@@ -560,14 +568,18 @@ export function SavingsCalculator() {
                           </div>
                           <div className="flex justify-between items-center text-sm font-bold text-red-700 bg-red-500/20 px-3 py-1.5 rounded">
                             <span>En 1 año:</span>
-                            <span>{proyecciones ? formatCurrency(proyecciones.en12Meses) : ''}</span>
+                            <span>
+                              {proyecciones ? formatCurrency(proyecciones.en12Meses) : ''}
+                            </span>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <div className={`grid transition-all duration-500 ease-in-out ${chartData.length > 1 ? 'grid-rows-[1fr] opacity-100 mt-4' : 'grid-rows-[0fr] opacity-0 mt-0'}`}>
+                  <div
+                    className={`grid transition-all duration-500 ease-in-out ${chartData.length > 1 ? 'grid-rows-[1fr] opacity-100 mt-4' : 'grid-rows-[0fr] opacity-0 mt-0'}`}
+                  >
                     <div className="overflow-hidden">
                       <div className="bg-foreground/5 p-4 rounded-xl border border-foreground/10">
                         <h4 className="font-bold mb-1 flex items-center gap-2">
@@ -586,7 +598,12 @@ export function SavingsCalculator() {
                                   <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
                                 </linearGradient>
                               </defs>
-                              <XAxis dataKey="anio" fontSize={10} tickLine={false} axisLine={false} />
+                              <XAxis
+                                dataKey="anio"
+                                fontSize={10}
+                                tickLine={false}
+                                axisLine={false}
+                              />
                               <RechartsTooltip
                                 formatter={(value: unknown) => [
                                   formatCurrency(Number(value)),
@@ -616,7 +633,9 @@ export function SavingsCalculator() {
                     </div>
                   </div>
 
-                  <div className={`grid transition-all duration-500 ease-in-out ${resultado ? 'grid-rows-[1fr] opacity-100 mt-4' : 'grid-rows-[0fr] opacity-0 mt-0'}`}>
+                  <div
+                    className={`grid transition-all duration-500 ease-in-out ${resultado ? 'grid-rows-[1fr] opacity-100 mt-4' : 'grid-rows-[0fr] opacity-0 mt-0'}`}
+                  >
                     <div className="overflow-hidden">
                       <div
                         className={`p-4 rounded-2xl border flex items-start gap-3 ${
@@ -643,7 +662,8 @@ export function SavingsCalculator() {
                               <span className="inline-block mt-1 mb-1 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-foreground/10">
                                 {resultado.estadoLegal === 'PRESCRITO' &&
                                   '⚖️ PRESCRITO (Art. 159 CNT)'}
-                                {resultado.estadoLegal === 'CADUCADO' && '⏱️ CADUCADO (Art. 161 CNT)'}
+                                {resultado.estadoLegal === 'CADUCADO' &&
+                                  '⏱️ CADUCADO (Art. 161 CNT)'}
                                 {resultado.estadoLegal === 'IMPUGNABLE_C038' &&
                                   '📷 IMPUGNABLE (C-038/2020)'}
                               </span>
@@ -652,7 +672,8 @@ export function SavingsCalculator() {
                             {resultado?.disclaimerLegal}
                           </p>
                           <div className="mt-2 inline-block px-2 py-1 rounded bg-foreground/10 text-[10px] font-bold uppercase tracking-wider">
-                            Éxito Histórico: {String(resultado?.probabilidadExito || '').split('%')[0]}%
+                            Éxito Histórico:{' '}
+                            {String(resultado?.probabilidadExito || '').split('%')[0]}%
                           </div>
 
                           {/* Semáforo de Probabilidad de Cobro Coactivo (Con Disclaimer Legal) */}
@@ -683,8 +704,8 @@ export function SavingsCalculator() {
                                       <strong>
                                         Desmulta no es una autoridad ni ofrece asesoría legal.
                                       </strong>{' '}
-                                      Solo el SIMIT o la Secretaría de Movilidad determinan y ejecutan
-                                      medidas cautelares como el embargo.
+                                      Solo el SIMIT o la Secretaría de Movilidad determinan y
+                                      ejecutan medidas cautelares como el embargo.
                                     </p>
                                   </TooltipContent>
                                 </Tooltip>

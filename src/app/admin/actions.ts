@@ -249,13 +249,21 @@ export async function getConsultations(
       .collection('consultations')
       .where('status', 'in', [
         'pendiente',
+        'PENDIENTE',
         'nuevo',
+        'NUEVO',
         'contactado',
+        'CONTACTADO',
         'estudio',
+        'ESTUDIO',
         'en_proceso',
+        'EN_PROCESO',
         'radicado',
+        'RADICADO',
         'descartado',
+        'DESCARTADO',
         'finalizado',
+        'FINALIZADO',
       ])
       .orderBy('createdAt', 'desc')
       .limit(pageSize);
@@ -454,13 +462,23 @@ export async function getCases(idToken: string, pageSize: number = 20, lastDocId
       .collection('cases')
       .where('status', 'in', [
         'apertura',
+        'APERTURA',
         'documentacion',
+        'DOCUMENTACION',
         'estudio',
-        'tramite',
-        'resolucion',
+        'ESTUDIO',
         'radicado',
+        'RADICADO',
+        'tramite',
+        'TRAMITE',
+        'resolucion',
+        'RESOLUCION',
         'en_espera',
+        'EN_ESPERA',
+        'archivo',
+        'ARCHIVO',
         'finalizado',
+        'FINALIZADO',
       ])
       .orderBy('createdAt', 'desc')
       .limit(pageSize);
@@ -1126,7 +1144,14 @@ const getCachedAnalyticsStats = unstable_cache(
     try {
       const casesSnap = await db
         .collection('cases')
-        .where('status', 'in', ['finalizado', 'archivo', 'terminado'])
+        .where('status', 'in', [
+          'finalizado',
+          'FINALIZADO',
+          'archivo',
+          'ARCHIVO',
+          'terminado',
+          'TERMINADO',
+        ])
         .orderBy('updatedAt', 'desc')
         .limit(50)
         .get();
@@ -1281,9 +1306,9 @@ export async function revealExpedienteSensitiveData(idToken: string, id: string)
   try {
     const decodedToken = await requireAdminSession(idToken);
 
-    // Rate limit preventivo: 20 revelaciones por hora por admin
+    // Rate limit preventivo: 200 revelaciones por hora por admin
     const { rateLimit } = await import('@/lib/security/rate-limit');
-    const rl = await rateLimit(`reveal-pii:${decodedToken.uid}`, 20, 60 * 1000 * 60);
+    const rl = await rateLimit(`reveal-pii:${decodedToken.uid}`, 200, 60 * 1000 * 60);
     if (!rl.success) {
       return { success: false, error: 'Límite de revelación de PII excedido. Intenta más tarde.' };
     }

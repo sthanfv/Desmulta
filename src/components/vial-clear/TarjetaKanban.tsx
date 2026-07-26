@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  GripVertical,
   MapPin,
   Loader2,
   MessageCircle,

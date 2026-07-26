@@ -336,7 +336,7 @@ export function AdminDashboard() {
   const showcaseForm = useForm<ShowcaseFormData>({
     resolver: zodResolver(showcaseSchema),
     defaultValues: {
-      counterValue: showcaseData?.counterValue || '754+',
+      counterValue: showcaseData?.counterValue || '204+',
       counterLabel: showcaseData?.counterLabel || 'Casos Exitosos',
     },
   });
@@ -355,7 +355,7 @@ export function AdminDashboard() {
   useEffect(() => {
     if (showcaseData) {
       showcaseForm.reset({
-        counterValue: showcaseData.counterValue || '754+',
+        counterValue: showcaseData.counterValue || '204+',
         counterLabel: showcaseData.counterLabel || 'Casos Exitosos',
       });
     }
@@ -818,7 +818,7 @@ export function AdminDashboard() {
                         Valor
                       </FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="754+" className="h-11 rounded-xl text-sm" />
+                        <Input {...field} placeholder="204+" className="h-11 rounded-xl text-sm" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

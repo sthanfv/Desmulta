@@ -35,7 +35,7 @@ export async function secureLogout(
       try {
         const dbs = await window.indexedDB.databases();
         dbs.forEach((db) => {
-          // FIX HALLAZGO: No borrar bases de datos de Firebase. 
+          // FIX HALLAZGO: No borrar bases de datos de Firebase.
           // Borrarlas abruptamente corrompe el SDK y causa 'auth/network-request-failed' en el siguiente login.
           if (db.name && !db.name.startsWith('firebase')) {
             window.indexedDB.deleteDatabase(db.name);

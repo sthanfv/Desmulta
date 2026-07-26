@@ -202,7 +202,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
                 <div className="glass p-4 rounded-2xl flex items-center gap-4 border-white/20 shadow-xl backdrop-blur-xl bg-black/40">
                   <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-primary-foreground font-bold text-lg shadow-md">
                     {(() => {
-                      const rawVal = showcaseData.counterValue || '754+';
+                      const rawVal = showcaseData.counterValue || '204+';
                       const numVal = parseInt(rawVal.replace(/[^0-9]/g, ''), 10) || 0;
                       const hasPlus = rawVal.includes('+');
                       return numVal > 0 ? (
