@@ -1014,11 +1014,18 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
                   )}
 
                   {filteredItems.filter((item: KanbanItem) => item.estado === columna.id).length ===
-                    0 && (
-                    <div className="h-24 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-center text-slate-400 dark:text-slate-600 text-sm font-medium">
-                      {searchQuery ? 'Sin Resultados' : 'Vacío'}
+                  0 ? (
+                    <div className="flex-1 border-2 border-dashed border-slate-200/50 dark:border-white/10 rounded-[1.5rem] flex items-center justify-center p-8 mt-4 bg-slate-50/30 dark:bg-black/10 flex-col gap-2">
+                      <p className="text-muted-foreground font-bold text-sm tracking-wide">
+                        Vacío
+                      </p>
+                      {allItems.filter((item: KanbanItem) => item.estado === columna.id).length > 0 && (
+                        <p className="text-[10px] text-orange-500/80 font-bold text-center leading-tight">
+                          Hay {allItems.filter((item: KanbanItem) => item.estado === columna.id).length} expedientes ocultos por los filtros.
+                        </p>
+                      )}
                     </div>
-                  )}
+                  ) : null}
                 </div>
               </div>
             );
