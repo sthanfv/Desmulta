@@ -327,7 +327,7 @@ export async function POST(request: NextRequest) {
         });
 
         const ocrTimeout = new Promise<never>((_, reject) => {
-          setTimeout(() => reject(new Error('PYTHON_OCR_TIMEOUT_10S')), 10000);
+          setTimeout(() => reject(new Error('PYTHON_OCR_TIMEOUT_25S')), 25000);
         });
 
         const fallbackResponse = await Promise.race([fetchPromise, ocrTimeout]) as Response;
