@@ -31,7 +31,10 @@
 *   **Fix Backend Queries Case-Sensitivity**: Se añadió una redundancia de mapeo en mayúsculas a las consultas `.where('status', 'in', [...])` de `getConsultations` y `getCases` dentro de `actions.ts`. Esto soluciona un bug en el que los leads antiguos (cuyo estado en BD estaba en MAYÚSCULAS) no cargaban en el tablero Kanban.
 *   **Fix UX: Layout Shift en Calculadora**: En `SavingsCalculator.tsx` se solucionó el *flickering* (parpadeo) de Recharts.
 *   **Ajuste Estadísticas**: Se ajustó el *fallback value* del componente estadístico a `204+` desde `754+` de acuerdo a lo reportado.
-*   Se corrieron validaciones de `typecheck` y tests (Exitosas ✅).
+*   **Diagnóstico de Filtros Móviles**: Se añadió un indicador visual en el estado "Vacío" del Kanban que muestra explícitamente si existen expedientes ocultos debido a filtros activos (como fechas o asignaciones), para diferenciar un array filtrado de una falla en la red o caché.
+*   **UI/UX Restauración de Avanzar**: Se eliminó la clase restrictiva (`md:hidden`) del botón de "Avanzar columna" en `TarjetaKanban.tsx` para que vuelva a estar visible en la vista de PC, por requerimiento directo del usuario.
+*   **Lenguaje Natural**: Se cambió la terminología técnica ('leads') por vocabulario orientado al cliente ('solicitud inicial') en la generación de historiales de nuevos expedientes en `actions.ts`.
+*   Se corrieron validaciones de `typecheck` y tests (Exitosas).
 
 ### Metas Pendientes / Tareas a Seguir
 *   Todo completado con éxito por ahora. Ninguna tarea pendiente a nivel crítico.
