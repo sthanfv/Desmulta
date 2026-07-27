@@ -70,10 +70,21 @@ export async function POST(request: NextRequest) {
     if (!rateLimitStatus.success) {
       const waitMs = rateLimitStatus.resetTime - Date.now();
       const waitSec = Math.max(0, Math.ceil(waitMs / 1000));
+      
+      const hours = Math.floor(waitSec / 3600);
+      const minutes = Math.floor((waitSec % 3600) / 60);
+      const seconds = waitSec % 60;
+      
+      const timeParts = [];
+      if (hours > 0) timeParts.push(`${hours} hora${hours > 1 ? 's' : ''}`);
+      if (minutes > 0) timeParts.push(`${minutes} minuto${minutes > 1 ? 's' : ''}`);
+      if (seconds > 0 || timeParts.length === 0) timeParts.push(`${seconds} segundo${seconds > 1 ? 's' : ''}`);
+      const timeString = timeParts.join(', ').replace(/, ([^,]*)$/, ' y $1');
+
       return NextResponse.json(
         apiError(
           'RATE_LIMITED',
-          `¡Has alcanzado el límite de escaneos de seguridad! Por favor, intenta de nuevo en ${waitSec} segundos.`
+          `¡Has alcanzado el límite de escaneos de seguridad! Por favor, intenta de nuevo en ${timeString}.`
         ),
         { status: 429, headers: { 'Retry-After': String(waitSec) } }
       );
@@ -199,7 +210,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(
           apiError(
             'INVALID_DOCUMENT',
-            'La imagen no parece ser una multa o resolución válida. Intenta con otra foto más clara.'
+            'La imagen no parece ser una imagen o captura del SIMIT. Intenta con otra foto más clara u otra captura de pantalla del SIMIT.'
           ),
           { status: 422 }
         );
@@ -363,7 +374,7 @@ export async function POST(request: NextRequest) {
           return NextResponse.json(
             apiError(
               'INVALID_DOCUMENT',
-              'La imagen no parece ser una multa o resolución válida. Intenta con otra foto más clara.'
+              'La imagen no parece ser una imagen o captura del SIMIT. Intenta con otra foto más clara u otra captura de pantalla del SIMIT.'
             ),
             { status: 422 }
           );

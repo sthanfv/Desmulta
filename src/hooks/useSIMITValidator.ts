@@ -439,9 +439,7 @@ export const useSIMITValidator = () => {
 
       if (!hasSimitFormat) {
         mediaLogger.log('FILE', 'Imagen rechazada por falta de patrones SIMIT');
-        throw new Error(
-          'El archivo no parece ser una captura válida del SIMIT. Asegúrate de que incluya palabras como COMPARENDO, INFRACCIÓN o SIMIT.'
-        );
+        throw new Error('Imagen rechazada. No se detectaron datos del SIMIT. Coloque la imagen correcta.');
       }
 
       const palabrasDetectadas: OcrWord[] = words.map((w) => ({
