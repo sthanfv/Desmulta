@@ -92,6 +92,46 @@ export type RateLimitType = keyof typeof rateLimiters;
  */
 export async function checkRateLimit(type: RateLimitType, identifier: string) {
   try {
+    // Implementación de Penalización Estricta (Cooldown) para OCR
+    if (type === 'ocr') {
+      const key = `ratelimit:custom_ocr_cooldown:${identifier}`;
+      const now = Date.now();
+      const WINDOW_MS = 24 * 60 * 60 * 1000; // 24 horas
+
+      // INCR y PEXPIRE atómicos mediante pipeline.
+      // PEXPIRE reinicia el contador de 24 horas con CADA petición (exitosa o bloqueada).
+      const pipeline = redis.pipeline();
+      pipeline.incr(key);
+      pipeline.pexpire(key, WINDOW_MS);
+      
+      const results = await pipeline.exec();
+      const count = results[0] as number;
+      
+      // Si el usuario intentó acceder pero ya estaba bloqueado, queremos mostrar
+      // el tiempo de expiración real restante desde Redis, o 24 horas si acaba de resetear.
+      const resetTime = now + WINDOW_MS;
+
+      if (count > 3) {
+        return {
+          success: false,
+          blocked: true,
+          limit: 3,
+          remaining: 0,
+          resetTime: resetTime,
+          isError: false,
+        };
+      }
+
+      return {
+        success: true,
+        blocked: false,
+        limit: 3,
+        remaining: 3 - count,
+        resetTime: resetTime,
+        isError: false,
+      };
+    }
+
     const limiter = rateLimiters[type];
 
     // Genera la clave única (ej. "ratelimit:consultation:192.168.1.5")
