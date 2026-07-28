@@ -47,22 +47,6 @@ async function handler(request: Request) {
     );
   }
 
-  if (goEngineUrl) {
-    const goHealthUrl = goEngineUrl.replace('/api/v1/calcular-multa', '/health');
-    logger.info(`[KEEPALIVE] Pinging Go Engine: ${goHealthUrl}`);
-    pingPromises.push(
-      fetch(goHealthUrl, { method: 'GET', signal: createTimeoutSignal(5000) })
-        .then(res => res.text())
-        .catch(err => {
-          if (err.name === 'AbortError') {
-             logger.info('[KEEPALIVE] Go ping tocó la puerta (Timeout 5s).');
-          } else {
-             logger.error('[KEEPALIVE] Go ping falló', err);
-          }
-        })
-    );
-  }
-
   await Promise.allSettled(pingPromises);
   logger.info('[KEEPALIVE] Pings completados/abortados con éxito.');
   

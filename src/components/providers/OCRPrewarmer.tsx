@@ -21,12 +21,10 @@ export function OCRPrewarmer() {
           window.requestIdleCallback(() => {
             tesseractManager.init().catch(() => {});
             fetch('/api/ocr').catch(() => {}); // Ping backend OCR (Python)
-            fetch('/api/public/calcular-multa').catch(() => {}); // Ping backend Calculadora (Go)
           });
         } else {
           tesseractManager.init().catch(() => {});
           fetch('/api/ocr').catch(() => {}); // Ping backend OCR (Python)
-          fetch('/api/public/calcular-multa').catch(() => {}); // Ping backend Calculadora (Go)
         }
       }, 5000);
 

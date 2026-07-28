@@ -46,6 +46,11 @@
 *   **Integración de Fallback OCR en Vercel**: Se modificó `src/app/api/ocr/route.ts`. Ahora, si Gemini agota su cuota gratuita o falla, el sistema realiza un fetch autenticado con HMAC-SHA256 (`OCR_ENGINE_SECRET`) al microservicio de Python (`OCR_FALLBACK_URL`). Se eliminó el bloque viejo y pesado de `tesseract.js` del código cliente.
 *   **Sistema Keep-Alive (Wake-Lock) con Anti-Bot Jitter**: Para evitar que Render suspenda las instancias gratuitas por inactividad, se migró la arquitectura a **Upstash QStash** (debido a limitaciones del plan Hobby de Vercel). QStash llama al endpoint `src/app/api/internal/keepalive/route.ts` cada 14 minutos. Este endpoint está protegido criptográficamente por `verifySignatureAppRouter` de QStash.
     *   **Jitter Algorítmico**: El endpoint genera internamente un retraso (Sleep) aleatorio de hasta 45 segundos antes de lanzar los Pings asíncronos a Render, evadiendo las heurísticas de los WAF que detectan cron jobs robóticos. Esto garantiza que las máquinas estén calientes 24/7 y la respuesta caiga siempre a promedios de 2 - 5 segundos.
+*   **[2026-07-27] Retiro de Ping (Anti-Cold Start) hacia Go Backend**:
+    *   **Qué cambió:** Se eliminaron las llamadas ciegas tipo ping `fetch('/api/public/calcular-multa')` que ocurrían en `src/components/providers/OCRPrewarmer.tsx` y en el cronjob de `src/app/api/internal/keepalive/route.ts`.
+    *   **Por qué cambió:** El backend en Go está siendo migrado de Render (Long-Running Process) a Vercel (Serverless Functions). En Vercel, mantener la función despierta mediante pings no es necesario (los cold starts en Go son <500ms) y, más importante aún, consumía aceleradamente la cuota gratuita mensual de 100,000 peticiones.
+    *   **Archivos afectados:** `src/components/providers/OCRPrewarmer.tsx`, `src/app/api/internal/keepalive/route.ts`.
+
 ### Metas Pendientes / Tareas a Seguir
 *   Todo completado con éxito por ahora. Ninguna tarea pendiente a nivel crítico.
 
