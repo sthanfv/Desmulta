@@ -108,32 +108,31 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/geo-bloqueado', request.url), { status: 302 });
   }
 
-  // ── 3. Rutas /api ─────────────────────────────────────────────────────────
-  // Headers básicos sin CSP completa (evita overhead). El rate-limit y auth
-  // son responsabilidad de cada handler individual.
-  if (pathname.startsWith('/api')) {
-    // 🛡️ API VIP Protection (Fail-Closed)
-    if (
-      pathname.startsWith('/api/vip') &&
-      !pathname.startsWith('/api/vip/auth') &&
-      !pathname.startsWith('/api/vip/logout')
-    ) {
-      const sessionToken = request.cookies.get('_vip_session')?.value;
-      const isVip = sessionToken ? !!(await verifyVipSession(sessionToken)) : false;
+  // ── 3. Rutas /api y 4. Rutas VIP Unificadas ──────────────────────────────
+  const isVipRoute = pathname.startsWith('/api/vip') || pathname.startsWith('/vip/dashboard');
+  const isVipAuthRoute = pathname.startsWith('/api/vip/auth') || pathname.startsWith('/api/vip/logout');
 
-      if (!isVip) {
-        const response = NextResponse.json(
-          { error: 'Sesión inválida o expirada' },
-          { status: 401 }
-        );
-        if (sessionToken) {
-          response.cookies.delete('_vip_session');
-        }
+  // 🛡️ API VIP Protection (Fail-Closed) - DRY Optimizado
+  if (isVipRoute && !isVipAuthRoute) {
+    const sessionToken = request.cookies.get('_vip_session')?.value;
+    const isVip = sessionToken ? !!(await verifyVipSession(sessionToken)) : false;
+
+    if (!isVip) {
+      if (pathname.startsWith('/api/')) {
+        const response = NextResponse.json({ error: 'Sesión inválida o expirada' }, { status: 401 });
+        if (sessionToken) response.cookies.delete('_vip_session');
         applyCommonSecurityHeaders(response, isProduction);
+        return response;
+      } else {
+        const redirectUrl = new URL('/vip', request.url);
+        const response = NextResponse.redirect(redirectUrl);
+        if (sessionToken) response.cookies.delete('_vip_session');
         return response;
       }
     }
+  }
 
+  if (pathname.startsWith('/api')) {
     const response = NextResponse.next({
       request: { headers: requestHeaders },
     });
@@ -161,11 +160,10 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
-  // ── 3. Rutas /admin — Guard JWT criptográfico ────────────────────────────
+  // ── 5. Rutas /admin — Guard JWT criptográfico ────────────────────────────
   if (pathname.startsWith('/admin')) {
     // 🛡️ E2E TESTING BYPASS: Permitir el bypass de autenticación en tests de Playwright usando el emulador
-    // FIX HALLAZGO 8: Se elimina la variable pública y se exige que NO sea el entorno de producción.
-    const isE2E = process.env.E2E_TEST_MODE === 'true'; // sin NEXT_PUBLIC_
+    const isE2E = process.env.E2E_TEST_MODE === 'true'; 
     const e2eSecret = process.env.E2E_TEST_SECRET; // ej: 32+ bytes aleatorios, solo en CI
     const mockSessionValue = request.cookies.get('__session')?.value;
 
@@ -249,32 +247,7 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // ── 4. Rutas /seguir/:uuid — Guard portal cliente ────────────────────────
-  // Se ha eliminado el bloqueo por sesión JWT. El UUID v4 es criptográficamente
-  // seguro (122 bits de entropía) y actúa como un Capability URL (como Google Drive).
-  // Esto permite que el usuario acceda directamente con el enlace generado
-  // sin necesidad de volver a ingresar su cédula/teléfono.
-  // ─────────────────────────────────────────────────────────────────────────
-
-  // ── 5. Rutas /vip/dashboard — Guard VIP ──────────────────────────────────
-  if (pathname.startsWith('/vip/dashboard')) {
-    const sessionToken = request.cookies.get('_vip_session')?.value;
-    const isVip = sessionToken ? !!(await verifyVipSession(sessionToken)) : false;
-
-    if (!isVip) {
-      const redirectUrl = new URL('/vip', request.url);
-      const response = NextResponse.redirect(redirectUrl);
-      if (sessionToken) {
-        response.cookies.delete('_vip_session');
-      }
-      return response;
-    }
-  }
-
   // ── 6. Páginas públicas — CSP (Sin Nonce estricto para permitir BFCache) ───────────
-  // Para optimizar el rendimiento y permitir la generación estática (SSG) de la página pública,
-  // relajamos la política usando 'unsafe-inline' en el script-src (establecido en security-headers.ts).
-
   let cspWithNonce = cspHeader;
 
   // Asegurar que base-uri esté en la CSP (previene base-tag injection)
@@ -300,7 +273,9 @@ export async function middleware(request: NextRequest) {
     'camera=*, microphone=(), geolocation=(), payment=(), xr-spatial-tracking=(self "https://challenges.cloudflare.com")'
   );
   response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
-  response.headers.set('Cross-Origin-Resource-Policy', 'cross-origin');
+  
+  // FIX CORP: Bloquear recursos incrustados cruzados para proteger data sensible
+  response.headers.set('Cross-Origin-Resource-Policy', 'same-origin');
 
   applyCommonSecurityHeaders(response, isProduction);
 
