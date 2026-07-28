@@ -149,8 +149,13 @@ const reconocerTextoConIA = async (
   onProgress?.(80);
 
   if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error || 'Error al procesar OCR con IA');
+    let data;
+    try {
+      data = await response.json();
+    } catch {
+      throw new Error(`Error de red o servidor: HTTP ${response.status}`);
+    }
+    throw new Error(data.message || data.error || 'Error al procesar OCR con IA');
   }
 
   const data = await response.json();
