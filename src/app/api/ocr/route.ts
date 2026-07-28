@@ -84,7 +84,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         apiError(
           'RATE_LIMITED',
-          `¡Has alcanzado el límite de escaneos de seguridad! Por favor, intenta de nuevo en ${timeString}.`
+          `¡Has alcanzado el límite de escaneos de seguridad! Por favor, intenta de nuevo en ${timeString}.`,
+          { retryAfter: waitSec }
         ),
         { status: 429, headers: { 'Retry-After': String(waitSec) } }
       );

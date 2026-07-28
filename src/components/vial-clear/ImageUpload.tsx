@@ -48,14 +48,39 @@ export function ImageUpload({
   const [warning, setWarning] = useState<string | null>(null);
   /** Información educativa de los códigos CNT detectados por el OCR — null si no aplica */
   const [infoEducativas, setInfoEducativas] = useState<InfoEducativa[] | null>(null);
-  // removed unused state
   const isCarouselOpenRef = useRef(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [countdown, setCountdown] = useState<number | null>(null);
 
   // 🛡️ MANDATO-FILTRO: Validador OCR Zero-Waste — procesa en cliente, no consume servidor
   const { validarImagenSIMIT, analizando, progresoOCR, errorOCR, limpiarErrorOCR } =
     useSIMITValidator();
+
+  React.useEffect(() => {
+    if (countdown === null) return;
+    if (countdown <= 0) {
+      setError(null);
+      limpiarErrorOCR();
+      setCountdown(null);
+      return;
+    }
+    const timer = setTimeout(() => {
+      setCountdown((prev) => (prev !== null ? prev - 1 : null));
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [countdown, limpiarErrorOCR]);
+
+  const formatCountdown = (waitSec: number) => {
+    const hours = Math.floor(waitSec / 3600);
+    const minutes = Math.floor((waitSec % 3600) / 60);
+    const seconds = waitSec % 60;
+    const timeParts = [];
+    if (hours > 0) timeParts.push(`${hours} hora${hours > 1 ? 's' : ''}`);
+    if (minutes > 0) timeParts.push(`${minutes} minuto${minutes > 1 ? 's' : ''}`);
+    if (seconds > 0 || timeParts.length === 0) timeParts.push(`${seconds} segundo${seconds > 1 ? 's' : ''}`);
+    return timeParts.join(', ').replace(/, ([^,]*)$/, ' y $1');
+  };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -89,6 +114,11 @@ export function ImageUpload({
       // MANTENER PREVIEW: No hacemos setPreview(null) para que el usuario
       // vea qué imagen fue rechazada.
       onAnalisisTecnico?.(undefined);
+      
+      if (resultado.retryAfter) {
+        setCountdown(resultado.retryAfter);
+      }
+      
       setError(
         resultado.error || errorOCR || 'Imagen rechazada: No se detectaron datos del SIMIT.'
       );
@@ -366,7 +396,9 @@ export function ImageUpload({
               <span>Incidente de Procesamiento</span>
             </div>
             <p className="text-[10px] font-medium leading-tight opacity-90">
-              {error || errorOCR}
+              {countdown !== null
+                ? `¡Has alcanzado el límite de escaneos de seguridad! Por favor, intenta de nuevo en ${formatCountdown(countdown)}.`
+                : error || errorOCR}
             </p>
           </m.div>
         )}

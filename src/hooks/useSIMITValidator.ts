@@ -108,6 +108,7 @@ export interface ResultadoOCR {
   infoEducativas?: InfoEducativa[] | null;
   comparendosEstructurados?: ComparendoEstructurado[] | null;
   requiresManualReview?: boolean;
+  retryAfter?: number;
 }
 
 interface TesseractWord {
@@ -155,7 +156,11 @@ const reconocerTextoConIA = async (
     } catch {
       throw new Error(`Error de red o servidor: HTTP ${response.status}`);
     }
-    throw new Error(data.message || data.error || 'Error al procesar OCR con IA');
+    const err = new Error(data.message || data.error || 'Error al procesar OCR con IA') as any;
+    if (data.details && typeof data.details.retryAfter === 'number') {
+      err.retryAfter = data.details.retryAfter;
+    }
+    throw err;
   }
 
   const data = await response.json();
@@ -518,6 +523,7 @@ export const useSIMITValidator = () => {
       };
     } catch (error) {
       const mensaje = error instanceof Error ? error.message : 'Error al procesar la imagen.';
+      const retryAfter = (error as any).retryAfter;
       mediaLogger.log('ERROR', 'Excepción capturada en Validador', { msg: mensaje });
       setErrorOCR(mensaje);
 
@@ -526,6 +532,7 @@ export const useSIMITValidator = () => {
         esValida: false,
         coincidencias: [],
         error: mensaje,
+        retryAfter,
       };
     } finally {
       setAnalizando(false);
