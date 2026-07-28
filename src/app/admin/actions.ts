@@ -55,6 +55,47 @@ function serializeDataForNextJS(obj: unknown): unknown {
 }
 
 /**
+ * Mapper Centralizado (Zero-PII): 
+ * Asegura que todas las funciones apliquen exactamente las mismas reglas de ofuscación
+ * a los datos sensibles antes de enviarlos al frontend del CRM.
+ */
+function mapZeroPiiData(data: any, safeData: Record<string, unknown>) {
+  const rawCedula = data.cedula || '';
+  const cedulaPlano = rawCedula.startsWith('ENC:') ? decryptSymmetric(rawCedula) : rawCedula;
+  const isSimitCaptura = cedulaPlano === 'SIMIT-CAPTURA';
+
+  const nombre =
+    data.nombre &&
+    data.nombre !== 'Sin Registrar' &&
+    data.nombre !== 'REQUIERE INGRESO MANUAL' &&
+    data.nombre !== 'NO REGISTRADO'
+      ? maskName(data.nombre)
+      : data.nombre || '';
+  const contacto = data.contacto ? maskPhone(data.contacto) : '';
+  const placa =
+    data.placa && data.placa !== 'N/A' && data.placa !== 'Sin Identificar'
+      ? maskPlate(data.placa)
+      : data.placa || '';
+  const email = data.email ? maskEmail(data.email) : '';
+
+  return {
+    cedula: isSimitCaptura ? cedulaPlano : maskId(cedulaPlano),
+    nombre,
+    contacto,
+    placa,
+    email,
+    ciudad: data.ciudad || '',
+    ticketNumber: data.ticketNumber || '',
+    trackingUuid: safeData.trackingUuid || null,
+    evidenceUrl: safeData.evidenceUrl || null,
+    esRecurrente: safeData.esRecurrente || false,
+    conteoRetornos: safeData.conteoRetornos || 0,
+    createdAt: (safeData.createdAt as string) || null,
+    updatedAt: (safeData.updatedAt as string) || null,
+  };
+}
+
+/**
  * Actualiza la configuración del componente Showcase (Tablero/Hero)
  * y fuerza la revalidación de la página principal.
  */
@@ -279,45 +320,14 @@ export async function getConsultations(
 
     const consultations = snapshot.docs.map((doc) => {
       const data = doc.data();
-      const rawCedula = data.cedula || '';
-      const cedulaPlano = rawCedula.startsWith('ENC:') ? decryptSymmetric(rawCedula) : rawCedula;
-      const isSimitCaptura = cedulaPlano === 'SIMIT-CAPTURA';
-
       const safeData = serializeDataForNextJS(data) as Record<string, unknown>;
-
-      // Enmascaramiento preventivo server-side para Zero-PII
-      const nombre =
-        data.nombre &&
-        data.nombre !== 'Sin Registrar' &&
-        data.nombre !== 'REQUIERE INGRESO MANUAL' &&
-        data.nombre !== 'NO REGISTRADO'
-          ? maskName(data.nombre)
-          : data.nombre || '';
-      const contacto = data.contacto ? maskPhone(data.contacto) : '';
-      const placa =
-        data.placa && data.placa !== 'N/A' && data.placa !== 'Sin Identificar'
-          ? maskPlate(data.placa)
-          : data.placa || '';
-
-      const email = data.email ? maskEmail(data.email) : '';
+      const piiData = mapZeroPiiData(data, safeData);
 
       return {
         id: doc.id,
         authorUid: data.authorUid || null,
-        cedula: isSimitCaptura ? cedulaPlano : maskId(cedulaPlano),
-        nombre,
-        contacto,
-        placa,
-        email,
-        ciudad: data.ciudad || '',
-        ticketNumber: data.ticketNumber || '',
+        ...piiData,
         status: (safeData.status as string) || 'nuevo',
-        trackingUuid: safeData.trackingUuid || null,
-        evidenceUrl: safeData.evidenceUrl || null,
-        esRecurrente: safeData.esRecurrente || false,
-        conteoRetornos: safeData.conteoRetornos || 0,
-        createdAt: (safeData.createdAt as string) || null,
-        updatedAt: (safeData.updatedAt as string) || null,
         notifiedAt: (safeData.notifiedAt as string) || null,
         retriedAt: (safeData.retriedAt as string) || null,
         timeline_updates: (safeData.timeline_updates as unknown[]) || [],
@@ -494,46 +504,15 @@ export async function getCases(idToken: string, pageSize: number = 20, lastDocId
 
     const cases = snapshot.docs.map((doc) => {
       const data = doc.data();
-      const rawCedula = data.cedula || '';
-      const cedulaPlano = rawCedula.startsWith('ENC:') ? decryptSymmetric(rawCedula) : rawCedula;
-      const isSimitCaptura = cedulaPlano === 'SIMIT-CAPTURA';
-
       const safeData = serializeDataForNextJS(data) as Record<string, unknown>;
-
-      // Enmascaramiento preventivo server-side para Zero-PII
-      const nombre =
-        data.nombre &&
-        data.nombre !== 'Sin Registrar' &&
-        data.nombre !== 'REQUIERE INGRESO MANUAL' &&
-        data.nombre !== 'NO REGISTRADO'
-          ? maskName(data.nombre)
-          : data.nombre || '';
-      const contacto = data.contacto ? maskPhone(data.contacto) : '';
-      const placa =
-        data.placa && data.placa !== 'N/A' && data.placa !== 'Sin Identificar'
-          ? maskPlate(data.placa)
-          : data.placa || '';
-
-      const email = data.email ? maskEmail(data.email) : '';
+      const piiData = mapZeroPiiData(data, safeData);
 
       return {
         id: doc.id,
         authorUid: data.authorUid || null,
         consultationId: data.consultationId || null,
-        cedula: isSimitCaptura ? cedulaPlano : maskId(cedulaPlano),
-        nombre,
-        contacto,
-        placa,
-        email,
-        ciudad: data.ciudad || '',
-        ticketNumber: data.ticketNumber || '',
+        ...piiData,
         status: (safeData.status as string) || 'apertura',
-        trackingUuid: safeData.trackingUuid || null,
-        evidenceUrl: safeData.evidenceUrl || null,
-        esRecurrente: safeData.esRecurrente || false,
-        conteoRetornos: safeData.conteoRetornos || 0,
-        createdAt: (safeData.createdAt as string) || null,
-        updatedAt: (safeData.updatedAt as string) || null,
         history: (safeData.history as unknown[]) || [],
         documents: (safeData.documents as unknown[]) || [],
       };

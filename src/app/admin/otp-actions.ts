@@ -82,7 +82,7 @@ export async function verifyAdminOtp(
       return result;
     }
 
-    // Firmar el JWT de 2FA temporal (8 horas)
+    // Firmar el JWT de 2FA temporal (2 horas de seguridad máxima)
     const jwtSecret = process.env.GOD_MODE_JWT_SECRET;
     if (!jwtSecret) {
       logger.error('CRITICAL: GOD_MODE_JWT_SECRET no configurada para firmas de 2FA.');
@@ -92,17 +92,16 @@ export async function verifyAdminOtp(
     const secret = new TextEncoder().encode(jwtSecret);
     const token = await new SignJWT({ uid: decodedToken.uid, role: 'admin', auth2fa: true })
       .setProtectedHeader({ alg: 'HS256' })
-      .setExpirationTime('8h')
+      .setExpirationTime('2h') // FIX: Reducido de 8h a 2h para máxima seguridad
       .sign(secret);
 
-    // Inyectar Cookie HttpOnly segura
+    // Inyectar Cookie HttpOnly segura como "Session Cookie" (sin maxAge, se borra al cerrar el navegador)
     const cookieStore = await cookies();
     cookieStore.set('admin-2fa-token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       path: '/admin',
-      maxAge: 8 * 60 * 60,
     });
 
     // Cookie de bandera pública para el cliente (no HttpOnly)
@@ -111,7 +110,6 @@ export async function verifyAdminOtp(
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       path: '/',
-      maxAge: 8 * 60 * 60,
     });
 
     const { logAdminAction } = await import('@/app/admin/audit-actions');
