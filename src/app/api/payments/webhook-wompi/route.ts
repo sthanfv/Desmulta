@@ -183,6 +183,18 @@ export async function POST(req: NextRequest) {
         flaggedAt: new Date(),
       },
     });
+
+    // FIX SEGURIDAD: Banear la IP original del estafador de forma permanente
+    if (purchase.ipAddress) {
+      await db.collection('banned_ips').doc(purchase.ipAddress.replace(/:/g, '_')).set({
+        ip: purchase.ipAddress,
+        reason: 'FRAUD_AMOUNT_MISMATCH',
+        bannedAt: FieldValue.serverTimestamp(),
+        reference,
+      });
+      logger.security('[webhook-wompi] IP BANEADA POR INTENTO DE FRAUDE', { ip: purchase.ipAddress });
+    }
+
     return NextResponse.json({ ok: true, flagged: true });
   }
 

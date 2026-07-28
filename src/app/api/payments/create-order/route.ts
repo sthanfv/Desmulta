@@ -117,10 +117,13 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    const unaHoraAtras = new Date(Date.now() - 60 * 60 * 1000);
+
     const recentOrders = await db
       .collection('purchases')
       .where('idempotencyKey', '==', idempotencyKey)
       .where('status', '==', 'PENDING')
+      .where('createdAt', '>', unaHoraAtras) // FIX: Solo reutilizar enlaces frescos
       .limit(1)
       .get();
 

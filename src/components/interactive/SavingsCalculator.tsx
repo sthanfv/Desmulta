@@ -83,6 +83,10 @@ export function SavingsCalculator() {
 
   const [isExpanded, setIsExpanded] = useState(false);
 
+  // Estados de Limite de Uso
+  const [rateLimitReached, setRateLimitReached] = useState(false);
+  const [retryTimeLeft, setRetryTimeLeft] = useState(0);
+
   // Estados Manuales Zod
   const [manualMonto, setManualMonto] = useState('');
   const [manualFechaText, setManualFechaText] = useState(''); // DD/MM/YYYY
@@ -160,16 +164,35 @@ export function SavingsCalculator() {
           setHistorialIntereses(financiero.historialIntereses || []);
           setRiesgoEmbargo(prescripcion.riesgoEmbargo || null);
           setEstrategia(estrategiaLegal);
+          setRateLimitReached(false);
+        } else if (response.status === 429) {
+          setRateLimitReached(true);
+          const retryAfter = response.headers.get('Retry-After');
+          if (retryAfter) {
+            setRetryTimeLeft(parseInt(retryAfter, 10));
+          } else {
+            setRetryTimeLeft(3600); // Default 1 hr if missing
+          }
         }
       } catch (error) {
         console.error('Error fetching API', error);
       }
     };
 
-    // Debounce para no colapsar la API cuando el usuario mueve rápido el slider
     const timeoutId = setTimeout(fetchData, 300);
     return () => clearTimeout(timeoutId);
   }, [montoBase, mesesMora, coactivo, fechaExactaGlobal, isEmbriaguez]);
+
+  // Reloj regresivo dinámico
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (rateLimitReached && retryTimeLeft > 0) {
+      timer = setInterval(() => {
+        setRetryTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [rateLimitReached, retryTimeLeft]);
 
   const total = montoBase + intereses;
 
@@ -192,6 +215,14 @@ export function SavingsCalculator() {
       currency: 'COP',
       maximumFractionDigits: 0,
     }).format(value);
+  };
+
+  const formatTimeLeft = (seconds: number) => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    if (h > 0) return `${h}h ${m}m ${s}s`;
+    return `${m}m ${s}s`;
   };
 
   const enviarLead = async () => {
@@ -265,8 +296,26 @@ export function SavingsCalculator() {
             </div>
           </div>
 
+          {/* MENSAJE DE LÍMITE DE USO (RATE LIMIT) */}
+          {rateLimitReached && (
+            <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-xl flex items-start gap-3 animate-in fade-in zoom-in-95">
+              <AlertOctagon className="w-6 h-6 text-red-500 shrink-0 mt-0.5" />
+              <div>
+                <h4 className="font-bold text-red-600 mb-1">
+                  Límite de Consultas Alcanzado
+                </h4>
+                <p className="text-sm text-red-700/80 mb-2">
+                  Por seguridad, permitimos un máximo de cálculos por día para evitar abusos automatizados. Tus resultados se han congelado temporalmente.
+                </p>
+                <div className="inline-block bg-red-500/20 text-red-700 font-bold px-3 py-1.5 rounded-lg text-sm font-mono tracking-widest">
+                  ⏱️ {formatTimeLeft(retryTimeLeft)}
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* --- CONTROLES FINANCIEROS Y TIEMPO (DOBLE INTERFAZ) --- */}
-          <Tabs defaultValue="slider" className="w-full space-y-6">
+          <Tabs defaultValue="slider" className={`w-full space-y-6 ${rateLimitReached ? 'opacity-50 pointer-events-none' : ''}`}>
             <TabsList className="grid w-full grid-cols-2 bg-foreground/10 p-1 rounded-xl">
               <TabsTrigger
                 value="slider"
