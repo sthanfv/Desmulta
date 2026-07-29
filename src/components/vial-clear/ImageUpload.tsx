@@ -223,13 +223,13 @@ export function ImageUpload({
       setLoadingTextIndex(0);
       const interval = setInterval(() => {
         setLoadingTextIndex((prev) => {
-          if (prev >= 3) {
+          if (prev >= 8) {
             clearInterval(interval);
-            return 4; // Índice final (vacío)
+            return 9; // Índice final (vacío)
           }
           return prev + 1;
         });
-      }, 3000);
+      }, 3500);
       return () => clearInterval(interval);
     } else {
       setLoadingTextIndex(0);
@@ -241,6 +241,11 @@ export function ImageUpload({
     'Configurando motor de análisis avanzado...',
     'Optimizando modelos para tu dispositivo...',
     'Escaneando documento...',
+    'Experimentando alta demanda. Cambiando motor...',
+    'Hubo una pequeña falla, procesando por canal alternativo...',
+    'Esto puede tardar unos segundos más, por favor espera...',
+    'Aplicando algoritmos de precisión profunda...',
+    'Finalizando extracción por canal alternativo...',
     '', // desaparece
   ];
 

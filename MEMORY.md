@@ -65,3 +65,10 @@
 *   Hardware limitado: Procesador AMD PRO A10.
 *   El código de la aplicación está alojado en `C:\Workspace\Desmulta`.
 *   Sistema operativo: Windows 10/11.
+
+
+## [2026-07-29] Auditoría OCR Python y Fallback en UI (Next.js)
+- **Archivos Modificados**: Lector-OCR/main.py, src/components/vial-clear/ImageUpload.tsx.
+- **Qué cambió**: Se mitigó un posible OOM y lentitud extrema en Tesseract inyectando contraste mediante PIL (ImageEnhance.Contrast) y asignando 3 hilos concurrentes por vCPU al motor. En Next.js, se ampliaron los mensajes de carga secuenciales para transparentar el Fallback ante el usuario ('Hubo una pequeña falla, procesando por canal alternativo...') mitigando la ansiedad por tiempos de espera altos (Vercel Serverless timeout workaround).
+- **Por qué cambió**: Recomendaciones de auditoría externa y del usuario para mejorar la resiliencia en Serverless (Cloud Run y Vercel).
+- **Estado Actual**: Implementado y robustecido.
