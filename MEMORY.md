@@ -48,8 +48,15 @@
     *   **Jitter Algorítmico**: El endpoint genera internamente un retraso (Sleep) aleatorio de hasta 45 segundos antes de lanzar los Pings asíncronos a Render, evadiendo las heurísticas de los WAF que detectan cron jobs robóticos. Esto garantiza que las máquinas estén calientes 24/7 y la respuesta caiga siempre a promedios de 2 - 5 segundos.
 *   **[2026-07-27] Retiro de Ping (Anti-Cold Start) hacia Go Backend**:
     *   **Qué cambió:** Se eliminaron las llamadas ciegas tipo ping `fetch('/api/public/calcular-multa')` que ocurrían en `src/components/providers/OCRPrewarmer.tsx` y en el cronjob de `src/app/api/internal/keepalive/route.ts`.
-    *   **Por qué cambió:** El backend en Go está siendo migrado de Render (Long-Running Process) a Vercel (Serverless Functions). En Vercel, mantener la función despierta mediante pings no es necesario (los cold starts en Go son <500ms) y, más importante aún, consumía aceleradamente la cuota gratuita mensual de 100,000 peticiones.
-    *   **Archivos afectados:** `src/components/providers/OCRPrewarmer.tsx`, `src/app/api/internal/keepalive/route.ts`.
+    *   **Por qué cambió:** El backend en Go está siendo migrado de Render (Long-Running Process) a Vercel (Serverless Functions). En Vercel, mantener la función despierta mediante pings no es necesario (los cold starts en Go son <500ms) y consumía cuota gratuita innecesariamente.
+*   **[2026-07-28] Auditoría 360 y Mejoras de Seguridad/UI**:
+    *   **Calculadora de Ahorros:** Se implementó un límite visual (Banner de cuenta regresiva) en `SavingsCalculator.tsx` para interceptar respuestas HTTP `429 Too Many Requests`, mejorando la UX cuando el rate limiter de Upstash interviene.
+    *   **Panel Administrativo (Zero-PII & DRY):** Se extrajo la lógica redundante de enmascaramiento de datos (PII Masking) hacia una función centralizada `mapZeroPiiData` en `actions.ts`. 
+    *   **Hardening de Sesiones Admin:** Se redujo el TTL del JWT administrativo de 8h a 2h, y se eliminó el atributo `maxAge` de las cookies de autenticación, convirtiéndolas en *Session Cookies* (caducan automáticamente al cerrar el navegador o la pestaña).
+    *   **Infraestructura de Datos (Firestore):** Se validó la seguridad de `firestore.rules` confirmando una arquitectura Zero-Trust. 
+*   **[2026-07-28] Migración Total Lector-OCR (Python) a Google Cloud Run**:
+    *   **Despliegue Serverless:** Se reescribió el `Dockerfile` del OCR para inyectar dinámicamente el `$PORT` de Google y se desplegó la aplicación en Google Cloud Run bajo el proyecto de Firebase actual. Esto elimina los cold-starts destructivos de Render y garantiza alta disponibilidad usando la capa de 2 millones de request gratuitos.
+    *   **Mantenimiento:** La variable `OCR_FALLBACK_URL` en Vercel fue apuntada permanentemente hacia la nueva infraestructura en Cloud Run `https://lector-ocr-...`. Render quedó descontinuado.
 
 ### Metas Pendientes / Tareas a Seguir
 *   Todo completado con éxito por ahora. Ninguna tarea pendiente a nivel crítico.

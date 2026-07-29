@@ -305,7 +305,7 @@ export function SavingsCalculator() {
                   Límite de Consultas Alcanzado
                 </h4>
                 <p className="text-sm text-red-700/80 mb-2">
-                  Por seguridad, permitimos un máximo de cálculos por día para evitar abusos automatizados. Tus resultados se han congelado temporalmente.
+                  Para garantizar que esta herramienta gratuita esté siempre disponible para todos los colombianos, permitimos un máximo de 3 consultas por día por usuario. Así evitamos abusos automatizados y mantenemos el sistema rápido para todos. ¡Vuelve pronto!
                 </p>
                 <div className="inline-block bg-red-500/20 text-red-700 font-bold px-3 py-1.5 rounded-lg text-sm font-mono tracking-widest">
                   ⏱️ {formatTimeLeft(retryTimeLeft)}
