@@ -25,7 +25,11 @@ export const rateLimiters = {
   // --- A. Operaciones Públicas ---
   leads: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(10, '15 m') }),
   ocr: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(3, '24 h') }),
-  consultation: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(3, '24 h') }),
+  consultation: new Ratelimit({ 
+    redis, 
+    limiter: Ratelimit.slidingWindow(10, '24 h'),
+    prefix: 'rl:consultation:v2' // Cambiar prefijo reinicia la cubeta para todos
+  }),
   validarOtp: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(3, '1 m') }),
   qr: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(60, '1 h') }),
   referidos: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(5, '24 h') }),
