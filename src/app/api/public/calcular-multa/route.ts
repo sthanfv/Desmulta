@@ -34,7 +34,14 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     // 🛡️ SEGURIDAD: Rate Limiter (Evita DDoS y spam hacia el motor de Go)
-    const ip = request.headers.get('x-forwarded-for') ?? '127.0.0.1';
+    // Extraemos la IP de forma robusta para evitar "Bloqueos Globales" si falla un header
+    let ip = request.ip ?? request.headers.get('x-real-ip');
+    const forwardedFor = request.headers.get('x-forwarded-for');
+    if (!ip && forwardedFor) {
+      ip = forwardedFor.split(',')[0].trim();
+    }
+    ip = ip ?? '127.0.0.1';
+    
     const rateLimit = await checkRateLimit('consultation', ip);
 
     if (rateLimit.blocked) {
