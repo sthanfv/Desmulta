@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleAuth } from 'google-auth-library';
 import { checkRateLimit } from '@/lib/security/rate-limit';
 import { logger } from '@/lib/logger/security-logger';
 import { apiError } from '@/lib/types/api-response';
@@ -347,14 +348,32 @@ export async function POST(request: NextRequest) {
 
         logger.info('[OCR] Llamando al microservicio Lector-OCR (Python)...');
         
+        const reqHeaders: Record<string, string> = {
+          'Content-Type': 'application/json',
+          'X-Engine-Timestamp': timestamp,
+          'X-Engine-Signature': signature,
+        };
+
+        // 🛡️ INFRAESTRUCTURA: Si la URL destino es de Cloud Run, solicitamos token OIDC
+        // Esto permite que el servicio Python exija autenticación IAM, evitando Billing Exhaustion
+        if (ocrFallbackUrl.includes('run.app')) {
+          try {
+            const auth = new GoogleAuth();
+            const client = await auth.getIdTokenClient(ocrFallbackUrl);
+            const authHeaders = await client.getRequestHeaders();
+            if (authHeaders.Authorization) {
+              reqHeaders['Authorization'] = authHeaders.Authorization;
+              logger.info('[OCR] Token OIDC inyectado exitosamente para Cloud Run IAM.');
+            }
+          } catch (authError) {
+            logger.warn('[OCR] No se pudo inyectar el token OIDC (Posible entorno local o credenciales ADC faltantes):', authError);
+          }
+        }
+
         // Competir contra el tiempo restante que nos da Vercel
         const fetchPromise = fetch(ocrFallbackUrl, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Engine-Timestamp': timestamp,
-            'X-Engine-Signature': signature,
-          },
+          headers: reqHeaders,
           body: bodyStr,
         });
 
