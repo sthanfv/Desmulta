@@ -274,8 +274,8 @@ export async function middleware(request: NextRequest) {
   );
   response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
   
-  // FIX CORP: Bloquear recursos incrustados cruzados para proteger data sensible
-  response.headers.set('Cross-Origin-Resource-Policy', 'same-origin');
+  // FIX CORP: Permitir recursos incrustados cruzados (Firebase Storage/Unsplash) sin colisión
+  response.headers.set('Cross-Origin-Resource-Policy', 'cross-origin');
 
   applyCommonSecurityHeaders(response, isProduction);
 

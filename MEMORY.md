@@ -72,3 +72,9 @@
 - **Qué cambió**: Se mitigó un posible OOM y lentitud extrema en Tesseract inyectando contraste mediante PIL (ImageEnhance.Contrast) y asignando 3 hilos concurrentes por vCPU al motor. En Next.js, se ampliaron los mensajes de carga secuenciales para transparentar el Fallback ante el usuario ('Hubo una pequeña falla, procesando por canal alternativo...') mitigando la ansiedad por tiempos de espera altos (Vercel Serverless timeout workaround).
 - **Por qué cambió**: Recomendaciones de auditoría externa y del usuario para mejorar la resiliencia en Serverless (Cloud Run y Vercel).
 - **Estado Actual**: Implementado y robustecido.
+
+## [2026-07-29] Auditoría Frontend Next.js (Fase 3)
+- **Archivos Modificados**: src/middleware.ts
+- **Qué cambió**: Se resolvió la colisión de políticas CORP fijando Cross-Origin-Resource-Policy a cross-origin para habilitar correctamente los assets de Firebase Storage. Se analizaron las vulnerabilidades estructurales (XSS por unsafe-inline y exposición de llaves privadas en Edge) documentándolas como riesgos residuales aceptados debido a los requerimientos de hidratación de React/Framer Motion y Next-Firebase-Auth-Edge.
+- **Por qué cambió**: Recomendaciones de auditoría externa de seguridad ofensiva para prevenir bloqueos impredecibles en el navegador y estandarizar postura de riesgo.
+- **Estado Actual**: Implementado y cerrado.
