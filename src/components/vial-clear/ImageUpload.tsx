@@ -217,7 +217,7 @@ export function ImageUpload({
 
   const [loadingTextIndex, setLoadingTextIndex] = useState(0);
 
-  // Avanza el índice cada 2.5 segundos MIENTRAS esté analizando (Efecto Labor Illusion)
+  // Avanza el índice cada 4 segundos MIENTRAS esté analizando (Efecto Labor Illusion)
   React.useEffect(() => {
     if (analizando) {
       setLoadingTextIndex(0);
@@ -229,7 +229,7 @@ export function ImageUpload({
           }
           return prev + 1;
         });
-      }, 2500); // 2.5s x 4 msjs iniciales = 10s (Tiempo óptimo de retención)
+      }, 4000); // 4s x 4 msjs iniciales = 16s de retención para soportar latencia de Gemini Free
       return () => clearInterval(interval);
     } else {
       setLoadingTextIndex(0);
