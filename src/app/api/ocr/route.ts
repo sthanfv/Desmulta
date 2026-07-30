@@ -360,9 +360,10 @@ export async function POST(request: NextRequest) {
           try {
             const auth = new GoogleAuth();
             const client = await auth.getIdTokenClient(ocrFallbackUrl);
-            const authHeaders = await client.getRequestHeaders();
-            if (authHeaders.Authorization) {
-              reqHeaders['Authorization'] = authHeaders.Authorization;
+            const authHeaders = (await client.getRequestHeaders()) as Record<string, string>;
+            const authToken = authHeaders.Authorization || authHeaders.authorization;
+            if (authToken) {
+              reqHeaders['Authorization'] = authToken;
               logger.info('[OCR] Token OIDC inyectado exitosamente para Cloud Run IAM.');
             }
           } catch (authError) {
