@@ -4,600 +4,1288 @@
     "nombre": "Bogotá",
     "departamento": "Cundinamarca",
     "entidadTransito": "Secretaría Distrital de Movilidad de Bogotá",
-    "textoContexto": "Concentra el mayor volumen de fotomultas y cámaras salvavidas en corredores principales."
+    "textoContexto": "Concentra el mayor volumen de fotomultas y cámaras salvavidas en corredores principales.",
+    "seoIntro": "Si recibiste una fotomulta o comparendo injusto en Bogotá, nuestro equipo de auditores jurídicos está listo para defenderte. Nos encargamos de radicar derechos de petición y tutelas directamente ante la Secretaría Distrital de Movilidad de Bogotá exigiendo la caducidad del proceso. No pagues sin antes consultar. Revisa tu estado con nosotros de forma 100% confidencial.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Bogotá",
+      "addressLocality": "Bogotá",
+      "addressRegion": "Cundinamarca",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "medellin",
     "nombre": "Medellín",
     "departamento": "Antioquia",
     "entidadTransito": "Secretaría de Movilidad de Medellín",
-    "textoContexto": "Alta densidad de fotodetecciones por velocidad y pico y placa en el Valle de Aburrá."
+    "textoContexto": "Alta densidad de fotodetecciones por velocidad y pico y placa en el Valle de Aburrá.",
+    "seoIntro": "¿Problemas con embargos o multas de tránsito en Medellín? En Desmulta somos expertos en prescripción y caducidad legal. Si la Secretaría de Movilidad de Medellín vulneró tu derecho al debido proceso, exigimos la exoneración inmediata y el desembargo de tus cuentas. El tiempo corre en tu contra; actúa ahora y solicita tu revisión de expediente.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Medellín",
+      "addressLocality": "Medellín",
+      "addressRegion": "Antioquia",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "cali",
     "nombre": "Cali",
     "departamento": "Valle del Cauca",
     "entidadTransito": "Secretaría de Movilidad de Cali",
-    "textoContexto": "Controles viales estrictos y alto volumen de cobros coactivos por notificaciones desactualizadas."
+    "textoContexto": "Controles viales estrictos y alto volumen de cobros coactivos por notificaciones desactualizadas.",
+    "seoIntro": "Evita dolores de cabeza con las secretarías de tránsito en Cali. Analizamos tu caso sin costo para encontrar vicios de nulidad. Conocemos al detalle cómo opera la Secretaría de Movilidad de Cali y utilizamos las sentencias de la Corte Constitucional a tu favor. Haz clic aquí para que uno de nuestros especialistas analice tu comparendo.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Cali",
+      "addressLocality": "Cali",
+      "addressRegion": "Valle del Cauca",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "barranquilla",
     "nombre": "Barranquilla",
     "departamento": "Atlántico",
     "entidadTransito": "Secretaría de Tránsito y Seguridad Vial de Barranquilla",
-    "textoContexto": "Radares activos en la Vía al Mar y avenidas clave propensos a prescripción legal."
+    "textoContexto": "Radares activos en la Vía al Mar y avenidas clave propensos a prescripción legal.",
+    "seoIntro": "Una fotomulta en Barranquilla no tiene por qué arruinar tu historial financiero. Te brindamos defensa técnica especializada. El proceso de impugnación contra la Secretaría de Tránsito y Seguridad Vial de Barranquilla requiere experticia legal que nosotros garantizamos desde el primer día. Agenda hoy tu consulta gratuita y recupera tu paz mental.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Barranquilla",
+      "addressLocality": "Barranquilla",
+      "addressRegion": "Atlántico",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "cartagena",
     "nombre": "Cartagena",
     "departamento": "Bolívar",
     "entidadTransito": "Departamento Administrativo de Tránsito y Transporte (DATT)",
-    "textoContexto": "Evaluamos si los tiempos del DATT superan los tres años de prescripción reglamentaria."
+    "textoContexto": "Evaluamos si los tiempos del DATT superan los tres años de prescripción reglamentaria.",
+    "seoIntro": "En Cartagena, cientos de conductores confían en nosotros para impugnar comparendos por SOAT, Pico y Placa y velocidad. Nuestra auditoría verifica paso a paso si la Departamento Administrativo de Tránsito y Transporte (DATT) cumplió con los tiempos legales de notificación según la Ley 1843. Déjanos tus datos y un abogado experto de nuestro equipo se contactará contigo.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Cartagena",
+      "addressLocality": "Cartagena",
+      "addressRegion": "Bolívar",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "bucaramanga",
     "nombre": "Bucaramanga",
     "departamento": "Santander",
     "entidadTransito": "Dirección de Tránsito de Bucaramanga",
-    "textoContexto": "Controles tecnológicos en el área metropolitana donde auditamos la notificación del debido proceso."
+    "textoContexto": "Controles tecnológicos en el área metropolitana donde auditamos la notificación del debido proceso.",
+    "seoIntro": "Si recibiste una fotomulta o comparendo injusto en Bucaramanga, nuestro equipo de auditores jurídicos está listo para defenderte. Nos encargamos de radicar derechos de petición y tutelas directamente ante la Dirección de Tránsito de Bucaramanga exigiendo la caducidad del proceso. No pagues sin antes consultar. Revisa tu estado con nosotros de forma 100% confidencial.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Bucaramanga",
+      "addressLocality": "Bucaramanga",
+      "addressRegion": "Santander",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "pereira",
     "nombre": "Pereira",
     "departamento": "Risaralda",
     "entidadTransito": "Instituto de Movilidad de Pereira",
-    "textoContexto": "Comparendos sin plena identificación del infractor, viables para impugnación por Sentencia C-038."
+    "textoContexto": "Comparendos sin plena identificación del infractor, viables para impugnación por Sentencia C-038.",
+    "seoIntro": "¿Problemas con embargos o multas de tránsito en Pereira? En Desmulta somos expertos en prescripción y caducidad legal. Si la Instituto de Movilidad de Pereira vulneró tu derecho al debido proceso, exigimos la exoneración inmediata y el desembargo de tus cuentas. El tiempo corre en tu contra; actúa ahora y solicita tu revisión de expediente.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Pereira",
+      "addressLocality": "Pereira",
+      "addressRegion": "Risaralda",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "manizales",
     "nombre": "Manizales",
     "departamento": "Caldas",
     "entidadTransito": "Secretaría de Movilidad de Manizales",
-    "textoContexto": "Estrictos controles de velocidad en pendientes que deben respetar la jurisprudencia de solidaridad."
+    "textoContexto": "Estrictos controles de velocidad en pendientes que deben respetar la jurisprudencia de solidaridad.",
+    "seoIntro": "Evita dolores de cabeza con las secretarías de tránsito en Manizales. Analizamos tu caso sin costo para encontrar vicios de nulidad. Conocemos al detalle cómo opera la Secretaría de Movilidad de Manizales y utilizamos las sentencias de la Corte Constitucional a tu favor. Haz clic aquí para que uno de nuestros especialistas analice tu comparendo.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Manizales",
+      "addressLocality": "Manizales",
+      "addressRegion": "Caldas",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "armenia",
     "nombre": "Armenia",
     "departamento": "Quindío",
     "entidadTransito": "Secretaría de Tránsito y Transporte de Armenia (SETTA)",
-    "textoContexto": "Regulación vial en el Eje Cafetero. Analizamos de inmediato vencimientos de términos del comparendo."
+    "textoContexto": "Regulación vial en el Eje Cafetero. Analizamos de inmediato vencimientos de términos del comparendo.",
+    "seoIntro": "Una fotomulta en Armenia no tiene por qué arruinar tu historial financiero. Te brindamos defensa técnica especializada. El proceso de impugnación contra la Secretaría de Tránsito y Transporte de Armenia (SETTA) requiere experticia legal que nosotros garantizamos desde el primer día. Agenda hoy tu consulta gratuita y recupera tu paz mental.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Armenia",
+      "addressLocality": "Armenia",
+      "addressRegion": "Quindío",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "cucuta",
     "nombre": "Cúcuta",
     "departamento": "Norte de Santander",
     "entidadTransito": "Secretaría de Tránsito y Transporte de Cúcuta",
-    "textoContexto": "Controles fronterizos y miles de multas antiguas aptas para prescribir legalmente."
+    "textoContexto": "Controles fronterizos y miles de multas antiguas aptas para prescribir legalmente.",
+    "seoIntro": "En Cúcuta, cientos de conductores confían en nosotros para impugnar comparendos por SOAT, Pico y Placa y velocidad. Nuestra auditoría verifica paso a paso si la Secretaría de Tránsito y Transporte de Cúcuta cumplió con los tiempos legales de notificación según la Ley 1843. Déjanos tus datos y un abogado experto de nuestro equipo se contactará contigo.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Cúcuta",
+      "addressLocality": "Cúcuta",
+      "addressRegion": "Norte de Santander",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "ibague",
     "nombre": "Ibagué",
     "departamento": "Tolima",
     "entidadTransito": "Secretaría de Movilidad de Ibagué",
-    "textoContexto": "Verificamos si las fotomultas en vías de acceso cumplen la entrega reglamentaria."
+    "textoContexto": "Verificamos si las fotomultas en vías de acceso cumplen la entrega reglamentaria.",
+    "seoIntro": "Si recibiste una fotomulta o comparendo injusto en Ibagué, nuestro equipo de auditores jurídicos está listo para defenderte. Nos encargamos de radicar derechos de petición y tutelas directamente ante la Secretaría de Movilidad de Ibagué exigiendo la caducidad del proceso. No pagues sin antes consultar. Revisa tu estado con nosotros de forma 100% confidencial.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Ibagué",
+      "addressLocality": "Ibagué",
+      "addressRegion": "Tolima",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "santa-marta",
     "nombre": "Santa Marta",
     "departamento": "Magdalena",
     "entidadTransito": "Secretaría de Movilidad Multimodal y Sostenible de Santa Marta",
-    "textoContexto": "Infracciones turísticas acumuladas que entran a cobro coactivo sin el debido proceso previo."
+    "textoContexto": "Infracciones turísticas acumuladas que entran a cobro coactivo sin el debido proceso previo.",
+    "seoIntro": "¿Problemas con embargos o multas de tránsito en Santa Marta? En Desmulta somos expertos en prescripción y caducidad legal. Si la Secretaría de Movilidad Multimodal y Sostenible de Santa Marta vulneró tu derecho al debido proceso, exigimos la exoneración inmediata y el desembargo de tus cuentas. El tiempo corre en tu contra; actúa ahora y solicita tu revisión de expediente.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Santa Marta",
+      "addressLocality": "Santa Marta",
+      "addressRegion": "Magdalena",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "villavicencio",
     "nombre": "Villavicencio",
     "departamento": "Meta",
     "entidadTransito": "Secretaría de Movilidad de Villavicencio",
-    "textoContexto": "Sanciones automáticas en aumento en la puerta del Llano. Analizamos nulidades procesales."
+    "textoContexto": "Sanciones automáticas en aumento en la puerta del Llano. Analizamos nulidades procesales.",
+    "seoIntro": "Evita dolores de cabeza con las secretarías de tránsito en Villavicencio. Analizamos tu caso sin costo para encontrar vicios de nulidad. Conocemos al detalle cómo opera la Secretaría de Movilidad de Villavicencio y utilizamos las sentencias de la Corte Constitucional a tu favor. Haz clic aquí para que uno de nuestros especialistas analice tu comparendo.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Villavicencio",
+      "addressLocality": "Villavicencio",
+      "addressRegion": "Meta",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "valledupar",
     "nombre": "Valledupar",
     "departamento": "Cesar",
     "entidadTransito": "Secretaría de Tránsito y Transporte de Valledupar",
-    "textoContexto": "Aplicamos la exclusión de culpabilidad del propietario en comparendos electrónicos de esta zona."
+    "textoContexto": "Aplicamos la exclusión de culpabilidad del propietario en comparendos electrónicos de esta zona.",
+    "seoIntro": "Una fotomulta en Valledupar no tiene por qué arruinar tu historial financiero. Te brindamos defensa técnica especializada. El proceso de impugnación contra la Secretaría de Tránsito y Transporte de Valledupar requiere experticia legal que nosotros garantizamos desde el primer día. Agenda hoy tu consulta gratuita y recupera tu paz mental.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Valledupar",
+      "addressLocality": "Valledupar",
+      "addressRegion": "Cesar",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "monteria",
     "nombre": "Montería",
     "departamento": "Córdoba",
     "entidadTransito": "Secretaría de Tránsito de Montería",
-    "textoContexto": "Auditamos la falta de homologación y calibración de radares en zonas de fotodetección."
+    "textoContexto": "Auditamos la falta de homologación y calibración de radares en zonas de fotodetección.",
+    "seoIntro": "En Montería, cientos de conductores confían en nosotros para impugnar comparendos por SOAT, Pico y Placa y velocidad. Nuestra auditoría verifica paso a paso si la Secretaría de Tránsito de Montería cumplió con los tiempos legales de notificación según la Ley 1843. Déjanos tus datos y un abogado experto de nuestro equipo se contactará contigo.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Montería",
+      "addressLocality": "Montería",
+      "addressRegion": "Córdoba",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "pasto",
     "nombre": "Pasto",
     "departamento": "Nariño",
     "entidadTransito": "Secretaría de Tránsito y Transporte de Pasto",
-    "textoContexto": "Garantizamos que el organismo local no exija cobros sobre multas legalmente prescritas."
+    "textoContexto": "Garantizamos que el organismo local no exija cobros sobre multas legalmente prescritas.",
+    "seoIntro": "Si recibiste una fotomulta o comparendo injusto en Pasto, nuestro equipo de auditores jurídicos está listo para defenderte. Nos encargamos de radicar derechos de petición y tutelas directamente ante la Secretaría de Tránsito y Transporte de Pasto exigiendo la caducidad del proceso. No pagues sin antes consultar. Revisa tu estado con nosotros de forma 100% confidencial.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Pasto",
+      "addressLocality": "Pasto",
+      "addressRegion": "Nariño",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "popayan",
     "nombre": "Popayán",
     "departamento": "Cauca",
     "entidadTransito": "Secretaría de Tránsito y Transporte de Popayán",
-    "textoContexto": "Revisamos si los mandamientos de pago antiguos en Popayán conservan vigencia de cobro."
+    "textoContexto": "Revisamos si los mandamientos de pago antiguos en Popayán conservan vigencia de cobro.",
+    "seoIntro": "¿Problemas con embargos o multas de tránsito en Popayán? En Desmulta somos expertos en prescripción y caducidad legal. Si la Secretaría de Tránsito y Transporte de Popayán vulneró tu derecho al debido proceso, exigimos la exoneración inmediata y el desembargo de tus cuentas. El tiempo corre en tu contra; actúa ahora y solicita tu revisión de expediente.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Popayán",
+      "addressLocality": "Popayán",
+      "addressRegion": "Cauca",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "floridablanca",
     "nombre": "Floridablanca",
     "departamento": "Santander",
     "entidadTransito": "Dirección de Tránsito y Transporte de Floridablanca (DTTF)",
-    "textoContexto": "Foco masivo de fotomultas donde la notificación física suele fallar los plazos."
+    "textoContexto": "Foco masivo de fotomultas donde la notificación física suele fallar los plazos.",
+    "seoIntro": "Evita dolores de cabeza con las secretarías de tránsito en Floridablanca. Analizamos tu caso sin costo para encontrar vicios de nulidad. Conocemos al detalle cómo opera la Dirección de Tránsito y Transporte de Floridablanca (DTTF) y utilizamos las sentencias de la Corte Constitucional a tu favor. Haz clic aquí para que uno de nuestros especialistas analice tu comparendo.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Floridablanca",
+      "addressLocality": "Floridablanca",
+      "addressRegion": "Santander",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "palmira",
     "nombre": "Palmira",
     "departamento": "Valle del Cauca",
     "entidadTransito": "Secretaría de Movilidad de Palmira",
-    "textoContexto": "Operatividad electrónica en vías nacionales que vulnera la responsabilidad subjetiva del conductor."
+    "textoContexto": "Operatividad electrónica en vías nacionales que vulnera la responsabilidad subjetiva del conductor.",
+    "seoIntro": "Una fotomulta en Palmira no tiene por qué arruinar tu historial financiero. Te brindamos defensa técnica especializada. El proceso de impugnación contra la Secretaría de Movilidad de Palmira requiere experticia legal que nosotros garantizamos desde el primer día. Agenda hoy tu consulta gratuita y recupera tu paz mental.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Palmira",
+      "addressLocality": "Palmira",
+      "addressRegion": "Valle del Cauca",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "envigado",
     "nombre": "Envigado",
     "departamento": "Antioquia",
     "entidadTransito": "Secretaría de Movilidad de Envigado",
-    "textoContexto": "Sistemas de captación del sur del Valle de Aburrá sujetos a estrictos términos de prescripción."
+    "textoContexto": "Sistemas de captación del sur del Valle de Aburrá sujetos a estrictos términos de prescripción.",
+    "seoIntro": "En Envigado, cientos de conductores confían en nosotros para impugnar comparendos por SOAT, Pico y Placa y velocidad. Nuestra auditoría verifica paso a paso si la Secretaría de Movilidad de Envigado cumplió con los tiempos legales de notificación según la Ley 1843. Déjanos tus datos y un abogado experto de nuestro equipo se contactará contigo.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Envigado",
+      "addressLocality": "Envigado",
+      "addressRegion": "Antioquia",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "tunja",
     "nombre": "Tunja",
     "departamento": "Boyacá",
     "entidadTransito": "Secretaría de Tránsito y Transporte de Tunja",
-    "textoContexto": "Comparendos locales que no superan el escrutinio de los tiempos legales de notificación."
+    "textoContexto": "Comparendos locales que no superan el escrutinio de los tiempos legales de notificación.",
+    "seoIntro": "Si recibiste una fotomulta o comparendo injusto en Tunja, nuestro equipo de auditores jurídicos está listo para defenderte. Nos encargamos de radicar derechos de petición y tutelas directamente ante la Secretaría de Tránsito y Transporte de Tunja exigiendo la caducidad del proceso. No pagues sin antes consultar. Revisa tu estado con nosotros de forma 100% confidencial.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Tunja",
+      "addressLocality": "Tunja",
+      "addressRegion": "Boyacá",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "neiva",
     "nombre": "Neiva",
     "departamento": "Huila",
     "entidadTransito": "Secretaría de Movilidad de Neiva",
-    "textoContexto": "Revisamos comparendos electrónicos para aplicar la prescripción de tres años correspondiente."
+    "textoContexto": "Revisamos comparendos electrónicos para aplicar la prescripción de tres años correspondiente.",
+    "seoIntro": "¿Problemas con embargos o multas de tránsito en Neiva? En Desmulta somos expertos en prescripción y caducidad legal. Si la Secretaría de Movilidad de Neiva vulneró tu derecho al debido proceso, exigimos la exoneración inmediata y el desembargo de tus cuentas. El tiempo corre en tu contra; actúa ahora y solicita tu revisión de expediente.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Neiva",
+      "addressLocality": "Neiva",
+      "addressRegion": "Huila",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "riohacha",
     "nombre": "Riohacha",
     "departamento": "La Guajira",
     "entidadTransito": "Instituto de Tránsito de Riohacha (INSTRAMD)",
-    "textoContexto": "Procedimiento de multas locales donde la falta de notificación personal invalida el cobro."
+    "textoContexto": "Procedimiento de multas locales donde la falta de notificación personal invalida el cobro.",
+    "seoIntro": "Evita dolores de cabeza con las secretarías de tránsito en Riohacha. Analizamos tu caso sin costo para encontrar vicios de nulidad. Conocemos al detalle cómo opera la Instituto de Tránsito de Riohacha (INSTRAMD) y utilizamos las sentencias de la Corte Constitucional a tu favor. Haz clic aquí para que uno de nuestros especialistas analice tu comparendo.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Riohacha",
+      "addressLocality": "Riohacha",
+      "addressRegion": "La Guajira",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "sincelejo",
     "nombre": "Sincelejo",
     "departamento": "Sucre",
     "entidadTransito": "Secretaría de Tránsito y Transporte de Sincelejo",
-    "textoContexto": "Fotomultas locales impugnables por falta de identificación del infractor."
+    "textoContexto": "Fotomultas locales impugnables por falta de identificación del infractor.",
+    "seoIntro": "Una fotomulta en Sincelejo no tiene por qué arruinar tu historial financiero. Te brindamos defensa técnica especializada. El proceso de impugnación contra la Secretaría de Tránsito y Transporte de Sincelejo requiere experticia legal que nosotros garantizamos desde el primer día. Agenda hoy tu consulta gratuita y recupera tu paz mental.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Sincelejo",
+      "addressLocality": "Sincelejo",
+      "addressRegion": "Sucre",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "florencia",
     "nombre": "Florencia",
     "departamento": "Caquetá",
     "entidadTransito": "Secretaría de Transporte y Movilidad de Florencia",
-    "textoContexto": "Analizamos cobros coactivos en Florencia para aplicar la exoneración de multas caducadas."
+    "textoContexto": "Analizamos cobros coactivos en Florencia para aplicar la exoneración de multas caducadas.",
+    "seoIntro": "En Florencia, cientos de conductores confían en nosotros para impugnar comparendos por SOAT, Pico y Placa y velocidad. Nuestra auditoría verifica paso a paso si la Secretaría de Transporte y Movilidad de Florencia cumplió con los tiempos legales de notificación según la Ley 1843. Déjanos tus datos y un abogado experto de nuestro equipo se contactará contigo.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Florencia",
+      "addressLocality": "Florencia",
+      "addressRegion": "Caquetá",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "quibdo",
     "nombre": "Quibdó",
     "departamento": "Chocó",
     "entidadTransito": "Secretaría de Movilidad y Tránsito de Quibdó",
-    "textoContexto": "Asesoría para exigir el debido proceso en cada multa impuesta de manera irregular."
+    "textoContexto": "Asesoría para exigir el debido proceso en cada multa impuesta de manera irregular.",
+    "seoIntro": "Si recibiste una fotomulta o comparendo injusto en Quibdó, nuestro equipo de auditores jurídicos está listo para defenderte. Nos encargamos de radicar derechos de petición y tutelas directamente ante la Secretaría de Movilidad y Tránsito de Quibdó exigiendo la caducidad del proceso. No pagues sin antes consultar. Revisa tu estado con nosotros de forma 100% confidencial.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Quibdó",
+      "addressLocality": "Quibdó",
+      "addressRegion": "Chocó",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "yopal",
     "nombre": "Yopal",
     "departamento": "Casanare",
     "entidadTransito": "Secretaría de Tránsito y Transporte de Yopal",
-    "textoContexto": "Notificaciones fuera de término en Casanare. Reclamamos la nulidad administrativa."
+    "textoContexto": "Notificaciones fuera de término en Casanare. Reclamamos la nulidad administrativa.",
+    "seoIntro": "¿Problemas con embargos o multas de tránsito en Yopal? En Desmulta somos expertos en prescripción y caducidad legal. Si la Secretaría de Tránsito y Transporte de Yopal vulneró tu derecho al debido proceso, exigimos la exoneración inmediata y el desembargo de tus cuentas. El tiempo corre en tu contra; actúa ahora y solicita tu revisión de expediente.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Yopal",
+      "addressLocality": "Yopal",
+      "addressRegion": "Casanare",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "arauca",
     "nombre": "Arauca",
     "departamento": "Arauca",
     "entidadTransito": "Instituto de Tránsito y Transporte de Arauca (ITDAR)",
-    "textoContexto": "Defensa vial contra fotomultas que violan la presunción de inocencia del propietario."
+    "textoContexto": "Defensa vial contra fotomultas que violan la presunción de inocencia del propietario.",
+    "seoIntro": "Evita dolores de cabeza con las secretarías de tránsito en Arauca. Analizamos tu caso sin costo para encontrar vicios de nulidad. Conocemos al detalle cómo opera la Instituto de Tránsito y Transporte de Arauca (ITDAR) y utilizamos las sentencias de la Corte Constitucional a tu favor. Haz clic aquí para que uno de nuestros especialistas analice tu comparendo.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Arauca",
+      "addressLocality": "Arauca",
+      "addressRegion": "Arauca",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "leticia",
     "nombre": "Leticia",
     "departamento": "Amazonas",
     "entidadTransito": "Secretaría de Tránsito y Transporte de Leticia",
-    "textoContexto": "Nulidad de aquellas infracciones locales que no cumplen las normativas nacionales."
+    "textoContexto": "Nulidad de aquellas infracciones locales que no cumplen las normativas nacionales.",
+    "seoIntro": "Una fotomulta en Leticia no tiene por qué arruinar tu historial financiero. Te brindamos defensa técnica especializada. El proceso de impugnación contra la Secretaría de Tránsito y Transporte de Leticia requiere experticia legal que nosotros garantizamos desde el primer día. Agenda hoy tu consulta gratuita y recupera tu paz mental.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Leticia",
+      "addressLocality": "Leticia",
+      "addressRegion": "Amazonas",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "san-jose-del-guaviare",
     "nombre": "San José del Guaviare",
     "departamento": "Guaviare",
     "entidadTransito": "Secretaría de Tránsito y Transporte del Guaviare",
-    "textoContexto": "Frenamos cobros ilegales aplicando los mecanismos de caducidad y prescripción de ley."
+    "textoContexto": "Frenamos cobros ilegales aplicando los mecanismos de caducidad y prescripción de ley.",
+    "seoIntro": "En San José del Guaviare, cientos de conductores confían en nosotros para impugnar comparendos por SOAT, Pico y Placa y velocidad. Nuestra auditoría verifica paso a paso si la Secretaría de Tránsito y Transporte del Guaviare cumplió con los tiempos legales de notificación según la Ley 1843. Déjanos tus datos y un abogado experto de nuestro equipo se contactará contigo.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en San José del Guaviare",
+      "addressLocality": "San José del Guaviare",
+      "addressRegion": "Guaviare",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "mocoa",
     "nombre": "Mocoa",
     "departamento": "Putumayo",
     "entidadTransito": "Instituto de Tránsito del Putumayo",
-    "textoContexto": "Nulidad de fotomultas que carecen del soporte de calibración técnica obligatoria."
+    "textoContexto": "Nulidad de fotomultas que carecen del soporte de calibración técnica obligatoria.",
+    "seoIntro": "Si recibiste una fotomulta o comparendo injusto en Mocoa, nuestro equipo de auditores jurídicos está listo para defenderte. Nos encargamos de radicar derechos de petición y tutelas directamente ante la Instituto de Tránsito del Putumayo exigiendo la caducidad del proceso. No pagues sin antes consultar. Revisa tu estado con nosotros de forma 100% confidencial.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Mocoa",
+      "addressLocality": "Mocoa",
+      "addressRegion": "Putumayo",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "puerto-carreno",
     "nombre": "Puerto Carreño",
     "departamento": "Vichada",
     "entidadTransito": "Secretaría de Tránsito y Transporte de Vichada",
-    "textoContexto": "Limpieza de historial de tránsito local por vencimiento de términos procesales."
+    "textoContexto": "Limpieza de historial de tránsito local por vencimiento de términos procesales.",
+    "seoIntro": "¿Problemas con embargos o multas de tránsito en Puerto Carreño? En Desmulta somos expertos en prescripción y caducidad legal. Si la Secretaría de Tránsito y Transporte de Vichada vulneró tu derecho al debido proceso, exigimos la exoneración inmediata y el desembargo de tus cuentas. El tiempo corre en tu contra; actúa ahora y solicita tu revisión de expediente.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Puerto Carreño",
+      "addressLocality": "Puerto Carreño",
+      "addressRegion": "Vichada",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "inirida",
     "nombre": "Inírida",
     "departamento": "Guainía",
     "entidadTransito": "Secretaría de Tránsito y Transporte de Inírida",
-    "textoContexto": "Defensa de derechos frente a sanciones que omiten identificar al conductor real."
+    "textoContexto": "Defensa de derechos frente a sanciones que omiten identificar al conductor real.",
+    "seoIntro": "Evita dolores de cabeza con las secretarías de tránsito en Inírida. Analizamos tu caso sin costo para encontrar vicios de nulidad. Conocemos al detalle cómo opera la Secretaría de Tránsito y Transporte de Inírida y utilizamos las sentencias de la Corte Constitucional a tu favor. Haz clic aquí para que uno de nuestros especialistas analice tu comparendo.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Inírida",
+      "addressLocality": "Inírida",
+      "addressRegion": "Guainía",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "mitu",
     "nombre": "Mitú",
     "departamento": "Vaupés",
     "entidadTransito": "Secretaría de Tránsito y Transporte de Mitú",
-    "textoContexto": "Apelación de comparendos que superan el límite de vigencia establecido por la ley."
+    "textoContexto": "Apelación de comparendos que superan el límite de vigencia establecido por la ley.",
+    "seoIntro": "Una fotomulta en Mitú no tiene por qué arruinar tu historial financiero. Te brindamos defensa técnica especializada. El proceso de impugnación contra la Secretaría de Tránsito y Transporte de Mitú requiere experticia legal que nosotros garantizamos desde el primer día. Agenda hoy tu consulta gratuita y recupera tu paz mental.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Mitú",
+      "addressLocality": "Mitú",
+      "addressRegion": "Vaupés",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "san-andres",
     "nombre": "San Andrés",
     "departamento": "San Andrés y Providencia",
     "entidadTransito": "Secretaría de Movilidad de San Andrés Isla",
-    "textoContexto": "Saneamiento de multas para residentes y turistas. Exigimos el debido proceso coactivo."
+    "textoContexto": "Saneamiento de multas para residentes y turistas. Exigimos el debido proceso coactivo.",
+    "seoIntro": "En San Andrés, cientos de conductores confían en nosotros para impugnar comparendos por SOAT, Pico y Placa y velocidad. Nuestra auditoría verifica paso a paso si la Secretaría de Movilidad de San Andrés Isla cumplió con los tiempos legales de notificación según la Ley 1843. Déjanos tus datos y un abogado experto de nuestro equipo se contactará contigo.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en San Andrés",
+      "addressLocality": "San Andrés",
+      "addressRegion": "San Andrés y Providencia",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "soledad",
     "nombre": "Soledad",
     "departamento": "Atlántico",
     "entidadTransito": "Instituto de Tránsito y Transportes de Soledad",
-    "textoContexto": "Alta tasa de fotomultas por velocidad en este municipio vecino de Barranquilla."
+    "textoContexto": "Alta tasa de fotomultas por velocidad en este municipio vecino de Barranquilla.",
+    "seoIntro": "Si recibiste una fotomulta o comparendo injusto en Soledad, nuestro equipo de auditores jurídicos está listo para defenderte. Nos encargamos de radicar derechos de petición y tutelas directamente ante la Instituto de Tránsito y Transportes de Soledad exigiendo la caducidad del proceso. No pagues sin antes consultar. Revisa tu estado con nosotros de forma 100% confidencial.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Soledad",
+      "addressLocality": "Soledad",
+      "addressRegion": "Atlántico",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "bello",
     "nombre": "Bello",
     "departamento": "Antioquia",
     "entidadTransito": "Secretaría de Movilidad de Bello",
-    "textoContexto": "Fotomultas activas en la Autopista Norte. Evaluamos si el comparendo cumple la ley."
+    "textoContexto": "Fotomultas activas en la Autopista Norte. Evaluamos si el comparendo cumple la ley.",
+    "seoIntro": "¿Problemas con embargos o multas de tránsito en Bello? En Desmulta somos expertos en prescripción y caducidad legal. Si la Secretaría de Movilidad de Bello vulneró tu derecho al debido proceso, exigimos la exoneración inmediata y el desembargo de tus cuentas. El tiempo corre en tu contra; actúa ahora y solicita tu revisión de expediente.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Bello",
+      "addressLocality": "Bello",
+      "addressRegion": "Antioquia",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "itagui",
     "nombre": "Itagüí",
     "departamento": "Antioquia",
     "entidadTransito": "Secretaría de Movilidad de Itagüí",
-    "textoContexto": "Cámaras de fotodetección en el sur del área metropolitana. Analizamos la caducidad."
+    "textoContexto": "Cámaras de fotodetección en el sur del área metropolitana. Analizamos la caducidad.",
+    "seoIntro": "Evita dolores de cabeza con las secretarías de tránsito en Itagüí. Analizamos tu caso sin costo para encontrar vicios de nulidad. Conocemos al detalle cómo opera la Secretaría de Movilidad de Itagüí y utilizamos las sentencias de la Corte Constitucional a tu favor. Haz clic aquí para que uno de nuestros especialistas analice tu comparendo.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Itagüí",
+      "addressLocality": "Itagüí",
+      "addressRegion": "Antioquia",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "soacha",
     "nombre": "Soacha",
     "departamento": "Cundinamarca",
     "entidadTransito": "Secretaría de Movilidad de Soacha",
-    "textoContexto": "Comparendos en la Autopista Sur que a menudo presentan fallas de notificación física."
+    "textoContexto": "Comparendos en la Autopista Sur que a menudo presentan fallas de notificación física.",
+    "seoIntro": "Una fotomulta en Soacha no tiene por qué arruinar tu historial financiero. Te brindamos defensa técnica especializada. El proceso de impugnación contra la Secretaría de Movilidad de Soacha requiere experticia legal que nosotros garantizamos desde el primer día. Agenda hoy tu consulta gratuita y recupera tu paz mental.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Soacha",
+      "addressLocality": "Soacha",
+      "addressRegion": "Cundinamarca",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "buenaventura",
     "nombre": "Buenaventura",
     "departamento": "Valle del Cauca",
     "entidadTransito": "Secretaría de Tránsito y Transporte de Buenaventura",
-    "textoContexto": "Operativos viales en zona portuaria. Aplicamos prescripción sobre comparendos antiguos."
+    "textoContexto": "Operativos viales en zona portuaria. Aplicamos prescripción sobre comparendos antiguos.",
+    "seoIntro": "En Buenaventura, cientos de conductores confían en nosotros para impugnar comparendos por SOAT, Pico y Placa y velocidad. Nuestra auditoría verifica paso a paso si la Secretaría de Tránsito y Transporte de Buenaventura cumplió con los tiempos legales de notificación según la Ley 1843. Déjanos tus datos y un abogado experto de nuestro equipo se contactará contigo.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Buenaventura",
+      "addressLocality": "Buenaventura",
+      "addressRegion": "Valle del Cauca",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "tulua",
     "nombre": "Tuluá",
     "departamento": "Valle del Cauca",
     "entidadTransito": "Departamento Administrativo de Movilidad y Seguridad Vial de Tuluá",
-    "textoContexto": "Análisis de comparendos locales con errores formales de registro en el RUNT."
+    "textoContexto": "Análisis de comparendos locales con errores formales de registro en el RUNT.",
+    "seoIntro": "Si recibiste una fotomulta o comparendo injusto en Tuluá, nuestro equipo de auditores jurídicos está listo para defenderte. Nos encargamos de radicar derechos de petición y tutelas directamente ante la Departamento Administrativo de Movilidad y Seguridad Vial de Tuluá exigiendo la caducidad del proceso. No pagues sin antes consultar. Revisa tu estado con nosotros de forma 100% confidencial.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Tuluá",
+      "addressLocality": "Tuluá",
+      "addressRegion": "Valle del Cauca",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "buga",
     "nombre": "Buga",
     "departamento": "Valle del Cauca",
     "entidadTransito": "Secretaría de Movilidad de Guadalajara de Buga",
-    "textoContexto": "Verificación de plazos de ley para multas electrónicas en corredores intermunicipales."
+    "textoContexto": "Verificación de plazos de ley para multas electrónicas en corredores intermunicipales.",
+    "seoIntro": "¿Problemas con embargos o multas de tránsito en Buga? En Desmulta somos expertos en prescripción y caducidad legal. Si la Secretaría de Movilidad de Guadalajara de Buga vulneró tu derecho al debido proceso, exigimos la exoneración inmediata y el desembargo de tus cuentas. El tiempo corre en tu contra; actúa ahora y solicita tu revisión de expediente.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Buga",
+      "addressLocality": "Buga",
+      "addressRegion": "Valle del Cauca",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "girardot",
     "nombre": "Girardot",
     "departamento": "Cundinamarca",
     "entidadTransito": "Secretaría de Tránsito y Transporte de Girardot",
-    "textoContexto": "Infracciones turísticas los fines de semana que incumplen los requisitos de entrega física."
+    "textoContexto": "Infracciones turísticas los fines de semana que incumplen los requisitos de entrega física.",
+    "seoIntro": "Evita dolores de cabeza con las secretarías de tránsito en Girardot. Analizamos tu caso sin costo para encontrar vicios de nulidad. Conocemos al detalle cómo opera la Secretaría de Tránsito y Transporte de Girardot y utilizamos las sentencias de la Corte Constitucional a tu favor. Haz clic aquí para que uno de nuestros especialistas analice tu comparendo.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Girardot",
+      "addressLocality": "Girardot",
+      "addressRegion": "Cundinamarca",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "duitama",
     "nombre": "Duitama",
     "departamento": "Boyacá",
     "entidadTransito": "Secretaría de Tránsito y Transporte de Duitama",
-    "textoContexto": "Objeción legal de comparendos locales vencidos o caducados por inactividad administrativa."
+    "textoContexto": "Objeción legal de comparendos locales vencidos o caducados por inactividad administrativa.",
+    "seoIntro": "Una fotomulta en Duitama no tiene por qué arruinar tu historial financiero. Te brindamos defensa técnica especializada. El proceso de impugnación contra la Secretaría de Tránsito y Transporte de Duitama requiere experticia legal que nosotros garantizamos desde el primer día. Agenda hoy tu consulta gratuita y recupera tu paz mental.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Duitama",
+      "addressLocality": "Duitama",
+      "addressRegion": "Boyacá",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "sogamoso",
     "nombre": "Sogamoso",
     "departamento": "Boyacá",
     "entidadTransito": "Instituto de Tránsito y Transporte de Sogamoso (INTRASOG)",
-    "textoContexto": "Impugnación de multas del SIMIT por superación de plazos procesales obligatorios."
+    "textoContexto": "Impugnación de multas del SIMIT por superación de plazos procesales obligatorios.",
+    "seoIntro": "En Sogamoso, cientos de conductores confían en nosotros para impugnar comparendos por SOAT, Pico y Placa y velocidad. Nuestra auditoría verifica paso a paso si la Instituto de Tránsito y Transporte de Sogamoso (INTRASOG) cumplió con los tiempos legales de notificación según la Ley 1843. Déjanos tus datos y un abogado experto de nuestro equipo se contactará contigo.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Sogamoso",
+      "addressLocality": "Sogamoso",
+      "addressRegion": "Boyacá",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "barrancabermeja",
     "nombre": "Barrancabermeja",
     "departamento": "Santander",
     "entidadTransito": "Inspectoría de Tránsito y Transporte de Barrancabermeja",
-    "textoContexto": "Controles estrictos que deben ajustarse a la jurisprudencia de responsabilidad subjetiva."
+    "textoContexto": "Controles estrictos que deben ajustarse a la jurisprudencia de responsabilidad subjetiva.",
+    "seoIntro": "Si recibiste una fotomulta o comparendo injusto en Barrancabermeja, nuestro equipo de auditores jurídicos está listo para defenderte. Nos encargamos de radicar derechos de petición y tutelas directamente ante la Inspectoría de Tránsito y Transporte de Barrancabermeja exigiendo la caducidad del proceso. No pagues sin antes consultar. Revisa tu estado con nosotros de forma 100% confidencial.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Barrancabermeja",
+      "addressLocality": "Barrancabermeja",
+      "addressRegion": "Santander",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "giron",
     "nombre": "Girón",
     "departamento": "Santander",
     "entidadTransito": "Secretaría de Tránsito y Transporte de Girón",
-    "textoContexto": "Fotomultas en zona metropolitana de Bucaramanga. Auditamos la homologación de los radares."
+    "textoContexto": "Fotomultas en zona metropolitana de Bucaramanga. Auditamos la homologación de los radares.",
+    "seoIntro": "¿Problemas con embargos o multas de tránsito en Girón? En Desmulta somos expertos en prescripción y caducidad legal. Si la Secretaría de Tránsito y Transporte de Girón vulneró tu derecho al debido proceso, exigimos la exoneración inmediata y el desembargo de tus cuentas. El tiempo corre en tu contra; actúa ahora y solicita tu revisión de expediente.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Girón",
+      "addressLocality": "Girón",
+      "addressRegion": "Santander",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "piedecuesta",
     "nombre": "Piedecuesta",
     "departamento": "Santander",
     "entidadTransito": "Secretaría de Tránsito de Piedecuesta",
-    "textoContexto": "Apelamos fotodetecciones que omiten la debida identificación plena del conductor."
+    "textoContexto": "Apelamos fotodetecciones que omiten la debida identificación plena del conductor.",
+    "seoIntro": "Evita dolores de cabeza con las secretarías de tránsito en Piedecuesta. Analizamos tu caso sin costo para encontrar vicios de nulidad. Conocemos al detalle cómo opera la Secretaría de Tránsito de Piedecuesta y utilizamos las sentencias de la Corte Constitucional a tu favor. Haz clic aquí para que uno de nuestros especialistas analice tu comparendo.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Piedecuesta",
+      "addressLocality": "Piedecuesta",
+      "addressRegion": "Santander",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "sabaneta",
     "nombre": "Sabaneta",
     "departamento": "Antioquia",
     "entidadTransito": "Secretaría de Movilidad de Sabaneta",
-    "textoContexto": "Sistemas de captación electrónica en el Valle de Aburrá. Estudiamos nulidades."
+    "textoContexto": "Sistemas de captación electrónica en el Valle de Aburrá. Estudiamos nulidades.",
+    "seoIntro": "Una fotomulta en Sabaneta no tiene por qué arruinar tu historial financiero. Te brindamos defensa técnica especializada. El proceso de impugnación contra la Secretaría de Movilidad de Sabaneta requiere experticia legal que nosotros garantizamos desde el primer día. Agenda hoy tu consulta gratuita y recupera tu paz mental.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Sabaneta",
+      "addressLocality": "Sabaneta",
+      "addressRegion": "Antioquia",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "rionegro",
     "nombre": "Rionegro",
     "departamento": "Antioquia",
     "entidadTransito": "Secretaría de Movilidad de Rionegro",
-    "textoContexto": "Operativos viales cerca al aeropuerto José María Córdova. Impugnamos irregularidades."
+    "textoContexto": "Operativos viales cerca al aeropuerto José María Córdova. Impugnamos irregularidades.",
+    "seoIntro": "En Rionegro, cientos de conductores confían en nosotros para impugnar comparendos por SOAT, Pico y Placa y velocidad. Nuestra auditoría verifica paso a paso si la Secretaría de Movilidad de Rionegro cumplió con los tiempos legales de notificación según la Ley 1843. Déjanos tus datos y un abogado experto de nuestro equipo se contactará contigo.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Rionegro",
+      "addressLocality": "Rionegro",
+      "addressRegion": "Antioquia",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "copacabana",
     "nombre": "Copacabana",
     "departamento": "Antioquia",
     "entidadTransito": "Secretaría de Movilidad de Copacabana",
-    "textoContexto": "Controles en la autopista Medellín-Bogotá. Apelamos fotomultas sin notificación oportuna."
+    "textoContexto": "Controles en la autopista Medellín-Bogotá. Apelamos fotomultas sin notificación oportuna.",
+    "seoIntro": "Si recibiste una fotomulta o comparendo injusto en Copacabana, nuestro equipo de auditores jurídicos está listo para defenderte. Nos encargamos de radicar derechos de petición y tutelas directamente ante la Secretaría de Movilidad de Copacabana exigiendo la caducidad del proceso. No pagues sin antes consultar. Revisa tu estado con nosotros de forma 100% confidencial.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Copacabana",
+      "addressLocality": "Copacabana",
+      "addressRegion": "Antioquia",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "caldas-antioquia",
     "nombre": "Caldas",
     "departamento": "Antioquia",
     "entidadTransito": "Secretaría de Movilidad de Caldas",
-    "textoContexto": "Revisión de comparendos de acceso sur por fallas de notificación a tiempo."
+    "textoContexto": "Revisión de comparendos de acceso sur por fallas de notificación a tiempo.",
+    "seoIntro": "¿Problemas con embargos o multas de tránsito en Caldas? En Desmulta somos expertos en prescripción y caducidad legal. Si la Secretaría de Movilidad de Caldas vulneró tu derecho al debido proceso, exigimos la exoneración inmediata y el desembargo de tus cuentas. El tiempo corre en tu contra; actúa ahora y solicita tu revisión de expediente.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Caldas",
+      "addressLocality": "Caldas",
+      "addressRegion": "Antioquia",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "la-estrella",
     "nombre": "La Estrella",
     "departamento": "Antioquia",
     "entidadTransito": "Secretaría de Movilidad de La Estrella",
-    "textoContexto": "Operativos contundentes en La Estrella. Validamos el cumplimiento del debido proceso."
+    "textoContexto": "Operativos contundentes en La Estrella. Validamos el cumplimiento del debido proceso.",
+    "seoIntro": "Evita dolores de cabeza con las secretarías de tránsito en La Estrella. Analizamos tu caso sin costo para encontrar vicios de nulidad. Conocemos al detalle cómo opera la Secretaría de Movilidad de La Estrella y utilizamos las sentencias de la Corte Constitucional a tu favor. Haz clic aquí para que uno de nuestros especialistas analice tu comparendo.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en La Estrella",
+      "addressLocality": "La Estrella",
+      "addressRegion": "Antioquia",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "chia",
     "nombre": "Chía",
     "departamento": "Cundinamarca",
     "entidadTransito": "Secretaría de Movilidad de Chía",
-    "textoContexto": "Fotomultas en la variante de Chía. Evaluamos fallas de entrega física reglamentaria."
+    "textoContexto": "Fotomultas en la variante de Chía. Evaluamos fallas de entrega física reglamentaria.",
+    "seoIntro": "Una fotomulta en Chía no tiene por qué arruinar tu historial financiero. Te brindamos defensa técnica especializada. El proceso de impugnación contra la Secretaría de Movilidad de Chía requiere experticia legal que nosotros garantizamos desde el primer día. Agenda hoy tu consulta gratuita y recupera tu paz mental.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Chía",
+      "addressLocality": "Chía",
+      "addressRegion": "Cundinamarca",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "zipaquira",
     "nombre": "Zipaquirá",
     "departamento": "Secretaría de Transporte y Movilidad de Zipaquirá",
-    "textoContexto": "Controles en zona norte de la sabana. Verificamos caducidad legal."
+    "textoContexto": "Controles en zona norte de la sabana. Verificamos caducidad legal.",
+    "seoIntro": "En Zipaquirá, cientos de conductores confían en nosotros para impugnar comparendos por SOAT, Pico y Placa y velocidad. Nuestra auditoría verifica paso a paso si la undefined cumplió con los tiempos legales de notificación según la Ley 1843. Déjanos tus datos y un abogado experto de nuestro equipo se contactará contigo.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Zipaquirá",
+      "addressLocality": "Zipaquirá",
+      "addressRegion": "Secretaría de Transporte y Movilidad de Zipaquirá",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "facatativa",
     "nombre": "Facatativá",
     "departamento": "Cundinamarca",
     "entidadTransito": "Secretaría de Tránsito y Transporte de Facatativá",
-    "textoContexto": "Impugnación de fotomultas por vicios de procedimiento y falta de tipicidad."
+    "textoContexto": "Impugnación de fotomultas por vicios de procedimiento y falta de tipicidad.",
+    "seoIntro": "Si recibiste una fotomulta o comparendo injusto en Facatativá, nuestro equipo de auditores jurídicos está listo para defenderte. Nos encargamos de radicar derechos de petición y tutelas directamente ante la Secretaría de Tránsito y Transporte de Facatativá exigiendo la caducidad del proceso. No pagues sin antes consultar. Revisa tu estado con nosotros de forma 100% confidencial.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Facatativá",
+      "addressLocality": "Facatativá",
+      "addressRegion": "Cundinamarca",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "fusagasuga",
     "nombre": "Fusagasugá",
     "departamento": "Cundinamarca",
     "entidadTransito": "Secretaría de Movilidad de Fusagasugá",
-    "textoContexto": "Fotomultas en el corredor vial del Sumapaz. Verificamos nulidades."
+    "textoContexto": "Fotomultas en el corredor vial del Sumapaz. Verificamos nulidades.",
+    "seoIntro": "¿Problemas con embargos o multas de tránsito en Fusagasugá? En Desmulta somos expertos en prescripción y caducidad legal. Si la Secretaría de Movilidad de Fusagasugá vulneró tu derecho al debido proceso, exigimos la exoneración inmediata y el desembargo de tus cuentas. El tiempo corre en tu contra; actúa ahora y solicita tu revisión de expediente.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Fusagasugá",
+      "addressLocality": "Fusagasugá",
+      "addressRegion": "Cundinamarca",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "mosquera",
     "nombre": "Mosquera",
     "departamento": "Cundinamarca",
     "entidadTransito": "Secretaría de Movilidad de Mosquera",
-    "textoContexto": "Controles de carga e infracciones locales. Aplicamos exclusión de cobros."
+    "textoContexto": "Controles de carga e infracciones locales. Aplicamos exclusión de cobros.",
+    "seoIntro": "Evita dolores de cabeza con las secretarías de tránsito en Mosquera. Analizamos tu caso sin costo para encontrar vicios de nulidad. Conocemos al detalle cómo opera la Secretaría de Movilidad de Mosquera y utilizamos las sentencias de la Corte Constitucional a tu favor. Haz clic aquí para que uno de nuestros especialistas analice tu comparendo.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Mosquera",
+      "addressLocality": "Mosquera",
+      "addressRegion": "Cundinamarca",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "funza",
     "nombre": "Funza",
     "departamento": "Cundinamarca",
     "entidadTransito": "Secretaría de Movilidad de Funza",
-    "textoContexto": "Fotomultas en sabana occidente. Apelamos comparendos sin notificación."
+    "textoContexto": "Fotomultas en sabana occidente. Apelamos comparendos sin notificación.",
+    "seoIntro": "Una fotomulta en Funza no tiene por qué arruinar tu historial financiero. Te brindamos defensa técnica especializada. El proceso de impugnación contra la Secretaría de Movilidad de Funza requiere experticia legal que nosotros garantizamos desde el primer día. Agenda hoy tu consulta gratuita y recupera tu paz mental.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Funza",
+      "addressLocality": "Funza",
+      "addressRegion": "Cundinamarca",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "madrid",
     "nombre": "Madrid",
     "departamento": "Cundinamarca",
     "entidadTransito": "Secretaría de Movilidad de Madrid",
-    "textoContexto": "Auditamos el historial del SIMIT para solicitar la nulidad de deudas antiguas."
+    "textoContexto": "Auditamos el historial del SIMIT para solicitar la nulidad de deudas antiguas.",
+    "seoIntro": "En Madrid, cientos de conductores confían en nosotros para impugnar comparendos por SOAT, Pico y Placa y velocidad. Nuestra auditoría verifica paso a paso si la Secretaría de Movilidad de Madrid cumplió con los tiempos legales de notificación según la Ley 1843. Déjanos tus datos y un abogado experto de nuestro equipo se contactará contigo.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Madrid",
+      "addressLocality": "Madrid",
+      "addressRegion": "Cundinamarca",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "cajica",
     "nombre": "Cajicá",
     "departamento": "Cundinamarca",
     "entidadTransito": "Secretaría de Movilidad de Cajicá",
-    "textoContexto": "Operativos viales residenciales. Analizamos la tipificación del comparendo."
+    "textoContexto": "Operativos viales residenciales. Analizamos la tipificación del comparendo.",
+    "seoIntro": "Si recibiste una fotomulta o comparendo injusto en Cajicá, nuestro equipo de auditores jurídicos está listo para defenderte. Nos encargamos de radicar derechos de petición y tutelas directamente ante la Secretaría de Movilidad de Cajicá exigiendo la caducidad del proceso. No pagues sin antes consultar. Revisa tu estado con nosotros de forma 100% confidencial.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Cajicá",
+      "addressLocality": "Cajicá",
+      "addressRegion": "Cundinamarca",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "dosquebradas",
     "nombre": "Dosquebradas",
     "departamento": "Risaralda",
     "entidadTransito": "Secretaría de Tránsito y Movilidad de Dosquebradas",
-    "textoContexto": "Conurbación con Pereira. Evaluamos la identificación de fotodetectores locales."
+    "textoContexto": "Conurbación con Pereira. Evaluamos la identificación de fotodetectores locales.",
+    "seoIntro": "¿Problemas con embargos o multas de tránsito en Dosquebradas? En Desmulta somos expertos en prescripción y caducidad legal. Si la Secretaría de Tránsito y Movilidad de Dosquebradas vulneró tu derecho al debido proceso, exigimos la exoneración inmediata y el desembargo de tus cuentas. El tiempo corre en tu contra; actúa ahora y solicita tu revisión de expediente.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Dosquebradas",
+      "addressLocality": "Dosquebradas",
+      "addressRegion": "Risaralda",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "santa-rosa-de-cabal",
     "nombre": "Santa Rosa de Cabal",
     "departamento": "Risaralda",
     "entidadTransito": "Dirección de Tránsito y Transporte de Santa Rosa de Cabal",
-    "textoContexto": "Infracciones de paso turístico. Exigimos el debido proceso en notificaciones."
+    "textoContexto": "Infracciones de paso turístico. Exigimos el debido proceso en notificaciones.",
+    "seoIntro": "Evita dolores de cabeza con las secretarías de tránsito en Santa Rosa de Cabal. Analizamos tu caso sin costo para encontrar vicios de nulidad. Conocemos al detalle cómo opera la Dirección de Tránsito y Transporte de Santa Rosa de Cabal y utilizamos las sentencias de la Corte Constitucional a tu favor. Haz clic aquí para que uno de nuestros especialistas analice tu comparendo.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Santa Rosa de Cabal",
+      "addressLocality": "Santa Rosa de Cabal",
+      "addressRegion": "Risaralda",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "cartago",
     "nombre": "Cartago",
     "departamento": "Valle del Cauca",
     "entidadTransito": "Secretaría de Movilidad y Tránsito de Cartago",
-    "textoContexto": "Nodos de paso interdepartamental. Aplicamos prescripciones y caducidades oportunas."
+    "textoContexto": "Nodos de paso interdepartamental. Aplicamos prescripciones y caducidades oportunas.",
+    "seoIntro": "Una fotomulta en Cartago no tiene por qué arruinar tu historial financiero. Te brindamos defensa técnica especializada. El proceso de impugnación contra la Secretaría de Movilidad y Tránsito de Cartago requiere experticia legal que nosotros garantizamos desde el primer día. Agenda hoy tu consulta gratuita y recupera tu paz mental.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Cartago",
+      "addressLocality": "Cartago",
+      "addressRegion": "Valle del Cauca",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "yumbo",
     "nombre": "Yumbo",
     "departamento": "Valle del Cauca",
     "entidadTransito": "Secretaría de Tránsito y Transporte de Yumbo",
-    "textoContexto": "Controles de carga industrial. Apelamos comparendos mal impuestos."
+    "textoContexto": "Controles de carga industrial. Apelamos comparendos mal impuestos.",
+    "seoIntro": "En Yumbo, cientos de conductores confían en nosotros para impugnar comparendos por SOAT, Pico y Placa y velocidad. Nuestra auditoría verifica paso a paso si la Secretaría de Tránsito y Transporte de Yumbo cumplió con los tiempos legales de notificación según la Ley 1843. Déjanos tus datos y un abogado experto de nuestro equipo se contactará contigo.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Yumbo",
+      "addressLocality": "Yumbo",
+      "addressRegion": "Valle del Cauca",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "jamundi",
     "nombre": "Jamundí",
     "departamento": "Valle del Cauca",
     "entidadTransito": "Secretaría de Movilidad de Jamundí",
-    "textoContexto": "Fotomultas al sur de Cali. Impugnamos infracciones que vulneran términos."
+    "textoContexto": "Fotomultas al sur de Cali. Impugnamos infracciones que vulneran términos.",
+    "seoIntro": "Si recibiste una fotomulta o comparendo injusto en Jamundí, nuestro equipo de auditores jurídicos está listo para defenderte. Nos encargamos de radicar derechos de petición y tutelas directamente ante la Secretaría de Movilidad de Jamundí exigiendo la caducidad del proceso. No pagues sin antes consultar. Revisa tu estado con nosotros de forma 100% confidencial.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Jamundí",
+      "addressLocality": "Jamundí",
+      "addressRegion": "Valle del Cauca",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "maicao",
     "nombre": "Maicao",
     "departamento": "La Guajira",
     "entidadTransito": "Dirección de Tránsito y Transporte de Maicao",
-    "textoContexto": "Cobros coactivos en zona de frontera sin debida notificación física previa."
+    "textoContexto": "Cobros coactivos en zona de frontera sin debida notificación física previa.",
+    "seoIntro": "¿Problemas con embargos o multas de tránsito en Maicao? En Desmulta somos expertos en prescripción y caducidad legal. Si la Dirección de Tránsito y Transporte de Maicao vulneró tu derecho al debido proceso, exigimos la exoneración inmediata y el desembargo de tus cuentas. El tiempo corre en tu contra; actúa ahora y solicita tu revisión de expediente.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Maicao",
+      "addressLocality": "Maicao",
+      "addressRegion": "La Guajira",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "aguachica",
     "nombre": "Aguachica",
     "departamento": "Cesar",
     "entidadTransito": "Instituto Municipal de Tránsito y Transporte de Aguachica (IMTTA)",
-    "textoContexto": "Auditamos comparendos físicos para detectar errores materiales insalvables."
+    "textoContexto": "Auditamos comparendos físicos para detectar errores materiales insalvables.",
+    "seoIntro": "Evita dolores de cabeza con las secretarías de tránsito en Aguachica. Analizamos tu caso sin costo para encontrar vicios de nulidad. Conocemos al detalle cómo opera la Instituto Municipal de Tránsito y Transporte de Aguachica (IMTTA) y utilizamos las sentencias de la Corte Constitucional a tu favor. Haz clic aquí para que uno de nuestros especialistas analice tu comparendo.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Aguachica",
+      "addressLocality": "Aguachica",
+      "addressRegion": "Cesar",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "ocana",
     "nombre": "Ocaña",
     "departamento": "Norte de Santander",
     "entidadTransito": "Secretaría de Movilidad y Tránsito de Ocaña",
-    "textoContexto": "Revisamos comparendos antiguos para anular cobros abusivos de intereses."
+    "textoContexto": "Revisamos comparendos antiguos para anular cobros abusivos de intereses.",
+    "seoIntro": "Una fotomulta en Ocaña no tiene por qué arruinar tu historial financiero. Te brindamos defensa técnica especializada. El proceso de impugnación contra la Secretaría de Movilidad y Tránsito de Ocaña requiere experticia legal que nosotros garantizamos desde el primer día. Agenda hoy tu consulta gratuita y recupera tu paz mental.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Ocaña",
+      "addressLocality": "Ocaña",
+      "addressRegion": "Norte de Santander",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "villa-del-rosario",
     "nombre": "Villa del Rosario",
     "departamento": "Norte de Santander",
     "entidadTransito": "Dirección de Tránsito y Transporte de Villa del Rosario",
-    "textoContexto": "Controles en eje de frontera. Anulamos cobros coactivos mal notificados."
+    "textoContexto": "Controles en eje de frontera. Anulamos cobros coactivos mal notificados.",
+    "seoIntro": "En Villa del Rosario, cientos de conductores confían en nosotros para impugnar comparendos por SOAT, Pico y Placa y velocidad. Nuestra auditoría verifica paso a paso si la Dirección de Tránsito y Transporte de Villa del Rosario cumplió con los tiempos legales de notificación según la Ley 1843. Déjanos tus datos y un abogado experto de nuestro equipo se contactará contigo.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Villa del Rosario",
+      "addressLocality": "Villa del Rosario",
+      "addressRegion": "Norte de Santander",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "los-patios",
     "nombre": "Los Patios",
     "departamento": "Norte de Santander",
     "entidadTransito": "Secretaría de Tránsito de Los Patios",
-    "textoContexto": "Fotomultas por velocidad en área metropolitana. Exigimos Sentencia C-038."
+    "textoContexto": "Fotomultas por velocidad en área metropolitana. Exigimos Sentencia C-038.",
+    "seoIntro": "Si recibiste una fotomulta o comparendo injusto en Los Patios, nuestro equipo de auditores jurídicos está listo para defenderte. Nos encargamos de radicar derechos de petición y tutelas directamente ante la Secretaría de Tránsito de Los Patios exigiendo la caducidad del proceso. No pagues sin antes consultar. Revisa tu estado con nosotros de forma 100% confidencial.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Los Patios",
+      "addressLocality": "Los Patios",
+      "addressRegion": "Norte de Santander",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "magangue",
     "nombre": "Magangué",
     "departamento": "Bolívar",
     "entidadTransito": "Fondo de Tránsito y Transporte de Magangué",
-    "textoContexto": "Nulidad de comparendos locales que carecen de notificación en dirección física."
+    "textoContexto": "Nulidad de comparendos locales que carecen de notificación en dirección física.",
+    "seoIntro": "¿Problemas con embargos o multas de tránsito en Magangué? En Desmulta somos expertos en prescripción y caducidad legal. Si la Fondo de Tránsito y Transporte de Magangué vulneró tu derecho al debido proceso, exigimos la exoneración inmediata y el desembargo de tus cuentas. El tiempo corre en tu contra; actúa ahora y solicita tu revisión de expediente.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Magangué",
+      "addressLocality": "Magangué",
+      "addressRegion": "Bolívar",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "turbaco",
     "nombre": "Turbaco",
     "departamento": "Bolívar",
     "entidadTransito": "Secretaría de Tránsito y Transporte de Turbaco",
-    "textoContexto": "Alta densidad de fotodetectores. Impugnamos infracciones sin notificación física."
+    "textoContexto": "Alta densidad de fotodetectores. Impugnamos infracciones sin notificación física.",
+    "seoIntro": "Evita dolores de cabeza con las secretarías de tránsito en Turbaco. Analizamos tu caso sin costo para encontrar vicios de nulidad. Conocemos al detalle cómo opera la Secretaría de Tránsito y Transporte de Turbaco y utilizamos las sentencias de la Corte Constitucional a tu favor. Haz clic aquí para que uno de nuestros especialistas analice tu comparendo.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Turbaco",
+      "addressLocality": "Turbaco",
+      "addressRegion": "Bolívar",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "el-carmen-de-bolivar",
     "nombre": "El Carmen de Bolívar",
     "departamento": "Bolívar",
     "entidadTransito": "Secretaría de Tránsito y Transporte de El Carmen de Bolívar",
-    "textoContexto": "Controles en vías nacionales de carga. Apelamos fotomultas por velocidad."
+    "textoContexto": "Controles en vías nacionales de carga. Apelamos fotomultas por velocidad.",
+    "seoIntro": "Una fotomulta en El Carmen de Bolívar no tiene por qué arruinar tu historial financiero. Te brindamos defensa técnica especializada. El proceso de impugnación contra la Secretaría de Tránsito y Transporte de El Carmen de Bolívar requiere experticia legal que nosotros garantizamos desde el primer día. Agenda hoy tu consulta gratuita y recupera tu paz mental.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en El Carmen de Bolívar",
+      "addressLocality": "El Carmen de Bolívar",
+      "addressRegion": "Bolívar",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "cienaga",
     "nombre": "Ciénaga",
     "departamento": "Magdalena",
     "entidadTransito": "Instituto de Tránsito y Transporte de Ciénaga (Intraciénaga)",
-    "textoContexto": "Vigilancia en la Troncal del Caribe. Auditamos fotomultas por velocidad."
+    "textoContexto": "Vigilancia en la Troncal del Caribe. Auditamos fotomultas por velocidad.",
+    "seoIntro": "En Ciénaga, cientos de conductores confían en nosotros para impugnar comparendos por SOAT, Pico y Placa y velocidad. Nuestra auditoría verifica paso a paso si la Instituto de Tránsito y Transporte de Ciénaga (Intraciénaga) cumplió con los tiempos legales de notificación según la Ley 1843. Déjanos tus datos y un abogado experto de nuestro equipo se contactará contigo.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Ciénaga",
+      "addressLocality": "Ciénaga",
+      "addressRegion": "Magdalena",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "fundacion",
     "nombre": "Fundación",
     "departamento": "Magdalena",
     "entidadTransito": "Secretaría de Tránsito de Fundación",
-    "textoContexto": "Infracciones de paso nacional. Analizamos caducidades por falta de resolución."
+    "textoContexto": "Infracciones de paso nacional. Analizamos caducidades por falta de resolución.",
+    "seoIntro": "Si recibiste una fotomulta o comparendo injusto en Fundación, nuestro equipo de auditores jurídicos está listo para defenderte. Nos encargamos de radicar derechos de petición y tutelas directamente ante la Secretaría de Tránsito de Fundación exigiendo la caducidad del proceso. No pagues sin antes consultar. Revisa tu estado con nosotros de forma 100% confidencial.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Fundación",
+      "addressLocality": "Fundación",
+      "addressRegion": "Magdalena",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "lorica",
     "nombre": "Lorica",
     "departamento": "Córdoba",
     "entidadTransito": "Secretaría de Tránsito de Lorica",
-    "textoContexto": "Eliminamos cobros antiguos sin debido proceso de notificación en Córdoba."
+    "textoContexto": "Eliminamos cobros antiguos sin debido proceso de notificación en Córdoba.",
+    "seoIntro": "¿Problemas con embargos o multas de tránsito en Lorica? En Desmulta somos expertos en prescripción y caducidad legal. Si la Secretaría de Tránsito de Lorica vulneró tu derecho al debido proceso, exigimos la exoneración inmediata y el desembargo de tus cuentas. El tiempo corre en tu contra; actúa ahora y solicita tu revisión de expediente.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Lorica",
+      "addressLocality": "Lorica",
+      "addressRegion": "Córdoba",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "cerete",
     "nombre": "Cereté",
     "departamento": "Córdoba",
     "entidadTransito": "Secretaría de Tránsito de Cereté",
-    "textoContexto": "Operativos metropolitanos. Estudiamos viabilidad de exoneración de la multa."
+    "textoContexto": "Operativos metropolitanos. Estudiamos viabilidad de exoneración de la multa.",
+    "seoIntro": "Evita dolores de cabeza con las secretarías de tránsito en Cereté. Analizamos tu caso sin costo para encontrar vicios de nulidad. Conocemos al detalle cómo opera la Secretaría de Tránsito de Cereté y utilizamos las sentencias de la Corte Constitucional a tu favor. Haz clic aquí para que uno de nuestros especialistas analice tu comparendo.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Cereté",
+      "addressLocality": "Cereté",
+      "addressRegion": "Córdoba",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "ipiales",
     "nombre": "Ipiales",
     "departamento": "Nariño",
     "entidadTransito": "Secretaría de Movilidad de Ipiales",
-    "textoContexto": "Infracciones a turistas de paso en frontera sur. Garantizamos plazos de ley."
+    "textoContexto": "Infracciones a turistas de paso en frontera sur. Garantizamos plazos de ley.",
+    "seoIntro": "Una fotomulta en Ipiales no tiene por qué arruinar tu historial financiero. Te brindamos defensa técnica especializada. El proceso de impugnación contra la Secretaría de Movilidad de Ipiales requiere experticia legal que nosotros garantizamos desde el primer día. Agenda hoy tu consulta gratuita y recupera tu paz mental.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Ipiales",
+      "addressLocality": "Ipiales",
+      "addressRegion": "Nariño",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "tumaco",
     "nombre": "Tumaco",
     "departamento": "Nariño",
     "entidadTransito": "Secretaría de Movilidad y Seguridad Vial de Tumaco",
-    "textoContexto": "Procesos contravencionales locales. Certificamos nulidad de multas sin soporte."
+    "textoContexto": "Procesos contravencionales locales. Certificamos nulidad de multas sin soporte.",
+    "seoIntro": "En Tumaco, cientos de conductores confían en nosotros para impugnar comparendos por SOAT, Pico y Placa y velocidad. Nuestra auditoría verifica paso a paso si la Secretaría de Movilidad y Seguridad Vial de Tumaco cumplió con los tiempos legales de notificación según la Ley 1843. Déjanos tus datos y un abogado experto de nuestro equipo se contactará contigo.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Tumaco",
+      "addressLocality": "Tumaco",
+      "addressRegion": "Nariño",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "santander-de-quilichao",
     "nombre": "Santander de Quilichao",
     "departamento": "Cauca",
     "entidadTransito": "Secretaría de Movilidad de Santander de Quilichao",
-    "textoContexto": "Regulamos el debido proceso en fotodetectores y comparendos físicos locales."
+    "textoContexto": "Regulamos el debido proceso en fotodetectores y comparendos físicos locales.",
+    "seoIntro": "Si recibiste una fotomulta o comparendo injusto en Santander de Quilichao, nuestro equipo de auditores jurídicos está listo para defenderte. Nos encargamos de radicar derechos de petición y tutelas directamente ante la Secretaría de Movilidad de Santander de Quilichao exigiendo la caducidad del proceso. No pagues sin antes consultar. Revisa tu estado con nosotros de forma 100% confidencial.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Santander de Quilichao",
+      "addressLocality": "Santander de Quilichao",
+      "addressRegion": "Cauca",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "espinal",
     "nombre": "Espinal",
     "departamento": "Tolima",
     "entidadTransito": "Dirección Administrativa de Tránsito y Transporte de El Espinal",
-    "textoContexto": "Nodo de conexión nacional. Limpiamos historial de multas viciadas."
+    "textoContexto": "Nodo de conexión nacional. Limpiamos historial de multas viciadas.",
+    "seoIntro": "¿Problemas con embargos o multas de tránsito en Espinal? En Desmulta somos expertos en prescripción y caducidad legal. Si la Dirección Administrativa de Tránsito y Transporte de El Espinal vulneró tu derecho al debido proceso, exigimos la exoneración inmediata y el desembargo de tus cuentas. El tiempo corre en tu contra; actúa ahora y solicita tu revisión de expediente.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Espinal",
+      "addressLocality": "Espinal",
+      "addressRegion": "Tolima",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "melgar",
     "nombre": "Melgar",
     "departamento": "Tolima",
     "entidadTransito": "Secretaría de Tránsito de Melgar",
-    "textoContexto": "Congestión de fines de semana. Apelamos fallas en entrega de comparendos."
+    "textoContexto": "Congestión de fines de semana. Apelamos fallas en entrega de comparendos.",
+    "seoIntro": "Evita dolores de cabeza con las secretarías de tránsito en Melgar. Analizamos tu caso sin costo para encontrar vicios de nulidad. Conocemos al detalle cómo opera la Secretaría de Tránsito de Melgar y utilizamos las sentencias de la Corte Constitucional a tu favor. Haz clic aquí para que uno de nuestros especialistas analice tu comparendo.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Melgar",
+      "addressLocality": "Melgar",
+      "addressRegion": "Tolima",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "pitalito",
     "nombre": "Pitalito",
     "departamento": "Huila",
     "entidadTransito": "Secretaría de Tránsito y Transporte de Pitalito",
-    "textoContexto": "Operativos de comercio en sur de Huila. Auditamos vigencia y caducidad."
+    "textoContexto": "Operativos de comercio en sur de Huila. Auditamos vigencia y caducidad.",
+    "seoIntro": "Una fotomulta en Pitalito no tiene por qué arruinar tu historial financiero. Te brindamos defensa técnica especializada. El proceso de impugnación contra la Secretaría de Tránsito y Transporte de Pitalito requiere experticia legal que nosotros garantizamos desde el primer día. Agenda hoy tu consulta gratuita y recupera tu paz mental.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Pitalito",
+      "addressLocality": "Pitalito",
+      "addressRegion": "Huila",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "san-gil",
     "nombre": "San Gil",
     "departamento": "Santander",
     "entidadTransito": "Secretaría de Tránsito y Transporte de San Gil",
-    "textoContexto": "Infracciones en vía de paso nacional. Apelamos fallas de tipicidad."
+    "textoContexto": "Infracciones en vía de paso nacional. Apelamos fallas de tipicidad.",
+    "seoIntro": "En San Gil, cientos de conductores confían en nosotros para impugnar comparendos por SOAT, Pico y Placa y velocidad. Nuestra auditoría verifica paso a paso si la Secretaría de Tránsito y Transporte de San Gil cumplió con los tiempos legales de notificación según la Ley 1843. Déjanos tus datos y un abogado experto de nuestro equipo se contactará contigo.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en San Gil",
+      "addressLocality": "San Gil",
+      "addressRegion": "Santander",
+      "addressCountry": "CO"
+    }
   },
   {
     "slug": "aguazul",
     "nombre": "Aguazul",
     "departamento": "Casanare",
     "entidadTransito": "Secretaría de Tránsito y Transporte de Aguazul",
-    "textoContexto": "Control de transporte pesado. Verificamos el debido proceso legal en la región."
+    "textoContexto": "Control de transporte pesado. Verificamos el debido proceso legal en la región.",
+    "seoIntro": "Si recibiste una fotomulta o comparendo injusto en Aguazul, nuestro equipo de auditores jurídicos está listo para defenderte. Nos encargamos de radicar derechos de petición y tutelas directamente ante la Secretaría de Tránsito y Transporte de Aguazul exigiendo la caducidad del proceso. No pagues sin antes consultar. Revisa tu estado con nosotros de forma 100% confidencial.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Sede Virtual - Cobertura Legal en Aguazul",
+      "addressLocality": "Aguazul",
+      "addressRegion": "Casanare",
+      "addressCountry": "CO"
+    }
   }
 ]

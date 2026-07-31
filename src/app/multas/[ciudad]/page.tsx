@@ -68,6 +68,14 @@ export default async function MultasCiudadPage(props: Props) {
               },
             },
             serviceType: 'Defensa legal contra multas de tránsito',
+            telephone: '+573005648309',
+            address: (ciudad as any).address || {
+              '@type': 'PostalAddress',
+              streetAddress: 'Sede Virtual',
+              addressLocality: ciudad.nombre,
+              addressRegion: ciudad.departamento,
+              addressCountry: 'CO'
+            },
             provider: {
               '@type': 'Organization',
               name: 'Desmulta',
@@ -79,6 +87,42 @@ export default async function MultasCiudadPage(props: Props) {
               priceCurrency: 'COP',
               description: 'Consulta inicial gratuita',
             },
+          }),
+        }}
+      />
+      {/* SEO: JSON-LD FAQPage */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: safeJsonLdStringify({
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: [
+              {
+                '@type': 'Question',
+                name: `¿Cómo impugnar una fotomulta en ${ciudad.nombre}?`,
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: `Para impugnar una fotomulta en ${ciudad.nombre}, debes solicitar una audiencia ante la ${ciudad.entidadTransito} dentro de los primeros 11 días hábiles siguientes a la notificación. Es crucial revisar si la notificación cumplió los tiempos establecidos en la Ley 1843.`,
+                },
+              },
+              {
+                '@type': 'Question',
+                name: `¿Cuándo caduca un comparendo en ${ciudad.nombre}?`,
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: `En ${ciudad.nombre} y toda Colombia, la caducidad ocurre si la ${ciudad.entidadTransito} no emite resolución sancionatoria dentro del año siguiente a la ocurrencia de la infracción, según el artículo 161 del Código Nacional de Tránsito.`,
+                },
+              },
+              {
+                '@type': 'Question',
+                name: `¿Qué pasa si me embargan cuentas por multas en ${ciudad.nombre}?`,
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: `Si la ${ciudad.entidadTransito} ordena un embargo, nuestro equipo de auditores jurídicos puede revisar el expediente para identificar vicios de nulidad y solicitar el levantamiento cautelar de las medidas.`,
+                },
+              }
+            ],
           }),
         }}
       />
@@ -122,11 +166,12 @@ export default async function MultasCiudadPage(props: Props) {
               </span>
             </h1>
 
-            <p className="text-xl text-white/60 mb-10 max-w-2xl mx-auto leading-relaxed">
-              {ciudad.textoContexto} Actúa antes de que la{' '}
-              <strong className="text-white">{ciudad.entidadTransito}</strong> inicie un proceso de
-              cobro coactivo.
-            </p>
+            {/* Texto dinámico SEO Programático */}
+            <div className="bg-black/50 p-6 rounded-2xl border border-white/5 mb-8">
+              <p className="text-muted-foreground leading-relaxed">
+                {ciudad.seoIntro || `Si recibiste una fotomulta o comparendo injusto en ${ciudad.nombre}, nuestro equipo de auditores jurídicos está listo para defenderte. Nuestra auditoría verifica paso a paso si la ${ciudad.entidadTransito} cumplió con los tiempos legales de notificación según la Ley 1843. No pagues sin antes consultar. Revisa tu estado con nosotros de forma 100% confidencial.`}
+              </p>
+            </div>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
