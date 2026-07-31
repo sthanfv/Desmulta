@@ -12,6 +12,11 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    match /config/{docId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
     match /site_config/{docId} {
       allow read: if true;
       allow write: if isAdmin();
