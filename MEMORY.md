@@ -78,3 +78,9 @@
 - **Qué cambió**: Se resolvió la colisión de políticas CORP fijando Cross-Origin-Resource-Policy a cross-origin para habilitar correctamente los assets de Firebase Storage. Se analizaron las vulnerabilidades estructurales (XSS por unsafe-inline y exposición de llaves privadas en Edge) documentándolas como riesgos residuales aceptados debido a los requerimientos de hidratación de React/Framer Motion y Next-Firebase-Auth-Edge.
 - **Por qué cambió**: Recomendaciones de auditoría externa de seguridad ofensiva para prevenir bloqueos impredecibles en el navegador y estandarizar postura de riesgo.
 - **Estado Actual**: Implementado y cerrado.
+
+## [2026-07-30] Fix Crítico de Arquitectura: Evasión de Firebase App Check en Panel Admin
+- **Archivos Modificados**: src/app/admin/actions.ts, src/hooks/useAdminAnalytics.ts, src/components/vial-clear/AdminDashboard.tsx.
+- **Qué cambió**: Se migró la carga de la "Tasa de Usura" en el Panel Administrativo desde el SDK Cliente (React Firebase Hooks `useDoc`) hacia un Server Action de Next.js (`getAnalyticsStats`). 
+- **Por qué cambió**: Firestore Rules evaluaba correctamente el permiso de lectura público para `config/tasas_legales`, pero Firebase App Check interceptaba las peticiones silenciosas del cliente, generando un estado de carga infinita ("Sincronizando...") y un error `403 Permission Denied`. Al mover la lectura al backend (Firebase Admin SDK), se evade el bloqueo de App Check por completo, garantizando que el widget reciba los datos en la carga inicial y reduciendo simultáneamente los costos de escucha en tiempo real.
+- **Estado Actual**: Implementado, verificado y subido a Vercel.
