@@ -1033,7 +1033,7 @@ const getCachedAnalyticsStats = unstable_cache(
       .toISOString()
       .split('T')[0];
 
-    const [rawLeadsSnap, casesCountSnap, globalMetricsSnap, dailyMetricsSnap] = await Promise.all([
+    const [rawLeadsSnap, casesCountSnap, globalMetricsSnap, dailyMetricsSnap, tasasSnap] = await Promise.all([
       db.collection('leads').count().get(),
       db.collection('cases').count().get(),
       db.collection('system_metrics').where('type', '==', 'global').get(),
@@ -1042,6 +1042,7 @@ const getCachedAnalyticsStats = unstable_cache(
         .where('type', '==', 'daily')
         .where('date', '>=', thirtyDaysAgoStr)
         .get(),
+      db.collection('config').doc('tasas_legales').get(),
     ]);
 
     const prospectosTotales = rawLeadsSnap.data().count;
@@ -1178,6 +1179,19 @@ const getCachedAnalyticsStats = unstable_cache(
       averageResolutionTime = 'N/A';
     }
 
+    // ── Extraer Tasas Legales ───────────────────────────────────────────────────
+    let tasasData = null;
+    if (tasasSnap.exists) {
+      const td = tasasSnap.data();
+      if (td) {
+        tasasData = {
+          usuraEA: td.usuraEA || null,
+          updatedAt: td.updatedAt ? td.updatedAt.toDate().toISOString() : null,
+          history: td.history || [],
+        };
+      }
+    }
+
     return {
       prospectosTotales,
       totalLeads,
@@ -1190,6 +1204,7 @@ const getCachedAnalyticsStats = unstable_cache(
       infractionData,
       funnelData,
       geminiRequestsToday,
+      tasasData,
     };
   },
   ['admin-analytics-stats'],

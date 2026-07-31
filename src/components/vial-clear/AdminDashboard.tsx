@@ -253,16 +253,6 @@ export function AdminDashboard() {
     facebookUrl: string;
   }>(footerRef, { suppressGlobalError: true });
 
-  const tasasRef = useMemoFirebase(
-    () => (firestore ? doc(firestore, 'config', 'tasas_legales') : null),
-    [firestore]
-  );
-  const { data: tasasData } = useDoc<{
-    usuraEA: number;
-    updatedAt: any;
-    history: any[];
-  }>(tasasRef, { suppressGlobalError: true });
-
   const {
     leadsParaKanban,
     casosParaKanban,
@@ -792,7 +782,7 @@ export function AdminDashboard() {
               data={analyticsData}
               isLoading={isAnalyticsLoading}
               error={analyticsError}
-              tasasData={tasasData}
+              tasasData={analyticsData?.tasasData}
             />
           </TabsContent>
 

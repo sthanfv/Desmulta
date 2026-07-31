@@ -17,6 +17,11 @@ export interface AnalyticsData {
   statusData: { name: string; value: number }[];
   infractionData: { name: string; value: number }[];
   funnelData?: { name: string; value: number; fill: string }[];
+  tasasData?: {
+    usuraEA: number;
+    updatedAt: string | null;
+    history: any[];
+  } | null;
 }
 
 export function useAdminAnalytics(idToken: string | null) {
