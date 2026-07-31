@@ -1,0 +1,1 @@
+fetch('http://localhost:9005/api/cron/sync-usura', { method: 'POST', headers: { 'Authorization': 'Bearer test-secret', 'Content-Type': 'application/json' }, body: JSON.stringify({ rate: 0.2879 }) }).then(r => r.json()).then(console.log).catch(console.error)

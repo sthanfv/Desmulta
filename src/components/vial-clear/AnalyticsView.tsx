@@ -2,6 +2,7 @@
 import React, { useMemo } from 'react';
 import { FirebaseConsumptionWidget } from '@/app/admin/components/FirebaseConsumptionWidget';
 import { GeminiConsumptionWidget } from '@/app/admin/components/GeminiConsumptionWidget';
+import { TasasLegalesWidget } from '@/app/admin/components/TasasLegalesWidget';
 import {
   BarChart,
   Bar,
@@ -138,9 +139,14 @@ interface AnalyticsViewProps {
   data: AnalyticsData | null;
   isLoading: boolean;
   error?: string | null;
+  tasasData?: {
+    usuraEA: number;
+    updatedAt: any;
+    history: any[];
+  };
 }
 
-export function AnalyticsView({ data, isLoading, error }: AnalyticsViewProps) {
+export function AnalyticsView({ data, isLoading, error, tasasData }: AnalyticsViewProps) {
   // Formato para eje X de fechas
   const growthData = data?.growthData;
   const formattedGrowthData = useMemo(() => {
@@ -173,10 +179,11 @@ export function AnalyticsView({ data, isLoading, error }: AnalyticsViewProps) {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
-      {/* ── Widgets de Consumo (Bases de datos e IA) ── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* ── Widgets de Consumo y Configuración ── */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <FirebaseConsumptionWidget totalLeads={data.totalLeads} />
         <GeminiConsumptionWidget requestsToday={data.geminiRequestsToday || 0} />
+        <TasasLegalesWidget tasasData={tasasData} />
       </div>
       {/* ── KPIs ── */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
