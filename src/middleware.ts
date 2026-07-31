@@ -87,7 +87,7 @@ export async function middleware(request: NextRequest) {
 
   const userAgent = request.headers.get('user-agent') || '';
   const isBot =
-    /Googlebot|bingbot|yandex|baiduspider|twitterbot|facebookexternalhit|rogerbot|linkedinbot|embedly|quora link preview|showyoubot|outbrain|pinterest|slackbot|vkShare|W3C_Validator|whatsapp|OAI-SearchBot|PerplexityBot/i.test(
+    /Googlebot|Google-InspectionTool|bingbot|yandex|baiduspider|twitterbot|facebookexternalhit|rogerbot|linkedinbot|embedly|quora link preview|showyoubot|outbrain|pinterest|slackbot|vkShare|W3C_Validator|whatsapp|OAI-SearchBot|PerplexityBot/i.test(
       userAgent
     );
 
