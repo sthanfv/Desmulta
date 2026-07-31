@@ -354,3 +354,68 @@ export async function sendTelegramPushError(
     return false;
   }
 }
+
+/**
+ * sendTelegramCronSuccess — Notifica al equipo cuando el Cron Job actualiza
+ * la Tasa de Usura en la base de datos (Firestore).
+ */
+export async function sendTelegramCronSuccess(rate: number): Promise<boolean> {
+  const { TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID } = process.env;
+  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) return false;
+
+  try {
+    const message = `🤖 <b>CRON JOB: TASA DE USURA ACTUALIZADA</b>
+━━━━━━━━━━━━━━━━━━━━
+📅 <b>Fecha de Sincronización:</b> ${new Date().toLocaleString('es-CO', { timeZone: 'America/Bogota' })}
+📊 <b>Nueva Tasa E.A.:</b> <code>${(rate * 100).toFixed(2)}%</code>
+
+✅ Guardado exitosamente en Firestore. El Motor Go utilizará esta tasa a partir de este instante.
+━━━━━━━━━━━━━━━━━━━━`;
+
+    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        text: message,
+        parse_mode: 'HTML',
+      }),
+    });
+    return true;
+  } catch (err) {
+    logger.error('[telegram-service] Error enviando éxito de Cron:', err);
+    return false;
+  }
+}
+
+/**
+ * sendTelegramCronError — Notifica al equipo si el Cron Job falla.
+ */
+export async function sendTelegramCronError(errorMsg: string): Promise<boolean> {
+  const { TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID } = process.env;
+  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) return false;
+
+  try {
+    const message = `🚨 <b>ALERTA DE SISTEMA: CRON JOB FALLIDO</b>
+━━━━━━━━━━━━━━━━━━━━
+<b>Proceso:</b> Sincronización de Tasa de Usura
+<b>Error:</b> <code>${escapeHtml(errorMsg)}</code>
+
+⚠️ <i>Se requiere intervención manual. Por favor actualiza la tasa directamente desde el panel de administración o verifica la conexión con la API externa.</i>
+━━━━━━━━━━━━━━━━━━━━`;
+
+    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        text: message,
+        parse_mode: 'HTML',
+      }),
+    });
+    return true;
+  } catch (err) {
+    logger.error('[telegram-service] Error enviando alerta de Cron:', err);
+    return false;
+  }
+}
