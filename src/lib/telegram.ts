@@ -360,8 +360,8 @@ export async function sendTelegramPushError(
  * la Tasa de Usura en la base de datos (Firestore).
  */
 export async function sendTelegramCronSuccess(rate: number): Promise<boolean> {
-  const { TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID } = process.env;
-  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) return false;
+  const { TELEGRAM_BOT_TOKEN, TELEGRAM_DEV_CHAT_ID } = process.env;
+  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_DEV_CHAT_ID) return false;
 
   try {
     const message = `🤖 <b>CRON JOB: TASA DE USURA ACTUALIZADA</b>
@@ -376,7 +376,7 @@ export async function sendTelegramCronSuccess(rate: number): Promise<boolean> {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        chat_id: TELEGRAM_CHAT_ID,
+        chat_id: TELEGRAM_DEV_CHAT_ID,
         text: message,
         parse_mode: 'HTML',
       }),
@@ -392,8 +392,8 @@ export async function sendTelegramCronSuccess(rate: number): Promise<boolean> {
  * sendTelegramCronError — Notifica al equipo si el Cron Job falla.
  */
 export async function sendTelegramCronError(errorMsg: string): Promise<boolean> {
-  const { TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID } = process.env;
-  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) return false;
+  const { TELEGRAM_BOT_TOKEN, TELEGRAM_DEV_CHAT_ID } = process.env;
+  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_DEV_CHAT_ID) return false;
 
   try {
     const message = `🚨 <b>ALERTA DE SISTEMA: CRON JOB FALLIDO</b>
@@ -408,7 +408,7 @@ export async function sendTelegramCronError(errorMsg: string): Promise<boolean> 
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        chat_id: TELEGRAM_CHAT_ID,
+        chat_id: TELEGRAM_DEV_CHAT_ID,
         text: message,
         parse_mode: 'HTML',
       }),
