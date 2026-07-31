@@ -253,6 +253,16 @@ export function AdminDashboard() {
     facebookUrl: string;
   }>(footerRef, { suppressGlobalError: true });
 
+  const tasasRef = useMemoFirebase(
+    () => (firestore ? doc(firestore, 'config', 'tasas_legales') : null),
+    [firestore]
+  );
+  const { data: tasasData } = useDoc<{
+    usuraEA: number;
+    updatedAt: any;
+    history: any[];
+  }>(tasasRef, { suppressGlobalError: true });
+
   const {
     leadsParaKanban,
     casosParaKanban,
@@ -798,6 +808,38 @@ export function AdminDashboard() {
 
         {/* ── Divider ── */}
         <div className="h-px bg-border/40" />
+
+        {/* ── Tasas Legales ── */}
+        <SectionCard>
+          <SectionHeader
+            icon={<BarChart3 size={16} />}
+            title="Tasas Legales y Financieras"
+            description="La Tasa de Usura es administrada y actualizada automáticamente por un Cron Job."
+          />
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 rounded-xl bg-muted/30 border border-border/50 gap-4">
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">
+                Tasa de Usura Actual (E.A.)
+              </p>
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-bold tracking-tight">
+                  {tasasData?.usuraEA ? (tasasData.usuraEA * 100).toFixed(2) : '---'}%
+                </span>
+                <span className="text-xs text-muted-foreground">Efectivo Anual</span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                Última actualización:{' '}
+                {tasasData?.updatedAt?.toDate
+                  ? tasasData.updatedAt.toDate().toLocaleString('es-CO')
+                  : 'Sincronizando...'}
+              </p>
+            </div>
+            <div className="bg-primary/10 text-primary border border-primary/20 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+              Sincronización Automática Activa
+            </div>
+          </div>
+        </SectionCard>
 
         {/* ── Showcase Config ── */}
         <SectionCard>
