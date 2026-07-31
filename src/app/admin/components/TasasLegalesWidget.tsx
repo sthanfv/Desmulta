@@ -9,7 +9,7 @@ interface TasasLegalesWidgetProps {
     usuraEA: number;
     updatedAt: any;
     history: any[];
-  } | undefined;
+  } | undefined | null;
 }
 
 export function TasasLegalesWidget({ tasasData }: TasasLegalesWidgetProps) {

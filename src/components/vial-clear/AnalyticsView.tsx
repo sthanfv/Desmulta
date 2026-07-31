@@ -143,7 +143,7 @@ interface AnalyticsViewProps {
     usuraEA: number;
     updatedAt: any;
     history: any[];
-  };
+  } | null;
 }
 
 export function AnalyticsView({ data, isLoading, error, tasasData }: AnalyticsViewProps) {
