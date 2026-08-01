@@ -105,7 +105,9 @@ export async function POST(req: NextRequest) {
   const db = getFirestore(getAdminApp());
 
   // 3. Generar llave de idempotencia y verificar existencia de orden previa
-  const requestFingerprint = `${cedula}-${productType}-${caseData.shortId}`;
+  // FIX: Se remueve caseData.shortId del fingerprint porque al depender de Date.now()
+  // en el frontend, invalidaba la protección contra doble-clics.
+  const requestFingerprint = `${cedula}-${productType}`;
   const idempotencyKey = createHash('sha256').update(requestFingerprint).digest('hex');
 
   const integritySecret = process.env.WOMPI_INTEGRITY_SECRET;
