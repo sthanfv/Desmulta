@@ -35,6 +35,7 @@ import { PurchaseDocument } from '@/lib/payments/purchase-document.types';
 // Constantes de seguridad y rendimiento
 const MAX_RETRIES_PER_RUN = 10;
 const GRACE_PERIOD_MINUTES = 15;
+const MAX_DELIVERY_ATTEMPTS = 5; // Evita starvation por poison pills
 
 async function handler(_req: NextRequest) {
   try {
@@ -71,12 +72,14 @@ async function handler(_req: NextRequest) {
     }
 
     const failedPurchases: PurchaseDocument[] = [];
-
-    // Filtrar en memoria las que NO tienen el campo pdfDeliveredAt
+    
+    // Filtrar en memoria las que NO tienen el campo pdfDeliveredAt y no han superado el límite de reintentos
     snapshot.forEach((docSnap) => {
       const data = docSnap.data() as PurchaseDocument;
-      if (!data.pdfDeliveredAt) {
+      if (!data.pdfDeliveredAt && (data.deliveryRetries || 0) < MAX_DELIVERY_ATTEMPTS) {
         failedPurchases.push(data);
+      } else if (!data.pdfDeliveredAt && (data.deliveryRetries || 0) >= MAX_DELIVERY_ATTEMPTS) {
+        logger.warn(`[dlq-pdf-delivery] Compra ${data.id} superó el límite de reintentos (${MAX_DELIVERY_ATTEMPTS}). Abandonando envío para evitar starvation.`);
       }
     });
 
@@ -96,6 +99,14 @@ async function handler(_req: NextRequest) {
           purchaseId: purchase.id,
           reference: purchase.wompiReference,
           err: String(err),
+        });
+        
+        // Incrementar el contador de reintentos para evitar poison pill starvation
+        const currentRetries = purchase.deliveryRetries || 0;
+        return db.collection('purchases').doc(purchase.id).update({
+          deliveryRetries: currentRetries + 1,
+        }).catch((updateErr) => {
+          logger.error(`[dlq-pdf-delivery] Error al incrementar deliveryRetries para ${purchase.id}`, { error: String(updateErr) });
         });
       });
     });

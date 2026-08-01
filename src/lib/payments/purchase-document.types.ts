@@ -113,4 +113,6 @@ export interface PurchaseDocument {
   pdfDeliveredAt?: Timestamp;
   /** Token de descarga temporal en Firestore (válido 72h, máx 3 descargas) */
   downloadToken?: string;
+  /** Contador de reintentos fallidos de entrega por la DLQ */
+  deliveryRetries?: number;
 }
