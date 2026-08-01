@@ -166,9 +166,15 @@ export default async function MultasCiudadPage(props: Props) {
               </span>
             </h1>
 
-            {/* Texto dinámico SEO Programático */}
-            <div className="bg-black/50 p-6 rounded-2xl border border-white/5 mb-8">
-              <p className="text-muted-foreground leading-relaxed">
+            {/* Texto dinámico SEO Programático con efecto Glassmorphism Premium */}
+            <div className="relative group overflow-hidden bg-white/5 p-8 md:p-10 rounded-3xl border border-white/10 mb-10 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] transition-all duration-500 hover:bg-white/10 hover:border-brand-500/30 hover:-translate-y-1">
+              {/* Decoración de luz interna */}
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[1px] bg-gradient-to-r from-transparent via-brand-500/50 to-transparent opacity-30 group-hover:opacity-100 transition-opacity duration-700"></div>
+              
+              {/* Efecto de resplandor (Glow) detrás del texto */}
+              <div className="absolute inset-0 bg-gradient-to-br from-brand-500/5 via-transparent to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+
+              <p className="relative z-10 text-white/80 leading-relaxed md:text-lg font-light">
                 {ciudad.seoIntro || `Si recibiste una fotomulta o comparendo injusto en ${ciudad.nombre}, nuestro equipo de auditores jurídicos está listo para defenderte. Nuestra auditoría verifica paso a paso si la ${ciudad.entidadTransito} cumplió con los tiempos legales de notificación según la Ley 1843. No pagues sin antes consultar. Revisa tu estado con nosotros de forma 100% confidencial.`}
               </p>
             </div>
