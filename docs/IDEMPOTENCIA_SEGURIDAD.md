@@ -29,6 +29,28 @@ En el flujo de checkout y compra del Derecho de Petición:
 
 ## 2. Idempotencia en la Creación de Órdenes (Capa API de Pago)
 
+El backend (`src/app/api/payments/create-order/route.ts`) es la barrera final y más estricta. Implementa una llave de idempotencia criptográfica:
+
+### A. Fingerprinting Determinista (SHA-256)
+Para asegurar que una misma intención de compra no genere dos enlaces de pago diferentes (lo que duplicaría cobros si el usuario lograba doble clic extremo), el backend genera un hash combinando estrictamente datos deterministas:
+- `Cédula del Infractor`
+- `Tipo de Producto` (ej. Derecho de Petición General)
+
+> [!WARNING]  
+> **Bug Histórico (Julio 2026):** Originalmente, el hash incluía un `shortId` generado en el cliente con `Date.now()`. Esto rompía el determinismo: dos clics separados por milisegundos tenían `shortId` diferentes, burlando la idempotencia. Esto fue solucionado eliminando el timestamp del hash.
+
+### B. Ventana de Idempotencia Temporal
+Antes de insertar la orden en Firebase, se ejecuta una consulta con bloqueo implícito:
+```typescript
+const prevOrder = await purchasesRef
+  .where('idempotencyKey', '==', idempotencyKey)
+  .where('createdAt', '>', OneHourAgo)
+  .where('status', '==', 'PENDING')
+  .limit(1)
+  .get();
+```
+Si existe una orden generada en la última hora, **se devuelve exactamente el mismo `wompiReference` y Link de Pago original**, abortando la creación. Esto hace imposible que Desmulta exponga al cliente a un doble cobro para la misma solicitud, cumpliendo con estándares transaccionales bancarios.
+
 Si un cliente lograra evadir la protección del frontend, el backend de Desmulta aplica idempotencia estricta en la generación de transacciones con la pasarela de pagos.
 
 ### A. Referencia Única de Alta Entropía (`create-order/route.ts`)
