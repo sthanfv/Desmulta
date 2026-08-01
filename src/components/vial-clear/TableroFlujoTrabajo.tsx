@@ -752,7 +752,9 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <button
-                      onClick={() => setFilterAssignee((prev) => (prev === 'mine' ? 'all' : 'mine'))}
+                      onClick={() =>
+                        setFilterAssignee((prev) => (prev === 'mine' ? 'all' : 'mine'))
+                      }
                       className={`flex flex-col items-center justify-center gap-1 min-w-[4.5rem] px-3 py-2.5 rounded-xl text-[10px] font-bold transition-all ${
                         filterAssignee === 'mine'
                           ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/20'
@@ -760,7 +762,9 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
                       }`}
                     >
                       <LayoutGrid className="w-4 h-4 shrink-0" />
-                      <span className="whitespace-nowrap leading-tight">{filterAssignee === 'mine' ? 'Mías' : 'Todas'}</span>
+                      <span className="whitespace-nowrap leading-tight">
+                        {filterAssignee === 'mine' ? 'Mías' : 'Todas'}
+                      </span>
                     </button>
                   </TooltipTrigger>
                   <TooltipContent>
@@ -772,6 +776,7 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <button
+                      title="Exportar a Excel"
                       onClick={() =>
                         setPinAuth({
                           isOpen: true,
@@ -1016,12 +1021,13 @@ export const TableroFlujoTrabajo = React.memo(function TableroFlujoTrabajo({
                   {filteredItems.filter((item: KanbanItem) => item.estado === columna.id).length ===
                   0 ? (
                     <div className="flex-1 border-2 border-dashed border-slate-200/50 dark:border-white/10 rounded-[1.5rem] flex items-center justify-center p-8 mt-4 bg-slate-50/30 dark:bg-black/10 flex-col gap-2">
-                      <p className="text-muted-foreground font-bold text-sm tracking-wide">
-                        Vacío
-                      </p>
-                      {allItems.filter((item: KanbanItem) => item.estado === columna.id).length > 0 && (
+                      <p className="text-muted-foreground font-bold text-sm tracking-wide">Vacío</p>
+                      {allItems.filter((item: KanbanItem) => item.estado === columna.id).length >
+                        0 && (
                         <p className="text-[10px] text-orange-500/80 font-bold text-center leading-tight">
-                          Hay {allItems.filter((item: KanbanItem) => item.estado === columna.id).length} expedientes ocultos por los filtros.
+                          Hay{' '}
+                          {allItems.filter((item: KanbanItem) => item.estado === columna.id).length}{' '}
+                          expedientes ocultos por los filtros.
                         </p>
                       )}
                     </div>
