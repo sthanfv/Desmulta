@@ -39,3 +39,18 @@ WOMPI_EVENTS_SECRET="tu_secreto_de_eventos_aqui"
 ```
 
 > **Nota de Seguridad:** Existen secretos diferentes para el entorno de pruebas y para el de producción. Asegúrate de colocar el secreto de producción en Vercel cuando hagas el lanzamiento oficial.
+
+---
+
+## 4. Arquitectura Resiliente: DLQ (Dead Letter Queue) para PDFs
+
+¿Qué ocurre si Wompi notifica a Desmulta exitosamente del pago (`APPROVED`), pero la API de Resend para enviar el correo del PDF adjunto falla en ese exacto milisegundo por un problema de red?
+
+Para evitar que el cliente se quede sin su compra, se ha implementado un mecanismo de colas con **Upstash QStash**.
+
+### Flujo de Resiliencia:
+1. El webhook de Wompi recibe el evento e intenta despachar el correo (PDF).
+2. Si la entrega de correo falla, el webhook guarda la orden como `APPROVED` pero **NO** marca `pdfDelivered = true`.
+3. Luego, encola una tarea de reintento en QStash dirigida a `/api/qstash/dlq-pdf-delivery`.
+4. QStash reintentará enviar el PDF en el futuro (backoff exponencial).
+5. **Mitigación Poison Pill:** El DLQ incrementa un contador interno `deliveryRetries` en Firestore. Si el contador llega a `MAX_DELIVERY_ATTEMPTS` (5), QStash descarta el mensaje para evitar un loop infinito (starvation) y alerta a administración (Sentry/Telegram).
