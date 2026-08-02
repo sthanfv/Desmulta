@@ -110,7 +110,7 @@ onCaseStatusChange          onConsultationStatusChange
 | Auth Admin | JWT ECDSA + httpOnly cookie | `src/lib/require-admin-session.ts` |
 | Doble Factor (2FA) | Código OTP de 6 dígitos enviado por email (Expiración de 2 minutos) con Cookie HttpOnly | `src/app/admin/otp-actions.ts` |
 | Auth VIP | JWT HS256 + httpOnly + sameSite:lax (Zero-PII: Solo Hashes) | `src/lib/security/vip-jwt.ts` |
-| Rate limit | Upstash Redis en memoria (Fail-CLOSED puro), lanzando excepciones para cubetas desconocidas | `src/lib/security/rate-limit.ts` |
+| Rate limit | Upstash Redis en memoria (Estrategia Mixta: Fail-OPEN para endpoints públicos como calculadora/OCR; Fail-CLOSED para endpoints críticos como pagos/login). | `src/lib/security/rate-limit.ts` |
 | Idempotencia y Atomicidad | Prevención de *Race Conditions* en descargas y cuotas semanales usando `db.runTransaction()` | `src/app/api/documentos/download/route.ts` |
 | Prevención de Inyección HTML | Sanitización estricta por `.transform()` y `.refine()` de Zod para correos transaccionales (Resend) | `src/app/api/payments/create-order/route.ts` |
 | Validación de Payloads | Zod en todos los endpoints, aplicando asincronía (`safeParseAsync`) para resoluciones de red | Cada `route.ts` |
