@@ -56,16 +56,16 @@ export default async function MultaEspecificaPage(props: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white selection:bg-brand-500/30 selection:text-white">
+    <div className="min-h-screen bg-background text-foreground selection:bg-brand-500/30 selection:text-primary-foreground">
       {/* Breadcrumbs */}
-      <div className="pt-24 px-6 md:px-12 max-w-4xl mx-auto flex items-center gap-2 text-sm text-white/50">
-        <Link href="/" className="hover:text-white transition-colors">
+      <div className="pt-24 px-4 sm:px-6 md:px-12 max-w-4xl mx-auto flex items-center gap-2 text-xs sm:text-sm text-slate-500 dark:text-white/50 overflow-x-auto whitespace-nowrap">
+        <Link href="/" className="hover:text-foreground transition-colors shrink-0">
           Inicio
         </Link>
         <span>/</span>
         <Link
           href={`/multas/${ciudad.slug}`}
-          className="hover:text-white transition-colors capitalize"
+          className="hover:text-foreground transition-colors capitalize shrink-0"
         >
           {ciudad.nombre}
         </Link>
@@ -74,15 +74,15 @@ export default async function MultaEspecificaPage(props: Props) {
       </div>
 
       {/* Hero Section */}
-      <section className="py-12 px-6 md:px-12">
+      <section className="py-10 sm:py-12 px-4 sm:px-6 md:px-12">
         <div className="max-w-4xl mx-auto">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand-500/10 mb-8 border border-brand-500/20">
-            <AlertTriangle size={32} className="text-brand-500" />
+          <div className="inline-flex items-center justify-center w-12 sm:w-16 h-12 sm:h-16 rounded-2xl bg-brand-500/10 mb-6 sm:mb-8 border border-brand-500/20">
+            <AlertTriangle size={32} className="text-brand-500 w-6 h-6 sm:w-8 sm:h-8" />
           </div>
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-6 leading-tight">
-            {infraccion.titulo_seo} en <span className="text-brand-400">{ciudad.nombre}</span>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight mb-4 sm:mb-6 leading-tight">
+            {infraccion.titulo_seo} en <span className="text-brand-500 dark:text-brand-400">{ciudad.nombre}</span>
           </h1>
-          <p className="text-xl text-white/70 leading-relaxed">
+          <p className="text-lg sm:text-xl text-slate-600 dark:text-white/70 leading-relaxed">
             {infraccion.descripcion_seo} Las notificaciones enviadas por la{' '}
             <strong>{ciudad.entidadTransito}</strong> a menudo contienen errores de procedimiento
             que permiten la caducidad del cobro.
@@ -91,15 +91,15 @@ export default async function MultaEspecificaPage(props: Props) {
       </section>
 
       {/* Contexto Legal */}
-      <section className="py-16 px-6 md:px-12 bg-white/5 border-y border-white/10">
+      <section className="py-12 sm:py-16 px-4 sm:px-6 md:px-12 bg-slate-50 dark:bg-white/5 border-y border-slate-200 dark:border-white/10">
         <div className="max-w-4xl mx-auto">
-          <div className="flex items-start gap-6 bg-black/40 p-8 rounded-[2rem] border border-white/5">
-            <div className="shrink-0 p-4 bg-white/5 rounded-2xl">
-              <BookOpen size={28} className="text-white/80" />
+          <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6 bg-white dark:bg-black/40 p-6 sm:p-8 rounded-[2rem] border border-slate-200 dark:border-white/5 shadow-sm">
+            <div className="shrink-0 p-3 sm:p-4 bg-slate-100 dark:bg-white/5 rounded-2xl">
+              <BookOpen size={28} className="text-slate-700 dark:text-white/80 w-6 h-6 sm:w-7 sm:h-7" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold mb-4">El Error de la Secretaría de Tránsito</h2>
-              <p className="text-white/70 leading-relaxed mb-6">{infraccion.contexto_legal}</p>
+              <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">El Error de la Secretaría de Tránsito</h2>
+              <p className="text-slate-600 dark:text-white/70 leading-relaxed mb-4 sm:mb-6 text-sm sm:text-base">{infraccion.contexto_legal}</p>
               <div className="p-4 bg-brand-500/10 border border-brand-500/20 rounded-xl text-sm text-brand-300 font-medium flex items-center gap-3">
                 <ShieldCheck size={20} className="shrink-0" />
                 <span>

@@ -74,7 +74,7 @@ export default async function MultasCiudadPage(props: Props) {
               streetAddress: 'Sede Virtual',
               addressLocality: ciudad.nombre,
               addressRegion: ciudad.departamento,
-              addressCountry: 'CO'
+              addressCountry: 'CO',
             },
             provider: {
               '@type': 'Organization',
@@ -121,25 +121,25 @@ export default async function MultasCiudadPage(props: Props) {
                   '@type': 'Answer',
                   text: `Si la ${ciudad.entidadTransito} ordena un embargo, nuestro equipo de auditores jurídicos puede revisar el expediente para identificar vicios de nulidad y solicitar el levantamiento cautelar de las medidas.`,
                 },
-              }
+              },
             ],
           }),
         }}
       />
-      <div className="min-h-screen bg-black text-white selection:bg-brand-500/30 selection:text-white relative">
+      <div className="min-h-screen bg-background text-foreground selection:bg-brand-500/30 selection:text-primary-foreground relative">
         {/* Header flotante para navegación fácil */}
-        <header className="fixed top-0 w-full z-50 p-6">
-          <div className="max-w-4xl mx-auto glass rounded-3xl px-8 h-16 flex items-center justify-between shadow-2xl border-white/10 bg-black/40 backdrop-blur-md">
+        <header className="fixed top-0 w-full z-50 p-4 sm:p-6">
+          <div className="max-w-4xl mx-auto glass rounded-3xl px-6 sm:px-8 h-16 flex items-center justify-between shadow-2xl border-slate-200 dark:border-white/10 bg-white/40 dark:bg-black/40 backdrop-blur-md">
             <Link
               href="/#contacto"
-              className="flex items-center gap-2 text-muted-foreground hover:text-white transition-all group active:scale-95"
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-all group active:scale-95"
             >
               <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
               <span className="font-bold text-sm">Inicio</span>
             </Link>
             <div className="flex items-center gap-2">
               <ShieldCheck className="text-brand-500" size={20} />
-              <span className="font-black tracking-tighter text-lg uppercase text-white">
+              <span className="font-black tracking-tighter text-lg uppercase text-foreground">
                 Defensa Local
               </span>
             </div>
@@ -147,14 +147,14 @@ export default async function MultasCiudadPage(props: Props) {
         </header>
 
         {/* Hero Section */}
-        <section className="relative pt-44 pb-20 px-6 md:px-12 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-brand-900/20 to-black/90 pointer-events-none" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand-500/10 blur-[120px] rounded-full pointer-events-none" />
+        <section className="relative pt-36 sm:pt-44 pb-16 sm:pb-20 px-4 sm:px-6 md:px-12 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-brand-900/10 dark:from-brand-900/20 to-background pointer-events-none" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] sm:w-[800px] h-[600px] sm:h-[800px] bg-brand-500/10 blur-[120px] rounded-full pointer-events-none" />
 
           <div className="max-w-4xl mx-auto relative z-10 text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-8 backdrop-blur-md">
-              <MapPin size={16} className="text-brand-400" />
-              <span className="text-sm font-medium tracking-wide text-white/80 uppercase">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 mb-6 sm:mb-8 backdrop-blur-md">
+              <MapPin size={16} className="text-brand-500 dark:text-brand-400" />
+              <span className="text-xs sm:text-sm font-medium tracking-wide text-slate-700 dark:text-white/80 uppercase">
                 {ciudad.departamento}
               </span>
             </div>
@@ -167,15 +167,16 @@ export default async function MultasCiudadPage(props: Props) {
             </h1>
 
             {/* Texto dinámico SEO Programático con efecto Glassmorphism Premium */}
-            <div className="relative group overflow-hidden bg-white/5 p-8 md:p-10 rounded-3xl border border-white/10 mb-10 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] transition-all duration-500 hover:bg-white/10 hover:border-brand-500/30 hover:-translate-y-1">
+            <div className="relative group overflow-hidden bg-slate-50 dark:bg-white/5 p-6 sm:p-8 md:p-10 rounded-[2rem] border border-slate-200 dark:border-white/10 mb-8 sm:mb-10 backdrop-blur-xl shadow-lg dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)] transition-all duration-500 hover:bg-slate-100 dark:hover:bg-white/10 hover:border-brand-500/30 hover:-translate-y-1">
               {/* Decoración de luz interna */}
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[1px] bg-gradient-to-r from-transparent via-brand-500/50 to-transparent opacity-30 group-hover:opacity-100 transition-opacity duration-700"></div>
-              
-              {/* Efecto de resplandor (Glow) detrás del texto */}
-              <div className="absolute inset-0 bg-gradient-to-br from-brand-500/5 via-transparent to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[1px] bg-gradient-to-r from-transparent via-brand-500/50 to-transparent opacity-0 dark:opacity-30 group-hover:opacity-100 transition-opacity duration-700"></div>
 
-              <p className="relative z-10 text-white/80 leading-relaxed md:text-lg font-light">
-                {ciudad.seoIntro || `Si recibiste una fotomulta o comparendo injusto en ${ciudad.nombre}, nuestro equipo de auditores jurídicos está listo para defenderte. Nuestra auditoría verifica paso a paso si la ${ciudad.entidadTransito} cumplió con los tiempos legales de notificación según la Ley 1843. No pagues sin antes consultar. Revisa tu estado con nosotros de forma 100% confidencial.`}
+              {/* Efecto de resplandor (Glow) detrás del texto */}
+              <div className="absolute inset-0 bg-gradient-to-br from-brand-500/5 via-transparent to-black/5 dark:to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+
+              <p className="relative z-10 text-slate-700 dark:text-white/80 leading-relaxed text-base sm:text-lg font-light text-left sm:text-center">
+                {ciudad.seoIntro ||
+                  `Si recibiste una fotomulta o comparendo injusto en ${ciudad.nombre}, nuestro equipo de auditores jurídicos está listo para defenderte. Nuestra auditoría verifica paso a paso si la ${ciudad.entidadTransito} cumplió con los tiempos legales de notificación según la Ley 1843. No pagues sin antes consultar. Revisa tu estado con nosotros de forma 100% confidencial.`}
               </p>
             </div>
 
@@ -191,28 +192,26 @@ export default async function MultasCiudadPage(props: Props) {
         </section>
 
         {/* Tipos de Infracción Section */}
-        <section className="py-20 px-6 md:px-12 bg-white/5 border-t border-white/10">
+        <section className="py-16 sm:py-20 px-4 sm:px-6 md:px-12 bg-slate-50 dark:bg-white/5 border-t border-slate-200 dark:border-white/10">
           <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl font-bold mb-4">
+            <div className="text-center mb-12 sm:mb-16">
+              <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-foreground">
                 ¿Qué tipo de problema tienes en {ciudad.nombre}?
               </h2>
-              <p className="text-white/60">
-                Selecciona tu caso para conocer las estrategias de defensa exactas en tu ciudad.
+              <p className="text-muted-foreground max-w-2xl mx-auto text-sm sm:text-base">
+                Selecciona tu caso específico para conocer la jurisprudencia aplicable y cómo
+                podemos ejercer tu derecho a la defensa ante la {ciudad.entidadTransito}.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {infraccionesData.map((infraccion) => (
                 <Link
                   key={infraccion.slug}
                   href={`/multas/${ciudad.slug}/${infraccion.slug}`}
-                  className="group p-6 rounded-[2rem] bg-black/40 border border-white/5 hover:border-brand-500/50 hover:bg-white/5 transition-all"
+                  className="group block p-6 sm:p-8 rounded-3xl bg-white dark:bg-black/40 border border-slate-200 dark:border-white/5 hover:border-brand-500/50 hover:bg-slate-50 dark:hover:bg-brand-500/5 transition-all"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-brand-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                    <ShieldAlert size={24} className="text-brand-500" />
-                  </div>
-                  <h3 className="text-xl font-bold mb-2 text-white group-hover:text-brand-400 transition-colors">
+                  <h3 className="text-lg sm:text-xl font-bold mb-3 group-hover:text-brand-500 dark:group-hover:text-brand-400 transition-colors text-foreground">
                     {infraccion.nombre}
                   </h3>
                   <p className="text-sm text-white/60 line-clamp-2">{infraccion.descripcion_seo}</p>
