@@ -64,6 +64,7 @@ export function SavingsCalculator() {
   const [montoBase, setMontoBase] = useState(0);
   const [mesesMora, setMesesMora] = useState(0);
   const [intereses, setIntereses] = useState(0);
+  const [costosCoactivos, setCostosCoactivos] = useState(0);
 
   // Estados Legales y de Conversión
   const [coactivo, setCoactivo] = useState(false);
@@ -158,6 +159,7 @@ export function SavingsCalculator() {
           const json = await response.json();
           const { prescripcion, financiero, estrategiaLegal } = json.data;
           setIntereses(financiero.interesesAcumulados);
+          setCostosCoactivos(financiero.costosCobroCoactivo || 0);
           setResultado(prescripcion);
           setProyecciones(financiero.proyecciones);
           setDescuentos(financiero.descuentos);
@@ -194,7 +196,7 @@ export function SavingsCalculator() {
     return () => clearInterval(timer);
   }, [rateLimitReached, retryTimeLeft]);
 
-  const total = montoBase + intereses;
+  const total = montoBase + intereses + costosCoactivos;
 
   // Transformar historial para efecto Bola de Nieve (Deuda Total Acumulada)
   const chartData = React.useMemo(() => {
@@ -519,6 +521,14 @@ export function SavingsCalculator() {
                       +$ <CountUp from={0} to={intereses} separator="." duration={1.5} />
                     </span>
                   </div>
+                  {costosCoactivos > 0 && (
+                    <div className="flex justify-between items-center text-sm animate-in fade-in zoom-in-95">
+                      <span className="text-muted-foreground font-semibold">Costas Proc. y Honorarios</span>
+                      <span className="font-bold text-red-600">
+                        +$ <CountUp from={0} to={costosCoactivos} separator="." duration={1.5} />
+                      </span>
+                    </div>
+                  )}
                   <div className="flex flex-col bg-foreground/5 dark:bg-black/40 p-4 rounded-2xl border border-foreground/10 gap-1">
                     <div className="flex justify-between items-end">
                       <span className="text-base font-medium text-muted-foreground">

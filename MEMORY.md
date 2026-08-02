@@ -102,3 +102,8 @@
 - **Qué cambió**: Se mitigó un bug de denegación de servicio (bloqueo global) que ocurría cuando las variables de entorno de Upstash Redis (`UPSTASH_REDIS_REST_URL`) no estaban configuradas o el servicio de Upstash caía. El bloque `catch` implementaba una política estricta de *Fail-Closed* que bloqueaba a todos los usuarios. Se refactorizó para aplicar un *Fail-Open* (permitir el tráfico) exclusivamente en endpoints públicos de baja criticidad (como `consultation`, `leads`, `ocr`, `qr`, `referidos`), mientras que se mantuvo el *Fail-Closed* estricto para operaciones críticas (`checkoutOrder`, `vipAuth`, `galleryDelete`, `godMode`).
 - **Por qué cambió**: Reporte de usuario indicando que la calculadora pública estaba bloqueando el acceso en el primer uso, lo cual impactaba directamente la conversión de usuarios.
 - **Estado Actual**: Implementado. El sistema ahora degrada de forma elegante garantizando la continuidad del negocio sin comprometer la seguridad de las transacciones financieras.
+
+## [2026-08-02] Hardening IAM para OCR en Cloud Run
+- **Qué cambió:** \src/app/api/ocr/route.ts\ inyecta el token OIDC usando \google-auth-library\ y \GCP_SERVICE_ACCOUNT_KEY\ cuando invoca al servicio Python OCR Fallback.
+- **Por qué cambió:** Prevenir invocaciones anónimas a Cloud Run y reducir el riesgo de *Billing Exhaustion* configurando \--no-allow-unauthenticated\.
+- **Estado actual:** El BFF Next.js funge como *Invoker* autorizado exclusivo del OCR.

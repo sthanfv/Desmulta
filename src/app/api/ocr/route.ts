@@ -366,7 +366,9 @@ export async function POST(request: NextRequest) {
         // Esto permite que el servicio Python exija autenticación IAM, evitando Billing Exhaustion
         if (ocrFallbackUrl.includes('run.app')) {
           try {
-            const auth = new GoogleAuth();
+            const gcpKey = process.env.GCP_SERVICE_ACCOUNT_KEY;
+            const authOpts = gcpKey ? { credentials: JSON.parse(gcpKey) } : {};
+            const auth = new GoogleAuth(authOpts);
             const client = await auth.getIdTokenClient(ocrFallbackUrl);
             // TypeScript exige casting estricto (a través de unknown) porque Headers no se superpone nativamente con Record
             const authHeaders = (await client.getRequestHeaders()) as unknown as Record<
