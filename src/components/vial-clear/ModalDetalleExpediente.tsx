@@ -321,446 +321,445 @@ export function ModalDetalleExpediente({
             <X className="w-4 h-4" />
           </button>
         </div>
-
         {/* CUERPO PRINCIPAL (Scrollable) */}
         <div className="p-8 overflow-y-auto custom-scrollbar flex-1 bg-slate-50/50 dark:bg-transparent">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div className="lg:col-span-7 space-y-8">
               {/* SECCIÓN 1: IDENTIDAD */}
-          <div className="space-y-3">
-            <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] ml-1">
-              Identidad del Ciudadano
-            </h3>
-            <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800/80 rounded-2xl overflow-hidden shadow-sm relative">
-              {!isRevealed && (
-                <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/70 dark:bg-black/70 backdrop-blur-md transition-all">
-                  <ShieldAlert className="w-8 h-8 text-slate-300 dark:text-slate-600 mb-3 opacity-50" />
-                  <button
-                    onClick={handleReveal}
-                    disabled={isProcessing === 'reveal'}
-                    className="flex items-center gap-2 bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest hover:scale-105 hover:shadow-xl hover:shadow-slate-900/20 dark:hover:shadow-white/20 active:scale-95 transition-all"
-                  >
-                    {isProcessing === 'reveal' ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <Eye className="w-4 h-4" />
-                    )}
-                    Revelar Datos Sensibles
-                  </button>
-                </div>
-              )}
-              {/* Fila Nombre */}
-              <div className="flex items-center p-4 border-b border-slate-100 dark:border-slate-800/60">
-                <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 shrink-0">
-                  <User className="w-4 h-4 text-slate-500 dark:text-slate-400" />
-                </div>
-                <div className="ml-4 flex-1">
-                  <p className="text-base font-bold text-slate-950 dark:text-white">
-                    {isRevealed
-                      ? revealedData?.nombre ||
-                        (esCaptura ? 'Usuario de SIMIT (Requiere Validación)' : 'Sin Registrar')
-                      : data.nombre || 'Sin Registrar'}
-                  </p>
-                </div>
-              </div>
-
-              {/* Fila Cédula & Teléfono */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-slate-100 dark:divide-slate-800/60 bg-slate-50/50 dark:bg-[#0f1523]">
-                {data.cedula && (
-                  <div className="group p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
-                    <div className="flex items-center gap-3">
-                      <Hash className="w-4 h-4 text-slate-400" />
-                      <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                          Documento
-                        </p>
-                        <p className="text-sm font-mono font-bold text-slate-900 dark:text-slate-200 tracking-tight">
-                          {isRevealed ? revealedData?.cedula : data.cedula}
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() =>
-                        copyToClipboard(
-                          isRevealed ? revealedData?.cedula || '' : data.cedula || '',
-                          'cedula'
-                        )
-                      }
-                      className="p-2 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700 transition-all border border-transparent hover:border-slate-200 dark:hover:border-slate-600 shadow-sm opacity-0 group-hover:opacity-100"
-                    >
-                      {copiedField === 'cedula' ? (
-                        <Check className="w-3.5 h-3.5 text-green-500" />
-                      ) : (
-                        <Copy className="w-3.5 h-3.5" />
-                      )}
-                    </button>
-                  </div>
-                )}
-
-                {data.contacto && (
-                  <div className="group p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
-                    <div className="flex items-center gap-3">
-                      <Phone className="w-4 h-4 text-slate-400" />
-                      <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                          Contacto
-                        </p>
-                        <p className="text-sm font-mono font-bold text-slate-900 dark:text-slate-200 tracking-tight">
-                          {isRevealed ? revealedData?.contacto : data.contacto}
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() =>
-                        copyToClipboard(
-                          isRevealed ? revealedData?.contacto || '' : data.contacto || '',
-                          'telefono'
-                        )
-                      }
-                      className="p-2 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700 transition-all border border-transparent hover:border-slate-200 dark:hover:border-slate-600 shadow-sm opacity-0 group-hover:opacity-100"
-                    >
-                      {copiedField === 'telefono' ? (
-                        <Check className="w-3.5 h-3.5 text-green-500" />
-                      ) : (
-                        <Copy className="w-3.5 h-3.5" />
-                      )}
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-                    {/* SECCIÓN 2: VEHÍCULO */}
-          {(data.placa || esCaptura) && (
-<div className="flex flex-col gap-4">
-              {/* Placa Destacada */}
-              {data.placa && data.placa !== 'N/A' && data.placa !== 'Sin Identificar' && (
-                <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-5 shadow-sm flex flex-col justify-center relative overflow-hidden group">
+              <div className="space-y-3">
+                <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] ml-1">
+                  Identidad del Ciudadano
+                </h3>
+                <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800/80 rounded-2xl overflow-hidden shadow-sm relative">
                   {!isRevealed && (
-                    <div className="absolute inset-0 z-10 bg-white/60 dark:bg-black/60 backdrop-blur-md" />
+                    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/70 dark:bg-black/70 backdrop-blur-md transition-all">
+                      <ShieldAlert className="w-8 h-8 text-slate-300 dark:text-slate-600 mb-3 opacity-50" />
+                      <button
+                        onClick={handleReveal}
+                        disabled={isProcessing === 'reveal'}
+                        className="flex items-center gap-2 bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest hover:scale-105 hover:shadow-xl hover:shadow-slate-900/20 dark:hover:shadow-white/20 active:scale-95 transition-all"
+                      >
+                        {isProcessing === 'reveal' ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Eye className="w-4 h-4" />
+                        )}
+                        Revelar Datos Sensibles
+                      </button>
+                    </div>
                   )}
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-yellow-400/10 dark:bg-yellow-500/5 rounded-bl-full pointer-events-none transition-transform group-hover:scale-110" />
-                  <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
-                    <Car className="w-3.5 h-3.5" /> Vehículo Implicado
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <p className="text-3xl font-black text-yellow-600 dark:text-yellow-500 tracking-widest uppercase">
-                      {isRevealed ? revealedData?.placa : data.placa}
-                    </p>
-                    <button
-                      onClick={() =>
-                        copyToClipboard(
-                          isRevealed ? revealedData?.placa || '' : data.placa || '',
-                          'placa'
-                        )
-                      }
-                      className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-yellow-600 dark:hover:text-yellow-400 transition-all border border-slate-200 dark:border-slate-700 hover:border-yellow-400 dark:hover:border-yellow-600/50 shadow-sm"
-                    >
-                      {copiedField === 'placa' ? (
-                        <Check className="w-4 h-4 text-green-500" />
-                      ) : (
-                        <Copy className="w-4 h-4" />
-                      )}
-                    </button>
+                  {/* Fila Nombre */}
+                  <div className="flex items-center p-4 border-b border-slate-100 dark:border-slate-800/60">
+                    <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 shrink-0">
+                      <User className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+                    </div>
+                    <div className="ml-4 flex-1">
+                      <p className="text-base font-bold text-slate-950 dark:text-white">
+                        {isRevealed
+                          ? revealedData?.nombre ||
+                            (esCaptura ? 'Usuario de SIMIT (Requiere Validación)' : 'Sin Registrar')
+                          : data.nombre || 'Sin Registrar'}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              )}
-              
-            </div>
-          )}
 
+                  {/* Fila Cédula & Teléfono */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-slate-100 dark:divide-slate-800/60 bg-slate-50/50 dark:bg-[#0f1523]">
+                    {data.cedula && (
+                      <div className="group p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                        <div className="flex items-center gap-3">
+                          <Hash className="w-4 h-4 text-slate-400" />
+                          <div>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                              Documento
+                            </p>
+                            <p className="text-sm font-mono font-bold text-slate-900 dark:text-slate-200 tracking-tight">
+                              {isRevealed ? revealedData?.cedula : data.cedula}
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() =>
+                            copyToClipboard(
+                              isRevealed ? revealedData?.cedula || '' : data.cedula || '',
+                              'cedula'
+                            )
+                          }
+                          className="p-2 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700 transition-all border border-transparent hover:border-slate-200 dark:hover:border-slate-600 shadow-sm opacity-0 group-hover:opacity-100"
+                        >
+                          {copiedField === 'cedula' ? (
+                            <Check className="w-3.5 h-3.5 text-green-500" />
+                          ) : (
+                            <Copy className="w-3.5 h-3.5" />
+                          )}
+                        </button>
+                      </div>
+                    )}
 
-
-          <div className="flex items-center justify-center gap-2 text-slate-400 dark:text-slate-500 pt-2 border-t border-slate-200/50 dark:border-slate-800/50 mt-8">
-            <Calendar className="w-3.5 h-3.5" />
-            <span className="text-[10px] font-bold tracking-[0.1em] uppercase">
-              Ingreso: {data.createdAt ? new Date(data.createdAt).toLocaleString() : 'Reciente'}
-            </span>
-          </div>
-
-          {/* ÁREA DE EDICIÓN DE PDF (SaaS Style) */}
-          {esCaso && isEditing && (
-            <div className="bg-amber-50/50 dark:bg-amber-500/[0.03] p-6 rounded-2xl border border-amber-200/50 dark:border-amber-500/20 animate-in fade-in slide-in-from-bottom-4 shadow-inner">
-              <div className="flex items-center gap-2 mb-5">
-                <div className="p-2 rounded-lg bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-500">
-                  <FileText className="w-4 h-4" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-extrabold text-amber-950 dark:text-amber-500 uppercase tracking-widest">
-                    Motor Documental
-                  </h3>
-                  <p className="text-[10px] text-amber-700/60 dark:text-amber-500/60 font-bold uppercase tracking-wider">
-                    Configura y emite documentos legales
-                  </p>
+                    {data.contacto && (
+                      <div className="group p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                        <div className="flex items-center gap-3">
+                          <Phone className="w-4 h-4 text-slate-400" />
+                          <div>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                              Contacto
+                            </p>
+                            <p className="text-sm font-mono font-bold text-slate-900 dark:text-slate-200 tracking-tight">
+                              {isRevealed ? revealedData?.contacto : data.contacto}
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() =>
+                            copyToClipboard(
+                              isRevealed ? revealedData?.contacto || '' : data.contacto || '',
+                              'telefono'
+                            )
+                          }
+                          className="p-2 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700 transition-all border border-transparent hover:border-slate-200 dark:hover:border-slate-600 shadow-sm opacity-0 group-hover:opacity-100"
+                        >
+                          {copiedField === 'telefono' ? (
+                            <Check className="w-3.5 h-3.5 text-green-500" />
+                          ) : (
+                            <Copy className="w-3.5 h-3.5" />
+                          )}
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              <div className="space-y-5">
-                {/* Custom Checkboxes tipo Tarjeta */}
-                <div className="grid grid-cols-2 gap-3">
-                  <label className="relative cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="peer sr-only"
-                      checked={selectedDocs.includes('poder')}
-                      onChange={(e) => {
-                        if (e.target.checked) setSelectedDocs((prev) => [...prev, 'poder']);
-                        else setSelectedDocs((prev) => prev.filter((d) => d !== 'poder'));
-                      }}
-                    />
-                    <div className="w-full h-full bg-white dark:bg-[#111827] border-2 border-slate-200 dark:border-slate-800 rounded-xl p-4 transition-all peer-checked:border-amber-500 peer-checked:bg-amber-50/50 dark:peer-checked:bg-amber-500/10 peer-checked:shadow-sm">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-widest">
-                          Poder
-                        </span>
-                        <div className="w-4 h-4 rounded-full border-2 border-slate-300 dark:border-slate-600 peer-checked:border-amber-500 flex items-center justify-center">
-                          {selectedDocs.includes('poder') && (
-                            <div className="w-2 h-2 rounded-full bg-amber-500" />
-                          )}
-                        </div>
-                      </div>
-                      <p className="text-[10px] text-slate-500 font-medium">
-                        Documento de representación legal.
+              {/* SECCIÓN 2: VEHÍCULO */}
+              {(data.placa || esCaptura) && (
+                <div className="flex flex-col gap-4">
+                  {/* Placa Destacada */}
+                  {data.placa && data.placa !== 'N/A' && data.placa !== 'Sin Identificar' && (
+                    <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-5 shadow-sm flex flex-col justify-center relative overflow-hidden group">
+                      {!isRevealed && (
+                        <div className="absolute inset-0 z-10 bg-white/60 dark:bg-black/60 backdrop-blur-md" />
+                      )}
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-yellow-400/10 dark:bg-yellow-500/5 rounded-bl-full pointer-events-none transition-transform group-hover:scale-110" />
+                      <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
+                        <Car className="w-3.5 h-3.5" /> Vehículo Implicado
                       </p>
-                    </div>
-                  </label>
-
-                  <label className="relative cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="peer sr-only"
-                      checked={selectedDocs.includes('peticion')}
-                      onChange={(e) => {
-                        if (e.target.checked) setSelectedDocs((prev) => [...prev, 'peticion']);
-                        else setSelectedDocs((prev) => prev.filter((d) => d !== 'peticion'));
-                      }}
-                    />
-                    <div className="w-full h-full bg-white dark:bg-[#111827] border-2 border-slate-200 dark:border-slate-800 rounded-xl p-4 transition-all peer-checked:border-amber-500 peer-checked:bg-amber-50/50 dark:peer-checked:bg-amber-500/10 peer-checked:shadow-sm">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-widest">
-                          Acción
-                        </span>
-                        <div className="w-4 h-4 rounded-full border-2 border-slate-300 dark:border-slate-600 peer-checked:border-amber-500 flex items-center justify-center">
-                          {selectedDocs.includes('peticion') && (
-                            <div className="w-2 h-2 rounded-full bg-amber-500" />
+                      <div className="flex items-center justify-between">
+                        <p className="text-3xl font-black text-yellow-600 dark:text-yellow-500 tracking-widest uppercase">
+                          {isRevealed ? revealedData?.placa : data.placa}
+                        </p>
+                        <button
+                          onClick={() =>
+                            copyToClipboard(
+                              isRevealed ? revealedData?.placa || '' : data.placa || '',
+                              'placa'
+                            )
+                          }
+                          className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-yellow-600 dark:hover:text-yellow-400 transition-all border border-slate-200 dark:border-slate-700 hover:border-yellow-400 dark:hover:border-yellow-600/50 shadow-sm"
+                        >
+                          {copiedField === 'placa' ? (
+                            <Check className="w-4 h-4 text-green-500" />
+                          ) : (
+                            <Copy className="w-4 h-4" />
                           )}
-                        </div>
+                        </button>
                       </div>
-                      <p className="text-[10px] text-slate-500 font-medium">
-                        Derecho de petición o tutela.
-                      </p>
                     </div>
-                  </label>
+                  )}
                 </div>
+              )}
 
-                {selectedDocs.includes('peticion') && (
-                  <div className="animate-in fade-in slide-in-from-top-2">
-                    <p className="text-[10px] font-black text-amber-900/60 dark:text-amber-500/60 uppercase tracking-widest mb-1.5 ml-1">
-                      Fundamento Jurídico
+              <div className="flex items-center justify-center gap-2 text-slate-400 dark:text-slate-500 pt-2 border-t border-slate-200/50 dark:border-slate-800/50 mt-8">
+                <Calendar className="w-3.5 h-3.5" />
+                <span className="text-[10px] font-bold tracking-[0.1em] uppercase">
+                  Ingreso: {data.createdAt ? new Date(data.createdAt).toLocaleString() : 'Reciente'}
+                </span>
+              </div>
+
+              {/* ÁREA DE EDICIÓN DE PDF (SaaS Style) */}
+              {esCaso && isEditing && (
+                <div className="bg-amber-50/50 dark:bg-amber-500/[0.03] p-6 rounded-2xl border border-amber-200/50 dark:border-amber-500/20 animate-in fade-in slide-in-from-bottom-4 shadow-inner">
+                  <div className="flex items-center gap-2 mb-5">
+                    <div className="p-2 rounded-lg bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-500">
+                      <FileText className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-extrabold text-amber-950 dark:text-amber-500 uppercase tracking-widest">
+                        Motor Documental
+                      </h3>
+                      <p className="text-[10px] text-amber-700/60 dark:text-amber-500/60 font-bold uppercase tracking-wider">
+                        Configura y emite documentos legales
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-5">
+                    {/* Custom Checkboxes tipo Tarjeta */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <label className="relative cursor-pointer">
+                        <input
+                          type="checkbox"
+                          className="peer sr-only"
+                          checked={selectedDocs.includes('poder')}
+                          onChange={(e) => {
+                            if (e.target.checked) setSelectedDocs((prev) => [...prev, 'poder']);
+                            else setSelectedDocs((prev) => prev.filter((d) => d !== 'poder'));
+                          }}
+                        />
+                        <div className="w-full h-full bg-white dark:bg-[#111827] border-2 border-slate-200 dark:border-slate-800 rounded-xl p-4 transition-all peer-checked:border-amber-500 peer-checked:bg-amber-50/50 dark:peer-checked:bg-amber-500/10 peer-checked:shadow-sm">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-widest">
+                              Poder
+                            </span>
+                            <div className="w-4 h-4 rounded-full border-2 border-slate-300 dark:border-slate-600 peer-checked:border-amber-500 flex items-center justify-center">
+                              {selectedDocs.includes('poder') && (
+                                <div className="w-2 h-2 rounded-full bg-amber-500" />
+                              )}
+                            </div>
+                          </div>
+                          <p className="text-[10px] text-slate-500 font-medium">
+                            Documento de representación legal.
+                          </p>
+                        </div>
+                      </label>
+
+                      <label className="relative cursor-pointer">
+                        <input
+                          type="checkbox"
+                          className="peer sr-only"
+                          checked={selectedDocs.includes('peticion')}
+                          onChange={(e) => {
+                            if (e.target.checked) setSelectedDocs((prev) => [...prev, 'peticion']);
+                            else setSelectedDocs((prev) => prev.filter((d) => d !== 'peticion'));
+                          }}
+                        />
+                        <div className="w-full h-full bg-white dark:bg-[#111827] border-2 border-slate-200 dark:border-slate-800 rounded-xl p-4 transition-all peer-checked:border-amber-500 peer-checked:bg-amber-50/50 dark:peer-checked:bg-amber-500/10 peer-checked:shadow-sm">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-widest">
+                              Acción
+                            </span>
+                            <div className="w-4 h-4 rounded-full border-2 border-slate-300 dark:border-slate-600 peer-checked:border-amber-500 flex items-center justify-center">
+                              {selectedDocs.includes('peticion') && (
+                                <div className="w-2 h-2 rounded-full bg-amber-500" />
+                              )}
+                            </div>
+                          </div>
+                          <p className="text-[10px] text-slate-500 font-medium">
+                            Derecho de petición o tutela.
+                          </p>
+                        </div>
+                      </label>
+                    </div>
+
+                    {selectedDocs.includes('peticion') && (
+                      <div className="animate-in fade-in slide-in-from-top-2">
+                        <p className="text-[10px] font-black text-amber-900/60 dark:text-amber-500/60 uppercase tracking-widest mb-1.5 ml-1">
+                          Fundamento Jurídico
+                        </p>
+                        <select
+                          value={selectedCausal}
+                          onChange={(e) => setSelectedCausal(e.target.value)}
+                          className="w-full bg-white dark:bg-[#111827] border-2 border-slate-200 dark:border-slate-800 p-3.5 rounded-xl text-sm font-semibold text-slate-900 dark:text-white shadow-sm focus:border-amber-500 outline-none transition-all cursor-pointer"
+                        >
+                          <option value="" disabled>
+                            Seleccione la causal de defensa...
+                          </option>
+                          {Object.values(CAUSALES_TRANSITO).map((causal) => (
+                            <option key={causal.id} value={causal.id}>
+                              {causal.titulo}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+
+                    <ModalEdicionDatos
+                      datos={editData}
+                      onChange={(campo, valor) =>
+                        setEditData((prev) => ({ ...prev, [campo]: valor }))
+                      }
+                      onGuardar={handleGenerarDocumentos}
+                      onCancelar={() => setIsEditing(false)}
+                      isGuardando={isProcessing === 'pdf'}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>{' '}
+          {/* END LEFT COL */}
+          <div className="lg:col-span-5 space-y-8">
+            {/* EVIDENCIA SIMIT (Alta Fidelidad) */}
+            {(data.placa || esCaptura) && (
+              <div className="flex flex-col gap-4 h-full">
+                {/* Evidencia SIMIT (Alta Fidelidad) */}
+                {esCaptura && (
+                  <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-4 shadow-sm h-full min-h-[140px] flex flex-col group">
+                    <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
+                      Evidencia SIMIT Adjunta
                     </p>
-                    <select
-                      value={selectedCausal}
-                      onChange={(e) => setSelectedCausal(e.target.value)}
-                      className="w-full bg-white dark:bg-[#111827] border-2 border-slate-200 dark:border-slate-800 p-3.5 rounded-xl text-sm font-semibold text-slate-900 dark:text-white shadow-sm focus:border-amber-500 outline-none transition-all cursor-pointer"
-                    >
-                      <option value="" disabled>
-                        Seleccione la causal de defensa...
-                      </option>
-                      {Object.values(CAUSALES_TRANSITO).map((causal) => (
-                        <option key={causal.id} value={causal.id}>
-                          {causal.titulo}
-                        </option>
-                      ))}
-                    </select>
+                    <div className="w-full flex-1 relative rounded-xl overflow-hidden border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-black/40">
+                      <Image
+                        src={data.evidenceUrl!}
+                        alt="Evidencia SIMIT"
+                        fill
+                        className="object-contain p-2"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
+                      />
+                      <a
+                        href={data.evidenceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="absolute inset-0 bg-slate-900/60 backdrop-blur-[2px] flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 text-white text-xs font-black gap-2 uppercase tracking-widest"
+                      >
+                        <ExternalLink className="w-5 h-5 mb-1" /> Ampliar Captura
+                      </a>
+                    </div>
                   </div>
                 )}
-
-                <ModalEdicionDatos
-                  datos={editData}
-                  onChange={(campo, valor) => setEditData((prev) => ({ ...prev, [campo]: valor }))}
-                  onGuardar={handleGenerarDocumentos}
-                  onCancelar={() => setIsEditing(false)}
-                  isGuardando={isProcessing === 'pdf'}
-                />
               </div>
-            </div>
-          )}
-        </div>
-            </div> {/* END LEFT COL */}
-            <div className="lg:col-span-5 space-y-8">
-              {/* EVIDENCIA SIMIT (Alta Fidelidad) */}
-              {(data.placa || esCaptura) && (
-                <div className="flex flex-col gap-4 h-full">
-                  {/* Evidencia SIMIT (Alta Fidelidad) */}
-              {esCaptura && (
-                <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-4 shadow-sm h-full min-h-[140px] flex flex-col group">
-                  <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
-                    Evidencia SIMIT Adjunta
-                  </p>
-                  <div className="w-full flex-1 relative rounded-xl overflow-hidden border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-black/40">
-                    <Image
-                      src={data.evidenceUrl!}
-                      alt="Evidencia SIMIT"
-                      fill
-                      className="object-contain p-2"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = 'none';
-                      }}
-                    />
-                    <a
-                      href={data.evidenceUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="absolute inset-0 bg-slate-900/60 backdrop-blur-[2px] flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 text-white text-xs font-black gap-2 uppercase tracking-widest"
-                    >
-                      <ExternalLink className="w-5 h-5 mb-1" /> Ampliar Captura
-                    </a>
-                  </div>
-                </div>
-              )}
-                </div>
-              )}
-              
-              {/* SECCIÓN QR DE SEGUIMIENTO */}
-          {data.trackingUuid && (
-            <div className="space-y-3">
-              <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] ml-1">
-                Seguimiento del Cliente
-              </h3>
-              <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-5 shadow-sm">
-                <div className="flex items-start gap-4">
-                  {/* QR visible — pequeño, solo para mostrar */}
-                  <div className="bg-white p-2 rounded-xl border border-slate-200 shadow-sm flex-shrink-0">
-                    <QRCode
-                      value={`${process.env.NEXT_PUBLIC_APP_URL || 'https://desmulta.online'}/seguir/${data.trackingUuid}`}
-                      size={72}
-                      bgColor="#ffffff"
-                      fgColor="#111827"
-                      qrStyle="squares"
-                      eyeRadius={4}
-                      logoImage="/icon.png"
-                      logoWidth={20}
-                      logoHeight={20}
-                      logoPadding={2}
-                      logoPaddingStyle="square"
-                      removeQrCodeBehindLogo={true}
-                      ecLevel="H"
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-slate-900 dark:text-white">
-                      Portal de Seguimiento
-                    </p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-                      El cliente puede escanear este QR para ver el estado en tiempo real. Sin
-                      iniciar sesión.
-                    </p>
-                    {/* Imagen oculta en alta resolución para la descarga */}
-                    <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
+            )}
+
+            {/* SECCIÓN QR DE SEGUIMIENTO */}
+            {data.trackingUuid && (
+              <div className="space-y-3">
+                <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] ml-1">
+                  Seguimiento del Cliente
+                </h3>
+                <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-5 shadow-sm">
+                  <div className="flex items-start gap-4">
+                    {/* QR visible — pequeño, solo para mostrar */}
+                    <div className="bg-white p-2 rounded-xl border border-slate-200 shadow-sm flex-shrink-0">
                       <QRCode
-                        id={`qr-hd-${data.trackingUuid}`}
                         value={`${process.env.NEXT_PUBLIC_APP_URL || 'https://desmulta.online'}/seguir/${data.trackingUuid}`}
-                        size={320}
+                        size={72}
                         bgColor="#ffffff"
                         fgColor="#111827"
                         qrStyle="squares"
-                        eyeRadius={12}
+                        eyeRadius={4}
                         logoImage="/icon.png"
-                        logoWidth={90}
-                        logoHeight={90}
-                        logoPadding={5}
+                        logoWidth={20}
+                        logoHeight={20}
+                        logoPadding={2}
                         logoPaddingStyle="square"
                         removeQrCodeBehindLogo={true}
                         ecLevel="H"
                       />
                     </div>
-                    <button
-                      onClick={() => {
-                        const trackingId = data.trackingUuid || 'NA';
-                        const imgElement = document.getElementById(
-                          `qr-hd-${trackingId}`
-                        ) as HTMLCanvasElement;
-                        if (!imgElement) {
-                          toast({
-                            title: 'Cargando',
-                            description: 'El código QR todavía se está generando...',
-                            variant: 'default',
-                          });
-                          return;
-                        }
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-slate-900 dark:text-white">
+                        Portal de Seguimiento
+                      </p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                        El cliente puede escanear este QR para ver el estado en tiempo real. Sin
+                        iniciar sesión.
+                      </p>
+                      {/* Imagen oculta en alta resolución para la descarga */}
+                      <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
+                        <QRCode
+                          id={`qr-hd-${data.trackingUuid}`}
+                          value={`${process.env.NEXT_PUBLIC_APP_URL || 'https://desmulta.online'}/seguir/${data.trackingUuid}`}
+                          size={320}
+                          bgColor="#ffffff"
+                          fgColor="#111827"
+                          qrStyle="squares"
+                          eyeRadius={12}
+                          logoImage="/icon.png"
+                          logoWidth={90}
+                          logoHeight={90}
+                          logoPadding={5}
+                          logoPaddingStyle="square"
+                          removeQrCodeBehindLogo={true}
+                          ecLevel="H"
+                        />
+                      </div>
+                      <button
+                        onClick={() => {
+                          const trackingId = data.trackingUuid || 'NA';
+                          const imgElement = document.getElementById(
+                            `qr-hd-${trackingId}`
+                          ) as HTMLCanvasElement;
+                          if (!imgElement) {
+                            toast({
+                              title: 'Cargando',
+                              description: 'El código QR todavía se está generando...',
+                              variant: 'default',
+                            });
+                            return;
+                          }
 
-                        // Crear canvas final con marca
-                        const PADDING = 28;
-                        const QR_SIZE = 320;
-                        const HEADER_H = 56;
-                        const FOOTER_H = 40;
-                        const TOTAL_W = QR_SIZE + PADDING * 2;
-                        const TOTAL_H = QR_SIZE + HEADER_H + FOOTER_H + PADDING * 2;
+                          // Crear canvas final con marca
+                          const PADDING = 28;
+                          const QR_SIZE = 320;
+                          const HEADER_H = 56;
+                          const FOOTER_H = 40;
+                          const TOTAL_W = QR_SIZE + PADDING * 2;
+                          const TOTAL_H = QR_SIZE + HEADER_H + FOOTER_H + PADDING * 2;
 
-                        const out = document.createElement('canvas');
-                        out.width = TOTAL_W;
-                        out.height = TOTAL_H;
-                        const ctx = out.getContext('2d')!;
+                          const out = document.createElement('canvas');
+                          out.width = TOTAL_W;
+                          out.height = TOTAL_H;
+                          const ctx = out.getContext('2d')!;
 
-                        // Fondo blanco limpio
-                        ctx.fillStyle = '#ffffff';
-                        ctx.fillRect(0, 0, TOTAL_W, TOTAL_H);
+                          // Fondo blanco limpio
+                          ctx.fillStyle = '#ffffff';
+                          ctx.fillRect(0, 0, TOTAL_W, TOTAL_H);
 
-                        // Franja superior dorada
-                        ctx.fillStyle = '#F5A800';
-                        ctx.fillRect(0, 0, TOTAL_W, HEADER_H);
+                          // Franja superior dorada
+                          ctx.fillStyle = '#F5A800';
+                          ctx.fillRect(0, 0, TOTAL_W, HEADER_H);
 
-                        // Texto "DESMULTA" en la franja
-                        ctx.fillStyle = '#000000';
-                        ctx.font = 'bold 22px system-ui, -apple-system, sans-serif';
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
-                        ctx.fillText('DESMULTA', TOTAL_W / 2, HEADER_H / 2);
+                          // Texto "DESMULTA" en la franja
+                          ctx.fillStyle = '#000000';
+                          ctx.font = 'bold 22px system-ui, -apple-system, sans-serif';
+                          ctx.textAlign = 'center';
+                          ctx.textBaseline = 'middle';
+                          ctx.fillText('DESMULTA', TOTAL_W / 2, HEADER_H / 2);
 
-                        // QR centrado
-                        ctx.drawImage(imgElement, PADDING, HEADER_H + PADDING, QR_SIZE, QR_SIZE);
+                          // QR centrado
+                          ctx.drawImage(imgElement, PADDING, HEADER_H + PADDING, QR_SIZE, QR_SIZE);
 
-                        // ID del expediente bajo el QR
-                        ctx.fillStyle = '#6b7280';
-                        ctx.font = '13px system-ui, -apple-system, sans-serif';
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'top';
-                        ctx.fillText(
-                          `Expediente: ${trackingId.slice(0, 8).toUpperCase()}`,
-                          TOTAL_W / 2,
-                          HEADER_H + PADDING + QR_SIZE + 10
-                        );
+                          // ID del expediente bajo el QR
+                          ctx.fillStyle = '#6b7280';
+                          ctx.font = '13px system-ui, -apple-system, sans-serif';
+                          ctx.textAlign = 'center';
+                          ctx.textBaseline = 'top';
+                          ctx.fillText(
+                            `Expediente: ${trackingId.slice(0, 8).toUpperCase()}`,
+                            TOTAL_W / 2,
+                            HEADER_H + PADDING + QR_SIZE + 10
+                          );
 
-                        // Pie con URL
-                        ctx.fillStyle = '#9ca3af';
-                        ctx.font = '11px system-ui, -apple-system, sans-serif';
-                        ctx.fillText('desmulta.online/seguir', TOTAL_W / 2, TOTAL_H - 18);
+                          // Pie con URL
+                          ctx.fillStyle = '#9ca3af';
+                          ctx.font = '11px system-ui, -apple-system, sans-serif';
+                          ctx.fillText('desmulta.online/seguir', TOTAL_W / 2, TOTAL_H - 18);
 
-                        out.toBlob((blob) => {
-                          if (!blob) return;
-                          const a = document.createElement('a');
-                          a.href = URL.createObjectURL(blob);
-                          a.download = `QR_Desmulta_${trackingId.slice(0, 8)}.png`;
-                          a.click();
-                          URL.revokeObjectURL(a.href);
-                        }, 'image/png');
-                      }}
-                      className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-xl
+                          out.toBlob((blob) => {
+                            if (!blob) return;
+                            const a = document.createElement('a');
+                            a.href = URL.createObjectURL(blob);
+                            a.download = `QR_Desmulta_${trackingId.slice(0, 8)}.png`;
+                            a.click();
+                            URL.revokeObjectURL(a.href);
+                          }, 'image/png');
+                        }}
+                        className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-xl
                         bg-primary/10 hover:bg-primary/20 border border-primary/30
                         text-primary dark:text-primary text-xs font-bold transition-all"
-                    >
-                      <Download className="w-3.5 h-3.5" />
-                      Descargar QR
-                    </button>
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        Descargar QR
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
-            </div>
-          </div> {/* END GRID */}
-        
+            )}
+          </div>
+        </div>{' '}
+        {/* END GRID */}
         {/* FOOTER & ACTIONS */}
         <div className="p-6 bg-white dark:bg-[#080d18] border-t border-slate-100 dark:border-slate-800/80 flex flex-col gap-3 shrink-0 relative z-20">
           <a

@@ -41,12 +41,14 @@ export async function POST(request: NextRequest) {
       // const res = await fetch('https://www.datos.gov.co/resource/XXXX-XXXX.json?$limit=1');
       // const data = await res.json();
       // newRate = parseFloat(data[0].tasa) * 1.5; // Interés Bancario * 1.5 = Usura
-      
+
       // Simulamos que el robot falló al encontrar la API correcta (como vimos en las pruebas)
       // En un entorno real, si esto falla, enviamos el error a Telegram
       const apiExternaFallo = true;
       if (apiExternaFallo) {
-        await sendTelegramCronError('No se pudo resolver el Dataset ID de la Superfinanciera. Se requiere inyectar el valor vía POST body.');
+        await sendTelegramCronError(
+          'No se pudo resolver el Dataset ID de la Superfinanciera. Se requiere inyectar el valor vía POST body.'
+        );
         return NextResponse.json({ error: 'Fallo al obtener datos externos' }, { status: 502 });
       }
     }
@@ -70,7 +72,9 @@ export async function POST(request: NextRequest) {
       { merge: true }
     );
 
-    logger.info(`[cron-usura] Tasa de Usura actualizada exitosamente a ${(newRate * 100).toFixed(2)}%`);
+    logger.info(
+      `[cron-usura] Tasa de Usura actualizada exitosamente a ${(newRate * 100).toFixed(2)}%`
+    );
 
     // 5. Notificar a Telegram
     await sendTelegramCronSuccess(newRate);

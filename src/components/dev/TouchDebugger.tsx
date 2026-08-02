@@ -61,6 +61,10 @@ type DebugTab = 'MEDIA' | 'ERRORES' | 'RED' | 'DEVICE' | 'TOUCH' | 'CONSOLE' | '
 // ─── Utilidades ───────────────────────────────────────────────────────────────
 
 const IS_PROD = process.env.NODE_ENV === 'production';
+// 🛡️ AUDITORÍA 2026-08-01: RIESGO ACEPTADO
+// NEXT_PUBLIC_DEBUG_PIN se expone en el cliente para permitir a los devs
+// desbloquear el TouchDebugger en producción mediante un gesto secreto.
+// Es un PIN de bajo riesgo (no da acceso a datos de usuarios, solo al panel de logs local).
 const DEBUG_PIN = process.env.NEXT_PUBLIC_DEBUG_PIN; // Sin valor por defecto inseguro en código fuente
 
 function DeltaBadge({ ms }: { ms: number }) {

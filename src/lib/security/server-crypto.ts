@@ -71,7 +71,9 @@ export function decryptE2EPayload<T = unknown>(encryptedBase64: string): T {
 const SYMMETRIC_ALGO = 'aes-256-gcm';
 const ENC_PREFIX = 'ENC:';
 
-// 🛡️ FIX CR-2: Memoización de la llave derivada para alto desempeño del backend
+// 🛡️ FIX CR-2: Memoización de la llave derivada para alto desempeño del backend.
+// 🛡️ AUDITORÍA 2026-08-01: S-NX-03 - Clave Derivada Memoizada como Variable Global.
+// Riesgo Aceptado: En Vercel Serverless persiste entre invocaciones (warm start). Riesgo muy bajo si no se expone el estado global en endpoints.
 let _derivedKey: Buffer | null = null;
 
 function getSymmetricKey(): Buffer {

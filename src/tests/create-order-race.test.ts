@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { POST } from '../app/api/payments/create-order/route';
 
 // Mock de NextResponse
@@ -58,6 +58,9 @@ const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 describe('Prevención de Race Conditions en Wompi (Hallazgo 1)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
   it('Debe generar un wompiReference único (UUID) en vez de usar el nombre de la colección', async () => {
     mockDoc.mockReturnValue({ id: 'uuid-unico', create: mockCreate });
 
@@ -103,5 +106,59 @@ describe('Prevención de Race Conditions en Wompi (Hallazgo 1)', () => {
         wompiReference: expect.stringMatching(/^DSM-/),
       })
     );
+  });
+
+  it('Debe devolver la misma orden (idempotencia) ante un doble clic con el mismo fingerprint', async () => {
+    // Simulamos que ya existe una orden previa creada recientemente
+    const mockExistingOrder = {
+      wompiReference: 'DSM-REF-DUPLICADA-123',
+      downloadToken: 'token-secreto-xyz',
+      createdAt: new Date(),
+    };
+
+    const mockGetExisting = vi.fn().mockResolvedValue({
+      empty: false,
+      docs: [{ data: () => mockExistingOrder }],
+    });
+
+    const mockLimitIdemp = vi.fn(() => ({ get: mockGetExisting }));
+    const mockWhereIdemp = vi.fn(() => ({
+      where: mockWhereIdemp,
+      limit: mockLimitIdemp,
+      get: mockGetExisting,
+    }));
+
+    // El mock responderá que YA HAY un registro con ese Idempotency Key
+    mockCollection.mockReturnValueOnce({
+      where: mockWhereIdemp,
+    });
+
+    const req = new Request('http://localhost/api/payments/create-order', {
+      method: 'POST',
+      body: JSON.stringify({
+        productType: 'peticion_general',
+        customerEmail: 'test@example.com',
+        cedula: '987654321', // fingerprint usa cedula y productType
+        celular: '3001234567',
+        caseData: {
+          infractorName: 'Maria Gomez',
+          infractorId: '987654321',
+          shortId: 'SHORT-999', // A pesar del shortId, debe dar idempotencia
+        },
+      }),
+    }) as any;
+    req.nextUrl = { origin: 'http://localhost' };
+
+    await POST(req);
+
+    // Se debe haber respondido con la referencia original en vez de crear una nueva
+    expect(mockJson).toHaveBeenCalledWith(
+      expect.objectContaining({
+        wompiReference: 'DSM-REF-DUPLICADA-123',
+      })
+    );
+
+    // No debe haber llamado a crear una nueva orden
+    expect(mockCreate).not.toHaveBeenCalled();
   });
 });

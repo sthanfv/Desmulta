@@ -5,19 +5,22 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Landmark, RefreshCw } from 'lucide-react';
 
 interface TasasLegalesWidgetProps {
-  tasasData: {
-    usuraEA: number;
-    updatedAt: any;
-    history: any[];
-  } | undefined | null;
+  tasasData:
+    | {
+        usuraEA: number;
+        updatedAt: any;
+        history: any[];
+      }
+    | undefined
+    | null;
 }
 
 export function TasasLegalesWidget({ tasasData }: TasasLegalesWidgetProps) {
   const isSyncing = !tasasData || !tasasData.usuraEA;
   const rate = tasasData?.usuraEA ? (tasasData.usuraEA * 100).toFixed(2) : '---';
-  
+
   const [dots, setDots] = useState('');
-  
+
   useEffect(() => {
     if (!isSyncing) return;
     const interval = setInterval(() => {
@@ -47,26 +50,26 @@ export function TasasLegalesWidget({ tasasData }: TasasLegalesWidgetProps) {
       <CardContent className="flex flex-col flex-1 justify-between">
         <div className="flex items-center justify-between gap-2">
           <div className="space-y-1 flex-shrink-0">
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Interés E.A.</p>
-            <p className="text-3xl font-black text-amber-600 dark:text-amber-400">
-              {rate}%
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">
+              Interés E.A.
             </p>
+            <p className="text-3xl font-black text-amber-600 dark:text-amber-400">{rate}%</p>
           </div>
 
           <div className="space-y-1 border-l pl-2 border-amber-100 dark:border-amber-900/30 text-muted-foreground min-w-0 flex-1 text-right">
             <p className="text-[10px] font-medium uppercase tracking-wider truncate">Actualizado</p>
             <div className="text-xs font-medium truncate">
-              {tasasData?.updatedAt
-                ? new Date(
-                    typeof tasasData.updatedAt === 'string'
-                      ? tasasData.updatedAt
-                      : (tasasData.updatedAt as any).toDate()
-                  ).toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' })
-                : (
-                  <span className="flex items-center justify-end">
-                    Sync<span className="inline-block w-2 text-left">{dots}</span>
-                  </span>
-                )}
+              {tasasData?.updatedAt ? (
+                new Date(
+                  typeof tasasData.updatedAt === 'string'
+                    ? tasasData.updatedAt
+                    : (tasasData.updatedAt as any).toDate()
+                ).toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' })
+              ) : (
+                <span className="flex items-center justify-end">
+                  Sync<span className="inline-block w-2 text-left">{dots}</span>
+                </span>
+              )}
             </div>
             <p className="text-[9px] uppercase tracking-wider text-amber-600/70 dark:text-amber-500/70 truncate">
               {isSyncing ? 'Esperando GCP' : 'vía Cron Job'}

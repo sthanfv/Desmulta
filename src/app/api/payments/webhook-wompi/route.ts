@@ -192,7 +192,9 @@ export async function POST(req: NextRequest) {
         bannedAt: FieldValue.serverTimestamp(),
         reference,
       });
-      logger.security('[webhook-wompi] IP BANEADA POR INTENTO DE FRAUDE', { ip: purchase.ipAddress });
+      logger.security('[webhook-wompi] IP BANEADA POR INTENTO DE FRAUDE', {
+        ip: purchase.ipAddress,
+      });
     }
 
     return NextResponse.json({ ok: true, flagged: true });

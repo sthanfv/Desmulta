@@ -288,7 +288,8 @@ export async function construirAnalisisCompleto(
           tasaEAVigente: goResult.financiero.tasaEAVigente,
           smmlvVigente: goResult.financiero.smmlvVigente,
           smdlvVigente: goResult.financiero.smdlvVigente,
-          valorEnSMLMV: goResult.financiero.valorEnSMMLV ?? goResult.financiero.valorEnSMDLV ?? null,
+          valorEnSMLMV:
+            goResult.financiero.valorEnSMMLV ?? goResult.financiero.valorEnSMDLV ?? null,
           vigenciaConstantesAnio: goResult.financiero.vigenciaAnio,
           fechaCalculo: goResult.financiero.fechaCalculo,
         },

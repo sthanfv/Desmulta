@@ -3,7 +3,7 @@ import { logger } from '@/lib/logger/security-logger';
 import { verifySignatureAppRouter } from '@upstash/qstash/nextjs';
 
 // 60 segundos de vida máxima para poder ejecutar el Jitter de hasta 45s
-export const maxDuration = 60; 
+export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
 async function handler(request: Request) {
@@ -11,9 +11,11 @@ async function handler(request: Request) {
   // Genera un retraso aleatorio entre 1 y 5 segundos (1000ms - 5000ms)
   // Reducido de 45s a 5s porque Render tarda 50s en despertar. Si sumamos 45s + 50s = 95s, Vercel nos mata a los 60s.
   const jitterMs = Math.floor(Math.random() * 4000) + 1000;
-  
-  logger.info(`[KEEPALIVE] QStash Cron iniciado. Aplicando Jitter de ${jitterMs}ms antes de disparar Pings...`);
-  
+
+  logger.info(
+    `[KEEPALIVE] QStash Cron iniciado. Aplicando Jitter de ${jitterMs}ms antes de disparar Pings...`
+  );
+
   await new Promise((resolve) => setTimeout(resolve, jitterMs));
 
   // 2. Disparar Pings a las máquinas con AbortController de 5 segundos.
@@ -35,13 +37,15 @@ async function handler(request: Request) {
     logger.info(`[KEEPALIVE] Pinging Python OCR: ${pythonHealthUrl}`);
     pingPromises.push(
       fetch(pythonHealthUrl, { method: 'GET', signal: createTimeoutSignal(5000) })
-        .then(res => res.text())
-        .catch(err => {
+        .then((res) => res.text())
+        .catch((err) => {
           // Si es AbortError, significa que tocamos la puerta y nos fuimos. ¡Perfecto!
           if (err.name === 'AbortError') {
-             logger.info('[KEEPALIVE] Python ping tocó la puerta (Timeout 5s esperado por Cold Start).');
+            logger.info(
+              '[KEEPALIVE] Python ping tocó la puerta (Timeout 5s esperado por Cold Start).'
+            );
           } else {
-             logger.error('[KEEPALIVE] Python ping falló', err);
+            logger.error('[KEEPALIVE] Python ping falló', err);
           }
         })
     );
@@ -49,11 +53,11 @@ async function handler(request: Request) {
 
   await Promise.allSettled(pingPromises);
   logger.info('[KEEPALIVE] Pings completados/abortados con éxito.');
-  
+
   return NextResponse.json({
     status: 'woke_up',
     jitter_applied_ms: jitterMs,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 }
 

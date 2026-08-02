@@ -78,7 +78,8 @@ export function ImageUpload({
     const timeParts = [];
     if (hours > 0) timeParts.push(`${hours} hora${hours > 1 ? 's' : ''}`);
     if (minutes > 0) timeParts.push(`${minutes} minuto${minutes > 1 ? 's' : ''}`);
-    if (seconds > 0 || timeParts.length === 0) timeParts.push(`${seconds} segundo${seconds > 1 ? 's' : ''}`);
+    if (seconds > 0 || timeParts.length === 0)
+      timeParts.push(`${seconds} segundo${seconds > 1 ? 's' : ''}`);
     return timeParts.join(', ').replace(/, ([^,]*)$/, ' y $1');
   };
 
@@ -114,11 +115,11 @@ export function ImageUpload({
       // MANTENER PREVIEW: No hacemos setPreview(null) para que el usuario
       // vea qué imagen fue rechazada.
       onAnalisisTecnico?.(undefined);
-      
+
       if (resultado.retryAfter) {
         setCountdown(resultado.retryAfter);
       }
-      
+
       setError(
         resultado.error || errorOCR || 'Imagen rechazada: No se detectaron datos del SIMIT.'
       );

@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
       ip = forwardedFor.split(',')[0].trim();
     }
     ip = ip ?? '127.0.0.1';
-    
+
     const rateLimit = await checkRateLimit('consultation', ip);
 
     if (rateLimit.blocked) {

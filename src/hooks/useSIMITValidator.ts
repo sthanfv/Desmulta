@@ -123,7 +123,7 @@ import { comprimirCaptura } from '@/lib/optimizador-imagenes';
 const reconocerTextoConIA = async (
   file: File,
   onProgress?: (progreso: number) => void
-): Promise<{ texto: string; palabras: TesseractWord[]; comparendo?: ComparendoEstructurado[] }> => {
+): Promise<{ texto: string; palabras: TesseractWord[]; comparendo?: ComparendoEstructurado[]; proveedor?: string }> => {
   onProgress?.(10);
 
   const base64 = await new Promise<string>((resolve, reject) => {
@@ -261,6 +261,14 @@ export const useSIMITValidator = () => {
 
           setProgresoOCR(100);
           clearTimeout(ocrTimeoutId);
+
+          // 🛡️ AUDITORÍA 2026-08-01: T-PY-02 - Activar revisión manual si se usó el fallback Tesseract
+          if (iaData.proveedor === 'python-tesseract-native') {
+            mediaLogger.log('OCR', 'ADVERTENCIA: Proveedor Tesseract (Fallback) detectado. Posibles errores en tablas complejas. Requiere revisión manual.');
+            resultRaw.data.confidence = 69; // Forzamos requiresManualReview abajo
+          }
+          
+          
         } else {
           // --- INICIO CÓDIGO TESSERACT (RESERVA) ---
           const ocrTask = async () => {
@@ -449,7 +457,9 @@ export const useSIMITValidator = () => {
 
       if (!hasSimitFormat) {
         mediaLogger.log('FILE', 'Imagen rechazada por falta de patrones SIMIT');
-        throw new Error('Imagen rechazada. No se detectaron datos del SIMIT. Coloque la imagen correcta.');
+        throw new Error(
+          'Imagen rechazada. No se detectaron datos del SIMIT. Coloque la imagen correcta.'
+        );
       }
 
       const palabrasDetectadas: OcrWord[] = words.map((w) => ({
@@ -510,6 +520,8 @@ export const useSIMITValidator = () => {
         });
       }
 
+      const requiresManualReview = confidenceScore < 70;
+
       return {
         esValida: true,
         coincidencias,
@@ -519,7 +531,8 @@ export const useSIMITValidator = () => {
         ocrData,
         infoEducativa: infoEducativas.length > 0 ? infoEducativas[0] : null,
         infoEducativas: infoEducativas.length > 0 ? infoEducativas : null,
-        comparendosEstructurados, // Propagar array a los componentes
+        comparendosEstructurados,
+        requiresManualReview,
       };
     } catch (error) {
       const mensaje = error instanceof Error ? error.message : 'Error al procesar la imagen.';

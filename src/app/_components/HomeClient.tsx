@@ -217,7 +217,7 @@ export default function HomeClient({
           {/* Glowing orbs para estética AMOLED premium sin comprometer el contraste */}
           <div className="absolute -top-40 -left-40 w-96 h-96 bg-primary/5 rounded-full blur-[120px] -z-10 pointer-events-none" />
           <div className="absolute top-40 -right-40 w-96 h-96 bg-blue-500/5 rounded-full blur-[120px] -z-10 pointer-events-none" />
-          
+
           <div className="mb-8 md:mb-10 text-center relative z-10">
             <h2 className="text-3xl md:text-4xl font-black text-foreground tracking-tight">
               {formMode === 'simit' ? 'Envío Rápido SIMIT' : 'Estudio de Viabilidad'}
@@ -319,7 +319,7 @@ export default function HomeClient({
         onOpenChange={setIsWhatsAppWarningOpen}
         title={<span className="font-black tracking-tight text-2xl">Asesoría Directa</span>}
         icon={
-          <m.div 
+          <m.div
             initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: 'spring', damping: 15 }}
@@ -338,18 +338,21 @@ export default function HomeClient({
         <div className="space-y-6 relative z-10 mt-2">
           {/* Fondo difuminado sutil para dar estilo premium */}
           <div className="absolute -top-32 -right-32 w-72 h-72 bg-[#25D366]/5 rounded-full blur-[100px] -z-10 pointer-events-none" />
-          
-          <m.p 
+
+          <m.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
             className="text-muted-foreground text-base md:text-lg leading-relaxed font-medium text-center"
           >
             Recuerde que el estudio de viabilidad base es{' '}
-            <span className="text-foreground font-black bg-[#25D366]/10 px-2 py-0.5 rounded-md border border-[#25D366]/20">100% gratuito</span>.
+            <span className="text-foreground font-black bg-[#25D366]/10 px-2 py-0.5 rounded-md border border-[#25D366]/20">
+              100% gratuito
+            </span>
+            .
           </m.p>
 
-          <m.div 
+          <m.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
@@ -361,12 +364,12 @@ export default function HomeClient({
             </div>
             <p className="text-xs md:text-sm text-foreground/80 leading-relaxed relative z-10">
               El canal directo está diseñado para iniciar la{' '}
-              <strong className="text-foreground">contratación de trámites</strong>. La gestión administrativa genera honorarios
-              por resultados.
+              <strong className="text-foreground">contratación de trámites</strong>. La gestión
+              administrativa genera honorarios por resultados.
             </p>
           </m.div>
 
-          <m.div 
+          <m.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}

@@ -12,6 +12,9 @@
 import { getApps, initializeApp, cert, type App } from 'firebase-admin/app';
 import { logger } from './logger/security-logger';
 import { FirebaseCircuitBreaker } from '@/lib/security/circuit-breaker';
+// 🛡️ AUDITORÍA 2026-08-01: FirebaseCircuitBreaker usa estado In-Memory intencionalmente (T-NX-05).
+// No se migró al modelo CircuitBreakerFs porque crearía una dependencia circular: 
+// necesitaría consultar Firestore para saber si puede inicializar la conexión a Firestore.
 
 /**
  * Sanitiza, reformatea y reconstruye la llave privada RSA/PKCS8 al formato

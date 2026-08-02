@@ -301,11 +301,12 @@ export function SavingsCalculator() {
             <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-xl flex items-start gap-3 animate-in fade-in zoom-in-95">
               <AlertOctagon className="w-6 h-6 text-red-500 shrink-0 mt-0.5" />
               <div>
-                <h4 className="font-bold text-red-600 mb-1">
-                  Límite de Consultas Alcanzado
-                </h4>
+                <h4 className="font-bold text-red-600 mb-1">Límite de Consultas Alcanzado</h4>
                 <p className="text-sm text-red-700/80 mb-2">
-                  Para garantizar que esta herramienta gratuita esté siempre disponible para todos los colombianos, permitimos un máximo de 10 consultas por día por usuario. Así evitamos abusos automatizados y mantenemos el sistema rápido para todos. ¡Vuelve pronto!
+                  Para garantizar que esta herramienta gratuita esté siempre disponible para todos
+                  los colombianos, permitimos un máximo de 10 consultas por día por usuario. Así
+                  evitamos abusos automatizados y mantenemos el sistema rápido para todos. ¡Vuelve
+                  pronto!
                 </p>
                 <div className="inline-block bg-red-500/20 text-red-700 font-bold px-3 py-1.5 rounded-lg text-sm font-mono tracking-widest">
                   ⏱️ {formatTimeLeft(retryTimeLeft)}
@@ -315,7 +316,10 @@ export function SavingsCalculator() {
           )}
 
           {/* --- CONTROLES FINANCIEROS Y TIEMPO (DOBLE INTERFAZ) --- */}
-          <Tabs defaultValue="slider" className={`w-full space-y-6 ${rateLimitReached ? 'opacity-50 pointer-events-none' : ''}`}>
+          <Tabs
+            defaultValue="slider"
+            className={`w-full space-y-6 ${rateLimitReached ? 'opacity-50 pointer-events-none' : ''}`}
+          >
             <TabsList className="grid w-full grid-cols-2 bg-foreground/10 p-1 rounded-xl">
               <TabsTrigger
                 value="slider"

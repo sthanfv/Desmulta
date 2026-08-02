@@ -76,12 +76,8 @@ async function verifyTurnstileToken(token: string | undefined): Promise<boolean>
 type ConsultationData = z.infer<typeof ConsultationSchema>;
 type SimitCaptureData = z.infer<typeof SimitCaptureSchema>;
 
-try {
-  getAdminApp();
-} catch (error) {
-  const message = error instanceof Error ? error.message : 'Error desconocido';
-  logger.error('[firebase-admin] Fallo preventivo de inicialización:', { error: message });
-}
+// 🛡️ AUDITORÍA 2026-08-01: Se eliminó la inicialización preventiva de Firebase fuera del handler.
+// El handler POST ya invoca getAdminApp() con su propio manejo de errores + Circuit Breaker.
 
 export async function POST(request: NextRequest) {
   // ------------------------------------------------------------------
@@ -420,6 +416,24 @@ export async function POST(request: NextRequest) {
 
       return { idSecuencial, trackingUuid, docId: consultationRef.id, alreadyExists: false };
     });
+
+    // 🛡️ AUDITORÍA 2026-08-01: E-NX-03 - Webhook para Email Marketing (Retención de Leads)
+    if (!result.alreadyExists && process.env.EMAIL_MARKETING_WEBHOOK_URL) {
+      try {
+        const payload = {
+          email: dataToSave.emailContacto,
+          nombre: dataToSave.nombre,
+          fecha: new Date().toISOString(),
+          fuente: dataToSave.fuente,
+        };
+        // Se ejecuta en background sin bloquear la respuesta al usuario (edge compatible)
+        fetch(process.env.EMAIL_MARKETING_WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        }).catch(err => logger.warn('[Marketing] Error en webhook:', err));
+      } catch (e) {}
+    }
 
     return NextResponse.json(
       {

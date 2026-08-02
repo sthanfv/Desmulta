@@ -155,31 +155,31 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
 
                 {multas.length > 0 && (
                   <m.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="p-4 rounded-2xl bg-primary/10 border border-primary/20 backdrop-blur-md flex items-center gap-4 group/expediente cursor-pointer hover:bg-primary/15 transition-all"
-                onClick={onConsultar}
-              >
-                <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow-md">
-                  <FileText size={20} />
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-widest text-primary">
-                    Expediente Activo
-                  </p>
-                  <p className="text-sm font-bold text-foreground">
-                    Tiene {multas.length}{' '}
-                    {multas.length === 1 ? 'multa detectada' : 'multas detectadas'} por analizar
-                  </p>
-                </div>
-                <ChevronRight
-                  size={16}
-                  className="text-primary ml-auto group-hover/expediente:translate-x-1 transition-transform"
-                />
-              </m.div>
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-4 rounded-2xl bg-primary/10 border border-primary/20 backdrop-blur-md flex items-center gap-4 group/expediente cursor-pointer hover:bg-primary/15 transition-all"
+                    onClick={onConsultar}
+                  >
+                    <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow-md">
+                      <FileText size={20} />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-widest text-primary">
+                        Expediente Activo
+                      </p>
+                      <p className="text-sm font-bold text-foreground">
+                        Tiene {multas.length}{' '}
+                        {multas.length === 1 ? 'multa detectada' : 'multas detectadas'} por analizar
+                      </p>
+                    </div>
+                    <ChevronRight
+                      size={16}
+                      className="text-primary ml-auto group-hover/expediente:translate-x-1 transition-transform"
+                    />
+                  </m.div>
+                )}
+              </>
             )}
-          </>
-        )}
 
             {/* Simulador — IZQUIERDA, debajo del texto */}
             <m.div

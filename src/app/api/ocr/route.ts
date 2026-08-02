@@ -14,6 +14,16 @@ import * as admin from 'firebase-admin';
 
 const redis = Redis.fromEnv();
 
+// 🛡️ AUDITORÍA 2026-08-01: Schema pre-compilado a nivel de módulo para evitar re-creación en cada request.
+const OcrBodySchema = z.object({
+  imageBase64: z
+    .string({ required_error: 'imageBase64 es requerido.' })
+    .max(8_388_608, 'La imagen excede el límite de 4MB en base64.'),
+  mimeType: z.enum(['image/jpeg', 'image/png', 'image/webp'], {
+    errorMap: () => ({ message: 'Tipo de imagen no permitido. Usar JPG, PNG o WebP.' }),
+  }),
+});
+
 /**
  * API Route: /api/ocr
  *
@@ -71,15 +81,16 @@ export async function POST(request: NextRequest) {
     if (!rateLimitStatus.success) {
       const waitMs = rateLimitStatus.resetTime - Date.now();
       const waitSec = Math.max(0, Math.ceil(waitMs / 1000));
-      
+
       const hours = Math.floor(waitSec / 3600);
       const minutes = Math.floor((waitSec % 3600) / 60);
       const seconds = waitSec % 60;
-      
+
       const timeParts = [];
       if (hours > 0) timeParts.push(`${hours} hora${hours > 1 ? 's' : ''}`);
       if (minutes > 0) timeParts.push(`${minutes} minuto${minutes > 1 ? 's' : ''}`);
-      if (seconds > 0 || timeParts.length === 0) timeParts.push(`${seconds} segundo${seconds > 1 ? 's' : ''}`);
+      if (seconds > 0 || timeParts.length === 0)
+        timeParts.push(`${seconds} segundo${seconds > 1 ? 's' : ''}`);
       const timeString = timeParts.join(', ').replace(/, ([^,]*)$/, ' y $1');
 
       return NextResponse.json(
@@ -117,15 +128,6 @@ export async function POST(request: NextRequest) {
     }
 
     // 2. Validar el body con Zod (estructura + tipos)
-    const OcrBodySchema = z.object({
-      imageBase64: z
-        .string({ required_error: 'imageBase64 es requerido.' })
-        .max(8_388_608, 'La imagen excede el límite de 4MB en base64.'),
-      mimeType: z.enum(['image/jpeg', 'image/png', 'image/webp'], {
-        errorMap: () => ({ message: 'Tipo de imagen no permitido. Usar JPG, PNG o WebP.' }),
-      }),
-    });
-
     const parsedBody = OcrBodySchema.safeParse(await request.json());
     if (!parsedBody.success) {
       return NextResponse.json(
@@ -273,12 +275,18 @@ export async function POST(request: NextRequest) {
         getAdminApp();
         const adminDb = getFirestore();
         const todayStr = new Date().toISOString().split('T')[0];
-        await adminDb.collection('system_metrics').doc(`daily_${todayStr}`).set({
-          date: todayStr,
-          type: 'daily',
-          gemini_requests: admin.firestore.FieldValue.increment(1),
-          last_updated: admin.firestore.FieldValue.serverTimestamp()
-        }, { merge: true });
+        await adminDb
+          .collection('system_metrics')
+          .doc(`daily_${todayStr}`)
+          .set(
+            {
+              date: todayStr,
+              type: 'daily',
+              gemini_requests: admin.firestore.FieldValue.increment(1),
+              last_updated: admin.firestore.FieldValue.serverTimestamp(),
+            },
+            { merge: true }
+          );
       } catch (fsError) {
         logger.warn('[OCR] Error guardando uso de Gemini en Firestore', {
           error: String(fsError),
@@ -347,7 +355,7 @@ export async function POST(request: NextRequest) {
           .digest('hex');
 
         logger.info('[OCR] Llamando al microservicio Lector-OCR (Python)...');
-        
+
         const reqHeaders: Record<string, string> = {
           'Content-Type': 'application/json',
           'X-Engine-Timestamp': timestamp,
@@ -361,14 +369,20 @@ export async function POST(request: NextRequest) {
             const auth = new GoogleAuth();
             const client = await auth.getIdTokenClient(ocrFallbackUrl);
             // TypeScript exige casting estricto (a través de unknown) porque Headers no se superpone nativamente con Record
-            const authHeaders = (await client.getRequestHeaders()) as unknown as Record<string, string>;
+            const authHeaders = (await client.getRequestHeaders()) as unknown as Record<
+              string,
+              string
+            >;
             const authToken = authHeaders.Authorization || authHeaders.authorization;
             if (authToken) {
               reqHeaders['Authorization'] = authToken;
               logger.info('[OCR] Token OIDC inyectado exitosamente para Cloud Run IAM.');
             }
           } catch (authError) {
-            logger.warn('[OCR] No se pudo inyectar el token OIDC (Posible entorno local o credenciales ADC faltantes):', authError);
+            logger.warn(
+              '[OCR] No se pudo inyectar el token OIDC (Posible entorno local o credenciales ADC faltantes):',
+              authError
+            );
           }
         }
 
@@ -383,16 +397,19 @@ export async function POST(request: NextRequest) {
           setTimeout(() => reject(new Error('PYTHON_OCR_TIMEOUT_55S')), 55000);
         });
 
-        const fallbackResponse = await Promise.race([fetchPromise, ocrTimeout]) as Response;
+        const fallbackResponse = (await Promise.race([fetchPromise, ocrTimeout])) as Response;
 
         if (!fallbackResponse.ok) {
           throw new Error(`El Lector-OCR falló (HTTP ${fallbackResponse.status})`);
         }
 
         const fallbackData = await fallbackResponse.json();
-        
+
         if (fallbackData.error === 'NO_VALID_DOCUMENT') {
-          logger.warn('[OCR] Imagen rechazada por Lector-OCR (Fallback): no parece un documento de tránsito válido', { ip });
+          logger.warn(
+            '[OCR] Imagen rechazada por Lector-OCR (Fallback): no parece un documento de tránsito válido',
+            { ip }
+          );
           return NextResponse.json(
             apiError(
               'INVALID_DOCUMENT',
@@ -401,10 +418,12 @@ export async function POST(request: NextRequest) {
             { status: 422 }
           );
         }
-        
+
         logger.info('[OCR] Procesamiento con Lector-OCR (Python) exitoso', {
           proveedor: fallbackData.proveedor,
-          multasEncontradas: Array.isArray(fallbackData.comparendo) ? fallbackData.comparendo.length : 1
+          multasEncontradas: Array.isArray(fallbackData.comparendo)
+            ? fallbackData.comparendo.length
+            : 1,
         });
 
         return NextResponse.json({
@@ -423,9 +442,6 @@ export async function POST(request: NextRequest) {
         throw new Error(`Fallback Lector-OCR falló: ${fMsg}. Error original Gemini: ${gMsg}`);
       }
       // --- FIN BLOQUE LECTOR OCR (PYTHON FALLBACK) ---
-
-      // Propagamos el error de Gemini al manejador principal para devolver el 503/500
-      throw geminiError;
     }
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error);

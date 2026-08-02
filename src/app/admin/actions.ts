@@ -55,7 +55,7 @@ function serializeDataForNextJS(obj: unknown): unknown {
 }
 
 /**
- * Mapper Centralizado (Zero-PII): 
+ * Mapper Centralizado (Zero-PII):
  * Asegura que todas las funciones apliquen exactamente las mismas reglas de ofuscación
  * a los datos sensibles antes de enviarlos al frontend del CRM.
  */
@@ -1033,17 +1033,18 @@ const getCachedAnalyticsStats = unstable_cache(
       .toISOString()
       .split('T')[0];
 
-    const [rawLeadsSnap, casesCountSnap, globalMetricsSnap, dailyMetricsSnap, tasasSnap] = await Promise.all([
-      db.collection('leads').count().get(),
-      db.collection('cases').count().get(),
-      db.collection('system_metrics').where('type', '==', 'global').get(),
-      db
-        .collection('system_metrics')
-        .where('type', '==', 'daily')
-        .where('date', '>=', thirtyDaysAgoStr)
-        .get(),
-      db.collection('config').doc('tasas_legales').get(),
-    ]);
+    const [rawLeadsSnap, casesCountSnap, globalMetricsSnap, dailyMetricsSnap, tasasSnap] =
+      await Promise.all([
+        db.collection('leads').count().get(),
+        db.collection('cases').count().get(),
+        db.collection('system_metrics').where('type', '==', 'global').get(),
+        db
+          .collection('system_metrics')
+          .where('type', '==', 'daily')
+          .where('date', '>=', thirtyDaysAgoStr)
+          .get(),
+        db.collection('config').doc('tasas_legales').get(),
+      ]);
 
     const prospectosTotales = rawLeadsSnap.data().count;
     const totalCases = casesCountSnap.data().count;
@@ -1087,7 +1088,7 @@ const getCachedAnalyticsStats = unstable_cache(
     let step0 = 0,
       step1 = 0,
       step2 = 0;
-      
+
     let geminiRequestsToday = 0;
     const todayStr = new Date().toISOString().split('T')[0];
 
@@ -1099,7 +1100,7 @@ const getCachedAnalyticsStats = unstable_cache(
       step0 += data.funnel_step_0 || 0;
       step1 += data.funnel_step_1 || 0;
       step2 += data.funnel_step_2 || 0;
-      
+
       // Consumo Gemini (Hoy)
       if (date === todayStr) {
         geminiRequestsToday += data.gemini_requests || 0;

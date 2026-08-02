@@ -20,6 +20,10 @@ import type { NextRequest } from 'next/server';
 import { cspHeader } from '@/lib/security-headers';
 import { verifyVipSession } from '@/lib/security/vip-jwt';
 
+// 🛡️ AUDITORÍA 2026-08-01: Imports a nivel de módulo para evitar penalización de cold start en Edge.
+import { getTokens } from 'next-firebase-auth-edge/lib/next/tokens';
+import { jwtVerify } from 'jose';
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 /**
@@ -74,6 +78,8 @@ export async function middleware(request: NextRequest) {
   // Solo Colombia (CO) tiene acceso. Rutas internas server-to-server y
   // rutas de assets están exentas. En desarrollo, la cabecera no existe
   // y se permite el paso (modo de fallo seguro = abierto en dev).
+  // 🛡️ AUDITORÍA 2026-08-01: S-NX-01 - Geobloqueo basado en header de Vercel.
+  // Riesgo Aceptado: Si la app se mueve de Vercel, x-vercel-ip-country podría ser spoofed por el cliente.
   const paisUsuario = request.headers.get('x-vercel-ip-country');
   const esRutaInterna = pathname.startsWith('/api/internal');
   const esRutaAuth = pathname.startsWith('/api/auth');
@@ -86,6 +92,9 @@ export async function middleware(request: NextRequest) {
     pathname.endsWith('.xml') || pathname.endsWith('.txt') || pathname.endsWith('.html');
 
   const userAgent = request.headers.get('user-agent') || '';
+  // 🛡️ AUDITORÍA 2026-08-01: S-NX-04 - User-Agent spoofing.
+  // Riesgo Aceptado: Un usuario puede evadir el geobloqueo usando UA de Googlebot.
+  // TODO: Si hay abuso real, validar IP contra ASN de Google (rDNS).
   const isBot =
     /Googlebot|Google-InspectionTool|bingbot|yandex|baiduspider|twitterbot|facebookexternalhit|rogerbot|linkedinbot|embedly|quora link preview|showyoubot|outbrain|pinterest|slackbot|vkShare|W3C_Validator|whatsapp|OAI-SearchBot|PerplexityBot/i.test(
       userAgent
@@ -110,7 +119,8 @@ export async function middleware(request: NextRequest) {
 
   // ── 3. Rutas /api y 4. Rutas VIP Unificadas ──────────────────────────────
   const isVipRoute = pathname.startsWith('/api/vip') || pathname.startsWith('/vip/dashboard');
-  const isVipAuthRoute = pathname.startsWith('/api/vip/auth') || pathname.startsWith('/api/vip/logout');
+  const isVipAuthRoute =
+    pathname.startsWith('/api/vip/auth') || pathname.startsWith('/api/vip/logout');
 
   // 🛡️ API VIP Protection (Fail-Closed) - DRY Optimizado
   if (isVipRoute && !isVipAuthRoute) {
@@ -119,7 +129,10 @@ export async function middleware(request: NextRequest) {
 
     if (!isVip) {
       if (pathname.startsWith('/api/')) {
-        const response = NextResponse.json({ error: 'Sesión inválida o expirada' }, { status: 401 });
+        const response = NextResponse.json(
+          { error: 'Sesión inválida o expirada' },
+          { status: 401 }
+        );
         if (sessionToken) response.cookies.delete('_vip_session');
         applyCommonSecurityHeaders(response, isProduction);
         return response;
@@ -163,7 +176,7 @@ export async function middleware(request: NextRequest) {
   // ── 5. Rutas /admin — Guard JWT criptográfico ────────────────────────────
   if (pathname.startsWith('/admin')) {
     // 🛡️ E2E TESTING BYPASS: Permitir el bypass de autenticación en tests de Playwright usando el emulador
-    const isE2E = process.env.E2E_TEST_MODE === 'true'; 
+    const isE2E = process.env.E2E_TEST_MODE === 'true';
     const e2eSecret = process.env.E2E_TEST_SECRET; // ej: 32+ bytes aleatorios, solo en CI
     const mockSessionValue = request.cookies.get('__session')?.value;
 
@@ -176,7 +189,6 @@ export async function middleware(request: NextRequest) {
     }
 
     try {
-      const { getTokens } = await import('next-firebase-auth-edge/lib/next/tokens');
       const tokens = await getTokens(request.cookies, {
         cookieName: '__session',
         cookieSignatureKeys: [
@@ -214,7 +226,6 @@ export async function middleware(request: NextRequest) {
 
         // Validar firma del token JWT 2FA
         try {
-          const { jwtVerify } = await import('jose');
           const token = request.cookies.get('admin-2fa-token')?.value;
           const jwtSecret = process.env.GOD_MODE_JWT_SECRET;
           if (!token || !jwtSecret) {
@@ -273,7 +284,7 @@ export async function middleware(request: NextRequest) {
     'camera=*, microphone=(), geolocation=(), payment=(), xr-spatial-tracking=(self "https://challenges.cloudflare.com")'
   );
   response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
-  
+
   // FIX CORP: Permitir recursos incrustados cruzados (Firebase Storage/Unsplash) sin colisión
   response.headers.set('Cross-Origin-Resource-Policy', 'cross-origin');
 
