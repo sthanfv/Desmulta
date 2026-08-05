@@ -19,7 +19,7 @@ export interface AnalyticsData {
   funnelData?: { name: string; value: number; fill: string }[];
   tasasData?: {
     usuraEA: number;
-    updatedAt: string | null;
+    updatedAt: string | number | null;
     history: Record<string, unknown>[];
   } | null;
 }

@@ -141,7 +141,7 @@ interface AnalyticsViewProps {
   error?: string | null;
   tasasData?: {
     usuraEA: number;
-    updatedAt: string | number;
+    updatedAt: string | number | null;
     history: Record<string, unknown>[];
   } | null;
 }

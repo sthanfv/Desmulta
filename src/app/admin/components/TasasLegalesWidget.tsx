@@ -8,7 +8,7 @@ interface TasasLegalesWidgetProps {
   tasasData:
     | {
         usuraEA: number;
-        updatedAt: string | number;
+        updatedAt: string | number | null;
         history: Record<string, unknown>[];
       }
     | undefined
