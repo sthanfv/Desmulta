@@ -81,7 +81,7 @@ export async function getNextOperator(
 /**
  * 🛡️ AUDITORÍA 2026-08-01: Reasignación de huérfanos (T-NX-06)
  * Reasigna los leads/consultas de un operador que fue eliminado del roster.
- * 
+ *
  * @param db - Instancia de Firestore
  * @param removedUid - UID del operador eliminado
  * @param fallbackUid - UID del operador al que se le asignarán los casos (Admin u otro)
@@ -92,24 +92,27 @@ export async function reassignOrphanedLeads(
   fallbackUid: string
 ): Promise<void> {
   const collectionsToUpdate = ['consultations', 'leads'];
-  
+
   for (const coll of collectionsToUpdate) {
-    const snapshot = await db.collection(coll)
+    const snapshot = await db
+      .collection(coll)
       .where('assignedTo', '==', removedUid)
       .where('status', 'in', ['PENDING', 'IN_PROGRESS', 'URGENT'])
       .get();
-      
+
     if (snapshot.empty) continue;
 
     const batch = db.batch();
     snapshot.docs.forEach((doc) => {
-      batch.update(doc.ref, { 
+      batch.update(doc.ref, {
         assignedTo: fallbackUid,
-        updatedAt: FieldValue.serverTimestamp()
+        updatedAt: FieldValue.serverTimestamp(),
       });
     });
-    
+
     await batch.commit();
-    logger.info(`[reassignment] Reasignados ${snapshot.size} documentos en ${coll} de ${removedUid} a ${fallbackUid}`);
+    logger.info(
+      `[reassignment] Reasignados ${snapshot.size} documentos en ${coll} de ${removedUid} a ${fallbackUid}`
+    );
   }
 }

@@ -20,7 +20,7 @@ export interface AnalyticsData {
   tasasData?: {
     usuraEA: number;
     updatedAt: string | null;
-    history: any[];
+    history: Record<string, unknown>[];
   } | null;
 }
 

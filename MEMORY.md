@@ -18,19 +18,6 @@
 
 3.  **Seguridad & Arquitectura**:
     *   **Firestore Security Rules**: Aislamiento estricto por tenant/operador, validación de schemas en DB.
-    *   **Middlewares**: Firewall de Cloudflare, Edge-Middlewares para sanitización de Request.
-    *   **Sincronización Automática**: El roster de operadores se auto-sincroniza en la base de datos `metadata/operator_roster`.
-
-### Últimos Cambios (Sesión Actual)
-*   **Asignación Round-Robin Transaccional**: Creados `operator-assignment.ts` y `sync-operator-roster.ts` e integrados en `/api/create-consultation` y `/api/leads`.
-*   **UI Dashboard/Kanban**: Filtro de "Mis Asignaciones", indicador de Carga de Trabajo y Panel Analítico Activo.
-*   **Modo Compacto Tarjetas Kanban**: Refactorización del diseño de tarjetas eliminando miniaturas inútiles (se reemplazaron por un icono de clip), cambiando badges largos por avatares pequeños, y usando *hover states* para acciones secundarias.
-*   **Seguridad de Sesión Estricta (Tab-Lock)**: Se refactorizó `/api/auth/session` para emitir cookies de sesión volátiles (sin `maxAge`), y se inyectó un candado en `sessionStorage` durante el inicio de sesión. `AdminDashboard.tsx` verifica este candado al montar; si no existe (ej. pestaña duplicada o reabierta), el usuario es expulsado, garantizando que el ciclo de vida de la sesión esté atado estrictamente a la pestaña activa.
-*   **Fix Crítico: Corrupción de SDK Firebase Auth**: Se ajustó `client-logout.ts` y `pwa-heal.ts` para EVITAR la eliminación forzada de la base de datos IndexedDB `firebaseLocalStorageDb`. Borrar esta base de datos en caliente (operación "Scorched Earth") corrompía el SDK de Firebase en la pestaña actual, lo que ocasionaba un falso error `auth/network-request-failed` en intentos de login posteriores en la misma ventana.
-*   **Fix Dashboard Crash (React Firebase Hooks)**: Se añadió la opción `{ suppressGlobalError: true }` a las llamadas de `useDoc` referentes a `site_config` dentro de `AdminDashboard.tsx` para evitar que un error de lectura de permisos bloquee todo el Dashboard.
-*   **Fix Backend Queries Case-Sensitivity**: Se añadió una redundancia de mapeo en mayúsculas a las consultas `.where('status', 'in', [...])` de `getConsultations` y `getCases` dentro de `actions.ts`. Esto soluciona un bug en el que los leads antiguos (cuyo estado en BD estaba en MAYÚSCULAS) no cargaban en el tablero Kanban.
-*   **Fix UX: Layout Shift en Calculadora**: En `SavingsCalculator.tsx` se solucionó el *flickering* (parpadeo) de Recharts.
-*   **Ajuste Estadísticas**: Se ajustó el *fallback value* del componente estadístico a `204+` desde `754+` de acuerdo a lo reportado.
 *   **Diagnóstico de Filtros Móviles**: Se añadió un indicador visual en el estado "Vacío" del Kanban que muestra explícitamente si existen expedientes ocultos debido a filtros activos (como fechas o asignaciones), para diferenciar un array filtrado de una falla en la red o caché.
 *   **UI/UX Restauración de Avanzar**: Se eliminó la clase restrictiva (`md:hidden`) del botón de "Avanzar columna" en `TarjetaKanban.tsx` para que vuelva a estar visible en la vista de PC, por requerimiento directo del usuario.
 *   **Lenguaje Natural**: Se cambió la terminología técnica ('leads') por vocabulario orientado al cliente ('solicitud inicial') en la generación de historiales de nuevos expedientes en `actions.ts`.
@@ -103,7 +90,15 @@
 - **Por qué cambió**: Reporte de usuario indicando que la calculadora pública estaba bloqueando el acceso en el primer uso, lo cual impactaba directamente la conversión de usuarios.
 - **Estado Actual**: Implementado. El sistema ahora degrada de forma elegante garantizando la continuidad del negocio sin comprometer la seguridad de las transacciones financieras.
 
+## Hitos de Refactorización y Auditoría
+
+### [2026-08-04] Fase 2: Estabilización de Infraestructura (Wompi y Circuit Breaker)
+- **Qué cambió:** 
+  - `webhook-wompi/route.ts`: Se corrigió la discrepancia de divisas (`amount_in_cents / 100`), evitando falsos positivos de fraude al comparar contra la base de datos en COP (T-FE-01).
+  - `server-circuit-breaker.ts`: Se implementó un Circuit Breaker global e híbrido para Firebase Admin. Este nuevo módulo utiliza Upstash Redis de forma asíncrona para compartir estado a través de todos los cold-starts de Vercel. Incorpora comportamiento **Fail-Open**: si Redis falla, ignora el error silenciosamente y opera con la memoria local, evitando colapsos completos. (T-FE-02, T-NX-05).
+- **Por qué cambió:** Prevenir baneos injustificados de usuarios legítimos que pagaron vía Wompi y asegurar la resiliencia en la inicialización de Firebase Admin en entornos Serverless, sin depender ciegamente de bases de datos externas de terceros.
+- **Archivos afectados:** `webhook-wompi/route.ts`, `server-circuit-breaker.ts`, `firebase-admin.ts`, `tests/firebase-admin.test.ts`.
+- **Estado:** Completado. Pendiente resultados de validación.
+
 ## [2026-08-02] Hardening IAM para OCR en Cloud Run
-- **Qué cambió:** \src/app/api/ocr/route.ts\ inyecta el token OIDC usando \google-auth-library\ y \GCP_SERVICE_ACCOUNT_KEY\ cuando invoca al servicio Python OCR Fallback.
-- **Por qué cambió:** Prevenir invocaciones anónimas a Cloud Run y reducir el riesgo de *Billing Exhaustion* configurando \--no-allow-unauthenticated\.
 - **Estado actual:** El BFF Next.js funge como *Invoker* autorizado exclusivo del OCR.

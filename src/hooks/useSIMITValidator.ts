@@ -123,7 +123,12 @@ import { comprimirCaptura } from '@/lib/optimizador-imagenes';
 const reconocerTextoConIA = async (
   file: File,
   onProgress?: (progreso: number) => void
-): Promise<{ texto: string; palabras: TesseractWord[]; comparendo?: ComparendoEstructurado[]; proveedor?: string }> => {
+): Promise<{
+  texto: string;
+  palabras: TesseractWord[];
+  comparendo?: ComparendoEstructurado[];
+  proveedor?: string;
+}> => {
   onProgress?.(10);
 
   const base64 = await new Promise<string>((resolve, reject) => {
@@ -156,7 +161,7 @@ const reconocerTextoConIA = async (
     } catch {
       throw new Error(`Error de red o servidor: HTTP ${response.status}`);
     }
-    const err = new Error(data.message || data.error || 'Error al procesar OCR con IA') as any;
+    const err = new Error(data.message || data.error || 'Error al procesar OCR con IA') as Error & { retryAfter?: number };
     if (data.details && typeof data.details.retryAfter === 'number') {
       err.retryAfter = data.details.retryAfter;
     }
@@ -264,11 +269,12 @@ export const useSIMITValidator = () => {
 
           // 🛡️ AUDITORÍA 2026-08-01: T-PY-02 - Activar revisión manual si se usó el fallback Tesseract
           if (iaData.proveedor === 'python-tesseract-native') {
-            mediaLogger.log('OCR', 'ADVERTENCIA: Proveedor Tesseract (Fallback) detectado. Posibles errores en tablas complejas. Requiere revisión manual.');
+            mediaLogger.log(
+              'OCR',
+              'ADVERTENCIA: Proveedor Tesseract (Fallback) detectado. Posibles errores en tablas complejas. Requiere revisión manual.'
+            );
             resultRaw.data.confidence = 69; // Forzamos requiresManualReview abajo
           }
-          
-          
         } else {
           // --- INICIO CÓDIGO TESSERACT (RESERVA) ---
           const ocrTask = async () => {
@@ -536,7 +542,7 @@ export const useSIMITValidator = () => {
       };
     } catch (error) {
       const mensaje = error instanceof Error ? error.message : 'Error al procesar la imagen.';
-      const retryAfter = (error as any).retryAfter;
+      const retryAfter = (error as Error & { retryAfter?: number }).retryAfter;
       mediaLogger.log('ERROR', 'Excepción capturada en Validador', { msg: mensaje });
       setErrorOCR(mensaje);
 

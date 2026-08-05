@@ -6,7 +6,7 @@ import { verifySignatureAppRouter } from '@upstash/qstash/nextjs';
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
-async function handler(request: Request) {
+async function handler(_request: Request) {
   // 1. Lógica Anti-Detección: Jitter Algorítmico (Ruido)
   // Genera un retraso aleatorio entre 1 y 5 segundos (1000ms - 5000ms)
   // Reducido de 45s a 5s porque Render tarda 50s en despertar. Si sumamos 45s + 50s = 95s, Vercel nos mata a los 60s.
@@ -22,9 +22,7 @@ async function handler(request: Request) {
   // No necesitamos esperar a que Render despierte (tarda 50s), solo necesitamos "tocarle la puerta".
   // Al tocarle la puerta, la máquina iniciará su proceso de encendido en background.
   const ocrFallbackUrl = process.env.OCR_FALLBACK_URL;
-  const goEngineUrl = process.env.GO_ENGINE_URL;
-
-  const pingPromises: Promise<any>[] = [];
+  const pingPromises: Promise<unknown>[] = [];
 
   const createTimeoutSignal = (ms: number) => {
     const controller = new AbortController();

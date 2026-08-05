@@ -157,7 +157,7 @@ describe('📊 Sistema Integrado de Telemetría, Modo Dios y Ventas', () => {
           return Promise.resolve({
             exists: true,
             data: () => ({
-              amountCop: 39000_00, // 39.000 COP en centavos
+              amountCop: 39000, // 39.000 COP puro
               productType: 'peticion_general',
               caseData: { shortId: 'EXP-101', infractorName: 'Pedro Pérez' },
             }),
@@ -236,7 +236,7 @@ describe('📊 Sistema Integrado de Telemetría, Modo Dios y Ventas', () => {
           return Promise.resolve({
             exists: true,
             data: () => ({
-              amountCop: 59000_00, // 59.000 COP esperado
+              amountCop: 59000, // 59.000 COP esperado
               productType: 'prescripcion_directa',
             }),
           });

@@ -80,7 +80,8 @@ export default async function MultaEspecificaPage(props: Props) {
             <AlertTriangle size={32} className="text-brand-500 w-6 h-6 sm:w-8 sm:h-8" />
           </div>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight mb-4 sm:mb-6 leading-tight">
-            {infraccion.titulo_seo} en <span className="text-brand-500 dark:text-brand-400">{ciudad.nombre}</span>
+            {infraccion.titulo_seo} en{' '}
+            <span className="text-brand-500 dark:text-brand-400">{ciudad.nombre}</span>
           </h1>
           <p className="text-lg sm:text-xl text-slate-600 dark:text-white/70 leading-relaxed">
             {infraccion.descripcion_seo} Las notificaciones enviadas por la{' '}
@@ -95,11 +96,18 @@ export default async function MultaEspecificaPage(props: Props) {
         <div className="max-w-4xl mx-auto">
           <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6 bg-white dark:bg-black/40 p-6 sm:p-8 rounded-[2rem] border border-slate-200 dark:border-white/5 shadow-sm">
             <div className="shrink-0 p-3 sm:p-4 bg-slate-100 dark:bg-white/5 rounded-2xl">
-              <BookOpen size={28} className="text-slate-700 dark:text-white/80 w-6 h-6 sm:w-7 sm:h-7" />
+              <BookOpen
+                size={28}
+                className="text-slate-700 dark:text-white/80 w-6 h-6 sm:w-7 sm:h-7"
+              />
             </div>
             <div>
-              <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">El Error de la Secretaría de Tránsito</h2>
-              <p className="text-slate-600 dark:text-white/70 leading-relaxed mb-4 sm:mb-6 text-sm sm:text-base">{infraccion.contexto_legal}</p>
+              <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">
+                El Error de la Secretaría de Tránsito
+              </h2>
+              <p className="text-slate-600 dark:text-white/70 leading-relaxed mb-4 sm:mb-6 text-sm sm:text-base">
+                {infraccion.contexto_legal}
+              </p>
               <div className="p-4 bg-brand-500/10 border border-brand-500/20 rounded-xl text-sm text-brand-300 font-medium flex items-center gap-3">
                 <ShieldCheck size={20} className="shrink-0" />
                 <span>

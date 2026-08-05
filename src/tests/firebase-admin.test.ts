@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { getAdminApp } from '../lib/firebase-admin';
-import { FirebaseCircuitBreaker } from '../lib/security/circuit-breaker';
+import { FirebaseCircuitBreakerGlobal as FirebaseCircuitBreaker } from '../lib/security/server-circuit-breaker';
 
 vi.mock('firebase-admin/app', () => ({
   getApps: vi.fn(() => []),

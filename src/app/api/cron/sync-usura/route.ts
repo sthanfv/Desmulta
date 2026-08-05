@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       if (body && typeof body.rate === 'number') {
         newRate = body.rate;
       }
-    } catch (e) {
+    } catch (_e) {
       // Body vacío, no es error, pasamos al fallback automático
     }
 

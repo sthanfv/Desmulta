@@ -8,8 +8,8 @@ interface TasasLegalesWidgetProps {
   tasasData:
     | {
         usuraEA: number;
-        updatedAt: any;
-        history: any[];
+        updatedAt: string | number;
+        history: Record<string, unknown>[];
       }
     | undefined
     | null;
@@ -63,7 +63,7 @@ export function TasasLegalesWidget({ tasasData }: TasasLegalesWidgetProps) {
                 new Date(
                   typeof tasasData.updatedAt === 'string'
                     ? tasasData.updatedAt
-                    : (tasasData.updatedAt as any).toDate()
+                    : (tasasData.updatedAt as string | number)
                 ).toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' })
               ) : (
                 <span className="flex items-center justify-end">

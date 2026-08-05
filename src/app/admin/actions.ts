@@ -59,6 +59,7 @@ function serializeDataForNextJS(obj: unknown): unknown {
  * Asegura que todas las funciones apliquen exactamente las mismas reglas de ofuscación
  * a los datos sensibles antes de enviarlos al frontend del CRM.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function mapZeroPiiData(data: any, safeData: Record<string, unknown>) {
   const rawCedula = data.cedula || '';
   const cedulaPlano = rawCedula.startsWith('ENC:') ? decryptSymmetric(rawCedula) : rawCedula;

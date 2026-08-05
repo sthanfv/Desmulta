@@ -166,7 +166,7 @@ export async function POST(req: NextRequest) {
 
   // 🛡️ FIX CRÍTICO: Validar que el monto que Wompi REALMENTE cobró coincide con
   // el precio server-side establecido al crear la pre-orden en Firestore.
-  const amountConfirmadoPorWompi = Number(transaction.amount_in_cents);
+  const amountConfirmadoPorWompi = Number(transaction.amount_in_cents) / 100;
   if (status === 'APPROVED' && amountConfirmadoPorWompi !== purchase.amountCop) {
     logger.security('[webhook-wompi] 🚨 DISCREPANCIA DE MONTO — posible intento de fraude', {
       reference,

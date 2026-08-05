@@ -51,19 +51,10 @@ function getGeminiModel() {
 }
 
 export async function GET() {
-  // Endpoint ligero para despertar al contenedor de Render (Pre-warming)
-  try {
-    const ocrFallbackUrl = process.env.OCR_FALLBACK_URL;
-    if (ocrFallbackUrl) {
-      // Reemplaza /api/v1/extract por /health para hacer el ping
-      const healthUrl = ocrFallbackUrl.replace('/api/v1/extract', '/health');
-      // No hacemos await para no bloquear, o hacemos un fetch muy rápido
-      fetch(healthUrl).catch(() => {});
-    }
-    return NextResponse.json({ status: 'warmed_up' }, { status: 200 });
-  } catch {
-    return NextResponse.json({ status: 'error' }, { status: 500 });
-  }
+  // 🛡️ AUDITORÍA 2026-08-04: (FinOps S-PY-01) Se desactiva el Pre-Warming asíncrono
+  // hacia Python Cloud Run para evitar Billing Exhaustion. Ahora Cloud Run SOLO
+  // se despertará si Gemini 1.5 Flash falla durante el POST (Fallback perezoso).
+  return NextResponse.json({ status: 'lazy_mode_active' }, { status: 200 });
 }
 
 export async function POST(request: NextRequest) {

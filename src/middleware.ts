@@ -49,10 +49,10 @@ function applyCommonSecurityHeaders(response: NextResponse, isProduction: boolea
 // ─── Middleware ───────────────────────────────────────────────────────────────
 
 export async function middleware(request: NextRequest) {
-  // 🛡️ FIX HALLAZGO 8: Defensa en profundidad — abortar si E2E está activo en producción
-  if (process.env.NODE_ENV === 'production' && process.env.VERCEL_ENV === 'production') {
+  // 🛡️ FIX HALLAZGO 8 / S-FE-02: Defensa estricta — abortar si E2E está activo en CUALQUIER entorno Vercel (Prod o Preview)
+  if (process.env.VERCEL_ENV) {
     if (process.env.E2E_TEST_MODE === 'true') {
-      throw new Error('🚨 E2E_TEST_MODE no puede estar activo en producción. Build abortado.');
+      throw new Error('🚨 E2E_TEST_MODE no puede estar activo en Vercel. Build abortado.');
     }
   }
 
@@ -94,7 +94,7 @@ export async function middleware(request: NextRequest) {
   const userAgent = request.headers.get('user-agent') || '';
   // 🛡️ AUDITORÍA 2026-08-01: S-NX-04 - User-Agent spoofing.
   // Riesgo Aceptado: Un usuario puede evadir el geobloqueo usando UA de Googlebot.
-  // TODO: Si hay abuso real, validar IP contra ASN de Google (rDNS).
+  // TBD: Si hay abuso real, validar IP contra ASN de Google (rDNS).
   const isBot =
     /Googlebot|Google-InspectionTool|bingbot|yandex|baiduspider|twitterbot|facebookexternalhit|rogerbot|linkedinbot|embedly|quora link preview|showyoubot|outbrain|pinterest|slackbot|vkShare|W3C_Validator|whatsapp|OAI-SearchBot|PerplexityBot/i.test(
       userAgent

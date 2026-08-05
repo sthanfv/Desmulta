@@ -115,11 +115,22 @@ export async function checkRateLimit(type: RateLimitType, identifier: string) {
   } catch (error) {
     // Si Upstash cae o no está configurado (ej. desarrollo local sin .env),
     // decidimos si bloqueamos (Fail-Closed) o permitimos (Fail-Open) según la criticidad.
-    const failOpenBuckets = ['consultation', 'leads', 'ocr', 'qr', 'referidos', 'telemetry', 'crashReport'];
+    const failOpenBuckets = [
+      'consultation',
+      'leads',
+      'ocr',
+      'qr',
+      'referidos',
+      'telemetry',
+      'crashReport',
+    ];
     const shouldFailOpen = failOpenBuckets.includes(type);
 
-    console.error(`[RateLimit Error - ${type}] Fallo en verificación Upstash (Fail-Open: ${shouldFailOpen}):`, error);
-    
+    console.error(
+      `[RateLimit Error - ${type}] Fallo en verificación Upstash (Fail-Open: ${shouldFailOpen}):`,
+      error
+    );
+
     return {
       success: shouldFailOpen,
       blocked: !shouldFailOpen,

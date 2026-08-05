@@ -1,6 +1,10 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { get, set, del } from 'idb-keyval';
+import { db } from '@/lib/firebase-client';
+import { doc, onSnapshot, Unsubscribe } from 'firebase/firestore';
+
+let unsubscribeFirestore: Unsubscribe | null = null;
 
 export interface Multa {
   id: string;
@@ -19,6 +23,7 @@ interface ExpedienteState {
   ciudad: string | null;
   autoridad: string | null;
   direccion: string | null;
+  estado: string | null;
   multas: Multa[];
   /** Timestamp (ms) de la última vez que se escribieron multas. Usada para invalidar el caché a las 24h. */
   multasCachedAt: number | null;
@@ -27,12 +32,19 @@ interface ExpedienteState {
   setCapturedImage: (img: string | null) => void;
   setFormData: (data: Partial<ExpedienteState>) => void;
   setCedula: (cedula: string) => void;
+  setEstado: (estado: string) => void;
   setOcrRawText: (text: string) => void;
   addMulta: (multa: Multa) => void;
   addMultas: (multas: Multa[]) => void;
   removeMulta: (id: string) => void;
   getTotalDeuda: () => number;
   clearExpediente: () => void;
+
+  /** Firestore Realtime Sync */
+  trackingUuid: string | null;
+  setTrackingUuid: (uuid: string) => void;
+  startSync: (uuid: string) => void;
+  stopSync: () => void;
 }
 
 export const useExpedienteStore = create<ExpedienteState>()(
@@ -46,6 +58,7 @@ export const useExpedienteStore = create<ExpedienteState>()(
       ciudad: null,
       autoridad: null,
       direccion: null,
+      estado: null,
       multas: [],
       multasCachedAt: null,
       ocrRawText: null,
@@ -53,6 +66,7 @@ export const useExpedienteStore = create<ExpedienteState>()(
       setCapturedImage: (capturedImage) => set({ capturedImage }),
       setFormData: (data) => set((state) => ({ ...state, ...data })),
       setCedula: (cedula) => set({ cedula }),
+      setEstado: (estado) => set({ estado }),
       setOcrRawText: (ocrRawText) => set({ ocrRawText }),
       addMulta: (multa) =>
         set((state) => {
@@ -69,7 +83,11 @@ export const useExpedienteStore = create<ExpedienteState>()(
         }),
       removeMulta: (id) => set((state) => ({ multas: state.multas.filter((m) => m.id !== id) })),
       getTotalDeuda: () => get().multas.reduce((total, multa) => total + multa.valor, 0),
-      clearExpediente: () =>
+      clearExpediente: () => {
+        if (unsubscribeFirestore) {
+          unsubscribeFirestore();
+          unsubscribeFirestore = null;
+        }
         set({
           cedula: null,
           nombre: null,
@@ -79,11 +97,49 @@ export const useExpedienteStore = create<ExpedienteState>()(
           ciudad: null,
           autoridad: null,
           direccion: null,
+          estado: null,
           multas: [],
           ocrRawText: null,
           capturedImage: null,
           multasCachedAt: null,
-        }),
+          trackingUuid: null,
+        });
+      },
+      trackingUuid: null,
+      setTrackingUuid: (trackingUuid) => set({ trackingUuid }),
+      startSync: (uuid) => {
+        if (unsubscribeFirestore) {
+          unsubscribeFirestore();
+        }
+        set({ trackingUuid: uuid });
+        const docRef = doc(db, 'expedientes', uuid);
+        unsubscribeFirestore = onSnapshot(
+          docRef,
+          (snapshot) => {
+            if (snapshot.exists()) {
+              const data = snapshot.data();
+              // Actualizamos la tienda Zustand reactivamente desde Firebase en vez de hacer Polling manual
+              set((state) => ({
+                ...state,
+                multas: data.multas || state.multas,
+                nombre: data.nombre || state.nombre,
+                estado: data.estado || state.estado,
+                // Si la base de datos es la fuente de verdad, actualizamos cache
+                multasCachedAt: Date.now(),
+              }));
+            }
+          },
+          (error) => {
+            console.error('[Zustand] Error en onSnapshot:', error);
+          }
+        );
+      },
+      stopSync: () => {
+        if (unsubscribeFirestore) {
+          unsubscribeFirestore();
+          unsubscribeFirestore = null;
+        }
+      },
     }),
     {
       name: 'desmulta-expediente-storage',
@@ -105,6 +161,7 @@ export const useExpedienteStore = create<ExpedienteState>()(
         multas: state.multas,
         // Timestamp para invalidación de caché (TTL 24h)
         multasCachedAt: state.multasCachedAt,
+        trackingUuid: state.trackingUuid,
         // ocrRawText también puede contener nombre/placa del SIMIT — eliminado.
       }),
       // Invalida multas persistidas si tienen más de 24 horas

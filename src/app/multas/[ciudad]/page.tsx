@@ -2,7 +2,7 @@ import React from 'react';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { ShieldAlert, ArrowRight, Scale, MapPin, ArrowLeft, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Scale, MapPin, ArrowLeft, ShieldCheck } from 'lucide-react';
 import ciudadesData from '@/lib/data/ciudades.json';
 import infraccionesData from '@/lib/data/infracciones.json';
 import { safeJsonLdStringify } from '@/lib/utils/json-ld';
@@ -69,7 +69,7 @@ export default async function MultasCiudadPage(props: Props) {
             },
             serviceType: 'Defensa legal contra multas de tránsito',
             telephone: '+573005648309',
-            address: (ciudad as any).address || {
+            address: (ciudad as Record<string, unknown>).address || {
               '@type': 'PostalAddress',
               streetAddress: 'Sede Virtual',
               addressLocality: ciudad.nombre,

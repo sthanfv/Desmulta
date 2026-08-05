@@ -74,7 +74,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     // H6: Sanitización del nombre
     const { searchParams } = new URL(request.url);
     const filenameRaw = searchParams.get('filename') || 'archivo.jpg';
-    const filenameSanitizado = sanitizarNombreArchivo(filenameRaw);
+    const _filenameSanitizado = sanitizarNombreArchivo(filenameRaw);
 
     // Conectar DB y validar rate limit
     logger.info('[upload] Paso 2: Conectando Firebase Admin...');
@@ -174,8 +174,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     // Carga a Vercel Blob desde el buffer (el stream ya fue consumido)
-    logger.info('[upload] Paso 3: Enviando a Vercel Blob...', { filename: filenameSanitizado });
-    const blob = await put(`simit_cap_${filenameSanitizado}`, bodyBuffer, {
+    const randomUUID = crypto.randomUUID();
+    logger.info('[upload] Paso 3: Enviando a Vercel Blob...', { filename: randomUUID });
+    const blob = await put(`simit_cap_${randomUUID}`, bodyBuffer, {
       access: 'public',
       addRandomSuffix: true,
       contentType: mimePrincipal,

@@ -431,8 +431,8 @@ export async function POST(request: NextRequest) {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
-        }).catch(err => logger.warn('[Marketing] Error en webhook:', err));
-      } catch (e) {}
+        }).catch((err) => logger.warn('[Marketing] Error en webhook:', err));
+      } catch (_e) {}
     }
 
     return NextResponse.json(

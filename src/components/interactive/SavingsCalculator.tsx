@@ -523,7 +523,9 @@ export function SavingsCalculator() {
                   </div>
                   {costosCoactivos > 0 && (
                     <div className="flex justify-between items-center text-sm animate-in fade-in zoom-in-95">
-                      <span className="text-muted-foreground font-semibold">Costas Proc. y Honorarios</span>
+                      <span className="text-muted-foreground font-semibold">
+                        Costas Proc. y Honorarios
+                      </span>
                       <span className="font-bold text-red-600">
                         +$ <CountUp from={0} to={costosCoactivos} separator="." duration={1.5} />
                       </span>

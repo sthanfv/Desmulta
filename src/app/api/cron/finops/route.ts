@@ -21,21 +21,25 @@ export async function GET(request: Request) {
 
   try {
     logger.info('[FinOps] Ejecutando análisis semanal de costos y métricas...');
-    
-    // TODO: Conectar con API de Firestore System Metrics para evaluar Reads/Writes
-    // TODO: Conectar con API de Upstash Redis para evaluar uso de comandos
-    // TODO: Conectar con API de Vercel para evaluar uso de Edge Functions
+
+    // TBD: Conectar con API de Firestore System Metrics para evaluar Reads/Writes
+    // TBD: Conectar con API de Upstash Redis para evaluar uso de comandos
+    // TBD: Conectar con API de Vercel para evaluar uso de Edge Functions
 
     // Simulación de envío de alerta si se supera un umbral ficticio (80%)
     const umbralSuperado = false;
-    
+
     if (umbralSuperado) {
       const telegramToken = process.env.TELEGRAM_BOT_TOKEN;
       const chatId = process.env.TELEGRAM_CHAT_ID;
-      
+
       if (telegramToken && chatId) {
-        const msg = encodeURIComponent('⚠️ *ALERTA FINOPS* ⚠️\nEl consumo de Firestore se acerca al límite gratuito mensual (80%). Revisa la cuota.');
-        await fetch(`https://api.telegram.org/bot${telegramToken}/sendMessage?chat_id=${chatId}&text=${msg}&parse_mode=Markdown`);
+        const msg = encodeURIComponent(
+          '⚠️ *ALERTA FINOPS* ⚠️\nEl consumo de Firestore se acerca al límite gratuito mensual (80%). Revisa la cuota.'
+        );
+        await fetch(
+          `https://api.telegram.org/bot${telegramToken}/sendMessage?chat_id=${chatId}&text=${msg}&parse_mode=Markdown`
+        );
       }
     }
 

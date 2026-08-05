@@ -59,7 +59,7 @@ describe('Wompi Webhook API', () => {
         return Promise.resolve({
           exists: true,
           data: () => ({
-            amountCop: 10000,
+            amountCop: 100,
             productType: 'poder_especial',
             caseData: {
               shortId: docId,

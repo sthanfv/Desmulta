@@ -9,8 +9,16 @@ export async function GET() {
 
   const results = {
     nextjs: { status: 'OK', timestamp: new Date().toISOString() },
-    go_engine: { status: 'UNKNOWN', url: goEngineUrl || 'NOT_CONFIGURED', error: null as string | null },
-    python_ocr: { status: 'UNKNOWN', url: ocrFallbackUrl || 'NOT_CONFIGURED', error: null as string | null }
+    go_engine: {
+      status: 'UNKNOWN',
+      url: goEngineUrl || 'NOT_CONFIGURED',
+      error: null as string | null,
+    },
+    python_ocr: {
+      status: 'UNKNOWN',
+      url: ocrFallbackUrl || 'NOT_CONFIGURED',
+      error: null as string | null,
+    },
   };
 
   const controller = new AbortController();
@@ -22,10 +30,10 @@ export async function GET() {
     if (goEngineUrl) {
       promises.push(
         fetch(`${goEngineUrl}/healthz`, { signal: controller.signal })
-          .then(res => {
+          .then((res) => {
             results.go_engine.status = res.ok ? 'OK' : 'ERROR';
           })
-          .catch(err => {
+          .catch((err) => {
             results.go_engine.status = 'ERROR';
             results.go_engine.error = err.message;
           })
@@ -35,10 +43,10 @@ export async function GET() {
     if (ocrFallbackUrl) {
       promises.push(
         fetch(`${ocrFallbackUrl}/health`, { signal: controller.signal })
-          .then(res => {
+          .then((res) => {
             results.python_ocr.status = res.ok ? 'OK' : 'ERROR';
           })
-          .catch(err => {
+          .catch((err) => {
             results.python_ocr.status = 'ERROR';
             results.python_ocr.error = err.message;
           })
@@ -48,13 +56,16 @@ export async function GET() {
     await Promise.allSettled(promises);
     clearTimeout(timeoutId);
 
-    const allOk = 
-      (results.go_engine.status === 'OK' || results.go_engine.status === 'UNKNOWN') && 
+    const allOk =
+      (results.go_engine.status === 'OK' || results.go_engine.status === 'UNKNOWN') &&
       (results.python_ocr.status === 'OK' || results.python_ocr.status === 'UNKNOWN');
 
     return NextResponse.json(results, { status: allOk ? 200 : 503 });
   } catch (error) {
     const errMsg = error instanceof Error ? error.message : String(error);
-    return NextResponse.json({ error: 'Fallo al verificar estado de los subsistemas', details: errMsg }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Fallo al verificar estado de los subsistemas', details: errMsg },
+      { status: 500 }
+    );
   }
 }
