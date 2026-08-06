@@ -35,7 +35,7 @@ export function WelcomeModal({ onAcknowledge }: WelcomeModalProps) {
         if (!open) handleClose();
       }}
       title={
-        <m.div
+        <m.div style={{ willChange: "transform, opacity" }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
@@ -48,7 +48,7 @@ export function WelcomeModal({ onAcknowledge }: WelcomeModalProps) {
         </m.div>
       }
       icon={
-        <m.div
+        <m.div style={{ willChange: "transform, opacity" }}
           initial={{ scale: 0.5, rotate: -10, opacity: 0 }}
           animate={{ scale: 1, rotate: 0, opacity: 1 }}
           transition={{ type: 'spring', damping: 12 }}
@@ -92,7 +92,7 @@ export function WelcomeModal({ onAcknowledge }: WelcomeModalProps) {
               desc: 'Documentos jurídicos (Peticiones, Nulidades) listos para descargar.',
             },
           ].map((item, idx) => (
-            <m.div
+            <m.div style={{ willChange: "transform, opacity" }}
               key={idx}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}

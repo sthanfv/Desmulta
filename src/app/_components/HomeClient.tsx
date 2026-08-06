@@ -319,7 +319,7 @@ export default function HomeClient({
         onOpenChange={setIsWhatsAppWarningOpen}
         title={<span className="font-black tracking-tight text-2xl">Asesoría Directa</span>}
         icon={
-          <m.div
+          <m.div style={{ willChange: "transform, opacity" }}
             initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: 'spring', damping: 15 }}
@@ -352,7 +352,7 @@ export default function HomeClient({
             .
           </m.p>
 
-          <m.div
+          <m.div style={{ willChange: "transform, opacity" }}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
@@ -369,7 +369,7 @@ export default function HomeClient({
             </p>
           </m.div>
 
-          <m.div
+          <m.div style={{ willChange: "transform, opacity" }}
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}

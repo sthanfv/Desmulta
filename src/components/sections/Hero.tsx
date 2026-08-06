@@ -64,7 +64,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
           {/* ─── COLUMNA IZQUIERDA: Título + CTA + Calculadora ─── */}
           <div className="flex flex-col gap-8">
             {/* Badge */}
-            <m.div
+            <m.div style={{ willChange: "transform, opacity" }}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
@@ -130,7 +130,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
             </m.p>
 
             {/* CTA */}
-            <m.div
+            <m.div style={{ willChange: "transform, opacity" }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
@@ -154,7 +154,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
                 </div>
 
                 {multas.length > 0 && (
-                  <m.div
+                  <m.div style={{ willChange: "transform, opacity" }}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="p-4 rounded-2xl bg-primary/5 border border-primary/20 flex items-center gap-4 group/expediente cursor-pointer hover:bg-primary/10 transition-all shadow-sm"
@@ -182,7 +182,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
             )}
 
             {/* Simulador — IZQUIERDA, debajo del texto */}
-            <m.div
+            <m.div style={{ willChange: "transform, opacity" }}
               id="calculadora-hero"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
