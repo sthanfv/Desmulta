@@ -99,6 +99,7 @@ export default function HomeClient({
   nonce,
 }: HomeClientProps) {
   // --- Estados de UI ---
+  const [geoCity, setGeoCity] = useState<string | undefined>(cityContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formMode, setFormMode] = useState<'full' | 'simit'>('full');
   const [isPreQualified, setIsPreQualified] = useState(false);
@@ -115,7 +116,19 @@ export default function HomeClient({
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+
+    // Recuperar Geo-localización de Vercel en el cliente (Optimización Option B)
+    if (cityContext === 'Colombia') {
+      fetch('/api/geo')
+        .then((res) => res.json())
+        .then((data) => {
+          if (data?.city) {
+            setGeoCity(data.city);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [cityContext]);
 
   useEffect(() => {
     if (auth) {
@@ -159,15 +172,14 @@ export default function HomeClient({
           setIsModalOpen(true);
         }}
       />
-
-      <Hero
-        cityContext={cityContext}
-        showcaseData={showcaseData}
-        onConsultar={() => {
-          setFormMode('full');
-          setIsModalOpen(true);
-        }}
-      />
+        <Hero
+          cityContext={geoCity}
+          showcaseData={showcaseData}
+          onConsultar={() => {
+            setFormMode('full');
+            setIsModalOpen(true);
+          }}
+        />
 
       <div>
         <Pillars />

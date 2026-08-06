@@ -107,17 +107,17 @@ export const DESMULTA_KB: KnowledgeBase = {
       {
         numero: '01',
         fase: 'Certificación de Viabilidad',
-        detalle: 'Filtro inicial de casos con sustento jurídico.',
+        detalle: 'Filtro inicial de casos con sustento jurídico. Ejecutamos un análisis de telemetría legal evaluando tiempos de notificación, caducidad y cumplimiento estricto del debido proceso.',
       },
       {
         numero: '02',
         fase: 'Blindaje Administrativo',
-        detalle: 'Radicación de defensas técnicas ante secretarías.',
+        detalle: 'Radicación de defensas técnicas ante secretarías. Construimos el acervo probatorio y despachamos derechos de petición estructurados con base en jurisprudencia y parámetros de la Superintendencia de Transporte.',
       },
       {
         numero: '03',
         fase: 'Certificación de Éxito',
-        detalle: 'Soporte de eliminación y actualización SIMIT/RUNT.',
+        detalle: 'Soporte de eliminación y actualización SIMIT/RUNT. Realizamos trazabilidad y seguimiento continuo hasta que el organismo de tránsito profiera la resolución a favor y aplique la depuración en las bases de datos nacionales.',
       },
     ],
     tiempos: 'El tiempo estándar de resolución oscila entre 15 y 45 días calendario.',
