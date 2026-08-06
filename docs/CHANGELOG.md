@@ -33,7 +33,7 @@ Todas las versiones y cambios significativos del proyecto.
 - **Tipado Estricto de Errores:** Bloques `catch (e)` refactorizados a `catch (e: unknown)` y chequeos de `instanceof Error` a lo largo del panel de administración (Galería, Layout) para evitar crashes por tipos `any` inseguros.
 
 ### 🔒 Security & Sentry
-- **Logs Cero-Exposición:** Reemplazados llamados genéricos de `console.error` y `console.warn` en `env-check.ts`, `tesseract-worker.ts`, y `pushService.ts` por envíos directos a `SecurityLogger`.
+- **Logs Cero-Exposición:** Reemplazados llamados genéricos de `console.error` y `console.warn` en `env-check.ts` y `pushService.ts` por envíos directos a `SecurityLogger`.
 - **Sentry Nativo:** Refactorizado el `SecurityLogger` para delegar directamente payloads con contexto enriquecido mediante `Sentry.captureMessage`, eliminando variables envueltas que dificultaban la lectura de incidentes de seguridad y errores en producción.
 - **Limpieza de UI Logs:** Los logs informativos del lado cliente como la limpieza de `localStorage` en el Tracking UI ahora están ocultos detrás de chequeos `process.env.NODE_ENV === 'development'`.
 
@@ -108,4 +108,4 @@ Todas las versiones y cambios significativos del proyecto.
 - Reglas Firestore: `/private/push`, `otp_rate_limits/`, `referidosCooldowns/` cerradas.
 
 ## [v1.0.0] - Lanzamiento Inicial
-- Formulario E2EE con RSA, OCR Tesseract client-side, infraestructura Vercel + Firebase.
+- Formulario E2EE con RSA, extracción OCR vía API, infraestructura Vercel + Firebase.

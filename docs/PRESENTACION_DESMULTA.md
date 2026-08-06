@@ -10,7 +10,7 @@
 ## 3. ¿Qué contiene y cómo funciona? (Funcionalidades Core)
 El sistema guía al ciudadano a través de un "embudo" de auditoría y defensa:
 
-1. **Scraping y OCR Local (Costo Cero):** El usuario sube capturas de pantalla de sus comparendos (ej. del portal SIMIT). Desmulta utiliza Inteligencia Artificial de Visión (Tesseract.js) que se ejecuta **100% en el dispositivo del usuario** (celular o PC). Esto garantiza la privacidad total y elimina costos de servidores en la nube.
+1. **Procesamiento OCR Híbrido:** El usuario sube capturas de pantalla de sus comparendos (ej. del portal SIMIT). Desmulta utiliza Inteligencia Artificial de Visión de alta eficiencia para procesar las imágenes con bajo consumo en el dispositivo del usuario. Todo ocurre con encriptación fuerte garantizando privacidad absoluta.
 2. **Motor de Inferencia Legal (Heurística Determinista):** Una vez extraído el texto, el motor identifica los códigos de infracción (ej. C29, D04) y despliega un **carrusel educativo interactivo** donde explica la sanción, el valor a pagar, el riesgo de inmovilización y, lo más importante, los **argumentos de defensa legal** específicos para ese caso.
 3. **Generador de Documentos Jurídicos:** Si el usuario decide defenderse, el sistema captura los datos necesarios y genera un *Derecho de Petición* a la medida, fundamentado en la ley colombiana. Incluye una previsualización en vivo, un editor en pantalla y exportación a PDF (formateado bajo estándares de juzgados colombianos).
 4. **Pasarela de Pagos (Wompi):** Integración robusta y blindada con Wompi para que los usuarios puedan adquirir los documentos generados de forma confiable.

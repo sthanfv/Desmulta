@@ -9,7 +9,6 @@ import {
 } from '@/lib/simit-parser';
 import { Multa } from '@/store/useExpedienteStore';
 import type { OcrWord } from '@/components/vial-clear/AnalizadorDocumentos';
-import { tesseractManager } from '@/lib/ocr/tesseract-worker';
 import { PrescriptionEngine } from '@/lib/legal/prescription-engine';
 import { OCRAnalysisResult, LegalStatus } from '@/lib/definitions';
 import codigosData from '@/lib/data/codigos-infraccion.json';
@@ -161,7 +160,9 @@ const reconocerTextoConIA = async (
     } catch {
       throw new Error(`Error de red o servidor: HTTP ${response.status}`);
     }
-    const err = new Error(data.message || data.error || 'Error al procesar OCR con IA') as Error & { retryAfter?: number };
+    const err = new Error(data.message || data.error || 'Error al procesar OCR con IA') as Error & {
+      retryAfter?: number;
+    };
     if (data.details && typeof data.details.retryAfter === 'number') {
       err.retryAfter = data.details.retryAfter;
     }
@@ -240,93 +241,36 @@ export const useSIMITValidator = () => {
          * 100% a la API de Gemini (flash-2.5) debido a su mayor precisión,
          * velocidad y cuota gratuita suficiente (1500 req/día vs límite de 5/sem).
          */
-        const USAR_TESSERACT_LOCAL = false;
+        mediaLogger.log('OCR', 'Enrutando hacia API en Cloud Run...');
+        setProgresoOCR(50);
+        const iaData = await reconocerTextoConIA(archivoProcesar, (p) => setProgresoOCR(p));
 
-        if (!USAR_TESSERACT_LOCAL) {
-          mediaLogger.log('OCR', 'Enrutando hacia API Gemini (Tesseract en reserva)...');
-          setProgresoOCR(50);
-          const iaData = await reconocerTextoConIA(archivoProcesar, (p) => setProgresoOCR(p));
+        if (!iaData || !iaData.texto) {
+          throw new Error('La API de OCR en la nube no pudo extraer texto de la imagen.');
+        }
 
-          if (!iaData || !iaData.texto) {
-            throw new Error('La API de IA no pudo extraer texto de la imagen.');
-          }
+        resultRaw = {
+          data: {
+            text: iaData.texto,
+            words: iaData.palabras,
+            confidence: 100,
+          },
+        };
 
-          resultRaw = {
-            data: {
-              text: iaData.texto,
-              words: iaData.palabras,
-              confidence: 100,
-            },
-          };
+        // El backend devuelve un Array estructurado con todas las multas
+        if (Array.isArray(iaData.comparendo)) {
+          comparendosEstructurados = iaData.comparendo;
+        }
 
-          // Gemini nos devuelve un Array estructurado con todas las multas
-          if (Array.isArray(iaData.comparendo)) {
-            comparendosEstructurados = iaData.comparendo;
-          }
+        setProgresoOCR(100);
+        clearTimeout(ocrTimeoutId);
 
-          setProgresoOCR(100);
-          clearTimeout(ocrTimeoutId);
-
-          // 🛡️ AUDITORÍA 2026-08-01: T-PY-02 - Activar revisión manual si se usó el fallback Tesseract
-          if (iaData.proveedor === 'python-tesseract-native') {
-            mediaLogger.log(
-              'OCR',
-              'ADVERTENCIA: Proveedor Tesseract (Fallback) detectado. Posibles errores en tablas complejas. Requiere revisión manual.'
-            );
-            resultRaw.data.confidence = 69; // Forzamos requiresManualReview abajo
-          }
-        } else {
-          // --- INICIO CÓDIGO TESSERACT (RESERVA) ---
-          const ocrTask = async () => {
-            mediaLogger.log('OCR', 'Inicializando motor Tesseract local (IA desactivada)...');
-            await tesseractManager.init((m: { status: string; progress: number }) => {
-              switch (m.status) {
-                case 'loading tesseract core':
-                  setCargandoModelo(true);
-                  setProgresoOCR((prev) => Math.max(prev, 10));
-                  break;
-                case 'loaded tesseract core':
-                  setProgresoOCR((prev) => Math.max(prev, 15));
-                  break;
-                case 'loading language traineddata':
-                  setProgresoOCR((prev) => Math.max(prev, 25));
-                  break;
-                case 'loaded language traineddata':
-                  setProgresoOCR((prev) => Math.max(prev, 30));
-                  break;
-                case 'initializing tesseract':
-                  setProgresoOCR((prev) => Math.max(prev, 40));
-                  break;
-                case 'initialized tesseract':
-                  setProgresoOCR((prev) => Math.max(prev, 45));
-                  break;
-                case 'recognizing text':
-                  setCargandoModelo(false);
-                  const progress = 45 + Math.round(m.progress * 55);
-                  setProgresoOCR((prev) => Math.max(prev, progress));
-                  break;
-              }
-            });
-
-            mediaLogger.log('OCR', 'Iniciando escaneo de patrones...');
-            return await tesseractManager.recognize(objectUrl);
-          };
-
-          resultRaw = (await Promise.race([ocrTask(), timeoutPromise])) as typeof resultRaw;
-
-          const palabrasRaw = resultRaw.data.words || [];
-          const avgConf =
-            palabrasRaw.length > 0
-              ? Math.round(
-                  palabrasRaw.reduce((acc, w) => acc + w.confidence, 0) / palabrasRaw.length
-                )
-              : 0;
-          mediaLogger.log('OCR', 'Escaneo local completado con éxito', {
-            wordCount: palabrasRaw.length,
-            avgConfidence: `${avgConf}%`,
-            textLength: resultRaw.data.text.length,
-          });
-          // --- FIN CÓDIGO TESSERACT ---
+        if (iaData.proveedor === 'python-tesseract-native') {
+          mediaLogger.log(
+            'OCR',
+            'ADVERTENCIA: Proveedor Tesseract nativo (Fallback backend) detectado. Posibles errores en tablas complejas. Requiere revisión manual.'
+          );
+          resultRaw.data.confidence = 69; // Forzamos requiresManualReview abajo
         }
       } catch (ocrError) {
         clearTimeout(ocrTimeoutId);

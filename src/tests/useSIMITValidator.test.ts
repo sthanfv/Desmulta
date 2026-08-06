@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useSIMITValidator, type ResultadoOCR } from '../hooks/useSIMITValidator';
-import { tesseractManager } from '../lib/ocr/tesseract-worker';
 
 // Mock de infraestructura Firebase (evita fallos de fetch/auth en tests)
 vi.mock('firebase/app', () => ({
@@ -21,15 +20,6 @@ vi.mock('@/store/useExpedienteStore', () => ({
     agregarMulta: vi.fn(),
     multas: [],
   })),
-}));
-
-// Mock de tesseractManager para evitar carga de WASM en tests
-vi.mock('@/lib/ocr/tesseract-worker', () => ({
-  tesseractManager: {
-    init: vi.fn(),
-    recognize: vi.fn(),
-    terminate: vi.fn(),
-  },
 }));
 
 // Mock de optimizador de imágenes

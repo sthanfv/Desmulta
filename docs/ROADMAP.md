@@ -5,7 +5,7 @@
 *   **Migración a Arquitectura Edge (Edge Functions):**
     Evaluar la migración de las operaciones de telemetría y middlewares de seguridad hacia funciones Edge (ej. Vercel Edge o Cloudflare Workers) para reducir el TTFB (Time to First Byte) a <50ms y ejecutar el rate-limiting más cerca del usuario.
 *   **Optimización de Bundle Size:**
-    Analizar el peso de componentes dinámicos como `Tesseract.js`. Se recomienda aislar completamente el OCR a un web worker o, idealmente, trasladar el procesamiento de imágenes SIMIT a una Cloud Function asíncrona para descargar el cliente móvil.
+    ✅ *Completado:* El procesamiento OCR fue completamente extraído a APIs asíncronas (Cloud Run/Gemini), descargando totalmente el cliente móvil y salvando recursos.
 *   **Gestión de Estados e Hidratación:**
     Implementar estrategias avanzadas de *Progressive Hydration* para componentes pesados. Diferir aún más la carga de elementos decorativos interactivos para garantizar métricas LCP perfectas.
 

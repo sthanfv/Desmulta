@@ -45,8 +45,8 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
       <section className="min-h-[100svh] flex items-center pt-24 sm:pt-36 md:pt-40 pb-16 sm:pb-24 md:pb-32 px-4 relative overflow-hidden">
         {/* Atmósfera institucional */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none bg-gradient-to-br from-slate-50 via-white to-amber-50/40 dark:from-background dark:via-background dark:to-background">
-          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/15 dark:bg-primary/5 blur-[100px] opacity-70 rounded-full translate-x-1/3 -translate-y-1/4" />
-          <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-500/5 blur-[100px] rounded-full -translate-x-1/2 translate-y-1/3" />
+          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/15 dark:from-primary/5 to-transparent opacity-70 rounded-full translate-x-1/3 -translate-y-1/4" />
+          <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-500/5 to-transparent rounded-full -translate-x-1/2 translate-y-1/3" />
           {/* Patrón sutil para romper la monotonía del plano */}
           <div
             className="absolute inset-0 opacity-[0.02] dark:opacity-[0.01]"
@@ -157,7 +157,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
                   <m.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="p-4 rounded-2xl bg-primary/10 border border-primary/20 backdrop-blur-md flex items-center gap-4 group/expediente cursor-pointer hover:bg-primary/15 transition-all"
+                    className="p-4 rounded-2xl bg-primary/5 border border-primary/20 flex items-center gap-4 group/expediente cursor-pointer hover:bg-primary/10 transition-all shadow-sm"
                     onClick={onConsultar}
                   >
                     <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow-md">
@@ -194,9 +194,9 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
           </div>
 
           {/* ─── COLUMNA DERECHA: Imagen + Contador + Vitrina de Documentos ─── */}
-          <div className="relative group animate-in zoom-in-95 duration-1000 delay-200 z-10 w-full flex flex-col gap-6 items-center lg:items-end">
-            <div className="absolute -inset-4 bg-primary/10 rounded-3xl blur-[60px] opacity-50 group-hover:opacity-70 transition-opacity duration-700 pointer-events-none" />
-            <TarjetaPremium className="relative glass-ultra p-4 overflow-hidden shadow-2xl rounded-3xl w-full">
+          <div className="relative group animate-in zoom-in-95 duration-1000 z-10 w-full flex flex-col gap-6 items-center lg:items-end">
+            <div className="absolute -inset-10 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 to-transparent rounded-3xl opacity-50 group-hover:opacity-70 transition-opacity duration-700 pointer-events-none" />
+            <TarjetaPremium className="relative p-4 overflow-hidden shadow-2xl rounded-3xl w-full bg-background border border-border/50">
               <Lightbox
                 src="/hero-bg.avif"
                 alt="Gestión de multas profesional - Desmulta"
@@ -205,7 +205,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
                 blurDataURL="data:image/avif;base64,AAAAHGZ0eXBhdmlmAAAAAG1pZjFhdmlmbWlhZgAAANZtZXRhAAAAAAAAACFoZGxyAAAAAAAAAABwaWN0AAAAAAAAAAAAAAAAAAAAAA5waXRtAAAAAAABAAAAImlsb2MAAAAAREAAAQABAAAAAAD6AAEAAAAAAAAAQAAAACNpaW5mAAAAAAABAAAAFWluZmUCAAAAAAEAAGF2MDEAAAAAVmlwcnAAAAA4aXBjbwAAAAxhdjFDgSACAAAAABRpc3BlAAAAAAAAAAoAAAAHAAAAEHBpeGkAAAAAAwgICAAAABZpcG1hAAAAAAAAAAEAAQOBAgMAAABIbWRhdBIACgg4DKcwgIaDSDIyGAAAAFDk2deQQylAHp7ST4ZDJ/xhxBmGNs6qXpyIgjdUiPVRLpr7v49vW3pjbgtn9oY="
               />
               <div className="absolute bottom-8 left-8 right-8 z-10 pointer-events-none animate-float">
-                <div className="glass p-4 rounded-2xl flex items-center gap-4 border-white/20 shadow-xl backdrop-blur-xl bg-black/40">
+                <div className="p-4 rounded-2xl flex items-center gap-4 border border-white/20 shadow-xl bg-black/60">
                   <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-primary-foreground font-bold text-lg shadow-md">
                     {(() => {
                       const rawVal = showcaseData.counterValue || '204+';

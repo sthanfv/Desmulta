@@ -6,7 +6,7 @@
 [![Protocolo](https://img.shields.io/badge/protocolo-MANDATO--FILTRO-blue)](#)
 
 Plataforma serverless de análisis jurídico vial para ciudadanos colombianos. 
-Analiza multas de tránsito mediante OCR local, aplica heurística legal determinista y gestiona expedientes con arquitectura **Zero-PII**.
+Analiza multas de tránsito mediante extracción OCR optimizada, aplica heurística legal determinista y gestiona expedientes con arquitectura **Zero-PII**.
 
 ---
 
@@ -28,7 +28,7 @@ npm run dev # -> http://localhost:9005
 |---|---|
 | **Framework** | Next.js 15 (React 19, App Router, Turbopack) |
 | **Infraestructura** | Firebase (Auth, Firestore, Cloud Functions Gen2) |
-| **OCR** | Tesseract.js 7 (100% Client-side Worker) |
+| **OCR** | Cloud Run API / Gemini Fallback |
 | **Seguridad** | RSA-OAEP Encryption + SHA-256 Hashing |
 | **QA** | Vitest + Playwright E2E |
 | **Analíticas UX** | Microsoft Clarity (Heatmaps & Session Replay) |

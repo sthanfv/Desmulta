@@ -10,7 +10,6 @@ import { getAuth } from 'firebase/auth';
 import { useSearchParams } from 'next/navigation';
 
 import { ConsultationSchema } from '@/lib/definitions';
-import { OCRProvider } from '@/components/ocr-provider';
 import dynamic from 'next/dynamic';
 
 import { RateLimitBanner } from '@/components/ui/RateLimitBanner';
@@ -698,7 +697,7 @@ export function ConsultationForm({ onSuccess, mode = 'full', nonce }: Consultati
   }
 
   return (
-    <OCRProvider>
+    <>
       <Form {...form}>
         <form
           onSubmit={(e) => {
@@ -868,6 +867,6 @@ export function ConsultationForm({ onSuccess, mode = 'full', nonce }: Consultati
           )}
         </form>
       </Form>
-    </OCRProvider>
+    </>
   );
 }

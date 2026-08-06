@@ -65,9 +65,9 @@ export function WelcomeModal({ onAcknowledge }: WelcomeModalProps) {
       }
     >
       <div className="space-y-6 md:space-y-8 mt-2 text-center md:text-left relative z-10">
-        {/* Efectos de iluminación premium */}
-        <div className="absolute -top-32 -left-32 w-80 h-80 bg-primary/10 rounded-full blur-[100px] -z-10 pointer-events-none" />
-        <div className="absolute top-40 -right-32 w-72 h-72 bg-blue-500/5 rounded-full blur-[100px] -z-10 pointer-events-none" />
+        {/* Efectos de iluminación premium optimizados con gradiente radial */}
+        <div className="absolute -top-32 -left-32 w-80 h-80 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 to-transparent rounded-full -z-10 pointer-events-none" />
+        <div className="absolute top-40 -right-32 w-72 h-72 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-500/10 to-transparent rounded-full -z-10 pointer-events-none" />
 
         <p className="text-muted-foreground text-sm md:text-base font-medium leading-relaxed relative z-10">
           Somos tu aliado técnico-legal. Nuestra plataforma está diseñada para ayudarte a auditar y

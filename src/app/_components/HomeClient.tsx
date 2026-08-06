@@ -214,9 +214,9 @@ export default function HomeClient({
         customHeader={true}
       >
         <div className="relative z-10">
-          {/* Glowing orbs para estética AMOLED premium sin comprometer el contraste */}
-          <div className="absolute -top-40 -left-40 w-96 h-96 bg-primary/5 rounded-full blur-[120px] -z-10 pointer-events-none" />
-          <div className="absolute top-40 -right-40 w-96 h-96 bg-blue-500/5 rounded-full blur-[120px] -z-10 pointer-events-none" />
+          {/* Glowing orbs optimizados con radial-gradient en lugar de blur para rendimiento móvil */}
+          <div className="absolute -top-40 -left-40 w-96 h-96 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 to-transparent rounded-full -z-10 pointer-events-none" />
+          <div className="absolute top-40 -right-40 w-96 h-96 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-500/10 to-transparent rounded-full -z-10 pointer-events-none" />
 
           <div className="mb-8 md:mb-10 text-center relative z-10">
             <h2 className="text-3xl md:text-4xl font-black text-foreground tracking-tight">
@@ -251,7 +251,7 @@ export default function HomeClient({
         <div
           className="
           absolute pointer-events-none
-          bg-black/80 dark:bg-black/60 backdrop-blur-xl text-white
+          bg-black/90 dark:bg-black/80 text-white
           px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em]
           opacity-0 group-hover:opacity-100 transition-all duration-500
           border border-white/10 whitespace-nowrap shadow-2xl
@@ -295,9 +295,9 @@ export default function HomeClient({
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           aria-label="Volver arriba"
           className={cn(
-            'pointer-events-auto w-14 h-14 rounded-full flex items-center justify-center transition-all duration-700 backdrop-blur-xl border border-white/10 shadow-2xl group/scroll',
+            'pointer-events-auto w-14 h-14 rounded-full flex items-center justify-center transition-all duration-700 border border-border/50 shadow-2xl group/scroll',
             showScrollTop
-              ? 'opacity-100 translate-y-0 scale-100 bg-white/10 dark:bg-black/40 text-primary'
+              ? 'opacity-100 translate-y-0 scale-100 bg-background text-primary'
               : 'opacity-0 translate-y-10 scale-50 pointer-events-none'
           )}
         >
@@ -336,8 +336,8 @@ export default function HomeClient({
         }
       >
         <div className="space-y-6 relative z-10 mt-2">
-          {/* Fondo difuminado sutil para dar estilo premium */}
-          <div className="absolute -top-32 -right-32 w-72 h-72 bg-[#25D366]/5 rounded-full blur-[100px] -z-10 pointer-events-none" />
+          {/* Fondo difuminado sutil (optimizado con gradiente radial) */}
+          <div className="absolute -top-32 -right-32 w-72 h-72 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#25D366]/10 to-transparent rounded-full -z-10 pointer-events-none" />
 
           <m.p
             initial={{ opacity: 0, y: 10 }}

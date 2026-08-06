@@ -7,7 +7,6 @@ import { useToast } from '@/hooks/use-toast';
 import { useRateLimit } from '@/components/ui/RateLimitBanner';
 import { useSystemHealth } from '@/components/providers/SystemHealthProvider';
 import { useWebPush } from '@/hooks/useWebPush';
-import { tesseractManager } from '@/lib/ocr/tesseract-worker';
 import type { OCRAnalysisResult } from '@/lib/definitions';
 
 type ConsultationFormData = z.infer<typeof ConsultationSchema>;
@@ -66,13 +65,8 @@ export function useConsultationForm(mode: 'full' | 'simit' = 'full') {
     return () => cancelAnimationFrame(rafId);
   }, [step]);
 
-  // Cleanup Tesseract al desmontar
-  useEffect(
-    () => () => {
-      tesseractManager.terminate();
-    },
-    []
-  );
+  // Cleanup al desmontar
+  useEffect(() => () => {}, []);
 
   // Recuperar vault si hay datos pendientes
   useEffect(() => {
