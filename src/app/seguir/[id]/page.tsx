@@ -50,6 +50,12 @@ export async function generateMetadata({
         },
       ],
     },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description: desc,
+      images: [`https://desmulta.online/seguir/${targetId}/opengraph-image`],
+    },
     robots: {
       index: false,
       follow: false,
