@@ -429,7 +429,7 @@ export const telegramWebhook = onRequest(
               
               if (nuevoMensaje !== msgActual) {
                 // Generar nuevo markup sin el botón de 'Ver Cédula'
-                const currentMarkup = cb.message?.reply_markup as { inline_keyboard: any[][] } | undefined;
+                const currentMarkup = (cb.message as any)?.reply_markup as { inline_keyboard: any[][] } | undefined;
                 let nuevoMarkup = currentMarkup;
                 
                 if (currentMarkup?.inline_keyboard) {
