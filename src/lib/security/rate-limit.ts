@@ -28,7 +28,7 @@ export const rateLimiters = {
   consultation: new Ratelimit({
     redis,
     limiter: Ratelimit.slidingWindow(10, '24 h'),
-    prefix: 'rl:consultation:v2', // Cambiar prefijo reinicia la cubeta para todos
+    prefix: 'rl:consultation:v3', // Cambiado a v3 a peticion del QA para resetear limites
   }),
   validarOtp: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(3, '1 m') }),
   qr: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(60, '1 h') }),
