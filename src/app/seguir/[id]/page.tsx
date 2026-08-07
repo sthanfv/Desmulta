@@ -35,13 +35,6 @@ export async function generateMetadata({
   return {
     title,
     description: desc,
-    openGraph: {
-      title,
-      description: desc,
-      url: `https://desmulta.online/seguir/${targetId}`,
-      siteName: 'Desmulta',
-      type: 'website',
-    },
     robots: {
       index: false,
       follow: false,
