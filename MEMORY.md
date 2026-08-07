@@ -105,7 +105,12 @@
 
 *   **[2026-08-05] Auditoría y Refactor de Rendimiento Frontend (Móviles / Baja Gama)**:
     *   **Eliminación Total de Motor OCR:** Se eliminó por completo la dependencia cliente de Motor OCR y su lógica interna de pre-warming (OCRPrewarmer, OCRProvider, 	esseract-worker.ts). Todo el procesamiento OCR ahora recae estrictamente en la API de Cloud Run o Gemini, protegiendo a los teléfonos de la saturación de RAM (OOM) y liberando el Main Thread del navegador.
-    *   **Optimización de Estética Glassmorphism:** Se eliminó y redujo estratégicamente la apilación agresiva del filtro ackdrop-blur en tarjetas y tooltips (ej. Expediente Activo, Tooltip de WhatsApp) para aliviar drásticamente la carga de la GPU al realizar scrolling, manteniendo el blur solo en elementos críticos (como el Navbar).
-    *   **Reemplazo de Glows por Matemáticas (Radial Gradients):** Se erradicó el uso extremo de la clase de Tailwind lur-[100px] o lur-[120px] en decoraciones gigantes de fondo (*Glowing Orbs* en Hero.tsx, HomeClient.tsx y WelcomeModal.tsx). Se sustituyeron por la función CSS vectorizada 
+    *   **Optimización de Estética Glassmorphism:** Se eliminó y redujo estratégicamente la apilación agresiva del filtro  ackdrop-blur en tarjetas y tooltips (ej. Expediente Activo, Tooltip de WhatsApp) para aliviar drásticamente la carga de la GPU al realizar scrolling, manteniendo el blur solo en elementos críticos (como el Navbar).
+    *   **Reemplazo de Glows por Matemáticas (Radial Gradients):** Se erradicó el uso extremo de la clase de Tailwind  lur-[100px] o  lur-[120px] en decoraciones gigantes de fondo (*Glowing Orbs* en Hero.tsx, HomeClient.tsx y WelcomeModal.tsx). Se sustituyeron por la función CSS vectorizada 
 adial-gradient(...), lo cual genera visualmente el mismo efecto *Premium AMOLED*, pero sin costo de procesamiento de convolución en la GPU.
-    *   **Pipeline Aprobado:** El sistema superó la compilación de 	sc --noEmit, los test con itest, y las reglas de slint (--max-warnings 0), conservando el 100% de la estética exigida.
+    *   **Pipeline Aprobado:** El sistema superó la compilación de `tsc --noEmit`, los test con `vitest`, y las reglas de `eslint (--max-warnings 0)`, conservando el 100% de la estética exigida.
+
+*   **[2026-08-06] Hotfix Crítico: Preservación de Enlaces Profundos (Deep Link) en Autenticación OTP**:
+    *   **Qué cambió**: Se parchó el `middleware.ts` y la vista de login (`src/app/acceso-panel/page.tsx`) para mantener íntegro el parámetro `search=ID` en la URL durante las redirecciones de autenticación.
+    *   **Por qué cambió**: Cuando un operador abría un enlace de Telegram (`/admin?search=ID_DEL_CASO`) sin sesión activa, el Middleware lo redirigía a `/acceso-panel` purgando el querystring, lo que ocasionaba que al finalizar el login OTP, el operador perdiera el contexto del caso (aterrizando en un panel genérico). Ahora, el contexto viaja junto con la sesión y permite aislar el caso de manera automática (Zero-PII en tránsito).
+    *   **Estado**: Desplegado en Vercel (Producción).
