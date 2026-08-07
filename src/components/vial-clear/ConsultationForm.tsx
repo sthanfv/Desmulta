@@ -427,7 +427,7 @@ export function ConsultationForm({ onSuccess, mode = 'full', nonce }: Consultati
 
         if (!edgeValidation.ok) {
           if (edgeValidation.status === 429) {
-            handleRateLimitResponse(edgeValidation, edgeResult?.error);
+            handleRateLimitResponse(edgeValidation, edgeResult?.message || 'Demasiadas peticiones. Intenta en unos minutos.');
             topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
             setIsFormProcessing(false);
             return;
@@ -469,7 +469,7 @@ export function ConsultationForm({ onSuccess, mode = 'full', nonce }: Consultati
       if (!response.ok) {
         // ── 429 Rate-limit: activar banner inline con countdown ──────────────
         if (response.status === 429) {
-          handleRateLimitResponse(response, result.error);
+          handleRateLimitResponse(response, result.message || 'Demasiadas peticiones. Intenta en unos minutos.');
           // Scroll suave al banner (topRef está al inicio del form)
           topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
           setIsFormProcessing(false);

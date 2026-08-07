@@ -62,9 +62,18 @@ export function RateLimitBanner({
     return () => clearInterval(timer);
   }, [secsLeft, onExpire]);
 
-  const mins = Math.floor(secsLeft / 60);
+  const hours = Math.floor(secsLeft / 3600);
+  const mins = Math.floor((secsLeft % 3600) / 60);
   const secs = secsLeft % 60;
-  const timeDisplay = mins > 0 ? `${mins}:${String(secs).padStart(2, '0')}` : `${secs}s`;
+  
+  let timeDisplay = '';
+  if (hours > 0) {
+    timeDisplay = `${hours}h ${String(mins).padStart(2, '0')}m`;
+  } else if (mins > 0) {
+    timeDisplay = `${mins}:${String(secs).padStart(2, '0')}`;
+  } else {
+    timeDisplay = `${secs}s`;
+  }
 
   const progressPct = total > 0 ? (secsLeft / total) * 100 : 0;
 

@@ -90,9 +90,15 @@ export async function POST(request: NextRequest) {
   const rateLimitStatus = await checkRateLimit('consultation', ip);
 
   if (!rateLimitStatus.success) {
+    const secondsRemaining = Math.max(1, Math.ceil((rateLimitStatus.resetTime - Date.now()) / 1000));
     return NextResponse.json(
-      { error: 'TOO_MANY_REQUESTS', message: 'Demasiadas peticiones. Intenta en unos minutos.' },
-      { status: 429 }
+      { error: 'TOO_MANY_REQUESTS', message: 'Has superado el límite de consultas permitidas.' },
+      { 
+        status: 429,
+        headers: {
+          'Retry-After': secondsRemaining.toString()
+        }
+      }
     );
   }
 
