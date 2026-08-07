@@ -179,7 +179,7 @@ export function SavingsCalculator() {
       }
     };
 
-    const timeoutId = setTimeout(fetchData, 300);
+    const timeoutId = setTimeout(fetchData, 800);
     return () => clearTimeout(timeoutId);
   }, [montoBase, mesesMora, coactivo, fechaExactaGlobal, isEmbriaguez]);
 

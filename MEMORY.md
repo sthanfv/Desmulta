@@ -53,6 +53,61 @@
 
 ### Metas Pendientes / Tareas a Seguir
 *   Todo completado con éxito por ahora. Ninguna tarea pendiente a nivel crítico.
+# 🧠 Memoria Central - Desmulta
+
+## 🏗️ Estado Actual de Implementación
+
+### Módulos Desarrollados
+1.  **Frontend (Next.js 15 / React 19)**:
+    *   **Tablero Kanban (`vial-clear`)**: Gestión de expedientes en tiempo real. 
+        *   **NUEVO (Modo Compacto)**: Se rediseñó la UI de `TarjetaKanban.tsx` para reducir el estrés cognitivo. Se aplicó "Progressive Disclosure", ocultando las acciones secundarias tras un *hover*, y compactando los metadatos (avatar de operador, indicativos visuales de captura, placa y nombre limpios). Todo esto mantiene la responsividad y el soporte *Dark Mode* intacto.
+    *   **Dashboard Analytics**: Métricas de ventas, rendimiento de operadores y distribución de referidos, incluyendo el nuevo indicador de carga laboral (Round-Robin).
+    *   **Calculadora de Ahorro Público**: Formularios con Cloudflare Turnstile, Honeypots y cifrado E2E para recolección de Leads.
+    *   **Sistema de Seguimiento al Cliente**: Portal de acceso seguro (Zero-PII) usando PIN OTP enviado por Telegram y SMS.
+
+2.  **Backend (API Routes / Firebase Admin)**:
+    *   **Asignación Automática (Round-Robin)**: Motor transaccional `getNextOperator()` que lee de `metadata/operator_roster` para asignar leads de manera equitativa a los operadores activos.
+    *   **Zero-PII Storage**: Almacenamiento seguro usando hashes HMAC-SHA256 (`hashPII`) y encriptación simétrica (`encryptSymmetric`) para datos sensibles.
+    *   **Rate Limiting**: Control de flujo robusto utilizando Upstash Redis.
+    *   **Roles & Auditoría (`audit-actions.ts`)**: Acciones privilegiadas controladas mediante *Custom Claims* de Firebase y *God Mode*.
+
+3.  **Seguridad & Arquitectura**:
+    *   **Firestore Security Rules**: Aislamiento estricto por tenant/operador, validación de schemas en DB.
+    *   **Middlewares**: Firewall de Cloudflare, Edge-Middlewares para sanitización de Request.
+    *   **Sincronización Automática**: El roster de operadores se auto-sincroniza en la base de datos `metadata/operator_roster`.
+
+### Últimos Cambios (Sesión Actual)
+*   **Asignación Round-Robin Transaccional**: Creados `operator-assignment.ts` y `sync-operator-roster.ts` e integrados en `/api/create-consultation` y `/api/leads`.
+*   **UI Dashboard/Kanban**: Filtro de "Mis Asignaciones", indicador de Carga de Trabajo y Panel Analítico Activo.
+*   **Modo Compacto Tarjetas Kanban**: Refactorización del diseño de tarjetas eliminando miniaturas inútiles (se reemplazaron por un icono de clip), cambiando badges largos por avatares pequeños, y usando *hover states* para acciones secundarias.
+*   **Seguridad de Sesión Estricta (Tab-Lock)**: Se refactorizó `/api/auth/session` para emitir cookies de sesión volátiles (sin `maxAge`), y se inyectó un candado en `sessionStorage` durante el inicio de sesión. `AdminDashboard.tsx` verifica este candado al montar; si no existe (ej. pestaña duplicada o reabierta), el usuario es expulsado, garantizando que el ciclo de vida de la sesión esté atado estrictamente a la pestaña activa.
+*   **Fix Crítico: Corrupción de SDK Firebase Auth**: Se ajustó `client-logout.ts` y `pwa-heal.ts` para EVITAR la eliminación forzada de la base de datos IndexedDB `firebaseLocalStorageDb`. Borrar esta base de datos en caliente (operación "Scorched Earth") corrompía el SDK de Firebase en la pestaña actual, lo que ocasionaba un falso error `auth/network-request-failed` en intentos de login posteriores en la misma ventana.
+*   **Fix Dashboard Crash (React Firebase Hooks)**: Se añadió la opción `{ suppressGlobalError: true }` a las llamadas de `useDoc` referentes a `site_config` dentro de `AdminDashboard.tsx` para evitar que un error de lectura de permisos bloquee todo el Dashboard.
+*   **Fix Backend Queries Case-Sensitivity**: Se añadió una redundancia de mapeo en mayúsculas a las consultas `.where('status', 'in', [...])` de `getConsultations` y `getCases` dentro de `actions.ts`. Esto soluciona un bug en el que los leads antiguos (cuyo estado en BD estaba en MAYÚSCULAS) no cargaban en el tablero Kanban.
+*   **Fix UX: Layout Shift en Calculadora**: En `SavingsCalculator.tsx` se solucionó el *flickering* (parpadeo) de Recharts.
+*   **Ajuste Estadísticas**: Se ajustó el *fallback value* del componente estadístico a `204+` desde `754+` de acuerdo a lo reportado.
+*   **Diagnóstico de Filtros Móviles**: Se añadió un indicador visual en el estado "Vacío" del Kanban que muestra explícitamente si existen expedientes ocultos debido a filtros activos (como fechas o asignaciones), para diferenciar un array filtrado de una falla en la red o caché.
+*   **UI/UX Restauración de Avanzar**: Se eliminó la clase restrictiva (`md:hidden`) del botón de "Avanzar columna" en `TarjetaKanban.tsx` para que vuelva a estar visible en la vista de PC, por requerimiento directo del usuario.
+*   **Lenguaje Natural**: Se cambió la terminología técnica ('leads') por vocabulario orientado al cliente ('solicitud inicial') en la generación de historiales de nuevos expedientes en `actions.ts`.
+*   Se corrieron validaciones de `typecheck` y tests (Exitosas).
+*   **Transición a Producción Wompi**: Se actualizaron las variables de entorno de pago (`NEXT_PUBLIC_WOMPI_PUBLIC_KEY`, `WOMPI_PRIVATE_KEY`, `WOMPI_EVENTS_SECRET`, `WOMPI_INTEGRITY_SECRET`) sustituyendo el Sandbox por las credenciales reales provistas por el usuario. El sistema está ahora listo para captar dinero real.
+*   **Integración Total BFF Go Engine (Sistema B2B)**: Se erradicó el uso de la antigua calculadora TypeScript (`calculadora-legal.ts`, ahora deprecada en modo almacén) en todos los endpoints B2B. El endpoint `analizar-comparendo` (OCR con Gemini) fue refactorizado para ser asíncrono y enrutar obligatoriamente el JSON extraído hacia el microservicio en Go a través de la firma segura HMAC-SHA256, unificando la lógica de cálculo y liberando carga de CPU de la web principal.
+*   **Vitrina Frontend Actualizada**: Se añadió a la tienda de documentos (en `plantillas/page.tsx`) el documento de **Nulidad Falta de Identidad (C-038)**. Se excluyeron deliberadamente la Caducidad de 1 año y el Poder Especial por instrucciones del usuario.
+*   **Welcome Modal UI/UX**: Se rediseñó el pop-up de bienvenida de la plataforma (`WelcomeModal.tsx`). Se solucionó un bug visual (la letra "A" cortada por desbordamiento CSS), se importaron nuevos íconos de `lucide-react` y se agregaron viñetas responsivas explicando las 3 características principales: Diagnóstico Inteligente, Calculadora Financiera y Generador de Defensa. Adicionalmente, se le agregaron efectos visuales premium (fondos difuminados radiales) para elevar la estética jurídica.
+*   **Auditoría y Refactor de Iconografía Profesional**: A petición del usuario, se revisó el uso de los iconos de la librería `lucide-react` en toda la web para mantener un contexto profesional serio. Se reemplazaron iconos lúdicos (como `BrainCircuit` por `SearchCheck` en Diagnóstico Inteligente, `Zap` por `Scale` en el background de Servicios, y `Sparkles/DatabaseZap` por `HardDrive/Database` en el proceso seguro de Logout).
+*   **WhatsApp Modal Rediseñado**: Se mejoró dramáticamente el diseño del modal "Asesoría Directa" que se abre al tocar el icono flotante de WhatsApp. Se implementaron animaciones de entrada progresiva con `framer-motion`, se mejoraron los gradientes, las sombras difuminadas con el color corporativo de WhatsApp (`#25D366`), y se rediseñó la experiencia del usuario. Todo fue compilado, versionado y desplegado a producción (Vercel vía GitHub).
+*   **Consultation Form AMOLED Glow**: Para combatir la simplicidad del fondo completamente negro de los pasos del formulario de viabilidad (p. ej., `StepPreAnalisis`, `StepContacto`), se inyectaron "Glowing Orbs" translúcidos al 5% de opacidad directamente en el contenedor del modal principal (`HomeClient.tsx > ResponsiveModal`). Esto mantiene el negro profundo (AMOLED-friendly) pero le da una textura premium, corporativa y legal.
+*   **Microservicio OCR de Respaldo (Lector-OCR)**: Se construyó desde cero una API externa en Python 3.11 (`C:\Workspace\Lector-OCR`) usando FastAPI y PyTesseract para procesar imágenes del SIMIT. Extrae array de comparendos, placa, cédula y valores usando Heurísticas (Regex). **Optimización Extrema de RAM (Plan 512MB):** Se implementó un Gestor de Contexto (`with Image.open(...)`) para forzar la destrucción inmediata de la imagen en memoria, y un sistema de cola `asyncio.Semaphore(1)` FIFO que garantiza que PyTesseract (CPU-bound en hilo separado `to_thread`) solo procese de a una (1) imagen simultáneamente, evitando bloqueos del event loop y previniendo el colapso por `Out Of Memory (OOM)` ante picos de tráfico.
+*   **Integración de Fallback OCR en Vercel**: Se modificó `src/app/api/ocr/route.ts`. Ahora, si Gemini agota su cuota gratuita o falla, el sistema realiza un fetch autenticado con HMAC-SHA256 (`OCR_ENGINE_SECRET`) al microservicio de Python (`OCR_FALLBACK_URL`). Se eliminó el bloque viejo y pesado de `tesseract.js` del código cliente.
+*   **Sistema Keep-Alive (Wake-Lock) with Anti-Bot Jitter**: Para evitar que Render suspenda las instancias gratuitas por inactividad, se migró la arquitectura a **Upstash QStash** (debido a limitaciones del plan Hobby de Vercel). QStash llama al endpoint `src/app/api/internal/keepalive/route.ts` cada 14 minutos. Este endpoint está protegido criptográficamente por `verifySignatureAppRouter` de QStash.
+    *   **Jitter Algorítmico**: El endpoint genera internamente un retraso (Sleep) aleatorio de hasta 45 segundos antes de lanzar los Pings asíncronos a Render, evadiendo las heurísticas de los WAF que detectan cron jobs robóticos. Esto garantiza que las máquinas estén calientes 24/7 y la respuesta caiga siempre a promedios de 2 - 5 segundos.
+*   **[2026-07-27] Retiro de Ping (Anti-Cold Start) hacia Go Backend**:
+    *   **Qué cambió:** Se eliminaron las llamadas ciegas tipo ping `fetch('/api/public/calcular-multa')` que ocurrían en `src/components/providers/OCRPrewarmer.tsx` y en el cronjob de `src/app/api/internal/keepalive/route.ts`.
+    *   **Por qué cambió:** El backend en Go está siendo migrado de Render (Long-Running Process) a Vercel (Serverless Functions). En Vercel, mantener la función despierta mediante pings no es necesario (los cold starts en Go son <500ms) y, más importante aún, consumía aceleradamente la cuota gratuita mensual de 100,000 peticiones.
+    *   **Archivos afectados:** `src/components/providers/OCRPrewarmer.tsx`, `src/app/api/internal/keepalive/route.ts`.
+
+### Metas Pendientes / Tareas a Seguir
+*   Todo completado con éxito por ahora. Ninguna tarea pendiente a nivel crítico.
 
 ### Restricciones / Entorno Local del Usuario
 *   Hardware limitado: Procesador AMD PRO A10.
@@ -63,3 +118,8 @@
 *   **Alcance:** Middleware (Next.js), APIs Financieras (Wompi), Webhooks (Idempotencia), Generación PDF, Firebase Rules y Dependencias de Terceros.
 *   **Resultados:** Arquitectura Zero-Trust validada. Prevención de fugas de memoria (Scorched Earth Logout) funcional. Tolerancia a fallos OCR y Wompi confirmadas.
 *   **Actualizaciones Automáticas:** Se ejecutó `npm audit fix` para parchar vulnerabilidades altas en el árbol de dependencias (`dompurify`, `postcss`, etc.), cerrando los vectores de ataque en la cadena de suministro. Ecosistema listado como Enterprise-Grade.
+
+### Hotfixes y Correcciones Recientes
+*   **Fix Rate Limit Calculadora (UX Interactivo):** 
+    *   **Problema:** El slider enviaba ráfagas (cada 300ms), consumiendo el cupo de la cubeta de Upstash y bloqueando a los usuarios ("1 a 3 minutos") debido a la protección WAF DDoS en Vercel Edge. Adicionalmente, el frontend leía un Epoch Unix bruto en lugar de segundos desde la cabecera HTTP `Retry-After`.
+    *   **Solución:** Se ajustó la política comercial en `rate-limit.ts` (cubeta `consultation`) de 3 a 10 usos por 24 horas. Se corrigió `calcular-multa/route.ts` para enviar correctamente `Retry-After` calculado en segundos según estándar HTTP. Se aumentó el `debounce` del `SavingsCalculator.tsx` de 300ms a 800ms para evitar falsos positivos de ataque DDoS al mover el slider.
