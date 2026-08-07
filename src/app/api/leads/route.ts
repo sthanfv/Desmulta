@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
     let ahorroCalculado = 0;
     if (cleanLeadData.monto_base && cleanLeadData.fecha_infraccion) {
       const { calcularMultaCompleta } = await import('@/lib/calculadora-legal');
-      const resultado = calcularMultaCompleta(cleanLeadData.monto_base, cleanLeadData.fecha_infraccion);
+      const resultado = await calcularMultaCompleta(cleanLeadData.monto_base, cleanLeadData.fecha_infraccion);
       deudaCalculada = resultado.financiero.valorTotalActual;
       ahorroCalculado = resultado.financiero.interesesAcumulados;
     }
