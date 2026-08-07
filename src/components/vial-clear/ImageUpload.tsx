@@ -72,10 +72,12 @@ export function ImageUpload({
   }, [countdown, limpiarErrorOCR]);
 
   const formatCountdown = (waitSec: number) => {
-    const hours = Math.floor(waitSec / 3600);
+    const days = Math.floor(waitSec / 86400);
+    const hours = Math.floor((waitSec % 86400) / 3600);
     const minutes = Math.floor((waitSec % 3600) / 60);
     const seconds = waitSec % 60;
     const timeParts = [];
+    if (days > 0) timeParts.push(`${days} día${days > 1 ? 's' : ''}`);
     if (hours > 0) timeParts.push(`${hours} hora${hours > 1 ? 's' : ''}`);
     if (minutes > 0) timeParts.push(`${minutes} minuto${minutes > 1 ? 's' : ''}`);
     if (seconds > 0 || timeParts.length === 0)
