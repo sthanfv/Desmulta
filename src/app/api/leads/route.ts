@@ -73,6 +73,16 @@ export async function POST(req: NextRequest) {
 
     const leadRef = db.collection('simit_leads').doc();
     const serverTimestamp = FieldValue.serverTimestamp();
+    
+    // Cálculo de seguridad en el backend
+    let deudaCalculada = 0;
+    let ahorroCalculado = 0;
+    if (cleanLeadData.monto_base && cleanLeadData.fecha_infraccion) {
+      const { calcularMultaCompleta } = await import('@/lib/calculadora-legal');
+      const resultado = calcularMultaCompleta(cleanLeadData.monto_base, cleanLeadData.fecha_infraccion);
+      deudaCalculada = resultado.financiero.valorTotalActual;
+      ahorroCalculado = resultado.financiero.interesesAcumulados;
+    }
 
     // 🔄 Transacción atómica: Round-Robin + escritura del lead
     await db.runTransaction(async (transaction) => {
@@ -80,6 +90,8 @@ export async function POST(req: NextRequest) {
 
       transaction.set(leadRef, {
         ...cleanLeadData,
+        deuda_total: deudaCalculada,
+        ahorro_potencial: ahorroCalculado,
         createdAt: serverTimestamp,
         // ZERO-PII: solo se guarda IP anonimizada. Nunca la IP completa.
         ip_address_anon: anonymizeIp(rawIp),

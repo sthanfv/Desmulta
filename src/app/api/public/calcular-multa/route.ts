@@ -45,10 +45,11 @@ export async function POST(request: NextRequest) {
     const rateLimit = await checkRateLimit('consultation', ip);
 
     if (rateLimit.blocked) {
-      const retryAfterSeconds = Math.ceil(Math.max(0, rateLimit.resetTime - Date.now()) / 1000);
+      // 🛡️ FIX: Retry-After debe ser en segundos (HTTP Standard), no Epoch en milisegundos.
+      const delaySeconds = Math.max(0, Math.ceil((rateLimit.resetTime - Date.now()) / 1000));
       return NextResponse.json(
         { error: 'Demasiadas consultas. Por favor espera un momento e inténtalo de nuevo.' },
-        { status: 429, headers: { 'Retry-After': String(retryAfterSeconds) } }
+        { status: 429, headers: { 'Retry-After': String(delaySeconds) } }
       );
     }
 

@@ -27,7 +27,7 @@ export const rateLimiters = {
   ocr: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(3, '7 d') }),
   consultation: new Ratelimit({
     redis,
-    limiter: Ratelimit.slidingWindow(5, '5 m'),
+    limiter: Ratelimit.slidingWindow(10, '24 h'),
     prefix: 'rl:consultation:v2', // Cambiar prefijo reinicia la cubeta para todos
   }),
   validarOtp: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(3, '1 m') }),

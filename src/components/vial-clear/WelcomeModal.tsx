@@ -23,8 +23,23 @@ export function WelcomeModal({ onAcknowledge }: WelcomeModalProps) {
   }, []);
 
   const handleClose = () => {
+    // 1. Telemetría Estratégica: Capturar intención antes de cerrar
+    try {
+      if (typeof window !== 'undefined' && (window as any).gtag) {
+        (window as any).gtag('event', 'welcome_modal_closed', {
+          event_category: 'engagement',
+          event_label: 'user_acknowledged'
+        });
+      }
+    } catch (e) {
+      console.warn('Telemetry error:', e);
+    }
+
+    // 2. Persistencia Segura
     localStorage.setItem('desmulta_welcome_time', Date.now().toString());
     setIsOpen(false);
+    
+    // 3. Callback diferido para permitir transición de salida
     setTimeout(onAcknowledge, 300);
   };
 

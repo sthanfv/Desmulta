@@ -233,6 +233,10 @@ export const SimitLeadSchema = z.object({
     })
     .optional(),
   website_hp: z.string().optional(),
-  deuda_total: z.number().optional(),
-  ahorro_potencial: z.number().optional(),
+  // ACEPTAR DATOS BASE (Seguros):
+  monto_base: z.number().min(0).max(100000000).optional(),
+  fecha_infraccion: z.string().optional(),
+  // RECHAZAR O IGNORAR TOTALES MANIPULABLES DEL CLIENTE:
+  deuda_total: z.undefined().optional(),
+  ahorro_potencial: z.undefined().optional(),
 });

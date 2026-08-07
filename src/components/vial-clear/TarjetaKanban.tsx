@@ -105,7 +105,11 @@ export function TarjetaKanban({
             {data._lastPushAttempt?.status === 'error' && (
               <span
                 className="text-red-500 animate-pulse"
-                title={`Fallo push: ${data._lastPushAttempt.reason}`}
+                title={`Fallo push: ${
+                  String(data._lastPushAttempt.reason || '')
+                    .replace(/[^\w\s-]/gi, '')
+                    .substring(0, 50) || 'Error desconocido'
+                }`}
               >
                 <AlertCircle className="w-3 h-3" />
               </span>

@@ -135,6 +135,9 @@ export async function sendTelegramNotification(
       dictamenHtml = `\n⚙️ <b>Dictamen Heurístico:</b> ${emoji} <b>${ocrData.status}</b>\n• <i>${escapeHtml(ocrData.technicalDictum)}</i>\n`;
     }
 
+    // 🛡️ FIX HTML INJECTION (DoS): Telegram bot arroja 400 Bad Request si el HTML es malformado.
+    // Usamos el helper escapeHtml() para sanitizar nombreMask y placaMask en caso de que vengan
+    // con <, >, & del frontend.
     const message = `<b>${headerTitle}</b>
 ━━━━━━━━━━━━━━━━━━━━
 
@@ -142,7 +145,7 @@ export async function sendTelegramNotification(
 🆔 <b>Ref:</b> <code>${escapeHtml(shortId)}</code>
 🪪 <b>Cédula:</b> 🔒 [Protegida por E2EE]
 🚗 <b>Placa:</b> <code>${escapeHtml(placaMask)}</code>
-📱 <b>WhatsApp:</b> <a href="${urlWhatsApp}">${escapeHtml(data?.contacto)}</a>
+📱 <b>WhatsApp:</b> <a href="${escapeHtml(urlWhatsApp)}">${escapeHtml(data?.contacto)}</a>
 ${dictamenHtml}${evidenceSection}
 📌 <b>Análisis de Viabilidad</b>
 • <b>Antigüedad:</b> ${escapeHtml(data?.antiguedad)}
@@ -158,7 +161,9 @@ ${dictamenHtml}${evidenceSection}
 ━━━━━━━━━━━━━━━━━━━━
 💡 <i>Usa los botones para gestionar este caso.</i>`;
 
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://desmulta.vercel.app';
+    // FIX: El fallback era .vercel.app, causando errores de sesión CORS cuando
+    // el operador abría el enlace desde Telegram. Se establece el dominio de producción real.
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://desmulta.online';
     const adminUrl = `${baseUrl}/admin?search=${encodeURIComponent(docId)}`;
 
     const replyMarkup = {
