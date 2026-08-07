@@ -255,7 +255,7 @@ export const telegramWebhook = onRequest(
   {
     region: 'us-central1',
     minInstances: 0,
-    secrets: ['TELEGRAM_BOT_TOKEN', 'TELEGRAM_WEBHOOK_SECRET', 'PII_ENCRYPTION_KEY', 'PII_HMAC_SECRET'],
+    secrets: ['TELEGRAM_BOT_TOKEN', 'TELEGRAM_WEBHOOK_SECRET', 'PII_ENCRYPTION_KEY', 'PII_HMAC_SECRET', 'PII_ENCRYPTION_SALT'],
   },
   async (req, res) => {
     const webhookSecret = process.env.TELEGRAM_WEBHOOK_SECRET?.trim();
