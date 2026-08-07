@@ -423,7 +423,33 @@ export const telegramWebhook = onRequest(
               await answerCallbackQuery(token, callbackId, '⚠️ Sin cédula registrada', true);
             } else {
               const decrypted = decryptSymmetric(encryptedCedula);
-              await answerCallbackQuery(token, callbackId, `🪪 Cédula del Cliente:\n\n${decrypted}`, true);
+              
+              const msgActual = cb.message?.caption || cb.message?.text || '';
+              const nuevoMensaje = msgActual.replace('[Cifrada - Usa el botón Ver Cédula]', decrypted);
+              
+              if (nuevoMensaje !== msgActual) {
+                // Generar nuevo markup sin el botón de 'Ver Cédula'
+                const currentMarkup = cb.message?.reply_markup as { inline_keyboard: any[][] } | undefined;
+                let nuevoMarkup = currentMarkup;
+                
+                if (currentMarkup?.inline_keyboard) {
+                  nuevoMarkup = {
+                    inline_keyboard: currentMarkup.inline_keyboard.map(row => 
+                      row.filter(btn => !btn.callback_data?.startsWith('vercedula_'))
+                    )
+                  };
+                }
+
+                await editMessageText(
+                  token,
+                  chatId,
+                  messageId,
+                  nuevoMensaje,
+                  nuevoMarkup
+                );
+              }
+
+              await answerCallbackQuery(token, callbackId, '✅ Cédula revelada en el mensaje');
             }
           } catch (err) {
             logger.error('[CRM] Error desencriptando cédula en Telegram callback:', err);
