@@ -35,6 +35,21 @@ export async function generateMetadata({
   return {
     title,
     description: desc,
+    openGraph: {
+      title,
+      description: desc,
+      url: `https://desmulta.online/seguir/${targetId}`,
+      siteName: 'Desmulta',
+      type: 'website',
+      images: [
+        {
+          url: `https://desmulta.online/seguir/${targetId}/opengraph-image`,
+          width: 1200,
+          height: 630,
+          alt: `Estado del Expediente - Desmulta`,
+        },
+      ],
+    },
     robots: {
       index: false,
       follow: false,
