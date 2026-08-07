@@ -255,7 +255,7 @@ export const telegramWebhook = onRequest(
   {
     region: 'us-central1',
     minInstances: 0,
-    secrets: ['TELEGRAM_BOT_TOKEN', 'TELEGRAM_WEBHOOK_SECRET', 'PII_ENCRYPTION_KEY', 'PII_HMAC_SECRET', 'PII_ENCRYPTION_SALT'],
+    secrets: ['TELEGRAM_BOT_TOKEN', 'TELEGRAM_WEBHOOK_SECRET', 'PII_ENCRYPTION_KEY', 'PII_HMAC_SECRET', 'PII_ENCRYPTION_SALT', 'TELEGRAM_CHAT_ID', 'TELEGRAM_DEV_CHAT_ID', 'TELEGRAM_SECURITY_CHAT_ID'],
   },
   async (req, res) => {
     const webhookSecret = process.env.TELEGRAM_WEBHOOK_SECRET?.trim();
@@ -425,7 +425,11 @@ export const telegramWebhook = onRequest(
               const decrypted = decryptSymmetric(encryptedCedula);
               
               const msgActual = cb.message?.caption || cb.message?.text || '';
-              const nuevoMensaje = msgActual.replace('[Cifrada - Usa el botón Ver Cédula]', decrypted);
+              let nuevoMensaje = msgActual.replace('[Cifrada - Usa el botón Ver Cédula]', decrypted);
+              
+              if (nuevoMensaje === msgActual) {
+                 nuevoMensaje = msgActual + `\n\n🪪 <b>Cédula revelada:</b> <code>${decrypted}</code>`;
+              }
               
               if (nuevoMensaje !== msgActual) {
                 // Generar nuevo markup sin el botón de 'Ver Cédula'
