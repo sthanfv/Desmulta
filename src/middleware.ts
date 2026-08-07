@@ -198,7 +198,9 @@ export async function middleware(request: NextRequest) {
         console.error(
           '[Middleware /admin] CRÍTICO: getTokens retornó null. Falta cookie __session o es inválida.'
         );
-        return NextResponse.redirect(new URL('/acceso-panel', request.url));
+        const loginUrl = new URL('/acceso-panel', request.url);
+        loginUrl.search = request.nextUrl.search;
+        return NextResponse.redirect(loginUrl);
       }
 
       // 🛡️ 2FA OTP Guard: Si es admin y no está en test, verificar la cookie `admin-2fa-token` y su firma JWT
@@ -209,7 +211,9 @@ export async function middleware(request: NextRequest) {
           console.error(
             '[Middleware /admin] CRÍTICO: Falta la cookie admin-2fa-token en la request.'
           );
-          return NextResponse.redirect(new URL('/acceso-panel', request.url));
+          const loginUrl = new URL('/acceso-panel', request.url);
+          loginUrl.search = request.nextUrl.search;
+          return NextResponse.redirect(loginUrl);
         }
 
         // Validar firma del token JWT 2FA
@@ -222,7 +226,9 @@ export async function middleware(request: NextRequest) {
               '[Middleware /admin] CRÍTICO: token 2fa vacío o falta GOD_MODE_JWT_SECRET en el servidor.',
               { hasToken: !!token, hasSecret: !!jwtSecret }
             );
-            const response = NextResponse.redirect(new URL('/acceso-panel', request.url));
+            const loginUrl = new URL('/acceso-panel', request.url);
+            loginUrl.search = request.nextUrl.search;
+            const response = NextResponse.redirect(loginUrl);
             response.cookies.delete('admin-2fa-token');
             response.cookies.delete('admin-2fa-flag');
             return response;
@@ -233,7 +239,9 @@ export async function middleware(request: NextRequest) {
           // Token inválido, expirado o corrupto → limpiar cookies y redirigir a login
           const errMsg = err instanceof Error ? err.message : String(err);
           console.error('[Middleware /admin] CRÍTICO: jwtVerify falló.', errMsg);
-          const response = NextResponse.redirect(new URL('/acceso-panel', request.url));
+          const loginUrl = new URL('/acceso-panel', request.url);
+          loginUrl.search = request.nextUrl.search;
+          const response = NextResponse.redirect(loginUrl);
           response.cookies.delete('admin-2fa-token');
           response.cookies.delete('admin-2fa-flag');
           return response;
@@ -243,7 +251,9 @@ export async function middleware(request: NextRequest) {
       // Token expirado, corrupto o error de red → redirect a login
       const errMsg = err instanceof Error ? err.message : String(err);
       console.error('[Middleware /admin] CRÍTICO: Error general al validar tokens:', errMsg);
-      return NextResponse.redirect(new URL('/acceso-panel', request.url));
+      const loginUrl = new URL('/acceso-panel', request.url);
+      loginUrl.search = request.nextUrl.search;
+      return NextResponse.redirect(loginUrl);
     }
   }
 

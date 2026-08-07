@@ -316,7 +316,7 @@ export default function AccesoPanel() {
 
       // Recarga completa (no client-side navigation) para que el middleware
       // de Next.js lea el nuevo estado de cookies desde el servidor.
-      window.location.href = '/admin';
+      window.location.href = '/admin' + window.location.search;
     } catch (error: unknown) {
       // Regresar a la fase de espera y limpiar los dígitos para reintento
       setPhase('awaiting_otp');
