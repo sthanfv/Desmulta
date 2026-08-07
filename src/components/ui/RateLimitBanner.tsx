@@ -68,7 +68,7 @@ export function RateLimitBanner({
   
   let timeDisplay = '';
   if (hours > 0) {
-    timeDisplay = `${hours}h ${String(mins).padStart(2, '0')}m`;
+    timeDisplay = `${hours}h ${String(mins).padStart(2, '0')}m ${String(secs).padStart(2, '0')}s`;
   } else if (mins > 0) {
     timeDisplay = `${mins}:${String(secs).padStart(2, '0')}`;
   } else {

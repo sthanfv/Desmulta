@@ -83,9 +83,13 @@ export async function POST(req: NextRequest) {
   // historial NO debe afectar su capacidad de realizar un pago.
   const rl = await checkRateLimit('checkoutOrder', ip);
   if (!rl.success) {
+    const secondsRemaining = Math.max(1, Math.ceil((rl.resetTime - Date.now()) / 1000));
     return NextResponse.json(
-      { error: 'Demasiadas solicitudes de pago. Intenta en unos minutos.' },
-      { status: 429 }
+      { error: 'Demasiadas solicitudes de pago. Intenta más tarde.' },
+      { 
+        status: 429,
+        headers: { 'Retry-After': secondsRemaining.toString() }
+      }
     );
   }
 
