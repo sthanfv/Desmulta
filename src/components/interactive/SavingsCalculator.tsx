@@ -250,8 +250,8 @@ export function SavingsCalculator() {
           // Truncar nombre a 60 chars para evitar overflow antes de enviarlo al servidor
           nombre: leadNombre.trim().slice(0, 60) || undefined,
           website_hp: leadHp,
-          deuda_total: total,
-          ahorro_potencial: intereses,
+          monto_base: montoBase,
+          fecha_infraccion: fechaExactaGlobal || undefined,
         }),
       });
       if (!response.ok) throw new Error('Error en el envío');

@@ -240,11 +240,16 @@ export async function POST(req: NextRequest) {
       const chatId = process.env.TELEGRAM_DEV_CHAT_ID || process.env.TELEGRAM_CHAT_ID;
 
       if (botToken && chatId) {
+        // Helper para escapar caracteres y evitar que Telegram devuelva 400 Bad Request
+        const escapeHtml = (text: string) => text.replace(/[&<>'"]/g, 
+          tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+        );
+
         // Extraemos datos extra si existen en el documento de la compra
-        const nombre = purchase?.caseData?.infractorName || 'Cliente Anónimo';
-        const producto = purchase?.productLabel || 'Documento Legal';
+        const nombre = escapeHtml(purchase?.caseData?.infractorName || 'Cliente Anónimo');
+        const producto = escapeHtml(purchase?.productLabel || 'Documento Legal');
         const ticketStr = purchase?.caseData?.ticketNumber
-          ? `\n<b>Comparendo:</b> <code>${purchase.caseData.ticketNumber}</code>`
+          ? `\n<b>Comparendo:</b> <code>${escapeHtml(purchase.caseData.ticketNumber)}</code>`
           : '';
 
         waitUntil(
