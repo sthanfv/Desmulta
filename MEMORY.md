@@ -97,3 +97,9 @@
 *   Hardware limitado: Procesador AMD PRO A10.
 *   El código de la aplicación está alojado en `C:\Workspace\Desmulta`.
 *   Sistema operativo: Windows 10/11.
+
+*   **[2026-08-07] Refinamiento de UX en Limites de Tasa y Fix de Telegram Webhook**:
+    *   **Rate Limiting UI:** Se ajustó la UI del formulario para presentar mensajes humanos cuando Upstash intercepta tráfico masivo, reemplazando el texto técnico TOO_MANY_REQUESTS y procesando el Retry-After para mostrar un contador dinámico en reversa.
+    *   **Restauración Telegram Webhook:** Falla silenciosa en la recepción de webhooks de Telegram resuelta al inyectar las dependencias de Secrets en la definición de la Cloud Function (onRequest({ secrets: [...] })).
+    *   **Hotfix Cifrado PII Zero-Trust:** Se corrigió un error de descifrado en el bot de Telegram. La bóveda de Firebase (Secret Manager) tenía inyectada erróneamente la llave HMAC (PII_HMAC_SECRET) en el campo de la llave de encriptación (PII_ENCRYPTION_KEY), generando una desincronización con el cifrado de Vercel. Se sincronizó correctamente el Secret Manager sin alterar código fuente y se redesplegó.
+*   **[2026-08-07] Refinamiento de Push Notifications (ID Humano)**: Se modificó la función push-notifications.ts para usar el shortId (Expediente EXP-...) en lugar del docId de Firestore para la interfaz visual, manteniendo el docId intacto en la carga útil (payload) para garantizar un ruteo perfecto en la App.

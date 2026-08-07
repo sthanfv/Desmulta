@@ -86,7 +86,8 @@ export async function sendCaseUpdateNotification(
   caseId: string,
   trackingUrl?: string,
   consultationId?: string,
-  operatorNote?: string
+  operatorNote?: string,
+  shortId?: string
 ) {
   try {
     const templateFn = STATUS_TEMPLATES[newStatus.toLowerCase()];
@@ -95,7 +96,8 @@ export async function sendCaseUpdateNotification(
       return;
     }
 
-    const { title, body } = templateFn(caseId, operatorNote);
+    const displayId = shortId || caseId;
+    const { title, body } = templateFn(displayId, operatorNote);
     const finalBody = body;
 
     const message = {

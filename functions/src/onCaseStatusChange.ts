@@ -149,7 +149,7 @@ async function processCaseEmail(caseId: string, after: CaseAfterData, isNew: boo
 
     if (fcmToken) {
       const trackingUrl = trackingUuid ? `https://desmulta.online/seguir/${trackingUuid}` : undefined;
-      await sendCaseUpdateNotification(fcmToken, status, caseId, trackingUrl, consultationId, operatorNote);
+      await sendCaseUpdateNotification(fcmToken, status, caseId, trackingUrl, consultationId, operatorNote, shortId);
     }
 
     if (!emailCiudadano) {
