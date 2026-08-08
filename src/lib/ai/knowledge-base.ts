@@ -112,7 +112,7 @@ export const DESMULTA_KB: KnowledgeBase = {
       {
         numero: '02',
         fase: 'Blindaje Administrativo',
-        detalle: 'Radicación de defensas técnicas ante secretarías. Construimos el acervo probatorio y despachamos derechos de petición estructurados con base en jurisprudencia y parámetros de la Superintendencia de Transporte.',
+        detalle: 'Radicación de defensas técnicas ante secretarías. Construimos el acervo probatorio y gestionamos la actuación administrativa con base en jurisprudencia y parámetros de la Superintendencia de Transporte.',
       },
       {
         numero: '03',
