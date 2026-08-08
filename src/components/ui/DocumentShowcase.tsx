@@ -208,11 +208,6 @@ export function DocumentShowcase() {
             style={{ filter: 'url(#noiseFilter)' }}
           />
 
-          {/* Efecto de esquina doblada (Flap) */}
-          <div 
-            className="absolute top-0 right-0 w-[40px] h-[40px] z-30 pointer-events-none border-b border-l border-border/50 bg-card/80 backdrop-blur-md rounded-bl-xl shadow-[-5px_5px_15px_rgba(0,0,0,0.15)]"
-          />
-
           {/* Brillo amarillo (Glow) estilo premium */}
           <div className="absolute -top-8 -right-8 w-40 h-40 bg-primary/30 dark:bg-primary/10 rounded-full blur-[40px] pointer-events-none z-0" />
 
