@@ -63,13 +63,13 @@ export default function TerminosPage() {
                   1.1. Naturaleza de la Gestión (SaaS LegalTech)
                 </h4>
                 <p>
-                  {brandName} actúa exclusivamente como un facilitador tecnológico, desarrollador de
-                  software (LegalTech) y gestor administrativo integral. <strong>No somos un bufete de abogados,
-                  ni proveemos representación legal judicial.</strong> Toda gestión documental generada
-                  por nuestro sistema es radicada bajo la figura jurídica de "causa propia" por parte del
-                  usuario, amparado en el Art. 23 de la Constitución Política de Colombia (Derecho de Petición)
-                  y el Decreto 2591 de 1991 (Acción de Tutela), legislaciones que no exigen la intermediación
-                  de un abogado titulado.
+                  {brandName} actúa exclusivamente como un facilitador tecnológico y gestor
+                  administrativo integral. <strong>No somos un bufete de abogados, ni
+                  proveemos representación en calidad de apoderados judiciales.</strong> Toda la
+                  documentación y gestión administrativa procesada por nuestra plataforma tecnológica
+                  es impulsada bajo la figura de titularidad del usuario (actuación a nombre propio).
+                  Nuestra plataforma estructura la viabilidad técnica y normativa, pero es el usuario
+                  quien figura como titular formal ante las autoridades competentes.
                 </p>
               </div>
 
