@@ -173,7 +173,7 @@ export function DocumentShowcase() {
             className="absolute inset-0 opacity-[0.03] pointer-events-none"
             style={{ filter: 'url(#noiseFilter)' }}
           />
-          <div className="absolute -top-12 -right-12 w-40 h-40 bg-primary/10 dark:hidden rounded-full blur-[50px] pointer-events-none" />
+          <div className="absolute -top-12 -right-12 w-40 h-40 bg-primary/20 dark:bg-primary/10 rounded-full blur-[50px] pointer-events-none" />
         </div>
 
         {/* Carta Trasera 1 */}
@@ -190,7 +190,7 @@ export function DocumentShowcase() {
             className="absolute inset-0 opacity-[0.03] pointer-events-none"
             style={{ filter: 'url(#noiseFilter)' }}
           />
-          <div className="absolute -top-12 -right-12 w-40 h-40 bg-primary/10 dark:hidden rounded-full blur-[50px] pointer-events-none" />
+          <div className="absolute -top-12 -right-12 w-40 h-40 bg-primary/20 dark:bg-primary/10 rounded-full blur-[50px] pointer-events-none" />
         </div>
 
         {/* Carta Frontal */}
@@ -208,8 +208,13 @@ export function DocumentShowcase() {
             style={{ filter: 'url(#noiseFilter)' }}
           />
 
-          {/* Brillo amarillo (Glow) estilo premium, visible solo en light mode */}
-          <div className="absolute -top-12 -right-12 w-40 h-40 bg-primary/10 dark:hidden rounded-full blur-[50px] pointer-events-none" />
+          {/* Efecto de esquina doblada (Flap) */}
+          <div 
+            className="absolute top-0 right-0 w-[40px] h-[40px] z-30 pointer-events-none border-b border-l border-border/50 bg-card/80 backdrop-blur-md rounded-bl-xl shadow-[-5px_5px_15px_rgba(0,0,0,0.15)]"
+          />
+
+          {/* Brillo amarillo (Glow) estilo premium */}
+          <div className="absolute -top-8 -right-8 w-40 h-40 bg-primary/30 dark:bg-primary/10 rounded-full blur-[40px] pointer-events-none z-0" />
 
           {/* Contenedor del Carrusel Interno (Fade) */}
           <div className="flex-grow relative z-10 w-full h-full overflow-hidden">
