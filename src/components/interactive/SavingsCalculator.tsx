@@ -67,7 +67,7 @@ export function SavingsCalculator() {
   const [costosCoactivos, setCostosCoactivos] = useState(0);
 
   // Estados Legales y de Conversión
-  const [coactivo, setCoactivo] = useState(true);
+  const [coactivo, setCoactivo] = useState(false);
   const [resultado, setResultado] = useState<ResultadoPrescripcion | null>(null);
   const [proyecciones, setProyecciones] = useState<ProyeccionesData | null>(null);
   const [descuentos, setDescuentos] = useState<DescuentosData | null>(null);
