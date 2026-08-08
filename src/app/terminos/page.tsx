@@ -105,7 +105,7 @@ export default function TerminosPage() {
                       <span className="text-primary font-black shrink-0">Fase 2 - Gestión:</span>
                       <span>
                         Acompañamiento técnico, generación automatizada de documentos y radicación
-                        formal (Peticiones, Nulidades, Tutelas) bajo la titularidad exclusiva del usuario,
+                        formal de requerimientos jurídicos bajo la titularidad exclusiva del usuario,
                         incluyendo el seguimiento de términos perentorios del Estado.
                       </span>
                     </li>
@@ -200,9 +200,9 @@ export default function TerminosPage() {
                 </h4>
                 <p>
                   La arquitectura del sistema, los algoritmos de detección de causales, los
-                  fundamentos jurídicos aplicados y las plantillas documentales (Peticiones,
-                  Acciones de Tutela, Recursos de Nulidad) generadas por la plataforma son propiedad
-                  intelectual exclusiva de {brandName} y constituyen secreto profesional.
+                  fundamentos jurídicos aplicados y las plantillas documentales generadas
+                  por la plataforma son propiedad intelectual exclusiva de {brandName} y
+                  constituyen secreto profesional.
                 </p>
               </div>
               <div className="space-y-3">
