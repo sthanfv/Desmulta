@@ -296,7 +296,9 @@ export function SavingsCalculator() {
                 Diagnóstico instantáneo de viabilidad judicial
               </p>
             </div>
-            {/* MENSAJE DE LÍMITE DE USO (RATE LIMIT) - AHORA COMO OVERLAY ABSOLUTO */}
+          </div>
+
+          {/* MENSAJE DE LÍMITE DE USO (RATE LIMIT) - AHORA COMO OVERLAY ABSOLUTO */}
           {rateLimitReached && (
             <div className="absolute inset-0 z-50 bg-background/90 backdrop-blur-sm rounded-[2rem] flex flex-col items-center justify-center p-6 animate-in fade-in zoom-in-95">
               <div className="bg-red-500/10 border border-red-500/20 p-6 rounded-2xl flex flex-col items-center text-center gap-4 max-w-sm shadow-2xl">
