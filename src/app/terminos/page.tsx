@@ -60,11 +60,16 @@ export default function TerminosPage() {
             <div className="grid gap-8 text-muted-foreground leading-relaxed text-lg">
               <div className="space-y-3">
                 <h4 className="font-black text-foreground uppercase tracking-widest text-xs opacity-60">
-                  1.1. Naturaleza de la Gestión
+                  1.1. Naturaleza de la Gestión (SaaS LegalTech)
                 </h4>
                 <p>
-                  {brandName} actúa como un facilitador jurídico y gestor administrativo integral.
-                  No somos una entidad estatal, judicial, ni un organismo de tránsito.
+                  {brandName} actúa exclusivamente como un facilitador tecnológico, desarrollador de
+                  software (LegalTech) y gestor administrativo integral. <strong>No somos un bufete de abogados,
+                  ni proveemos representación legal judicial.</strong> Toda gestión documental generada
+                  por nuestro sistema es radicada bajo la figura jurídica de "causa propia" por parte del
+                  usuario, amparado en el Art. 23 de la Constitución Política de Colombia (Derecho de Petición)
+                  y el Decreto 2591 de 1991 (Acción de Tutela), legislaciones que no exigen la intermediación
+                  de un abogado titulado.
                 </p>
               </div>
 
@@ -99,8 +104,9 @@ export default function TerminosPage() {
                     <li className="flex gap-2">
                       <span className="text-primary font-black shrink-0">Fase 2 - Gestión:</span>
                       <span>
-                        Representación, interposición de acciones legales (Peticiones, Nulidades,
-                        Tutelas) y seguimiento de términos perentorios.
+                        Acompañamiento técnico, generación automatizada de documentos y radicación
+                        formal (Peticiones, Nulidades, Tutelas) bajo la titularidad exclusiva del usuario,
+                        incluyendo el seguimiento de términos perentorios del Estado.
                       </span>
                     </li>
                     <li className="flex gap-2">

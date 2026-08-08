@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowLeft, ShieldCheck, Database, Eye, Cpu } from 'lucide-react';
+import { ArrowLeft, ShieldCheck, Database, Server, Eye, Cpu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function PrivacidadPage() {
@@ -151,6 +151,43 @@ export default function PrivacidadPage() {
                   Las imágenes de sus comparendos <strong>NO</strong> son enviadas a servidores
                   externos de Inteligencia Artificial (IA) para ser leídas ni para entrenar modelos
                   de lenguaje de terceros.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* SECCIÓN 4: Mandato Electrónico y Extracción de Datos (Scraping) */}
+          <section className="floating-card bg-card/40 backdrop-blur-sm border border-white/10 p-10 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-400">
+            <div className="flex items-center gap-4 mb-10">
+              <div className="p-3 bg-primary/10 rounded-2xl border border-primary/20 shadow-inner">
+                <Database className="text-primary" size={28} />
+              </div>
+              <h2 className="text-3xl font-black text-foreground tracking-tight">
+                Mandato Tecnológico y Extracción de Datos
+              </h2>
+            </div>
+            <div className="grid gap-8 text-muted-foreground leading-relaxed text-lg">
+              <div className="space-y-3">
+                <h4 className="font-black text-foreground uppercase tracking-widest text-xs opacity-60">
+                  4.1. Autorización de Mandato Electrónico (Habeas Data)
+                </h4>
+                <p>
+                  En cumplimiento de la Ley 1581 de 2012 y sus decretos reglamentarios, al suministrar 
+                  su número de documento e interactuar con la plataforma, el usuario otorga a {brandName} 
+                  un <strong>Mandato Tecnológico Expreso</strong>. Esta figura nos faculta para actuar 
+                  como su representante tecnológico temporal, permitiendo que nuestros sistemas automatizados 
+                  (bots/scraping) consulten plataformas públicas del Estado (ej. SIMIT, RUNT) en su nombre.
+                </p>
+              </div>
+              <div className="space-y-3">
+                <h4 className="font-black text-foreground uppercase tracking-widest text-xs opacity-60">
+                  4.2. Uso Exclusivo y Transitorio
+                </h4>
+                <p>
+                  Los datos extraídos de dichas plataformas estatales tienen el único propósito de 
+                  generar el diagnóstico de viabilidad y pre-diligenciar las plantillas de defensa. 
+                  Una vez finalizada la consulta o el trámite, los datos residuales del scraping son 
+                  purgados de la memoria activa para garantizar su privacidad.
                 </p>
               </div>
             </div>
