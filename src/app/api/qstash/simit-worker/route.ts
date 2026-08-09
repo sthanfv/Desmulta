@@ -23,14 +23,18 @@ export async function POST(request: NextRequest) {
     const signature = request.headers.get('upstash-signature');
     const bodyText = await request.text();
 
-    if (!signature) {
+    const isDev = process.env.NODE_ENV === 'development';
+
+    if (!signature && !isDev) {
       logger.warn('[simit-worker] Intento de acceso sin firma QStash');
       return NextResponse.json({ error: 'Firma QStash requerida' }, { status: 401 });
     }
 
-    const isValid = await receiver.verify({ signature, body: bodyText });
-    if (!isValid) {
-      return NextResponse.json({ error: 'Firma QStash inválida' }, { status: 401 });
+    if (signature) {
+      const isValid = await receiver.verify({ signature, body: bodyText });
+      if (!isValid && !isDev) {
+        return NextResponse.json({ error: 'Firma QStash inválida' }, { status: 401 });
+      }
     }
 
     const payload = bodyText ? JSON.parse(bodyText) : {};
@@ -132,6 +136,33 @@ export async function POST(request: NextRequest) {
         } catch (emailErr) {
           logger.warn('[simit-worker] Fallo al enviar email de alerta', {
             error: emailErr instanceof Error ? emailErr.message : String(emailErr),
+          });
+        }
+      }
+
+      // Notificar por Push (FCM) si el usuario lo activó
+      if (hasChanges && sub?.pushToken) {
+        try {
+          const { getMessaging } = await import('firebase-admin/messaging');
+          const { getAdminApp } = await import('@/lib/firebase-admin');
+          
+          await getMessaging(getAdminApp()).send({
+            token: sub.pushToken,
+            notification: {
+              title: totalMultas > previousCount ? '🚨 Nueva Multa SIMIT' : '✅ Cambio SIMIT',
+              body: `Detectamos movimientos en el estado de cuenta de la cédula ${ced}.`,
+            },
+            webpush: {
+              fcmOptions: {
+                link: 'https://desmulta.online/escudo-simit'
+              }
+            }
+          });
+          logger.info(`[simit-worker] Notificación Push enviada exitosamente para cédula ${ced}`);
+        } catch (pushErr) {
+          logger.warn('[simit-worker] Fallo al enviar notificación Push FCM', {
+            error: pushErr instanceof Error ? pushErr.message : String(pushErr),
+            cedula: ced
           });
         }
       }

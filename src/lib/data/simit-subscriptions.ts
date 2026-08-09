@@ -10,6 +10,7 @@ export interface SimitSubscription {
   lastCheckedAt?: number;
   lastKnownFinesCount?: number;
   lastKnownTotalAmount?: number;
+  pushToken?: string;
 }
 
 export interface SimitSubscriptionDoc {
@@ -20,6 +21,7 @@ export interface SimitSubscriptionDoc {
   lastCheckedAt?: number;
   lastKnownFinesCount?: number;
   lastKnownTotalAmount?: number;
+  pushToken?: string;
 }
 
 const COLLECTION_NAME = 'simit_subscriptions';
@@ -44,6 +46,7 @@ export async function getActiveSubscriptions(): Promise<SimitSubscription[]> {
       lastCheckedAt: data.lastCheckedAt,
       lastKnownFinesCount: data.lastKnownFinesCount,
       lastKnownTotalAmount: data.lastKnownTotalAmount,
+      pushToken: data.pushToken,
     };
   });
 }
@@ -75,6 +78,7 @@ export async function getDueSubscriptions(limitCount: number): Promise<SimitSubs
       lastCheckedAt: data.lastCheckedAt,
       lastKnownFinesCount: data.lastKnownFinesCount,
       lastKnownTotalAmount: data.lastKnownTotalAmount,
+      pushToken: data.pushToken,
     };
   });
 }
@@ -97,6 +101,7 @@ export async function upsertSubscription(data: Omit<SimitSubscription, 'createdA
     lastCheckedAt: data.lastCheckedAt !== undefined ? data.lastCheckedAt : 0, // Asegurar un número para indexación ascendente
     lastKnownFinesCount: data.lastKnownFinesCount,
     lastKnownTotalAmount: data.lastKnownTotalAmount,
+    pushToken: data.pushToken,
   };
   
   // Eliminar undefined para que Firestore no se queje (merge ignorará los vacíos pero los undefined explícitos lanzan error)

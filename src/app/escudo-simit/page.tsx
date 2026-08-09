@@ -5,6 +5,8 @@ import Link from 'next/link';
 import Script from 'next/script';
 import { m, LazyMotion, domAnimation, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
+import { getMessaging, getToken, isSupported } from 'firebase/messaging';
+import { app } from '@/lib/firebase-client';
 
 const Turnstile = dynamic(() => import('@marsidev/react-turnstile').then((mod) => mod.Turnstile), {
   ssr: false,
@@ -66,6 +68,36 @@ const formatCOP = (valor: number): string =>
     minimumFractionDigits: 0,
   }).format(valor);
 
+async function obtainFcmToken(): Promise<string | null> {
+  if (typeof window === 'undefined' || !('serviceWorker' in navigator) || !('Notification' in window)) return null;
+  
+  try {
+    const soportado = await isSupported();
+    if (!soportado) return null;
+
+    let permiso = Notification.permission;
+    if (permiso === 'default') {
+      permiso = await Notification.requestPermission();
+    }
+    
+    if (permiso !== 'granted') return null;
+
+    const swReg = await navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/' });
+    const messaging = getMessaging(app);
+    
+    const vapidKey = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
+    if (!vapidKey) return null;
+
+    return await getToken(messaging, { 
+      vapidKey,
+      serviceWorkerRegistration: swReg
+    });
+  } catch (err) {
+    console.warn('[Escudo SIMIT] No se pudo obtener el FCM token', err);
+    return null;
+  }
+}
+
 // ── Componente Principal ───────────────────────────────────────────────
 
 export default function EscudoSimitPage() {
@@ -126,6 +158,15 @@ export default function EscudoSimitPage() {
     setIsActivating(true);
 
     try {
+      // 1. Intentar capturar el token Push para incluirlo en la suscripción
+      let pushToken: string | null = null;
+      try {
+        pushToken = await obtainFcmToken();
+      } catch (err) {
+        // Fallo silencioso de push (no bloquea el servicio)
+      }
+
+      // 2. Disparar al Backend
       const response = await fetch('/api/escudo-simit/activate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -133,6 +174,7 @@ export default function EscudoSimitPage() {
           cedula,
           email,
           turnstileToken: turnstileRef.current,
+          pushToken,
         }),
       });
 
