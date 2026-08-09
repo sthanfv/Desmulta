@@ -249,8 +249,9 @@ export default function EscudoSimitPage() {
                     Activa tu Escudo SIMIT
                   </h2>
                   <p className="text-muted-foreground mb-10 relative z-10">
-                    Ingresa tu cédula y correo. Recibirás tu estado de cuenta al instante y
-                    monitoreo gratuito durante 30 días.
+                    Ingresa tu cédula y correo para recibir tu estado de cuenta actual. 
+                    <br/><br/>
+                    <strong className="text-primary">Nota:</strong> Te enviaremos reportes periódicos semanales de forma automática. Te recomendamos revisar tu bandeja principal y la carpeta de <strong>Spam / Correo No Deseado</strong> para no perderte nuestras alertas tempranas.
                   </p>
 
                   <div className="space-y-5 relative z-10">

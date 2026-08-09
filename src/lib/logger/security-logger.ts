@@ -50,6 +50,24 @@ const getFingerprint = (contexto: string): string[] => {
   return ['desmulta-core'];
 };
 
+/**
+ * Envía una alerta técnica directa al chat de Telegram de Soporte (MANDATO-FILTRO)
+ */
+const sendTelegramAlert = (contexto: string, mensaje: string) => {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_TECH_CHAT_ID;
+
+  if (!token || !chatId) return; // Si no hay configuración, saltamos silenciosamente
+
+  const text = `🚨 <b>ERROR DEL SISTEMA: Desmulta</b>\n📍 <b>Origen:</b> <code>${contexto}</code>\n⚠️ <b>Detalle:</b>\n<pre>${mensaje}</pre>\n⏱ <b>Timestamp:</b> ${new Date().toISOString()}`;
+
+  fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' }),
+  }).catch((err) => console.error('[TELEGRAM_FAIL] No se pudo alertar a Telegram:', err));
+};
+
 export const SecurityLogger = {
   info: (contexto: string, datos?: unknown) => {
     const logSanitizado = sanitizarPII(JSON.stringify(datos || {}));
@@ -71,6 +89,9 @@ export const SecurityLogger = {
   error: (contexto: string, datos?: unknown) => {
     const logSanitizado = sanitizarPII(JSON.stringify(datos || {}));
     console.error(`[ERROR] ${contexto}:`, logSanitizado);
+
+    // Enviar a Telegram Inmediatamente
+    sendTelegramAlert(contexto, logSanitizado);
 
     // Capturar en Sentry para visibilidad en producción
     if (process.env.NODE_ENV === 'production') {
