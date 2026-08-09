@@ -113,12 +113,11 @@ export default function EscudoSimitPage() {
   const { toast } = useToast();
 
   const loadingPhases = [
-    'Iniciando conexión segura con SIMIT...',
-    'Evadiendo cortafuegos gubernamentales...',
-    'Extrayendo resoluciones y comparendos...',
-    'Procesando cobros coactivos e intereses...',
-    'Encriptando datos y blindando cédula...',
-    'Generando reporte final...',
+    'Estableciendo conexión segura con la plataforma nacional...',
+    'Analizando base de datos de resoluciones y comparendos...',
+    'Calculando prescripciones y estado de cobros coactivos...',
+    'Asegurando expediente bajo protocolo Zero-PII...',
+    'Generando reporte final consolidado...',
   ];
 
   React.useEffect(() => {
@@ -132,7 +131,7 @@ export default function EscudoSimitPage() {
         if (currentPhase < loadingPhases.length) {
           setLoadingPhase(currentPhase);
         }
-      }, 3500); // 3.5 segundos por fase
+      }, 700); // 700ms por fase para que se vea rápido y fluido
     }
     return () => clearInterval(interval);
   }, [isActivating]);
