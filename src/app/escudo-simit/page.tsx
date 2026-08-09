@@ -4,6 +4,11 @@ import React, { useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import Script from 'next/script';
 import { m, LazyMotion, domAnimation, AnimatePresence } from 'framer-motion';
+import dynamic from 'next/dynamic';
+
+const Turnstile = dynamic(() => import('@marsidev/react-turnstile').then((mod) => mod.Turnstile), {
+  ssr: false,
+});
 import {
   ShieldCheck,
   ArrowLeft,
@@ -131,11 +136,6 @@ export default function EscudoSimitPage() {
 
   return (
     <LazyMotion features={domAnimation}>
-      {/* Turnstile Script */}
-      <Script
-        src="https://challenges.cloudflare.com/turnstile/v0/api.js"
-        strategy="lazyOnload"
-      />
 
       <div className="min-h-screen bg-background relative overflow-hidden selection:bg-primary/30 text-foreground">
         {/* Fondos glassmorphism */}
@@ -286,17 +286,20 @@ export default function EscudoSimitPage() {
 
                     {/* Turnstile */}
                     <div className="flex justify-center py-2">
-                      <div
-                        className="cf-turnstile"
-                        data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
-                        data-callback="onTurnstileSuccess"
-                        data-theme="dark"
-                      />
-                      <script
-                        dangerouslySetInnerHTML={{
-                          __html: `window.onTurnstileSuccess = function(token) { window.__turnstileToken = token; }`,
-                        }}
-                      />
+                      {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ? (
+                        <Turnstile
+                          siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+                          onSuccess={(token) => {
+                            turnstileRef.current = token;
+                          }}
+                          options={{
+                            theme: 'dark',
+                            size: 'normal',
+                          }}
+                        />
+                      ) : (
+                        <p className="text-red-500 text-xs">Falta SITE_KEY de Turnstile</p>
+                      )}
                     </div>
 
                     {/* Error */}
@@ -314,12 +317,7 @@ export default function EscudoSimitPage() {
                     {/* Botón */}
                     <Button
                       size="lg"
-                      onClick={() => {
-                        // Capturar token de Turnstile del widget global
-                        turnstileRef.current =
-                          (window as unknown as Record<string, string>).__turnstileToken || null;
-                        handleActivate();
-                      }}
+                      onClick={handleActivate}
                       disabled={isActivating}
                       className="w-full h-16 rounded-2xl bg-primary text-primary-foreground font-black text-lg shadow-xl shadow-primary/20 hover:scale-[1.02] transition-transform"
                     >
