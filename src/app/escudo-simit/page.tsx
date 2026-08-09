@@ -131,7 +131,7 @@ export default function EscudoSimitPage() {
         if (currentPhase < loadingPhases.length) {
           setLoadingPhase(currentPhase);
         }
-      }, 700); // 700ms por fase para que se vea rápido y fluido
+      }, 2500); // 2500ms por fase para que el usuario pueda leer los procesos
     }
     return () => clearInterval(interval);
   }, [isActivating]);

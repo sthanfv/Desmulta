@@ -89,13 +89,6 @@
 *   **Fix Rate Limit Calculadora (UX Interactivo):** 
     *   **Problema:** Ráfagas de slider consumían cuotas de Upstash y bloqueaban usuarios por WAF.
     *   **Solución:** Aumento de límite (3 a 10/día), corrección de cabecera `Retry-After` (segundos), y `debounce` ajustado a 800ms.
-
-### Metas Pendientes / Tareas a Seguir
-*   Todo completado con éxito por ahora. Ninguna tarea pendiente a nivel crítico.
-
-### Restricciones / Entorno Local del Usuario
-*   Hardware limitado: Procesador AMD PRO A10.
-*   El código de la aplicación está alojado en `C:\Workspace\Desmulta`.
 # 🧠 Memoria Central - Desmulta
 
 ## 🏗️ Estado Actual de Implementación
@@ -167,3 +160,7 @@
     *   **Desencriptado Volátil:** El worker de QStash fue refactorizado para ejecutarse como CRON automatizado sin payload externo, leyendo Firestore, desencriptando en RAM y realizando consultas en lote al scraper de forma segura.
     *   **Suite de Pruebas:** Se crearon y pasaron al 100% las pruebas unitarias y de integración (`crypto.test.ts`), así como las validaciones estáticas (`typecheck`).
     *   **Implementación CI/CD:** Se asesoró y verificó la conexión de despliegue continuo entre GitHub y Google Cloud Run usando Cloud Build Triggers nativos para despliegues automatizados.
+*   **[2026-08-09] Resolución FinOps y UX Escudo SIMIT**:
+    *   **Navegación UX:** Se integraron redirecciones directas desde `/servicios` hacia la Calculadora y Escudo SIMIT (con botones contextuales), y el escudo redirige correctamente a `/` usando la KB compartida en `knowledge-base.ts`.
+    *   **Fix Crítico QStash/Vercel (Timeout silencioso):** La corrupción de un documento aislado provocaba fallos masivos en Vercel antes del scraper; solucionado con `.filter()` preventivo aislando nodos dañados en RAM antes de procesar el lote. Comprobado con `Invoke-RestMethod` exitosamente.
+    *   **Garbage Collector & FinOps (30 Días):** Creado script de purga automatizada `clean-old-records.ts` que suprimirá permanentemente perfiles Beta tras 30 días para no comprometer costos de Cloud Run.
