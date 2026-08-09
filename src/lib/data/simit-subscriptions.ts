@@ -36,19 +36,24 @@ export async function getActiveSubscriptions(): Promise<SimitSubscription[]> {
     .where('isActive', '==', true)
     .get();
 
-  return snapshot.docs.map((doc: QueryDocumentSnapshot) => {
-    const data = doc.data() as SimitSubscriptionDoc;
-    return {
-      cedula: decryptData(data.encryptedCedula),
-      email: decryptData(data.encryptedEmail),
-      isActive: data.isActive,
-      createdAt: data.createdAt,
-      lastCheckedAt: data.lastCheckedAt,
-      lastKnownFinesCount: data.lastKnownFinesCount,
-      lastKnownTotalAmount: data.lastKnownTotalAmount,
-      pushToken: data.pushToken,
-    };
-  });
+  return snapshot.docs
+    .filter((doc) => {
+      const data = doc.data() as SimitSubscriptionDoc;
+      return !!data.encryptedCedula && !!data.encryptedEmail;
+    })
+    .map((doc: QueryDocumentSnapshot) => {
+      const data = doc.data() as SimitSubscriptionDoc;
+      return {
+        cedula: decryptData(data.encryptedCedula),
+        email: decryptData(data.encryptedEmail),
+        isActive: data.isActive,
+        createdAt: data.createdAt,
+        lastCheckedAt: data.lastCheckedAt,
+        lastKnownFinesCount: data.lastKnownFinesCount,
+        lastKnownTotalAmount: data.lastKnownTotalAmount,
+        pushToken: data.pushToken,
+      };
+    });
 }
 
 /**
@@ -68,19 +73,24 @@ export async function getDueSubscriptions(limitCount: number): Promise<SimitSubs
     .limit(limitCount)
     .get();
 
-  return snapshot.docs.map((doc: QueryDocumentSnapshot) => {
-    const data = doc.data() as SimitSubscriptionDoc;
-    return {
-      cedula: decryptData(data.encryptedCedula),
-      email: decryptData(data.encryptedEmail),
-      isActive: data.isActive,
-      createdAt: data.createdAt,
-      lastCheckedAt: data.lastCheckedAt,
-      lastKnownFinesCount: data.lastKnownFinesCount,
-      lastKnownTotalAmount: data.lastKnownTotalAmount,
-      pushToken: data.pushToken,
-    };
-  });
+  return snapshot.docs
+    .filter((doc) => {
+      const data = doc.data() as SimitSubscriptionDoc;
+      return !!data.encryptedCedula && !!data.encryptedEmail;
+    })
+    .map((doc: QueryDocumentSnapshot) => {
+      const data = doc.data() as SimitSubscriptionDoc;
+      return {
+        cedula: decryptData(data.encryptedCedula),
+        email: decryptData(data.encryptedEmail),
+        isActive: data.isActive,
+        createdAt: data.createdAt,
+        lastCheckedAt: data.lastCheckedAt,
+        lastKnownFinesCount: data.lastKnownFinesCount,
+        lastKnownTotalAmount: data.lastKnownTotalAmount,
+        pushToken: data.pushToken,
+      };
+    });
 }
 
 /**
