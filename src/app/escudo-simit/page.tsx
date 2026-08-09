@@ -116,7 +116,7 @@ export default function EscudoSimitPage() {
     'Estableciendo conexión segura con la plataforma nacional...',
     'Analizando base de datos de resoluciones y comparendos...',
     'Calculando prescripciones y estado de cobros coactivos...',
-    'Asegurando expediente bajo protocolo Zero-PII...',
+    'Asegurando tu información y protegiendo tu privacidad...',
     'Generando reporte final consolidado...',
   ];
 
@@ -293,7 +293,7 @@ export default function EscudoSimitPage() {
               <h3 className="text-2xl font-black mb-4">Máxima Privacidad</h3>
               <p className="text-muted-foreground leading-relaxed">
                 Nuestras consultas a las bases de datos gubernamentales son 100% seguras y anónimas. 
-                No guardamos tu información personal (Zero-PII) ni compartimos tus datos con terceros.
+                No guardamos tu información personal ni compartimos tus datos con terceros.
               </p>
             </m.div>
           </div>
@@ -427,8 +427,7 @@ export default function EscudoSimitPage() {
                     )}
 
                     <p className="text-xs text-muted-foreground/60 font-medium text-center">
-                      Al activar, aceptas nuestros términos de servicio y política de privacidad
-                      Zero-PII.
+                      Al activar, aceptas nuestros términos de servicio y política de privacidad.
                     </p>
                   </div>
                 </div>
@@ -581,7 +580,7 @@ export default function EscudoSimitPage() {
                     {/* CTA de consultoría */}
                     <div className="glass p-8 rounded-3xl border border-white/10 text-center">
                       <p className="text-muted-foreground mb-6">
-                        ¿Quieres impugnar alguna de estas multas? Nuestro equipo legal puede
+                        ¿Quieres impugnar alguna de estas multas? Nuestro equipo de expertos puede
                         analizar tu caso gratuitamente.
                       </p>
                       <Button asChild size="lg" className="rounded-2xl font-black">
