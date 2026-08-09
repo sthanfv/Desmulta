@@ -183,8 +183,8 @@ export default function EscudoSimitPage() {
                 </span>
               </h1>
               <p className="text-xl text-muted-foreground font-medium max-w-2xl mx-auto">
-                ¿Miedo a multas fantasma? Nuestro radar Serverless vigila tu cédula 24/7 en el SIMIT
-                y te alerta al instante si el Estado intenta sorprenderte.
+                ¿Miedo a multas fantasma? Nuestro sistema inteligente vigila tu cédula 24/7
+                y te notifica al instante si el Estado intenta sorprenderte con una fotomulta o comparendo.
               </p>
             </m.div>
           </div>
@@ -218,10 +218,10 @@ export default function EscudoSimitPage() {
                 <Lock size={120} className="text-primary" />
               </div>
               <Activity className="text-primary mb-6" size={40} />
-              <h3 className="text-2xl font-black mb-4">Evasión WAF (Anti-Bot)</h3>
+              <h3 className="text-2xl font-black mb-4">Máxima Privacidad</h3>
               <p className="text-muted-foreground leading-relaxed">
-                Utilizamos inteligencia de enjambre y ráfagas caóticas para consultar las bases de
-                datos gubernamentales sin ser detectados ni bloqueados. Tu privacidad es absoluta.
+                Nuestras consultas a las bases de datos gubernamentales son 100% seguras y anónimas. 
+                No guardamos tu información personal (Zero-PII) ni compartimos tus datos con terceros.
               </p>
             </m.div>
           </div>
