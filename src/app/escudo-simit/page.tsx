@@ -75,6 +75,7 @@ export default function EscudoSimitPage() {
   const [isActivated, setIsActivated] = useState(false);
   const [resultData, setResultData] = useState<SimitData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [turnstileRefreshCount, setTurnstileRefreshCount] = useState(0);
   const turnstileRef = useRef<string | null>(null);
   const { toast } = useToast();
 
@@ -124,6 +125,10 @@ export default function EscudoSimitPage() {
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Error desconocido';
       setError(msg);
+      // Forzar reseteo del widget de Turnstile porque los tokens son de un solo uso
+      setTurnstileRefreshCount((c) => c + 1);
+      turnstileRef.current = null;
+      
       toast({
         title: '❌ Error',
         description: msg,
@@ -288,6 +293,7 @@ export default function EscudoSimitPage() {
                     <div className="flex justify-center py-2">
                       {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ? (
                         <Turnstile
+                          key={`ts-${turnstileRefreshCount}`}
                           siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
                           onSuccess={(token) => {
                             turnstileRef.current = token;
