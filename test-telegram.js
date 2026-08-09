@@ -1,10 +1,10 @@
 require('dotenv').config({ path: '.env.local' }); // Lee el .env local
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
-const chatId = process.env.TELEGRAM_TECH_CHAT_ID;
+const chatId = process.env.TELEGRAM_DEV_CHAT_ID;
 
 if (!token || !chatId) {
-  console.error('❌ ERROR: Faltan las variables TELEGRAM_BOT_TOKEN o TELEGRAM_TECH_CHAT_ID en tu archivo .env.local');
+  console.error('❌ ERROR: Faltan las variables TELEGRAM_BOT_TOKEN o TELEGRAM_DEV_CHAT_ID en tu archivo .env.local');
   process.exit(1);
 }
 

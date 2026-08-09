@@ -55,7 +55,7 @@ const getFingerprint = (contexto: string): string[] => {
  */
 const sendTelegramAlert = (contexto: string, mensaje: string) => {
   const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_TECH_CHAT_ID;
+  const chatId = process.env.TELEGRAM_DEV_CHAT_ID || process.env.TELEGRAM_SECURITY_CHAT_ID;
 
   if (!token || !chatId) return; // Si no hay configuración, saltamos silenciosamente
 
