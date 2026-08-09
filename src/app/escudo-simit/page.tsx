@@ -218,11 +218,11 @@ export default function EscudoSimitPage() {
         <header className="fixed top-0 w-full z-50 p-6">
           <div className="max-w-4xl mx-auto glass rounded-3xl px-8 h-16 flex items-center justify-between shadow-2xl border-white/10">
             <Link
-              href="/servicios"
+              href="/"
               className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-all group active:scale-95"
             >
               <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-              <span className="font-bold text-sm">Volver a Servicios</span>
+              <span className="font-bold text-sm">Volver al Inicio</span>
             </Link>
             <div className="flex items-center gap-2">
               <ShieldCheck className="text-primary" size={20} />

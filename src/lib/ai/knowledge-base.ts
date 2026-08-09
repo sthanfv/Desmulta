@@ -14,6 +14,7 @@ export interface Servicio {
   proceso: string;
   tiempos: string;
   detalles?: string[];
+  href?: string;
 }
 
 export interface Paso {
@@ -118,6 +119,20 @@ export const DESMULTA_KB: KnowledgeBase = {
       ],
     },
     {
+      id: 'calculadora',
+      titulo: 'Calculadora de Multas',
+      descripcion: 'Calcula el valor exacto de tus multas incluyendo intereses de mora de forma automática.',
+      costo: 'Gratuito',
+      proceso: 'Simulación financiera en tiempo real.',
+      tiempos: 'Inmediato',
+      detalles: [
+        'Cálculo preciso de intereses moratorios vigentes.',
+        'Soporte para resoluciones y fotomultas.',
+        'Actualizado con tasas de usura certificadas.',
+      ],
+      href: '/calculadora',
+    },
+    {
       id: 'escudo-simit',
       titulo: 'Escudo SIMIT 24/7',
       descripcion: 'Monitoreo automatizado semanal para prevenir multas fantasma.',
@@ -129,6 +144,7 @@ export const DESMULTA_KB: KnowledgeBase = {
         'Alertas tempranas automáticas vía correo y notificaciones Push.',
         'Protección total de identidad (cédula encriptada).',
       ],
+      href: '/escudo-simit',
     },
   ],
   metodologia: {
