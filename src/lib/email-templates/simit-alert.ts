@@ -35,7 +35,7 @@ const formatCOP = (valor: number): string =>
 /**
  * Genera el HTML del email de bienvenida del Escudo SIMIT.
  */
-export function buildEscudoSimitEmail(cedula: string, resultado: ResultadoEmail): string {
+export function buildEscudoSimitEmail(cedula: string, resultado: ResultadoEmail, isWelcomeEmail = false): string {
   const { resumen, multas } = resultado;
 
   const filasMultas = multas.map((m) => `
@@ -64,10 +64,12 @@ export function buildEscudoSimitEmail(cedula: string, resultado: ResultadoEmail)
         🛡️ Escudo SIMIT Activado
       </div>
       <h1 style="color: #ffffff; font-size: 28px; font-weight: 900; margin: 20px 0 8px; letter-spacing: -0.5px;">
-        Tu cédula está blindada
+        ${isWelcomeEmail ? '¡Bienvenido al Escudo SIMIT!' : 'Alerta: Cambios en tu SIMIT'}
       </h1>
-      <p style="color: #888; font-size: 15px; margin: 0;">
-        Monitoreo automático 24/7 activado para la cédula <strong style="color: #d4af37;">${cedula}</strong>
+      <p style="color: #888; font-size: 15px; margin: 0; line-height: 1.5;">
+        ${isWelcomeEmail 
+          ? `Gracias por adquirir nuestro servicio gratuito de monitoreo. A partir de hoy, tu cédula <strong style="color: #d4af37;">${cedula}</strong> está blindada. Te enviaremos alertas automáticas ante cualquier cambio.` 
+          : `Hemos detectado un movimiento en el estado de cuenta de tu cédula <strong style="color: #d4af37;">${cedula}</strong>. Revisa los detalles a continuación.`}
       </p>
     </div>
 
@@ -76,16 +78,19 @@ export function buildEscudoSimitEmail(cedula: string, resultado: ResultadoEmail)
       <h2 style="color: #fff; font-size: 16px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 20px;">
         Resumen de Estado de Cuenta
       </h2>
-      <div style="display: flex; gap: 16px;">
-        <div style="flex: 1; background: #1a1a1a; border-radius: 12px; padding: 16px; text-align: center;">
-          <div style="color: #d4af37; font-size: 28px; font-weight: 900;">${resumen.totalMultas}</div>
-          <div style="color: #888; font-size: 11px; text-transform: uppercase; font-weight: 700;">Multas</div>
-        </div>
-        <div style="flex: 1; background: #1a1a1a; border-radius: 12px; padding: 16px; text-align: center;">
-          <div style="color: #d4af37; font-size: 28px; font-weight: 900;">${resumen.totalComparendos}</div>
-          <div style="color: #888; font-size: 11px; text-transform: uppercase; font-weight: 700;">Comparendos</div>
-        </div>
-      </div>
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td width="48%" style="background: #1a1a1a; border-radius: 12px; padding: 16px; text-align: center;">
+            <div style="color: #d4af37; font-size: 28px; font-weight: 900;">${resumen.totalMultas}</div>
+            <div style="color: #888; font-size: 11px; text-transform: uppercase; font-weight: 700;">Multas</div>
+          </td>
+          <td width="4%"></td> <!-- Espacio -->
+          <td width="48%" style="background: #1a1a1a; border-radius: 12px; padding: 16px; text-align: center;">
+            <div style="color: #d4af37; font-size: 28px; font-weight: 900;">${resumen.totalComparendos}</div>
+            <div style="color: #888; font-size: 11px; text-transform: uppercase; font-weight: 700;">Comparendos</div>
+          </td>
+        </tr>
+      </table>
       <div style="background: linear-gradient(135deg, #1a1a0a, #1a1408); border: 1px solid #333; border-radius: 12px; padding: 20px; margin-top: 16px; text-align: center;">
         <div style="color: #888; font-size: 11px; text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Total en SIMIT</div>
         <div style="color: #fff; font-size: 32px; font-weight: 900;">${formatCOP(resumen.valorTotal)}</div>
@@ -112,6 +117,9 @@ export function buildEscudoSimitEmail(cedula: string, resultado: ResultadoEmail)
           ${filasMultas}
         </tbody>
       </table>
+      <p style="color: #666; font-size: 11px; margin-top: 16px; line-height: 1.4; font-style: italic;">
+        * Nota: El "Total en SIMIT" refleja el saldo global oficial reportado por la plataforma. Los valores individuales por infracción pueden no sumar exactamente este monto si existen acuerdos de pago previos, intereses de mora acumulados, o cobros coactivos paralelos que el SIMIT agrupa en el encabezado.
+      </p>
     </div>
     ` : ''}
 

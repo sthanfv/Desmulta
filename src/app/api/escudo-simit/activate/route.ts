@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
 
     // ── Enviar email de bienvenida con resultados ───────────────────
     try {
-      const emailHtml = buildEscudoSimitEmail(cedula, resultado);
+      const emailHtml = buildEscudoSimitEmail(cedula, resultado, true);
       await resend.emails.send({
         from: 'Desmulta Escudo SIMIT <alerta@desmulta.online>',
         to: email,
