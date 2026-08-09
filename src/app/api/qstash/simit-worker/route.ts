@@ -31,16 +31,27 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Firma QStash inválida' }, { status: 401 });
     }
 
-    const payload = JSON.parse(bodyText);
-    const cedulas: string[] = payload.cedulas;
+    const payload = bodyText ? JSON.parse(bodyText) : {};
+    
+    // 2. Obtener suscripciones activas (Zero-PII decripta en memoria aquí)
+    const subscriptions = await getActiveSubscriptions();
+    const subsMap = new Map(subscriptions.map((s) => [s.cedula, s]));
+    
+    let cedulas: string[];
+    if (payload.cedulas && Array.isArray(payload.cedulas) && payload.cedulas.length > 0) {
+      cedulas = payload.cedulas; // Ejecución manual/prueba
+    } else {
+      cedulas = subscriptions.map((s) => s.cedula); // Ejecución CRON normal
+    }
 
-    if (!cedulas || !Array.isArray(cedulas) || cedulas.length === 0) {
-      return NextResponse.json({ error: 'Array de cédulas vacío o inválido' }, { status: 400 });
+    if (cedulas.length === 0) {
+      logger.info('[simit-worker] No hay suscripciones activas para revisar');
+      return NextResponse.json({ success: true, message: 'No active subscriptions' });
     }
 
     logger.info(`[simit-worker] Iniciando procesamiento de lote con ${cedulas.length} cédulas`);
 
-    // 2. Llamar al Scraper en Cloud Run
+    // 3. Llamar al Scraper en Cloud Run
     const scraperUrl = process.env.SIMIT_SCRAPER_URL;
     const apiKey = process.env.SIMIT_SCRAPER_API_KEY;
 
@@ -67,10 +78,6 @@ export async function POST(request: NextRequest) {
     if (!scraperData.success) {
       throw new Error('El scraper devolvió un estado fallido general');
     }
-
-    // 3. Obtener todas las suscripciones para cruzar emails
-    const subscriptions = await getActiveSubscriptions();
-    const subsMap = new Map(subscriptions.map((s) => [s.cedula, s]));
 
     // 4. Procesar resultados y notificar
     for (const result of scraperData.results) {
