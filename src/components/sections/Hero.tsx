@@ -4,6 +4,7 @@ import React from 'react';
 import { ArrowUp, FileText, ChevronRight, Shield } from 'lucide-react';
 import { LazyMotion, domAnimation, m } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { TarjetaPremium } from '@/components/ui/TarjetaPremium';
 import CountUp from '@/components/ui/CountUp';
@@ -129,21 +130,34 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
                 : '¿Tiene multas en el SIMIT? Analizamos su caso sin costo y le decimos si podemos borrarlas por tiempo cumplido o errores en el proceso.'}
             </m.p>
 
-            {/* CTA */}
+            {/* CTAs */}
             <m.div style={{ willChange: "transform, opacity" }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
+              className="flex flex-col sm:flex-row gap-4"
             >
               <Button
                 onClick={onConsultar}
                 size="lg"
-                className="w-full sm:w-auto h-14 sm:h-16 px-6 sm:px-12 text-base sm:text-lg font-semibold rounded-2xl shadow-md hover:shadow-2xl hover:-translate-y-1 active:scale-95 transition-all group"
+                className="w-full sm:w-auto h-14 sm:h-16 px-6 sm:px-10 text-base sm:text-lg font-semibold rounded-2xl shadow-md hover:shadow-2xl hover:-translate-y-1 active:scale-95 transition-all group"
               >
                 <span className="flex items-center gap-3">
-                  Iniciar estudio sin costo
+                  Estudio Legal Gratuito
                   <ArrowUp className="w-5 h-5 rotate-45 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                 </span>
+              </Button>
+
+              <Button
+                asChild
+                variant="outline"
+                size="lg"
+                className="w-full sm:w-auto h-14 sm:h-16 px-6 sm:px-10 text-base sm:text-lg font-semibold rounded-2xl border-primary/20 hover:bg-primary/5 hover:text-primary active:scale-95 transition-all shadow-sm"
+              >
+                <Link href="/escudo-simit" className="flex items-center gap-2">
+                  <Shield className="w-5 h-5 text-primary" />
+                  Activar Escudo SIMIT
+                </Link>
               </Button>
             </m.div>
 
