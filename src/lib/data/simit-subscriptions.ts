@@ -49,6 +49,37 @@ export async function getActiveSubscriptions(): Promise<SimitSubscription[]> {
 }
 
 /**
+ * Extrae suscripciones que llevan más de 7 días sin revisarse
+ */
+export async function getDueSubscriptions(limitCount: number): Promise<SimitSubscription[]> {
+  const db = getFirestore(getAdminApp());
+  
+  // 7 días en milisegundos
+  const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+
+  const snapshot = await db
+    .collection(COLLECTION_NAME)
+    .where('isActive', '==', true)
+    .where('lastCheckedAt', '<', sevenDaysAgo)
+    .orderBy('lastCheckedAt', 'asc') // Los que llevan más tiempo esperando primero
+    .limit(limitCount)
+    .get();
+
+  return snapshot.docs.map((doc: QueryDocumentSnapshot) => {
+    const data = doc.data() as SimitSubscriptionDoc;
+    return {
+      cedula: decryptData(data.encryptedCedula),
+      email: decryptData(data.encryptedEmail),
+      isActive: data.isActive,
+      createdAt: data.createdAt,
+      lastCheckedAt: data.lastCheckedAt,
+      lastKnownFinesCount: data.lastKnownFinesCount,
+      lastKnownTotalAmount: data.lastKnownTotalAmount,
+    };
+  });
+}
+
+/**
  * Registra o actualiza una suscripción de un usuario
  */
 export async function upsertSubscription(data: Omit<SimitSubscription, 'createdAt'> & { createdAt?: number }): Promise<void> {
@@ -63,7 +94,7 @@ export async function upsertSubscription(data: Omit<SimitSubscription, 'createdA
     encryptedEmail: encryptData(data.email),
     isActive: data.isActive,
     createdAt: data.createdAt || Date.now(),
-    lastCheckedAt: data.lastCheckedAt,
+    lastCheckedAt: data.lastCheckedAt !== undefined ? data.lastCheckedAt : 0, // Asegurar un número para indexación ascendente
     lastKnownFinesCount: data.lastKnownFinesCount,
     lastKnownTotalAmount: data.lastKnownTotalAmount,
   };

@@ -162,3 +162,8 @@
     *   **Landing Page Dinámica:** Se transformó `app/escudo-simit/page.tsx` de un mock a un componente funcional que procesa la cédula y correo del usuario, valida Turnstile, invoca el scraper en tiempo real y renderiza una tabla animada de resultados.
     *   **Capa de Negocio (Activación):** Se creó `api/escudo-simit/activate/route.ts` que centraliza la lógica (suscripción en Firestore, primera consulta síncrona y envío de email de bienvenida).
     *   **Notificaciones Inteligentes:** El worker (`simit-worker/route.ts`) ahora rastrea cambios (compara `totalMultas` vs `lastKnownFinesCount` en Firestore) y despacha un Email Premium estructurado (vía Resend) si detecta nuevas infracciones. El pipeline Typecheck finalizó con cero errores.
+*   **[2026-08-09] Criptografía Zero-PII y Auditoría CI/CD SIMIT**:
+    *   **Módulo Criptográfico Militar:** Se implementó AES-256-GCM para cifrar el contenido (Cédula y Email) y HMAC-SHA-256 para hashear los identificadores de los documentos en `simit-subscriptions.ts`.
+    *   **Desencriptado Volátil:** El worker de QStash fue refactorizado para ejecutarse como CRON automatizado sin payload externo, leyendo Firestore, desencriptando en RAM y realizando consultas en lote al scraper de forma segura.
+    *   **Suite de Pruebas:** Se crearon y pasaron al 100% las pruebas unitarias y de integración (`crypto.test.ts`), así como las validaciones estáticas (`typecheck`).
+    *   **Implementación CI/CD:** Se asesoró y verificó la conexión de despliegue continuo entre GitHub y Google Cloud Run usando Cloud Build Triggers nativos para despliegues automatizados.

@@ -4,7 +4,9 @@ import { logger } from '@/lib/logger/security-logger';
 import {
   updateSubscriptionAfterCheck,
   getActiveSubscriptions,
+  getDueSubscriptions,
 } from '@/lib/data/simit-subscriptions';
+import { shouldExecuteWorker, getRandomBatchSize } from '@/lib/security/stochastic-engine';
 import { resend } from '@/lib/resend';
 import { buildEscudoSimitEmail } from '@/lib/email-templates/simit-alert';
 
@@ -33,20 +35,34 @@ export async function POST(request: NextRequest) {
 
     const payload = bodyText ? JSON.parse(bodyText) : {};
     
-    // 2. Obtener suscripciones activas (Zero-PII decripta en memoria aquí)
-    const subscriptions = await getActiveSubscriptions();
-    const subsMap = new Map(subscriptions.map((s) => [s.cedula, s]));
-    
     let cedulas: string[];
+    let subsMap = new Map();
+    
     if (payload.cedulas && Array.isArray(payload.cedulas) && payload.cedulas.length > 0) {
       cedulas = payload.cedulas; // Ejecución manual/prueba
+      const manualSubs = await getActiveSubscriptions();
+      subsMap = new Map(manualSubs.map((s) => [s.cedula, s]));
     } else {
-      cedulas = subscriptions.map((s) => s.cedula); // Ejecución CRON normal
-    }
+      // 2. Lógica Estocástica (Jitter + Lotes)
+      // Con un CRON cada 1 minuto (900 m útiles al día) y 6% prob = ~54 ejecuciones/día.
+      const executionProbability = 0.06; 
+      const decision = shouldExecuteWorker(new Date(), executionProbability);
+      
+      if (!decision.execute) {
+        logger.info(`[simit-worker] Ejecución estocástica saltada: ${decision.reason}`);
+        return NextResponse.json({ success: true, message: `Skipped: ${decision.reason}` });
+      }
 
-    if (cedulas.length === 0) {
-      logger.info('[simit-worker] No hay suscripciones activas para revisar');
-      return NextResponse.json({ success: true, message: 'No active subscriptions' });
+      const batchSize = getRandomBatchSize(1, 4); // Lotes de 1 a 4 cédulas
+      const dueSubscriptions = await getDueSubscriptions(batchSize);
+      
+      if (dueSubscriptions.length === 0) {
+        logger.info('[simit-worker] No hay suscripciones pendientes de revisión en este momento');
+        return NextResponse.json({ success: true, message: 'No due subscriptions' });
+      }
+
+      subsMap = new Map(dueSubscriptions.map((s) => [s.cedula, s]));
+      cedulas = dueSubscriptions.map((s) => s.cedula); 
     }
 
     logger.info(`[simit-worker] Iniciando procesamiento de lote con ${cedulas.length} cédulas`);
