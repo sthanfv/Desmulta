@@ -72,12 +72,38 @@ export default function EscudoSimitPage() {
   const [cedula, setCedula] = useState('');
   const [email, setEmail] = useState('');
   const [isActivating, setIsActivating] = useState(false);
+  const [loadingPhase, setLoadingPhase] = useState(0);
   const [isActivated, setIsActivated] = useState(false);
   const [resultData, setResultData] = useState<SimitData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [turnstileRefreshCount, setTurnstileRefreshCount] = useState(0);
   const turnstileRef = useRef<string | null>(null);
   const { toast } = useToast();
+
+  const loadingPhases = [
+    'Iniciando conexión segura con SIMIT...',
+    'Evadiendo cortafuegos gubernamentales...',
+    'Extrayendo resoluciones y comparendos...',
+    'Procesando cobros coactivos e intereses...',
+    'Encriptando datos y blindando cédula...',
+    'Generando reporte final...',
+  ];
+
+  React.useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isActivating) {
+      setLoadingPhase(0);
+      let currentPhase = 0;
+      interval = setInterval(() => {
+        currentPhase++;
+        // Se queda en la última fase hasta que termine
+        if (currentPhase < loadingPhases.length) {
+          setLoadingPhase(currentPhase);
+        }
+      }, 3500); // 3.5 segundos por fase
+    }
+    return () => clearInterval(interval);
+  }, [isActivating]);
 
   const handleActivate = useCallback(async () => {
     setError(null);
@@ -321,22 +347,43 @@ export default function EscudoSimitPage() {
                       </m.div>
                     )}
 
-                    {/* Botón */}
-                    <Button
-                      size="lg"
-                      onClick={handleActivate}
-                      disabled={isActivating}
-                      className="w-full h-16 rounded-2xl bg-primary text-primary-foreground font-black text-lg shadow-xl shadow-primary/20 hover:scale-[1.02] transition-transform"
-                    >
-                      {isActivating ? (
-                        <span className="flex items-center gap-2">
-                          <Loader2 className="animate-spin" size={20} />
-                          Consultando SIMIT...
-                        </span>
-                      ) : (
-                        'Activar Monitoreo Gratuito'
-                      )}
-                    </Button>
+                    {/* Botón o Terminal de Carga */}
+                    {isActivating ? (
+                      <m.div 
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="w-full p-6 rounded-2xl bg-black/60 border border-primary/30 flex flex-col gap-3 font-mono text-sm shadow-inner shadow-primary/10"
+                      >
+                        {loadingPhases.map((phase, i) => (
+                           <div 
+                             key={i} 
+                             className={`flex items-center gap-3 transition-all duration-500 ${
+                               i > loadingPhase ? 'opacity-20 scale-95' 
+                               : i === loadingPhase ? 'text-primary scale-100 font-bold' 
+                               : 'text-muted-foreground scale-100'
+                             }`}
+                           >
+                              {i < loadingPhase ? (
+                                <CheckCircle2 size={16} className="text-green-500" />
+                              ) : i === loadingPhase ? (
+                                <Loader2 size={16} className="animate-spin text-primary" />
+                              ) : (
+                                <div className="w-4 h-4 rounded-full border border-current opacity-30" />
+                              )}
+                              <span>{phase}</span>
+                           </div>
+                        ))}
+                      </m.div>
+                    ) : (
+                      <Button
+                        size="lg"
+                        onClick={handleActivate}
+                        disabled={isActivating}
+                        className="w-full h-16 rounded-2xl bg-primary text-primary-foreground font-black text-lg shadow-xl shadow-primary/20 hover:scale-[1.02] transition-transform"
+                      >
+                        Activar Monitoreo Gratuito
+                      </Button>
+                    )}
 
                     <p className="text-xs text-muted-foreground/60 font-medium text-center">
                       Al activar, aceptas nuestros términos de servicio y política de privacidad
