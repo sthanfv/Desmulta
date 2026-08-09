@@ -26,14 +26,14 @@ export async function POST(request: NextRequest) {
     const isDev = process.env.NODE_ENV === 'development';
 
     if (!signature && !isDev) {
-      logger.warn('[simit-worker] Intento de acceso sin firma QStash - BYPASS TEMPORAL');
-      // return NextResponse.json({ error: 'Firma QStash requerida' }, { status: 401 });
+      logger.warn('[simit-worker] Intento de acceso sin firma QStash');
+      return NextResponse.json({ error: 'Firma QStash requerida' }, { status: 401 });
     }
 
     if (signature) {
       const isValid = await receiver.verify({ signature, body: bodyText });
       if (!isValid && !isDev) {
-        // return NextResponse.json({ error: 'Firma QStash inválida' }, { status: 401 });
+        return NextResponse.json({ error: 'Firma QStash inválida' }, { status: 401 });
       }
     }
 
