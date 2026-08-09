@@ -59,7 +59,14 @@ const sendTelegramAlert = (contexto: string, mensaje: string) => {
 
   if (!token || !chatId) return; // Si no hay configuración, saltamos silenciosamente
 
-  const text = `🚨 <b>ERROR DEL SISTEMA: Desmulta</b>\n📍 <b>Origen:</b> <code>${contexto}</code>\n⚠️ <b>Detalle:</b>\n<pre>${mensaje}</pre>\n⏱ <b>Timestamp:</b> ${new Date().toISOString()}`;
+  const fechaAmigable = new Intl.DateTimeFormat('es-CO', {
+    timeZone: 'America/Bogota',
+    dateStyle: 'full',
+    timeStyle: 'medium',
+    hour12: true,
+  }).format(new Date());
+
+  const text = `🚨 <b>ERROR DEL SISTEMA: Desmulta</b>\n📍 <b>Origen:</b> <code>${contexto}</code>\n⚠️ <b>Detalle:</b>\n<pre>${mensaje}</pre>\n⏱ <b>Fecha:</b> ${fechaAmigable}`;
 
   fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
     method: 'POST',

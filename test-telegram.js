@@ -8,7 +8,14 @@ if (!token || !chatId) {
   process.exit(1);
 }
 
-const text = `✅ <b>TEST DEL SISTEMA: Desmulta</b>\n📍 <b>Origen:</b> <code>test-telegram.js</code>\nℹ️ <b>Detalle:</b>\n<pre>¡El webhook de Telegram está funcionando perfectamente!</pre>\n⏱ <b>Timestamp:</b> ${new Date().toISOString()}`;
+const fechaAmigable = new Intl.DateTimeFormat('es-CO', {
+  timeZone: 'America/Bogota',
+  dateStyle: 'full',
+  timeStyle: 'medium',
+  hour12: true,
+}).format(new Date());
+
+const text = `✅ <b>TEST DEL SISTEMA: Desmulta</b>\n📍 <b>Origen:</b> <code>test-telegram.js</code>\nℹ️ <b>Detalle:</b>\n<pre>¡El webhook de Telegram está funcionando perfectamente!</pre>\n⏱ <b>Fecha:</b> ${fechaAmigable}`;
 
 console.log('Enviando mensaje de prueba a Telegram...');
 
