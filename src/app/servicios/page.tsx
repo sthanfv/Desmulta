@@ -84,7 +84,14 @@ export default function ServiciosPage() {
                     Detalles Técnicos
                   </h4>
                   <ul className="space-y-4">
-                    {servicio.proceso && (
+                    {servicio.detalles?.map((detalle, i) => (
+                      <li key={i} className="flex gap-4">
+                        <CheckCircle2 size={18} className="text-primary shrink-0 mt-1" />
+                        <p className="text-sm font-medium text-muted-foreground">
+                          {detalle}
+                        </p>
+                      </li>
+                    )) || (
                       <li className="flex gap-4">
                         <CheckCircle2 size={18} className="text-primary shrink-0 mt-1" />
                         <p className="text-sm font-medium text-muted-foreground">
@@ -92,18 +99,6 @@ export default function ServiciosPage() {
                         </p>
                       </li>
                     )}
-                    <li className="flex gap-4">
-                      <CheckCircle2 size={18} className="text-primary shrink-0 mt-1" />
-                      <p className="text-sm font-medium text-muted-foreground">
-                        Análisis de estado de cuenta SIMIT gratuito.
-                      </p>
-                    </li>
-                    <li className="flex gap-4">
-                      <CheckCircle2 size={18} className="text-primary shrink-0 mt-1" />
-                      <p className="text-sm font-medium text-muted-foreground">
-                        Protocolo de seguridad RSA 256-bit.
-                      </p>
-                    </li>
                   </ul>
                   <Button
                     asChild

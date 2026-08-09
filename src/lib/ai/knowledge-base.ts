@@ -13,6 +13,7 @@ export interface Servicio {
   costo: string;
   proceso: string;
   tiempos: string;
+  detalles?: string[];
 }
 
 export interface Paso {
@@ -84,6 +85,11 @@ export const DESMULTA_KB: KnowledgeBase = {
       costo: 'Gratuito',
       proceso: 'Consulta técnica en bases de datos institucionales.',
       tiempos: 'Inmediato',
+      detalles: [
+        'Consulta técnica en bases de datos institucionales.',
+        'Análisis de estado de cuenta SIMIT gratuito.',
+        'Protocolo de seguridad RSA 256-bit para protección Zero-PII.',
+      ],
     },
     {
       id: 'eliminacion-fotomultas',
@@ -92,6 +98,11 @@ export const DESMULTA_KB: KnowledgeBase = {
       costo: 'Sujeto a estudio',
       proceso: 'Protocolos de impugnación administrativa.',
       tiempos: '15 a 45 días hábiles',
+      detalles: [
+        'Protocolos de impugnación administrativa.',
+        'Sustento en Sentencia C-038 de 2020 (plena identidad).',
+        'Radicación electrónica directa con Secretaría de Tránsito.',
+      ],
     },
     {
       id: 'saneamiento-comparendos',
@@ -100,6 +111,11 @@ export const DESMULTA_KB: KnowledgeBase = {
       costo: 'Sujeto a estudio',
       proceso: 'Radicación de defensas técnicas.',
       tiempos: '15 a 45 días hábiles',
+      detalles: [
+        'Evaluación de términos legales de prescripción y caducidad.',
+        'Auditoría de notificación de cobro coactivo.',
+        'Radicación de revocatorias directas y tutelas.',
+      ],
     },
     {
       id: 'escudo-simit',
@@ -108,6 +124,11 @@ export const DESMULTA_KB: KnowledgeBase = {
       costo: 'Suscripción Beta',
       proceso: 'Rastreo con tecnología Serverless y alertas inmediatas.',
       tiempos: 'Permanente (Suscripción)',
+      detalles: [
+        'Motor de web scraping Serverless en la nube.',
+        'Alertas tempranas automáticas vía correo y notificaciones Push.',
+        'Protección total de identidad (cédula encriptada).',
+      ],
     },
   ],
   metodologia: {
