@@ -96,6 +96,55 @@
 ### Restricciones / Entorno Local del Usuario
 *   Hardware limitado: Procesador AMD PRO A10.
 *   El código de la aplicación está alojado en `C:\Workspace\Desmulta`.
+# 🧠 Memoria Central - Desmulta
+
+## 🏗️ Estado Actual de Implementación
+
+### Módulos Desarrollados
+1.  **Frontend (Next.js 15 / React 19)**:
+    *   **Tablero Kanban (`vial-clear`)**: Gestión de expedientes en tiempo real. 
+        *   **NUEVO (Modo Compacto)**: Se rediseñó la UI de `TarjetaKanban.tsx` para reducir el estrés cognitivo. Se aplicó "Progressive Disclosure", ocultando las acciones secundarias tras un *hover*, y compactando los metadatos (avatar de operador, indicativos visuales de captura, placa y nombre limpios). Todo esto mantiene la responsividad y el soporte *Dark Mode* intacto.
+    *   **Dashboard Analytics**: Métricas de ventas, rendimiento de operadores y distribución de referidos, incluyendo el nuevo indicador de carga laboral (Round-Robin).
+    *   **Calculadora de Ahorro Público**: Formularios con Cloudflare Turnstile, Honeypots y cifrado E2E para recolección de Leads.
+    *   **Middlewares**: Firewall de Cloudflare, Edge-Middlewares para sanitización de Request.
+    *   **Sincronización Automática**: El roster de operadores se auto-sincroniza en la base de datos `metadata/operator_roster`.
+
+### Últimos Cambios (Sesión Actual)
+*   **Asignación Round-Robin Transaccional**: Creados `operator-assignment.ts` y `sync-operator-roster.ts` e integrados en `/api/create-consultation` y `/api/leads`.
+*   **UI Dashboard/Kanban**: Filtro de "Mis Asignaciones", indicador de Carga de Trabajo y Panel Analítico Activo.
+*   **Modo Compacto Tarjetas Kanban**: Refactorización del diseño de tarjetas eliminando miniaturas inútiles, cambiando badges largos por avatares pequeños, y usando *hover states* para acciones secundarias.
+*   **Seguridad de Sesión Estricta (Tab-Lock)**: Sesiones volátiles vinculadas a la pestaña activa; expulsión automática ante duplicados.
+*   **Fix Crítico: Corrupción de SDK Firebase Auth**: Se ajustó `client-logout.ts` para evitar la eliminación forzada de `firebaseLocalStorageDb`.
+*   **Fix Dashboard Crash (React Firebase Hooks)**: Añadido `{ suppressGlobalError: true }` a llamadas de `useDoc`.
+*   **Fix Backend Queries Case-Sensitivity**: Mapeo en mayúsculas para consultas de estados en `actions.ts`.
+*   **Transición a Producción Wompi**: Credenciales reales configuradas para captación de dinero.
+*   **Integración Total BFF Go Engine (Sistema B2B)**: Unificación de cálculo en microservicio Go vía HMAC-SHA256.
+*   **Welcome Modal UI/UX**: Rediseño, corrección de bugs CSS e incorporación de efectos difuminados radiales premium.
+*   **Microservicio OCR (Cloud Run)**: Despliegue de Lector-OCR (Python) en Google Cloud Run; implementación de colas `asyncio.Semaphore(1)` para evitar OOM y soporte de Fallback en `src/app/api/ocr/route.ts`.
+*   **[2026-07-29] Auditoría OCR Python y Fallback en UI (Next.js)**: Optimización con PIL y robustecimiento de mensajes de carga.
+*   **[2026-07-29] Auditoría Frontend Next.js (Fase 3)**: Resolución de colisión CORP para assets de Firebase.
+*   **[2026-07-30] Fix Crítico: Evasión de Firebase App Check en Panel Admin**: Migración de `tasas_legales` a Server Action.
+*   **[2026-08-01] Auditoría de Seguridad de Pagos (Wompi)**: Implementación de Idempotencia Transaccional determinista, test de carrera, y DLQ para entrega de PDFs vía QStash.
+*   **[2026-08-02] Hotfix: Estrategia Mixta en Rate Limiting (Fail-Open/Fail-Closed)**: Protección de calculadora ante caídas de Upstash.
+*   **[2026-08-04] Fase 2: Estabilización de Infraestructura (Wompi y Circuit Breaker)**: Circuit Breaker global con política Fail-Open.
+*   **[2026-08-05] Optimización Frontend**: Eliminación de Motor OCR cliente, optimización de Glassmorphism y reemplazo de Glows por CSS `radial-gradient` para mejor rendimiento en móviles.
+*   **[2026-08-06] Hotfix: Preservación de Enlaces Profundos (Deep Link) en Autenticación OTP**: Mantenimiento de contexto `search=ID` post-login.
+
+### Auditoría 360 Finalizada (2026-07-29)
+*   **Alcance:** Middleware (Next.js), APIs Financieras (Wompi), Webhooks (Idempotencia), Generación PDF, Firebase Rules y Dependencias de Terceros.
+*   **Resultados:** Arquitectura Zero-Trust validada. Ecosistema listado como Enterprise-Grade tras `npm audit fix`.
+
+### Hotfixes y Correcciones Recientes
+*   **Fix Rate Limit Calculadora (UX Interactivo):** 
+    *   **Problema:** Ráfagas de slider consumían cuotas de Upstash y bloqueaban usuarios por WAF.
+    *   **Solución:** Aumento de límite (3 a 10/día), corrección de cabecera `Retry-After` (segundos), y `debounce` ajustado a 800ms.
+
+### Metas Pendientes / Tareas a Seguir
+*   Todo completado con éxito por ahora. Ninguna tarea pendiente a nivel crítico.
+
+### Restricciones / Entorno Local del Usuario
+*   Hardware limitado: Procesador AMD PRO A10.
+*   El código de la aplicación está alojado en `C:\Workspace\Desmulta`.
 *   Sistema operativo: Windows 10/11.
 
 *   **[2026-08-07] Refinamiento de UX en Limites de Tasa y Fix de Telegram Webhook**:
@@ -104,3 +153,12 @@
     *   **Hotfix Cifrado PII Zero-Trust:** Se corrigió un error de descifrado en el bot de Telegram. La bóveda de Firebase (Secret Manager) tenía inyectada erróneamente la llave HMAC (PII_HMAC_SECRET) en el campo de la llave de encriptación (PII_ENCRYPTION_KEY), generando una desincronización con el cifrado de Vercel. Se sincronizó correctamente el Secret Manager sin alterar código fuente y se redesplegó.
 *   **[2026-08-07] Refinamiento de Push Notifications (ID Humano)**: Se modificó la función push-notifications.ts para usar el shortId (Expediente EXP-...) en lugar del docId de Firestore para la interfaz visual, manteniendo el docId intacto en la carga útil (payload) para garantizar un ruteo perfecto en la App.
 *   **[2026-08-07] Refactor de Open Graph (OG) Dinámico en Seguimientos**: Implementación de 'next/og' (ImageResponse) en '/seguir/[id]/opengraph-image.tsx' para renderizar tarjetas gráficas bajo demanda. Cada URL compartida en redes genera un PNG con estado y ID corto (ej: 'EXP-1234') y estética Glassmorphism.
+*   **[2026-08-08] Arquitectura SIMIT Orchestrator (Cerebro)**: 
+    *   **Scheduler & Worker:** Se creó una capa asíncrona usando QStash para disparar comprobaciones del SIMIT en lotes de 10 usuarios, repartidos a lo largo de 12 horas mediante Jitter matemático para evadir WAFs.
+    *   **Base de Datos Aislada:** Se creó la colección independiente `simit_subscriptions` y su controlador en `src/lib/data/simit-subscriptions.ts` para no contaminar los perfiles principales de los usuarios.
+    *   **Limpieza de Entorno:** Se consolidaron las variables `SIMIT_SCRAPER_URL` y `SIMIT_SCRAPER_API_KEY` exclusivamente en el archivo `.env` maestro, eliminando basura innecesaria (`.env.local`). Se corrió validación de tipos (`typecheck`) pasando exitosamente tras inyectar `getFirestore(getAdminApp())`.
+*   **[2026-08-08] Integración End-to-End Escudo SIMIT**:
+    *   **Scraper v2 (Cloud Run):** Se reescribió `simit.ts` para devolver multas estructuradas (array de objetos en JSON) en lugar de texto plano. Se implementó anti-ban avanzado (rotación de User-Agents, Viewports aleatorios, retrasos humanos y flags anti-fingerprint). Desplegado exitosamente en revisión `00005-k6l`.
+    *   **Landing Page Dinámica:** Se transformó `app/escudo-simit/page.tsx` de un mock a un componente funcional que procesa la cédula y correo del usuario, valida Turnstile, invoca el scraper en tiempo real y renderiza una tabla animada de resultados.
+    *   **Capa de Negocio (Activación):** Se creó `api/escudo-simit/activate/route.ts` que centraliza la lógica (suscripción en Firestore, primera consulta síncrona y envío de email de bienvenida).
+    *   **Notificaciones Inteligentes:** El worker (`simit-worker/route.ts`) ahora rastrea cambios (compara `totalMultas` vs `lastKnownFinesCount` en Firestore) y despacha un Email Premium estructurado (vía Resend) si detecta nuevas infracciones. El pipeline Typecheck finalizó con cero errores.

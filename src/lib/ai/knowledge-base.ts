@@ -101,6 +101,14 @@ export const DESMULTA_KB: KnowledgeBase = {
       proceso: 'Radicación de defensas técnicas.',
       tiempos: '15 a 45 días hábiles',
     },
+    {
+      id: 'escudo-simit',
+      titulo: 'Escudo SIMIT 24/7',
+      descripcion: 'Monitoreo automatizado semanal para prevenir multas fantasma.',
+      costo: 'Suscripción Beta',
+      proceso: 'Rastreo con tecnología Serverless y alertas inmediatas.',
+      tiempos: 'Permanente (Suscripción)',
+    },
   ],
   metodologia: {
     pasos: [
