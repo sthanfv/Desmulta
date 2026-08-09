@@ -172,7 +172,21 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, processed: scraperData.results.length });
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
-    logger.error('[simit-worker] Error en el worker', { error: msg });
-    return NextResponse.json({ error: 'Procesamiento fallido' }, { status: 500 });
+    const stack = error instanceof Error ? error.stack : '';
+    logger.error('[simit-worker] Error en el worker', { error: msg, stack });
+    
+    // Loguear el error directamente en Firestore para poder verlo desde mi consola local
+    try {
+      const { getFirestore } = await import('firebase-admin/firestore');
+      const { getAdminApp } = await import('@/lib/firebase-admin');
+      await getFirestore(getAdminApp()).collection('worker_logs').add({
+        timestamp: Date.now(),
+        error: msg,
+        stack: stack,
+        source: 'simit-worker'
+      });
+    } catch (e) {}
+
+    return NextResponse.json({ error: 'Procesamiento fallido', details: msg, stack }, { status: 500 });
   }
 }
