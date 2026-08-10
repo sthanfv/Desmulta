@@ -131,7 +131,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <PageProgressBar />
         <ErrorBoundary>
           <FirebaseClientProvider>
-            <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+            <ThemeProvider attribute="class" defaultTheme="system" enableSystem={true}>
               {/* MANDATO-FILTRO: El main es un contenedor limpio — HomeClient maneja su propio layout */}
               {/* PushProvider inyectado globalmente — escucha notificaciones en primer y segundo plano */}
               <SystemHealthProvider>

@@ -91,6 +91,7 @@ export const DESMULTA_KB: KnowledgeBase = {
         'Análisis de estado de cuenta SIMIT gratuito.',
         'Protocolo de seguridad RSA 256-bit para protección Zero-PII.',
       ],
+      href: '/?action=consultar',
     },
     {
       id: 'eliminacion-fotomultas',
@@ -104,6 +105,7 @@ export const DESMULTA_KB: KnowledgeBase = {
         'Sustento en Sentencia C-038 de 2020 (plena identidad).',
         'Radicación electrónica directa con Secretaría de Tránsito.',
       ],
+      href: '/?action=consultar',
     },
     {
       id: 'saneamiento-comparendos',
@@ -117,6 +119,7 @@ export const DESMULTA_KB: KnowledgeBase = {
         'Auditoría de notificación de cobro coactivo.',
         'Radicación de revocatorias directas y tutelas.',
       ],
+      href: '/?action=consultar',
     },
     {
       id: 'calculadora',
