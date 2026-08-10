@@ -187,6 +187,6 @@ export async function POST(request: NextRequest) {
       });
     } catch (e) {}
 
-    return NextResponse.json({ error: 'Procesamiento fallido', details: msg, stack }, { status: 500 });
+    return NextResponse.json({ error: 'Procesamiento fallido' }, { status: 500 });
   }
 }
