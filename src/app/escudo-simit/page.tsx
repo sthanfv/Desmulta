@@ -2,7 +2,6 @@
 
 import React, { useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
-import Script from 'next/script';
 import { m, LazyMotion, domAnimation, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { getMessaging, getToken, isSupported } from 'firebase/messaging';
@@ -146,7 +145,7 @@ export default function EscudoSimitPage() {
       }, 2500); // 2500ms por fase para que el usuario pueda leer los procesos
     }
     return () => clearInterval(interval);
-  }, [isActivating]);
+  }, [isActivating, loadingPhases.length]);
 
   const handleActivate = useCallback(async () => {
     setError(null);
@@ -169,7 +168,7 @@ export default function EscudoSimitPage() {
       let pushToken: string | null = null;
       try {
         pushToken = await obtainFcmToken();
-      } catch (err) {
+      } catch (_err) {
         // Fallo silencioso de push (no bloquea el servicio)
       }
 
@@ -212,7 +211,7 @@ export default function EscudoSimitPage() {
     } finally {
       setIsActivating(false);
     }
-  }, [cedula, email, toast]);
+  }, [cedula, email, toast, honeypot]);
 
   return (
     <LazyMotion features={domAnimation}>

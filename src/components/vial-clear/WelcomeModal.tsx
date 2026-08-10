@@ -25,8 +25,8 @@ export function WelcomeModal({ onAcknowledge }: WelcomeModalProps) {
   const handleClose = () => {
     // 1. Telemetría Estratégica: Capturar intención antes de cerrar
     try {
-      if (typeof window !== 'undefined' && (window as any).gtag) {
-        (window as any).gtag('event', 'welcome_modal_closed', {
+      if (typeof window !== 'undefined' && 'gtag' in window) {
+        (window as Window & typeof globalThis & { gtag?: (...args: unknown[]) => void }).gtag?.('event', 'welcome_modal_closed', {
           event_category: 'engagement',
           event_label: 'user_acknowledged'
         });

@@ -185,7 +185,7 @@ export async function POST(request: NextRequest) {
         stack: stack,
         source: 'simit-worker'
       });
-    } catch (e) {}
+    } catch (_e) {}
 
     return NextResponse.json({ error: 'Procesamiento fallido' }, { status: 500 });
   }

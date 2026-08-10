@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowLeft, ShieldCheck, Database, Server, Eye, Cpu } from 'lucide-react';
+import { ArrowLeft, ShieldCheck, Database, Eye, Cpu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function PrivacidadPage() {
