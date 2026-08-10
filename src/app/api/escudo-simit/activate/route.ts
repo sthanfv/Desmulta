@@ -3,6 +3,15 @@ import { logger } from '@/lib/logger/security-logger';
 import { upsertSubscription } from '@/lib/data/simit-subscriptions';
 import { resend } from '@/lib/resend';
 import { buildEscudoSimitEmail } from '@/lib/email-templates/simit-alert';
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
+
+// Instanciar Rate Limiter (Máximo 2 peticiones por minuto por IP) para mitigar DDoS aplicativo
+const ratelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(2, '1 m'),
+  analytics: true,
+});
 
 /**
  * POST /api/escudo-simit/activate
@@ -16,6 +25,20 @@ import { buildEscudoSimitEmail } from '@/lib/email-templates/simit-alert';
  */
 export async function POST(request: NextRequest) {
   try {
+    // Extraer IP para aplicar el Rate Limit de forma determinista
+    const ip = request.headers.get('x-forwarded-for') ?? '127.0.0.1';
+    
+    // Verificamos en Upstash Redis si la IP superó la cuota
+    const { success, reset } = await ratelimit.limit(`ratelimit_escudo_${ip}`);
+    
+    if (!success) {
+      logger.warn('[escudo-simit] Bloqueo por Rate Limit Excedido (Ataque de Concurrencia)', { ip });
+      return NextResponse.json(
+        { error: 'Demasiadas solicitudes. Por favor, espera 1 minuto antes de volver a intentar.' },
+        { status: 429, headers: { 'Retry-After': Math.ceil((reset - Date.now()) / 1000).toString() } }
+      );
+    }
+
     const body = await request.json();
     const { cedula, email, turnstileToken, pushToken } = body;
 

@@ -570,16 +570,15 @@ export function ConsultationForm({ onSuccess, mode = 'full', nonce }: Consultati
       // Activar banner no intrusivo si el usuario no ha decidido
       mostrarBannerPushNotificacion();
 
-      // 🛡️ MANDATO-FILTRO v8.9.4 — Token de retorno opaco.
-      // ANTES: SHA256(cedula) — reversible por fuerza bruta en GPU (espacio ~100M).
-      // AHORA: UUID aleatorio sin relación con datos PII del ciudadano.
-      // El token sirve SOLO para reconocer al usuario en visitas futuras, nunca para recuperar la cédula.
+      // 🛡️ MANDATO-FILTRO v8.9.4 — Migración a SessionStorage (Volatilidad)
       try {
         const returnToken = crypto.randomUUID();
-        localStorage.setItem('desmulta_client_token', returnToken);
-        // Guardar shortId activo para el mini-dashboard
+        // [MODIFICADO] Usar sessionStorage para prevenir acceso desde otras pestañas/extensiones persistentes
+        sessionStorage.setItem('desmulta_client_token', returnToken);
+        
         if (result.trackingUuid) {
-          localStorage.setItem('desmulta_active_case', result.trackingUuid);
+          // [MODIFICADO] Limitar el active case al ciclo de vida del navegador
+          sessionStorage.setItem('desmulta_active_case', result.trackingUuid);
         }
       } catch (fError) {
         if (process.env.NODE_ENV === 'development') {

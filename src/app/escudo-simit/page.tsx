@@ -7,6 +7,17 @@ import { m, LazyMotion, domAnimation, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { getMessaging, getToken, isSupported } from 'firebase/messaging';
 import { app } from '@/lib/firebase-client';
+import { z } from 'zod';
+
+const formSchema = z.object({
+  cedula: z.string().regex(/^\d{5,10}$/, 'Ingresa un número de cédula válido (entre 5 y 10 dígitos numéricos).'),
+  email: z.string().email('Ingresa un correo electrónico válido.').refine((val) => {
+    const disposableDomains = ['yopmail.com', 'tempmail.com', '10minutemail.com', 'guerrillamail.com', 'mailinator.com', 'temp-mail.org', 'tempmail.net'];
+    const domain = val.split('@')[1]?.toLowerCase();
+    return !disposableDomains.includes(domain);
+  }, { message: 'Por seguridad, no se permiten correos electrónicos temporales o desechables.' }),
+  honeypot: z.string().max(0, 'Solicitud inválida.'),
+});
 
 const Turnstile = dynamic(() => import('@marsidev/react-turnstile').then((mod) => mod.Turnstile), {
   ssr: false,
@@ -103,6 +114,7 @@ async function obtainFcmToken(): Promise<string | null> {
 export default function EscudoSimitPage() {
   const [cedula, setCedula] = useState('');
   const [email, setEmail] = useState('');
+  const [honeypot, setHoneypot] = useState('');
   const [isActivating, setIsActivating] = useState(false);
   const [loadingPhase, setLoadingPhase] = useState(0);
   const [isActivated, setIsActivated] = useState(false);
@@ -139,13 +151,9 @@ export default function EscudoSimitPage() {
   const handleActivate = useCallback(async () => {
     setError(null);
 
-    if (!cedula || !/^\d{5,12}$/.test(cedula)) {
-      setError('Ingresa un número de cédula válido (5 a 12 dígitos).');
-      return;
-    }
-
-    if (!email || !email.includes('@')) {
-      setError('Ingresa un correo electrónico válido.');
+    const validationResult = formSchema.safeParse({ cedula, email, honeypot });
+    if (!validationResult.success) {
+      setError(validationResult.error.errors[0].message);
       return;
     }
 
@@ -322,6 +330,20 @@ export default function EscudoSimitPage() {
                   </p>
 
                   <div className="space-y-5 relative z-10">
+                    {/* Campo Honeypot Anti-Bot (Oculto) */}
+                    <div style={{ position: 'absolute', left: '-9999px', opacity: 0 }} aria-hidden="true">
+                      <label htmlFor="telefono_secundario">Teléfono Secundario</label>
+                      <input
+                        id="telefono_secundario"
+                        name="telefono_secundario"
+                        type="text"
+                        tabIndex={-1}
+                        autoComplete="off"
+                        value={honeypot}
+                        onChange={(e) => setHoneypot(e.target.value)}
+                      />
+                    </div>
+
                     {/* Cédula */}
                     <div>
                       <label htmlFor="escudo-cedula" className="block text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">

@@ -41,6 +41,11 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: false,
   },
   productionBrowserSourceMaps: false,
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error'], // Mantener solo los errores en producción para auditoría
+    } : false,
+  },
 
   images: {
     formats: ['image/avif', 'image/webp'],
