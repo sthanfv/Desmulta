@@ -6,6 +6,9 @@ import { buildEscudoSimitEmail } from '@/lib/email-templates/simit-alert';
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
 
+export const maxDuration = 60; // Forzar timeout Vercel a 60s para soportar el scraper SIMIT
+
+
 // Instanciar Rate Limiter (Máximo 2 peticiones por minuto por IP) para mitigar DDoS aplicativo
 const ratelimit = new Ratelimit({
   redis: Redis.fromEnv(),

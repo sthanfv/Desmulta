@@ -128,7 +128,7 @@ export default function EscudoSimitPage() {
     'Analizando base de datos de resoluciones y comparendos...',
     'Calculando prescripciones y estado de cobros coactivos...',
     'Asegurando tu información y protegiendo tu privacidad...',
-    'Generando reporte final consolidado...',
+    'Generando reporte final (el SIMIT está lento, puede tomar hasta 45s)...',
   ];
 
   React.useEffect(() => {
