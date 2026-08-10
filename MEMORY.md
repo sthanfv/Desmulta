@@ -169,3 +169,7 @@
     *   **Persistencia de Sesión (Cookie Jar):** Implementación de una caché en RAM (TTL 4h) para preservar las cookies de Angular del SIMIT entre ejecuciones, reduciendo significativamente la firma de ataque (fuerza bruta de sesiones nuevas).
     *   **Bloqueo de Recursos y FinOps:** Se interceptaron y cancelaron las solicitudes de red para imágenes, fuentes, CSS y trackers. Esto redujo el tiempo de procesamiento por cédula en un 40% (~41s), disminuyendo drásticamente la factura de Cloud Run.
     *   **Sanitización Frontend:** Se eliminó la exposición del `stack` y detalles internos en los mensajes de error del worker `simit-worker` de Desmulta, estandarizando un manejo global seguro y silencioso ante fallas.
+*   **[2026-08-09] SEO, Light Mode y Rutas de Servicios (UI/UX)**:
+    *   **Grid de Servicios Enlazado:** Se mapearon explícitamente los `href` en `knowledge-base.ts` para que cada servicio del Grid redirija a su destino exacto (`/calculadora`, `/?action=consultar`, etc.).
+    *   **Light Mode OS-Level:** Se modificó `<ThemeProvider>` en `layout.tsx` a `defaultTheme="system"` (removiendo el `dark` forzado), permitiendo que la web adopte de forma automática el esquema de colores (Luna/Sol) del dispositivo del usuario usando las variables de `globals.css`.
+    *   **SEO Server-Side en Escudo SIMIT:** Al ser `escudo-simit/page.tsx` interactiva (`use client`), se creó un contenedor de servidor `layout.tsx` para inyectar Metadatos y tarjetas enriquecidas (Open Graph) para indexación por Google, que ya conoce la ruta vía `sitemap.ts`.
