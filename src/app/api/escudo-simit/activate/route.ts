@@ -43,9 +43,9 @@ export async function POST(request: NextRequest) {
     const { cedula, email, turnstileToken, pushToken } = body;
 
     // ── Validación de entrada ──────────────────────────────────────
-    if (!cedula || typeof cedula !== 'string' || !/^\d{5,12}$/.test(cedula)) {
+    if (!cedula || typeof cedula !== 'string' || !/^\d{5,10}$/.test(cedula)) {
       return NextResponse.json(
-        { error: 'Cédula inválida. Debe contener entre 5 y 12 dígitos.' },
+        { error: 'Cédula inválida. Debe contener entre 5 y 10 dígitos.' },
         { status: 400 }
       );
     }
@@ -66,6 +66,14 @@ export async function POST(request: NextRequest) {
     }
 
     const turnstileSecret = process.env.TURNSTILE_SECRET_KEY;
+    // Forzar fallo en producción si falta la variable (B-FE-02)
+    if (!turnstileSecret && process.env.NODE_ENV === 'production') {
+      logger.error('[escudo-simit] CRÍTICO: TURNSTILE_SECRET_KEY no configurada en producción.');
+      return NextResponse.json(
+        { error: 'Error de configuración del servidor. Contacte al administrador.' },
+        { status: 500 }
+      );
+    }
     if (turnstileSecret) {
       const turnstileResponse = await fetch(
         'https://challenges.cloudflare.com/turnstile/v0/siteverify',
@@ -150,7 +158,7 @@ export async function POST(request: NextRequest) {
     const msg = error instanceof Error ? error.message : String(error);
     logger.error('[escudo-simit] Error en activación', { error: msg });
     return NextResponse.json(
-      { error: 'Error interno al activar el Escudo SIMIT.', detail: msg },
+      { error: 'Error interno al activar el Escudo SIMIT.' },
       { status: 500 }
     );
   }
