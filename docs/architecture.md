@@ -186,3 +186,24 @@ firebase deploy --only firestore:rules
 # Firestore Indexes
 firebase deploy --only firestore:indexes
 ```
+
+---
+
+## 8. Post-Mortem (Módulo "Escudo SIMIT")
+
+**Estatus Actual:** DESHABILITADO Y OCULTO.
+
+En agosto de 2026, la Federación Colombiana de Municipios implementó **Cloudflare Turnstile** con validación *Proof-of-Work* en el frontend del portal público del SIMIT. Esto reemplazó el antiguo rate limit basado puramente en IPs.
+
+### Impacto
+* El motor del **Escudo SIMIT** (código alojado en `desmulta-scraper`, el cual utilizaba Playwright Headless) comenzó a sufrir *Shadowbanning*.
+* El CAPTCHA detecta anomalías del navegador headless y firmas de Puppeteer/Playwright, respondiendo artificialmente con "0 multas" o bloqueando la carga del DOM, independientemente de la rotación de proxies IP residenciales.
+* Como resultado, las consultas gratuitas a SIMIT sin intermediarios de resolución AI fallaron de manera sistemática.
+
+### Medidas Tomadas
+1. **Ocultamiento de Rutas en Next.js:** Las rutas relacionadas (`src/app/escudo-simit`, `src/app/api/escudo-simit`, `api/qstash/simit-worker`) fueron renombradas con el prefijo `_` para que Next.js App Router las ignore por completo en tiempo de compilación.
+2. **Depuración de UI:** Se removieron los botones y *Call-To-Actions* del **Hero** y el **Header**.
+3. **Mantenimiento Cero:** El código del microservicio en Python (Desmulta-Scraper) quedó archivado en su repositorio respectivo. El servicio debe eliminarse de Cloud Run para mitigar costos innecesarios de CPU.
+
+**¿Cómo revivir el Escudo SIMIT en el futuro?**
+El microservicio deberá ser refactorizado para integrarse de forma nativa con APIs resolutorias de Captchas (ej. CapSolver o 2Captcha) o con frameworks Anti-Detect como *Undetected ChromeDriver* o FlareSolverr consumiendo un pool de *Residential Proxies*, y asumir los costos operativos que esto conlleva.

@@ -132,15 +132,7 @@ export const Header = ({ onOpenModal }: HeaderProps) => {
               </Link>
             </MagneticItem>
 
-            <MagneticItem mouseX={mouseX}>
-              <Link
-                href="/escudo-simit"
-                className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-primary hover:bg-primary/10 rounded-xl transition-all"
-              >
-                <ShieldCheck className="w-4 h-4" />
-                <span>Escudo SIMIT</span>
-              </Link>
-            </MagneticItem>
+
 
             <MagneticItem mouseX={mouseX}>
               <Link
@@ -243,16 +235,7 @@ export const Header = ({ onOpenModal }: HeaderProps) => {
               <span>Consultar Expediente</span>
             </Link>
 
-            <Link
-              href="/escudo-simit"
-              onClick={closeMenu}
-              className="flex items-center gap-3 px-4 py-3 text-sm font-bold text-primary hover:bg-primary/10 rounded-2xl transition-colors"
-            >
-              <div className="bg-primary/20 p-2 rounded-xl text-primary flex-shrink-0">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-              <span>Activar Escudo SIMIT</span>
-            </Link>
+
 
             <Link
               href="/blog"

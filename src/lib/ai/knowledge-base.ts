@@ -135,20 +135,7 @@ export const DESMULTA_KB: KnowledgeBase = {
       ],
       href: '/calculadora',
     },
-    {
-      id: 'escudo-simit',
-      titulo: 'Escudo SIMIT 24/7',
-      descripcion: 'Monitoreo automatizado semanal para prevenir multas fantasma.',
-      costo: 'Suscripción Beta',
-      proceso: 'Rastreo con tecnología Serverless y alertas inmediatas.',
-      tiempos: 'Permanente (Suscripción)',
-      detalles: [
-        'Motor de web scraping Serverless en la nube.',
-        'Alertas tempranas automáticas vía correo y notificaciones Push.',
-        'Protección total de identidad (cédula encriptada).',
-      ],
-      href: '/escudo-simit',
-    },
+
   ],
   metodologia: {
     pasos: [

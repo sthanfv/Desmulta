@@ -148,17 +148,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
                 </span>
               </Button>
 
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="w-full sm:w-auto h-14 sm:h-16 px-6 sm:px-10 text-base sm:text-lg font-semibold rounded-2xl border-primary/20 hover:bg-primary/5 hover:text-primary active:scale-95 transition-all shadow-sm"
-              >
-                <Link href="/escudo-simit" className="flex items-center gap-2">
-                  <Shield className="w-5 h-5 text-primary" />
-                  Activar Escudo SIMIT
-                </Link>
-              </Button>
+
             </m.div>
 
             {isHydrated && (
