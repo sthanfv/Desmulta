@@ -158,7 +158,7 @@ export default function HomeClient({
   };
 
   return (
-    <div className="min-h-screen bg-background selection:bg-primary/30 selection:text-primary-foreground overflow-x-hidden relative group/layout rounded-t-xl sm:rounded-t-[2.5rem] md:rounded-[3rem] shadow-2xl sm:border-x sm:border-t border-white/5">
+    <div className="min-h-screen bg-background selection:bg-primary/30 selection:text-primary-foreground relative group/layout rounded-t-xl sm:rounded-t-[2.5rem] md:rounded-[3rem] shadow-2xl sm:border-x sm:border-t border-white/5">
       {/* Herramienta de diagnóstico táctil y OCR */}
       {process.env.NODE_ENV === 'development' && <TouchDebugger />}
 
@@ -185,19 +185,19 @@ export default function HomeClient({
         <Pillars />
       </div>
 
-      <div className="defer-render">
+      <div>
         <Methodology />
       </div>
 
-      <div className="defer-render">
+      <div>
         <SuccessCases showcaseData={showcaseData} />
       </div>
 
-      <div className="defer-render">
+      <div>
         <FAQ mounted={mounted} />
       </div>
 
-      <div className="defer-render">
+      <div>
         <CTA
           onConsultar={() => {
             setFormMode('full');
@@ -207,7 +207,7 @@ export default function HomeClient({
         />
       </div>
 
-      <div className="defer-render">
+      <div>
         <Footer
           footerData={footerData}
           onOpenWhatsAppWarning={() => setIsWhatsAppWarningOpen(true)}

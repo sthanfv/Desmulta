@@ -54,6 +54,10 @@
     @apply border-border;
   }
 
+  html, body {
+    overflow-x: hidden;
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
     min-height: 100svh;
@@ -472,9 +476,7 @@
 
 /* Removido código problemático PWA native feel */
 
-.defer-render {
-  will-change: transform, opacity;
-}
+
 
 /* Fix Scroll iOS Safari en Modales */
 .modal-scroll {
