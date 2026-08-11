@@ -4,7 +4,7 @@ import React from 'react';
 import { ArrowUp, FileText, ChevronRight, Shield } from 'lucide-react';
 import { LazyMotion, domAnimation, m } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+
 import dynamic from 'next/dynamic';
 import { TarjetaPremium } from '@/components/ui/TarjetaPremium';
 import CountUp from '@/components/ui/CountUp';

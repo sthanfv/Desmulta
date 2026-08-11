@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { POST } from './src/app/api/qstash/simit-worker/route';
+import { POST } from './src/app/api/qstash/_simit-worker/route';
 import * as dotenv from 'dotenv';
 
 dotenv.config({ path: '.env.local' });
