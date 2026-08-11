@@ -33,11 +33,12 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: 'Desmulta — Expertos en Multas de Tránsito Colombia',
+    default: 'Desmulta — Eliminación de Fotomultas y Saneamiento Vial en Colombia',
     template: '%s | Desmulta — Saneamiento y Prescripción Legal',
   },
   description:
-    'Análisis técnico de multas de tránsito en Colombia. Identificamos si su caso tiene fundamentos de prescripción, caducidad o vicios de notificación. Consulta inicial gratuita.',
+    'Expertos en análisis técnico de multas de tránsito en Colombia. Logramos la prescripción, caducidad e impugnación de fotomultas por vicios de notificación. Consulta 100% gratuita.',
+  applicationName: 'Desmulta Colombia',
   keywords: [
     'multas de tránsito Colombia',
     'fotomulta Colombia',

@@ -104,10 +104,12 @@ export default function ServiciosPage() {
                     asChild
                     className="w-full mt-10 h-14 rounded-2xl bg-primary text-primary-foreground font-black shadow-lg shadow-primary/20"
                   >
-                    <Link href={servicio.href || "/?action=consultar"}>
-                      {servicio.href 
-                        ? (servicio.id === 'escudo-simit' ? 'Activar Escudo' : servicio.id === 'calculadora' ? 'Ir a la Calculadora' : 'Acceder')
-                        : 'Solicitar Información'}
+                    <Link href={servicio.href === '/?action=consultar' ? '/#contacto' : (servicio.href || '/#contacto')}>
+                      {servicio.id === 'escudo-simit' 
+                        ? 'Activar Escudo' 
+                        : servicio.id === 'calculadora' 
+                          ? 'Ir a la Calculadora' 
+                          : 'Solicitar Análisis Gratis'}
                     </Link>
                   </Button>
                 </div>
