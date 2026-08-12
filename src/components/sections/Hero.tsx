@@ -10,12 +10,25 @@ import { TarjetaPremium } from '@/components/ui/TarjetaPremium';
 import CountUp from '@/components/ui/CountUp';
 import { DocumentShowcase } from '@/components/ui/DocumentShowcase';
 
-const SavingsCalculator = dynamic(
-  () => import('@/components/interactive/SavingsCalculator').then((mod) => mod.SavingsCalculator),
+const PreQualifyWidget = dynamic(
+  () => import('@/components/forms/PreQualifyWidget').then((mod) => mod.PreQualifyWidget),
   {
     ssr: false,
     loading: () => (
-      <div className="h-[360px] sm:h-[400px] rounded-3xl bg-muted/10 border border-white/5 animate-pulse" />
+      <div className="h-[200px] w-full bg-muted/10 border border-white/5 rounded-3xl animate-pulse" />
+    ),
+  }
+);
+
+const ConsultationForm = dynamic(
+  () => import('@/components/vial-clear/ConsultationForm').then((mod) => mod.ConsultationForm),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex flex-col items-center justify-center p-8 h-[360px] sm:h-[400px] space-y-6 bg-muted/10 border border-white/5 rounded-3xl animate-pulse">
+        <div className="w-16 h-16 rounded-full bg-primary/10 border border-primary/20" />
+        <div className="h-4 w-48 bg-muted/40 rounded-full" />
+      </div>
     ),
   }
 );
@@ -40,6 +53,7 @@ interface HeroProps {
 export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
   const { multas } = useExpedienteStore();
   const isHydrated = useHydration();
+  const [isPreQualified, setIsPreQualified] = React.useState(false);
 
   return (
     <LazyMotion features={domAnimation} strict>
@@ -130,70 +144,31 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
                 : '¿Tiene multas en el SIMIT? Analizamos su caso sin costo y le decimos si podemos borrarlas por tiempo cumplido o errores en el proceso.'}
             </m.p>
 
-            {/* CTAs */}
+            {/* CTA / Formulario Inline (CRO Optimizado) */}
             <m.div style={{ willChange: "transform, opacity" }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="flex flex-col sm:flex-row gap-4"
-            >
-              <Button
-                onClick={onConsultar}
-                size="lg"
-                className="w-full sm:w-auto h-14 sm:h-16 px-6 sm:px-10 text-base sm:text-lg font-semibold rounded-2xl shadow-md hover:shadow-2xl hover:-translate-y-1 active:scale-95 transition-all group"
-              >
-                <span className="flex items-center gap-3">
-                  Estudio Legal Gratuito
-                  <ArrowUp className="w-5 h-5 rotate-45 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                </span>
-              </Button>
-
-
-            </m.div>
-
-            {isHydrated && (
-              <>
-                <div className="-mt-4 relative z-30">
-                  <ReturningUserBanner />
-                </div>
-
-                {multas.length > 0 && (
-                  <m.div style={{ willChange: "transform, opacity" }}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="p-4 rounded-2xl bg-primary/5 border border-primary/20 flex items-center gap-4 group/expediente cursor-pointer hover:bg-primary/10 transition-all shadow-sm"
-                    onClick={onConsultar}
-                  >
-                    <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow-md">
-                      <FileText size={20} />
-                    </div>
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-widest text-primary">
-                        Expediente Activo
-                      </p>
-                      <p className="text-sm font-bold text-foreground">
-                        Tiene {multas.length}{' '}
-                        {multas.length === 1 ? 'multa detectada' : 'multas detectadas'} por analizar
-                      </p>
-                    </div>
-                    <ChevronRight
-                      size={16}
-                      className="text-primary ml-auto group-hover/expediente:translate-x-1 transition-transform"
-                    />
-                  </m.div>
-                )}
-              </>
-            )}
-
-            {/* Simulador — IZQUIERDA, debajo del texto */}
-            <m.div style={{ willChange: "transform, opacity" }}
+              className="w-full mt-4"
               id="calculadora-hero"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, delay: 0.5 }}
-              className="w-full"
             >
-              <SavingsCalculator />
+              <div className="bg-background/80 backdrop-blur-md border border-border/50 shadow-2xl rounded-[2.5rem] p-4 sm:p-6 relative">
+                {/* Etiqueta de Transparencia de Precios */}
+                <div className="absolute -top-4 -right-4 sm:-right-6 bg-amber-500 text-amber-950 font-black text-xs px-4 py-2 rounded-full shadow-lg border border-amber-300 transform rotate-2 z-20">
+                  ESTUDIO GRATUITO
+                </div>
+                
+                {!isPreQualified ? (
+                  <PreQualifyWidget onQualify={() => setIsPreQualified(true)} />
+                ) : (
+                  <ConsultationForm onSuccess={() => {}} mode="full" />
+                )}
+                
+                {/* Disclaimer de Monetización */}
+                <p className="mt-4 text-center text-xs text-muted-foreground font-medium">
+                  El análisis de IA es 100% gratuito. Si detectamos que tu caso es viable legalmente, el documento de defensa oficial tiene un costo de <strong className="text-foreground">$39.000 COP</strong>.
+                </p>
+              </div>
             </m.div>
           </div>
 
