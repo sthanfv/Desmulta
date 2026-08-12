@@ -449,17 +449,46 @@ export default function HomeClient({
         </div>
       </ResponsiveModal>
 
-      {/* Mobile Sticky CTA */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 pb-[calc(env(safe-area-inset-bottom,0px)+1rem)] bg-background/90 backdrop-blur-md border-t border-border/50 z-40 sm:hidden flex flex-col gap-2 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] dark:shadow-[0_-10px_40px_rgba(0,0,0,0.3)]">
-        <Button
-          onClick={() => {
-            setFormMode('full');
-            setIsModalOpen(true);
-          }}
-          className="w-full h-14 rounded-2xl text-[1.1rem] font-black shadow-lg shadow-primary/20 active:scale-95 transition-transform"
+      {/* Mobile Sticky CTA & Scroll Top */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 sm:hidden flex flex-col items-center pointer-events-none">
+        
+        {/* Mobile Scroll-To-Top (No background, centered) */}
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          aria-label="Volver arriba"
+          className={cn(
+            'pointer-events-auto mb-3 flex items-center justify-center transition-all duration-700 drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] dark:drop-shadow-[0_0_8px_rgba(0,0,0,0.8)] text-foreground',
+            showScrollTop
+              ? 'opacity-100 translate-y-0 scale-100'
+              : 'opacity-0 translate-y-10 scale-50 pointer-events-none'
+          )}
         >
-          CONSULTAR MI CASO GRATIS
-        </Button>
+          <svg
+            className="w-10 h-10"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M12 19V5M5 12l7-7 7 7" />
+          </svg>
+        </button>
+
+        {/* Sticky CTA Bar */}
+        <div className="w-full pointer-events-auto p-4 pb-[calc(env(safe-area-inset-bottom,0px)+1rem)] bg-background/90 backdrop-blur-md border-t border-border/50 flex flex-col gap-2 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] dark:shadow-[0_-10px_40px_rgba(0,0,0,0.3)]">
+          <Button
+            onClick={() => {
+              setFormMode('full');
+              setIsModalOpen(true);
+            }}
+            className="w-full h-14 rounded-2xl text-[1.1rem] font-black shadow-lg shadow-primary/20 active:scale-95 transition-transform"
+          >
+            CONSULTAR MI CASO GRATIS
+          </Button>
+        </div>
       </div>
 
       {/* Onboarding Inicial (Se auto-gestiona con localStorage) */}
