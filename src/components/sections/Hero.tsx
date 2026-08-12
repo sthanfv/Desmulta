@@ -79,64 +79,34 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
             <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[7rem] font-black text-foreground tracking-tighter leading-[1.05] sm:leading-[0.9] text-balance">
               {cityContext ? (
                 <>
-                  <m.span
-                    className="block text-foreground/90 whitespace-nowrap"
-                    initial={{ y: 40, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                  >
+                  <span className="block text-foreground/90 whitespace-nowrap">
                     MULTAS EN
-                  </m.span>
-                  <m.span
-                    className="block text-primary font-bold"
-                    initial={{ y: 40, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-                  >
+                  </span>
+                  <span className="block text-primary font-bold">
                     {cityContext}
-                  </m.span>
+                  </span>
                 </>
               ) : (
                 <>
-                  <m.span
-                    className="block text-foreground/90"
-                    initial={{ y: 40, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                  >
+                  <span className="block text-foreground/90">
                     Borramos sus multas.
-                  </m.span>
-                  <m.span
-                    className="block text-primary font-black"
-                    initial={{ y: 40, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-                  >
+                  </span>
+                  <span className="block text-primary font-black">
                     De forma 100% legal.
-                  </m.span>
+                  </span>
                 </>
               )}
             </h1>
 
             {/* Descripción */}
-            <m.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-base sm:text-lg text-muted-foreground font-medium leading-[1.7] max-w-lg"
-            >
+            <p className="text-base sm:text-lg text-muted-foreground font-medium leading-[1.7] max-w-lg">
               {cityContext
                 ? `¿Tiene multas en ${cityContext}? Le decimos si podemos borrarlas por tiempo cumplido o errores en el proceso. Análisis gratuito.`
                 : '¿Tiene multas en el SIMIT? Analizamos su caso sin costo y le decimos si podemos borrarlas por tiempo cumplido o errores en el proceso.'}
-            </m.p>
+            </p>
 
             {/* CTAs */}
-            <m.div style={{ willChange: "transform, opacity" }}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              className="flex flex-col sm:flex-row gap-4"
-            >
+            <div className="flex flex-col sm:flex-row gap-4">
               <Button
                 onClick={onConsultar}
                 size="lg"
@@ -147,9 +117,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
                   <ArrowUp className="w-5 h-5 rotate-45 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                 </span>
               </Button>
-
-
-            </m.div>
+            </div>
 
             {isHydrated && (
               <>

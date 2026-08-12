@@ -180,3 +180,7 @@
 *   **[2026-08-11] Cierre de Auditoría Forense y Mantenimiento NPM**:
     *   **Inhabilitación SIMIT (Legal):** Se inhabilitó permanentemente el worker automatizado (`_simit-worker` -> 410 Gone) y el motor estocástico para asegurar cumplimiento estricto con las políticas estatales Anti-Bot, preservando únicamente la evaluación OCR de documentos provistos manualmente por el usuario.
     *   **Remediación de Terceros:** Se aplicó `npm audit fix` solucionando vulnerabilidades críticas y moderadas (CWE-79, CWE-22, CWE-96) en `postcss`, `sharp` y `serialize-javascript`. La suite de 521 pruebas finalizó con un 100% de éxito de integración.
+*   **[2026-08-11] Optimización de Rendimiento UX y SEO (Landing Page)**:
+    *   **Eliminación de Scroll Jank:** Se removió el recorte forzado (`overflow-x-hidden`) y sombras globales del contenedor principal en `HomeClient.tsx`, optimizando drásticamente la fluidez de desplazamiento (scroll) y el renderizado en GPUs de móviles gama media/baja.
+    *   **Reparación Core Web Vitals (LCP):** Se eliminó el `opacity: 0` (framer-motion) inicial en las etiquetas `<h1>` y CTA del `Hero.tsx`, permitiendo un LCP inmediato para los bots de indexación de Google y mejorando el SEO.
+    *   **Estrategia Sticky CTA (CRO):** Se ocultó el botón flotante invasivo de WhatsApp en la vista móvil y se reemplazó por un Footer Anclado (Sticky CTA) masivo a ancho completo ("Consultar Mi Caso Gratis") en la parte inferior, optimizado con safe-area-inset para iOS/Android, forzando un embudo de conversión limpio hacia el formulario Modal.

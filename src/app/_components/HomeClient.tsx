@@ -158,7 +158,7 @@ export default function HomeClient({
   };
 
   return (
-    <div className="min-h-screen bg-background selection:bg-primary/30 selection:text-primary-foreground relative group/layout rounded-t-xl sm:rounded-t-[2.5rem] md:rounded-[3rem] shadow-2xl sm:border-x sm:border-t border-white/5">
+    <div className="min-h-screen bg-background selection:bg-primary/30 selection:text-primary-foreground relative group/layout">
       {/* Herramienta de diagnóstico táctil y OCR */}
       {process.env.NODE_ENV === 'development' && <TouchDebugger />}
 
@@ -256,9 +256,9 @@ export default function HomeClient({
         </div>
       </ResponsiveModal>
 
-      {/* Floating Elements (WhatsApp & ScrollTop) */}
+      {/* Floating Elements (WhatsApp & ScrollTop) - Hidden on Mobile */}
       {/* MANDATO-FILTRO v7.4.3: safe-area-inset-bottom respeta la barra de gestos nativa de Android */}
-      <div className="fixed bottom-[calc(env(safe-area-inset-bottom,0px)+2rem)] right-10 sm:right-12 z-50 flex flex-col items-end gap-4 sm:gap-5 group pointer-events-none overflow-visible">
+      <div className="fixed bottom-[calc(env(safe-area-inset-bottom,0px)+2rem)] right-10 sm:right-12 z-50 hidden sm:flex flex-col items-end gap-4 sm:gap-5 group pointer-events-none overflow-visible">
         {/* Tooltip — En desktop apunta a la izquierda, en móvil apunta hacia arriba */}
         <div
           className="
@@ -448,6 +448,19 @@ export default function HomeClient({
           </div>
         </div>
       </ResponsiveModal>
+
+      {/* Mobile Sticky CTA */}
+      <div className="fixed bottom-0 left-0 right-0 p-4 pb-[calc(env(safe-area-inset-bottom,0px)+1rem)] bg-background/90 backdrop-blur-md border-t border-border/50 z-40 sm:hidden flex flex-col gap-2 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] dark:shadow-[0_-10px_40px_rgba(0,0,0,0.3)]">
+        <Button
+          onClick={() => {
+            setFormMode('full');
+            setIsModalOpen(true);
+          }}
+          className="w-full h-14 rounded-2xl text-[1.1rem] font-black shadow-lg shadow-primary/20 active:scale-95 transition-transform"
+        >
+          CONSULTAR MI CASO GRATIS
+        </Button>
+      </div>
 
       {/* Onboarding Inicial (Se auto-gestiona con localStorage) */}
       <WelcomeModal onAcknowledge={() => {}} />
