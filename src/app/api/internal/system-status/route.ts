@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { timingSafeEqual } from 'crypto';
 
-export const runtime = 'edge';
 
 // 🛡️ AUDITORÍA 2026-08-01: Health Check Unificado (X-03)
 export async function GET(request: Request) {
