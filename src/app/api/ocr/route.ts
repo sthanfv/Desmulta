@@ -442,7 +442,8 @@ export async function POST(request: NextRequest) {
 
     // 🚨 ENVIAR ALERTA A TELEGRAM ANTES DE MORIR
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
-    const chatId = process.env.TELEGRAM_CHAT_ID;
+    // Usar el canal de desarrollo/alertas técnicas, no el de leads.
+    const chatId = process.env.TELEGRAM_DEV_CHAT_ID || process.env.TELEGRAM_CHAT_ID;
 
     if (botToken && chatId) {
       const telegramText = `🚨 *ALERTA SIMIT (OCR FALLIDO)* 🚨\n\nEl sistema de extracción de texto falló o se agotó el tiempo (Timeout/503).\n\n*Diagnóstico:*\n\`${errorMsg}\`\n\n_El cliente recibió un error. Podría abandonar el embudo._`;
