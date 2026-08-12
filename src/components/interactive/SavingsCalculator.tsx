@@ -134,6 +134,10 @@ export function SavingsCalculator() {
   }, [isExpanded]);
 
   useEffect(() => {
+    // 🔥 FIX: No disparar la API al cargar la página en cero.
+    // Solo consultar cuando el usuario mueva el slider o escriba algo mayor a cero.
+    if (montoBase === 0) return;
+
     let fechaInfraccionISO = '';
     if (fechaExactaGlobal) {
       fechaInfraccionISO = fechaExactaGlobal;
