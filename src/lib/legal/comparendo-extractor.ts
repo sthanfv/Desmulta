@@ -8,6 +8,7 @@ import {
 } from '@/lib/config-constants';
 import { PrescriptionEngine, OCRSanitizer } from '@/lib/legal/prescription-engine';
 import crypto from 'crypto';
+import { logger } from '@/lib/logger/security-logger';
 
 /**
  * Esquema Zod para el objeto comparendo extraído por Gemini.
@@ -295,7 +296,9 @@ export async function construirAnalisisCompleto(
         },
       };
     } catch (error) {
-      console.error('[comparendo-extractor] Error al consumir Go Engine, usando fallback', error);
+      logger.error('[comparendo-extractor] Error al consumir Go Engine, usando fallback', {
+        error: error instanceof Error ? error.message : String(error),
+      });
       // Fall through to legacy si Go falla
     }
   }

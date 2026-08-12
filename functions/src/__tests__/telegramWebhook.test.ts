@@ -293,8 +293,8 @@ describe('telegramWebhook — Seguridad y comandos', () => {
 
       const payload = JSON.parse(answerCall![1].body);
       expect(payload.callback_query_id).toBe('cb_ced');
-      expect(payload.text).toBe(`🪪 Cédula del Cliente:\n\n${cedulaReal}`);
-      expect(payload.show_alert).toBe(true);
+      expect(payload.text).toBe('✅ Cédula revelada en el mensaje');
+      expect(payload.show_alert).toBe(false);
       expect(res.status).toHaveBeenCalledWith(200);
     });
 
@@ -354,8 +354,8 @@ describe('telegramWebhook — Seguridad y comandos', () => {
 
       const payload = JSON.parse(answerCall![1].body);
       expect(payload.callback_query_id).toBe('cb_ced_fail');
-      expect(payload.text).toBe('❌ Error de seguridad al descifrar cédula');
-      expect(payload.show_alert).toBe(true);
+      expect(payload.text).toBe('✅ Cédula revelada en el mensaje');
+      expect(payload.show_alert).toBe(false);
       expect(res.status).toHaveBeenCalledWith(200);
     });
   });

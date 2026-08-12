@@ -3,6 +3,8 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { get, set, del } from 'idb-keyval';
 import { db } from '@/lib/firebase-client';
 import { doc, onSnapshot, Unsubscribe } from 'firebase/firestore';
+import { z } from 'zod';
+import { encryptForStorage, decryptFromStorage } from '@/lib/security/storage-crypto';
 
 let unsubscribeFirestore: Unsubscribe | null = null;
 
@@ -47,6 +49,18 @@ interface ExpedienteState {
   stopSync: () => void;
 }
 
+// 🛡️ Esquema de validación para prevenir sobrescritura arbitraria del estado
+const FormDataSchema = z.object({
+  cedula: z.string().regex(/^\d{6,12}$/).optional(),
+  nombre: z.string().max(100).optional(),
+  placa: z.string().max(10).optional(),
+  email: z.string().email().optional(),
+  celular: z.string().max(15).optional(),
+  ciudad: z.string().max(50).optional(),
+  autoridad: z.string().max(100).optional(),
+  direccion: z.string().max(200).optional(),
+}).partial();
+
 export const useExpedienteStore = create<ExpedienteState>()(
   persist(
     (set, get) => ({
@@ -64,7 +78,11 @@ export const useExpedienteStore = create<ExpedienteState>()(
       ocrRawText: null,
       capturedImage: null,
       setCapturedImage: (capturedImage) => set({ capturedImage }),
-      setFormData: (data) => set((state) => ({ ...state, ...data })),
+      setFormData: (data) => {
+        const parsed = FormDataSchema.safeParse(data);
+        if (!parsed.success) return;
+        set((state) => ({ ...state, ...parsed.data }));
+      },
       setCedula: (cedula) => set({ cedula }),
       setEstado: (estado) => set({ estado }),
       setOcrRawText: (ocrRawText) => set({ ocrRawText }),
@@ -145,10 +163,19 @@ export const useExpedienteStore = create<ExpedienteState>()(
       name: 'desmulta-expediente-storage',
       storage: createJSONStorage(() => ({
         getItem: async (name: string): Promise<string | null> => {
-          return (await get(name)) || null;
+          const stored = await get(name);
+          if (!stored) return null;
+          try {
+            return await decryptFromStorage(stored as string);
+          } catch (e) {
+            // Retrocompatibilidad: si no se puede descifrar (posiblemente porque estaba en texto plano),
+            // se retorna el valor original para que Zustand lo parsee y luego se guarde cifrado.
+            return stored as string;
+          }
         },
         setItem: async (name: string, value: string): Promise<void> => {
-          await set(name, value);
+          const encrypted = await encryptForStorage(value);
+          await set(name, encrypted);
         },
         removeItem: async (name: string): Promise<void> => {
           await del(name);

@@ -2,6 +2,7 @@ import { NextResponse, NextRequest } from 'next/server';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 import { getAdminApp } from '@/lib/firebase-admin';
 import { logger } from '@/lib/logger/security-logger';
+import { timingSafeEqual } from 'crypto';
 import { sendTelegramCronSuccess, sendTelegramCronError } from '@/lib/telegram';
 
 export async function POST(request: NextRequest) {
@@ -15,7 +16,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Configuración del servidor inválida' }, { status: 500 });
     }
 
-    if (authHeader !== `Bearer ${cronSecret}`) {
+    const expected = Buffer.from(`Bearer ${cronSecret}`);
+    const provided = Buffer.from(authHeader ?? '');
+    if (provided.length !== expected.length || !timingSafeEqual(provided, expected)) {
       logger.security('[cron-usura] Intento no autorizado de ejecución de Cron Job', {
         ip: request.headers.get('x-forwarded-for'),
       });

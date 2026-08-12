@@ -1,5 +1,6 @@
 import * as functions from 'firebase-functions/v1';
 import * as admin from 'firebase-admin';
+import * as logger from 'firebase-functions/logger';
 
 /**
  * retryFailedDeliveries — Reintento real de entregas de PDF fallidas.
@@ -8,7 +9,7 @@ import * as admin from 'firebase-admin';
  * campo pdfDeliveredAt sea null, indicando que la entrega del PDF falló
  * durante el procesamiento del webhook de Wompi.
  *
- * \ud83d\udee1\ufe0f FIX H-17: Implementación real del reintento. Antes, esta función ejecutaba
+ * 🛡️ FIX H-17: Implementación real del reintento. Antes, esta función ejecutaba
  * solo un `console.log` y el cliente nunca recibía su documento.
  *
  * El reintento se delega al endpoint interno `/api/internal/retry-pdf-delivery`
@@ -45,14 +46,14 @@ export const retryFailedDeliveries = functions
       .get();
 
     if (pending.empty) {
-      console.log('[retry] Sin entregas pendientes de reintentar.');
+      logger.info('[retry] Sin entregas pendientes de reintentar.');
       return;
     }
 
-    console.log(`[retry] Detectadas ${pending.size} entregas fallidas. Iniciando reintentos.`);
+    logger.info(`[retry] Detectadas ${pending.size} entregas fallidas. Iniciando reintentos.`);
 
     if (!INTERNAL_API_SECRET) {
-      console.error('[retry] INTERNAL_API_SECRET no configurado. Abortando reintentos.');
+      logger.error('[retry] INTERNAL_API_SECRET no configurado. Abortando reintentos.');
       return;
     }
 
@@ -81,14 +82,14 @@ export const retryFailedDeliveries = functions
           throw new Error(`HTTP ${response.status}: ${body.substring(0, 200)}`);
         }
 
-        console.log(`[retry] ✅ Entrega exitosa en reintento: ${purchaseId}`);
+        logger.info(`[retry] ✅ Entrega exitosa en reintento: ${purchaseId}`);
       })
     );
 
     // 🛡️ FIX H-17: Registrar los reintentos que sigan fallando para visibilidad operativa.
     const fallos = results.filter((r) => r.status === 'rejected');
     if (fallos.length > 0) {
-      console.error(
+      logger.error(
         `[retry] ❌ ${fallos.length} reintento(s) fallido(s):`,
         fallos.map((f) => (f as PromiseRejectedResult).reason?.message)
       );

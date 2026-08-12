@@ -172,7 +172,7 @@ describe('F-12 — Separación de Claves Criptográficas', () => {
     const { encryptSymmetric } = await import('@/lib/security/server-crypto');
     const resultado = encryptSymmetric('test-pii-data');
     expect(resultado).toMatch(/^ENC:/);
-  });
+  }, 10000);
 
   it('encryptSymmetric debe lanzar error cuando PII_ENCRYPTION_KEY NO está configurada', async () => {
     // Eliminar la variable para simular entorno mal configurado

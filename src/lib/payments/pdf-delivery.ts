@@ -68,8 +68,8 @@ export async function generarYEnviarPDF(purchase: PurchaseDocument, db: Firestor
     // Se usa cadena vacía como fallback; el motor PDF lo omite si está vacío.
     ticketNumber: caseData.ticketNumber ?? '',
     documentType: productType as DocumentType,
-    operatorName: 'SISTEMA AUTOMATIZADO DESMULTA',
-    operatorId: 'NIT 900.000.000-1',
+    operatorName: process.env.OPERATOR_LEGAL_NAME || 'SISTEMA AUTOMATIZADO DESMULTA',
+    operatorId: process.env.OPERATOR_LEGAL_ID || '[NIT_NO_CONFIGURADO]',
     acceptedAt: new Date().toISOString(),
   };
 

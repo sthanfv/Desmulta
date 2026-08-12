@@ -42,9 +42,9 @@ export async function POST(req: Request) {
     }
 
     // 3. Construir URL absoluta para el fetch interno
-    const host = req.headers.get('host') || 'localhost:3000';
-    const protocol = host.includes('localhost') ? 'http' : 'https';
-    const destinationUrl = `${protocol}://${host}/api/internal/crash-report`;
+    // 🛡️ SSRF Prevention: URL destino definida por env var, nunca por headers del cliente
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://desmulta.online';
+    const destinationUrl = `${baseUrl}/api/internal/crash-report`;
 
     // 4. Delegar la petición al endpoint de crash-report seguro
     const response = await fetch(destinationUrl, {

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { timingSafeEqual } from 'crypto';
 import { logger } from '@/lib/logger/security-logger';
 
 export const runtime = 'edge';
@@ -11,20 +12,21 @@ export const runtime = 'edge';
 export async function GET(request: Request) {
   // Validación de seguridad para Vercel Cron
   const authHeader = request.headers.get('authorization');
-  if (
-    process.env.CRON_SECRET &&
-    authHeader !== `Bearer ${process.env.CRON_SECRET}` &&
-    process.env.NODE_ENV === 'production'
-  ) {
+  const cronSecret = process.env.CRON_SECRET;
+  if (!cronSecret) {
+    logger.error('[FinOps] CRON_SECRET no configurado');
+    return new NextResponse('Server Error', { status: 500 });
+  }
+  const expected = Buffer.from(`Bearer ${cronSecret}`);
+  const provided = Buffer.from(authHeader ?? '');
+  if (provided.length !== expected.length || !timingSafeEqual(provided, expected)) {
     return new NextResponse('Unauthorized', { status: 401 });
   }
 
   try {
     logger.info('[FinOps] Ejecutando análisis semanal de costos y métricas...');
 
-    // TBD: Conectar con API de Firestore System Metrics para evaluar Reads/Writes
-    // TBD: Conectar con API de Upstash Redis para evaluar uso de comandos
-    // TBD: Conectar con API de Vercel para evaluar uso de Edge Functions
+    // Pendiente: Integración con métricas de costos. Ver ticket interno DES-FIN-01.
 
     // Simulación de envío de alerta si se supera un umbral ficticio (80%)
     const umbralSuperado = false;

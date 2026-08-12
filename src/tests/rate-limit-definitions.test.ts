@@ -55,9 +55,9 @@ describe('🛡️ Rate Limiting — Configuración y Límites', () => {
     expect(rateLimiters.referidos.limiter.tokens).toBe(5);
     expect(rateLimiters.referidos.limiter.window).toBe('24 h');
 
-    // Consultation: 5 por 5 minutos
-    expect(rateLimiters.consultation.limiter.tokens).toBe(5);
-    expect(rateLimiters.consultation.limiter.window).toBe('5 m');
+    // Consultation: 10 por 24 horas
+    expect(rateLimiters.consultation.limiter.tokens).toBe(10);
+    expect(rateLimiters.consultation.limiter.window).toBe('24 h');
 
     // Checkout: 3 por 1 hora
     expect(rateLimiters.checkoutOrder.limiter.tokens).toBe(3);

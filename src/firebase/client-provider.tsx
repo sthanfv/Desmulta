@@ -26,8 +26,11 @@ export function FirebaseClientProvider({ children }: FirebaseClientProviderProps
       if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY) {
         // Habilita el modo debug en localhost para que puedas seguir desarrollando sin bloqueos
         if (process.env.NODE_ENV === 'development') {
-          (window as Record<string, unknown>).FIREBASE_APPCHECK_DEBUG_TOKEN =
-            process.env.NEXT_PUBLIC_APPCHECK_DEBUG_TOKEN || true;
+          // 🛡️ Solo usar debug token explícito, nunca el boolean `true`
+          const debugToken = process.env.NEXT_PUBLIC_APPCHECK_DEBUG_TOKEN;
+          if (debugToken && debugToken !== 'true') {
+            (window as Record<string, unknown>).FIREBASE_APPCHECK_DEBUG_TOKEN = debugToken;
+          }
         }
 
         try {

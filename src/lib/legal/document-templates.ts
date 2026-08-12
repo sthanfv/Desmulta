@@ -1,3 +1,5 @@
+import { logger } from '@/lib/logger/security-logger';
+
 /**
  * DESMULTA — Base de Datos Legal de Documentos v3.0
  *
@@ -87,9 +89,7 @@ const getApoderado = () => {
   const id = process.env.OPERATOR_LEGAL_ID || process.env.DEFAULT_OPERATOR_ID;
   if (!name || !id) {
     if (process.env.NODE_ENV === 'production') {
-      console.warn(
-        '[Seguridad] OPERATOR_LEGAL_NAME o DEFAULT_OPERATOR_NAME no configurados. Usando fallback legal genérico.'
-      );
+      logger.warn('[Seguridad] Variables de operador legal no configuradas. Usando fallback genérico.');
       return 'Analista Legal de Apoyo Desmulta';
     }
     return 'Especialista en Tránsito de Prueba, C.C. No. 0000000000';
