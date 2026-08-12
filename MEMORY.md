@@ -180,7 +180,3 @@
 *   **[2026-08-11] Cierre de Auditoría Forense y Mantenimiento NPM**:
     *   **Inhabilitación SIMIT (Legal):** Se inhabilitó permanentemente el worker automatizado (`_simit-worker` -> 410 Gone) y el motor estocástico para asegurar cumplimiento estricto con las políticas estatales Anti-Bot, preservando únicamente la evaluación OCR de documentos provistos manualmente por el usuario.
     *   **Remediación de Terceros:** Se aplicó `npm audit fix` solucionando vulnerabilidades críticas y moderadas (CWE-79, CWE-22, CWE-96) en `postcss`, `sharp` y `serialize-javascript`. La suite de 521 pruebas finalizó con un 100% de éxito de integración.
-*   **[2026-08-11] Auditoría Táctica y Refactorización CRO (UX)**:
-    *   **Optimización del Embudo de Conversión:** Se eliminó el "Friction Wall" del `ResponsiveModal`. El `ConsultationForm` (Lector OCR) y el `PreQualifyWidget` ahora viven directamente en el `Hero` de la Landing Page.
-    *   **Mejora de Rendimiento Móvil (FCP):** Ambos formularios interactivos se convirtieron a `next/dynamic` (`ssr: false`), garantizando que la hidratación de la interfaz y la librería de OCR pesada no bloqueen la carga inicial en redes 3G.
-    *   **Transparencia de Precios:** Se añadió un bloque de aclaración de costos bajo el formulario para calificar los leads antes de que entren al flujo de pago de Wompi, protegiendo la reputación de la marca y la tasa de conversión final.

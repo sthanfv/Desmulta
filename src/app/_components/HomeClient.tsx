@@ -137,18 +137,14 @@ export default function HomeClient({
   }, [auth]);
 
   useEffect(() => {
-    const scrollToForm = () => {
-      document.getElementById('calculadora-hero')?.scrollIntoView({ behavior: 'smooth' });
-    };
-
     const params = new URLSearchParams(window.location.search);
     if (params.get('action') === 'consultar') {
-      setTimeout(scrollToForm, 500);
+      setIsModalOpen(true);
       window.history.replaceState({}, '', window.location.pathname);
     }
-    
-    window.addEventListener('open-consultation-modal', scrollToForm);
-    return () => window.removeEventListener('open-consultation-modal', scrollToForm);
+    const handleOpenModal = () => setIsModalOpen(true);
+    window.addEventListener('open-consultation-modal', handleOpenModal);
+    return () => window.removeEventListener('open-consultation-modal', handleOpenModal);
   }, []);
 
   const handleWhatsAppRedirect = () => {
@@ -173,7 +169,7 @@ export default function HomeClient({
       <Header
         onOpenModal={(mode) => {
           setFormMode(mode);
-          document.getElementById('calculadora-hero')?.scrollIntoView({ behavior: 'smooth' });
+          setIsModalOpen(true);
         }}
       />
         <Hero
@@ -205,7 +201,7 @@ export default function HomeClient({
         <CTA
           onConsultar={() => {
             setFormMode('full');
-            document.getElementById('calculadora-hero')?.scrollIntoView({ behavior: 'smooth' });
+            setIsModalOpen(true);
           }}
           onOpenSimitTutorial={() => setIsSimitTutorialOpen(true)}
         />
@@ -218,7 +214,47 @@ export default function HomeClient({
         />
       </div>
 
+      <ResponsiveModal
+        open={isModalOpen}
+        onOpenChange={(open) => {
+          setIsModalOpen(open);
+          if (!open) {
+            setFormMode('full');
+            setIsPreQualified(false);
+          }
+        }}
+        customHeader={true}
+      >
+        <div className="relative z-10">
+          {/* Glowing orbs optimizados con radial-gradient en lugar de blur para rendimiento móvil */}
+          <div className="absolute -top-40 -left-40 w-96 h-96 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 to-transparent rounded-full -z-10 pointer-events-none" />
+          <div className="absolute top-40 -right-40 w-96 h-96 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-500/10 to-transparent rounded-full -z-10 pointer-events-none" />
 
+          <div className="mb-8 md:mb-10 text-center relative z-10">
+            <h2 className="text-3xl md:text-4xl font-black text-foreground tracking-tight">
+              {formMode === 'simit' ? 'Envío Rápido SIMIT' : 'Estudio de Viabilidad'}
+            </h2>
+            <p className="text-muted-foreground mt-2 md:mt-3 font-medium text-sm md:text-lg">
+              {formMode === 'simit'
+                ? 'Sube tu captura del SIMIT y déjanos tu WhatsApp.'
+                : 'Recibiremos su información para un análisis técnico detallado.'}
+            </p>
+          </div>
+          <div className="relative z-10">
+            <ErrorBoundary>
+              {formMode === 'full' && !isPreQualified ? (
+                <PreQualifyWidget onQualify={() => setIsPreQualified(true)} />
+              ) : (
+                <ConsultationForm
+                  onSuccess={() => setIsModalOpen(false)}
+                  mode={formMode}
+                  nonce={nonce}
+                />
+              )}
+            </ErrorBoundary>
+          </div>
+        </div>
+      </ResponsiveModal>
 
       {/* Floating Elements (WhatsApp & ScrollTop) */}
       {/* MANDATO-FILTRO v7.4.3: safe-area-inset-bottom respeta la barra de gestos nativa de Android */}
