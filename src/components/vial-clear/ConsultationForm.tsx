@@ -698,6 +698,9 @@ export function ConsultationForm({ onSuccess, mode = 'full', nonce }: Consultati
   return (
     <>
       <Form {...form}>
+        <div className="mb-4 text-center text-xs md:text-sm text-muted-foreground bg-primary/5 p-3 rounded-xl border border-primary/10">
+          El análisis inicial con IA es <strong className="text-foreground">100% gratuito</strong>. Si tu caso es viable, la generación del documento legal oficial tiene un costo de <strong className="text-foreground">$39.000 COP</strong>.
+        </div>
         <form
           onSubmit={(e) => {
             e.preventDefault();
