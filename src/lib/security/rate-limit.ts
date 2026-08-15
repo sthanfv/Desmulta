@@ -59,6 +59,7 @@ export const rateLimiters = {
   vipAuth: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(5, '15 m') }),
   telemetry: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(3, '24 h') }),
   crashReport: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(20, '1 m') }),
+  escudoSimit: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(2, '1 m') }),
 
   // 🛡️ Cubetas adicionales para evitar bloqueo cruzado entre endpoints
   referral: new Ratelimit({
@@ -127,6 +128,7 @@ export async function checkRateLimit(type: RateLimitType, identifier: string) {
       'referidos',
       'telemetry',
       'crashReport',
+      'escudoSimit',
     ];
     const shouldFailOpen = failOpenBuckets.includes(type);
 

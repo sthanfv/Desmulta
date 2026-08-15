@@ -172,7 +172,7 @@ export const useExpedienteStore = create<ExpedienteState>()(
           if (!stored) return null;
           try {
             return await decryptFromStorage(stored as string);
-          } catch (e) {
+          } catch (_e) {
             // Retrocompatibilidad: si no se puede descifrar (posiblemente porque estaba en texto plano),
             // se retorna el valor original para que Zustand lo parsee y luego se guarde cifrado.
             return stored as string;

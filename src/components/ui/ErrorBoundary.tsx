@@ -37,7 +37,10 @@ export class ErrorBoundary extends Component<Props, State> {
           message: (error.message || 'Error desconocido').substring(0, 500),
           stack: error.stack?.substring(0, 2000),
           componentStack: errorInfo.componentStack?.substring(0, 2000),
-          path: typeof window !== 'undefined' ? (window.location.pathname + window.location.search).substring(0, 256) : '/unknown',
+          path:
+            typeof window !== 'undefined'
+              ? (window.location.pathname + window.location.search).substring(0, 256)
+              : '/unknown',
         }),
         keepalive: true,
       }).catch(() => {

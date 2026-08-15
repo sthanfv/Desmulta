@@ -3,17 +3,10 @@ import { logger } from '@/lib/logger/security-logger';
 import { upsertSubscription } from '@/lib/data/simit-subscriptions';
 import { resend } from '@/lib/resend';
 import { buildEscudoSimitEmail } from '@/lib/email-templates/simit-alert';
-import { Ratelimit } from '@upstash/ratelimit';
-import { Redis } from '@upstash/redis';
+import { checkRateLimit } from '@/lib/security/rate-limit';
+import { BusinessCache } from '@/lib/cache/redis-business';
 
 export const maxDuration = 60; // Forzar timeout Vercel a 60s para soportar el scraper SIMIT
-
-// Instanciar Rate Limiter (Máximo 2 peticiones por minuto por IP) para mitigar DDoS aplicativo
-const ratelimit = new Ratelimit({
-  redis: Redis.fromEnv(),
-  limiter: Ratelimit.slidingWindow(2, '1 m'),
-  analytics: true,
-});
 
 /**
  * POST /api/escudo-simit/activate
@@ -30,10 +23,10 @@ export async function POST(request: NextRequest) {
     // Extraer IP para aplicar el Rate Limit de forma determinista
     const ip = request.headers.get('x-forwarded-for') ?? '127.0.0.1';
 
-    // Verificamos en Upstash Redis si la IP superó la cuota
-    const { success, reset } = await ratelimit.limit(`ratelimit_escudo_${ip}`);
+    // 🛡️ FIX: Utilizar el motor centralizado de rate limit (Fail-Open/Fail-Closed)
+    const rateLimit = await checkRateLimit('escudoSimit', ip);
 
-    if (!success) {
+    if (rateLimit.blocked) {
       logger.warn('[escudo-simit] Bloqueo por Rate Limit Excedido (Ataque de Concurrencia)', {
         ip,
       });
@@ -41,7 +34,9 @@ export async function POST(request: NextRequest) {
         { error: 'Demasiadas solicitudes. Por favor, espera 1 minuto antes de volver a intentar.' },
         {
           status: 429,
-          headers: { 'Retry-After': Math.ceil((reset - Date.now()) / 1000).toString() },
+          headers: {
+            'Retry-After': Math.ceil((rateLimit.resetTime - Date.now()) / 1000).toString(),
+          },
         }
       );
     }
@@ -112,6 +107,42 @@ export async function POST(request: NextRequest) {
       throw new Error('Variables de entorno del scraper SIMIT no configuradas.');
     }
 
+    // 🛡️ CAPA CACHÉ DE NEGOCIO (Upstash Redis) - Ahorro en Cloud Run
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const cachedSimit = await BusinessCache.get<any>('simit-scraper', { cedula });
+    if (cachedSimit) {
+      // 🛡️ FIX: Enviar correo de bienvenida INCLUSO si la respuesta viene de caché
+      try {
+        const emailHtml = buildEscudoSimitEmail(cedula, cachedSimit, true);
+        await resend.emails.send({
+          from: 'Desmulta Escudo SIMIT <alerta@desmulta.online>',
+          to: email,
+          subject: `🛡️ Escudo SIMIT Activado — ${cachedSimit.resumen?.totalMultas ?? 0} multa(s) detectada(s)`,
+          html: emailHtml,
+        });
+        logger.info('[escudo-simit] Email de bienvenida enviado desde caché', { email });
+      } catch (emailError) {
+        logger.warn('[escudo-simit] Fallo al enviar email de bienvenida desde caché', {
+          error: String(emailError),
+        });
+      }
+
+      // Retornar directamente desde la caché si alguien ya consultó esta cédula
+      return NextResponse.json(
+        {
+          success: true,
+          data: cachedSimit,
+        },
+        { headers: { 'X-Cache': 'HIT' } }
+      );
+    }
+
+    // 🧨 CAOS ENGINEERING: Simular Timeout en SIMIT
+    if (process.env.CHAOS_SIMULATE_SIMIT_TIMEOUT?.replace(/"/g, '') === 'true') {
+      logger.warn('[escudo-simit] 🧨 CHAOS: Simulando Timeout de SIMIT Scraper');
+      throw new Error('Simulación de Timeout SIMIT (Chaos Engineering)');
+    }
+
     const scraperResponse = await fetch(scraperUrl, {
       method: 'POST',
       headers: {
@@ -133,6 +164,9 @@ export async function POST(request: NextRequest) {
     }
 
     const resultado = scraperData.results[0].data;
+
+    // Guardar en Caché por 6 horas (21600 segundos) para mitigar costos si el mismo usuario recarga
+    await BusinessCache.set('simit-scraper', { cedula }, resultado, 21600);
 
     // ── Enviar email de bienvenida con resultados ───────────────────
     try {

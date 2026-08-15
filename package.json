@@ -27,7 +27,8 @@
     "test:smoke": "firebase emulators:exec \"cross-env USE_FIREBASE_EMULATOR=true NEXT_PUBLIC_USE_FIREBASE_EMULATOR=true playwright test tests/e2e/smoke.test.ts\" --only firestore --config firebase.test.json",
     "blog:sync": "ts-node --skip-project -O \"{\\\"module\\\":\\\"commonjs\\\"}\" scripts/sync-blog-rss.ts",
     "repair:admins": "ts-node --skip-project -O \"{\\\"module\\\":\\\"commonjs\\\"}\" scripts/repair-admin-docs.ts",
-    "docs:lint": "markdownlint README.md CONTRIBUTING.md CHANGELOG.md docs/*.md"
+    "docs:lint": "markdownlint README.md CONTRIBUTING.md CHANGELOG.md docs/*.md",
+    "prepare": "husky"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -135,7 +136,9 @@
     "eslint": "^9",
     "eslint-config-next": "^16.2.3",
     "eslint-plugin-security": "^4.0.0",
+    "husky": "^9.1.7",
     "jsdom": "^29.0.1",
+    "lint-staged": "^17.3.0",
     "markdownlint-cli": "^0.48.0",
     "postcss": "^8",
     "prettier": "^3.8.1",
@@ -143,5 +146,14 @@
     "ts-node": "^10.9.2",
     "typescript": "^5",
     "vitest": "^4.1.8"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --max-warnings 0",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
   }
 }

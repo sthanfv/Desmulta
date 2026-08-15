@@ -1,4 +1,4 @@
-import { getBogotaHour, shouldExecuteWorker, getRandomBatchSize } from '../stochastic-engine';
+import { shouldExecuteWorker, getRandomBatchSize } from '../stochastic-engine';
 
 describe('Motor Estocástico (Stochastic Engine) - DEPRECATED', () => {
   it('shouldExecuteWorker siempre debe retornar execute: false por cumplimiento legal', () => {

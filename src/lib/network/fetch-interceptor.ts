@@ -24,7 +24,7 @@ export async function fetchWithTrace(
       headersList.get('x-trace-id') || headersList.get('x-vercel-id') || crypto.randomUUID();
     host = headersList.get('host') || 'desmulta.online';
     userAgent = headersList.get('user-agent') || 'Unknown';
-  } catch (e) {
+  } catch (_e) {
     // Silencioso: Si falla (ej. en un contexto donde headers() no está disponible) seguimos adelante
   }
 
@@ -46,7 +46,7 @@ export async function fetchWithTrace(
       try {
         const errorJson = await response.json();
         errorDetails = JSON.stringify(errorJson, null, 2);
-      } catch (jsonErr) {
+      } catch (_jsonErr) {
         errorDetails = await response.text();
       }
 
@@ -69,7 +69,7 @@ export async function fetchWithTrace(
     }
 
     return response;
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Si hay un error de red (Timeout, DNS, etc.)
     const alertContext = {
       traceId,
@@ -77,7 +77,7 @@ export async function fetchWithTrace(
       userAgent,
       microservice: options.microserviceName,
       endpoint: url.toString(),
-      error: error.message || String(error),
+      error: error instanceof Error ? error.message : String(error),
       payload: options.originalPayload || 'N/A',
     };
 

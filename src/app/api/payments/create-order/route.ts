@@ -30,6 +30,7 @@ import { checkRateLimit } from '@/lib/security/rate-limit';
 import { hashPII } from '@/lib/security/server-crypto';
 import { createHash } from 'crypto';
 import { PRODUCT_PRICES } from '@/lib/payments/product-prices';
+import { logger } from '@/lib/logger/security-logger';
 
 const schema = z.object({
   productType: z.enum([
@@ -90,6 +91,15 @@ export async function POST(req: NextRequest) {
         status: 429,
         headers: { 'Retry-After': secondsRemaining.toString() },
       }
+    );
+  }
+
+  // 🧨 CAOS ENGINEERING: Simular Caída de Pasarela de Pagos (Wompi)
+  if (process.env.CHAOS_SIMULATE_WOMPI_DOWN?.replace(/"/g, '') === 'true') {
+    logger.warn('[create-order] 🧨 CHAOS: Simulando Caída de Banco Wompi');
+    return NextResponse.json(
+      { error: 'Simulación de Caída de Banco Wompi (Chaos Engineering)' },
+      { status: 503 }
     );
   }
 

@@ -12,7 +12,7 @@ import { logger } from '@/lib/logger/security-logger';
  *
  * Esta función queda estrictamente como un MOCK inactivo.
  */
-export async function sendOtpSms(celular: string, otpCode: string): Promise<void> {
+export async function sendOtpSms(celular: string, _otpCode: string): Promise<void> {
   logger.warn('[SMS Mock] Intento de envío OTP bloqueado — infraestructura SMS inactiva.', {
     celularSufijo: celular.slice(-4),
   });

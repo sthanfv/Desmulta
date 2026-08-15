@@ -1,0 +1,2 @@
+echo "🛡️ Pilar 4: Corriendo red de seguridad pre-push (Tests Unitarios)..."
+npm run test:local

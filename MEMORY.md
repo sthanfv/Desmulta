@@ -317,3 +317,9 @@ Se implementó y verificó un sistema de "Cámaras" (Traceability) end-to-end en
 2. **Caché de Negocio (FinOps):** Upstash Redis para cachear respuestas de OCR y Calculadora Go.
 3. **Ingeniería del Caos (Chaos Engineering):** Banderas ocultas para simular fallas en Wompi, OCR y Firebase.
 4. **Pipeline CI/CD Estricto:** Bloqueo de merges si hay fallas en tests, builds o auditorías NPM.
+
+### 🟢 [2026-08-14] PILAR 2: Caché de Negocio (COMPLETADO)
+Se implementó el patrón Cache-Aside usando Upstash Redis para proteger los motores pesados.
+- **Seguridad (Zero-Trust):** Las llaves de caché se generan mediante un hash determinista en el lado del servidor (src/lib/cache/redis-business.ts), aislando por completo la memoria de manipulaciones vía cliente (F12).
+- **Calculadora (Go):** Se interceptaron las llamadas en calcular-multa/route.ts guardando los JSON de Go por 24 horas.
+- **Scraper SIMIT:** Se inyectó caché en scudo-simit/activate/route.ts con TTL de 6 horas para mitigar facturación redundante en Cloud Run.

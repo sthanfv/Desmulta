@@ -4,8 +4,19 @@
  */
 /* eslint-disable security/detect-unsafe-regex */
 import * as Sentry from '@sentry/nextjs';
+import { Client as QStashClient } from '@upstash/qstash';
 
-const escapeHTML = (str: string) => str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const escapeHTML = (str: string) =>
+  str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+const safeStringify = (obj: unknown): string => {
+  if (obj === undefined) return '';
+  try {
+    return JSON.stringify(obj, null, 2);
+  } catch (_err) {
+    return '[Error de serialización: Objeto Circular o Inválido]';
+  }
+};
 
 /**
  * Filtro de seguridad MANDATO-FILTRO:
@@ -56,7 +67,14 @@ const getFingerprint = (contexto: string): string[] => {
  * Envía una alerta técnica directa al chat de Telegram de Soporte (MANDATO-FILTRO)
  * Formato Vercel-Style con Trace ID, Host, Path y Error exacto.
  */
-const sendTelegramAlert = (contexto: string, mensaje: string, rawContextData?: any, sentryEventId?: string) => {
+
+const sendTelegramAlert = (
+  contexto: string,
+  mensaje: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  rawContextData?: any,
+  sentryEventId?: string
+) => {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_DEV_CHAT_ID || process.env.TELEGRAM_SECURITY_CHAT_ID;
 
@@ -85,20 +103,20 @@ const sendTelegramAlert = (contexto: string, mensaje: string, rawContextData?: a
 `;
     let safePayload = '';
     let stackTraceSection = '';
-    
+
     if (payload && (payload.stack || payload.componentStack)) {
-       const { stack, componentStack, ...restPayload } = payload;
-       if (Object.keys(restPayload).length > 0) {
-           safePayload = `\n📦 <b>PAYLOAD RECIBIDO:</b>\n<pre>${escapeHTML(sanitizarPII(JSON.stringify(restPayload, null, 2)))}</pre>`;
-       }
-       if (stack) {
-           stackTraceSection += `\n🛑 <b>STACK TRACE (Línea Exacta):</b>\n<pre>${escapeHTML(sanitizarPII(String(stack)))}</pre>`;
-       }
-       if (componentStack) {
-           stackTraceSection += `\n⚛️ <b>COMPONENT STACK:</b>\n<pre>${escapeHTML(sanitizarPII(String(componentStack)))}</pre>`;
-       }
+      const { stack, componentStack, ...restPayload } = payload;
+      if (Object.keys(restPayload).length > 0) {
+        safePayload = `\n📦 <b>PAYLOAD RECIBIDO:</b>\n<pre>${escapeHTML(sanitizarPII(safeStringify(restPayload)))}</pre>`;
+      }
+      if (stack) {
+        stackTraceSection += `\n🛑 <b>STACK TRACE (Línea Exacta):</b>\n<pre>${escapeHTML(sanitizarPII(String(stack)))}</pre>`;
+      }
+      if (componentStack) {
+        stackTraceSection += `\n⚛️ <b>COMPONENT STACK:</b>\n<pre>${escapeHTML(sanitizarPII(String(componentStack)))}</pre>`;
+      }
     } else {
-       safePayload = `\n📦 <b>PAYLOAD RECIBIDO:</b>\n<pre>${escapeHTML(sanitizarPII(JSON.stringify(payload || {}, null, 2)))}</pre>`;
+      safePayload = `\n📦 <b>PAYLOAD RECIBIDO:</b>\n<pre>${escapeHTML(sanitizarPII(safeStringify(payload || {})))}</pre>`;
     }
 
     errorSection = `
@@ -110,27 +128,78 @@ const sendTelegramAlert = (contexto: string, mensaje: string, rawContextData?: a
 
   let sentrySection = '';
   if (sentryEventId) {
-    sentrySection = `\n\n🛠 <b>Modo Dios (Sentry):</b>\n<a href="https://sentry.io/issues/?query=${sentryEventId}">Ver Volcado de Memoria y Source Maps</a>`;
+    const org = process.env.SENTRY_ORG_SLUG || 'tu-organizacion';
+    sentrySection = `\n\n🛠 <b>Modo Dios (Sentry):</b>\nBusca este ID en Sentry: <code>${sentryEventId}</code>\n<a href="https://sentry.io/organizations/${org}/issues/?query=${sentryEventId}">Intentar enlace directo</a>`;
   }
 
-  const text = `🚨 <b>ALERTA CRÍTICA: ${contexto}</b>
+  let text = `🚨 <b>ALERTA CRÍTICA: ${contexto}</b>
 -------------------------------------------${traceSection}
 ${errorSection}${sentrySection}`;
 
-  fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' }),
-  }).catch((err) => console.error('[TELEGRAM_FAIL] No se pudo alertar a Telegram:', err));
+  // 🛡️ TELEGRAM LIMIT: Telegram rechaza mensajes de más de 4096 caracteres.
+  if (text.length > 4000) {
+    // Si truncamos a lo bruto, podemos cortar una etiqueta HTML (ej: <pre>) y Telegram rechazará el mensaje.
+    const cleanText = text.substring(0, 3900).replace(/<[^>]*>?/gm, '');
+    text = `🚨 <b>ALERTA CRÍTICA TRUNCADA</b> 🚨\n\n${cleanText}\n\n[...MENSAJE TRUNCADO Y SIN FORMATO POR LÍMITE DE TELEGRAM...]`;
+  }
+
+  const targetUrl = `https://api.telegram.org/bot${token}/sendMessage`;
+  const payload = { chat_id: chatId, text, parse_mode: 'HTML' };
+  const qstashToken = process.env.QSTASH_TOKEN;
+
+  const sendPromise = (async () => {
+    if (qstashToken) {
+      // DLQ y Retry automático si Telegram se cae, pero con Fallback si QStash se cae
+      const qstash = new QStashClient({ token: qstashToken });
+      await qstash
+        .publishJSON({
+          url: targetUrl,
+          body: payload,
+        })
+        .catch((err) => {
+          console.error(
+            '[TELEGRAM_QSTASH_FAIL] Error al encolar alerta en QStash. Fallback directo activado:',
+            err
+          );
+          // Fallback directo a Telegram si Upstash falla
+          return fetch(targetUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          }).catch((fallbackErr) =>
+            console.error(
+              '[TELEGRAM_FAIL] Fallback de envío directo a Telegram también falló:',
+              fallbackErr
+            )
+          );
+        });
+    } else {
+      // Fallback sincrónico para desarrollo si no hay token de QStash
+      await fetch(targetUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      }).catch((err) => console.error('[TELEGRAM_FAIL] No se pudo alertar a Telegram:', err));
+    }
+  })();
+
+  // 🛡️ FIX: Prevenir que Vercel cancele la petición a Telegram al cerrar la conexión http (Orphaned Promise)
+  import('@vercel/functions')
+    .then(({ waitUntil }) => {
+      waitUntil(sendPromise);
+    })
+    .catch(() => {
+      // Entorno no-Vercel (ej. local/Vitest), la promesa sigue viva en Node Event Loop
+    });
 };
 
 export const SecurityLogger = {
   info: (contexto: string, datos?: unknown) => {
-    const logSanitizado = sanitizarPII(JSON.stringify(datos || {}));
+    const logSanitizado = sanitizarPII(safeStringify(datos));
     console.info(`[INFO] ${contexto}:`, logSanitizado);
   },
   warn: (contexto: string, datos?: unknown) => {
-    const logSanitizado = sanitizarPII(JSON.stringify(datos || {}));
+    const logSanitizado = sanitizarPII(safeStringify(datos));
     console.warn(`[WARN] ${contexto}:`, logSanitizado);
 
     const fp = getFingerprint(contexto);
@@ -143,7 +212,7 @@ export const SecurityLogger = {
     });
   },
   error: (contexto: string, datos?: unknown) => {
-    const logSanitizado = sanitizarPII(JSON.stringify(datos || {}));
+    const logSanitizado = sanitizarPII(safeStringify(datos));
     console.error(`[ERROR] ${contexto}:`, logSanitizado);
 
     let eventId = '';
@@ -160,7 +229,7 @@ export const SecurityLogger = {
     sendTelegramAlert(contexto, logSanitizado, datos, eventId);
   },
   security: (contexto: string, datos?: unknown) => {
-    const logSanitizado = sanitizarPII(JSON.stringify(datos || {}));
+    const logSanitizado = sanitizarPII(safeStringify(datos));
     console.warn(`[SECURITY EVENT] ${contexto}:`, logSanitizado);
 
     // Los eventos de seguridad siempre van a Sentry

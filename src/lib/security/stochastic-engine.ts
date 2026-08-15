@@ -27,8 +27,8 @@ export function getBogotaHour(date: Date): number {
  * Retorna siempre { execute: false } para bloquear cualquier intento de ejecución.
  */
 export function shouldExecuteWorker(
-  date: Date,
-  probability: number
+  _date: Date,
+  _probability: number
 ): { execute: boolean; reason?: string } {
   console.warn('[COMPLIANCE] Intento de usar Motor Estocástico bloqueado.');
   return { execute: false, reason: 'bloqueo_por_compliance_legal' };
@@ -38,7 +38,7 @@ export function shouldExecuteWorker(
  * @deprecated ELIMINADO POR COMPLIANCE ANTI-SCRAPING
  * Retorna siempre 0.
  */
-export function getRandomBatchSize(min: number, max: number): number {
+export function getRandomBatchSize(_min: number, _max: number): number {
   console.warn('[COMPLIANCE] Intento de generar lotes de scraping bloqueado.');
   return 0;
 }

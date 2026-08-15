@@ -20,11 +20,6 @@ const CrashPayloadSchema = z.object({
 const MAX_REQUESTS_PER_WINDOW = 50;
 const WINDOW_MS = 60 * 1000; // 1 minuto por IP
 
-function escapeHTML(text: string): string {
-  if (!text) return '';
-  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-
 export async function POST(req: Request) {
   try {
     // 🛡️ F-04 DEVSECOPS: Autenticación del endpoint interno
@@ -105,7 +100,7 @@ export async function POST(req: Request) {
         payload: {
           stack: data.stack,
           componentStack: data.componentStack,
-        }
+        },
       });
     };
 

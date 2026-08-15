@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit } from '@/lib/security/rate-limit';
+import { BusinessCache } from '@/lib/cache/redis-business';
 import crypto from 'crypto';
 import { z } from 'zod';
 
@@ -55,13 +56,18 @@ export async function POST(request: NextRequest) {
 
     const rawBody = await request.json();
 
-    // 🛡️ FIX HALLAZGO #6: Validar y filtrar antes de reenviar al motor Go
     const parsed = ProxySchema.safeParse(rawBody);
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Datos de entrada inválidos para el cálculo.' },
         { status: 400 }
       );
+    }
+
+    // 🛡️ CAPA CACHÉ DE NEGOCIO (Upstash Redis) - Ahorro de CPU de Go
+    const cachedResponse = await BusinessCache.get('go-engine', parsed.data);
+    if (cachedResponse) {
+      return NextResponse.json(cachedResponse, { status: 200, headers: { 'X-Cache': 'HIT' } });
     }
 
     // 🛡️ FIX HALLAZGO #1 + #10: Sin fallbacks hardcodeados. Fail-Closed si falta configuración.
@@ -106,8 +112,11 @@ export async function POST(request: NextRequest) {
 
     const goJson = await goResponse.json();
 
+    // Guardar en Caché por 24 horas (86400 segundos) para futuras peticiones iguales
+    await BusinessCache.set('go-engine', parsed.data, goJson, 86400);
+
     // Retornamos directamente lo que dijo Go
-    return NextResponse.json(goJson, { status: 200 });
+    return NextResponse.json(goJson, { status: 200, headers: { 'X-Cache': 'MISS' } });
   } catch (error: unknown) {
     // 🛡️ FIX HALLAZGO #4: Registrar el error internamente, nunca exponerlo al cliente.
     const mensaje = error instanceof Error ? error.message : String(error);

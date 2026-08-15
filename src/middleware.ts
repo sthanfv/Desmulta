@@ -223,6 +223,18 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(loginUrl);
       }
 
+      // 🧨 CAOS ENGINEERING: Simular pérdida repentina de sesión Firebase
+      if (process.env.CHAOS_SIMULATE_AUTH_DROP?.replace(/"/g, '') === 'true') {
+        console.warn(
+          '[Middleware /admin] 🧨 CHAOS: Simulando pérdida de sesión de Firebase Auth Drop'
+        );
+        const loginUrl = new URL('/acceso-panel', request.url);
+        loginUrl.search = request.nextUrl.search;
+        const response = NextResponse.redirect(loginUrl);
+        response.cookies.delete('__session');
+        return response;
+      }
+
       // 🛡️ 2FA OTP Guard: Si es admin y no está en test, verificar la cookie `admin-2fa-token` y su firma JWT
       const isE2E_2FA = process.env.E2E_TEST_MODE === 'true';
       if (!isE2E_2FA) {
