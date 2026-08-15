@@ -1,1 +1,1 @@
-const test: number = 'string';
+const x: number = 'texto';
