@@ -45,6 +45,7 @@
     "functions/**/*",
     "src/tests",
     "playwright.config.ts",
-    "vitest.config.ts"
+    "vitest.config.ts",
+    "scripts/sandbox"
   ]
 }

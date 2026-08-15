@@ -80,6 +80,7 @@ test-pdf.ts
 test-pdf2.ts
 test-strings.js
 scratch/
+scripts/sandbox/
 
 # Archivos de debug y recuperación — NUNCA deben subirse al repositorio
 # (pueden contener datos de Firestore, tokens, o estructuras internas sensibles)
@@ -95,8 +96,8 @@ eslint_output3.txt
 lint_output.txt
 test_output.txt
 
-# Documentación interna (Protección Comercial de Propiedad Intelectual)
-MEMORY.md
-README.md
-ARCHITECTURE.md
-docs/
+# Documentación interna (AHORA FORMA PARTE DEL SISTEMA VERSIONADO)
+# MEMORY.md
+# README.md
+# ARCHITECTURE.md
+# docs/
