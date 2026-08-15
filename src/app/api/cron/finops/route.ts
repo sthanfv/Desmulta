@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import { timingSafeEqual } from 'crypto';
 import { logger } from '@/lib/logger/security-logger';
 
-
 /**
  * 🛡️ AUDITORÍA 2026-08-01: E-NX-01 - Monitoreo de Costos FinOps
  * Cron job destinado a ejecutarse semanalmente para monitorear el gasto de Firestore y Upstash.

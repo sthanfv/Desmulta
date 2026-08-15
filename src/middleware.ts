@@ -68,11 +68,19 @@ export async function middleware(request: NextRequest) {
     );
   }
 
-  // ── 1. Headers de ciudad (geolocalización Vercel, costo $0) ──────────────
+  // ── 1. Headers de ciudad (geolocalización Vercel, costo $0) y Trazabilidad ──────────────
   const ciudadUsuario =
     request.headers.get('x-vercel-ip-city') || process.env.DEV_CIUDAD_OVERRIDE || 'Colombia';
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set('x-ciudad-usuario', ciudadUsuario);
+
+  // Pilar 1: Trazabilidad Distribuida (Trace ID)
+  // Reutilizamos el ID de Vercel si existe, si no generamos uno estándar (UUIDv4)
+  let traceId = request.headers.get('x-vercel-id') || request.headers.get('x-trace-id');
+  if (!traceId) {
+    traceId = crypto.randomUUID();
+  }
+  requestHeaders.set('x-trace-id', traceId);
 
   // ── 2. Geobloqueo por país (x-vercel-ip-country, $0 en Vercel) ───────────
   // Solo Colombia (CO) tiene acceso. Rutas internas server-to-server y

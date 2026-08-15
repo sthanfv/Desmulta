@@ -34,6 +34,7 @@ export default function GlobalError({
         },
         body: JSON.stringify({
           message: error.message,
+          stack: error.stack?.substring(0, 2000),
           digest: error.digest,
           path: window.location.pathname + window.location.search,
         }),

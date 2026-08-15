@@ -5,6 +5,8 @@
 /* eslint-disable security/detect-unsafe-regex */
 import * as Sentry from '@sentry/nextjs';
 
+const escapeHTML = (str: string) => str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
 /**
  * Filtro de seguridad MANDATO-FILTRO:
  * Sanitiza cualquier cadena de texto reemplazando PII con asteriscos.
@@ -52,8 +54,9 @@ const getFingerprint = (contexto: string): string[] => {
 
 /**
  * Envía una alerta técnica directa al chat de Telegram de Soporte (MANDATO-FILTRO)
+ * Formato Vercel-Style con Trace ID, Host, Path y Error exacto.
  */
-const sendTelegramAlert = (contexto: string, mensaje: string) => {
+const sendTelegramAlert = (contexto: string, mensaje: string, rawContextData?: any, sentryEventId?: string) => {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_DEV_CHAT_ID || process.env.TELEGRAM_SECURITY_CHAT_ID;
 
@@ -66,7 +69,53 @@ const sendTelegramAlert = (contexto: string, mensaje: string) => {
     hour12: true,
   }).format(new Date());
 
-  const text = `🚨 <b>ERROR DEL SISTEMA: Desmulta</b>\n📍 <b>Origen:</b> <code>${contexto}</code>\n⚠️ <b>Detalle:</b>\n<pre>${mensaje}</pre>\n⏱ <b>Fecha:</b> ${fechaAmigable}`;
+  // Extraer metadata estilo Vercel si existe
+  let traceSection = '';
+  let errorSection = `<pre>${mensaje}</pre>`;
+
+  if (rawContextData && typeof rawContextData === 'object' && rawContextData.traceId) {
+    const { traceId, host, userAgent, endpoint, error, payload } = rawContextData;
+
+    traceSection = `
+🆔 <b>Request ID:</b> <code>${traceId || 'N/A'}</code>
+📍 <b>Path/Endpoint:</b> <code>${endpoint || 'N/A'}</code>
+💻 <b>User Agent:</b> <code>${userAgent || 'N/A'}</code>
+🌐 <b>Host:</b> <code>${host || 'N/A'}</code>
+⏱ <b>Fecha:</b> ${fechaAmigable}
+`;
+    let safePayload = '';
+    let stackTraceSection = '';
+    
+    if (payload && (payload.stack || payload.componentStack)) {
+       const { stack, componentStack, ...restPayload } = payload;
+       if (Object.keys(restPayload).length > 0) {
+           safePayload = `\n📦 <b>PAYLOAD RECIBIDO:</b>\n<pre>${escapeHTML(sanitizarPII(JSON.stringify(restPayload, null, 2)))}</pre>`;
+       }
+       if (stack) {
+           stackTraceSection += `\n🛑 <b>STACK TRACE (Línea Exacta):</b>\n<pre>${escapeHTML(sanitizarPII(String(stack)))}</pre>`;
+       }
+       if (componentStack) {
+           stackTraceSection += `\n⚛️ <b>COMPONENT STACK:</b>\n<pre>${escapeHTML(sanitizarPII(String(componentStack)))}</pre>`;
+       }
+    } else {
+       safePayload = `\n📦 <b>PAYLOAD RECIBIDO:</b>\n<pre>${escapeHTML(sanitizarPII(JSON.stringify(payload || {}, null, 2)))}</pre>`;
+    }
+
+    errorSection = `
+🔥 <b>DETALLE DEL ERROR:</b>
+<pre>${escapeHTML(sanitizarPII(String(error || mensaje)))}</pre>${stackTraceSection}${safePayload}`;
+  } else {
+    traceSection = `⏱ <b>Fecha:</b> ${fechaAmigable}`;
+  }
+
+  let sentrySection = '';
+  if (sentryEventId) {
+    sentrySection = `\n\n🛠 <b>Modo Dios (Sentry):</b>\n<a href="https://sentry.io/issues/?query=${sentryEventId}">Ver Volcado de Memoria y Source Maps</a>`;
+  }
+
+  const text = `🚨 <b>ALERTA CRÍTICA: ${contexto}</b>
+-------------------------------------------${traceSection}
+${errorSection}${sentrySection}`;
 
   fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
     method: 'POST',
@@ -97,16 +146,18 @@ export const SecurityLogger = {
     const logSanitizado = sanitizarPII(JSON.stringify(datos || {}));
     console.error(`[ERROR] ${contexto}:`, logSanitizado);
 
-    // Enviar a Telegram Inmediatamente
-    sendTelegramAlert(contexto, logSanitizado);
-
-    // Capturar en Sentry para visibilidad en producción
-    if (process.env.NODE_ENV === 'production') {
-      Sentry.captureMessage(`${contexto}: ${logSanitizado}`, {
+    let eventId = '';
+    // Capturar en Sentry para visibilidad profunda (Source Maps, Dumps)
+    // Se activa si hay DSN configurado (incluso en dev para pruebas) o en producción
+    if (process.env.NODE_ENV === 'production' || process.env.NEXT_PUBLIC_SENTRY_DSN) {
+      eventId = Sentry.captureMessage(`${contexto}: ${logSanitizado}`, {
         level: 'error',
         fingerprint: getFingerprint(contexto),
       });
     }
+
+    // Enviar a Telegram Inmediatamente (Pasando los datos crudos para formato Vercel y el Sentry ID)
+    sendTelegramAlert(contexto, logSanitizado, datos, eventId);
   },
   security: (contexto: string, datos?: unknown) => {
     const logSanitizado = sanitizarPII(JSON.stringify(datos || {}));

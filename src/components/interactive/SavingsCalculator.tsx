@@ -308,9 +308,12 @@ export function SavingsCalculator() {
               <div className="bg-red-500/10 border border-red-500/20 p-6 rounded-2xl flex flex-col items-center text-center gap-4 max-w-sm shadow-2xl">
                 <AlertOctagon className="w-12 h-12 text-red-500 shrink-0" />
                 <div>
-                  <h4 className="font-bold text-red-600 dark:text-red-400 mb-2 text-lg">Límite Alcanzado</h4>
+                  <h4 className="font-bold text-red-600 dark:text-red-400 mb-2 text-lg">
+                    Límite Alcanzado
+                  </h4>
                   <p className="text-sm text-red-700/80 dark:text-red-300/80 mb-4 leading-relaxed">
-                    Para garantizar que esta herramienta sea gratuita para todos, permitimos 10 consultas por día.
+                    Para garantizar que esta herramienta sea gratuita para todos, permitimos 10
+                    consultas por día.
                   </p>
                   <p className="text-sm font-bold text-red-700 dark:text-red-400">
                     Intenta de nuevo en:
@@ -323,10 +326,7 @@ export function SavingsCalculator() {
           )}
 
           {/* --- CONTROLES FINANCIEROS Y TIEMPO (DOBLE INTERFAZ) --- */}
-          <Tabs
-            defaultValue="slider"
-            className="w-full space-y-6"
-          >
+          <Tabs defaultValue="slider" className="w-full space-y-6">
             <TabsList className="grid w-full grid-cols-2 bg-foreground/10 p-1 rounded-xl">
               <TabsTrigger
                 value="slider"

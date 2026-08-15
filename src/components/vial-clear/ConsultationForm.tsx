@@ -427,7 +427,10 @@ export function ConsultationForm({ onSuccess, mode = 'full', nonce }: Consultati
 
         if (!edgeValidation.ok) {
           if (edgeValidation.status === 429) {
-            handleRateLimitResponse(edgeValidation, edgeResult?.message || 'Demasiadas peticiones. Intenta en unos minutos.');
+            handleRateLimitResponse(
+              edgeValidation,
+              edgeResult?.message || 'Demasiadas peticiones. Intenta en unos minutos.'
+            );
             topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
             setIsFormProcessing(false);
             return;
@@ -469,7 +472,10 @@ export function ConsultationForm({ onSuccess, mode = 'full', nonce }: Consultati
       if (!response.ok) {
         // ── 429 Rate-limit: activar banner inline con countdown ──────────────
         if (response.status === 429) {
-          handleRateLimitResponse(response, result.message || 'Demasiadas peticiones. Intenta en unos minutos.');
+          handleRateLimitResponse(
+            response,
+            result.message || 'Demasiadas peticiones. Intenta en unos minutos.'
+          );
           // Scroll suave al banner (topRef está al inicio del form)
           topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
           setIsFormProcessing(false);
@@ -575,7 +581,7 @@ export function ConsultationForm({ onSuccess, mode = 'full', nonce }: Consultati
         const returnToken = crypto.randomUUID();
         // [MODIFICADO] Usar sessionStorage para prevenir acceso desde otras pestañas/extensiones persistentes
         sessionStorage.setItem('desmulta_client_token', returnToken);
-        
+
         if (result.trackingUuid) {
           // [MODIFICADO] Limitar el active case al ciclo de vida del navegador
           sessionStorage.setItem('desmulta_active_case', result.trackingUuid);
@@ -699,7 +705,9 @@ export function ConsultationForm({ onSuccess, mode = 'full', nonce }: Consultati
     <>
       <Form {...form}>
         <div className="mb-4 text-center text-xs md:text-sm text-muted-foreground bg-primary/5 p-3 rounded-xl border border-primary/10">
-          El análisis inicial con IA es <strong className="text-foreground">100% gratuito</strong>. Si tu caso es viable, la generación del documento legal oficial tiene un costo de <strong className="text-foreground">$39.000 COP</strong>.
+          El análisis inicial con IA es <strong className="text-foreground">100% gratuito</strong>.
+          Si tu caso es viable, la generación del documento legal oficial tiene un costo de{' '}
+          <strong className="text-foreground">$39.000 COP</strong>.
         </div>
         <form
           onSubmit={(e) => {

@@ -2,10 +2,12 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Escudo SIMIT | Monitoreo 24/7 de Multas y Comparendos',
-  description: 'Sistema inteligente de vigilancia 24/7. Detectamos y te notificamos al instante sobre fotomultas y comparendos antes de los cobros coactivos.',
+  description:
+    'Sistema inteligente de vigilancia 24/7. Detectamos y te notificamos al instante sobre fotomultas y comparendos antes de los cobros coactivos.',
   openGraph: {
     title: 'Escudo SIMIT | Desmulta',
-    description: 'Sistema inteligente de vigilancia 24/7. Detectamos y te notificamos al instante sobre fotomultas y comparendos.',
+    description:
+      'Sistema inteligente de vigilancia 24/7. Detectamos y te notificamos al instante sobre fotomultas y comparendos.',
     url: 'https://desmulta.online/escudo-simit',
     siteName: 'Desmulta',
     images: [
@@ -21,10 +23,6 @@ export const metadata: Metadata = {
   },
 };
 
-export default function EscudoSimitLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function EscudoSimitLayout({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }

@@ -26,10 +26,14 @@ export function WelcomeModal({ onAcknowledge }: WelcomeModalProps) {
     // 1. Telemetría Estratégica: Capturar intención antes de cerrar
     try {
       if (typeof window !== 'undefined' && 'gtag' in window) {
-        (window as Window & typeof globalThis & { gtag?: (...args: unknown[]) => void }).gtag?.('event', 'welcome_modal_closed', {
-          event_category: 'engagement',
-          event_label: 'user_acknowledged'
-        });
+        (window as Window & typeof globalThis & { gtag?: (...args: unknown[]) => void }).gtag?.(
+          'event',
+          'welcome_modal_closed',
+          {
+            event_category: 'engagement',
+            event_label: 'user_acknowledged',
+          }
+        );
       }
     } catch (e) {
       console.warn('Telemetry error:', e);
@@ -38,7 +42,7 @@ export function WelcomeModal({ onAcknowledge }: WelcomeModalProps) {
     // 2. Persistencia Segura
     localStorage.setItem('desmulta_welcome_time', Date.now().toString());
     setIsOpen(false);
-    
+
     // 3. Callback diferido para permitir transición de salida
     setTimeout(onAcknowledge, 300);
   };
@@ -50,7 +54,8 @@ export function WelcomeModal({ onAcknowledge }: WelcomeModalProps) {
         if (!open) handleClose();
       }}
       title={
-        <m.div style={{ willChange: "transform, opacity" }}
+        <m.div
+          style={{ willChange: 'transform, opacity' }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
@@ -63,7 +68,8 @@ export function WelcomeModal({ onAcknowledge }: WelcomeModalProps) {
         </m.div>
       }
       icon={
-        <m.div style={{ willChange: "transform, opacity" }}
+        <m.div
+          style={{ willChange: 'transform, opacity' }}
           initial={{ scale: 0.5, rotate: -10, opacity: 0 }}
           animate={{ scale: 1, rotate: 0, opacity: 1 }}
           transition={{ type: 'spring', damping: 12 }}
@@ -107,7 +113,8 @@ export function WelcomeModal({ onAcknowledge }: WelcomeModalProps) {
               desc: 'Documentos jurídicos (Peticiones, Nulidades) listos para descargar.',
             },
           ].map((item, idx) => (
-            <m.div style={{ willChange: "transform, opacity" }}
+            <m.div
+              style={{ willChange: 'transform, opacity' }}
               key={idx}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}

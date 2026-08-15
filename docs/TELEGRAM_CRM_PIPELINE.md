@@ -39,6 +39,7 @@ Dado que el Dashboard consume lecturas de Firestore que pueden ser costosas a es
 
 ## 4. Telemetría y Crash Reporting (Sistema NOC)
 Además de funcionar como CRM, Telegram actúa como el **Network Operations Center (NOC)** de la plataforma:
+- **Trazabilidad Distribuida (Vercel-Style):** Todos los microservicios (Next.js, Go Calculadora, Python OCR, Gemini) operan bajo un mismo `X-Trace-Id`. Si cualquier componente falla, Next.js intercepta el payload y envía a Telegram una alerta enriquecida con el Trace-ID, Host, Path, User Agent y el payload ofuscado que causó el error, permitiendo reproducir el fallo instantáneamente.
 - **Captura de Excepciones Críticas:** Cualquier error 500 no controlado de React (Server o Client Components) es capturado por las *Error Boundaries* (`error.tsx` / `global-error.tsx`).
 - **Almacenamiento Redundante:** El payload del error se envía a la colección `crash_reports` en Firestore, garantizando que haya un registro persistente incluso si la API de Telegram falla.
 - **Notificación Push a Telegram:** Se envía una alerta roja a un canal secundario (Supergrupo de Alertas Técnicas, configurado vía `TELEGRAM_DEV_CHAT_ID`) utilizando un parseador `HTML` seguro, adjuntando el *Stack Trace* seguro (digest ID) y la URL afectada.

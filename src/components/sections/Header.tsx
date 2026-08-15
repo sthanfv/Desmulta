@@ -132,8 +132,6 @@ export const Header = ({ onOpenModal }: HeaderProps) => {
               </Link>
             </MagneticItem>
 
-
-
             <MagneticItem mouseX={mouseX}>
               <Link
                 href="/blog"
@@ -234,8 +232,6 @@ export const Header = ({ onOpenModal }: HeaderProps) => {
               </div>
               <span>Consultar Expediente</span>
             </Link>
-
-
 
             <Link
               href="/blog"

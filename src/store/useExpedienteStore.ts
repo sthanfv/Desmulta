@@ -50,16 +50,21 @@ interface ExpedienteState {
 }
 
 // 🛡️ Esquema de validación para prevenir sobrescritura arbitraria del estado
-const FormDataSchema = z.object({
-  cedula: z.string().regex(/^\d{6,12}$/).optional(),
-  nombre: z.string().max(100).optional(),
-  placa: z.string().max(10).optional(),
-  email: z.string().email().optional(),
-  celular: z.string().max(15).optional(),
-  ciudad: z.string().max(50).optional(),
-  autoridad: z.string().max(100).optional(),
-  direccion: z.string().max(200).optional(),
-}).partial();
+const FormDataSchema = z
+  .object({
+    cedula: z
+      .string()
+      .regex(/^\d{6,12}$/)
+      .optional(),
+    nombre: z.string().max(100).optional(),
+    placa: z.string().max(10).optional(),
+    email: z.string().email().optional(),
+    celular: z.string().max(15).optional(),
+    ciudad: z.string().max(50).optional(),
+    autoridad: z.string().max(100).optional(),
+    direccion: z.string().max(200).optional(),
+  })
+  .partial();
 
 export const useExpedienteStore = create<ExpedienteState>()(
   persist(

@@ -9,12 +9,28 @@ import { app } from '@/lib/firebase-client';
 import { z } from 'zod';
 
 const formSchema = z.object({
-  cedula: z.string().regex(/^\d{5,10}$/, 'Ingresa un número de cédula válido (entre 5 y 10 dígitos numéricos).'),
-  email: z.string().email('Ingresa un correo electrónico válido.').refine((val) => {
-    const disposableDomains = ['yopmail.com', 'tempmail.com', '10minutemail.com', 'guerrillamail.com', 'mailinator.com', 'temp-mail.org', 'tempmail.net'];
-    const domain = val.split('@')[1]?.toLowerCase();
-    return !disposableDomains.includes(domain);
-  }, { message: 'Por seguridad, no se permiten correos electrónicos temporales o desechables.' }),
+  cedula: z
+    .string()
+    .regex(/^\d{5,10}$/, 'Ingresa un número de cédula válido (entre 5 y 10 dígitos numéricos).'),
+  email: z
+    .string()
+    .email('Ingresa un correo electrónico válido.')
+    .refine(
+      (val) => {
+        const disposableDomains = [
+          'yopmail.com',
+          'tempmail.com',
+          '10minutemail.com',
+          'guerrillamail.com',
+          'mailinator.com',
+          'temp-mail.org',
+          'tempmail.net',
+        ];
+        const domain = val.split('@')[1]?.toLowerCase();
+        return !disposableDomains.includes(domain);
+      },
+      { message: 'Por seguridad, no se permiten correos electrónicos temporales o desechables.' }
+    ),
   honeypot: z.string().max(0, 'Solicitud inválida.'),
 });
 
@@ -79,8 +95,13 @@ const formatCOP = (valor: number): string =>
   }).format(valor);
 
 async function obtainFcmToken(): Promise<string | null> {
-  if (typeof window === 'undefined' || !('serviceWorker' in navigator) || !('Notification' in window)) return null;
-  
+  if (
+    typeof window === 'undefined' ||
+    !('serviceWorker' in navigator) ||
+    !('Notification' in window)
+  )
+    return null;
+
   try {
     const soportado = await isSupported();
     if (!soportado) return null;
@@ -89,18 +110,20 @@ async function obtainFcmToken(): Promise<string | null> {
     if (permiso === 'default') {
       permiso = await Notification.requestPermission();
     }
-    
+
     if (permiso !== 'granted') return null;
 
-    const swReg = await navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/' });
+    const swReg = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
+      scope: '/',
+    });
     const messaging = getMessaging(app);
-    
+
     const vapidKey = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
     if (!vapidKey) return null;
 
-    return await getToken(messaging, { 
+    return await getToken(messaging, {
       vapidKey,
-      serviceWorkerRegistration: swReg
+      serviceWorkerRegistration: swReg,
     });
   } catch (err) {
     console.warn('[Escudo SIMIT] No se pudo obtener el FCM token', err);
@@ -202,7 +225,7 @@ export default function EscudoSimitPage() {
       // Forzar reseteo del widget de Turnstile porque los tokens son de un solo uso
       setTurnstileRefreshCount((c) => c + 1);
       turnstileRef.current = null;
-      
+
       toast({
         title: '❌ Error',
         description: msg,
@@ -215,7 +238,6 @@ export default function EscudoSimitPage() {
 
   return (
     <LazyMotion features={domAnimation}>
-
       <div className="min-h-screen bg-background relative overflow-hidden selection:bg-primary/30 text-foreground">
         {/* Fondos glassmorphism */}
         <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,191,0,0.08)_0%,transparent_50%)] pointer-events-none" />
@@ -233,9 +255,7 @@ export default function EscudoSimitPage() {
             </Link>
             <div className="flex items-center gap-2">
               <ShieldCheck className="text-primary" size={20} />
-              <span className="font-black tracking-tighter text-lg uppercase">
-                Escudo SIMIT
-              </span>
+              <span className="font-black tracking-tighter text-lg uppercase">Escudo SIMIT</span>
             </div>
           </div>
         </header>
@@ -262,8 +282,9 @@ export default function EscudoSimitPage() {
                 </span>
               </h1>
               <p className="text-xl text-muted-foreground font-medium max-w-2xl mx-auto">
-                ¿Miedo a multas fantasma? Nuestro sistema inteligente vigila tu cédula 24/7
-                y te notifica al instante si el Estado intenta sorprenderte con una fotomulta o comparendo.
+                ¿Miedo a multas fantasma? Nuestro sistema inteligente vigila tu cédula 24/7 y te
+                notifica al instante si el Estado intenta sorprenderte con una fotomulta o
+                comparendo.
               </p>
             </m.div>
           </div>
@@ -299,7 +320,7 @@ export default function EscudoSimitPage() {
               <Activity className="text-primary mb-6" size={40} />
               <h3 className="text-2xl font-black mb-4">Máxima Privacidad</h3>
               <p className="text-muted-foreground leading-relaxed">
-                Nuestras consultas a las bases de datos gubernamentales son 100% seguras y anónimas. 
+                Nuestras consultas a las bases de datos gubernamentales son 100% seguras y anónimas.
                 No guardamos tu información personal ni compartimos tus datos con terceros.
               </p>
             </m.div>
@@ -319,18 +340,23 @@ export default function EscudoSimitPage() {
                 <div className="bg-card/40 backdrop-blur-xl border border-white/10 p-10 md:p-14 rounded-[3.5rem] shadow-2xl shadow-primary/5 relative overflow-hidden">
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-1/2 bg-primary/10 blur-[100px] pointer-events-none" />
 
-                  <h2 className="text-3xl font-black mb-2 relative z-10">
-                    Activa tu Escudo SIMIT
-                  </h2>
+                  <h2 className="text-3xl font-black mb-2 relative z-10">Activa tu Escudo SIMIT</h2>
                   <p className="text-muted-foreground mb-10 relative z-10">
-                    Ingresa tu cédula y correo para recibir tu estado de cuenta actual. 
-                    <br/><br/>
-                    <strong className="text-primary">Nota:</strong> Te enviaremos reportes periódicos semanales de forma automática. Te recomendamos revisar tu bandeja principal y la carpeta de <strong>Spam / Correo No Deseado</strong> para no perderte nuestras alertas tempranas.
+                    Ingresa tu cédula y correo para recibir tu estado de cuenta actual.
+                    <br />
+                    <br />
+                    <strong className="text-primary">Nota:</strong> Te enviaremos reportes
+                    periódicos semanales de forma automática. Te recomendamos revisar tu bandeja
+                    principal y la carpeta de <strong>Spam / Correo No Deseado</strong> para no
+                    perderte nuestras alertas tempranas.
                   </p>
 
                   <div className="space-y-5 relative z-10">
                     {/* Campo Honeypot Anti-Bot (Oculto) */}
-                    <div style={{ position: 'absolute', left: '-9999px', opacity: 0 }} aria-hidden="true">
+                    <div
+                      style={{ position: 'absolute', left: '-9999px', opacity: 0 }}
+                      aria-hidden="true"
+                    >
                       <label htmlFor="telefono_secundario">Teléfono Secundario</label>
                       <input
                         id="telefono_secundario"
@@ -345,7 +371,10 @@ export default function EscudoSimitPage() {
 
                     {/* Cédula */}
                     <div>
-                      <label htmlFor="escudo-cedula" className="block text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">
+                      <label
+                        htmlFor="escudo-cedula"
+                        className="block text-xs font-black uppercase tracking-widest text-muted-foreground mb-2"
+                      >
                         <CreditCard size={14} className="inline mr-1" />
                         Número de Cédula
                       </label>
@@ -364,7 +393,10 @@ export default function EscudoSimitPage() {
 
                     {/* Email */}
                     <div>
-                      <label htmlFor="escudo-email" className="block text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">
+                      <label
+                        htmlFor="escudo-email"
+                        className="block text-xs font-black uppercase tracking-widest text-muted-foreground mb-2"
+                      >
                         <Mail size={14} className="inline mr-1" />
                         Correo Electrónico
                       </label>
@@ -411,29 +443,31 @@ export default function EscudoSimitPage() {
 
                     {/* Botón o Terminal de Carga */}
                     {isActivating ? (
-                      <m.div 
+                      <m.div
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         className="w-full p-6 rounded-2xl bg-black/60 border border-primary/30 flex flex-col gap-3 font-mono text-sm shadow-inner shadow-primary/10"
                       >
                         {loadingPhases.map((phase, i) => (
-                           <div 
-                             key={i} 
-                             className={`flex items-center gap-3 transition-all duration-500 ${
-                               i > loadingPhase ? 'opacity-20 scale-95' 
-                               : i === loadingPhase ? 'text-primary scale-100 font-bold' 
-                               : 'text-muted-foreground scale-100'
-                             }`}
-                           >
-                              {i < loadingPhase ? (
-                                <CheckCircle2 size={16} className="text-green-500" />
-                              ) : i === loadingPhase ? (
-                                <Loader2 size={16} className="animate-spin text-primary" />
-                              ) : (
-                                <div className="w-4 h-4 rounded-full border border-current opacity-30" />
-                              )}
-                              <span>{phase}</span>
-                           </div>
+                          <div
+                            key={i}
+                            className={`flex items-center gap-3 transition-all duration-500 ${
+                              i > loadingPhase
+                                ? 'opacity-20 scale-95'
+                                : i === loadingPhase
+                                  ? 'text-primary scale-100 font-bold'
+                                  : 'text-muted-foreground scale-100'
+                            }`}
+                          >
+                            {i < loadingPhase ? (
+                              <CheckCircle2 size={16} className="text-green-500" />
+                            ) : i === loadingPhase ? (
+                              <Loader2 size={16} className="animate-spin text-primary" />
+                            ) : (
+                              <div className="w-4 h-4 rounded-full border border-current opacity-30" />
+                            )}
+                            <span>{phase}</span>
+                          </div>
                         ))}
                       </m.div>
                     ) : (

@@ -1,12 +1,12 @@
 /**
  * @deprecated ⚠️ WARNING (COMPLIANCE & LEGAL) ⚠️
- * 
+ *
  * Motor Estocástico (Stochastic Engine) INHABILITADO.
- * 
+ *
  * Este módulo se diseñó para la evasión Anti-Bot (WAF) asociada al scraper
  * automatizado del portal SIMIT. Dado que SIMIT prohíbe explícitamente el scraping,
  * el uso de este motor acarrea riesgos legales inaceptables para el negocio.
- * 
+ *
  * TODAS las funciones de este archivo están marcadas como deprecadas y han sido
  * desactivadas. No deben ser usadas en ninguna nueva implementación.
  */
@@ -26,7 +26,10 @@ export function getBogotaHour(date: Date): number {
  * @deprecated ELIMINADO POR COMPLIANCE ANTI-SCRAPING
  * Retorna siempre { execute: false } para bloquear cualquier intento de ejecución.
  */
-export function shouldExecuteWorker(date: Date, probability: number): { execute: boolean; reason?: string } {
+export function shouldExecuteWorker(
+  date: Date,
+  probability: number
+): { execute: boolean; reason?: string } {
   console.warn('[COMPLIANCE] Intento de usar Motor Estocástico bloqueado.');
   return { execute: false, reason: 'bloqueo_por_compliance_legal' };
 }

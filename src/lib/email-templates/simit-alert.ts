@@ -30,15 +30,25 @@ interface ResultadoEmail {
  * Formatea un número como moneda colombiana.
  */
 const formatCOP = (valor: number): string =>
-  new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(valor);
+  new Intl.NumberFormat('es-CO', {
+    style: 'currency',
+    currency: 'COP',
+    minimumFractionDigits: 0,
+  }).format(valor);
 
 /**
  * Genera el HTML del email de bienvenida del Escudo SIMIT.
  */
-export function buildEscudoSimitEmail(cedula: string, resultado: ResultadoEmail, isWelcomeEmail = false): string {
+export function buildEscudoSimitEmail(
+  cedula: string,
+  resultado: ResultadoEmail,
+  isWelcomeEmail = false
+): string {
   const { resumen, multas } = resultado;
 
-  const filasMultas = multas.map((m) => `
+  const filasMultas = multas
+    .map(
+      (m) => `
     <tr style="border-bottom: 1px solid #333;">
       <td style="padding: 12px 8px; font-size: 13px; color: #ccc;">${m.id.substring(0, 12)}${m.id.length > 12 ? '…' : ''}</td>
       <td style="padding: 12px 8px; font-size: 13px; color: #ccc;">${m.secretaria}</td>
@@ -46,7 +56,9 @@ export function buildEscudoSimitEmail(cedula: string, resultado: ResultadoEmail,
       <td style="padding: 12px 8px; font-size: 13px; color: ${m.estado === 'Cobro coactivo' ? '#ef4444' : '#eab308'}; font-weight: 600;">${m.estado}</td>
       <td style="padding: 12px 8px; font-size: 13px; color: #fff; font-weight: 700; text-align: right;">${formatCOP(m.valorPagar)}</td>
     </tr>
-  `).join('');
+  `
+    )
+    .join('');
 
   return `
 <!DOCTYPE html>
@@ -67,9 +79,11 @@ export function buildEscudoSimitEmail(cedula: string, resultado: ResultadoEmail,
         ${isWelcomeEmail ? '¡Bienvenido al Escudo SIMIT!' : 'Alerta: Cambios en tu SIMIT'}
       </h1>
       <p style="color: #888; font-size: 15px; margin: 0; line-height: 1.5;">
-        ${isWelcomeEmail 
-          ? `Gracias por adquirir nuestro servicio gratuito de monitoreo. A partir de hoy, tu cédula <strong style="color: #d4af37;">${cedula}</strong> está blindada. Te enviaremos alertas automáticas ante cualquier cambio.` 
-          : `Hemos detectado un movimiento en el estado de cuenta de tu cédula <strong style="color: #d4af37;">${cedula}</strong>. Revisa los detalles a continuación.`}
+        ${
+          isWelcomeEmail
+            ? `Gracias por adquirir nuestro servicio gratuito de monitoreo. A partir de hoy, tu cédula <strong style="color: #d4af37;">${cedula}</strong> está blindada. Te enviaremos alertas automáticas ante cualquier cambio.`
+            : `Hemos detectado un movimiento en el estado de cuenta de tu cédula <strong style="color: #d4af37;">${cedula}</strong>. Revisa los detalles a continuación.`
+        }
       </p>
     </div>
 
@@ -98,7 +112,9 @@ export function buildEscudoSimitEmail(cedula: string, resultado: ResultadoEmail,
     </div>
 
     <!-- Tabla de Multas -->
-    ${multas.length > 0 ? `
+    ${
+      multas.length > 0
+        ? `
     <div style="background: #161616; border: 1px solid #2a2a2a; border-radius: 20px; padding: 30px; margin-bottom: 24px; overflow-x: auto;">
       <h2 style="color: #fff; font-size: 16px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 20px;">
         Detalle de Multas
@@ -121,7 +137,9 @@ export function buildEscudoSimitEmail(cedula: string, resultado: ResultadoEmail,
         * Nota: El "Total en SIMIT" refleja el saldo global oficial reportado por la plataforma. Los valores individuales por infracción pueden no sumar exactamente este monto si existen acuerdos de pago previos, intereses de mora acumulados, o cobros coactivos paralelos que el SIMIT agrupa en el encabezado.
       </p>
     </div>
-    ` : ''}
+    `
+        : ''
+    }
 
     <!-- CTA -->
     <div style="text-align: center; padding: 20px 0;">

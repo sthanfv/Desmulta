@@ -31,10 +31,7 @@ const COLLECTION_NAME = 'simit_subscriptions';
  */
 export async function getActiveSubscriptions(): Promise<SimitSubscription[]> {
   const db = getFirestore(getAdminApp());
-  const snapshot = await db
-    .collection(COLLECTION_NAME)
-    .where('isActive', '==', true)
-    .get();
+  const snapshot = await db.collection(COLLECTION_NAME).where('isActive', '==', true).get();
 
   return snapshot.docs
     .filter((doc) => {
@@ -61,9 +58,9 @@ export async function getActiveSubscriptions(): Promise<SimitSubscription[]> {
  */
 export async function getDueSubscriptions(limitCount: number): Promise<SimitSubscription[]> {
   const db = getFirestore(getAdminApp());
-  
+
   // 7 días en milisegundos
-  const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+  const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
 
   const snapshot = await db
     .collection(COLLECTION_NAME)
@@ -96,13 +93,15 @@ export async function getDueSubscriptions(limitCount: number): Promise<SimitSubs
 /**
  * Registra o actualiza una suscripción de un usuario
  */
-export async function upsertSubscription(data: Omit<SimitSubscription, 'createdAt'> & { createdAt?: number }): Promise<void> {
+export async function upsertSubscription(
+  data: Omit<SimitSubscription, 'createdAt'> & { createdAt?: number }
+): Promise<void> {
   const db = getFirestore(getAdminApp());
-  
+
   // Hash unidireccional de la cédula para usar como ID del documento (Búsqueda anónima segura)
   const docId = hashData(data.cedula);
   const docRef = db.collection(COLLECTION_NAME).doc(docId);
-  
+
   const docData: Partial<SimitSubscriptionDoc> = {
     encryptedCedula: encryptData(data.cedula),
     encryptedEmail: encryptData(data.email),
@@ -113,27 +112,34 @@ export async function upsertSubscription(data: Omit<SimitSubscription, 'createdA
     lastKnownTotalAmount: data.lastKnownTotalAmount,
     pushToken: data.pushToken,
   };
-  
-  // Eliminar undefined para que Firestore no se queje (merge ignorará los vacíos pero los undefined explícitos lanzan error)
-  Object.keys(docData).forEach(key => docData[key as keyof typeof docData] === undefined && delete docData[key as keyof typeof docData]);
 
-  await docRef.set({
-    ...docData,
-    updatedAt: Date.now(),
-  }, { merge: true });
+  // Eliminar undefined para que Firestore no se queje (merge ignorará los vacíos pero los undefined explícitos lanzan error)
+  Object.keys(docData).forEach(
+    (key) =>
+      docData[key as keyof typeof docData] === undefined &&
+      delete docData[key as keyof typeof docData]
+  );
+
+  await docRef.set(
+    {
+      ...docData,
+      updatedAt: Date.now(),
+    },
+    { merge: true }
+  );
 }
 
 /**
  * Actualiza el estado después de una revisión exitosa del Scraper
  */
 export async function updateSubscriptionAfterCheck(
-  cedula: string, 
-  finesCount: number, 
+  cedula: string,
+  finesCount: number,
   totalAmount: number
 ): Promise<void> {
   const db = getFirestore(getAdminApp());
   const docId = hashData(cedula);
-  
+
   await db.collection(COLLECTION_NAME).doc(docId).update({
     lastCheckedAt: Date.now(),
     lastKnownFinesCount: finesCount,

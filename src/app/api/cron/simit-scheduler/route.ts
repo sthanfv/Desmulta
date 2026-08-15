@@ -26,40 +26,41 @@ export async function POST(_request: Request) {
 
     const BATCH_SIZE = 10;
     const batches = [];
-    
+
     // Trocear el array en lotes de 10
     for (let i = 0; i < subscriptions.length; i += BATCH_SIZE) {
       batches.push(subscriptions.slice(i, i + BATCH_SIZE));
     }
 
-    logger.info(`[simit-scheduler] Procesando ${subscriptions.length} suscripciones en ${batches.length} lotes.`);
+    logger.info(
+      `[simit-scheduler] Procesando ${subscriptions.length} suscripciones en ${batches.length} lotes.`
+    );
 
     // Agendar en QStash
     const results = await Promise.all(
       batches.map(async (batch, index) => {
         const cedulas = batch.map((sub) => sub.cedula);
-        
+
         // Jitter a nivel de lote: El lote se enviará a QStash con un retraso (delay)
         // Hacemos que cada lote se procese de forma aleatoria dentro de las siguientes 12 horas (43200 segundos).
-        const maxDelaySeconds = 12 * 60 * 60; 
+        const maxDelaySeconds = 12 * 60 * 60;
         const randomDelay = Math.floor(Math.random() * maxDelaySeconds);
 
         const response = await qstash.publishJSON({
           url: `${APP_URL}/api/qstash/simit-worker`,
           body: { cedulas },
-          delay: randomDelay, 
+          delay: randomDelay,
         });
 
         return { batchIndex: index, messageId: response.messageId, delay: randomDelay };
       })
     );
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       lotesAgendados: batches.length,
-      detalles: results 
+      detalles: results,
     });
-
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     logger.error('[simit-scheduler] Error fatal', { error: msg });

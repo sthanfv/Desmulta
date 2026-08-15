@@ -243,9 +243,12 @@ export async function POST(req: NextRequest) {
 
       if (botToken && chatId) {
         // Helper para escapar caracteres y evitar que Telegram devuelva 400 Bad Request
-        const escapeHtml = (text: string) => text.replace(/[&<>'"]/g, 
-          tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-        );
+        const escapeHtml = (text: string) =>
+          text.replace(
+            /[&<>'"]/g,
+            (tag) =>
+              ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[tag] || tag
+          );
 
         // Extraemos datos extra si existen en el documento de la compra
         const nombre = escapeHtml(purchase?.caseData?.infractorName || 'Cliente Anónimo');

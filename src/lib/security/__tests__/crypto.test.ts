@@ -13,10 +13,10 @@ describe('Zero-PII Cryptography Module', () => {
     it('should encrypt and decrypt data correctly', () => {
       const originalText = '1234567890';
       const encrypted = encryptData(originalText);
-      
+
       expect(encrypted).not.toBe(originalText);
       expect(encrypted.split(':').length).toBe(3); // iv, authTag, encryptedData
-      
+
       const decrypted = decryptData(encrypted);
       expect(decrypted).toBe(originalText);
     });
@@ -25,12 +25,12 @@ describe('Zero-PII Cryptography Module', () => {
       const originalText = '1234567890';
       const encrypted1 = encryptData(originalText);
       const encrypted2 = encryptData(originalText);
-      
+
       expect(encrypted1).not.toBe(encrypted2);
-      
+
       const decrypted1 = decryptData(encrypted1);
       const decrypted2 = decryptData(encrypted2);
-      
+
       expect(decrypted1).toBe(originalText);
       expect(decrypted2).toBe(originalText);
     });
@@ -45,7 +45,7 @@ describe('Zero-PII Cryptography Module', () => {
       const originalText = '1234567890';
       const hash1 = hashData(originalText);
       const hash2 = hashData(originalText);
-      
+
       expect(hash1).toBe(hash2);
       expect(hash1).not.toBe(originalText);
     });
@@ -53,7 +53,7 @@ describe('Zero-PII Cryptography Module', () => {
     it('should produce different hashes for different inputs', () => {
       const hash1 = hashData('1234567890');
       const hash2 = hashData('0987654321');
-      
+
       expect(hash1).not.toBe(hash2);
     });
   });

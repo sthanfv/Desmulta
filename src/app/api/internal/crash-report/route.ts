@@ -11,6 +11,8 @@ const CrashPayloadSchema = z.object({
     .string()
     .max(2000, 'El mensaje no puede superar 2000 caracteres.')
     .default('(sin mensaje)'),
+  stack: z.string().max(3000).optional(),
+  componentStack: z.string().max(3000).optional(),
   digest: z.string().max(100).optional(),
   path: z.string().max(512, 'La ruta no puede superar 512 caracteres.').default('/'),
 });
@@ -94,39 +96,17 @@ export async function POST(req: Request) {
         logger.error('[crash-report] Error guardando en Firestore', { err: String(dbErr) });
       }
 
-      // 2. Notificar por Telegram (al canal de DEV)
-      const botToken = process.env.TELEGRAM_BOT_TOKEN;
-      const devChatId = process.env.TELEGRAM_DEV_CHAT_ID || process.env.TELEGRAM_CHAT_ID;
-
-      if (botToken && devChatId) {
-        const safeMessage = escapeHTML(data.message.substring(0, 500));
-        const safePath = escapeHTML(data.path);
-        const safeDigest = escapeHTML(data.digest || 'N/A');
-
-        const textMessage = `
-🚨 <b>CRÍTICO: ERROR DE RENDERIZADO 500</b> 🚨
-
-📍 <b>Ruta:</b> <code>${safePath}</code>
-💥 <b>Mensaje:</b>
-<pre>${safeMessage}</pre>
-🔑 <b>Digest ID:</b> <code>${safeDigest}</code>
-
-<i>Un usuario se ha topado con la pantalla de interrupción.</i>`;
-
-        try {
-          await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              chat_id: devChatId,
-              text: textMessage,
-              parse_mode: 'HTML',
-            }),
-          });
-        } catch (err) {
-          logger.error('[crash-report] Fallo enviando a Telegram', { err: String(err) });
+      // 2. Notificar al NOC unificado vía security-logger
+      logger.error('Fallo Crítico de Frontend (Pantalla Rota)', {
+        traceId: data.digest || 'FRONTEND-CRASH',
+        endpoint: data.path,
+        userAgent: userAgent.substring(0, 300),
+        error: data.message,
+        payload: {
+          stack: data.stack,
+          componentStack: data.componentStack,
         }
-      }
+      });
     };
 
     import('@vercel/functions')

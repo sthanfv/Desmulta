@@ -25,6 +25,27 @@ export class ErrorBoundary extends Component<Props, State> {
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     logger.error('Granular Error Boundary caught', { error: error.message, errorInfo });
+
+    // Telemetría pasiva de Crash Reporting para componentes granulares
+    try {
+      fetch('/api/internal/crash-proxy', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: (error.message || 'Error desconocido').substring(0, 500),
+          stack: error.stack?.substring(0, 2000),
+          componentStack: errorInfo.componentStack?.substring(0, 2000),
+          path: typeof window !== 'undefined' ? (window.location.pathname + window.location.search).substring(0, 256) : '/unknown',
+        }),
+        keepalive: true,
+      }).catch(() => {
+        /* Fallo silencioso */
+      });
+    } catch (_e) {
+      // Ignorar
+    }
   }
 
   public render() {

@@ -54,7 +54,8 @@
     @apply border-border;
   }
 
-  html, body {
+  html,
+  body {
     overflow-x: hidden;
   }
 
@@ -437,7 +438,7 @@
       #f0f0f0 100%
     ) !important;
   }
-  
+
   .dark .aurora-bg {
     background: radial-gradient(
       ellipse at 30% 60%,
@@ -473,8 +474,6 @@
 }
 
 /* Removido código problemático PWA native feel */
-
-
 
 /* Fix Scroll iOS Safari en Modales */
 .modal-scroll {

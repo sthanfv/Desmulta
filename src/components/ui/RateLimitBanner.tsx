@@ -65,7 +65,7 @@ export function RateLimitBanner({
   const hours = Math.floor(secsLeft / 3600);
   const mins = Math.floor((secsLeft % 3600) / 60);
   const secs = secsLeft % 60;
-  
+
   let timeDisplay = '';
   if (hours > 0) {
     timeDisplay = `${hours}h ${String(mins).padStart(2, '0')}m ${String(secs).padStart(2, '0')}s`;

@@ -87,9 +87,7 @@ export default function ServiciosPage() {
                     {servicio.detalles?.map((detalle, i) => (
                       <li key={i} className="flex gap-4">
                         <CheckCircle2 size={18} className="text-primary shrink-0 mt-1" />
-                        <p className="text-sm font-medium text-muted-foreground">
-                          {detalle}
-                        </p>
+                        <p className="text-sm font-medium text-muted-foreground">{detalle}</p>
                       </li>
                     )) || (
                       <li className="flex gap-4">
@@ -104,11 +102,17 @@ export default function ServiciosPage() {
                     asChild
                     className="w-full mt-10 h-14 rounded-2xl bg-primary text-primary-foreground font-black shadow-lg shadow-primary/20"
                   >
-                    <Link href={servicio.href === '/?action=consultar' ? '/#contacto' : (servicio.href || '/#contacto')}>
-                      {servicio.id === 'escudo-simit' 
-                        ? 'Activar Escudo' 
-                        : servicio.id === 'calculadora' 
-                          ? 'Ir a la Calculadora' 
+                    <Link
+                      href={
+                        servicio.href === '/?action=consultar'
+                          ? '/#contacto'
+                          : servicio.href || '/#contacto'
+                      }
+                    >
+                      {servicio.id === 'escudo-simit'
+                        ? 'Activar Escudo'
+                        : servicio.id === 'calculadora'
+                          ? 'Ir a la Calculadora'
                           : 'Solicitar Análisis Gratis'}
                     </Link>
                   </Button>

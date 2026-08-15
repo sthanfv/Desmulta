@@ -64,12 +64,16 @@ export default function TerminosPage() {
                 </h4>
                 <p>
                   {brandName} actúa exclusivamente como un facilitador tecnológico y gestor
-                  administrativo integral. <strong>No somos un bufete de abogados, ni
-                  proveemos representación en calidad de apoderados judiciales.</strong> Toda la
-                  documentación y gestión administrativa procesada por nuestra plataforma tecnológica
-                  es impulsada bajo la figura de titularidad del usuario (actuación a nombre propio).
-                  Nuestra plataforma estructura la viabilidad técnica y normativa, pero es el usuario
-                  quien figura como titular formal ante las autoridades competentes.
+                  administrativo integral.{' '}
+                  <strong>
+                    No somos un bufete de abogados, ni proveemos representación en calidad de
+                    apoderados judiciales.
+                  </strong>{' '}
+                  Toda la documentación y gestión administrativa procesada por nuestra plataforma
+                  tecnológica es impulsada bajo la figura de titularidad del usuario (actuación a
+                  nombre propio). Nuestra plataforma estructura la viabilidad técnica y normativa,
+                  pero es el usuario quien figura como titular formal ante las autoridades
+                  competentes.
                 </p>
               </div>
 
@@ -105,8 +109,8 @@ export default function TerminosPage() {
                       <span className="text-primary font-black shrink-0">Fase 2 - Gestión:</span>
                       <span>
                         Acompañamiento técnico, generación automatizada de documentos y radicación
-                        formal de requerimientos jurídicos bajo la titularidad exclusiva del usuario,
-                        incluyendo el seguimiento de términos perentorios del Estado.
+                        formal de requerimientos jurídicos bajo la titularidad exclusiva del
+                        usuario, incluyendo el seguimiento de términos perentorios del Estado.
                       </span>
                     </li>
                     <li className="flex gap-2">
@@ -200,9 +204,9 @@ export default function TerminosPage() {
                 </h4>
                 <p>
                   La arquitectura del sistema, los algoritmos de detección de causales, los
-                  fundamentos jurídicos aplicados y las plantillas documentales generadas
-                  por la plataforma son propiedad intelectual exclusiva de {brandName} y
-                  constituyen secreto profesional.
+                  fundamentos jurídicos aplicados y las plantillas documentales generadas por la
+                  plataforma son propiedad intelectual exclusiva de {brandName} y constituyen
+                  secreto profesional.
                 </p>
               </div>
               <div className="space-y-3">

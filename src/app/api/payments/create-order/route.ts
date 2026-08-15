@@ -86,9 +86,9 @@ export async function POST(req: NextRequest) {
     const secondsRemaining = Math.max(1, Math.ceil((rl.resetTime - Date.now()) / 1000));
     return NextResponse.json(
       { error: 'Demasiadas solicitudes de pago. Intenta más tarde.' },
-      { 
+      {
         status: 429,
-        headers: { 'Retry-After': secondsRemaining.toString() }
+        headers: { 'Retry-After': secondsRemaining.toString() },
       }
     );
   }

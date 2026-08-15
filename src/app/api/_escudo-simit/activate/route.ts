@@ -8,7 +8,6 @@ import { Redis } from '@upstash/redis';
 
 export const maxDuration = 60; // Forzar timeout Vercel a 60s para soportar el scraper SIMIT
 
-
 // Instanciar Rate Limiter (Máximo 2 peticiones por minuto por IP) para mitigar DDoS aplicativo
 const ratelimit = new Ratelimit({
   redis: Redis.fromEnv(),
@@ -30,15 +29,20 @@ export async function POST(request: NextRequest) {
   try {
     // Extraer IP para aplicar el Rate Limit de forma determinista
     const ip = request.headers.get('x-forwarded-for') ?? '127.0.0.1';
-    
+
     // Verificamos en Upstash Redis si la IP superó la cuota
     const { success, reset } = await ratelimit.limit(`ratelimit_escudo_${ip}`);
-    
+
     if (!success) {
-      logger.warn('[escudo-simit] Bloqueo por Rate Limit Excedido (Ataque de Concurrencia)', { ip });
+      logger.warn('[escudo-simit] Bloqueo por Rate Limit Excedido (Ataque de Concurrencia)', {
+        ip,
+      });
       return NextResponse.json(
         { error: 'Demasiadas solicitudes. Por favor, espera 1 minuto antes de volver a intentar.' },
-        { status: 429, headers: { 'Retry-After': Math.ceil((reset - Date.now()) / 1000).toString() } }
+        {
+          status: 429,
+          headers: { 'Retry-After': Math.ceil((reset - Date.now()) / 1000).toString() },
+        }
       );
     }
 
@@ -54,18 +58,12 @@ export async function POST(request: NextRequest) {
     }
 
     if (!email || typeof email !== 'string' || !email.includes('@')) {
-      return NextResponse.json(
-        { error: 'Email inválido.' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Email inválido.' }, { status: 400 });
     }
 
     // ── Validar Turnstile (Anti-Bot) ───────────────────────────────
     if (!turnstileToken) {
-      return NextResponse.json(
-        { error: 'Verificación anti-bot requerida.' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Verificación anti-bot requerida.' }, { status: 400 });
     }
 
     const turnstileSecret = process.env.TURNSTILE_SECRET_KEY;

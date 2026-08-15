@@ -33,6 +33,7 @@ export default function Error({
         body: JSON.stringify({
           // 🛡️ FIX H-4: truncar campos para evitar payloads de telemetría abusivos
           message: (error.message || 'Error desconocido').substring(0, 500),
+          stack: error.stack?.substring(0, 2000),
           digest: error.digest?.substring(0, 50),
           path: (window.location.pathname + window.location.search).substring(0, 256),
         }),

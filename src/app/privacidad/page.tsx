@@ -172,11 +172,13 @@ export default function PrivacidadPage() {
                   4.1. Autorización de Mandato Electrónico (Habeas Data)
                 </h4>
                 <p>
-                  En cumplimiento de la Ley 1581 de 2012 y sus decretos reglamentarios, al suministrar 
-                  su número de documento e interactuar con la plataforma, el usuario otorga a {brandName} 
-                  un <strong>Mandato Tecnológico Expreso</strong>. Esta figura nos faculta para actuar 
-                  como su representante tecnológico temporal, permitiendo que nuestros sistemas automatizados 
-                  (bots/scraping) consulten plataformas públicas del Estado (ej. SIMIT, RUNT) en su nombre.
+                  En cumplimiento de la Ley 1581 de 2012 y sus decretos reglamentarios, al
+                  suministrar su número de documento e interactuar con la plataforma, el usuario
+                  otorga a {brandName}
+                  un <strong>Mandato Tecnológico Expreso</strong>. Esta figura nos faculta para
+                  actuar como su representante tecnológico temporal, permitiendo que nuestros
+                  sistemas automatizados (bots/scraping) consulten plataformas públicas del Estado
+                  (ej. SIMIT, RUNT) en su nombre.
                 </p>
               </div>
               <div className="space-y-3">
@@ -184,9 +186,9 @@ export default function PrivacidadPage() {
                   4.2. Uso Exclusivo y Transitorio
                 </h4>
                 <p>
-                  Los datos extraídos de dichas plataformas estatales tienen el único propósito de 
-                  generar el diagnóstico de viabilidad y pre-diligenciar las plantillas de defensa. 
-                  Una vez finalizada la consulta o el trámite, los datos residuales del scraping son 
+                  Los datos extraídos de dichas plataformas estatales tienen el único propósito de
+                  generar el diagnóstico de viabilidad y pre-diligenciar las plantillas de defensa.
+                  Una vez finalizada la consulta o el trámite, los datos residuales del scraping son
                   purgados de la memoria activa para garantizar su privacidad.
                 </p>
               </div>

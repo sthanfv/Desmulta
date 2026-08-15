@@ -17,6 +17,6 @@
 export async function logToFirestoreEdge(_dataPayload: Record<string, unknown>) {
   throw new Error(
     '[ELIMINADO] firebase-edge.ts fue desconectado permanentemente. ' +
-    'Usar Server Actions con Firebase Admin SDK para telemetría.'
+      'Usar Server Actions con Firebase Admin SDK para telemetría.'
   );
 }
