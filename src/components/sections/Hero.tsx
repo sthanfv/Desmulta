@@ -161,7 +161,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
           </div>
 
           {/* ─── COLUMNA DERECHA: Imagen + Contador + Vitrina de Documentos ─── */}
-          <div className="relative group animate-in zoom-in-95 duration-1000 z-10 w-full flex flex-col gap-6 items-center lg:items-end">
+          <div className="relative group z-10 w-full flex flex-col gap-6 items-center lg:items-end">
             <div className="absolute -inset-4 md:-inset-10 bg-primary/10 dark:bg-primary/5 blur-[80px] md:blur-[120px] rounded-[100%] opacity-50 group-hover:opacity-70 transition-opacity duration-1000 pointer-events-none" />
             <TarjetaPremium className="relative p-4 overflow-hidden shadow-2xl rounded-3xl w-full bg-background border border-border/50">
               <Lightbox

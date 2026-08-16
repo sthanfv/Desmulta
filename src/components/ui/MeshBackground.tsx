@@ -36,11 +36,20 @@ export function MeshBackground() {
 
   return (
     <div className="aurora-bg">
-      {/* Blob Principal (Dorado/Naranja) */}
-      <div className="aurora-blob blob-primary" style={{ transform: 'translateZ(0)' }} />
+      {/* Fallback CSS estático ultra-liviano para Móviles (No JS, cero lag) */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-blue-500/5 md:hidden" />
 
-      {/* Blob Secundario (Azul Eléctrico) */}
-      <div className="aurora-blob blob-secondary" style={{ transform: 'translateZ(0)' }} />
+      {/* Blob Principal (Dorado/Naranja) - Bloqueado en móviles */}
+      <div
+        className="aurora-blob blob-primary hidden md:block"
+        style={{ transform: 'translateZ(0)' }}
+      />
+
+      {/* Blob Secundario (Azul Eléctrico) - Bloqueado en móviles */}
+      <div
+        className="aurora-blob blob-secondary hidden md:block"
+        style={{ transform: 'translateZ(0)' }}
+      />
 
       {/* Blob Terciario (Magenta/Púrpura) */}
       <div
