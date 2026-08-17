@@ -14,14 +14,19 @@ export function ReturningUserBanner() {
   const [caseStatus, setCaseStatus] = useState<string | null>(null);
 
   useEffect(() => {
-    // Verificamos si existe la huella digital en LocalStorage
-    const token = localStorage.getItem('desmulta_client_token');
-    const caseId = localStorage.getItem('desmulta_active_case');
+    // 🛡️ FIX HALLAZGO #1: Leer de sessionStorage (fuente actual) con fallback a localStorage (legado)
+    const token =
+      sessionStorage.getItem('desmulta_client_token') ||
+      localStorage.getItem('desmulta_client_token');
+    const caseId =
+      sessionStorage.getItem('desmulta_active_case') ||
+      localStorage.getItem('desmulta_active_case');
 
     if (token) {
       if (caseId) {
         if (caseId.length > 15) {
           // Es un ID antiguo de Firestore (Legacy). Limpiamos para evitar 404.
+          sessionStorage.removeItem('desmulta_active_case');
           localStorage.removeItem('desmulta_active_case');
         } else {
           setActiveCaseId(caseId);

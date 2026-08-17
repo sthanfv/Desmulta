@@ -50,6 +50,7 @@ describe('🏦 Server Action - Consolidación de Expediente', () => {
       cedula: '1090123456',
       telefono: '3001234567',
       nuevasMultas: [{ comparendo: 'ABC', fecha: '2022', valor: 100000, estado: 'Cobro' }],
+      turnstileToken: 'mock-turnstile-token-123',
     };
 
     const respuesta = await consolidarExpedienteEnDB(payload);

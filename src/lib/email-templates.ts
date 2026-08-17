@@ -18,6 +18,17 @@ const theme = {
 const fontStack =
   "font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;";
 
+export function escapeHtml(text: string | undefined | null): string {
+  if (!text) return '';
+  return text
+    .toString()
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 export const buildAnalysisEmail = (
   nombre: string,
   ciudad: string,
@@ -61,7 +72,7 @@ export const buildAnalysisEmail = (
   };
 
   // --- PREHEADER OCULTO ---
-  const preheaderText = `El análisis de tu caso en ${ciudad || 'Colombia'} está en marcha. Conoce los detalles y la ruta técnica...`;
+  const preheaderText = `El análisis de tu caso en ${escapeHtml(ciudad || 'Colombia')} está en marcha. Conoce los detalles y la ruta técnica...`;
 
   return `
     <!DOCTYPE html>
@@ -113,8 +124,8 @@ export const buildAnalysisEmail = (
                 </tr>
               </table>
 
-              <h1 style="font-size: 22px; color: white; margin: 0 0 16px 0; font-weight: 700;">¡Es un gusto saludarte, ${nombre}!</h1>
-              <p style="margin-bottom: 20px; color: #d4d4d8;">Es un placer darte la bienvenida a <strong>Desmulta</strong>. Queremos informarte que hemos recibido tu solicitud y nuestro equipo de analistas ya ha iniciado el <span style="color: white; font-weight: 600;">estudio de viabilidad técnica</span> para tu caso en <span style="color: white; font-weight: 600;">${ciudad || 'Colombia'}</span>.</p>
+              <h1 style="font-size: 22px; color: white; margin: 0 0 16px 0; font-weight: 700;">¡Es un gusto saludarte, ${escapeHtml(nombre)}!</h1>
+              <p style="margin-bottom: 20px; color: #d4d4d8;">Es un placer darte la bienvenida a <strong>Desmulta</strong>. Queremos informarte que hemos recibido tu solicitud y nuestro equipo de analistas ya ha iniciado el <span style="color: white; font-weight: 600;">estudio de viabilidad técnica</span> para tu caso en <span style="color: white; font-weight: 600;">${escapeHtml(ciudad || 'Colombia')}</span>.</p>
               <p style="margin-bottom: 24px; color: #d4d4d8;">Estamos evaluando cuidadosamente cada detalle ${baseLegal}</p>
               
               <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: ${theme.bgElevated}; border-left: 4px solid ${theme.brandGold}; border-radius: 6px; margin-bottom: 28px;">
@@ -143,7 +154,7 @@ export const buildAnalysisEmail = (
                     <strong style="color: ${theme.textPrimary}; display: block; margin-bottom: 8px;">🛡️ SELLO DE GARANTÍA DESMULTA:</strong>
                     Este correo es una comunicación oficial y segura. Nuestros sistemas han verificado la integridad de este mensaje de extremo a extremo.
                     <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid ${theme.border}; font-size: 12px;">
-                      Radicado Oficial: <strong style="color: ${theme.textPrimary};">${radicadoId}</strong> (EXP-DIGITAL)<br>
+                      Radicado Oficial: <strong style="color: ${theme.textPrimary};">${escapeHtml(radicadoId)}</strong> (EXP-DIGITAL)<br>
                       Fecha de Emisión: ${new Date().toLocaleDateString('es-CO')}
                     </div>
                   </td>
@@ -186,7 +197,7 @@ export const buildWelcomeEmail = (
   };
 
   // --- PREHEADER OCULTO ---
-  const preheaderText = `Hola ${nombre}, hemos recibido tu solicitud para la placa ${placa}. Tu radicado oficial es ${radicado}.`;
+  const preheaderText = `Hola ${escapeHtml(nombre)}, hemos recibido tu solicitud para la placa ${escapeHtml(placa)}. Tu radicado oficial es ${escapeHtml(radicado)}.`;
 
   return `
     <!DOCTYPE html>
@@ -222,11 +233,11 @@ export const buildWelcomeEmail = (
             <td style="padding: 40px 30px; color: ${theme.textPrimary}; line-height: 1.6; font-size: 16px;">
               <div style="color: ${theme.brandGreen}; font-size: 11px; font-weight: bold; margin-bottom: 24px; text-transform: uppercase; letter-spacing: 0.1em;">✓ Trámite Oficial Iniciado</div>
               
-              <p style="margin-bottom: 16px;">Hola <strong>${nombre}</strong>,</p>
-              <p style="margin-bottom: 16px;">Hemos recibido tu solicitud de análisis para la placa <strong style="color:white; background: ${theme.bgElevated}; padding: 4px 8px; border-radius: 4px; border: 1px solid ${theme.border};">${placa}</strong>.</p>
+              <p style="margin-bottom: 16px;">Hola <strong>${escapeHtml(nombre)}</strong>,</p>
+              <p style="margin-bottom: 16px;">Hemos recibido tu solicitud de análisis para la placa <strong style="color:white; background: ${theme.bgElevated}; padding: 4px 8px; border-radius: 4px; border: 1px solid ${theme.border};">${escapeHtml(placa)}</strong>.</p>
               
               <p style="margin-bottom: 24px;">Tu caso ha sido blindado y registrado bajo el radicado oficial:<br>
-              <strong style="color: ${theme.brandGold}; font-size: 18px; letter-spacing: 0.05em;">${radicado}</strong></p>
+              <strong style="color: ${theme.brandGold}; font-size: 18px; letter-spacing: 0.05em;">${escapeHtml(radicado)}</strong></p>
               
               <p style="margin-bottom: 32px;">Nuestro equipo técnico está evaluando la viabilidad técnica de tu caso. Te contactaremos pronto vía WhatsApp para darte una respuesta definitiva y los pasos a seguir.</p>
               
@@ -268,7 +279,7 @@ export const buildStatusChangeEmail = (
   const jsonLd = {
     '@context': 'http://schema.org',
     '@type': 'EmailMessage',
-    description: `Actualización de estado: ${nuevoEstado}`,
+    description: `Actualización de estado: ${escapeHtml(nuevoEstado)}`,
   };
 
   return `
@@ -301,16 +312,16 @@ export const buildStatusChangeEmail = (
             <td style="padding: 40px 30px; color: ${theme.textPrimary}; line-height: 1.6; font-size: 16px;">
               <div style="color: ${theme.brandGreen}; font-size: 11px; font-weight: bold; margin-bottom: 24px; text-transform: uppercase; letter-spacing: 0.1em;">✓ Actualización de Estado</div>
               
-              <p style="margin-bottom: 16px;">Hola <strong>${nombre}</strong>,</p>
-              <p style="margin-bottom: 16px;">Queremos informarte que tu expediente ha cambiado de estado a: <strong style="color:white; background: ${theme.bgElevated}; padding: 4px 8px; border-radius: 4px; border: 1px solid ${theme.border};">${nuevoEstado}</strong>.</p>
+              <p style="margin-bottom: 16px;">Hola <strong>${escapeHtml(nombre)}</strong>,</p>
+              <p style="margin-bottom: 16px;">Queremos informarte que tu expediente ha cambiado de estado a: <strong style="color:white; background: ${theme.bgElevated}; padding: 4px 8px; border-radius: 4px; border: 1px solid ${theme.border};">${escapeHtml(nuevoEstado)}</strong>.</p>
               
-              <p style="margin-bottom: 24px;">${mensaje}</p>
+              <p style="margin-bottom: 24px;">${escapeHtml(mensaje)}</p>
               ${
                 notaOperador
                   ? `
                 <div style="background-color: rgba(212, 175, 55, 0.1); border-left: 4px solid #D4AF37; padding: 15px; margin-bottom: 24px; border-radius: 4px;">
                   <strong style="color: #D4AF37; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 8px;">Mensaje de tu asesor:</strong>
-                  <p style="font-style: italic; color: #d4d4d8; font-size: 14px; margin: 0;">"${notaOperador}"</p>
+                  <p style="font-style: italic; color: #d4d4d8; font-size: 14px; margin: 0;">"${escapeHtml(notaOperador)}"</p>
                 </div>
               `
                   : ''
@@ -339,7 +350,7 @@ export const buildStatusChangeEmail = (
  * NOTA: El sistema solo envia este correo UNA vez por lead (anti-duplicado via followUpSentAt).
  */
 export const buildFollowUpEmail = (nombre: string, trackingUrl: string) => {
-  const preheaderText = `Hola ${nombre}, vimos que tu caso esta pausado. Podemos ayudarte?`;
+  const preheaderText = `Hola ${escapeHtml(nombre)}, vimos que tu caso esta pausado. Podemos ayudarte?`;
   return `
     <!DOCTYPE html>
     <html lang="es">
@@ -357,7 +368,7 @@ export const buildFollowUpEmail = (nombre: string, trackingUrl: string) => {
           </td></tr>
           <tr><td style="padding:36px 30px;color:${theme.textPrimary};line-height:1.6;font-size:16px;">
             <div style="color:${theme.brandGold};font-size:11px;font-weight:bold;margin-bottom:20px;text-transform:uppercase;letter-spacing:0.1em;">Actualizacion de tu Caso</div>
-            <p style="margin-bottom:16px;">Hola <strong>${nombre}</strong>,</p>
+            <p style="margin-bottom:16px;">Hola <strong>${escapeHtml(nombre)}</strong>,</p>
             <p style="margin-bottom:20px;color:#d4d4d8;">Notamos que tu caso lleva un momento sin avanzar. Hay algo en lo que podamos ayudarte?</p>
             <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:${theme.bgElevated};border-left:4px solid ${theme.brandGold};border-radius:6px;margin-bottom:28px;">
               <tr><td style="padding:20px;"><p style="margin:0;font-size:15px;color:${theme.textPrimary};line-height:1.5;">Nuestro equipo esta listo para continuar. A veces solo hace falta un documento o una confirmacion de tu parte.</p></td></tr>

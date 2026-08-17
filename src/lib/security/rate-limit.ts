@@ -82,6 +82,11 @@ export const rateLimiters = {
     limiter: Ratelimit.slidingWindow(10, '1 h'),
     prefix: 'rl:webPushRevoke',
   }),
+  expedienteAction: new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(10, '1 m'),
+    prefix: 'rl:expedienteAction',
+  }),
 };
 
 export type RateLimitType = keyof typeof rateLimiters;
@@ -172,7 +177,7 @@ export async function rateLimit(
   else if (collectionName === 'referidosCooldowns') type = 'referral';
   else if (collectionName === 'web_push_register_rl') type = 'webPushRegister';
   else if (collectionName === 'web_push_revoke_rl') type = 'webPushRevoke';
-  else if (collectionName === 'expediente_action_rl') type = 'operatorPin';
+  else if (collectionName === 'expediente_action_rl') type = 'expedienteAction';
   else if (collectionName === 'abandonmentRateLimits') type = 'abandonment';
   else if (collectionName === 'security_rate_limits' && identifier.startsWith('vip-auth-cedula:'))
     type = 'vipAuth';

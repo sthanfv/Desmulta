@@ -65,6 +65,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Token FCM inválido.' }, { status: 400 });
     }
 
+    if (!uid) {
+      logger.security('[Push Register] Intento de registro sin autenticación', { docId });
+      return NextResponse.json(
+        { error: 'No autorizado. Autenticación requerida.' },
+        { status: 401 }
+      );
+    }
+
     const idStr = docId as string;
     let targetDocRef = db.collection('consultations').doc(idStr);
     let docSnap = await targetDocRef.get();
@@ -91,6 +99,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, message: 'Solicitud procesada.' });
     }
 
+    if (docSnap.data()?.authorUid !== uid) {
+      logger.security('[Push Register] Intento de registro por UID distinto al autor', {
+        uid,
+        authorUid: docSnap.data()?.authorUid,
+        docId,
+      });
+      return NextResponse.json(
+        { error: 'No autorizado. El expediente no pertenece a este usuario.' },
+        { status: 403 }
+      );
+    }
+
     const now = new Date().toISOString();
 
     // FUENTE DE VERDAD: Subcolección private/push (acceso restringido por reglas Firestore)
@@ -102,7 +122,7 @@ export async function POST(request: Request) {
           fcmToken: fcmToken as string,
           pushOptInAt: now,
           tokenUpdatedAt: now,
-          ...(uid ? { registeredByUid: uid } : {}),
+          registeredByUid: uid,
         },
         { merge: true }
       );
@@ -118,26 +138,6 @@ export async function POST(request: Request) {
       },
       { merge: true }
     );
-
-    if (!uid) {
-      logger.security('[Push Register] Intento de registro sin autenticación', { docId });
-      return NextResponse.json(
-        { error: 'No autorizado. Autenticación requerida.' },
-        { status: 401 }
-      );
-    }
-
-    if (docSnap.data()?.authorUid !== uid) {
-      logger.security('[Push Register] Intento de registro por UID distinto al autor', {
-        uid,
-        authorUid: docSnap.data()?.authorUid,
-        docId,
-      });
-      return NextResponse.json(
-        { error: 'No autorizado. El expediente no pertenece a este usuario.' },
-        { status: 403 }
-      );
-    }
 
     return NextResponse.json({ success: true, message: 'FCM Token vinculado al expediente.' });
   } catch (error: unknown) {

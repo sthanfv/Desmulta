@@ -23,6 +23,10 @@ import { logger } from '@/lib/logger/security-logger';
 export async function getCaseByTrackingUuid(uuid: string) {
   const db = getFirestore();
   try {
+    // DevSecOps: Prevenir Path Traversal en Firestore
+    if (!/^[a-zA-Z0-9_-]{5,50}$/.test(uuid)) {
+      return { success: false, error: 'Formato de UUID inválido' };
+    }
     const docRef = db.collection('public_tracking').doc(uuid);
     const docSnap = await docRef.get();
 

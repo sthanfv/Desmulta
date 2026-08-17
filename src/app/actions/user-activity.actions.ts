@@ -19,8 +19,19 @@ import { logger } from '@/lib/logger/security-logger';
  * la hashea y busca por esa huella digital.
  */
 
+import { checkRateLimit } from '@/lib/security/rate-limit';
+import { headers } from 'next/headers';
+
 export async function getConsultationActivity(cedula: string) {
   try {
+    const headersList = await headers();
+    const { getSecureIp } = await import('@/lib/security/ip-utils');
+    const ip = getSecureIp(headersList);
+    const rl = await checkRateLimit('consultation', ip);
+    if (!rl.success) {
+      return { success: false, error: 'Demasiadas consultas. Intenta más tarde.' };
+    }
+
     // Validación básica de entrada
     if (!cedula || cedula.trim().length < 5) {
       return { success: false, error: 'Número de cédula inválido.' };

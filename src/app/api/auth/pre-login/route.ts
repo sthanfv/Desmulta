@@ -107,6 +107,7 @@ export async function POST(request: NextRequest) {
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Error interno en pre-login.';
     logger.error('[pre-login] Error durante la pre-autenticación.', { error: msg });
-    return NextResponse.json({ error: msg }, { status: 401 });
+    // M-6: No devolver msg al frontend para evitar Information Leak
+    return NextResponse.json({ error: 'Error de autenticación.' }, { status: 401 });
   }
 }

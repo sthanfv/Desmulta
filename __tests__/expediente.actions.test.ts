@@ -1,6 +1,5 @@
 import { consolidarExpedienteEnDB } from '@/app/actions/expediente.actions';
-import { getAdminApp } from '@/lib/firebase-admin';
-import { getFirestore, FieldValue } from 'firebase-admin/firestore';
+import { getFirestore } from 'firebase-admin/firestore';
 import { logger } from '@/lib/logger/security-logger';
 import { describe, it, expect, beforeEach, vi, type Mock } from 'vitest';
 
@@ -26,11 +25,11 @@ vi.mock('@/lib/logger/security-logger', () => ({
 }));
 
 vi.mock('@/lib/security/server-crypto', () => ({
-  hashPII: vi.fn((val) => `HASHED_${val}`)
+  hashPII: vi.fn((val) => `HASHED_${val}`),
 }));
 
 vi.mock('@/lib/security/rate-limit', () => ({
-  rateLimit: vi.fn().mockResolvedValue({ success: true })
+  rateLimit: vi.fn().mockResolvedValue({ success: true }),
 }));
 
 vi.mock('next/headers', () => ({
@@ -69,7 +68,8 @@ describe('QA FinOps & DB: consolidarExpedienteEnDB', () => {
   const basePayload = {
     cedula: '1234567890',
     telefono: '3000000000',
-    nombre: 'Usuario Prueba',
+    nombre: 'Usuario Test',
+    turnstileToken: 'mock-valid-token-12345',
     nuevasMultas: [{ comparendo: 'C001', fecha: '2026-01-01', valor: 500000, estado: 'PENDIENTE' }],
   };
 

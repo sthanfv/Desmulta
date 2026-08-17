@@ -20,8 +20,8 @@ export const maxDuration = 60; // Forzar timeout Vercel a 60s para soportar el s
  */
 export async function POST(request: NextRequest) {
   try {
-    // Extraer IP para aplicar el Rate Limit de forma determinista
-    const ip = request.headers.get('x-forwarded-for') ?? '127.0.0.1';
+    const { getSecureIp } = await import('@/lib/security/ip-utils');
+    const ip = getSecureIp(request);
 
     // 🛡️ FIX: Utilizar el motor centralizado de rate limit (Fail-Open/Fail-Closed)
     const rateLimit = await checkRateLimit('escudoSimit', ip);

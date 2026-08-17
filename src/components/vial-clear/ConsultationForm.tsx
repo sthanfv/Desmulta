@@ -535,6 +535,7 @@ export function ConsultationForm({ onSuccess, mode = 'full', nonce }: Consultati
               valor,
               estado,
             })),
+            turnstileToken: cfToken!,
           });
           statusConsolidacion = resExpediente.status || 'creado';
           clearExpediente();

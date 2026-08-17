@@ -264,7 +264,7 @@ export async function POST(req: NextRequest) {
             body: JSON.stringify({
               chat_id: chatId,
               parse_mode: 'HTML',
-              text: `💰 <b>¡NUEVO PAGO RECIBIDO!</b> 💰\n\n<b>Cliente:</b> ${nombre}\n<b>Producto:</b> ${producto}${ticketStr}\n<b>Monto:</b> $${(amountConfirmadoPorWompi / 100).toLocaleString('es-CO')} COP\n<b>Ref:</b> <code>${reference}</code>\n\nEl PDF se está enviando automáticamente. 🚀`,
+              text: `💰 <b>¡NUEVO PAGO RECIBIDO!</b> 💰\n\n<b>Cliente:</b> ${nombre}\n<b>Producto:</b> ${producto}${ticketStr}\n<b>Monto:</b> $${amountConfirmadoPorWompi.toLocaleString('es-CO')} COP\n<b>Ref:</b> <code>${reference}</code>\n\nEl PDF se está enviando automáticamente. 🚀`,
             }),
           })
             .then(async (res) => {

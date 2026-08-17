@@ -28,6 +28,12 @@ export const getExpedienteCacheado = unstable_cache(
   async (shortId: string) => {
     getAdminApp();
     const db = getFirestore();
+
+    // DevSecOps: Prevenir Path Traversal en Firestore
+    if (!/^[a-zA-Z0-9_-]{5,50}$/.test(shortId)) {
+      return null;
+    }
+
     const docRef = db.collection('public_tracking').doc(shortId);
     const docSnap = await docRef.get();
 

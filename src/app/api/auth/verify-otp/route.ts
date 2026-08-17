@@ -20,6 +20,18 @@ import { jwtVerify, SignJWT } from 'jose';
 import { setAuthCookies } from 'next-firebase-auth-edge/lib/next/cookies';
 import { verifyOtpCode } from '@/lib/auth/otp-service';
 import { logger } from '@/lib/logger/security-logger';
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
+import { z } from 'zod';
+
+// 🛡️ FIX HALLAZGO #3: Rate limit estricto — 5 intentos por IP cada 5 minutos
+const redis = Redis.fromEnv();
+const rateLimit = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(5, '5 m'),
+  analytics: true,
+  prefix: '@upstash/ratelimit/verify_otp',
+});
 
 // Forzar runtime Node.js para Firebase Admin y crypto
 export const runtime = 'nodejs';
@@ -53,15 +65,34 @@ function getAuthCookieOptions() {
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { temp_token, code } = body as { temp_token?: string; code?: string };
-
-    if (!temp_token || !code) {
+    // 🛡️ FIX HALLAZGO #3: Rate limiting por IP — previene fuerza bruta del OTP
+    const { getSecureIp } = await import('@/lib/security/ip-utils');
+    const ip = getSecureIp(request);
+    const { success: rlOk } = await rateLimit.limit(ip);
+    if (!rlOk) {
+      logger.security('[verify-otp] Rate limit excedido — posible fuerza bruta OTP.', { ip });
       return NextResponse.json(
-        { error: 'El token temporal y el código son requeridos.' },
-        { status: 400 }
+        { error: 'Demasiados intentos de verificación. Espera unos minutos.' },
+        { status: 429 }
       );
     }
+
+    const body = await request.json();
+
+    // Validación estricta con Zod
+    const OtpSchema = z.object({
+      temp_token: z.string().min(1, 'Token requerido'),
+      code: z
+        .string()
+        .length(6, 'El código debe tener exactamente 6 dígitos')
+        .regex(/^\d+$/, 'Solo números permitidos'),
+    });
+
+    const parsed = OtpSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.errors[0].message }, { status: 400 });
+    }
+    const { temp_token, code } = parsed.data;
 
     // 1. Verificar la firma y expiración del tempToken
     const jwtSecret = process.env.GOD_MODE_JWT_SECRET;

@@ -15,13 +15,16 @@ Sentry.init({
   enableLogs: true,
   sendDefaultPii: false,
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   beforeSend(event: ErrorEvent) {
     try {
       return applyPIIScrubber(event);
     } catch (error) {
-      console.error('[DevSecOps] Sanitización fallida en Edge Sentry. Destruyendo evento.', error);
-      return null;
+      console.error(
+        '[DevSecOps] Sanitización fallida en Edge Sentry. Enviando evento con alerta.',
+        error
+      );
+      event.tags = { ...event.tags, pii_scrub_failed: 'true' };
+      return event;
     }
   },
 });

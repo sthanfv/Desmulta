@@ -138,6 +138,12 @@ export async function dispatchToTelegram(
       return { status: 500, error: 'DISPATCH_FAILED' };
     }
 
+    // B-3: Marcar como DISPATCHED en la DB para evitar re-envío de PDFs
+    await db.collection('legal_mandates').doc(mandateKey).update({
+      status: 'DISPATCHED',
+      dispatchedAt: new Date().toISOString(),
+    });
+
     return { status: 200, message: 'PAYLOAD_DELIVERED' };
   } catch (error) {
     logger.error('[telegram-bridge] BRIDGE_CRASH', { error: String(error) });

@@ -135,14 +135,7 @@ export async function POST(req: NextRequest) {
       isSharpMissing,
       detalle: msg,
     });
-    return NextResponse.json(
-      {
-        error: isSharpMissing
-          ? 'sharp no instalado. Ejecuta: npm install sharp'
-          : 'Error interno del servidor',
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
   }
 }
 

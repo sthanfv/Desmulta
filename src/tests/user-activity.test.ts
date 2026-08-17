@@ -23,6 +23,16 @@ vi.mock('../lib/logger/security-logger', () => ({
   },
 }));
 
+vi.mock('next/headers', () => ({
+  headers: vi.fn().mockResolvedValue({
+    get: vi.fn().mockReturnValue('127.0.0.1'),
+  }),
+}));
+
+vi.mock('../lib/security/rate-limit', () => ({
+  checkRateLimit: vi.fn().mockResolvedValue({ success: true }),
+}));
+
 describe('User Activity Actions — getConsultationActivity', () => {
   const mockCedula = '10904586653';
 

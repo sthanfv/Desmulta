@@ -61,11 +61,9 @@ type DebugTab = 'MEDIA' | 'ERRORES' | 'RED' | 'DEVICE' | 'TOUCH' | 'CONSOLE' | '
 // ─── Utilidades ───────────────────────────────────────────────────────────────
 
 const IS_PROD = process.env.NODE_ENV === 'production';
-// 🛡️ AUDITORÍA 2026-08-01: RIESGO ACEPTADO
-// NEXT_PUBLIC_DEBUG_PIN se expone en el cliente para permitir a los devs
-// desbloquear el TouchDebugger en producción mediante un gesto secreto.
-// Es un PIN de bajo riesgo (no da acceso a datos de usuarios, solo al panel de logs local).
-const DEBUG_PIN = process.env.NEXT_PUBLIC_DEBUG_PIN; // Sin valor por defecto inseguro en código fuente
+// 🛡️ FIX HALLAZGO #4: Almacenar solo el HASH del PIN, no el PIN en texto plano
+// NEXT_PUBLIC_DEBUG_PIN_HASH permite verificar el PIN de debug sin exponerlo
+const DEBUG_PIN_HASH = process.env.NEXT_PUBLIC_DEBUG_PIN_HASH; // SHA-256 del PIN
 
 function DeltaBadge({ ms }: { ms: number }) {
   if (ms <= 0) return null;
@@ -307,13 +305,13 @@ export function TouchDebugger() {
 
           if (IS_PROD) {
             // En producción, solo activar si hay un PIN seguro configurado
-            if (DEBUG_PIN && DEBUG_PIN !== '1234') {
+            if (DEBUG_PIN_HASH) {
               setPinMode(true);
               setPinInput('');
               setPinError(false);
             } else {
               logger.error(
-                '[TouchDebugger] Intento de activación bloqueado en producción: NEXT_PUBLIC_DEBUG_PIN no configurado o inseguro.'
+                '[TouchDebugger] Intento de activación bloqueado en producción: NEXT_PUBLIC_DEBUG_PIN_HASH no configurado o inseguro.'
               );
             }
           } else {
@@ -331,16 +329,23 @@ export function TouchDebugger() {
       const next = (pinInput + digit).slice(0, 4);
       setPinInput(next);
       if (next.length === 4) {
-        if (next === DEBUG_PIN) {
-          setPinMode(false);
-          activatePanel();
-        } else {
-          setPinError(true);
-          setTimeout(() => {
-            setPinInput('');
-            setPinError(false);
-          }, 800);
-        }
+        // Comparar hash SHA-256 del input vs hash almacenado
+        const encoder = new TextEncoder();
+        crypto.subtle.digest('SHA-256', encoder.encode(next)).then((buf) => {
+          const inputHash = Array.from(new Uint8Array(buf))
+            .map((b) => b.toString(16).padStart(2, '0'))
+            .join('');
+          if (inputHash === DEBUG_PIN_HASH) {
+            setPinMode(false);
+            activatePanel();
+          } else {
+            setPinError(true);
+            setTimeout(() => {
+              setPinInput('');
+              setPinError(false);
+            }, 800);
+          }
+        });
       }
     },
     [pinInput, activatePanel]

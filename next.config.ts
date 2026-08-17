@@ -1,6 +1,7 @@
 import type { NextConfig } from 'next';
 import withPWAInit from '@ducanh2912/next-pwa';
 import withBundleAnalyzer from '@next/bundle-analyzer';
+import { withSentryConfig } from '@sentry/nextjs';
 
 const withAnalyzer = withBundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
@@ -16,9 +17,9 @@ const withPWA = withPWAInit({
     runtimeCaching: [], // Desactivar el precaching agresivo por defecto
     exclude: [
       /firebase-messaging-sw\.js$/,
-      /^\/admin(\/.*)?$/,
-      /^\/api\/admin(\/.*)?$/,
-      /^\/acceso-panel(\/.*)?$/,
+      /^\/admin($|\/)/,
+      /^\/api\/admin($|\/)/,
+      /^\/acceso-panel($|\/)/,
     ],
     // Evitar que el Service Worker intercepte estas rutas para el fallback offline
     navigateFallbackDenylist: [/^\/admin/, /^\/api/, /^\/acceso-panel/],
@@ -42,9 +43,12 @@ const nextConfig: NextConfig = {
   },
   productionBrowserSourceMaps: false,
   compiler: {
-    removeConsole: process.env.NODE_ENV === 'production' ? {
-      exclude: ['error'], // Mantener solo los errores en producción para auditoría
-    } : false,
+    removeConsole:
+      process.env.NODE_ENV === 'production'
+        ? {
+            exclude: ['error'], // Mantener solo los errores en producción para auditoría
+          }
+        : false,
   },
 
   images: {
@@ -80,15 +84,11 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/fonts/(.*)',
-        headers: [
-          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
-        ],
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
       },
       {
         source: '/tesseract/(.*)',
-        headers: [
-          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
-        ],
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
       },
       {
         // Imágenes locales en /public — cachear agresivamente
@@ -125,4 +125,13 @@ const nextConfig: NextConfig = {
 // Solo para inspección y testing. Next.js utiliza el export default (con wrapper PWA).
 // Importar este export NO incluye la configuración de PWA.
 export { nextConfig as nextConfigBase };
-export default withAnalyzer(withPWA(nextConfig));
+const wrappedConfig = withAnalyzer(withPWA(nextConfig));
+
+export default withSentryConfig(wrappedConfig, {
+  // Configuración base recomendada para Source Maps
+  silent: true,
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  widenClientFileUpload: true,
+  disableLogger: true,
+});

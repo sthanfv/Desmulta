@@ -44,6 +44,23 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'docId inválido.' }, { status: 400 });
     }
 
+    const authHeader = request.headers.get('Authorization');
+    let uid: string | undefined = undefined;
+    if (authHeader?.startsWith('Bearer ')) {
+      const idToken = authHeader.slice(7);
+      try {
+        const { getAuth } = await import('firebase-admin/auth');
+        const decodedToken = await getAuth().verifyIdToken(idToken);
+        uid = decodedToken.uid;
+      } catch {
+        // Ignorar
+      }
+    }
+
+    if (!uid) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
+
     getAdminApp();
     const db = getFirestore();
 
@@ -67,6 +84,15 @@ export async function POST(request: Request) {
     if (!docSnap.exists) {
       // Responder 200 genérico — no revelar si el ID existe o no
       return NextResponse.json({ success: true });
+    }
+
+    const data = docSnap.data() || {};
+    if (data.authorUid && data.authorUid !== uid) {
+      logger.security('[PushRevoke] M-5 Intento de bypass de revocación', {
+        docId: idStr,
+        attemptUid: uid,
+      });
+      return NextResponse.json({ error: 'No autorizado para revocar este token' }, { status: 403 });
     }
 
     // Eliminar token FCM del campo raíz

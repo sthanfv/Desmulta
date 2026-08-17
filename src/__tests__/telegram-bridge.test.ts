@@ -15,6 +15,7 @@ vi.mock('firebase-admin/firestore', () => ({
     collection: vi.fn(() => ({
       doc: vi.fn(() => ({
         get: vi.fn().mockResolvedValue({ exists: true, data: () => ({ status: 'VERIFIED' }) }),
+        update: vi.fn().mockResolvedValue(true),
       })),
     })),
   })),

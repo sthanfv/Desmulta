@@ -8,6 +8,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { headers } from 'next/headers';
 import { logger } from '@/lib/logger/security-logger';
 import bcrypt from 'bcryptjs';
+import { checkRateLimit } from '@/lib/security/rate-limit';
 
 // Hashea el documentId (cédula) para evitar exponer PII en IDs de Firestore y Cloud Logging
 function getMandateKey(documentId: string): string {
@@ -38,6 +39,15 @@ export async function dispatchOTP(email: string, documentId: string) {
   }
 
   try {
+    const cleanEmail = email.toLowerCase().trim();
+
+    // DevSecOps: M-3 Rate limit por email (Email Bombing) usando Upstash
+    const emailRl = await checkRateLimit('validarOtp', `email:${cleanEmail}`);
+    if (emailRl.blocked) {
+      logger.warn('[legal-auth] Email bombing interceptado', { email: cleanEmail });
+      return { status: 429, error: 'Demasiadas solicitudes para este correo. Intente más tarde.' };
+    }
+
     getAdminApp();
     const db = getFirestore();
 
@@ -98,7 +108,7 @@ export async function dispatchOTP(email: string, documentId: string) {
 
     await resend.emails.send({
       from: 'Desmulta Legal <legal@desmulta.online>',
-      to: email,
+      to: cleanEmail,
       subject: 'Código de Firma Electrónica - Desmulta',
       text: `Tu código de autorización legal es: ${otpCode}. Expira en 5 minutos.`,
     });

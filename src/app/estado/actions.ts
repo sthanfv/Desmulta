@@ -17,6 +17,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { hashPII, signPortalSession } from '@/lib/security/server-crypto';
 import { z } from 'zod';
 import { rateLimit } from '@/lib/security/rate-limit';
+import { logger } from '@/lib/logger/security-logger';
 
 /** Tiempo mínimo garantizado de respuesta (ms) — mitiga timing attacks */
 const MIN_RESPONSE_MS = 300;
@@ -145,8 +146,8 @@ async function _authenticate(
 
     return { success: true, trackingUuid };
   } catch (_error) {
-    console.error('DEBUG_LOGIN_ERROR:', _error);
-    const msg = _error instanceof Error ? _error.message : String(_error);
-    return { success: false, error: `Error interno de conexión. Detalle: ${msg}` };
+    // 🛡️ FIX HALLAZGO #2: Registrar internamente pero NUNCA exponer detalles al cliente
+    logger.error('[estado/loginClientPortal] Error de conexión', { error: String(_error) });
+    return { success: false, error: 'Error interno de conexión. Intenta nuevamente.' };
   }
 }

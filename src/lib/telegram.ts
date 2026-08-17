@@ -1,6 +1,7 @@
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { getAdminApp } from '@/lib/firebase-admin';
 import { logger } from '@/lib/logger/security-logger';
+import { validateWebhookUrl } from '@/lib/security/ssrf-guard';
 
 // Helper para escapar caracteres HTML en mensajes de Telegram
 function escapeHtml(text: string): string {
@@ -188,6 +189,9 @@ ${dictamenHtml}${evidenceSection}
 
     if (activeEvidenceUrl) {
       telegramApiUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`;
+
+      // Validación SSRF antes de hacer fetch
+      await validateWebhookUrl(activeEvidenceUrl);
 
       // 🌉 DATA BRIDGE: Descarga efímera a memoria RAM
       // Evita que Telegram dependa de la URL pública de Vercel

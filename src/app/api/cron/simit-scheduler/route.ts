@@ -15,9 +15,11 @@ const APP_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://desmulta.com';
  */
 export async function POST(_request: Request) {
   try {
-    // Validar autorización básica si se desea proteger este cron
-    // const authHeader = request.headers.get('authorization');
-    // if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // Validar autorización básica para proteger este cron
+    const authHeader = _request.headers.get('authorization');
+    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
     const subscriptions = await getActiveSubscriptions();
     if (subscriptions.length === 0) {

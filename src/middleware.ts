@@ -253,10 +253,8 @@ export async function middleware(request: NextRequest) {
           const token = request.cookies.get('admin-2fa-token')?.value;
           const jwtSecret = process.env.GOD_MODE_JWT_SECRET;
           if (!token || !jwtSecret) {
-            console.error(
-              '[Middleware /admin] CRÍTICO: token 2fa vacío o falta GOD_MODE_JWT_SECRET en el servidor.',
-              { hasToken: !!token, hasSecret: !!jwtSecret }
-            );
+            // 🛡️ FIX HALLAZGO #8: Mensaje genérico sin metadatos sensibles
+            console.error('[Middleware /admin] Falta token 2FA o configuración de servidor');
             const loginUrl = new URL('/acceso-panel', request.url);
             loginUrl.search = request.nextUrl.search;
             const response = NextResponse.redirect(loginUrl);

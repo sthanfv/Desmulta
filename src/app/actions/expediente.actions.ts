@@ -31,9 +31,31 @@ const ConsolidarSchema = z.object({
       })
     ),
   nombre: z.string().trim().max(60).optional(),
+  turnstileToken: z.string().min(10, { message: 'Token de seguridad inválido' }),
 });
 
 type ConsolidarPayload = z.infer<typeof ConsolidarSchema>;
+
+async function verifyTurnstile(token: string): Promise<boolean> {
+  if (!token) return false;
+  const secret = process.env.TURNSTILE_SECRET_KEY;
+  if (!secret) return process.env.NODE_ENV !== 'production';
+
+  try {
+    const formData = new URLSearchParams();
+    formData.append('secret', secret);
+    formData.append('response', token);
+    const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      body: formData.toString(),
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    });
+    const data = await res.json();
+    return !!data.success;
+  } catch (_err) {
+    return false;
+  }
+}
 
 /**
  * Server Action de Consolidación (FinOps)
@@ -53,6 +75,12 @@ export async function consolidarExpedienteEnDB(payloadParams: ConsolidarPayload)
     }
 
     const payload = ConsolidarSchema.parse(payloadParams);
+
+    // M-4: Prevención de DB Pollution (Bot Protection)
+    const isValidBot = await verifyTurnstile(payload.turnstileToken);
+    if (!isValidBot) {
+      throw new Error('Token de seguridad inválido o expirado. (Bot Protection)');
+    }
 
     const adminApp = getAdminApp();
     const db = getFirestore(adminApp);

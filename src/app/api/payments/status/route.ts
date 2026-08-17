@@ -10,8 +10,28 @@ import { timingSafeEqual } from 'crypto';
  * Devuelve únicamente el estado de pago y el tipo de producto de una compra
  * a partir de la referencia (ref) y validando el token de descarga, previniendo la exposición de PII y la enumeración (IDOR).
  */
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
+
+// 🛡️ FIX HALLAZGO #7: Rate limit para evitar enumeración y abuso
+const redis = Redis.fromEnv();
+const rateLimit = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(20, '1 m'),
+  analytics: true,
+  prefix: '@upstash/ratelimit/payment_status',
+});
+
 export async function GET(req: NextRequest) {
   try {
+    const { getSecureIp } = await import('@/lib/security/ip-utils');
+    const ip = getSecureIp(req);
+    const { success: rlOk } = await rateLimit.limit(ip);
+
+    if (!rlOk) {
+      logger.security('[api/payments/status] Rate limit excedido', { ip });
+      return NextResponse.json({ error: 'Demasiadas consultas.' }, { status: 429 });
+    }
     const { searchParams } = new URL(req.url);
     const ref = searchParams.get('ref');
     const downloadToken = req.cookies.get(`dt_${ref}`)?.value;
@@ -51,9 +71,10 @@ export async function GET(req: NextRequest) {
       timingSafeEqual(expected, received);
 
     if (!isTokenValid) {
+      // M-7: No imprimir el downloadToken en texto plano (Zero-PII / Zero-Leak)
       logger.security('[api/payments/status] Token de descarga inválido (IDOR detectado)', {
         ref,
-        receivedToken: downloadToken,
+        receivedToken: downloadToken ? `${downloadToken.slice(0, 4)}***` : 'N/A',
       });
       return NextResponse.json(
         { error: 'No autorizado. Token de descarga inválido.' },

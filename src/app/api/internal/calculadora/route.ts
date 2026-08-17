@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { TASA_EA_VIGENTE, SMDLV_2026 } from '@/lib/config-constants';
 import { PrescriptionEngine, OCRSanitizer } from '@/lib/legal/prescription-engine';
+import { timingSafeEqual } from 'crypto';
+import { checkRateLimit } from '@/lib/security/rate-limit';
+import { logger } from '@/lib/logger/security-logger';
+import { getSecureIp } from '@/lib/security/ip-utils';
 
 // ─── Tipos Públicos ─────────────────────────────────────────────────────────────
 
@@ -304,6 +308,24 @@ function calcularMultaCompleta(
 
 export async function POST(req: NextRequest) {
   try {
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader || !process.env.INTERNAL_API_SECRET) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const a = Buffer.from(token);
+    const b = Buffer.from(process.env.INTERNAL_API_SECRET);
+    if (a.length !== b.length || !timingSafeEqual(a, b)) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
+
+    const ip = getSecureIp(req);
+    const rl = await checkRateLimit('consultation', ip);
+    if (!rl.success) {
+      return NextResponse.json({ error: 'Demasiadas consultas' }, { status: 429 });
+    }
+
     const body = await req.json();
     const { valorMulta2026, fechaInfraccionISO, tieneCobroCoactivo, textoOCR } = body;
 
@@ -320,7 +342,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(resultado);
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json({ error: message }, { status: 500 });
+    logger.error('[calculadora-interna] Error al calcular:', error);
+    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
   }
 }

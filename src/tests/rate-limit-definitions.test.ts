@@ -164,9 +164,9 @@ describe('🛡️ Rate Limiting — Configuración y Límites', () => {
     await rateLimit('test-ip', 5, 60, 'web_push_revoke_rl');
     expect(limitMock).toHaveBeenLastCalledWith('ratelimit:webPushRevoke:test-ip');
 
-    // Expediente Action -> operatorPin
+    // Expediente Action -> expedienteAction
     await rateLimit('test-ip', 5, 60, 'expediente_action_rl');
-    expect(limitMock).toHaveBeenLastCalledWith('ratelimit:operatorPin:test-ip');
+    expect(limitMock).toHaveBeenLastCalledWith('ratelimit:expedienteAction:test-ip');
 
     // Prefijo god-mode-auth: -> godMode
     await rateLimit('god-mode-auth:user123', 3, 60);
