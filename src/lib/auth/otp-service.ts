@@ -17,7 +17,7 @@ import { createHash, timingSafeEqual } from 'crypto';
 import { logger } from '@/lib/logger/security-logger';
 
 // Constantes de seguridad del protocolo OTP
-const OTP_EXPIRY_MINUTES = 2;
+const OTP_EXPIRY_MINUTES = 5;
 const MAX_OTP_ATTEMPTS = 3;
 
 /**
