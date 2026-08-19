@@ -27,10 +27,15 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     return { title: 'Cámaras no encontradas' };
   }
 
+  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://desmulta.online';
+
   return {
     title: `Ubicación de Cámaras de Fotomultas (SAST) en ${ciudad.nombre} | Desmulta`,
     description: `Consulta el mapa exacto y listado oficial de cámaras de fotodetección autorizadas por la ANSV en ${ciudad.nombre}, ${ciudad.departamento}.`,
     keywords: `cámaras fotomultas ${ciudad.nombre}, ubicacion camaras salvavidas ${ciudad.nombre}, SAST ${ciudad.nombre}`,
+    alternates: {
+      canonical: `${SITE_URL}/multas/${ciudad.slug}/camaras`,
+    },
   };
 }
 
