@@ -10,8 +10,9 @@ Desmulta utiliza generación de rutas estáticas para atrapar búsquedas locales
 
 - **Ruta:** `src/app/multas/[ciudad]/page.tsx`
 - **Ruta:** `src/app/servicios/[ciudad]/page.tsx`
+- **Ruta:** `src/app/multas/[ciudad]/camaras/page.tsx` (Directorio ANSV con fallback de Coordenadas GPS)
 
-Estas rutas permiten que cuando un usuario en Google busque "Fotomultas en Medellín" o "Impugnar comparendo en Bogotá", el sistema ya tenga un archivo HTML estático compilado y ultra-rápido listo para ser servido por el CDN de Vercel.
+Estas rutas permiten que cuando un usuario en Google busque "Fotomultas en Medellín", "Impugnar comparendo en Bogotá" o "Dónde están las cámaras en Cali", el sistema ya tenga un archivo HTML estático compilado y ultra-rápido listo para ser servido por el CDN de Vercel. La inyección estricta de la etiqueta `canonical` previene penalizaciones por páginas descubiertas sin indexar.
 
 ### 2.1. Cero JavaScript Bloqueante
 

@@ -47,6 +47,7 @@
 - [x] **Gestor de Estados de Cámaras (Cards):** Rediseño profundo estilo "Dark Premium" (`#0a0a0a`), uso avanzado de colorimetría para severidad de infracción (Ámbar para C, Rojo para D), y formato inteligente satelital cuando falta la dirección legal.
 - [x] **Barra Fija de Estadísticas (Sticky Bar):** Contador flotante en tiempo real del número de cámaras activadas, conectado al embudo de ventas (`#escaner`).
 - [x] **Conversión en Ciudades Vacías:** Las ciudades con 0 cámaras ahora muestran un "Empty State" optimizado psicológicamente, indicando que todas las multas allí son ilegales para impulsar la auditoría. Project Manager, se ejecutó una revisión de seguridad pasiva sobre la implementación (100% Client-Side Filtering, JSON estático, protección XSS nativa de React, sin SQL/DB queries, enlaces de Maps codificados). Pendiente cualquier auditoría adicional.
+- [x] **Auditoría UI/UX Dual-Theme (Light/Dark):** Se ajustó el contraste visual extremo del componente militar de escaneo de radar para funcionar en modo claro (Light Mode) forzando interior oscuro, y se liberó la ruta `multas/ciudades` que tenía un fondo negro (Dark Mode) hardcodeado. Las tarjetas se elevaron con degradados sutiles (Gradients + Shadows) aumentando su visibilidad diurna.
 - Evaluar posible expansión del embudo hacia suscripciones automáticas (notificaciones).
 
 ## 🎯 Metas Pendientes / Tareas a Seguir

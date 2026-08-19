@@ -69,10 +69,10 @@ export default function ListaCamarasCiudad({ ciudadNombre, ciudadSlug }: Props) 
   // Helper de Colores Psicológicos para Infracciones
   const getSeverityColor = (codigo: string) => {
     if (codigo.startsWith('D'))
-      return 'bg-red-100 dark:bg-red-500/10 text-red-800 dark:text-red-400 border-red-300 dark:border-red-500/20 hover:bg-red-500 hover:text-white dark:hover:text-white';
+      return 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20 hover:bg-red-500 hover:text-white';
     if (codigo.startsWith('C'))
-      return 'bg-amber-100 dark:bg-amber-500/10 text-amber-800 dark:text-amber-400 border-amber-300 dark:border-amber-500/20 hover:bg-amber-500 hover:text-black';
-    return 'bg-slate-200 dark:bg-white/10 text-slate-800 dark:text-white/80 border-slate-300 dark:border-white/5 hover:bg-brand-500 hover:text-black';
+      return 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20 hover:bg-amber-500 hover:text-black';
+    return 'bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-white/80 border-slate-200 dark:border-white/5 hover:bg-brand-500 hover:text-black';
   };
 
   // --- ESTADO VACÍO (0 Cámaras en la ciudad) ---
@@ -143,25 +143,25 @@ export default function ListaCamarasCiudad({ ciudadNombre, ciudadSlug }: Props) 
             className="absolute inset-0 z-50 bg-background/90 backdrop-blur-md flex flex-col items-center justify-start pt-20 text-center"
           >
             {/* Radar Premium Nivel Militar */}
-            <div className="relative w-56 h-56 md:w-64 md:h-64 mb-10 rounded-full bg-slate-100 dark:bg-[#050505] border-[8px] border-slate-300 dark:border-slate-800/80 overflow-hidden shadow-[0_0_50px_rgba(245,158,11,0.2)] flex items-center justify-center">
+            <div className="relative w-56 h-56 md:w-64 md:h-64 mb-10 rounded-full bg-[#050505] border-[8px] border-slate-800 overflow-hidden shadow-[0_0_50px_rgba(245,158,11,0.2)] flex items-center justify-center">
               {/* Anillos de distancia (Grid) */}
-              <div className="absolute inset-0 rounded-full border border-brand-500/30 dark:border-brand-500/20 m-6"></div>
-              <div className="absolute inset-0 rounded-full border border-brand-500/40 dark:border-brand-500/30 m-12 border-dashed"></div>
-              <div className="absolute inset-0 rounded-full border border-brand-500/30 dark:border-brand-500/20 m-18"></div>
-              <div className="absolute inset-0 rounded-full border border-brand-500/20 dark:border-brand-500/10 m-24"></div>
+              <div className="absolute inset-0 rounded-full border border-brand-500/30 m-6"></div>
+              <div className="absolute inset-0 rounded-full border border-brand-500/40 m-12 border-dashed"></div>
+              <div className="absolute inset-0 rounded-full border border-brand-500/20 m-18"></div>
+              <div className="absolute inset-0 rounded-full border border-brand-500/10 m-24"></div>
 
               {/* Ejes Centrales Cruzados */}
-              <div className="absolute w-full h-[1px] bg-brand-500/40 dark:bg-brand-500/30"></div>
-              <div className="absolute h-full w-[1px] bg-brand-500/40 dark:bg-brand-500/30"></div>
+              <div className="absolute w-full h-[1px] bg-brand-500/40"></div>
+              <div className="absolute h-full w-[1px] bg-brand-500/40"></div>
               <div className="absolute w-full h-[1px] bg-brand-500/20 rotate-45"></div>
               <div className="absolute w-full h-[1px] bg-brand-500/20 -rotate-45"></div>
 
               {/* El Barrido (Sweep) */}
               <div
-                className="absolute inset-0 rounded-full opacity-80 animate-[spin_2s_linear_infinite]"
+                className="absolute inset-0 rounded-full opacity-90 animate-[spin_2s_linear_infinite]"
                 style={{
                   background:
-                    'conic-gradient(from 0deg, transparent 50%, rgba(245,158,11,0.1) 85%, rgba(245,158,11,0.9) 100%)',
+                    'conic-gradient(from 0deg, transparent 50%, rgba(245,158,11,0.2) 85%, rgba(245,158,11,1) 100%)',
                 }}
               ></div>
 
@@ -269,7 +269,7 @@ export default function ListaCamarasCiudad({ ciudadNombre, ciudadSlug }: Props) 
                       exit={{ opacity: 0, scale: 0.95 }}
                       transition={{ duration: 0.3, delay: index * 0.05 }}
                       key={`${camara.id}-${index}`}
-                      className="bg-white dark:bg-[#0a0a0a] border border-slate-200 dark:border-white/10 rounded-3xl p-5 sm:p-7 hover:border-brand-500/50 transition-colors group shadow-lg flex flex-col h-full relative overflow-hidden"
+                      className="bg-gradient-to-br from-white to-slate-50 dark:from-[#0f0f0f] dark:to-[#050505] border border-slate-200 dark:border-white/10 rounded-3xl p-5 sm:p-7 hover:border-brand-500/50 hover:shadow-2xl hover:shadow-brand-500/10 dark:hover:shadow-brand-500/5 transition-all duration-300 group shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none flex flex-col h-full relative overflow-hidden"
                     >
                       {/* Estado: Activa Pulsante */}
                       <div className="absolute top-5 sm:top-6 right-5 sm:right-6 flex items-center gap-2 bg-green-500/10 border border-green-500/20 px-3 py-1.5 rounded-full z-10">
@@ -315,7 +315,7 @@ export default function ListaCamarasCiudad({ ciudadNombre, ciudadSlug }: Props) 
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-4 mb-6 bg-slate-50 dark:bg-white/5 rounded-2xl p-4 border border-slate-200 dark:border-white/5">
+                      <div className="grid grid-cols-2 gap-4 mb-6 bg-white dark:bg-[#0a0a0a] rounded-2xl p-4 border border-slate-100 dark:border-white/5 shadow-sm">
                         <div>
                           <div className="flex items-center gap-2 text-muted-foreground mb-1">
                             <Radar size={14} />
