@@ -161,9 +161,7 @@ export default async function MultasCiudadPage(props: Props) {
 
             <h1 className="text-4xl md:text-6xl font-black tracking-tight mb-6 leading-tight">
               Defensa legal contra fotomultas en{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-brand-600">
-                {ciudad.nombre}
-              </span>
+              <span className="text-brand-500">{ciudad.nombre}</span>
             </h1>
 
             {/* Texto dinámico SEO Programático con efecto Glassmorphism Premium */}
@@ -209,12 +207,14 @@ export default async function MultasCiudadPage(props: Props) {
                 <Link
                   key={infraccion.slug}
                   href={`/multas/${ciudad.slug}/${infraccion.slug}`}
-                  className="group block p-6 sm:p-8 rounded-3xl bg-white dark:bg-black/40 border border-slate-200 dark:border-white/5 hover:border-brand-500/50 hover:bg-slate-50 dark:hover:bg-brand-500/5 transition-all"
+                  className="group block p-6 sm:p-8 rounded-3xl bg-white dark:bg-black/40 border border-slate-200 dark:border-white/5 hover:border-brand-500/50 hover:bg-slate-50 dark:hover:bg-brand-500/5 transition-all shadow-sm"
                 >
                   <h3 className="text-lg sm:text-xl font-bold mb-3 group-hover:text-brand-500 dark:group-hover:text-brand-400 transition-colors text-foreground">
                     {infraccion.nombre}
                   </h3>
-                  <p className="text-sm text-white/60 line-clamp-2">{infraccion.descripcion_seo}</p>
+                  <p className="text-sm text-slate-500 dark:text-white/60 line-clamp-2">
+                    {infraccion.descripcion_seo}
+                  </p>
                   <div className="mt-6 flex items-center gap-2 text-brand-500 text-sm font-semibold">
                     Ver estrategia{' '}
                     <ArrowRight
@@ -224,6 +224,30 @@ export default async function MultasCiudadPage(props: Props) {
                   </div>
                 </Link>
               ))}
+
+              {/* Enlace destacado hacia el directorio de cámaras de fotomultas de la ciudad */}
+              <Link
+                href={`/multas/${ciudad.slug}/camaras`}
+                className="group block p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-slate-900 to-black dark:from-white/10 dark:to-white/5 border border-slate-800 dark:border-white/10 hover:border-brand-500 transition-all shadow-lg col-span-1 md:col-span-2 lg:col-span-1"
+              >
+                <div className="inline-flex items-center justify-center p-3 bg-brand-500/20 rounded-xl mb-4">
+                  <MapPin className="text-brand-500" size={24} />
+                </div>
+                <h3 className="text-lg sm:text-xl font-bold mb-3 text-white">
+                  Directorio de Cámaras (ANSV)
+                </h3>
+                <p className="text-sm text-white/70 line-clamp-2">
+                  Verifica la ubicación exacta de las cámaras de fotodetección autorizadas en{' '}
+                  {ciudad.nombre}.
+                </p>
+                <div className="mt-6 flex items-center gap-2 text-brand-500 text-sm font-bold">
+                  Explorar mapa{' '}
+                  <ArrowRight
+                    size={16}
+                    className="group-hover:translate-x-1 transition-transform"
+                  />
+                </div>
+              </Link>
             </div>
           </div>
         </section>
