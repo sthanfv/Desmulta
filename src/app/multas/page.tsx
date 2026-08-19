@@ -13,18 +13,18 @@ export const metadata: Metadata = {
 
 export default function DirectorioMultasPage() {
   return (
-    <div className="min-h-screen bg-black text-white selection:bg-brand-500/30 selection:text-white pb-24">
+    <div className="min-h-screen bg-background text-foreground pb-24">
       {/* Hero Section */}
       <section className="relative pt-32 pb-16 px-6 md:px-12 text-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-brand-900/20 to-black pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-brand-900/10 dark:from-brand-900/20 to-background pointer-events-none" />
         <div className="relative z-10 max-w-4xl mx-auto">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand-500/10 mb-8 border border-brand-500/20">
-            <ShieldCheck size={32} className="text-brand-500" />
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand-100 dark:bg-brand-500/10 mb-8 border border-brand-200 dark:border-brand-500/20">
+            <ShieldCheck size={32} className="text-brand-600 dark:text-brand-500" />
           </div>
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-6 leading-tight">
+          <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-6 leading-tight text-foreground">
             Directorio Nacional de Tránsito
           </h1>
-          <p className="text-xl text-white/60 mb-10 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
             Las leyes de tránsito son nacionales, pero las secretarías operan a nivel local.
             Selecciona tu ciudad para conocer cómo impugnar legalmente según la jurisdicción.
           </p>
@@ -38,22 +38,22 @@ export default function DirectorioMultasPage() {
             <Link
               key={ciudad.slug}
               href={`/multas/${ciudad.slug}`}
-              className="group p-6 rounded-3xl bg-white/5 border border-white/10 hover:border-brand-500/50 hover:bg-white/10 transition-all flex flex-col justify-between"
+              className="group p-6 rounded-3xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:border-brand-500/50 hover:bg-slate-100 dark:hover:bg-white/10 transition-all flex flex-col justify-between shadow-sm"
             >
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <div className="w-10 h-10 rounded-full bg-brand-500/20 flex items-center justify-center">
-                    <MapPin size={18} className="text-brand-400" />
+                  <div className="w-10 h-10 rounded-full bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center">
+                    <MapPin size={18} className="text-brand-600 dark:text-brand-400" />
                   </div>
                   <ArrowRight
                     size={20}
-                    className="text-white/20 group-hover:text-brand-500 group-hover:-rotate-45 transition-all"
+                    className="text-slate-300 dark:text-white/20 group-hover:text-brand-600 dark:group-hover:text-brand-500 group-hover:-rotate-45 transition-all"
                   />
                 </div>
-                <h2 className="text-xl font-bold mb-1 group-hover:text-brand-400 transition-colors">
+                <h2 className="text-xl font-bold mb-1 text-foreground group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
                   {ciudad.nombre}
                 </h2>
-                <p className="text-sm text-white/50 uppercase tracking-widest font-semibold">
+                <p className="text-sm text-muted-foreground uppercase tracking-widest font-semibold">
                   {ciudad.departamento}
                 </p>
               </div>

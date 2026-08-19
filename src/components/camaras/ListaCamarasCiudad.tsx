@@ -69,10 +69,10 @@ export default function ListaCamarasCiudad({ ciudadNombre, ciudadSlug }: Props) 
   // Helper de Colores Psicológicos para Infracciones
   const getSeverityColor = (codigo: string) => {
     if (codigo.startsWith('D'))
-      return 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20 hover:bg-red-500 hover:text-white';
+      return 'bg-red-100 dark:bg-red-500/10 text-red-800 dark:text-red-400 border-red-300 dark:border-red-500/20 hover:bg-red-500 hover:text-white dark:hover:text-white';
     if (codigo.startsWith('C'))
-      return 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20 hover:bg-amber-500 hover:text-black';
-    return 'bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-white/80 border-slate-200 dark:border-white/5 hover:bg-brand-500 hover:text-black';
+      return 'bg-amber-100 dark:bg-amber-500/10 text-amber-800 dark:text-amber-400 border-amber-300 dark:border-amber-500/20 hover:bg-amber-500 hover:text-black';
+    return 'bg-slate-200 dark:bg-white/10 text-slate-800 dark:text-white/80 border-slate-300 dark:border-white/5 hover:bg-brand-500 hover:text-black';
   };
 
   // --- ESTADO VACÍO (0 Cámaras en la ciudad) ---
@@ -143,18 +143,18 @@ export default function ListaCamarasCiudad({ ciudadNombre, ciudadSlug }: Props) 
             className="absolute inset-0 z-50 bg-background/90 backdrop-blur-md flex flex-col items-center justify-start pt-20 text-center"
           >
             {/* Radar Premium Nivel Militar */}
-            <div className="relative w-56 h-56 md:w-64 md:h-64 mb-10 rounded-full bg-slate-50 dark:bg-[#050505] border-[8px] border-slate-200 dark:border-slate-800/80 overflow-hidden shadow-[0_0_50px_rgba(245,158,11,0.15)] flex items-center justify-center">
+            <div className="relative w-56 h-56 md:w-64 md:h-64 mb-10 rounded-full bg-slate-100 dark:bg-[#050505] border-[8px] border-slate-300 dark:border-slate-800/80 overflow-hidden shadow-[0_0_50px_rgba(245,158,11,0.2)] flex items-center justify-center">
               {/* Anillos de distancia (Grid) */}
-              <div className="absolute inset-0 rounded-full border border-brand-500/20 m-6"></div>
-              <div className="absolute inset-0 rounded-full border border-brand-500/30 m-12 border-dashed"></div>
-              <div className="absolute inset-0 rounded-full border border-brand-500/20 m-18"></div>
-              <div className="absolute inset-0 rounded-full border border-brand-500/10 m-24"></div>
+              <div className="absolute inset-0 rounded-full border border-brand-500/30 dark:border-brand-500/20 m-6"></div>
+              <div className="absolute inset-0 rounded-full border border-brand-500/40 dark:border-brand-500/30 m-12 border-dashed"></div>
+              <div className="absolute inset-0 rounded-full border border-brand-500/30 dark:border-brand-500/20 m-18"></div>
+              <div className="absolute inset-0 rounded-full border border-brand-500/20 dark:border-brand-500/10 m-24"></div>
 
               {/* Ejes Centrales Cruzados */}
-              <div className="absolute w-full h-[1px] bg-brand-500/30"></div>
-              <div className="absolute h-full w-[1px] bg-brand-500/30"></div>
-              <div className="absolute w-full h-[1px] bg-brand-500/10 rotate-45"></div>
-              <div className="absolute w-full h-[1px] bg-brand-500/10 -rotate-45"></div>
+              <div className="absolute w-full h-[1px] bg-brand-500/40 dark:bg-brand-500/30"></div>
+              <div className="absolute h-full w-[1px] bg-brand-500/40 dark:bg-brand-500/30"></div>
+              <div className="absolute w-full h-[1px] bg-brand-500/20 rotate-45"></div>
+              <div className="absolute w-full h-[1px] bg-brand-500/20 -rotate-45"></div>
 
               {/* El Barrido (Sweep) */}
               <div
