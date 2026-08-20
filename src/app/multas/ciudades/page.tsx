@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { ShieldCheck, ArrowLeft, MapPin } from 'lucide-react';
 import colombiaCities from '@/lib/data/ciudades.json';
+import { ClientCitiesGrid } from './ClientCitiesGrid';
 
 export const metadata: Metadata = {
   title: 'Directorio de Cobertura Nacional por Ciudad | Desmulta',
@@ -35,7 +36,7 @@ export default function DirectorioCiudadesPage() {
       </header>
 
       {/* Fondo */}
-      <div className="absolute top-0 left-0 w-full h-[500px] bg-[radial-gradient(circle_at_50%_-20%,rgba(34,197,94,0.1)_0%,transparent_50%)] dark:bg-[radial-gradient(circle_at_50%_-20%,rgba(34,197,94,0.06)_0%,transparent_50%)] pointer-events-none" />
+      <div className="absolute top-0 left-0 w-full h-[500px] bg-[radial-gradient(circle_at_50%_-20%,rgba(245,158,11,0.1)_0%,transparent_50%)] dark:bg-[radial-gradient(circle_at_50%_-20%,rgba(245,158,11,0.06)_0%,transparent_50%)] pointer-events-none" />
 
       {/* Hero Section */}
       <section className="relative z-10 pt-36 pb-12 px-6 md:px-12 text-center">
@@ -57,26 +58,7 @@ export default function DirectorioCiudadesPage() {
       {/* Grid de Ciudades */}
       <section className="relative z-10 px-6 md:px-12">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-            {colombiaCities.map((city) => (
-              <Link
-                key={city.slug}
-                href={`/multas/${city.slug}`}
-                className="group flex items-center gap-3 p-4 bg-slate-50/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl hover:bg-slate-100 dark:hover:bg-white/10 hover:border-brand-500/30 transition-all active:scale-95 shadow-sm"
-                title={`Impugnar multas y fotomultas en ${city.nombre}`}
-              >
-                <div className="w-8 h-8 rounded-full bg-slate-200/50 dark:bg-white/5 flex items-center justify-center group-hover:bg-brand-500/20 transition-colors shrink-0">
-                  <MapPin
-                    size={14}
-                    className="text-slate-500 dark:text-slate-400 group-hover:text-brand-600 dark:group-hover:text-brand-500 transition-colors"
-                  />
-                </div>
-                <span className="text-sm font-bold text-slate-700 dark:text-white/80 group-hover:text-foreground transition-colors truncate">
-                  {city.nombre}
-                </span>
-              </Link>
-            ))}
-          </div>
+          <ClientCitiesGrid cities={colombiaCities} />
         </div>
       </section>
     </div>
