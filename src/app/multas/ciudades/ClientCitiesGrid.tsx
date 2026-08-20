@@ -50,9 +50,9 @@ export function ClientCitiesGrid({ cities }: Props) {
         {cities.map((city) => (
           <m.div key={city.slug} variants={itemVariants} className="h-full">
             <Link
-              href={/multas/ + city.slug}
+              href={`/multas/${city.slug}`}
               className="group flex items-center gap-3 p-4 bg-slate-50/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl hover:bg-slate-100 dark:hover:bg-white/10 hover:border-brand-500/30 transition-all active:scale-95 shadow-sm h-full"
-              title={Impugnar multas y fotomultas en  + city.nombre}
+              title={`Impugnar multas y fotomultas en ${city.nombre}`}
             >
               <div className="w-8 h-8 rounded-full bg-slate-200/50 dark:bg-white/5 flex items-center justify-center group-hover:bg-brand-500/20 transition-colors shrink-0">
                 <MapPin
