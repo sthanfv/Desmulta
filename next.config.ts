@@ -133,5 +133,4 @@ export default withSentryConfig(wrappedConfig, {
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
   widenClientFileUpload: true,
-  disableLogger: true,
 });

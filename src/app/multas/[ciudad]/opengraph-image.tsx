@@ -1,7 +1,6 @@
 import { ImageResponse } from 'next/og';
 import ciudadesData from '@/lib/data/ciudades.json';
 
-export const runtime = 'edge';
 export const alt = 'Multas de tránsito — Desmulta';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';

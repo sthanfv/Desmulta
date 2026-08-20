@@ -2,7 +2,6 @@ import { ImageResponse } from 'next/og';
 
 // Edge Runtime: generación de imagen en milisegundos cerca del usuario.
 // Compatible con Edge ya que este componente solo usa parámetros de URL (sin acceso a filesystem).
-export const runtime = 'edge';
 
 export const alt = 'Desmulta - Auditoría y Saneamiento Vial';
 export const size = { width: 1200, height: 630 };

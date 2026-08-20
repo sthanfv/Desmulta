@@ -157,5 +157,16 @@
     "*.{json,md,yml,yaml}": [
       "prettier --write"
     ]
+  },
+  "allowScripts": {
+    "@firebase/util": "true",
+    "@playwright/browser-chromium": "true",
+    "@sentry/cli": "true",
+    "canvas": "true",
+    "core-js": "true",
+    "protobufjs": "true",
+    "sharp": "true",
+    "unrs-resolver": "true",
+    "unix-dgram": "true"
   }
 }
