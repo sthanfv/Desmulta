@@ -266,10 +266,13 @@ export default function ListaCamarasCiudad({ ciudadNombre, ciudadSlug }: Props) 
                   return (
                     <m.div
                       layout
-                      initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      initial="hidden"
+                      animate={isScanning ? "hidden" : "visible"}
+                      variants={{
+                        hidden: { opacity: 0, scale: 0.95, y: 20 },
+                        visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.3, delay: index * 0.05 } }
+                      }}
                       exit={{ opacity: 0, scale: 0.95 }}
-                      transition={{ duration: 0.3, delay: index * 0.05 }}
                       key={`${camara.id}-${index}`}
                       className="bg-gradient-to-br from-white to-slate-50 dark:from-[#0f0f0f] dark:to-[#050505] border border-slate-200 dark:border-white/10 rounded-3xl p-5 sm:p-7 hover:border-brand-500/50 hover:shadow-2xl hover:shadow-brand-500/10 dark:hover:shadow-brand-500/5 transition-all duration-300 group shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none flex flex-col h-full relative overflow-hidden"
                     >

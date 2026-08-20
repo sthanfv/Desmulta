@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, MapPin } from 'lucide-react';
 import ListaCamarasCiudad from '@/components/camaras/ListaCamarasCiudad';
+import { ClientAnimatedTitle } from '@/components/ui/ClientAnimatedTitle';
 import ciudadesData from '@/lib/data/ciudades.json';
 
 type Props = {
@@ -67,12 +68,14 @@ export default async function CamarasCiudadPage(props: Props) {
 
       <main className="pt-32 pb-16">
         <div className="max-w-4xl mx-auto px-4 text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-            Cámaras Autorizadas en <span className="text-brand-500">{ciudad.nombre}</span>
-          </h1>
-          <p className="text-lg text-muted-foreground">
-            Directorio oficial de la Agencia Nacional de Seguridad Vial
-          </p>
+          <ClientAnimatedTitle
+            title={
+              <>
+                Cámaras Autorizadas en <span className="text-brand-500">{ciudad.nombre}</span>
+              </>
+            }
+            subtitle="Directorio oficial de la Agencia Nacional de Seguridad Vial"
+          />
         </div>
 
         <ListaCamarasCiudad ciudadNombre={ciudad.nombre} ciudadSlug={ciudad.slug} />
