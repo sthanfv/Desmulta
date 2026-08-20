@@ -60,8 +60,9 @@
 - **Limpieza DevSecOps:** Erradicación de advertencias (warnings) de compilación en Vercel (Edge Runtime mitigado en OG images, Sentry disableLogger removido, y Scripts de NPM autorizados).
 
 ## 🎯 Metas Pendientes / Tareas a Seguir
-- **Agente Comercial IA (Chatbot RAG):** Investigar e implementar plataforma Open Source (Dify, Flowise o AnythingLLM) para integrar un asistente virtual de tránsito en Desmulta. Debe estar condicionado bajo **Prompt Engineering estricto** para responder dudas legales sin revelar el paso a paso detallado (Secreto Comercial), sirviendo como un embudo (Funnel) hacia los servicios pagos, plantillas y herramientas de la plataforma.
+- **Agente Comercial IA (desmulta-ai-agent):** [2026-08-20] Microservicio inicializado y blindado en C:\Workspace\desmulta-ai-agent con FastAPI, 27 tests unitarios (94% cobertura), autenticación B2B con HMAC-SHA256, Zero-PII y RAG legal colombiano.
 
 - **Revisión de Seguridad del Código Nuevo:** Como solicitado por el Project Manager, se ejecutó una revisión de seguridad pasiva sobre la implementación (100% Client-Side Filtering, JSON estático, protección XSS nativa de React, sin SQL/DB queries, enlaces de Maps codificados). Pendiente cualquier auditoría adicional.
 - Evaluar posible expansión del embudo hacia suscripciones automáticas (notificaciones).
+
 
