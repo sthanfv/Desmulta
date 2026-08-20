@@ -40,12 +40,12 @@ export default function DirectorioCiudadesPage() {
       {/* Hero Section */}
       <section className="relative z-10 pt-36 pb-12 px-6 md:px-12 text-center">
         <div className="max-w-4xl mx-auto">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-[1.5rem] bg-green-500/10 mb-8 border border-green-500/20 shadow-inner">
-            <MapPin size={30} className="text-green-500" />
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-[1.5rem] bg-brand-500/10 mb-8 border border-brand-500/20 shadow-inner">
+            <MapPin size={30} className="text-brand-500" />
           </div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight mb-6 leading-tight uppercase">
             Directorio de <br className="hidden sm:inline" />
-            <span className="text-green-500">Cobertura Nacional</span>
+            <span className="text-brand-500">Cobertura Nacional</span>
           </h1>
           <p className="text-lg md:text-xl text-slate-600 dark:text-slate-300 leading-relaxed font-medium max-w-2xl mx-auto">
             Ofrecemos representación legal y técnica en todo el territorio colombiano. Selecciona tu
@@ -62,13 +62,13 @@ export default function DirectorioCiudadesPage() {
               <Link
                 key={city.slug}
                 href={`/multas/${city.slug}`}
-                className="group flex items-center gap-3 p-4 bg-slate-50/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl hover:bg-slate-100 dark:hover:bg-white/10 hover:border-green-500/30 transition-all active:scale-95 shadow-sm"
+                className="group flex items-center gap-3 p-4 bg-slate-50/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl hover:bg-slate-100 dark:hover:bg-white/10 hover:border-brand-500/30 transition-all active:scale-95 shadow-sm"
                 title={`Impugnar multas y fotomultas en ${city.nombre}`}
               >
-                <div className="w-8 h-8 rounded-full bg-slate-200/50 dark:bg-white/5 flex items-center justify-center group-hover:bg-green-500/20 transition-colors shrink-0">
+                <div className="w-8 h-8 rounded-full bg-slate-200/50 dark:bg-white/5 flex items-center justify-center group-hover:bg-brand-500/20 transition-colors shrink-0">
                   <MapPin
                     size={14}
-                    className="text-slate-500 dark:text-slate-400 group-hover:text-green-600 dark:group-hover:text-green-500 transition-colors"
+                    className="text-slate-500 dark:text-slate-400 group-hover:text-brand-600 dark:group-hover:text-brand-500 transition-colors"
                   />
                 </div>
                 <span className="text-sm font-bold text-slate-700 dark:text-white/80 group-hover:text-foreground transition-colors truncate">
