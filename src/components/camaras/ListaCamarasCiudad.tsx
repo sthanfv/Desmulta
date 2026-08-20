@@ -25,18 +25,20 @@ export default function ListaCamarasCiudad({ ciudadNombre, ciudadSlug }: Props) 
   const [searchTerm, setSearchTerm] = useState('');
   const [isScanning, setIsScanning] = useState(true);
 
+  const normalizeCityName = (name: string) => {
+    return name
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/\bd\.?c\.?\b/g, '') // Quita D.C o D.C.
+      .trim();
+  };
+
   // Filtrar cámaras de la ciudad una sola vez
   const camarasCiudad = React.useMemo(() => {
     return camarasData.filter(
       (camara) =>
-        camara.municipio
-          .normalize('NFD')
-          .replace(/[\u0300-\u036f]/g, '')
-          .toLowerCase() ===
-        ciudadNombre
-          .normalize('NFD')
-          .replace(/[\u0300-\u036f]/g, '')
-          .toLowerCase()
+        normalizeCityName(camara.municipio) === normalizeCityName(ciudadNombre)
     );
   }, [ciudadNombre]);
 
