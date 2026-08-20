@@ -52,7 +52,16 @@
 - [x] **Tolerancia a Fallos (Fuzzy Search):** Se implementó normalización estricta (remoción de tildes y del sufijo "D.C.") en el cruce de datos y buscador, resolviendo un bug crítico donde Bogotá aparecía con 0 cámaras.
 - Evaluar posible expansión del embudo hacia suscripciones automáticas (notificaciones).
 
+### [2026-08-19] - Consolidación de Servicios (Documentación de Funcionalidades)
+- **Calculadora de Tiempo y SIMIT OCR:** Operativos. El sistema permite escanear comparendos y calcular fechas usando IA y lógica determinista (Go).
+- **Directorio de Códigos de Infracción y Ciudades:** Base de datos estática navegable (SEO programático) que mapea todas las ciudades de Colombia y sus respectivos códigos de infracción de tránsito.
+- **Directorio Nacional de Radares (ANSV):** Directorio interactivo con coordenadas GPS exactas conectado a Google Maps, con animaciones de entrada en SSR/Client.
+- **Portal VIP de Seguimiento (Seguridad):** Módulo de trazabilidad y estado para usuarios registrados, bajo estrictas reglas de Zero-PII.
+- **Limpieza DevSecOps:** Erradicación de advertencias (warnings) de compilación en Vercel (Edge Runtime mitigado en OG images, Sentry disableLogger removido, y Scripts de NPM autorizados).
+
 ## 🎯 Metas Pendientes / Tareas a Seguir
+- **Agente Comercial IA (Chatbot RAG):** Investigar e implementar plataforma Open Source (Dify, Flowise o AnythingLLM) para integrar un asistente virtual de tránsito en Desmulta. Debe estar condicionado bajo **Prompt Engineering estricto** para responder dudas legales sin revelar el paso a paso detallado (Secreto Comercial), sirviendo como un embudo (Funnel) hacia los servicios pagos, plantillas y herramientas de la plataforma.
 
 - **Revisión de Seguridad del Código Nuevo:** Como solicitado por el Project Manager, se ejecutó una revisión de seguridad pasiva sobre la implementación (100% Client-Side Filtering, JSON estático, protección XSS nativa de React, sin SQL/DB queries, enlaces de Maps codificados). Pendiente cualquier auditoría adicional.
 - Evaluar posible expansión del embudo hacia suscripciones automáticas (notificaciones).
+

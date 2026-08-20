@@ -61,6 +61,33 @@ export const TAG_ICONS: Record<ChangeTag, string> = {
 // ═══════════════════════════════════════════════════════════════════════
 export const changelogHistory: ChangelogRelease[] = [
   {
+    version: '1.2.0',
+    date: 'Agosto 2026',
+    title: 'Radares de Tránsito y Portal VIP de Seguimiento',
+    changes: [
+      {
+        tag: 'NUEVA FUNCIÓN',
+        text: 'Directorio Nacional de Radares y Cámaras: Mapas interactivos para que conozcas la ubicación exacta de las Cámaras salvavidas autorizadas por la ANSV en tu ciudad.',
+      },
+      {
+        tag: 'NUEVA FUNCIÓN',
+        text: 'Buscador de Códigos de Infracción: Catlogo detallado de todas las multas de tránsito para que sepas cuánto debes pagar y cuáles son tus derechos.',
+      },
+      {
+        tag: 'NUEVA FUNCIÓN',
+        text: 'Portal VIP de Seguimiento: Acceso privado y seguro a un panel donde podrás monitorear el estado exacto de tus defensas y procesos.',
+      },
+      {
+        tag: 'SEGURIDAD',
+        text: 'Escudo de Alta Privacidad: Implementamos una red de seguridad activa avanzada que bloquea cualquier intento de suplantación y asegura tu información.',
+      },
+      {
+        tag: 'OPTIMIZACIÓN',
+        text: 'Navegacin Ultra Rápida para Mviles: Experimenta transiciones más fluidas, interfaces de nueva generacin y tiempos de carga instantneos desde cualquier celular.',
+      },
+    ],
+  },
+  {
     version: '1.1.0',
     date: '',
     title: 'Catálogo de Defensa y Directorio de Tránsito',
