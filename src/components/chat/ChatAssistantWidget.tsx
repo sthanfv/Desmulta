@@ -46,7 +46,7 @@ export function ChatAssistantWidget() {
       id: 'welcome-1',
       role: 'assistant',
       content:
-        '¡Hola! Soy tu especialista técnico de Desmulta. Puedo verificar si tu fotomulta cumple con la Ley 1843, calcular fechas de prescripción o validar cámaras autorizadas en tu ciudad directamente aquí.',
+        '¡Hola! Soy tu asistente técnico de Desmulta. Puedo verificar si tu fotomulta cumple con la Ley 1843, calcular fechas de prescripción o validar cámaras autorizadas en tu ciudad.',
       citations: [
         {
           norma: 'Ley 1843 de 2017',
@@ -55,9 +55,9 @@ export function ChatAssistantWidget() {
         },
       ],
       followUpQuestions: [
-        '¿Cómo saber si una fotomulta en Bogotá o Medellín es legal?',
+        '¿Cómo saber si una fotomulta es legal en mi ciudad?',
         '¿A los cuántos años prescribe un comparendo?',
-        '¿Qué hacer si me embargaron la cuenta bancaria por una multa?',
+        '¿Qué hacer si me embargaron la cuenta bancaria?',
       ],
       timestamp: 'Ahora',
     },
@@ -175,23 +175,23 @@ export function ChatAssistantWidget() {
     ]);
   };
 
-  // Helper para renderizar ícono de la herramienta
   const getToolIcon = (tipo: string) => {
     switch (tipo) {
       case 'camaras':
-        return <Camera className="w-4 h-4 text-amber-400" />;
+        return <Camera className="w-3.5 h-3.5 text-primary" />;
       case 'calculadora':
-        return <Calculator className="w-4 h-4 text-amber-400" />;
+        return <Calculator className="w-3.5 h-3.5 text-primary" />;
       case 'plantilla':
-        return <FileText className="w-4 h-4 text-amber-400" />;
+        return <FileText className="w-3.5 h-3.5 text-primary" />;
       default:
-        return <Scale className="w-4 h-4 text-amber-400" />;
+        return <Scale className="w-3.5 h-3.5 text-primary" />;
     }
   };
 
   return (
-    <div className="fixed bottom-5 left-4 sm:bottom-6 sm:left-6 z-[60] flex flex-col items-start font-sans">
-      {/* ─── Botón Flotante de Apertura (Trigger en Esquina Izquierda) ─── */}
+    // Posición calibrada: en móvil queda a bottom-24 (por encima de la barra amarilla sticky) y en desktop a bottom-6
+    <div className="fixed bottom-24 left-3.5 sm:bottom-6 sm:left-6 z-[60] flex flex-col items-start font-sans">
+      {/* ─── Botón Flotante de Apertura (Trigger) ─── */}
       <AnimatePresence>
         {!isOpen && (
           <LazyMotion features={domAnimation}>
@@ -203,25 +203,25 @@ export function ChatAssistantWidget() {
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0, opacity: 0 }}
-              className="relative group flex items-center gap-3 px-4 py-3 rounded-full bg-zinc-950/90 text-white shadow-[0_10px_30px_rgba(0,0,0,0.8),0_0_20px_rgba(245,158,11,0.18)] border border-amber-500/40 hover:border-amber-400 backdrop-blur-2xl transition-all duration-300"
+              className="relative group flex items-center gap-2.5 p-2 sm:px-3.5 sm:py-2.5 rounded-full bg-card/95 dark:bg-zinc-900/95 text-foreground shadow-xl border border-primary/40 hover:border-primary backdrop-blur-xl transition-all duration-300"
               aria-label="Abrir asistente de tránsito Desmulta"
             >
-              {/* Ícono de Escudo con relieve en oro */}
-              <div className="relative flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-tr from-amber-500 to-amber-300 text-black shadow-lg shadow-amber-500/30">
-                <ShieldCheck className="w-5 h-5 text-zinc-950" />
+              {/* Ícono de Escudo */}
+              <div className="relative flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground shadow-md shadow-primary/20 shrink-0">
+                <ShieldCheck className="w-4 h-4 text-black" />
               </div>
 
               <div className="flex flex-col items-start pr-1 text-left hidden sm:flex">
-                <span className="text-xs font-black tracking-tight text-zinc-100 flex items-center gap-1">
+                <span className="text-[11px] font-black tracking-tight text-foreground leading-tight">
                   Asistente Desmulta
                 </span>
-                <span className="text-[10px] text-amber-400/90 font-medium">
+                <span className="text-[9px] text-muted-foreground font-medium">
                   Especialista en Tránsito
                 </span>
               </div>
 
               {hasUnread && (
-                <span className="bg-gradient-to-r from-amber-400 to-amber-500 text-zinc-950 text-[10px] font-black px-1.5 py-0.5 rounded-full shadow-sm">
+                <span className="bg-primary text-primary-foreground text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shrink-0">
                   1
                 </span>
               )}
@@ -230,58 +230,56 @@ export function ChatAssistantWidget() {
         )}
       </AnimatePresence>
 
-      {/* ─── Ventana Flotante del Asistente (Glassmorphism Ámbar Premium) ─── */}
+      {/* ─── Ventana Flotante Compacta y Adaptativa ─── */}
       <AnimatePresence>
         {isOpen && (
           <LazyMotion features={domAnimation}>
             <m.div
-              initial={{ opacity: 0, y: 25, scale: 0.94 }}
+              initial={{ opacity: 0, y: 15, scale: 0.96 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 25, scale: 0.94 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="w-[calc(100vw-2rem)] sm:w-[390px] h-[520px] max-h-[75vh] flex flex-col rounded-[2rem] bg-zinc-950/95 dark:bg-zinc-950/95 backdrop-blur-3xl border border-amber-500/30 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9),0_0_30px_rgba(245,158,11,0.12)] overflow-hidden"
+              exit={{ opacity: 0, y: 15, scale: 0.96 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 320 }}
+              className="w-[calc(100vw-1.75rem)] sm:w-[360px] h-[450px] max-h-[58vh] sm:max-h-[64vh] flex flex-col rounded-3xl bg-card/98 dark:bg-zinc-950/98 backdrop-blur-2xl border border-border/80 dark:border-primary/25 shadow-2xl shadow-black/40 overflow-hidden text-foreground"
             >
-              {/* Encabezado Premium con Luz Ambiental */}
-              <div className="relative flex items-center justify-between px-5 py-3.5 bg-gradient-to-r from-zinc-950 via-zinc-900 to-zinc-950 border-b border-amber-500/20 text-zinc-100">
-                <div className="absolute top-0 left-10 right-10 h-px bg-gradient-to-r from-transparent via-amber-400/60 to-transparent" />
-
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 shadow-inner">
-                    <ShieldCheck className="w-5 h-5 text-amber-400" />
+              {/* Encabezado Compacto */}
+              <div className="flex items-center justify-between px-3.5 py-2.5 bg-muted/40 dark:bg-zinc-900/60 border-b border-border/60">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-1.5 rounded-xl bg-primary/10 border border-primary/25 text-primary">
+                    <ShieldCheck className="w-4 h-4 text-primary" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-black tracking-tight text-zinc-100 flex items-center gap-1.5">
-                      Asistente <span className="text-amber-400 italic">Desmulta</span>
+                    <h3 className="text-xs font-black tracking-tight leading-none text-foreground">
+                      Asistente Desmulta
                     </h3>
-                    <p className="text-[11px] text-zinc-400 font-medium flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.8)] animate-pulse"></span>
-                      Especialista Técnico en Tránsito
+                    <p className="text-[10px] text-muted-foreground font-medium flex items-center gap-1 mt-0.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+                      Especialista en Tránsito
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-0.5">
                   <button
                     type="button"
                     onClick={handleResetChat}
                     title="Reiniciar conversación"
-                    className="p-1.5 text-zinc-400 hover:text-amber-300 hover:bg-white/5 rounded-xl transition-colors"
+                    className="p-1 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
                   >
-                    <RotateCcw className="w-4 h-4" />
+                    <RotateCcw className="w-3.5 h-3.5" />
                   </button>
                   <button
                     type="button"
                     onClick={() => setIsOpen(false)}
                     title="Cerrar asistente"
-                    className="p-1.5 text-zinc-400 hover:text-white hover:bg-white/5 rounded-xl transition-colors"
+                    className="p-1 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
                   >
-                    <X className="w-5 h-5" />
+                    <X className="w-4 h-4" />
                   </button>
                 </div>
               </div>
 
               {/* Cuerpo de la Conversación */}
-              <div className="flex-1 p-4 overflow-y-auto space-y-4 scroll-smooth bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-500/5 via-zinc-950 to-zinc-950">
+              <div className="flex-1 p-3 overflow-y-auto space-y-3 scroll-smooth text-xs">
                 {messages.map((msg) => (
                   <div
                     key={msg.id}
@@ -291,30 +289,30 @@ export function ChatAssistantWidget() {
                   >
                     <div
                       className={
-                        'max-w-[88%] rounded-2xl px-4 py-3 text-xs sm:text-sm leading-relaxed transition-all ' +
+                        'max-w-[88%] rounded-2xl px-3 py-2 leading-relaxed ' +
                         (msg.role === 'user'
-                          ? 'bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-500 text-zinc-950 font-bold rounded-br-none shadow-lg shadow-amber-500/20'
-                          : 'bg-zinc-900/90 text-zinc-100 border border-zinc-800/90 rounded-bl-none shadow-md backdrop-blur-md')
+                          ? 'bg-primary text-primary-foreground font-semibold rounded-br-none shadow-sm'
+                          : 'bg-muted/70 dark:bg-zinc-900/80 text-foreground border border-border/60 rounded-bl-none shadow-sm')
                       }
                     >
-                      <p className="whitespace-pre-wrap">{msg.content}</p>
+                      <p className="whitespace-pre-wrap text-[11px] sm:text-xs">{msg.content}</p>
 
-                      {/* Citas Normativas (RAG Legal) */}
+                      {/* Citas Normativas (RAG) */}
                       {msg.citations && msg.citations.length > 0 && (
-                        <div className="mt-3 pt-2.5 border-t border-zinc-800/80 space-y-1.5">
-                          <div className="text-[10px] font-black uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
-                            <BookOpen className="w-3.5 h-3.5 text-amber-400" />
-                            Fundamento Normativo:
+                        <div className="mt-2 pt-1.5 border-t border-border/40 space-y-1">
+                          <div className="text-[9px] font-black uppercase tracking-wider text-primary flex items-center gap-1">
+                            <BookOpen className="w-2.5 h-2.5" />
+                            Norma:
                           </div>
                           {msg.citations.map((c, i) => (
                             <div
                               key={i}
-                              className="text-[11px] bg-zinc-950/80 p-2.5 rounded-xl border border-amber-500/20 shadow-inner"
+                              className="text-[10px] bg-background/60 dark:bg-black/40 p-1.5 rounded-lg border border-border/40"
                             >
-                              <div className="font-bold text-amber-300">
+                              <div className="font-bold text-primary">
                                 {c.norma} — {c.articulo}
                               </div>
-                              <div className="text-zinc-400 text-[10px] mt-0.5 leading-snug">
+                              <div className="text-muted-foreground text-[9px] leading-tight">
                                 {c.resumen}
                               </div>
                             </div>
@@ -322,47 +320,47 @@ export function ChatAssistantWidget() {
                         </div>
                       )}
 
-                      {/* Tarjeta Visual de Herramienta Desmulta */}
+                      {/* Tarjeta de Acción */}
                       {msg.suggestedAction && (
-                        <div className="mt-3 p-3 rounded-2xl bg-gradient-to-br from-amber-500/15 to-transparent border border-amber-500/30 shadow-inner">
-                          <div className="text-[11px] font-black text-amber-300 flex items-center gap-1.5 mb-1">
+                        <div className="mt-2 p-2 rounded-xl bg-primary/10 border border-primary/25">
+                          <div className="text-[10px] font-black text-foreground flex items-center gap-1 mb-0.5">
                             {getToolIcon(msg.suggestedAction.tipo)}
                             {msg.suggestedAction.titulo}
                           </div>
-                          <p className="text-[10px] text-zinc-300 mb-2.5 leading-relaxed">
+                          <p className="text-[9px] text-muted-foreground mb-1.5 leading-snug">
                             {msg.suggestedAction.descripcion}
                           </p>
                           <Link
                             href={msg.suggestedAction.url}
                             onClick={() => setIsOpen(false)}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-zinc-950 font-black text-[11px] shadow-md shadow-amber-500/20 transition-all active:scale-95"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[10px] transition-all"
                           >
                             Abrir herramienta
-                            <ArrowRight className="w-3 h-3" />
+                            <ArrowRight className="w-2.5 h-2.5" />
                           </Link>
                         </div>
                       )}
 
                       <span
                         className={
-                          'text-[9px] block mt-1.5 ' +
-                          (msg.role === 'user' ? 'text-zinc-950/70 font-medium' : 'text-zinc-500')
+                          'text-[8px] block mt-1 ' +
+                          (msg.role === 'user' ? 'text-black/60' : 'text-muted-foreground')
                         }
                       >
                         {msg.timestamp}
                       </span>
                     </div>
 
-                    {/* Preguntas de Sugerencia Rápida (Pills Interactivas) */}
+                    {/* Pills de preguntas sugeridas */}
                     {msg.followUpQuestions && msg.followUpQuestions.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 mt-2 max-w-[92%]">
+                      <div className="flex flex-wrap gap-1 mt-1.5 max-w-[94%]">
                         {msg.followUpQuestions.map((q, idx) => (
                           <button
                             key={idx}
                             type="button"
                             onClick={() => handleSendMessage(q)}
                             disabled={isLoading}
-                            className="text-[11px] font-medium text-left px-3 py-1.5 rounded-full bg-zinc-900/90 hover:bg-amber-500/15 text-zinc-300 hover:text-amber-300 border border-zinc-800 hover:border-amber-500/40 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 shadow-sm"
+                            className="text-[10px] font-medium text-left px-2 py-1 rounded-full bg-muted/60 hover:bg-primary/15 text-foreground hover:text-primary border border-border/70 hover:border-primary/40 transition-all active:scale-95 disabled:opacity-50"
                           >
                             {q}
                           </button>
@@ -372,48 +370,45 @@ export function ChatAssistantWidget() {
                   </div>
                 ))}
 
-                {/* Indicador de Análisis */}
+                {/* Indicador de Carga */}
                 {isLoading && (
-                  <div className="flex items-center gap-2.5 p-3 bg-zinc-900/90 rounded-2xl rounded-bl-none max-w-[80%] border border-zinc-800">
-                    <ShieldCheck className="w-4 h-4 text-amber-400 animate-pulse" />
-                    <span className="text-xs text-zinc-400">
-                      Calculando viabilidad y normativa...
+                  <div className="flex items-center gap-2 p-2 bg-muted/60 rounded-xl rounded-bl-none max-w-[70%] border border-border/50">
+                    <ShieldCheck className="w-3.5 h-3.5 text-primary animate-pulse" />
+                    <span className="text-[10px] text-muted-foreground">
+                      Analizando normativa...
                     </span>
                   </div>
                 )}
                 <div ref={messagesEndRef} />
               </div>
 
-              {/* Pie con Formulario de Entrada */}
-              <div className="p-3 border-t border-zinc-800/80 bg-zinc-950/90">
+              {/* Pie de Entrada */}
+              <div className="p-2 border-t border-border/60 bg-muted/20">
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
                     handleSendMessage();
                   }}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-1.5"
                 >
                   <input
                     ref={inputRef}
                     type="text"
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}
-                    placeholder="Pregunta sobre comparendos, prescripción..."
+                    placeholder="Escribe tu consulta..."
                     disabled={isLoading}
-                    className="flex-1 px-3.5 py-2.5 text-xs sm:text-sm rounded-xl bg-zinc-900 border border-zinc-800 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 text-zinc-100 placeholder:text-zinc-500 disabled:opacity-50 transition-all"
+                    className="flex-1 px-3 py-1.5 text-xs rounded-xl bg-background border border-border focus:outline-none focus:border-primary text-foreground placeholder:text-muted-foreground disabled:opacity-50"
                   />
                   <button
                     type="submit"
                     disabled={!inputMessage.trim() || isLoading}
-                    className="p-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-zinc-950 disabled:opacity-40 transition-all active:scale-95 shrink-0 shadow-md shadow-amber-500/20"
-                    aria-label="Enviar consulta"
+                    className="p-2 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-40 transition-transform active:scale-95 shrink-0"
+                    aria-label="Enviar"
                   >
-                    <Send className="w-4 h-4 text-zinc-950" />
+                    <Send className="w-3.5 h-3.5 text-black" />
                   </button>
                 </form>
-                <p className="text-[9px] text-zinc-500 text-center mt-1.5 leading-tight">
-                  Orientación técnica informativa según normativa colombiana.
-                </p>
               </div>
             </m.div>
           </LazyMotion>
