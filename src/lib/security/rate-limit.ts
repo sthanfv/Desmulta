@@ -29,6 +29,7 @@ export const rateLimiters = {
     limiter: Ratelimit.slidingWindow(3, '7 d'),
     prefix: 'rl:ocr:v2', // Reiniciado a v2 a peticion de QA
   }),
+  chatAgent: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(15, '10 m'), prefix: 'rl:chat:v1' }),
   consultation: new Ratelimit({
     redis,
     limiter: Ratelimit.slidingWindow(10, '24 h'),

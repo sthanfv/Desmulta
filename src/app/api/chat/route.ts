@@ -25,16 +25,23 @@ const chatRequestSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
-    // 1. Rate Limiting por IP para mitigar abusos
+    // 1. Rate Limiting dedicado por IP (15 consultas cada 10 min)
     const ip = getSecureIp(req);
-    const rl = await checkRateLimit('consultation', ip);
+    const rl = await checkRateLimit('chatAgent', ip);
     if (!rl.success) {
       return NextResponse.json(
         {
-          error: 'Demasiadas consultas al asistente. Por favor, espera unos segundos.',
+          error: 'Límite temporal alcanzado',
           reply:
-            'Has alcanzado el límite temporal de mensajes. Por favor espera unos momentos antes de continuar.',
+            'Debido a la alta demanda de consultas ciudadanas en vivo, hemos pausado temporalmente tus preguntas para garantizar la velocidad de respuesta a todos los usuarios. Puedes continuar en unos minutos o radicar tu caso ahora con un especialista para estudio prioritario.',
+          isRateLimited: true,
           citations: [],
+          suggested_action: {
+            tipo: 'modal_full',
+            titulo: 'Radicar Caso para Estudio Gratuito',
+            url: '#consultar',
+            descripcion: 'Un especialista evaluará tu comparendo y la cadena de notificación del RUNT.',
+          },
           follow_up_questions: [],
         },
         { status: 429 }
@@ -101,17 +108,23 @@ export async function POST(req: NextRequest) {
         return NextResponse.json(
           {
             reply:
-              'En este momento nuestro motor jurídico está procesando un alto volumen de consultas. En Colombia, recuerda que según el Art. 159 de la Ley 769 de 2002 y la Sentencia C-038 de 2020, tienes derecho al debido proceso y a auditar la legalidad de tu fotomulta.',
-            citations: [],
+              'En este momento nuestro motor técnico está procesando consultas ciudadanas de alta demanda. Recuerda que bajo la Ley 1843 de 2017 y la Sentencia C-038 de 2020, las fotomultas exigen prueba plena del conductor y notificación formal al RUNT.',
+            citations: [
+              {
+                norma: 'Ley 1843 de 2017',
+                articulo: 'Art. 8 - Procedimiento de Notificación',
+                resumen: 'La notificación debe realizarse por correo certificado al RUNT.',
+              },
+            ],
             suggested_action: {
               tipo: 'camaras',
-              titulo: 'Verificar Cámaras de Fotomulta',
+              titulo: 'Verificar Radares Autorizados ANSV',
               url: '/multas/bogota/camaras',
-              descripcion: 'Consulta los radares autorizados en tu ciudad.',
+              descripcion: 'Consulta si las cámaras de tu ciudad tienen permisos vigentes.',
             },
             follow_up_questions: [
-              '¿Cuándo prescribe una fotomulta?',
-              '¿Cómo verificar si una cámara está autorizada?',
+              '¿A los cuántos años prescribe un comparendo?',
+              '¿Qué hacer si me embargaron la cuenta bancaria?',
             ],
             trace_id: traceId,
           },
@@ -125,16 +138,15 @@ export async function POST(req: NextRequest) {
       clearTimeout(timeout);
       logger.error('[Chat-API] Microservicio no disponible:', fetchError);
 
-      // Fallback local elegante para que el usuario nunca vea la app rota
       return NextResponse.json(
         {
           reply:
-            '¡Hola! En Desmulta te ayudamos a defenderte de fotomultas y comparendos de tránsito. Recuerda que bajo la Ley 1843 de 2017 y la Sentencia C-038 de 2020, la Secretaría de Tránsito debe demostrar quién era el conductor infractor y notificar a la dirección del RUNT.',
+            'Bajo la Ley 1843 de 2017 y la Sentencia C-038 de 2020, la Secretaría de Tránsito no puede sancionar al propietario sin identificar al conductor infractor, y debe agotar la notificación física en la dirección registrada en el RUNT.',
           citations: [
             {
               norma: 'Ley 1843 de 2017',
               articulo: 'Art. 8 - Procedimiento de Notificación',
-              resumen: 'La notificación debe realizarse por correo certificado al RUNT.',
+              resumen: 'Obligatoriedad de envío por mensajería certificada.',
             },
             {
               norma: 'Sentencia C-038 de 2020',
@@ -143,14 +155,14 @@ export async function POST(req: NextRequest) {
             },
           ],
           suggested_action: {
-            tipo: 'calculadora',
-            titulo: 'Calcular Prescripción de Comparendo',
-            url: '/#escaner',
-            descripcion: 'Calcula gratis si tu multa ya caducó o prescribió.',
+            tipo: 'modal_simit',
+            titulo: 'Subir Captura para Estudio Técnico',
+            url: '#subir-captura',
+            descripcion: 'Evaluamos la validez de tu comparendo de forma inmediata.',
           },
           follow_up_questions: [
-            '¿Qué requisitos debe tener una fotomulta legal?',
-            '¿Cuándo prescribe una multa con cobro coactivo?',
+            '¿Cómo saber si la dirección del RUNT fue respetada?',
+            '¿Qué trámite procede ante un embargo de cuenta?',
           ],
           trace_id: traceId,
         },

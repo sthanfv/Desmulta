@@ -142,7 +142,15 @@ export default function HomeClient({
       setIsModalOpen(true);
       window.history.replaceState({}, '', window.location.pathname);
     }
-    const handleOpenModal = () => setIsModalOpen(true);
+    const handleOpenModal = (e?: Event) => {
+      const customEvent = e as CustomEvent<{ mode?: 'full' | 'simit' }>;
+      if (customEvent?.detail?.mode === 'simit') {
+        setFormMode('simit');
+      } else {
+        setFormMode('full');
+      }
+      setIsModalOpen(true);
+    };
     window.addEventListener('open-consultation-modal', handleOpenModal);
     return () => window.removeEventListener('open-consultation-modal', handleOpenModal);
   }, []);
