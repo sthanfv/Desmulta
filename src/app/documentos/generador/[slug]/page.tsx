@@ -275,8 +275,17 @@ export default function GeneradorDinamico({ params }: GeneradorDinamicoProps) {
     shortId: 'TEST12',
   };
 
-  // Obtener líneas del cuerpo para la previsualización
-  const cuerpoLineas = tmpl.cuerpo(dataForPDF);
+  // Función determinista para ofuscar texto preservando la estética del difuminado
+  const obfuscateText = (str: string) => {
+    return str.replace(/[a-zA-Z]/g, function (c) {
+      const code = c.charCodeAt(0) + 13;
+      return String.fromCharCode((c <= 'Z' ? 90 : 122) >= code ? code : code - 26);
+    });
+  };
+
+  // Obtener líneas del cuerpo para la previsualización y OFUSCARLAS
+  const rawCuerpo = tmpl.cuerpo(dataForPDF);
+  const cuerpoLineas = rawCuerpo.map((linea) => obfuscateText(linea));
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row">
@@ -682,8 +691,10 @@ export default function GeneradorDinamico({ params }: GeneradorDinamicoProps) {
                   </li>
                 ))}
                 <li className="blur-[4.5px] pointer-events-none select-none text-slate-600">
-                  {tmpl.facultades[2] ||
-                    'Que se actualice el sistema SIMIT y RUNT eliminando de manera definitiva cualquier reporte negativo asociado.'}
+                  {obfuscateText(
+                    tmpl.facultades[2] ||
+                      'Que se actualice el sistema SIMIT y RUNT eliminando de manera definitiva cualquier reporte negativo asociado.'
+                  )}
                 </li>
               </ol>
             </div>
