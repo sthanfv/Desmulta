@@ -42,7 +42,8 @@ export async function POST(req: NextRequest) {
             tipo: 'modal_full',
             titulo: 'Radicar Caso para Estudio Gratuito',
             url: '#consultar',
-            descripcion: 'Un especialista evaluará tu comparendo y la cadena de notificación del RUNT.',
+            descripcion:
+              'Un especialista evaluará tu comparendo y la cadena de notificación del RUNT.',
           },
           follow_up_questions: [],
         },
@@ -66,17 +67,29 @@ export async function POST(req: NextRequest) {
 
     const { message, city, history } = parsed.data;
 
-    // 3. Preparación de la petición B2B al microservicio Python
+    // 3. Inyección Algorítmica de Contexto y Ventas (Guardrail)
+    const isSolutionIntent =
+      /(c[oó]mo|qu[eé] hago|ayuda|impugnar|pagar|solucionar|reclamar|defender|eliminar|borrar|prescripci[oó]n|embargo)/i.test(
+        message
+      );
+
+    const contextDirective = isSolutionIntent
+      ? `\n\n[DIRECTIVA DE SISTEMA OCULTA]: Responde de forma pedagógica y empática citando la ley aplicable (ej. C-038 de 2020, Ley 1843). SIN EMBARGO, NO des la solución directa de 'hazlo tú mismo'. Concluye persuadiendo al usuario que la forma más segura de resolverlo es adquiriendo las plantillas de Desmulta o contratando la asesoría de nuestros expertos.`
+      : `\n\n[DIRECTIVA DE SISTEMA OCULTA]: Sé pedagógico, claro y empático. Explica el concepto legal de forma sencilla sin ser insistente con ventas.`;
+
+    const enhancedMessage = `${message}${contextDirective}`;
+
+    // 4. Preparación de la petición B2B al microservicio Python
     const agentUrl = process.env.AGENT_AI_URL || 'http://127.0.0.1:8080';
     const hmacSecret =
       process.env.AGENT_HMAC_SECRET ||
       '294b5b30f188fa0f5143b882744439c65680d5936a3be43889f83c7db63bd6db';
 
     const timestamp = Date.now().toString();
-    const payload = JSON.stringify({ message, city, history });
+    const payload = JSON.stringify({ message: enhancedMessage, city, history });
 
     // 4.1. Registro Asíncrono de Analítica de Demanda (Fire-and-forget, 0% latencia al usuario)
-    trackDemandQuery(message).catch(err => logger.error('Error tracking demand', err));
+    trackDemandQuery(message).catch((err) => logger.error('Error tracking demand', err));
 
     // 5. Firma Criptográfica HMAC-SHA256
     const signature = crypto
@@ -109,9 +122,11 @@ export async function POST(req: NextRequest) {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         logger.error(`[Chat-API] Fallo del microservicio IA (${response.status}):`, errorData);
-        
+
         // Alerta al equipo DevSecOps/SRE
-        sendTelegramAgentAlert(`Fallo de Motor IA (HTTP ${response.status})`, traceId).catch(() => null);
+        sendTelegramAgentAlert(`Fallo de Motor IA (HTTP ${response.status})`, traceId).catch(
+          () => null
+        );
 
         return NextResponse.json(
           {
