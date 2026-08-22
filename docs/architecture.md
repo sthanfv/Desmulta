@@ -57,19 +57,19 @@ graph TD
 
 ## 2. Colecciones Firestore
 
-| Colección | Propósito | Acceso cliente | Admin SDK |
-|---|---|---|---|
-| `consultations/` | Lead del formulario web | Solo admin auth | ✅ |
-| `consultations/{id}/private/push` | FCM token (privado) | ❌ | ✅ |
-| `cases/` | Expediente legal activo | ❌ | ✅ |
-| `public_tracking/` | Estado público por UUID | `get` (por UUID secreto) | ✅ |
-| `leads/` | Datos OCR previos al formulario | ❌ | ✅ |
-| `processed_callbacks/` | Idempotencia Telegram | ❌ | ✅ |
-| `referidos/` | Sistema de referidos | Solo admin auth | ✅ |
-| `edge_telemetry/` | Métricas anónimas | ❌ | ✅ |
-| `legal_mandates/` | Mandatos verificados OTP | ❌ | ✅ |
-| `otp_rate_limits/` | Rate limit OTP | ❌ | ✅ |
-| `upload_rate_limits/` | Rate limit uploads por IP | ❌ | ✅ |
+| Colección                         | Propósito                       | Acceso cliente           | Admin SDK |
+| --------------------------------- | ------------------------------- | ------------------------ | --------- |
+| `consultations/`                  | Lead del formulario web         | Solo admin auth          | ✅        |
+| `consultations/{id}/private/push` | FCM token (privado)             | ❌                       | ✅        |
+| `cases/`                          | Expediente legal activo         | ❌                       | ✅        |
+| `public_tracking/`                | Estado público por UUID         | `get` (por UUID secreto) | ✅        |
+| `leads/`                          | Datos OCR previos al formulario | ❌                       | ✅        |
+| `processed_callbacks/`            | Idempotencia Telegram           | ❌                       | ✅        |
+| `referidos/`                      | Sistema de referidos            | Solo admin auth          | ✅        |
+| `edge_telemetry/`                 | Métricas anónimas               | ❌                       | ✅        |
+| `legal_mandates/`                 | Mandatos verificados OTP        | ❌                       | ✅        |
+| `otp_rate_limits/`                | Rate limit OTP                  | ❌                       | ✅        |
+| `upload_rate_limits/`             | Rate limit uploads por IP       | ❌                       | ✅        |
 
 ---
 
@@ -104,47 +104,49 @@ onCaseStatusChange          onConsultationStatusChange
 
 ## 4. Seguridad — Capas de Defensa en Profundidad
 
-| Capa | Mecanismo | Archivo clave |
-|---|---|---|
-| Red | HSTS + CSP nonce + X-Frame-Options | `src/middleware.ts` |
-| SSRF Guard | Validación de Webhooks asíncrona (`dns.lookup`) con bloqueo IPv6 Literal y Metadata Cloud. *(Ver [docs/SSRF_ARCHITECTURE.md](SSRF_ARCHITECTURE.md))* | `src/lib/security/ssrf-guard.ts` |
-| CSRF / Origin | Validación de cabecera Origin contra SITE_URL en endpoints admin | `/api/gallery` y `/api/admin/export-pdf` |
-| Auth Admin | JWT ECDSA + httpOnly cookie | `src/lib/require-admin-session.ts` |
-| Doble Factor (2FA) | Código OTP de 6 dígitos enviado por email (Expiración de 2 minutos) con Cookie HttpOnly | `src/app/admin/otp-actions.ts` |
-| Auth VIP | JWT HS256 + httpOnly + sameSite:lax (Zero-PII: Solo Hashes) | `src/lib/security/vip-jwt.ts` |
-| Rate limit | Upstash Redis en memoria (Estrategia Mixta: Fail-OPEN para endpoints públicos como calculadora/OCR; Fail-CLOSED para endpoints críticos como pagos/login). | `src/lib/security/rate-limit.ts` |
-| Idempotencia y Atomicidad | Prevención de *Race Conditions* en descargas y cuotas semanales usando `db.runTransaction()` | `src/app/api/documentos/download/route.ts` |
-| Prevención de Inyección HTML | Sanitización estricta por `.transform()` y `.refine()` de Zod para correos transaccionales (Resend) | `src/app/api/payments/create-order/route.ts` |
-| Validación de Payloads | Zod en todos los endpoints, aplicando asincronía (`safeParseAsync`) para resoluciones de red | Cada `route.ts` |
-| Upload | Magic bytes + MIME whitelist + 10MB | `src/app/api/upload/route.ts` |
-| Anti-bot | Cloudflare Turnstile server-side | `src/lib/turnstile.ts` |
-| Cifrado y Hash PII | RSA E2EE formulario + PBKDF2 (600k iteraciones) + AES-256-GCM para PII en reposo | `src/lib/security/server-crypto.ts` |
+| Capa                         | Mecanismo                                                                                                                                                  | Archivo clave                                |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| Red                          | HSTS + CSP nonce + X-Frame-Options                                                                                                                         | `src/middleware.ts`                          |
+| SSRF Guard                   | Validación de Webhooks asíncrona (`dns.lookup`) con bloqueo IPv6 Literal y Metadata Cloud. _(Ver [docs/SSRF_ARCHITECTURE.md](SSRF_ARCHITECTURE.md))_       | `src/lib/security/ssrf-guard.ts`             |
+| CSRF / Origin                | Validación de cabecera Origin contra SITE_URL en endpoints admin                                                                                           | `/api/gallery` y `/api/admin/export-pdf`     |
+| Auth Admin                   | JWT ECDSA + httpOnly cookie                                                                                                                                | `src/lib/require-admin-session.ts`           |
+| Doble Factor (2FA)           | Código OTP de 6 dígitos enviado por email (Expiración de 2 minutos) con Cookie HttpOnly                                                                    | `src/app/admin/otp-actions.ts`               |
+| Auth VIP                     | JWT HS256 + httpOnly + sameSite:lax (Zero-PII: Solo Hashes)                                                                                                | `src/lib/security/vip-jwt.ts`                |
+| Rate limit                   | Upstash Redis en memoria (Estrategia Mixta: Fail-OPEN para endpoints públicos como calculadora/OCR; Fail-CLOSED para endpoints críticos como pagos/login). | `src/lib/security/rate-limit.ts`             |
+| Idempotencia y Atomicidad    | Prevención de _Race Conditions_ en descargas y cuotas semanales usando `db.runTransaction()`                                                               | `src/app/api/documentos/download/route.ts`   |
+| Prevención de Inyección HTML | Sanitización estricta por `.transform()` y `.refine()` de Zod para correos transaccionales (Resend)                                                        | `src/app/api/payments/create-order/route.ts` |
+| Validación de Payloads       | Zod en todos los endpoints, aplicando asincronía (`safeParseAsync`) para resoluciones de red                                                               | Cada `route.ts`                              |
+| Upload                       | Magic bytes + MIME whitelist + 10MB                                                                                                                        | `src/app/api/upload/route.ts`                |
+| Anti-bot                     | Cloudflare Turnstile server-side                                                                                                                           | `src/lib/turnstile.ts`                       |
+| Cifrado y Hash PII           | RSA E2EE formulario + PBKDF2 (600k iteraciones) + AES-256-GCM para PII en reposo                                                                           | `src/lib/security/server-crypto.ts`          |
 
 ### Excepciones de Seguridad Conocidas
-*   **style-src unsafe-inline (CSP):** Se permite la directiva `'unsafe-inline'` en `style-src` debido a los requerimientos de hidratación dinámica de Framer Motion y Tailwind CSS en Next.js. Es una excepción aceptada en beneficio del dinamismo visual de la interfaz de usuario de cara al cliente y en ausencia de un motor de hashes/nonces dinámicos a tiempo de compilación.
+
+- **style-src unsafe-inline (CSP):** Se permite la directiva `'unsafe-inline'` en `style-src` debido a los requerimientos de hidratación dinámica de Framer Motion y Tailwind CSS en Next.js. Es una excepción aceptada en beneficio del dinamismo visual de la interfaz de usuario de cara al cliente y en ausencia de un motor de hashes/nonces dinámicos a tiempo de compilación.
 
 ---
 
 ## 5. Cloud Functions — Descripción
 
-| Función | Trigger | Propósito |
-|---|---|---|
-| `onCasoChanged` | Firestore `onDocumentWritten` `casos/` | Auditoría inmutable (Mejora A) y alertas de seguridad Telegram ante DELETE (Mejora C). |
-| `onConsultaChanged` | Firestore `onDocumentWritten` `consultations/` | Auditoría inmutable (Mejora A) y alertas de seguridad Telegram ante DELETE (Mejora C). |
-| `onConsultationCreated` | Firestore create `consultations/` | Envía mensaje a Telegram con dictamen + guarda `telegramMessageId` |
-| `onCaseStatusChange` | Firestore update `cases/` | Email + Push + edita mensaje Telegram |
-| `onCaseCreated` | Firestore create `cases/` | Email de bienvenida al caso |
-| `onConsultationStatusChange` | Firestore update `consultations/` | Email al cliente (no Telegram) |
-| `onPushOptIn` | Firestore update (fcmToken) | Notifica al operador en Telegram que un cliente activó push |
-| `telegramWebhook` | HTTP POST | Procesa callbacks de botones Telegram, cambia estados |
-| `cronRetryNotifications` | Schedule cada 15 min | Reintenta mensajes Telegram fallidos, guarda nuevo `telegramMessageId` |
-| `cronLimpieza` | Schedule diaria | Elimina `processed_callbacks` expirados, limpia rate limits |
+| Función                      | Trigger                                        | Propósito                                                                              |
+| ---------------------------- | ---------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `onCasoChanged`              | Firestore `onDocumentWritten` `casos/`         | Auditoría inmutable (Mejora A) y alertas de seguridad Telegram ante DELETE (Mejora C). |
+| `onConsultaChanged`          | Firestore `onDocumentWritten` `consultations/` | Auditoría inmutable (Mejora A) y alertas de seguridad Telegram ante DELETE (Mejora C). |
+| `onConsultationCreated`      | Firestore create `consultations/`              | Envía mensaje a Telegram con dictamen + guarda `telegramMessageId`                     |
+| `onCaseStatusChange`         | Firestore update `cases/`                      | Email + Push + edita mensaje Telegram                                                  |
+| `onCaseCreated`              | Firestore create `cases/`                      | Email de bienvenida al caso                                                            |
+| `onConsultationStatusChange` | Firestore update `consultations/`              | Email al cliente (no Telegram)                                                         |
+| `onPushOptIn`                | Firestore update (fcmToken)                    | Notifica al operador en Telegram que un cliente activó push                            |
+| `telegramWebhook`            | HTTP POST                                      | Procesa callbacks de botones Telegram, cambia estados                                  |
+| `cronRetryNotifications`     | Schedule cada 15 min                           | Reintenta mensajes Telegram fallidos, guarda nuevo `telegramMessageId`                 |
+| `cronLimpieza`               | Schedule diaria                                | Elimina `processed_callbacks` expirados, limpia rate limits                            |
 
 ---
 
 ## 6. Variables de Entorno Requeridas
 
 ### Vercel (Next.js)
+
 ```env
 FIREBASE_ADMIN_CREDENTIALS=...   # JSON base64 del service account
 RESEND_API_KEY=re_...             # Para emails desde server actions
@@ -160,9 +162,14 @@ PII_ENCRYPTION_KEY=...           # Clave simétrica primaria para cifrado AES
 PII_ENCRYPTION_SALT=...          # Semilla hexadecimal (64 chars) para PBKDF2
 OCR_FALLBACK_URL=...             # URL del microservicio Python Lector-OCR (Render)
 OCR_ENGINE_SECRET=...            # Secreto HMAC-SHA256 para comunicación Vercel -> Python
+AGENT_AI_URL=...                 # URL del microservicio de Inteligencia Artificial
+AGENT_HMAC_SECRET=...            # Secreto HMAC-SHA256 para comunicación Vercel -> Chatbot
+UPSTASH_REDIS_URL=...            # Base de datos en memoria para Rate Limits y Analítica de Demanda
+UPSTASH_REDIS_REST_TOKEN=...
 ```
 
 ### Firebase Secrets (Cloud Functions)
+
 ```
 RESEND_API_KEY          → firebase functions:secrets:set RESEND_API_KEY
 TELEGRAM_BOT_TOKEN      → firebase functions:secrets:set TELEGRAM_BOT_TOKEN
@@ -195,17 +202,19 @@ firebase deploy --only firestore:indexes
 
 **Estatus Actual:** DESHABILITADO Y OCULTO.
 
-En agosto de 2026, la Federación Colombiana de Municipios implementó **Cloudflare Turnstile** con validación *Proof-of-Work* en el frontend del portal público del SIMIT. Esto reemplazó el antiguo rate limit basado puramente en IPs.
+En agosto de 2026, la Federación Colombiana de Municipios implementó **Cloudflare Turnstile** con validación _Proof-of-Work_ en el frontend del portal público del SIMIT. Esto reemplazó el antiguo rate limit basado puramente en IPs.
 
 ### Impacto
-* El motor del **Escudo SIMIT** (código alojado en `desmulta-scraper`, el cual utilizaba Playwright Headless) comenzó a sufrir *Shadowbanning*.
-* El CAPTCHA detecta anomalías del navegador headless y firmas de Puppeteer/Playwright, respondiendo artificialmente con "0 multas" o bloqueando la carga del DOM, independientemente de la rotación de proxies IP residenciales.
-* Como resultado, las consultas gratuitas a SIMIT sin intermediarios de resolución AI fallaron de manera sistemática.
+
+- El motor del **Escudo SIMIT** (código alojado en `desmulta-scraper`, el cual utilizaba Playwright Headless) comenzó a sufrir _Shadowbanning_.
+- El CAPTCHA detecta anomalías del navegador headless y firmas de Puppeteer/Playwright, respondiendo artificialmente con "0 multas" o bloqueando la carga del DOM, independientemente de la rotación de proxies IP residenciales.
+- Como resultado, las consultas gratuitas a SIMIT sin intermediarios de resolución AI fallaron de manera sistemática.
 
 ### Medidas Tomadas
+
 1. **Ocultamiento de Rutas en Next.js:** Las rutas relacionadas (`src/app/escudo-simit`, `src/app/api/escudo-simit`, `api/qstash/simit-worker`) fueron renombradas con el prefijo `_` para que Next.js App Router las ignore por completo en tiempo de compilación.
-2. **Depuración de UI:** Se removieron los botones y *Call-To-Actions* del **Hero** y el **Header**.
+2. **Depuración de UI:** Se removieron los botones y _Call-To-Actions_ del **Hero** y el **Header**.
 3. **Mantenimiento Cero:** El código del microservicio en Python (Desmulta-Scraper) quedó archivado en su repositorio respectivo. El servicio debe eliminarse de Cloud Run para mitigar costos innecesarios de CPU.
 
 **¿Cómo revivir el Escudo SIMIT en el futuro?**
-El microservicio deberá ser refactorizado para integrarse de forma nativa con APIs resolutorias de Captchas (ej. CapSolver o 2Captcha) o con frameworks Anti-Detect como *Undetected ChromeDriver* o FlareSolverr consumiendo un pool de *Residential Proxies*, y asumir los costos operativos que esto conlleva.
+El microservicio deberá ser refactorizado para integrarse de forma nativa con APIs resolutorias de Captchas (ej. CapSolver o 2Captcha) o con frameworks Anti-Detect como _Undetected ChromeDriver_ o FlareSolverr consumiendo un pool de _Residential Proxies_, y asumir los costos operativos que esto conlleva.

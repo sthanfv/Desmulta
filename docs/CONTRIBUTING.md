@@ -6,17 +6,17 @@
 
 ## 📋 Qué actualizar en docs/ según el tipo de cambio
 
-| Cambias esto... | Actualiza este archivo |
-|---|---|
-| Flujo de notificaciones (email, push, Telegram) | `docs/architecture.md` sección 3 + `docs/MEMORY.md` |
-| Seguridad (rate limit, auth, validación, rules) | `docs/architecture.md` sección 4 + `docs/CHANGELOG.md` |
-| Cloud Functions (triggers, lógica) | `docs/architecture.md` sección 5 + `docs/TELEGRAM_CRM_PIPELINE.md` |
-| Variables de entorno | `docs/architecture.md` sección 6 |
-| Kanban / Panel admin | `docs/admin-manual.md` |
-| Portal VIP / SIMIT | `docs/architecture.md` + `docs/MEMORY.md` |
-| Bug fix importante | `docs/CHANGELOG.md` bajo `[version actual]` |
-| Nueva feature | `docs/CHANGELOG.md` + `docs/MEMORY.md` (nueva sesión) |
-| Cualquier cambio | `docs/CHANGELOG.md` siempre |
+| Cambias esto...                                 | Actualiza este archivo                                             |
+| ----------------------------------------------- | ------------------------------------------------------------------ |
+| Flujo de notificaciones (email, push, Telegram) | `docs/architecture.md` sección 3 + `docs/MEMORY.md`                |
+| Seguridad (rate limit, auth, validación, rules) | `docs/architecture.md` sección 4 + `docs/CHANGELOG.md`             |
+| Cloud Functions (triggers, lógica)              | `docs/architecture.md` sección 5 + `docs/TELEGRAM_CRM_PIPELINE.md` |
+| Variables de entorno                            | `docs/architecture.md` sección 6                                   |
+| Kanban / Panel admin                            | `docs/admin-manual.md`                                             |
+| Portal VIP / SIMIT                              | `docs/architecture.md` + `docs/MEMORY.md`                          |
+| Bug fix importante                              | `docs/CHANGELOG.md` bajo `[version actual]`                        |
+| Nueva feature                                   | `docs/CHANGELOG.md` + `docs/MEMORY.md` (nueva sesión)              |
+| Cualquier cambio                                | `docs/CHANGELOG.md` siempre                                        |
 
 ---
 
@@ -44,6 +44,7 @@ rama-feature → cambios código → actualizar docs/ → tests → PR → merge
 2. **Haz el cambio** y actualiza `docs/` en el mismo commit.
 
 3. **Suite completa antes del PR:**
+
    ```bash
    npm run format && npm run lint && npm run typecheck && npm run test -- --run && npm run build
    ```
@@ -58,18 +59,19 @@ rama-feature → cambios código → actualizar docs/ → tests → PR → merge
 <tipo>(<alcance>): <descripción en español>
 ```
 
-| Tipo | Cuándo |
-|---|---|
-| `feat` | Nueva funcionalidad |
-| `fix` | Corrección de bug |
-| `security` | Parche de seguridad / hardening |
-| `docs` | Solo archivos `.md` o comentarios |
-| `perf` | Mejora de rendimiento |
+| Tipo       | Cuándo                            |
+| ---------- | --------------------------------- |
+| `feat`     | Nueva funcionalidad               |
+| `fix`      | Corrección de bug                 |
+| `security` | Parche de seguridad / hardening   |
+| `docs`     | Solo archivos `.md` o comentarios |
+| `perf`     | Mejora de rendimiento             |
 | `refactor` | Cambio sin alterar comportamiento |
-| `test` | Añadir o corregir tests |
-| `chore` | Deps, configs, CI |
+| `test`     | Añadir o corregir tests           |
+| `chore`    | Deps, configs, CI                 |
 
 **Ejemplos:**
+
 ```
 feat(vip): agregar validación de propiedad en endpoint web-push
 fix(push): corregir early return que bloqueaba push en usuarios SIMIT
@@ -91,3 +93,9 @@ docs(architecture): actualizar diagrama de flujo de notificaciones
 - [ ] Variables de entorno nuevas documentadas en `docs/architecture.md` sección 6
 - [ ] Sin `console.log` de debug en producción
 - [ ] Sin `TODO` sin issue asociado
+
+## ?? Flujo DevSecOps (Husky & Testing Aislado)
+
+1. **Pre-commit:** Al hacer git commit, el sistema \lint-staged\ correra formateo y un testeo aislado (\itest related\) UNICAMENTE en los archivos que acabas de modificar. Esto acelera tu trabajo a ~14 segundos.
+2. **Pre-push:** Todos los tests pesados o monoliticos fueron delegados al sistema CI/CD en la nube para no bloquear tu maquina local.
+3. Esta ESTRICTAMENTE PROHIBIDO usar las banderas \--no-verify\ para saltar las revisiones de pre-commit.
