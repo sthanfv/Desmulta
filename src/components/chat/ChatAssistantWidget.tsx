@@ -43,6 +43,15 @@ interface Message {
 
 type FontScale = 'normal' | 'large' | 'xlarge';
 
+/** Función utilitaria para formatear la hora en formato civil estándar (12h con a.m. / p.m.) */
+function getCivilTimeString(): string {
+  return new Date().toLocaleTimeString('es-CO', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  });
+}
+
 /**
  * Formateador liviano de Markdown sin dependencias externas pesadas.
  * Convierte encabezados ###, negritas **texto** y viñetas en elementos JSX limpios y escalables.
@@ -51,15 +60,15 @@ function FormattedMessageText({ text, fontScale }: { text: string; fontScale: Fo
   const lines = text.split('\n');
 
   const getTitleSizeClass = () => {
-    if (fontScale === 'xlarge') return 'text-base sm:text-lg';
-    if (fontScale === 'large') return 'text-sm sm:text-base';
-    return 'text-xs sm:text-[14px]';
+    if (fontScale === 'xlarge') return 'text-base sm:text-lg leading-snug';
+    if (fontScale === 'large') return 'text-sm sm:text-base leading-snug';
+    return 'text-xs sm:text-[14px] leading-snug';
   };
 
   const getBodySizeClass = () => {
-    if (fontScale === 'xlarge') return 'text-[15px] sm:text-[17px] leading-relaxed';
-    if (fontScale === 'large') return 'text-[14px] sm:text-[15.5px] leading-relaxed';
-    return 'text-[13px] sm:text-[14px] leading-relaxed';
+    if (fontScale === 'xlarge') return 'text-[15px] sm:text-[17px] leading-loose tracking-normal';
+    if (fontScale === 'large') return 'text-[14px] sm:text-[15.5px] leading-relaxed tracking-normal';
+    return 'text-[13px] sm:text-[14px] leading-relaxed tracking-normal';
   };
 
   return (
@@ -143,7 +152,7 @@ export function ChatAssistantWidget() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-scroll al final al recibir mensajes
+  // Auto-scroll al final al recibir mensajes o cambiar escala
   useEffect(() => {
     if (isOpen) {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -166,7 +175,7 @@ export function ChatAssistantWidget() {
       id: userMsgId,
       role: 'user',
       content: query,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      timestamp: getCivilTimeString(),
     };
 
     setMessages((prev) => [...prev, userMsg]);
@@ -199,7 +208,7 @@ export function ChatAssistantWidget() {
         citations: data.citations || [],
         suggestedAction: data.suggested_action || null,
         followUpQuestions: data.follow_up_questions || [],
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: getCivilTimeString(),
       };
 
       setMessages((prev) => [...prev, assistantMsg]);
@@ -227,7 +236,7 @@ export function ChatAssistantWidget() {
           '¿Cómo saber si la dirección del RUNT fue respetada?',
           '¿Qué trámite procede ante un embargo de cuenta?',
         ],
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: getCivilTimeString(),
       };
       setMessages((prev) => [...prev, fallbackMsg]);
     } finally {
@@ -409,7 +418,7 @@ export function ChatAssistantWidget() {
                   </div>
                 </div>
 
-                {/* Cuerpo de la Conversación (Aprovechamiento al 100% del ancho para eliminar espacio vacío) */}
+                {/* Cuerpo de la Conversación */}
                 <div className="flex-1 p-3.5 overflow-y-auto space-y-3.5 scroll-smooth">
                   {messages.map((msg) => (
                     <div
@@ -530,7 +539,7 @@ export function ChatAssistantWidget() {
 
                         <span
                           className={
-                            'text-[8px] block mt-1 ' +
+                            'text-[9px] block mt-1.5 ' +
                             (msg.role === 'user' ? 'text-black/60' : 'text-muted-foreground')
                           }
                         >
