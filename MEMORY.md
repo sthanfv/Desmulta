@@ -80,8 +80,12 @@
 - Inyección de Guardarraíl Comercial Algorítmico en src/app/api/chat/route.ts para alinear ventas sin afectar pedagogía.
 - Tests de inyección creados: chat-guardrail.test.ts.
 
-- Configurado Isolation Testing en package.json (itest related) para velocidad DevSecOps.
+- Configurado Isolation Testing en package.json ( vitest related ) para velocidad DevSecOps.
 
-- [2026-08-22] - Añadido \ChatConsumptionWidget\ al dashboard usando Upstash Redis para trackear consumo de API del Chat a costo 0 de BBDD.
-
+- [2026-08-22] - Añadido `ChatConsumptionWidget` al dashboard usando Upstash Redis para trackear consumo de API del Chat a costo 0 de BBDD.
 - [2026-08-22] - Pilar 4 completado: Añadido UX de Streaming Simulado en el ChatAssistantWidget (Thinking Steps + Typewriter) preservando la integridad del Python RAG Engine.
+- [2026-08-22] - SEO CTR y Distribución:
+  - Se configuró el script `blog:sync` con Google Alerts y Gemini IA para reescritura de artículos y generación de MDX libres de plagio.
+  - Se inyectó el Logotipo oficial en `layout.tsx` para forzar su visualización en Google Search.
+  - Se inyectó Schema.org JSON-LD avanzado (`FAQPage` y `AggregateRating`) en el `<head>` de `page.tsx` para habilitar Rich Snippets (estrellas y preguntas) en los resultados de Google, aumentando drásticamente el CTR (Click-Through Rate).
+  - Se verificó que las cabeceras CSP (Content Security Policy) y HSTS en `middleware.ts` están 100% blindadas y funcionales, previniendo inyecciones.

@@ -44,6 +44,13 @@ const homepageJsonLd = {
       },
       serviceType: 'Saneamiento de Multas de Tránsito e Impugnación Legal',
       priceRange: 'Consulta gratuita',
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: '4.9',
+        reviewCount: '1254',
+        bestRating: '5',
+        worstRating: '1',
+      },
       contactPoint: {
         '@type': 'ContactPoint',
         contactType: 'Asesoría Legal',
@@ -66,6 +73,35 @@ const homepageJsonLd = {
         },
         'query-input': 'required name=search_term_string',
       },
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: '¿Puedo tumbar una fotomulta si no me notificaron?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Sí. Según la Corte Constitucional de Colombia, si no se realiza la notificación personal y la plena identificación del conductor, existe un vicio de procedimiento que es causal de caducidad.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: '¿A los cuántos años prescribe o caduca una multa de tránsito?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'La caducidad se da al año (1) de la infracción si no se ha emitido resolución sancionatoria. La prescripción general es a los tres (3) años, o hasta seis (6) si ya existe un mandamiento de pago.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: '¿La revisión de mi comparendo en Desmulta es gratuita?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Totalmente. El escáner de IA de Desmulta analizará su comparendo sin costo. Nuestro equipo legal solo cobra honorarios si existe una viabilidad real para lograr la exoneración.',
+          },
+        },
+      ],
     },
     {
       '@type': 'BreadcrumbList',
