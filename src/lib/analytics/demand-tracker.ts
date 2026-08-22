@@ -10,22 +10,26 @@ const TOPIC_RULES = [
   {
     id: 'embargos',
     label: 'Embargos y Coactivos',
-    regex: /(embargo|embargad[oa]|congelar|retencion|bancolombia|nequi|daviplata|banco|cuenta bancaria|coactivo)/i,
+    regex:
+      /(embargo|embargad[oa]|congelar|retencion|bancolombia|nequi|daviplata|banco|cuenta bancaria|coactivo)/i,
   },
   {
     id: 'prescripcion',
     label: 'Prescripción (> 3 años)',
-    regex: /(prescripcion|prescribir|prescribe|caducidad|caducar|3 a[ñn]os|tres a[ñn]os|viejo|antiguo|2019|2020|2021|borrar)/i,
+    regex:
+      /(prescripcion|prescribir|prescribe|caducidad|caducar|3 a[ñn]os|tres a[ñn]os|viejo|antiguo|2019|2020|2021|borrar)/i,
   },
   {
     id: 'fotomultas',
     label: 'Fotomultas y Notificación',
-    regex: /(fotomulta|c[aá]mara|foto|c-038|notificaci[oó]n|notificado|correo|runt|sancion|comparendo electronico|multa electronica)/i,
+    regex:
+      /(fotomulta|c[aá]mara|foto|c-038|notificaci[oó]n|notificado|correo|runt|sancion|comparendo electronico|multa electronica)/i,
   },
   {
     id: 'radares_ansv',
     label: 'Radares ANSV',
-    regex: /(radar|velocidad|ansv|permiso|calibraci[oó]n|metrolog[ií]a|autorizaci[oó]n|legalidad|senalizacion|se[ñn]al)/i,
+    regex:
+      /(radar|velocidad|ansv|permiso|calibraci[oó]n|metrolog[ií]a|autorizaci[oó]n|legalidad|senalizacion|se[ñn]al)/i,
   },
   {
     id: 'alcoholemia',
@@ -41,16 +45,36 @@ const TOPIC_RULES = [
     id: 'licencias',
     label: 'Licencias y SOAT',
     regex: /(licencia|pase|soat|traspaso|curso pedag[oó]gico|curso|renovar)/i,
-  }
+  },
 ];
 
 // 3. Diccionario Heurístico de Ciudades Principales
 const CITIES = [
-  'bogota', 'medellin', 'cali', 'barranquilla', 'cartagena', 
-  'cucuta', 'bucaramanga', 'pereira', 'santa marta', 'ibague', 
-  'pasto', 'manizales', 'neiva', 'villavicencio', 'armenia', 
-  'valledupar', 'popayan', 'sincelejo', 'floridablanca', 'palmira',
-  'bello', 'soacha', 'envigado', 'itagui', 'soledad'
+  'bogota',
+  'medellin',
+  'cali',
+  'barranquilla',
+  'cartagena',
+  'cucuta',
+  'bucaramanga',
+  'pereira',
+  'santa marta',
+  'ibague',
+  'pasto',
+  'manizales',
+  'neiva',
+  'villavicencio',
+  'armenia',
+  'valledupar',
+  'popayan',
+  'sincelejo',
+  'floridablanca',
+  'palmira',
+  'bello',
+  'soacha',
+  'envigado',
+  'itagui',
+  'soledad',
 ];
 
 /**
@@ -63,7 +87,7 @@ export async function trackDemandQuery(message: string): Promise<void> {
 
   try {
     const textToAnalyze = message.toLowerCase();
-    
+
     // 1. Detectar Tema
     let topicId = 'otros';
     for (const rule of TOPIC_RULES) {
@@ -76,7 +100,7 @@ export async function trackDemandQuery(message: string): Promise<void> {
     // 2. Detectar Ciudad
     let cityId = 'no_identificada';
     // Reemplaza tildes para búsqueda de ciudad
-    const normalizedText = textToAnalyze.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const normalizedText = textToAnalyze.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     for (const city of CITIES) {
       if (normalizedText.includes(city)) {
         cityId = city;
@@ -84,19 +108,23 @@ export async function trackDemandQuery(message: string): Promise<void> {
       }
     }
 
-    // 3. Obtener el mes actual (e.g., "2026-08")
+    // 3. Obtener las llaves de tiempo
     const date = new Date();
     const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+    const todayStr = date.toISOString().split('T')[0];
 
     // 4. Conteo Atómico en Upstash Redis (Pipeline para agrupar comandos en 1 sola red)
     const pipeline = redis.pipeline();
-    
+
     // Incrementar Contador Global Mensual
     pipeline.incr(`analytics:demand:total:${monthKey}`);
-    
+
+    // Incrementar Contador Diario de Uso del Motor IA
+    pipeline.incr(`analytics:api_usage:chat:${todayStr}`);
+
     // Incrementar Contador por Tema
     pipeline.hincrby(`analytics:demand:topics:${monthKey}`, topicId, 1);
-    
+
     // Incrementar Contador por Ciudad (si fue identificada)
     if (cityId !== 'no_identificada') {
       pipeline.hincrby(`analytics:demand:cities:${monthKey}`, cityId, 1);
@@ -104,18 +132,35 @@ export async function trackDemandQuery(message: string): Promise<void> {
 
     // Ejecutar Pipeline (Demora < 5ms)
     await pipeline.exec();
-
   } catch (error) {
     // Si falla el tracker, fallamos en silencio (Fail-Open) para no bloquear al usuario
     const msg = error instanceof Error ? error.message : String(error);
     logger.error('[demand-tracker] Error registrando analítica:', { error: msg });
-    
+
     // Auditar e informar del fallo crítico en la telemetría (asíncrono)
-    sendTelegramAgentAlert(`Fallo en Ingesta de Demanda (Upstash Redis): ${msg}`, `TRACKER-${Date.now()}`).catch(() => null);
+    sendTelegramAgentAlert(
+      `Fallo en Ingesta de Demanda (Upstash Redis): ${msg}`,
+      `TRACKER-${Date.now()}`
+    ).catch(() => null);
+  }
+}
+
+/**
+ * Recupera el número de peticiones enviadas al Motor IA en el día actual
+ */
+export async function getChatApiUsageToday(): Promise<number> {
+  try {
+    const todayStr = new Date().toISOString().split('T')[0];
+    const val = await redis.get<number | string>(`analytics:api_usage:chat:${todayStr}`);
+    if (!val) return 0;
+    return typeof val === 'number' ? val : parseInt(val, 10) || 0;
+  } catch (error) {
+    logger.error('[demand-tracker] Error leyendo API usage:', error);
+    return 0; // Fail-open en lecturas de analytics
   }
 }
 
 export function getDemandTopicLabel(topicId: string): string {
-  const rule = TOPIC_RULES.find(r => r.id === topicId);
+  const rule = TOPIC_RULES.find((r) => r.id === topicId);
   return rule ? rule.label : 'Otros Trámites';
 }

@@ -152,7 +152,8 @@
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
       "eslint --max-warnings 0",
-      "prettier --write"
+      "prettier --write",
+      "cross-env NODE_OPTIONS=\"--max-old-space-size=4096\" vitest related --run --passWithNoTests"
     ],
     "*.{json,md,yml,yaml}": [
       "prettier --write"

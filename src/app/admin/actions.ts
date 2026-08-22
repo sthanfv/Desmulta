@@ -10,6 +10,7 @@ import { maskId, maskName, maskPhone, maskPlate, maskEmail } from '@/lib/securit
 import { Consultation } from '@/lib/definitions';
 import { DocumentType } from '@/lib/legal/document-templates';
 import { ShowcaseConfig, FooterConfig } from '@/lib/site-config';
+import { getChatApiUsageToday } from '@/lib/analytics/demand-tracker';
 
 /**
  * Interfaz de duck-typing para detectar Timestamps de Firestore sin importar su clase.
@@ -1206,6 +1207,7 @@ const getCachedAnalyticsStats = unstable_cache(
       infractionData,
       funnelData,
       geminiRequestsToday,
+      chatRequestsToday: await getChatApiUsageToday(),
       tasasData,
     };
   },

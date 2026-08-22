@@ -15,6 +15,7 @@ export interface AnalyticsData {
   infractionData: { name: string; value: number }[];
   funnelData?: { name: string; value: number; fill: string }[];
   geminiRequestsToday?: number;
+  chatRequestsToday?: number;
 }
 
 export function useAnalyticsStats(auth: Auth | null) {
