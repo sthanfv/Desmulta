@@ -164,9 +164,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, ignored: true });
   }
 
-  // 🛡️ FIX CRÍTICO: Validar que el monto que Wompi REALMENTE cobró coincide con
+  // 🚨 FIX CRÍTICO: Validar que el monto que Wompi REALMENTE cobró coincide con
   // el precio server-side establecido al crear la pre-orden en Firestore.
-  const amountConfirmadoPorWompi = Number(transaction.amount_in_cents) / 100;
+  // purchase.amountCop está en centavos (ej. 3900000 para $39.000)
+  const amountConfirmadoPorWompi = Number(transaction.amount_in_cents);
   if (status === 'APPROVED' && amountConfirmadoPorWompi !== purchase.amountCop) {
     logger.security('[webhook-wompi] 🚨 DISCREPANCIA DE MONTO — posible intento de fraude', {
       reference,
@@ -264,7 +265,7 @@ export async function POST(req: NextRequest) {
             body: JSON.stringify({
               chat_id: chatId,
               parse_mode: 'HTML',
-              text: `💰 <b>¡NUEVO PAGO RECIBIDO!</b> 💰\n\n<b>Cliente:</b> ${nombre}\n<b>Producto:</b> ${producto}${ticketStr}\n<b>Monto:</b> $${amountConfirmadoPorWompi.toLocaleString('es-CO')} COP\n<b>Ref:</b> <code>${reference}</code>\n\nEl PDF se está enviando automáticamente. 🚀`,
+              text: `💰 <b>¡NUEVO PAGO RECIBIDO!</b> 💰\n\n<b>Cliente:</b> ${nombre}\n<b>Producto:</b> ${producto}${ticketStr}\n<b>Monto:</b> $${(amountConfirmadoPorWompi / 100).toLocaleString('es-CO')} COP\n<b>Ref:</b> <code>${reference}</code>\n\nEl PDF se está enviando automáticamente. 🚀`,
             }),
           })
             .then(async (res) => {

@@ -21,6 +21,7 @@ vi.mock('firebase-admin/firestore', () => {
           get: () => mockGet(collName, docId),
           set: mockSet,
           update: mockUpdate,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           create: (...args: any[]) => mockCreate(collName, docId, ...args),
         })),
       })),
@@ -59,7 +60,7 @@ describe('Wompi Webhook API', () => {
         return Promise.resolve({
           exists: true,
           data: () => ({
-            amountCop: 100,
+            amountCop: 10000,
             productType: 'poder_especial',
             caseData: {
               shortId: docId,
@@ -73,8 +74,11 @@ describe('Wompi Webhook API', () => {
   });
 
   it('debería rechazar peticiones con firma inválida (401)', async () => {
-    const payload = JSON.stringify({ event: 'transaction.updated', data: { transaction: { id: '123' } } });
-    
+    const payload = JSON.stringify({
+      event: 'transaction.updated',
+      data: { transaction: { id: '123' } },
+    });
+
     // Firma incorrecta
     const req = new NextRequest('http://localhost/api', {
       method: 'POST',
@@ -86,24 +90,29 @@ describe('Wompi Webhook API', () => {
 
     const res = await POST(req);
     expect(res.status).toBe(401);
-    
+
     const json = await res.json();
     expect(json.error).toBe('Firma inválida');
   });
 
   it('debería procesar peticiones con firma válida y devolver 200', async () => {
     const timestamp = 1612345678;
-    const basePayload = { 
-      event: 'transaction.updated', 
-      data: { 
-        transaction: { id: 'txn_123', reference: 'ref_123', status: 'APPROVED', amount_in_cents: 10000 } 
+    const basePayload = {
+      event: 'transaction.updated',
+      data: {
+        transaction: {
+          id: 'txn_123',
+          reference: 'ref_123',
+          status: 'APPROVED',
+          amount_in_cents: 10000,
+        },
       },
       timestamp,
       signature: {
-        properties: ['transaction.id', 'transaction.status', 'transaction.amount_in_cents']
-      }
+        properties: ['transaction.id', 'transaction.status', 'transaction.amount_in_cents'],
+      },
     };
-    
+
     // Generar firma correcta (SHA256) según la concatenación dinámica de Wompi
     const concatenatedValues = 'txn_123' + 'APPROVED' + '10000' + String(timestamp) + SECRET;
     const expectedSignature = crypto.createHash('sha256').update(concatenatedValues).digest('hex');
@@ -112,8 +121,8 @@ describe('Wompi Webhook API', () => {
       ...basePayload,
       signature: {
         ...basePayload.signature,
-        checksum: expectedSignature
-      }
+        checksum: expectedSignature,
+      },
     });
 
     const req = new NextRequest('http://localhost/api', {
@@ -123,27 +132,27 @@ describe('Wompi Webhook API', () => {
 
     const res = await POST(req);
     expect(res.status).toBe(200);
-    
+
     const json = await res.json();
     expect(json.ok).toBe(true);
     expect(json.status).toBe('APPROVED');
   });
-  
+
   it('debería ignorar eventos que no sean transaction.updated', async () => {
     const timestamp = 1612345678;
-    const basePayload = { 
-      event: 'nequi_token.updated', 
+    const basePayload = {
+      event: 'nequi_token.updated',
       data: { transaction: { id: 'txn_123' } },
       timestamp,
-      signature: { properties: ['transaction.id'] }
+      signature: { properties: ['transaction.id'] },
     };
-    
+
     const concatenatedValues = 'txn_123' + String(timestamp) + SECRET;
     const expectedSignature = crypto.createHash('sha256').update(concatenatedValues).digest('hex');
 
     const payload = JSON.stringify({
       ...basePayload,
-      signature: { ...basePayload.signature, checksum: expectedSignature }
+      signature: { ...basePayload.signature, checksum: expectedSignature },
     });
 
     const req = new NextRequest('http://localhost/api', {
@@ -153,7 +162,7 @@ describe('Wompi Webhook API', () => {
 
     const res = await POST(req);
     expect(res.status).toBe(200);
-    
+
     const json = await res.json();
     expect(json.ignored).toBe(true);
   });
