@@ -3,6 +3,7 @@ import React, { useMemo } from 'react';
 import { FirebaseConsumptionWidget } from '@/app/admin/components/FirebaseConsumptionWidget';
 import { GeminiConsumptionWidget } from '@/app/admin/components/GeminiConsumptionWidget';
 import { TasasLegalesWidget } from '@/app/admin/components/TasasLegalesWidget';
+import { DemandTrendsWidget } from '@/app/admin/components/DemandTrendsWidget';
 import {
   BarChart,
   Bar,
@@ -185,6 +186,10 @@ export function AnalyticsView({ data, isLoading, error, tasasData }: AnalyticsVi
         <GeminiConsumptionWidget requestsToday={data.geminiRequestsToday || 0} />
         <TasasLegalesWidget tasasData={tasasData} />
       </div>
+
+      {/* ── Widget de Analítica de Demanda Ciudadana en Vivo ── */}
+      <DemandTrendsWidget />
+
       {/* ── KPIs ── */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <KPICard

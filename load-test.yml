@@ -1,0 +1,26 @@
+config:
+  target: "http://localhost:9005"
+  phases:
+    - duration: 10
+      arrivalRate: 5
+      name: "Fase 1: Calentamiento"
+    - duration: 20
+      arrivalRate: 50
+      name: "Fase 2: Pico de Tráfico (1000 usuarios en 20s)"
+  plugins:
+    ensure: {}
+  ensure:
+    thresholds:
+      - http.response_time.p95: 500
+    conditions:
+      - expression: vusers.failed == 0
+        strict: true
+
+scenarios:
+  - name: "Ciudadano visitando la página principal"
+    flow:
+      - get:
+          url: "/"
+      - think: 2
+      - get:
+          url: "/nosotros"

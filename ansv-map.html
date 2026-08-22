@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="author" content="Agencia Nacional de Seguridad Vial" />
+	<meta name="description" content="Fotodetección" />
+	<link rel="shortcut icon" href="img/ansv-icon.png" />
+	<link href="css/mb.css?v=1.4" rel="stylesheet" type="text/css" />
+	<link href="css/fa.css?v=1.4" rel="stylesheet" type="text/css" />
+	<link href="css/open-sans.css?v=1.4" rel="stylesheet" type="text/css" />
+	<link href="css/bt5.css?v=1.4" rel="stylesheet" type="text/css" />
+	<link href="css/dx.min.css?v=1.4" rel="stylesheet" type="text/css" />
+	<link href="css/dx-fd.css?v=1.4" rel="stylesheet" type="text/css" />
+	<link href="css/base.min.css?v=1.4" rel="stylesheet" type="text/css" />
+	<title>Cámaras de fotodetección autorizadas &raquo; Sistema de Información de Fotodetección ANSV</title>
+	<style>
+		.boton_suspendidas {
+			width: auto;
+			z-index: 100;
+			background: orange;
+			color: white !important;
+			border: 0px;
+			padding: 5px 25px;
+			border-radius: 5px;
+		}
+		.boton_suspendidas a {
+			color: white;
+			text-decoration: none;
+		}
+		.boton_suspendidas a:hover {
+			color: white;
+		}
+		#grid {
+			margin-top: 15px;
+		}
+
+		@media only screen and (max-device-width : 991px) {
+			.fa-arrow-left {
+				margin-right: 5px;
+			}
+
+			.bg-main .row {
+				flex-direction: column;
+			}
+
+			.cnt-back {
+				justify-content: flex-start !important;
+			}
+		}
+
+		@media only screen and (max-device-width : 430px) {
+			h4.cams {
+				font-size: 1.4rem !important;
+			}
+
+			.cnt-back h6, .cnt-back a, .cnt-back i {
+				font-size: .9rem !important;
+			}
+		}
+
+		@media (min-width: 1400px) {
+			.container {
+				max-width: calc(100% - 200px) !important;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="main fd">
+		<div class="header">
+			<div class="container">
+				<div class="row">
+					<div class="col d-flex justify-content-between align-items-center">
+						<a href="/" title="Inicio..." target="_top">
+							<img class="h-80" src="img/ansv-logo-fd.png" />
+						</a>
+						<span>
+							<h3 class="blue m-0"><i class="fa fa-video"></i>&nbsp;&nbsp;Cámaras de fotodetección autorizadas</h3>
+							<p class="msg m-0">Sistema de ubicación de cámaras de fotodetección autorizadas <small>(desde el 10/12/2018)</small></p>
+						</span>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="content">
+			<div class="container hidden" id="cams">
+				<div class="row mb-1">
+					<div class="col">
+						<div class="card">
+							<div class="card-header bg-main">
+								<div class="row">
+									<div class="col">
+										<h4 class="cams m-0 d-inline-block"><i class="fa fa-video"></i>&nbsp;&nbsp;Cámaras autorizadas:</h4>
+										<h4 class="cams m-0 ml-3 d-inline-block"><strong id="total_aprobados"></strong></h4>
+									</div>
+									<div class="col d-flex justify-content-end align-items-center cnt-back">
+										<h6 class="m-0 d-inline-block"><i class="fa fa-calendar-alt"></i>&nbsp;&nbsp;Fecha de actualización:</h6>
+										<h6 class="m-0 ml-3 d-inline-block"><strong id="fecha_actualizacion">&nbsp;</strong></h6>
+										<a href="/" title="Volver..." class="font-weight-semibold back"><i class="fa fa-arrow-left" target="_top"></i> Volver</a>
+									</div>
+								</div>
+							</div>
+							<div class="embed-responsive map" id="map"></div>
+							<div class="card-body hidden info" id="current">
+								<div class="row">
+									<div class="col-md-1 text-center" id="c0"><i class="fa fa-video"></i></div>
+									<div class="col-md-5" id="c1"></div>
+									<div class="col-md-6" id="c2"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+
+					<div class="col">
+						<div class="card">
+							<div class="card-body">
+								<button title="equipos con resolución emitida por la Superintendencia de Transporte" class="boton_suspendidas">
+									<a href="https://ansv-my.sharepoint.com/:f:/g/personal/juan_heredia_ansv_gov_co/EtaAdslSlHlKvmsbZrl7NikBn5A4eekDN4_cdMPTfO7YEA?e=oUJaAm" target="_blank">
+										Ver resoluciones emitidas por la Superintendencia de Transporte
+									</a>
+								</button>
+								<div class="embed-responsive grid" id="grid">&nbsp;</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="footer">
+			<div class="container">
+				<div class="row text-center">
+					<div class="col">
+						<a href="https://www.ansv.gov.co/" title="Agencia Nacional de Seguridad Vial..." target="_blank">
+							<img src="img/logoANSV.png" />
+						</a>
+						<a href="https://www.mintransporte.gov.co/" title="Ministerio de Transporte..." target="_blank">
+							<img src="img/min_transporte_logo.png" />
+						</a>
+						<img src="img/logo_its.png" />
+						<img src="img/logo-gobierno-colombia.png" />
+					</div>
+				</div>
+				<div class="row text-center">
+					<div class="col">
+						© 2021 -
+						<a href="//www.ansv.gov.co/" style="color: #0c0c0c" target="_blank"> Agencia Nacional de Seguridad Vial (ANSV)</a>&nbsp;
+						<small class="">
+							<i><span id="ver"></span> <span id="env"></span></i>
+						</small>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="js/jq.js?v=1.4"></script>
+	<script src="js/bt5.js?v=1.4"></script>
+	<script src="js/mw.js?v=1.4"></script>
+	<script src="js/mb.js?v=1.4"></script>
+	<script src="js/ea.js?v=1.4"></script>
+	<script src="js/sc.js?v=1.4"></script>
+	<script src="js/csb.js?v=1.4"></script>
+	<script src="js/pf.js?v=1.4"></script>
+	<script src="js/xls.js?v=1.4"></script>
+	<script src="js/fs.js?v=1.4"></script>
+	<script src="js/dx.js?v=1.4"></script>
+	<script src="js/dx.es.js?v=1.4"></script>
+	<script src="js/app-fd.min.js?v=1.4"></script>
+	<script src="js/root.min.js?v=1.4"></script>
+</body>
+</html>

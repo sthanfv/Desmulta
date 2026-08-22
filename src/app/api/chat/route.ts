@@ -4,6 +4,8 @@ import crypto from 'crypto';
 import { getSecureIp } from '@/lib/security/ip-utils';
 import { checkRateLimit } from '@/lib/security/rate-limit';
 import { logger } from '@/lib/logger/security-logger';
+import { trackDemandQuery } from '@/lib/analytics/demand-tracker';
+import { sendTelegramAgentAlert } from '@/lib/telegram';
 
 // Esquema de validación del payload entrante
 const chatRequestSchema = z.object({
@@ -73,7 +75,10 @@ export async function POST(req: NextRequest) {
     const timestamp = Date.now().toString();
     const payload = JSON.stringify({ message, city, history });
 
-    // 4. Firma Criptográfica HMAC-SHA256
+    // 4.1. Registro Asíncrono de Analítica de Demanda (Fire-and-forget, 0% latencia al usuario)
+    trackDemandQuery(message).catch(err => logger.error('Error tracking demand', err));
+
+    // 5. Firma Criptográfica HMAC-SHA256
     const signature = crypto
       .createHmac('sha256', hmacSecret)
       .update(timestamp)
@@ -82,7 +87,7 @@ export async function POST(req: NextRequest) {
 
     const traceId = `web-chat-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
 
-    // 5. Invocación al Microservicio de IA
+    // 6. Invocación al Microservicio de IA
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 12000); // 12s timeout
 
@@ -104,6 +109,9 @@ export async function POST(req: NextRequest) {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         logger.error(`[Chat-API] Fallo del microservicio IA (${response.status}):`, errorData);
+        
+        // Alerta al equipo DevSecOps/SRE
+        sendTelegramAgentAlert(`Fallo de Motor IA (HTTP ${response.status})`, traceId).catch(() => null);
 
         return NextResponse.json(
           {
@@ -137,6 +145,9 @@ export async function POST(req: NextRequest) {
     } catch (fetchError: unknown) {
       clearTimeout(timeout);
       logger.error('[Chat-API] Microservicio no disponible:', fetchError);
+
+      // Alerta al equipo DevSecOps/SRE
+      sendTelegramAgentAlert(`Microservicio IA Down (Timeout/Network)`, traceId).catch(() => null);
 
       return NextResponse.json(
         {

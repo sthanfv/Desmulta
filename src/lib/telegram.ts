@@ -428,3 +428,42 @@ export async function sendTelegramCronError(errorMsg: string): Promise<boolean> 
     return false;
   }
 }
+
+/**
+ * sendTelegramAgentAlert — Notifica al equipo de ingeniería si el motor
+ * conversacional de IA o la API de Google tienen una falla crítica.
+ */
+export async function sendTelegramAgentAlert(
+  errorMsg: string,
+  traceId: string
+): Promise<boolean> {
+  const { TELEGRAM_BOT_TOKEN, TELEGRAM_DEV_CHAT_ID, TELEGRAM_CHAT_ID } = process.env;
+  const targetChatId = TELEGRAM_DEV_CHAT_ID || TELEGRAM_CHAT_ID;
+  if (!TELEGRAM_BOT_TOKEN || !targetChatId) return false;
+
+  try {
+    const message = `🚨 <b>ALERTA DE SISTEMA: MOTOR DE IA / ASISTENTE</b>
+━━━━━━━━━━━━━━━━━━━━
+<b>Trace ID:</b> <code>${escapeHtml(traceId)}</code>
+<b>Error:</b> <code>${escapeHtml(errorMsg)}</code>
+
+⚠️ <i>El Circuit Breaker o el fallback local se ha activado para proteger la experiencia del usuario. Por favor verifica la disponibilidad de Google Cloud o el balanceador.</i>
+━━━━━━━━━━━━━━━━━━━━`;
+
+    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: targetChatId,
+        text: message,
+        parse_mode: 'HTML',
+      }),
+    });
+
+    return true;
+  } catch (err) {
+    logger.error('[telegram-service] Error construyendo alerta de agente:', err);
+    return false;
+  }
+}
+

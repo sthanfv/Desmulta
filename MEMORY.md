@@ -66,3 +66,10 @@
 - Evaluar posible expansión del embudo hacia suscripciones automáticas (notificaciones).
 
 
+
+### [2026-08-21] - Fase 3: Telemetría Zero-Cost y Observabilidad
+- [x] **Analítica de Demanda Ciudadana (Google Trends de Multas)**: Implementación de rastreador asíncrono en RAM usando Upstash Redis. Costo $0 (cero escrituras/lecturas de Firestore). Clasifica temas como mbargos, prescripcion y ciudades.
+- [x] **Dashboard Administrativo**: Se creó DemandTrendsWidget.tsx incrustado en AnalyticsView.tsx de Desmulta.
+- [x] **Seguridad Admin**: La telemetría solo se extrae validando el __session token JWT de administrador en el Route Handler con 
+ext-firebase-auth-edge.
+- [x] **Tolerancia a Fallos y SRE**: Agregadas alertas a Telegram (sendTelegramAgentAlert) que se disparan únicamente cuando hay un fallo en el motor del agente de IA, evitando spam y aprovechando la infraestructura existente de 	elegram.ts.
