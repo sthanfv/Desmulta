@@ -12,6 +12,8 @@ graph TD
     A1[Formulario Completo] -->|RSA E2EE + Zod| C[POST /api/create-consultation]
     A2[Formulario SIMIT\ntelefono + foto] -->|Zod| C
     OCR[Gemini OCR + \nLector-OCR Python\n(Fallback Microservicio)] --> A2
+    CHAT[Asistente IA Chatbot] -->|B2B| IA[Microservicio Python (FastAPI)]
+    CHAT -->|Fire-and-forget| REDIS[(Upstash Redis: Analítica)]
   end
 
   subgraph VIP["Portal VIP (usuarios SIMIT)"]

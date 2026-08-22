@@ -1,5 +1,6 @@
 import { Redis } from '@upstash/redis';
 import { logger } from '@/lib/logger/security-logger';
+import { sendTelegramAgentAlert } from '@/lib/telegram';
 
 // 1. Instancia de Upstash Redis (Memoria Edge)
 const redis = Redis.fromEnv();
@@ -106,7 +107,11 @@ export async function trackDemandQuery(message: string): Promise<void> {
 
   } catch (error) {
     // Si falla el tracker, fallamos en silencio (Fail-Open) para no bloquear al usuario
-    logger.error('[demand-tracker] Error registrando analítica:', { error: error instanceof Error ? error.message : String(error) });
+    const msg = error instanceof Error ? error.message : String(error);
+    logger.error('[demand-tracker] Error registrando analítica:', { error: msg });
+    
+    // Auditar e informar del fallo crítico en la telemetría (asíncrono)
+    sendTelegramAgentAlert(`Fallo en Ingesta de Demanda (Upstash Redis): ${msg}`, `TRACKER-${Date.now()}`).catch(() => null);
   }
 }
 
