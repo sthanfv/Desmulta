@@ -178,6 +178,25 @@ export async function middleware(request: NextRequest) {
       response.headers.set('Expires', '0');
     }
 
+    // FIX CRÍTICO: Las rutas /api/admin eludían el Guard 2FA porque el middleware
+    // retornaba tempranamente. Ahora validamos el token 2FA en la API también.
+    if (pathname.startsWith('/api/admin')) {
+      const isE2E_2FA = process.env.E2E_TEST_MODE === 'true';
+      if (!isE2E_2FA) {
+        const token = request.cookies.get('admin-2fa-token')?.value;
+        const jwtSecret = process.env.GOD_MODE_JWT_SECRET;
+        if (!token || !jwtSecret) {
+          return NextResponse.json({ error: '2FA token requerido' }, { status: 401 });
+        }
+        try {
+          const secret = new TextEncoder().encode(jwtSecret);
+          await jwtVerify(token, secret);
+        } catch {
+          return NextResponse.json({ error: '2FA token inválido o expirado' }, { status: 401 });
+        }
+      }
+    }
+
     return response;
   }
 
