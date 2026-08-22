@@ -269,7 +269,7 @@ describe('2FA OTP — Server Actions (Flujo Clásico)', () => {
     expect(cookieStore.set).toHaveBeenCalledWith(
       'admin-2fa-token',
       expect.any(String),
-      expect.objectContaining({ httpOnly: true, sameSite: 'strict', path: '/admin' })
+      expect.objectContaining({ httpOnly: true, sameSite: 'strict', path: '/' })
     );
   });
 });

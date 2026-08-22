@@ -229,7 +229,7 @@ export async function POST(request: NextRequest) {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      path: '/admin',
+      path: '/',
     });
 
     // Cookie de bandera pública (no HttpOnly) para que el cliente detecte el estado

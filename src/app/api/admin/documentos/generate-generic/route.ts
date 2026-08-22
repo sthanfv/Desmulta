@@ -33,7 +33,7 @@ async function verifyAdminAuth(request: NextRequest): Promise<string | null> {
 }
 
 async function verifyGodMode(request: NextRequest) {
-  const token = request.cookies.get('admin-god-mode-token');
+  const token = request.cookies.get('admin-2fa-token');
   if (!token) return false;
 
   try {
