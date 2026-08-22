@@ -54,10 +54,8 @@
     @apply border-border;
   }
 
-  html,
-  body {
-    overflow-x: hidden;
-  }
+  /* Eliminado overflow-x: hidden en html y body para evitar bug de scroll "doble toque" en Safari iOS.
+     La restricción horizontal ya se maneja de forma segura en <main className="overflow-x-hidden"> en layout.tsx */
 
   body {
     @apply bg-background text-foreground antialiased;
