@@ -24,12 +24,28 @@ export interface PDFTemplateData {
   };
 }
 
+// 🛡️ DEVSECOPS: Sanitizador obligatorio para evitar Server-Side XSS en el motor PDF
+function escapeHtml(text: string | undefined | null): string {
+  if (!text) return '';
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function escapeCssString(text: string | undefined | null): string {
+  if (!text) return '';
+  return String(text).replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n');
+}
+
 export function generarHtmlReporte(data: PDFTemplateData): string {
   const filtrosStr = [
-    data.filtros.ciudad && `Ciudad: ${data.filtros.ciudad}`,
-    data.filtros.estado && `Estado: ${data.filtros.estado}`,
+    data.filtros.ciudad && `Ciudad: ${escapeHtml(data.filtros.ciudad)}`,
+    data.filtros.estado && `Estado: ${escapeHtml(data.filtros.estado)}`,
     (data.filtros.fechaInicio || data.filtros.fechaFin) &&
-      `Fechas: ${data.filtros.fechaInicio || '*'} - ${data.filtros.fechaFin || '*'}`,
+      `Fechas: ${escapeHtml(data.filtros.fechaInicio) || '*'} - ${escapeHtml(data.filtros.fechaFin) || '*'}`,
   ]
     .filter(Boolean)
     .join(' | ');
@@ -39,12 +55,12 @@ export function generarHtmlReporte(data: PDFTemplateData): string {
       (item) => `
     <tr>
       <td>${item.tipo === 'lead' ? 'Petición' : 'Caso'}</td>
-      <td>${item.nombre || 'N/A'}</td>
-      <td>${item.cedula || 'N/A'}</td>
-      <td>${item.placa || 'N/A'}</td>
-      <td>${item.ciudad || 'N/A'}</td>
-      <td>${item.estado}</td>
-      <td>${item.createdAt ? new Date(item.createdAt).toLocaleDateString('es-CO') : 'N/A'}</td>
+      <td>${escapeHtml(item.nombre) || 'N/A'}</td>
+      <td>${escapeHtml(item.cedula) || 'N/A'}</td>
+      <td>${escapeHtml(item.placa) || 'N/A'}</td>
+      <td>${escapeHtml(item.ciudad) || 'N/A'}</td>
+      <td>${escapeHtml(item.estado)}</td>
+      <td>${item.createdAt ? escapeHtml(new Date(item.createdAt).toLocaleDateString('es-CO')) : 'N/A'}</td>
     </tr>
   `
     )
@@ -52,7 +68,7 @@ export function generarHtmlReporte(data: PDFTemplateData): string {
 
   const opInfo = data.operatorDetails;
   const watermarkText = opInfo
-    ? `OPERADOR RESPONSABLE:\\nNombre: ${opInfo.nombre}\\nEmail: ${opInfo.email}\\nTeléfono: ${opInfo.telefono}\\n\\nPROPIEDAD DE DESMULTA - ESTRICTAMENTE CONFIDENCIAL`
+    ? `OPERADOR RESPONSABLE:\\nNombre: ${escapeCssString(opInfo.nombre)}\\nEmail: ${escapeCssString(opInfo.email)}\\nTeléfono: ${escapeCssString(opInfo.telefono)}\\n\\nPROPIEDAD DE DESMULTA - ESTRICTAMENTE CONFIDENCIAL`
     : 'OPERADOR DESCONOCIDO - DOCUMENTO NO AUTORIZADO';
 
   return `<!DOCTYPE html>
@@ -75,7 +91,7 @@ export function generarHtmlReporte(data: PDFTemplateData): string {
       }
       
       @bottom-left {
-        content: "Hash Integridad: ${data.integrityHash || 'N/A'} | Generado: ${data.fechaExportacion}";
+        content: "Hash Integridad: ${data.integrityHash || 'N/A'} | Generado: ${escapeCssString(data.fechaExportacion)}";
         font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
         font-size: 7pt;
         color: #718096;
