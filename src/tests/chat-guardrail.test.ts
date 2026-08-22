@@ -56,40 +56,39 @@ describe('Chat API Guardrail Injection (Sales vs Pedagogy)', () => {
     const payloadStr = fetchCall[1].body as string;
     const payload = JSON.parse(payloadStr);
 
-    // Verificamos que el mensaje incluya la directiva pedagógica sin presionar a ventas
-    expect(payload.message).toContain('[DIRECTIVA DE SISTEMA OCULTA]');
-    expect(payload.message).toContain('sin ser insistente con ventas');
-    expect(payload.message).not.toContain('adquiriendo las plantillas');
+    // Verificamos que el mensaje del usuario quede aislado de la directiva pedagógica
+    expect(payload.message).toBe('¿Qué es el RUNT?');
+    expect(payload.system_directive).toContain('sin ser insistente con ventas');
+    expect(payload.system_directive).not.toContain('adquiriendo las plantillas');
   });
 
   it('Debe inyectar la directiva comercial/ventas para preguntas con intención de solución (ej. cómo impugnar)', async () => {
     const req = createMockRequest('¿Cómo impugno una fotomulta?');
     await POST(req);
 
-    expect(mockFetch).toHaveBeenCalledTimes(1);
-    const fetchCall = mockFetch.mock.calls[0];
-    const payloadStr = fetchCall[1].body as string;
+    const payloadStr = mockFetch.mock.calls[0][1].body as string;
     const payload = JSON.parse(payloadStr);
 
-    // Verificamos que el mensaje obligue a persuadir la compra de plantillas o asesoría
-    expect(payload.message).toContain('[DIRECTIVA DE SISTEMA OCULTA]');
-    expect(payload.message).toContain('adquiriendo las plantillas de Desmulta');
-    expect(payload.message).toContain('contratando la asesoría');
-    expect(payload.message).toContain('NO des la solución directa');
+    // Verificamos el aislamiento del plano de control
+    expect(payload.message).toBe('¿Cómo impugno una fotomulta?');
+    expect(payload.system_directive).toContain('adquiriendo las plantillas de Desmulta');
+    expect(payload.system_directive).toContain('contratando la asesoría');
+    expect(payload.system_directive).toContain('NO des la solución directa');
   });
 
   it('Debe detectar correctamente múltiples variaciones de intención comercial (prescripción, embargo)', async () => {
     const keywords = ['qué hago con este embargo', 'solucionar mi caso', 'aplicar la prescripción'];
 
-    for (const msg of keywords) {
+    for (const keyword of keywords) {
       mockFetch.mockClear();
-      const req = createMockRequest(msg);
+      const req = createMockRequest(keyword);
       await POST(req);
 
       const payloadStr = mockFetch.mock.calls[0][1].body as string;
       const payload = JSON.parse(payloadStr);
 
-      expect(payload.message).toContain('NO des la solución directa');
+      expect(payload.message).toBe(keyword);
+      expect(payload.system_directive).toContain('NO des la solución directa');
     }
   });
 });
