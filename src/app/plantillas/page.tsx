@@ -49,7 +49,7 @@ const TEMPLATE_CARDS = [
       'Úsala como primer paso si sabes que tienes multas pendientes pero desconoces si te notificaron correctamente. Te permite recolectar los soportes y pruebas oficiales para armar tu defensa sin asumir riesgos.',
     badge: 'Uso General',
     exito: '95%',
-    precio: '$39.000',
+    precio: '$19.500',
   },
   {
     id: 'prescripcion_directa',
@@ -59,7 +59,7 @@ const TEMPLATE_CARDS = [
       'Aplica si tus multas tienen más de 3 años de antigüedad y la Secretaría de Tránsito NUNCA inició un proceso de cobro coactivo (embargo o mandamiento de pago). Solicita la exoneración directa por vencimiento de plazo inicial.',
     badge: 'Popular',
     exito: '98%',
-    precio: '$59.000',
+    precio: '$29.500',
   },
   {
     id: 'doble_prescripcion',
@@ -69,7 +69,7 @@ const TEMPLATE_CARDS = [
       'El recurso definitivo si tu deudada ya está en cobro coactivo o embargada. Si pasaron más de 5 años desde que el tránsito dictó el mandamiento de pago (típicamente sumando 6 años en total desde el comparendo), la ley obliga a borrar la deuda.',
     badge: 'Especializada',
     exito: '94%',
-    precio: '$79.000',
+    precio: '$39.500',
   },
   {
     id: 'nulidad_notificacion',
@@ -79,7 +79,7 @@ const TEMPLATE_CARDS = [
       'Perfecta para cámaras de fotodetección. Úsala si el tránsito te cargó una fotomulta sin enviarte la citación física a tu dirección del RUNT dentro de los 13 días hábiles posteriores, violando tu derecho a defenderte.',
     badge: 'Fotomultas',
     exito: '96%',
-    precio: '$49.000',
+    precio: '$24.500',
   },
   {
     id: 'tutela_silencio',
@@ -90,7 +90,7 @@ const TEMPLATE_CARDS = [
       'Úsala si ya enviaste un derecho de petición y el organismo de tránsito guardó silencio por más de 15 días hábiles. Este recurso constitucional obliga a un juez a ordenarles responderte de forma inmediata en 48 horas.',
     badge: 'Urgente',
     exito: '99%',
-    precio: '$39.000',
+    precio: '$19.500',
   },
   {
     id: 'nulidad_falta_identidad',
@@ -100,7 +100,7 @@ const TEMPLATE_CARDS = [
       'Ideal si te impusieron una fotomulta basándose únicamente en la placa de tu vehículo, pero la Secretaría de Tránsito no tiene ninguna prueba (foto de tu rostro, biometría, etc.) que demuestre de forma irrefutable que TÚ ibas conduciendo. Obliga al tránsito a probar tu identidad según la Sentencia C-038 de 2020.',
     badge: 'Sentencia C-038',
     exito: '97%',
-    precio: '$49.000',
+    precio: '$24.500',
   },
 ];
 

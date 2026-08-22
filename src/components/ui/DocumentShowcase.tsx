@@ -10,7 +10,7 @@ const templates = [
       'SEÑOR: ORGANISMO DE TRÁNSITO Y TRANSPORTE<br>E. S. D.<br>REF: DERECHO DE PETICIÓN — ART. 23 C.P.',
     title: 'Petición General',
     desc: 'Plantilla exploratoria para exigir copia de comparendos y guías de envío al Tránsito.',
-    price: '$39.000',
+    price: '$19.500',
     successRate: '95% Éxito',
   },
   {
@@ -18,7 +18,7 @@ const templates = [
       'AL DESPACHO DEL INSPECTOR DE TRÁNSITO<br>E. S. D.<br>REF: SOLICITUD DE PRESCRIPCIÓN — ART. 159 C.N.T.',
     title: 'Prescripción Directa (3 Años)',
     desc: 'Solicite la eliminación de la multa tras haber cumplido 3 años sin mandamiento de pago.',
-    price: '$59.000',
+    price: '$29.500',
     successRate: '98% Éxito',
   },
   {
@@ -26,7 +26,7 @@ const templates = [
       'OFICINA DE EJECUCIONES COACTIVAS DE TRÁNSITO<br>E. S. D.<br>REF: EXCEPCIÓN DE PRESCRIPCIÓN ACUMULADA (3+3)',
     title: 'Doble Prescripción (Coactivo)',
     desc: 'Levante embargos y exija caducidad si han pasado 6 años sin pago efectivo o remate.',
-    price: '$79.000',
+    price: '$39.500',
     successRate: '94% Éxito',
   },
   {
@@ -34,7 +34,7 @@ const templates = [
       'AUTORIDAD DE TRÁNSITO Y TRANSPORTE<br>E. S. D.<br>REF: RECURSO DE NULIDAD CONTRA FOTOMULTA — SENT. C-038/20',
     title: 'Nulidad de Fotomulta',
     desc: 'Tumbe su fotomulta exigiendo la plena identificación del infractor obligada por la Corte.',
-    price: '$49.000',
+    price: '$24.500',
     successRate: '96% Éxito',
   },
   {
@@ -42,7 +42,7 @@ const templates = [
       'SEÑOR: JUEZ CONSTITUCIONAL DE LA REPÚBLICA<br>E. S. D.<br>REF: ACCIÓN DE TUTELA — VULNERACIÓN DEBIDO PROCESO',
     title: 'Acción de Tutela (Silencio)',
     desc: 'Demande a Tránsito ante un juez si ignoran sus peticiones o violan su debido proceso.',
-    price: '$39.000',
+    price: '$19.500',
     successRate: '99% Éxito',
   },
 ];
