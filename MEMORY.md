@@ -83,3 +83,5 @@
 - Configurado Isolation Testing en package.json (itest related) para velocidad DevSecOps.
 
 - [2026-08-22] - Añadido \ChatConsumptionWidget\ al dashboard usando Upstash Redis para trackear consumo de API del Chat a costo 0 de BBDD.
+
+- [2026-08-22] - Pilar 4 completado: Añadido UX de Streaming Simulado en el ChatAssistantWidget (Thinking Steps + Typewriter) preservando la integridad del Python RAG Engine.

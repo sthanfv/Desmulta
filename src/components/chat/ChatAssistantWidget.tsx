@@ -35,6 +35,7 @@ interface Message {
   role: 'user' | 'assistant';
   content: string;
   isRateLimited?: boolean;
+  isTyping?: boolean;
   citations?: Citation[];
   suggestedAction?: SuggestedAction | null;
   followUpQuestions?: string[];
@@ -56,7 +57,7 @@ function getCivilTimeString(): string {
  * Formateador liviano de Markdown sin dependencias externas pesadas.
  * Convierte encabezados ###, negritas **texto** y viñetas en elementos JSX limpios y escalables.
  */
-function FormattedMessageText({ text, fontScale }: { text: string; fontScale: FontScale }) {
+function FormattedMessageTextStatic({ text, fontScale }: { text: string; fontScale: FontScale }) {
   const lines = text.split('\n');
 
   const getTitleSizeClass = () => {
@@ -67,7 +68,8 @@ function FormattedMessageText({ text, fontScale }: { text: string; fontScale: Fo
 
   const getBodySizeClass = () => {
     if (fontScale === 'xlarge') return 'text-[15px] sm:text-[17px] leading-loose tracking-normal';
-    if (fontScale === 'large') return 'text-[14px] sm:text-[15.5px] leading-relaxed tracking-normal';
+    if (fontScale === 'large')
+      return 'text-[14px] sm:text-[15.5px] leading-relaxed tracking-normal';
     return 'text-[13px] sm:text-[14px] leading-relaxed tracking-normal';
   };
 
@@ -128,6 +130,39 @@ function parseBoldText(text: string) {
   });
 }
 
+function FormattedMessageText({
+  text,
+  fontScale,
+  isTyping,
+}: {
+  text: string;
+  fontScale: FontScale;
+  isTyping?: boolean;
+}) {
+  const [displayedText, setDisplayedText] = useState(isTyping ? '' : text);
+
+  useEffect(() => {
+    if (!isTyping) {
+      setDisplayedText(text);
+      return;
+    }
+
+    let currentIndex = 0;
+    const intervalId = setInterval(() => {
+      setDisplayedText(text.slice(0, currentIndex + 5));
+      currentIndex += 5;
+      if (currentIndex >= text.length) {
+        clearInterval(intervalId);
+        setDisplayedText(text);
+      }
+    }, 20);
+
+    return () => clearInterval(intervalId);
+  }, [text, isTyping]);
+
+  return <FormattedMessageTextStatic text={displayedText} fontScale={fontScale} />;
+}
+
 export function ChatAssistantWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [fontScale, setFontScale] = useState<FontScale>('normal');
@@ -148,6 +183,25 @@ export function ChatAssistantWidget() {
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [thinkingStep, setThinkingStep] = useState(0);
+
+  useEffect(() => {
+    if (isLoading) {
+      const interval = setInterval(() => {
+        setThinkingStep((prev) => (prev + 1) % 4);
+      }, 1800);
+      return () => clearInterval(interval);
+    } else {
+      setThinkingStep(0);
+    }
+  }, [isLoading]);
+
+  const thinkingMessages = [
+    '🔍 Consultando base de radares ANSV...',
+    '⚖️ Analizando jurisprudencia (Ley 1843)...',
+    '🛡️ Validando viabilidad procesal...',
+    '🧠 Procesando redacción legal...',
+  ];
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -203,6 +257,7 @@ export function ChatAssistantWidget() {
       const assistantMsg: Message = {
         id: 'asst-' + Date.now(),
         role: 'assistant',
+        isTyping: true,
         content: data.reply || 'No pude procesar la consulta en este momento.',
         isRateLimited: data.isRateLimited || res.status === 429,
         citations: data.citations || [],
@@ -424,7 +479,8 @@ export function ChatAssistantWidget() {
                     <div
                       key={msg.id}
                       className={
-                        'flex flex-col ' + (msg.role === 'user' ? 'items-end' : 'items-start w-full')
+                        'flex flex-col ' +
+                        (msg.role === 'user' ? 'items-end' : 'items-start w-full')
                       }
                     >
                       <div
@@ -433,8 +489,8 @@ export function ChatAssistantWidget() {
                           (msg.role === 'user'
                             ? 'max-w-[85%] bg-primary text-primary-foreground font-semibold rounded-br-none'
                             : msg.isRateLimited
-                            ? 'w-full bg-amber-500/10 border border-amber-500/30 text-foreground rounded-bl-none'
-                            : 'w-full bg-muted/75 dark:bg-zinc-900/85 text-foreground border border-border/70 rounded-bl-none')
+                              ? 'w-full bg-amber-500/10 border border-amber-500/30 text-foreground rounded-bl-none'
+                              : 'w-full bg-muted/75 dark:bg-zinc-900/85 text-foreground border border-border/70 rounded-bl-none')
                         }
                       >
                         {/* Mensaje Renderizado con Escala Dinámica de Tipografía */}
@@ -448,7 +504,8 @@ export function ChatAssistantWidget() {
                               Alta Demanda Ciudadana
                             </div>
                             <p className="text-[10px] text-muted-foreground leading-tight">
-                              Para garantizar atención ágil a todos los conductores, puedes radicar tu caso directamente para estudio con un operador:
+                              Para garantizar atención ágil a todos los conductores, puedes radicar
+                              tu caso directamente para estudio con un operador:
                             </p>
                             <div className="flex flex-col sm:flex-row gap-1.5 pt-1">
                               <button
@@ -570,8 +627,8 @@ export function ChatAssistantWidget() {
                   {isLoading && (
                     <div className="flex items-center gap-2 p-2.5 bg-muted/60 rounded-xl rounded-bl-none max-w-[75%] border border-border/50">
                       <MessageSquareQuote className="w-3.5 h-3.5 text-primary animate-pulse" />
-                      <span className="text-[11px] text-muted-foreground">
-                        Consultando bases de tránsito...
+                      <span className="text-[11px] font-medium text-primary animate-pulse">
+                        {thinkingMessages[thinkingStep]}
                       </span>
                     </div>
                   )}
