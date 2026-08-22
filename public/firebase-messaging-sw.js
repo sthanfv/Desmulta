@@ -2,10 +2,10 @@ importScripts('/firebase-app-compat.js');
 importScripts('/firebase-messaging-compat.js');
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAiRkUuVLUIYLLl80WW8drvxGHKgE__lB4",
-  projectId: "studio-9140393615-6d1a3",
-  messagingSenderId: "10695562214",
-  appId: "1:10695562214:web:cf04e10c87f2d0242a3c27",
+  apiKey: 'AIzaSyAiRkUuVLUIYLLl80WW8drvxGHKgE__lB4',
+  projectId: 'studio-9140393615-6d1a3',
+  messagingSenderId: '10695562214',
+  appId: '1:10695562214:web:cf04e10c87f2d0242a3c27',
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -17,14 +17,12 @@ messaging.onBackgroundMessage((payload) => {
   }
 
   const notificationTitle = payload.data?.title || '🔔 Novedad en tu expediente';
-  const targetUrl = payload.fcmOptions?.link
-    || payload.data?.url
-    || 'https://desmulta.online/estado';
+  const targetUrl =
+    payload.fcmOptions?.link || payload.data?.url || 'https://desmulta.online/estado';
 
   const notificationOptions = {
     body: payload.data?.body || 'Tu caso ha sido actualizado. Toca para ver los detalles.',
-    icon: '/icon.png',
-    badge: '/maskable_icon.png',
+    icon: self.location.origin + '/icon.png',
     vibrate: [200, 100, 200, 100, 200],
     tag: 'desmulta-estado',
     renotify: true,
@@ -58,17 +56,15 @@ self.addEventListener('push', (event) => {
   if (!event.data) return;
   try {
     const data = event.data.json();
-    if (data.from) return; 
-    
+    if (data.from) return;
+
     const title = data.title || '🔔 Desmulta';
     const options = {
       body: data.body || 'Actualización en tu expediente.',
-      icon: '/icon.png',
-      badge: '/maskable_icon.png',
+      icon: self.location.origin + '/icon.png',
       tag: 'desmulta-push',
       data: { url: data.url || 'https://desmulta.online/estado' },
     };
     event.waitUntil(self.registration.showNotification(title, options));
-  } catch {
-  }
+  } catch {}
 });

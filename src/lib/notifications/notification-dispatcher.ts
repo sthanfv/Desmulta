@@ -241,7 +241,6 @@ export async function dispatchPush(
       },
       notification: {
         icon: 'https://desmulta.online/icon.png',
-        badge: 'https://desmulta.online/maskable_icon.png',
         requireInteraction: false,
         silent: false,
         // vibrate: [200, 100, 200], // Solo para Android Web
