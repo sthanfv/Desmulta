@@ -7,7 +7,7 @@ import {
   ArrowRight,
   RotateCcw,
   BookOpen,
-  ShieldCheck,
+  MessageSquareQuote,
   Scale,
   X,
   Camera,
@@ -46,7 +46,6 @@ interface Message {
  * Convierte encabezados ###, negritas **texto** y viñetas en elementos JSX limpios.
  */
 function FormattedMessageText({ text }: { text: string }) {
-  // Dividir por saltos de línea para procesar párrafos, encabezados y viñetas
   const lines = text.split('\n');
 
   return (
@@ -119,14 +118,8 @@ export function ChatAssistantWidget() {
       id: 'welcome-1',
       role: 'assistant',
       content:
-        '¡Hola! Soy tu especialista técnico de Desmulta. Puedo verificar si tu fotomulta cumple con la Ley 1843, calcular fechas de prescripción o validar radares autorizados en tu ciudad.',
-      citations: [
-        {
-          norma: 'Ley 1843 de 2017',
-          articulo: 'Art. 8 y 13',
-          resumen: 'Exige señalización a 500m y notificación física obligatoria al RUNT.',
-        },
-      ],
+        '¡Hola! Soy tu asesor técnico de Desmulta. Puedo orientarte sobre la validez de fotomultas, calcular tiempos de prescripción o verificar radares autorizados en tu ciudad.',
+      citations: [], // Saludo 100% limpio sin cajas estáticas de normas
       followUpQuestions: [
         '¿Cómo saber si una fotomulta en Bogotá o Medellín es legal?',
         '¿A los cuántos años prescribe un comparendo?',
@@ -137,7 +130,6 @@ export function ChatAssistantWidget() {
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [hasUnread, setHasUnread] = useState(true);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -152,7 +144,6 @@ export function ChatAssistantWidget() {
   // Foco al abrir
   useEffect(() => {
     if (isOpen) {
-      setHasUnread(false);
       setTimeout(() => inputRef.current?.focus(), 150);
     }
   }, [isOpen]);
@@ -242,6 +233,7 @@ export function ChatAssistantWidget() {
         role: 'assistant',
         content:
           'Conversación reiniciada. ¿En qué comparendo, fotomulta o trámite de tránsito te puedo orientar hoy?',
+        citations: [],
         followUpQuestions: [
           '¿Cómo saber si una fotomulta es legal?',
           '¿Cuándo prescribe una multa de tránsito?',
@@ -302,28 +294,22 @@ export function ChatAssistantWidget() {
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0, opacity: 0 }}
-                className="relative group flex items-center gap-2.5 p-2 sm:px-3.5 sm:py-2.5 rounded-full bg-card/95 dark:bg-zinc-900/95 text-foreground shadow-2xl border border-primary/40 hover:border-primary backdrop-blur-xl transition-all duration-300"
+                className="relative group flex items-center gap-2.5 p-2 sm:px-4 sm:py-2.5 rounded-full bg-card/95 dark:bg-zinc-900/95 text-foreground shadow-2xl border border-primary/40 hover:border-primary backdrop-blur-xl transition-all duration-300"
                 aria-label="Abrir asistente de tránsito Desmulta"
               >
-                {/* Ícono de Escudo */}
+                {/* Ícono de Diálogo Conversacional */}
                 <div className="relative flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground shadow-md shadow-primary/20 shrink-0">
-                  <ShieldCheck className="w-4 h-4 text-black" />
+                  <MessageSquareQuote className="w-4 h-4 text-black" />
                 </div>
 
                 <div className="flex flex-col items-start pr-1 text-left hidden sm:flex">
-                  <span className="text-[11px] font-black tracking-tight text-foreground leading-tight">
+                  <span className="text-xs font-black tracking-tight text-foreground leading-tight">
                     Asistente Desmulta
                   </span>
-                  <span className="text-[9px] text-muted-foreground font-medium">
+                  <span className="text-[10px] text-muted-foreground font-medium">
                     Especialista en Tránsito
                   </span>
                 </div>
-
-                {hasUnread && (
-                  <span className="bg-primary text-primary-foreground text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shrink-0">
-                    1
-                  </span>
-                )}
               </m.button>
             </LazyMotion>
           )}
@@ -338,7 +324,7 @@ export function ChatAssistantWidget() {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 25, scale: 0.96 }}
                 transition={{ type: 'spring', damping: 25, stiffness: 320 }}
-                className="fixed inset-x-0 bottom-0 sm:static w-full sm:w-[380px] h-[64vh] max-h-[490px] sm:h-[490px] flex flex-col rounded-t-[2.2rem] sm:rounded-[2rem] bg-card/98 dark:bg-zinc-950/98 backdrop-blur-3xl border-t sm:border border-border/80 dark:border-primary/25 shadow-2xl shadow-black/60 overflow-hidden text-foreground"
+                className="fixed inset-x-0 bottom-0 sm:static w-full sm:w-[390px] h-[64vh] max-h-[490px] sm:h-[490px] flex flex-col rounded-t-[2.2rem] sm:rounded-[2rem] bg-card/98 dark:bg-zinc-950/98 backdrop-blur-3xl border-t sm:border border-border/80 dark:border-primary/25 shadow-2xl shadow-black/60 overflow-hidden text-foreground"
               >
                 {/* Tirador visual de Bottom Sheet en Móvil */}
                 <div className="w-12 h-1 bg-muted-foreground/30 rounded-full mx-auto mt-2 sm:hidden shrink-0" />
@@ -347,10 +333,10 @@ export function ChatAssistantWidget() {
                 <div className="flex items-center justify-between px-4 py-2.5 bg-muted/40 dark:bg-zinc-900/60 border-b border-border/60 shrink-0">
                   <div className="flex items-center gap-2.5">
                     <div className="p-1.5 rounded-xl bg-primary/10 border border-primary/25 text-primary">
-                      <ShieldCheck className="w-4 h-4 text-primary" />
+                      <MessageSquareQuote className="w-4 h-4 text-primary" />
                     </div>
                     <div>
-                      <h3 className="text-xs font-black tracking-tight leading-none text-foreground">
+                      <h3 className="text-xs sm:text-sm font-black tracking-tight leading-none text-foreground">
                         Asistente Desmulta
                       </h3>
                       <p className="text-[10px] text-muted-foreground font-medium flex items-center gap-1 mt-0.5">
@@ -433,7 +419,7 @@ export function ChatAssistantWidget() {
                           </div>
                         )}
 
-                        {/* Citas Normativas (RAG Legal) */}
+                        {/* Citas Normativas (RAG Legal) - Solo se muestran si vienen en la respuesta real */}
                         {msg.citations && msg.citations.length > 0 && (
                           <div className="mt-2.5 pt-2 border-t border-border/40 space-y-1">
                             <div className="text-[9px] font-black uppercase tracking-wider text-primary flex items-center gap-1">
@@ -531,7 +517,7 @@ export function ChatAssistantWidget() {
                   {/* Indicador de Carga */}
                   {isLoading && (
                     <div className="flex items-center gap-2 p-2.5 bg-muted/60 rounded-xl rounded-bl-none max-w-[75%] border border-border/50">
-                      <ShieldCheck className="w-3.5 h-3.5 text-primary animate-pulse" />
+                      <MessageSquareQuote className="w-3.5 h-3.5 text-primary animate-pulse" />
                       <span className="text-[11px] text-muted-foreground">
                         Consultando bases de tránsito...
                       </span>
@@ -556,7 +542,7 @@ export function ChatAssistantWidget() {
                       onChange={(e) => setInputMessage(e.target.value)}
                       placeholder="Pregunta sobre comparendos, prescripción..."
                       disabled={isLoading}
-                      className="flex-1 px-3 py-2 text-[13px] sm:text-[14.5px] rounded-xl bg-background border border-border focus:outline-none focus:border-primary text-foreground placeholder:text-muted-foreground disabled:opacity-50"
+                      className="flex-1 px-3 py-2 text-[13px] sm:text-[14px] rounded-xl bg-background border border-border focus:outline-none focus:border-primary text-foreground placeholder:text-muted-foreground disabled:opacity-50"
                     />
                     <button
                       type="submit"
