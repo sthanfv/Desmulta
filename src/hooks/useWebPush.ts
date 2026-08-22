@@ -285,9 +285,20 @@ export function useWebPush(options: UseWebPushOptions = {}) {
 
         return token;
       } catch (error) {
+        const errorDetails = error instanceof Error ? error.message : String(error);
         if (process.env.NODE_ENV === 'development') {
-          logger.error('[useWebPush] FCM Token falló:', error);
+          console.error('[useWebPush] FCM Token falló:', error);
         }
+
+        // Reportar el fallo silencioso al backend para que alerte a Telegram/Sentry
+        fetch('/api/web-push/error', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            error: errorDetails,
+            docId: docId,
+          }),
+        }).catch(() => {});
 
         // Auto-sanación selectiva: solo desregistrar el SW de Firebase Messaging
         // para no destruir el SW principal de Workbox/next-pwa
