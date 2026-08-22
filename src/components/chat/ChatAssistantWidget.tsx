@@ -41,12 +41,26 @@ interface Message {
   timestamp: string;
 }
 
+type FontScale = 'normal' | 'large' | 'xlarge';
+
 /**
  * Formateador liviano de Markdown sin dependencias externas pesadas.
- * Convierte encabezados ###, negritas **texto** y viñetas en elementos JSX limpios.
+ * Convierte encabezados ###, negritas **texto** y viñetas en elementos JSX limpios y escalables.
  */
-function FormattedMessageText({ text }: { text: string }) {
+function FormattedMessageText({ text, fontScale }: { text: string; fontScale: FontScale }) {
   const lines = text.split('\n');
+
+  const getTitleSizeClass = () => {
+    if (fontScale === 'xlarge') return 'text-base sm:text-lg';
+    if (fontScale === 'large') return 'text-sm sm:text-base';
+    return 'text-xs sm:text-[14px]';
+  };
+
+  const getBodySizeClass = () => {
+    if (fontScale === 'xlarge') return 'text-[15px] sm:text-[17px] leading-relaxed';
+    if (fontScale === 'large') return 'text-[14px] sm:text-[15.5px] leading-relaxed';
+    return 'text-[13px] sm:text-[14px] leading-relaxed';
+  };
 
   return (
     <div className="space-y-2">
@@ -55,19 +69,13 @@ function FormattedMessageText({ text }: { text: string }) {
         if (!trimmed) return null;
 
         // Encabezados Markdown (### Titulo)
-        if (trimmed.startsWith('###')) {
-          const titleText = trimmed.replace(/^###\s*/, '');
-          return (
-            <h4 key={idx} className="font-black text-amber-400 text-sm sm:text-[15px] mt-2 mb-1 tracking-tight">
-              {titleText}
-            </h4>
-          );
-        }
-
-        if (trimmed.startsWith('##') || trimmed.startsWith('#')) {
+        if (trimmed.startsWith('###') || trimmed.startsWith('##') || trimmed.startsWith('#')) {
           const titleText = trimmed.replace(/^#+\s*/, '');
           return (
-            <h4 key={idx} className="font-black text-amber-400 text-sm sm:text-[15px] mt-2 mb-1 tracking-tight">
+            <h4
+              key={idx}
+              className={`font-black text-amber-400 mt-2.5 mb-1 tracking-tight ${getTitleSizeClass()}`}
+            >
               {titleText}
             </h4>
           );
@@ -77,7 +85,7 @@ function FormattedMessageText({ text }: { text: string }) {
         if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
           const bulletContent = trimmed.replace(/^[-*]\s*/, '');
           return (
-            <div key={idx} className="flex items-start gap-1.5 pl-1.5 text-[13px] sm:text-[14.5px]">
+            <div key={idx} className={`flex items-start gap-1.5 pl-1.5 ${getBodySizeClass()}`}>
               <span className="text-amber-400 font-bold mt-0.5">•</span>
               <span>{parseBoldText(bulletContent)}</span>
             </div>
@@ -86,7 +94,7 @@ function FormattedMessageText({ text }: { text: string }) {
 
         // Párrafo estándar con negritas
         return (
-          <p key={idx} className="text-[13px] sm:text-[14.5px] leading-relaxed">
+          <p key={idx} className={getBodySizeClass()}>
             {parseBoldText(trimmed)}
           </p>
         );
@@ -113,13 +121,14 @@ function parseBoldText(text: string) {
 
 export function ChatAssistantWidget() {
   const [isOpen, setIsOpen] = useState(false);
+  const [fontScale, setFontScale] = useState<FontScale>('normal');
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 'welcome-1',
       role: 'assistant',
       content:
         '¡Hola! Soy tu asesor técnico de Desmulta. Puedo orientarte sobre la validez de fotomultas, calcular tiempos de prescripción o verificar radares autorizados en tu ciudad.',
-      citations: [], // Saludo 100% limpio sin cajas estáticas de normas
+      citations: [],
       followUpQuestions: [
         '¿Cómo saber si una fotomulta en Bogotá o Medellín es legal?',
         '¿A los cuántos años prescribe un comparendo?',
@@ -139,7 +148,7 @@ export function ChatAssistantWidget() {
     if (isOpen) {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages, isOpen]);
+  }, [messages, isOpen, fontScale]);
 
   // Foco al abrir
   useEffect(() => {
@@ -244,7 +253,6 @@ export function ChatAssistantWidget() {
     ]);
   };
 
-  // Disparador de Modales Directos de Desmulta
   const handleOpenDesmultaModal = (mode: 'full' | 'simit') => {
     setIsOpen(false);
     window.dispatchEvent(new CustomEvent('open-consultation-modal', { detail: { mode } }));
@@ -281,7 +289,8 @@ export function ChatAssistantWidget() {
         )}
       </AnimatePresence>
 
-      <div className="fixed bottom-24 left-3.5 sm:bottom-6 sm:left-6 z-[60] flex flex-col items-start font-sans">
+      {/* ─── Posición: en móvil a la derecha (right-4) para pulgar, en desktop a la izquierda (left-6) ─── */}
+      <div className="fixed bottom-24 right-4 sm:bottom-6 sm:left-6 z-[60] flex flex-col items-end sm:items-start font-sans">
         {/* ─── Botón Flotante de Apertura (Trigger) ─── */}
         <AnimatePresence>
           {!isOpen && (
@@ -324,12 +333,12 @@ export function ChatAssistantWidget() {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 25, scale: 0.96 }}
                 transition={{ type: 'spring', damping: 25, stiffness: 320 }}
-                className="fixed inset-x-0 bottom-0 sm:static w-full sm:w-[390px] h-[64vh] max-h-[490px] sm:h-[490px] flex flex-col rounded-t-[2.2rem] sm:rounded-[2rem] bg-card/98 dark:bg-zinc-950/98 backdrop-blur-3xl border-t sm:border border-border/80 dark:border-primary/25 shadow-2xl shadow-black/60 overflow-hidden text-foreground"
+                className="fixed inset-x-0 bottom-0 sm:static w-full sm:w-[400px] h-[66vh] max-h-[520px] sm:h-[510px] flex flex-col rounded-t-[2.2rem] sm:rounded-[2rem] bg-card/98 dark:bg-zinc-950/98 backdrop-blur-3xl border-t sm:border border-border/80 dark:border-primary/25 shadow-2xl shadow-black/60 overflow-hidden text-foreground"
               >
                 {/* Tirador visual de Bottom Sheet en Móvil */}
                 <div className="w-12 h-1 bg-muted-foreground/30 rounded-full mx-auto mt-2 sm:hidden shrink-0" />
 
-                {/* Encabezado del Asistente */}
+                {/* Encabezado del Asistente con Accesibilidad de Tamaño de Letra */}
                 <div className="flex items-center justify-between px-4 py-2.5 bg-muted/40 dark:bg-zinc-900/60 border-b border-border/60 shrink-0">
                   <div className="flex items-center gap-2.5">
                     <div className="p-1.5 rounded-xl bg-primary/10 border border-primary/25 text-primary">
@@ -346,7 +355,41 @@ export function ChatAssistantWidget() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1">
+                  {/* Controles de Cabecera: Selector de Letra (A- / A+) + Reset + Cerrar */}
+                  <div className="flex items-center gap-1.5">
+                    {/* Selector de Accesibilidad Visual (A- / A+) */}
+                    <div className="flex items-center bg-background/80 dark:bg-zinc-900/90 rounded-lg p-0.5 border border-border/60 shadow-xs">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setFontScale((prev) =>
+                            prev === 'xlarge' ? 'large' : prev === 'large' ? 'normal' : 'normal'
+                          )
+                        }
+                        disabled={fontScale === 'normal'}
+                        title="Reducir tamaño de letra"
+                        className="px-1.5 py-0.5 text-[10px] font-bold text-muted-foreground hover:text-foreground disabled:opacity-30 rounded transition-colors"
+                      >
+                        A-
+                      </button>
+                      <span className="text-[9px] font-black px-1 text-primary">
+                        {fontScale === 'normal' ? '1x' : fontScale === 'large' ? '1.2x' : '1.4x'}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setFontScale((prev) =>
+                            prev === 'normal' ? 'large' : prev === 'large' ? 'xlarge' : 'xlarge'
+                          )
+                        }
+                        disabled={fontScale === 'xlarge'}
+                        title="Aumentar tamaño de letra"
+                        className="px-1.5 py-0.5 text-[10px] font-bold text-muted-foreground hover:text-foreground disabled:opacity-30 rounded transition-colors"
+                      >
+                        A+
+                      </button>
+                    </div>
+
                     <button
                       type="button"
                       onClick={handleResetChat}
@@ -366,27 +409,27 @@ export function ChatAssistantWidget() {
                   </div>
                 </div>
 
-                {/* Cuerpo de la Conversación con Formateador Markdown */}
+                {/* Cuerpo de la Conversación (Aprovechamiento al 100% del ancho para eliminar espacio vacío) */}
                 <div className="flex-1 p-3.5 overflow-y-auto space-y-3.5 scroll-smooth">
                   {messages.map((msg) => (
                     <div
                       key={msg.id}
                       className={
-                        'flex flex-col ' + (msg.role === 'user' ? 'items-end' : 'items-start')
+                        'flex flex-col ' + (msg.role === 'user' ? 'items-end' : 'items-start w-full')
                       }
                     >
                       <div
                         className={
-                          'max-w-[88%] rounded-2xl px-3.5 py-2.5 shadow-sm transition-all ' +
+                          'rounded-2xl px-3.5 py-2.5 shadow-sm transition-all ' +
                           (msg.role === 'user'
-                            ? 'bg-primary text-primary-foreground font-semibold rounded-br-none'
+                            ? 'max-w-[85%] bg-primary text-primary-foreground font-semibold rounded-br-none'
                             : msg.isRateLimited
-                            ? 'bg-amber-500/10 border border-amber-500/30 text-foreground rounded-bl-none'
-                            : 'bg-muted/75 dark:bg-zinc-900/85 text-foreground border border-border/70 rounded-bl-none')
+                            ? 'w-full bg-amber-500/10 border border-amber-500/30 text-foreground rounded-bl-none'
+                            : 'w-full bg-muted/75 dark:bg-zinc-900/85 text-foreground border border-border/70 rounded-bl-none')
                         }
                       >
-                        {/* Mensaje Renderizado con Markdown (Sin # ni **) */}
-                        <FormattedMessageText text={msg.content} />
+                        {/* Mensaje Renderizado con Escala Dinámica de Tipografía */}
+                        <FormattedMessageText text={msg.content} fontScale={fontScale} />
 
                         {/* Tarjeta de Alerta de Rate Limit con Prueba Social */}
                         {msg.isRateLimited && (
@@ -419,9 +462,9 @@ export function ChatAssistantWidget() {
                           </div>
                         )}
 
-                        {/* Citas Normativas (RAG Legal) - Solo se muestran si vienen en la respuesta real */}
+                        {/* Citas Normativas (RAG Legal) - Aprovecha el 100% del ancho */}
                         {msg.citations && msg.citations.length > 0 && (
-                          <div className="mt-2.5 pt-2 border-t border-border/40 space-y-1">
+                          <div className="mt-2.5 pt-2 border-t border-border/40 space-y-1 w-full">
                             <div className="text-[9px] font-black uppercase tracking-wider text-primary flex items-center gap-1">
                               <BookOpen className="w-2.5 h-2.5" />
                               Norma de Referencia:
@@ -429,12 +472,12 @@ export function ChatAssistantWidget() {
                             {msg.citations.map((c, i) => (
                               <div
                                 key={i}
-                                className="text-[10px] bg-background/60 dark:bg-black/40 p-2 rounded-lg border border-border/40"
+                                className="text-[10px] sm:text-[11px] bg-background/60 dark:bg-black/40 p-2.5 rounded-lg border border-border/40 w-full"
                               >
                                 <div className="font-bold text-primary">
                                   {c.norma} — {c.articulo}
                                 </div>
-                                <div className="text-muted-foreground text-[9px] leading-tight mt-0.5">
+                                <div className="text-muted-foreground leading-relaxed mt-0.5">
                                   {c.resumen}
                                 </div>
                               </div>
@@ -444,12 +487,12 @@ export function ChatAssistantWidget() {
 
                         {/* Tarjeta Visual de Herramienta o Modal Desmulta */}
                         {msg.suggestedAction && !msg.isRateLimited && (
-                          <div className="mt-2.5 p-2.5 rounded-xl bg-primary/10 border border-primary/25">
-                            <div className="text-[11px] font-black text-foreground flex items-center gap-1 mb-0.5">
+                          <div className="mt-2.5 p-2.5 rounded-xl bg-primary/10 border border-primary/25 w-full">
+                            <div className="text-[11px] sm:text-xs font-black text-foreground flex items-center gap-1 mb-0.5">
                               {getToolIcon(msg.suggestedAction.tipo)}
                               {msg.suggestedAction.titulo}
                             </div>
-                            <p className="text-[10px] text-muted-foreground mb-2 leading-snug">
+                            <p className="text-[10px] sm:text-[11px] text-muted-foreground mb-2 leading-snug">
                               {msg.suggestedAction.descripcion}
                             </p>
 
@@ -458,7 +501,7 @@ export function ChatAssistantWidget() {
                               <button
                                 type="button"
                                 onClick={() => handleOpenDesmultaModal('simit')}
-                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[10px] transition-all active:scale-95 shadow-sm"
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[10px] transition-all active:scale-95 shadow-sm"
                               >
                                 Subir foto de comparendo
                                 <ArrowRight className="w-2.5 h-2.5" />
@@ -467,7 +510,7 @@ export function ChatAssistantWidget() {
                               <button
                                 type="button"
                                 onClick={() => handleOpenDesmultaModal('full')}
-                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[10px] transition-all active:scale-95 shadow-sm"
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[10px] transition-all active:scale-95 shadow-sm"
                               >
                                 Radicar estudio formal
                                 <ArrowRight className="w-2.5 h-2.5" />
@@ -476,7 +519,7 @@ export function ChatAssistantWidget() {
                               <Link
                                 href={msg.suggestedAction.url}
                                 onClick={() => setIsOpen(false)}
-                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[10px] transition-all active:scale-95 shadow-sm"
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[10px] transition-all active:scale-95 shadow-sm"
                               >
                                 Abrir herramienta
                                 <ArrowRight className="w-2.5 h-2.5" />
@@ -497,14 +540,14 @@ export function ChatAssistantWidget() {
 
                       {/* Pills de preguntas sugeridas */}
                       {msg.followUpQuestions && msg.followUpQuestions.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-1.5 max-w-[94%]">
+                        <div className="flex flex-wrap gap-1.5 mt-2 w-full">
                           {msg.followUpQuestions.map((q, idx) => (
                             <button
                               key={idx}
                               type="button"
                               onClick={() => handleSendMessage(q)}
                               disabled={isLoading}
-                              className="text-[10px] font-medium text-left px-2.5 py-1 rounded-full bg-muted/60 hover:bg-primary/15 text-foreground hover:text-primary border border-border/70 hover:border-primary/40 transition-all active:scale-95 disabled:opacity-50"
+                              className="text-[10px] sm:text-[11px] font-medium text-left px-2.5 py-1 rounded-full bg-muted/60 hover:bg-primary/15 text-foreground hover:text-primary border border-border/70 hover:border-primary/40 transition-all active:scale-95 disabled:opacity-50"
                             >
                               {q}
                             </button>
