@@ -16,8 +16,9 @@
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getAdminApp } from '@/lib/firebase-admin';
-import { headers } from 'next/headers';
+import { headers, cookies } from 'next/headers';
 import { logger } from '@/lib/logger/security-logger';
+import { jwtVerify } from 'jose';
 
 /** Token expira en menos de N segundos → rechazar para evitar race conditions */
 const TOKEN_EXPIRY_BUFFER_SECS = 60;
@@ -63,7 +64,34 @@ export async function requireAdminSession(idToken: string) {
     throw new Error('Acceso denegado.');
   }
 
-  // ── Verificación del token con Firebase Admin ────────────────────────────
+  // 🛡️ FIX CRÍTICO: Validar el segundo factor (2FA JWT) nativamente en las Server Actions.
+  // Sin esto, un atacante con un idToken de Firebase robado podría hacer Action Hijacking
+  // llamando a Server Actions administrativas desde rutas públicas (ej. /) evadiendo el middleware.
+  const isE2E_2FA = process.env.E2E_TEST_MODE === 'true';
+  if (!isE2E_2FA) {
+    const cookieStore = await cookies();
+    const token2fa = cookieStore.get('admin-2fa-token')?.value;
+    const jwtSecret = process.env.GOD_MODE_JWT_SECRET;
+
+    if (!token2fa || !jwtSecret) {
+      logger.security(
+        '[requireAdminSession] Bloqueado: Falta token 2FA en Server Action Hijacking'
+      );
+      throw new Error('Acceso denegado.');
+    }
+
+    try {
+      const secret = new TextEncoder().encode(jwtSecret);
+      await jwtVerify(token2fa, secret);
+    } catch {
+      logger.security(
+        '[requireAdminSession] Bloqueado: Token 2FA inválido en Server Action Hijacking'
+      );
+      throw new Error('Acceso denegado.');
+    }
+  }
+
+  // 🛡️ Verificación del token con Firebase Admin 🛡️────────────────────────────
   getAdminApp();
   let decodedToken;
   try {

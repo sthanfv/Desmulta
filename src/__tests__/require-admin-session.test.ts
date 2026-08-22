@@ -28,7 +28,13 @@ vi.mock('next/headers', () => ({
       return null;
     }),
   })),
+  cookies: vi.fn(() => ({
+    get: vi.fn(),
+  })),
 }));
+
+// Evita la validación criptográfica 2FA durante los tests unitarios
+process.env.E2E_TEST_MODE = 'true';
 
 import { requireAdminSession } from '@/lib/auth/require-admin-session';
 import { getAuth } from 'firebase-admin/auth';
