@@ -565,7 +565,7 @@ export function AdminDashboard() {
                   className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1"
                 >
                   <span className="font-medium text-sm">Petición General</span>
-                  <span className="text-muted-foreground text-xs">$39,000</span>
+                  <span className="text-muted-foreground text-xs">$19,500</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() =>
@@ -578,7 +578,7 @@ export function AdminDashboard() {
                   className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1"
                 >
                   <span className="font-medium text-sm">Prescripción Directa</span>
-                  <span className="text-muted-foreground text-xs">$59,000</span>
+                  <span className="text-muted-foreground text-xs">$29,500</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() =>
@@ -591,7 +591,7 @@ export function AdminDashboard() {
                   className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1"
                 >
                   <span className="font-medium text-sm">Doble Prescripción</span>
-                  <span className="text-muted-foreground text-xs">$79,000</span>
+                  <span className="text-muted-foreground text-xs">$39,500</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() =>
@@ -604,7 +604,7 @@ export function AdminDashboard() {
                   className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1"
                 >
                   <span className="font-medium text-sm">Nulidad por Notificación</span>
-                  <span className="text-muted-foreground text-xs">$49,000</span>
+                  <span className="text-muted-foreground text-xs">$24,500</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() =>
@@ -617,7 +617,7 @@ export function AdminDashboard() {
                   className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1"
                 >
                   <span className="font-medium text-sm">Tutela (Silencio Admin)</span>
-                  <span className="text-muted-foreground text-xs">$39,000</span>
+                  <span className="text-muted-foreground text-xs">$19,500</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() =>
@@ -630,7 +630,7 @@ export function AdminDashboard() {
                   className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1"
                 >
                   <span className="font-medium text-sm">Caducidad 1 Año</span>
-                  <span className="text-muted-foreground text-xs">$59,000</span>
+                  <span className="text-muted-foreground text-xs">$29,500</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() =>
@@ -643,7 +643,7 @@ export function AdminDashboard() {
                   className="justify-between cursor-pointer rounded-lg hover:bg-muted/50 focus:bg-muted/50 my-1"
                 >
                   <span className="font-medium text-sm">Nulidad por Identidad</span>
-                  <span className="text-muted-foreground text-xs">$49,000</span>
+                  <span className="text-muted-foreground text-xs">$24,500</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

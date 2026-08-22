@@ -236,7 +236,7 @@ describe('📊 Sistema Integrado de Telemetría, Modo Dios y Ventas', () => {
           return Promise.resolve({
             exists: true,
             data: () => ({
-              amountCop: 2950000, // 59.000 COP esperado
+              amountCop: 2950000, // 29.500 COP esperado
               productType: 'prescripcion_directa',
             }),
           });
