@@ -144,7 +144,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <PushProvider>
                   <MotionProvider>
                     <PWAAutoUpdater />
-                    <main id="main-content" className="overflow-x-hidden w-full relative">
+                    <main id="main-content" className="overflow-x-clip w-full relative">
                       {children}
                     </main>
                   </MotionProvider>
