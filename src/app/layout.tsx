@@ -53,6 +53,10 @@ export const metadata: Metadata = {
     'caducidad fotomultas',
   ],
   authors: [{ name: 'Desmulta Legal', url: 'https://desmulta.online' }],
+  icons: {
+    icon: [{ url: '/favicon.ico' }, { url: '/icon.png', type: 'image/png' }],
+    apple: [{ url: '/apple-touch-icon.png' }],
+  },
   creator: 'Desmulta Corp',
   publisher: 'Desmulta Colombia',
   // FIX SEO: Forzar siempre el dominio canónico de producción para evitar
