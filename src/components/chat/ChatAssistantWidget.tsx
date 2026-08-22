@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion';
 import {
   Send,
@@ -164,6 +165,7 @@ function FormattedMessageText({
 }
 
 export function ChatAssistantWidget() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [fontScale, setFontScale] = useState<FontScale>('normal');
   const [messages, setMessages] = useState<Message[]>([
@@ -336,6 +338,10 @@ export function ChatAssistantWidget() {
         return <Scale className="w-3.5 h-3.5 text-primary" />;
     }
   };
+
+  if (pathname !== '/') {
+    return null;
+  }
 
   return (
     <>
