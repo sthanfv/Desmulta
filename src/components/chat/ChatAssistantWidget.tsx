@@ -59,7 +59,7 @@ function FormattedMessageText({ text }: { text: string }) {
         if (trimmed.startsWith('###')) {
           const titleText = trimmed.replace(/^###\s*/, '');
           return (
-            <h4 key={idx} className="font-black text-amber-400 text-xs sm:text-sm mt-2 mb-1 tracking-tight">
+            <h4 key={idx} className="font-black text-amber-400 text-sm sm:text-[15px] mt-2 mb-1 tracking-tight">
               {titleText}
             </h4>
           );
@@ -68,7 +68,7 @@ function FormattedMessageText({ text }: { text: string }) {
         if (trimmed.startsWith('##') || trimmed.startsWith('#')) {
           const titleText = trimmed.replace(/^#+\s*/, '');
           return (
-            <h4 key={idx} className="font-black text-amber-400 text-xs sm:text-sm mt-2 mb-1 tracking-tight">
+            <h4 key={idx} className="font-black text-amber-400 text-sm sm:text-[15px] mt-2 mb-1 tracking-tight">
               {titleText}
             </h4>
           );
@@ -78,7 +78,7 @@ function FormattedMessageText({ text }: { text: string }) {
         if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
           const bulletContent = trimmed.replace(/^[-*]\s*/, '');
           return (
-            <div key={idx} className="flex items-start gap-1.5 pl-1.5 text-xs sm:text-[13px]">
+            <div key={idx} className="flex items-start gap-1.5 pl-1.5 text-[13px] sm:text-[14.5px]">
               <span className="text-amber-400 font-bold mt-0.5">•</span>
               <span>{parseBoldText(bulletContent)}</span>
             </div>
@@ -87,7 +87,7 @@ function FormattedMessageText({ text }: { text: string }) {
 
         // Párrafo estándar con negritas
         return (
-          <p key={idx} className="text-xs sm:text-[13px] leading-relaxed">
+          <p key={idx} className="text-[13px] sm:text-[14.5px] leading-relaxed">
             {parseBoldText(trimmed)}
           </p>
         );
@@ -556,7 +556,7 @@ export function ChatAssistantWidget() {
                       onChange={(e) => setInputMessage(e.target.value)}
                       placeholder="Pregunta sobre comparendos, prescripción..."
                       disabled={isLoading}
-                      className="flex-1 px-3 py-2 text-xs sm:text-[13px] rounded-xl bg-background border border-border focus:outline-none focus:border-primary text-foreground placeholder:text-muted-foreground disabled:opacity-50"
+                      className="flex-1 px-3 py-2 text-[13px] sm:text-[14.5px] rounded-xl bg-background border border-border focus:outline-none focus:border-primary text-foreground placeholder:text-muted-foreground disabled:opacity-50"
                     />
                     <button
                       type="submit"
