@@ -315,7 +315,7 @@ export default function HomeClient({
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           aria-label="Volver arriba"
           className={cn(
-            'pointer-events-auto w-14 h-14 rounded-full flex items-center justify-center transition-all duration-700 border border-border/50 shadow-2xl group/scroll',
+            'pointer-events-auto relative z-20 w-14 h-14 rounded-full flex items-center justify-center transition-all duration-700 border border-border/50 shadow-2xl group/scroll',
             showScrollTop
               ? 'opacity-100 translate-y-0 scale-100 bg-background text-primary'
               : 'opacity-0 translate-y-10 scale-50 pointer-events-none'
@@ -467,7 +467,7 @@ export default function HomeClient({
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           aria-label="Volver arriba"
           className={cn(
-            'pointer-events-auto mb-3 flex items-center justify-center transition-all duration-700 drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] dark:drop-shadow-[0_0_8px_rgba(0,0,0,0.8)] text-foreground',
+            'pointer-events-auto relative z-20 mb-3 flex items-center justify-center transition-all duration-700 drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] dark:drop-shadow-[0_0_8px_rgba(0,0,0,0.8)] text-foreground',
             showScrollTop
               ? 'opacity-100 translate-y-0 scale-100'
               : 'opacity-0 translate-y-10 scale-50 pointer-events-none'

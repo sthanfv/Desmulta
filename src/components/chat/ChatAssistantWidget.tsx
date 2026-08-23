@@ -361,11 +361,11 @@ export function ChatAssistantWidget() {
 
       {/* ─── Posición: en móvil a la derecha (right-4) para pulgar, en desktop a la izquierda (left-6) ─── */}
       <div className="chat-widget-container fixed bottom-24 right-4 sm:bottom-6 sm:left-6 z-[60] flex flex-col items-end sm:items-start font-sans transition-all duration-300">
-        {/* ─── Botón Flotante de Apertura (Trigger) ─── */}
-        <AnimatePresence>
-          {!isOpen && (
-            <LazyMotion features={domAnimation}>
+        <LazyMotion features={domAnimation}>
+          <AnimatePresence mode="wait">
+            {!isOpen ? (
               <m.button
+                key="chat-trigger"
                 type="button"
                 onClick={() => setIsOpen(true)}
                 whileHover={{ scale: 1.05 }}
@@ -373,6 +373,7 @@ export function ChatAssistantWidget() {
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0, opacity: 0 }}
+                transition={{ duration: 0.2 }}
                 className="relative group flex items-center gap-2.5 p-2 sm:px-4 sm:py-2.5 rounded-full bg-card/95 dark:bg-zinc-900/95 text-foreground shadow-2xl border border-primary/40 hover:border-primary backdrop-blur-xl transition-all duration-300"
                 aria-label="Abrir asistente de tránsito Desmulta"
               >
@@ -390,15 +391,9 @@ export function ChatAssistantWidget() {
                   </span>
                 </div>
               </m.button>
-            </LazyMotion>
-          )}
-        </AnimatePresence>
-
-        {/* ─── Ventana / Bottom Sheet del Asistente ─── */}
-        <AnimatePresence>
-          {isOpen && (
-            <LazyMotion features={domAnimation}>
+            ) : (
               <m.div
+                key="chat-window"
                 initial={{ opacity: 0, y: 25, scale: 0.96 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 25, scale: 0.96 }}
@@ -670,9 +665,9 @@ export function ChatAssistantWidget() {
                   </form>
                 </div>
               </m.div>
-            </LazyMotion>
-          )}
-        </AnimatePresence>
+            )}
+          </AnimatePresence>
+        </LazyMotion>
       </div>
     </>
   );
