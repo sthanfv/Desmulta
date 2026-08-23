@@ -767,3 +767,11 @@ html[data-magicui-theme-vt='active']::view-transition-new(root) {
     animation: none !important;
   }
 }
+
+/* Ocultar el widget de IA cuando un Modal bloquea el Scroll del Body */
+body[data-scroll-locked] .chat-widget-container {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: translateY(15px) scale(0.95) !important;
+}
+

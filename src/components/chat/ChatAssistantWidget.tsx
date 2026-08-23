@@ -360,7 +360,7 @@ export function ChatAssistantWidget() {
       </AnimatePresence>
 
       {/* ─── Posición: en móvil a la derecha (right-4) para pulgar, en desktop a la izquierda (left-6) ─── */}
-      <div className="fixed bottom-24 right-4 sm:bottom-6 sm:left-6 z-[60] flex flex-col items-end sm:items-start font-sans">
+      <div className="chat-widget-container fixed bottom-24 right-4 sm:bottom-6 sm:left-6 z-[60] flex flex-col items-end sm:items-start font-sans transition-all duration-300">
         {/* ─── Botón Flotante de Apertura (Trigger) ─── */}
         <AnimatePresence>
           {!isOpen && (
