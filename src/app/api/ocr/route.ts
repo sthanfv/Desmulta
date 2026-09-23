@@ -11,6 +11,7 @@ import { PROMPT_EXTRACCION_ESTRUCTURADA_STRICT } from '@/lib/ai/gemini-prompts';
 import { getAdminApp } from '@/lib/firebase-admin';
 import { getFirestore } from 'firebase-admin/firestore';
 import * as admin from 'firebase-admin';
+import { alertServiceFailureInBackground } from '@/lib/monitoring/service-alert';
 
 const redis = Redis.fromEnv();
 
@@ -304,6 +305,11 @@ export async function POST(request: NextRequest) {
             error: gMsg,
           }
         );
+        // Degradación silenciosa antes: el cliente recibía resultado (vía Lector-OCR) y nadie
+        // se enteraba de que Gemini estaba fallando.
+        alertServiceFailureInBackground('ocr-fallback', `Gemini falló: ${gMsg}`, {
+          severity: 'degraded',
+        });
       } else if (gMsg === 'GEMINI_QUOTA_EXCEEDED') {
         logger.warn(
           '[OCR] Cuota diaria de Gemini alcanzada. Cayendo directamente a Tesseract (Fallback)...'
@@ -440,23 +446,13 @@ export async function POST(request: NextRequest) {
     const errorMsg = error instanceof Error ? error.message : String(error);
     logger.error('[OCR] Error general', { error: errorMsg });
 
-    // 🚨 ENVIAR ALERTA A TELEGRAM ANTES DE MORIR
-    const botToken = process.env.TELEGRAM_BOT_TOKEN;
-    // Usar el canal de desarrollo/alertas técnicas, no el de leads.
-    const chatId = process.env.TELEGRAM_DEV_CHAT_ID || process.env.TELEGRAM_CHAT_ID;
-
-    if (botToken && chatId) {
-      const telegramText = `🚨 *ALERTA SIMIT (OCR FALLIDO)* 🚨\n\nEl sistema de extracción de texto falló o se agotó el tiempo (Timeout/503).\n\n*Diagnóstico:*\n\`${errorMsg}\`\n\n_El cliente recibió un error. Podría abandonar el embudo._`;
-      fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text: telegramText,
-          parse_mode: 'Markdown',
-        }),
-      }).catch(() => {});
-    }
+    // 🚨 Alerta al canal técnico. [2026-09-22] Antes: Markdown con el error crudo (Telegram la
+    // rechazaba si el error traía `_` o comillas invertidas) y sin esperar el envío (se perdía
+    // al congelarse la función). Ahora: HTML escapado, waitUntil y anti-spam de 10 min.
+    alertServiceFailureInBackground(
+      'ocr',
+      `Extracción falló y el cliente recibió un error: ${errorMsg}`
+    );
 
     // Retornamos 503 para que el cliente sepa que es saturación temporal
     const statusCode = errorMsg.includes('Timeout') || errorMsg.includes('503') ? 503 : 500;

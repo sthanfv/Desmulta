@@ -1,5 +1,2 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
 echo "⚡ DevSecOps: Test Monolítico diferido al CI/CD."
 echo "✅ Calidad asegurada vía Aislamiento Inteligente (lint-staged + vitest related) en pre-commit."

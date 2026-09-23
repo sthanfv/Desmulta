@@ -5,12 +5,22 @@ import { getSecureIp } from '@/lib/security/ip-utils';
 import { checkRateLimit } from '@/lib/security/rate-limit';
 import { logger } from '@/lib/logger/security-logger';
 import { trackDemandQuery } from '@/lib/analytics/demand-tracker';
-import { sendTelegramAgentAlert } from '@/lib/telegram';
+import { alertServiceFailureInBackground } from '@/lib/monitoring/service-alert';
+import { detectSmallTalk, smallTalkReply, STARTER_QUESTIONS } from '@/lib/chat/small-talk';
+import { buildWhatsAppUrl } from '@/lib/chat/whatsapp';
+import { trimHistory } from '@/lib/chat/history';
 
-// Esquema de validación del payload entrante
+// Debe superar el timeout de Gemini dentro del agente (10 s): así, si Gemini se demora, el
+// agente alcanza a responder con su motor de respaldo en vez de que la web corte primero.
+const AGENT_TIMEOUT_MS = 14_000;
+
+// Por debajo del límite del agente (32 KB); configurable si el agente cambia su límite.
+const AGENT_PAYLOAD_BUDGET_BYTES = Number(process.env.AGENT_MAX_PAYLOAD_BYTES) || 28_000;
+
 const chatRequestSchema = z.object({
   message: z
     .string()
+    .trim()
     .min(1, 'El mensaje no puede estar vacío')
     .max(1000, 'Mensaje demasiado largo'),
   city: z.string().max(100).optional(),
@@ -18,45 +28,89 @@ const chatRequestSchema = z.object({
     .array(
       z.object({
         role: z.enum(['user', 'assistant']),
-        content: z.string().max(2000),
+        content: z.string().max(4000),
       })
     )
-    .max(20)
+    .max(30)
     .optional(),
 });
 
+interface SuggestedAction {
+  tipo: string;
+  titulo: string;
+  url: string;
+  descripcion: string;
+}
+
+const SOLUTION_INTENT =
+  /(c[oó]mo|qu[eé] hago|ayuda|impugnar|pagar|solucionar|reclamar|defender|eliminar|borrar|prescripci[oó]n|embargo)/i;
+
+const DIRECTIVE_SOLUTION = `Con tono cálido y en pocas líneas, responde de forma pedagógica y empática citando la ley aplicable solo si aporta (ej. C-038 de 2020, Ley 1843). SIN EMBARGO, NO des la solución directa de 'hazlo tú mismo'. Concluye persuadiendo al usuario que la forma más segura de resolverlo es adquiriendo las plantillas de Desmulta o contratando la asesoría de nuestros expertos.`;
+const DIRECTIVE_CONVERSATION = `Conversa de forma cálida y natural, como una persona que sabe del tema. Responde exactamente lo que pregunta en pocas líneas, sin ser insistente con ventas.`;
+
+function whatsappAction(): SuggestedAction {
+  return {
+    tipo: 'whatsapp',
+    titulo: 'Hablar con una persona',
+    url: buildWhatsAppUrl(),
+    descripcion: 'Nuestro equipo te responde por WhatsApp.',
+  };
+}
+
+/** Respuesta local cuando el agente no está disponible: humana, honesta y sin leyes de relleno. */
+function localReply(message: string, traceId?: string) {
+  const kind = detectSmallTalk(message);
+  if (kind) {
+    return {
+      reply: smallTalkReply(kind),
+      citations: [],
+      suggested_action: null,
+      follow_up_questions: kind === 'farewell' ? [] : STARTER_QUESTIONS,
+      trace_id: traceId,
+    };
+  }
+  return {
+    reply:
+      'Uy, en este momento no logro conectarme con mi sistema para responderte bien 😕. Intenta de nuevo en un minuto o, si prefieres, escríbenos por WhatsApp y una persona del equipo te ayuda con tu caso.',
+    citations: [],
+    suggested_action: whatsappAction(),
+    follow_up_questions: [],
+    degraded: true,
+    trace_id: traceId,
+  };
+}
+
+function rateLimitedReply(kind: 'burst' | 'daily') {
+  return {
+    error: 'Límite temporal alcanzado',
+    reply:
+      kind === 'burst'
+        ? '¡Vas muy rápido! 😅 Dame un momentico y vuelve a escribirme en un minuto.'
+        : 'Por hoy llegaste al límite de mensajes con el asistente. Si quieres seguir, escríbenos por WhatsApp y una persona del equipo te ayuda.',
+    isRateLimited: true,
+    citations: [],
+    suggested_action: whatsappAction(),
+    follow_up_questions: [],
+  };
+}
+
 export async function POST(req: NextRequest) {
   try {
-    // 1. Rate Limiting dedicado por IP (15 consultas cada 10 min)
+    // 1. Rate limiting en dos niveles por IP (ráfaga + diario). Fail-closed si Redis falla.
     const ip = getSecureIp(req);
-    const rl = await checkRateLimit('chatAgent', ip);
-    if (!rl.success) {
-      return NextResponse.json(
-        {
-          error: 'Límite temporal alcanzado',
-          reply:
-            'Debido a la alta demanda de consultas ciudadanas en vivo, hemos pausado temporalmente tus preguntas para garantizar la velocidad de respuesta a todos los usuarios. Puedes continuar en unos minutos o radicar tu caso ahora con un especialista para estudio prioritario.',
-          isRateLimited: true,
-          citations: [],
-          suggested_action: {
-            tipo: 'modal_full',
-            titulo: 'Radicar Caso para Estudio Gratuito',
-            url: '#consultar',
-            descripcion:
-              'Un especialista evaluará tu comparendo y la cadena de notificación del RUNT.',
-          },
-          follow_up_questions: [],
-        },
-        { status: 429 }
-      );
+    const burst = await checkRateLimit('chatAgent', ip);
+    if (!burst.success) {
+      if (burst.isError) {
+        alertServiceFailureInBackground('chat', 'Rate limiter (Upstash) no disponible');
+      }
+      return NextResponse.json(rateLimitedReply('burst'), { status: 429 });
     }
 
-    // 2. Validación de Entrada
+    // 2. Validación de entrada
     const body = await req.json().catch(() => null);
     if (!body) {
       return NextResponse.json({ error: 'Payload JSON inválido' }, { status: 400 });
     }
-
     const parsed = chatRequestSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(
@@ -64,68 +118,53 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-
     const { message, city, history } = parsed.data;
 
-    // 3. Inyección Algorítmica de Contexto y Ventas (Guardrail)
-    const isSolutionIntent =
-      /(c[oó]mo|qu[eé] hago|ayuda|impugnar|pagar|solucionar|reclamar|defender|eliminar|borrar|prescripci[oó]n|embargo)/i.test(
-        message
-      );
+    // 3. Charla corta (hola, gracias, chao…): respuesta humana inmediata. No consume el cupo
+    // diario ni tokens de Gemini, y no ensucia la analítica de demanda.
+    const smallTalk = detectSmallTalk(message);
+    if (smallTalk) {
+      return NextResponse.json(localReply(message), { status: 200 });
+    }
 
-    const contextDirective = isSolutionIntent
-      ? `Responde de forma pedagógica y empática citando la ley aplicable (ej. C-038 de 2020, Ley 1843). SIN EMBARGO, NO des la solución directa de 'hazlo tú mismo'. Concluye persuadiendo al usuario que la forma más segura de resolverlo es adquiriendo las plantillas de Desmulta o contratando la asesoría de nuestros expertos.`
-      : `Sé pedagógico, claro y empático. Explica el concepto legal de forma sencilla sin ser insistente con ventas.`;
+    const daily = await checkRateLimit('chatAgentDaily', ip);
+    if (!daily.success) {
+      return NextResponse.json(rateLimitedReply('daily'), { status: 429 });
+    }
 
-    // 4. Preparación de la petición B2B al microservicio Python
-    // [2026-09-22] FIX CRÍTICO: se eliminó el secreto HMAC hardcodeado como fallback
-    // (quedó en el historial de Git → ROTARLO en Vercel y en desmulta-ai-agent).
+    // 4. Directiva de control (aislada del mensaje del usuario: anti prompt-injection)
+    const contextDirective = SOLUTION_INTENT.test(message)
+      ? DIRECTIVE_SOLUTION
+      : DIRECTIVE_CONVERSATION;
+
+    // 5. Configuración del microservicio (sin secretos por defecto: fail-closed)
     const agentUrl = process.env.AGENT_AI_URL;
     const hmacSecret = process.env.AGENT_HMAC_SECRET;
     if (!agentUrl || !hmacSecret || hmacSecret.length < 32) {
       logger.error('[Chat-API] AGENT_AI_URL / AGENT_HMAC_SECRET no configurados');
-      return NextResponse.json(
-        {
-          reply:
-            'Nuestro asistente está en mantenimiento. Puedes radicar tu caso y un especialista lo revisará.',
-          citations: [],
-          suggested_action: {
-            tipo: 'modal_full',
-            titulo: 'Radicar Caso para Estudio Gratuito',
-            url: '#consultar',
-            descripcion: 'Un especialista evaluará tu comparendo.',
-          },
-          follow_up_questions: [],
-        },
-        { status: 200 }
-      );
+      alertServiceFailureInBackground('chat', 'AGENT_AI_URL / AGENT_HMAC_SECRET no configurados');
+      return NextResponse.json(localReply(message), { status: 200 });
     }
 
-    const timestamp = Date.now().toString();
-    // FIX CRÍTICO (Prompt Injection): Nunca concatenar. Aislar plano de control en "system_directive"
+    const basePayload = { message, system_directive: contextDirective, city };
     const payload = JSON.stringify({
-      message: message,
-      system_directive: contextDirective,
-      city,
-      history,
+      ...basePayload,
+      history: trimHistory(history, basePayload, AGENT_PAYLOAD_BUDGET_BYTES),
     });
 
-    // 4.1. Registro Asíncrono de Analítica de Demanda (Fire-and-forget, 0% latencia al usuario)
+    // Analítica de demanda (fire-and-forget, 0 % de latencia al usuario)
     trackDemandQuery(message).catch((err) => logger.error('Error tracking demand', err));
 
-    // 5. Firma Criptográfica HMAC-SHA256
+    // 6. Firma HMAC-SHA256 (timestamp + cuerpo)
+    const timestamp = Date.now().toString();
     const signature = crypto
       .createHmac('sha256', hmacSecret)
       .update(timestamp)
       .update(payload)
       .digest('hex');
+    const traceId = `web-chat-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`;
 
-    const traceId = `web-chat-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
-
-    // 6. Invocación al Microservicio de IA
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 12000); // 12s timeout
-
+    // 7. Invocación al microservicio de IA
     try {
       const response = await fetch(`${agentUrl}/api/v1/chat`, {
         method: 'POST',
@@ -136,86 +175,32 @@ export async function POST(req: NextRequest) {
           'X-Trace-Id': traceId,
         },
         body: payload,
-        signal: controller.signal,
+        signal: AbortSignal.timeout(AGENT_TIMEOUT_MS),
       });
-
-      clearTimeout(timeout);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         logger.error(`[Chat-API] Fallo del microservicio IA (${response.status}):`, errorData);
-
-        // Alerta al equipo DevSecOps/SRE
-        sendTelegramAgentAlert(`Fallo de Motor IA (HTTP ${response.status})`, traceId).catch(
-          () => null
-        );
-
-        return NextResponse.json(
-          {
-            reply:
-              'En este momento nuestro motor técnico está procesando consultas ciudadanas de alta demanda. Recuerda que bajo la Ley 1843 de 2017 y la Sentencia C-038 de 2020, las fotomultas exigen prueba plena del conductor y notificación formal al RUNT.',
-            citations: [
-              {
-                norma: 'Ley 1843 de 2017',
-                articulo: 'Art. 8 - Procedimiento de Notificación',
-                resumen: 'La notificación debe realizarse por correo certificado al RUNT.',
-              },
-            ],
-            suggested_action: {
-              tipo: 'camaras',
-              titulo: 'Verificar Radares Autorizados ANSV',
-              url: '/multas/bogota/camaras',
-              descripcion: 'Consulta si las cámaras de tu ciudad tienen permisos vigentes.',
-            },
-            follow_up_questions: [
-              '¿A los cuántos años prescribe un comparendo?',
-              '¿Qué hacer si me embargaron la cuenta bancaria?',
-            ],
-            trace_id: traceId,
-          },
-          { status: 200 }
-        );
+        alertServiceFailureInBackground('chat', `Motor IA respondió HTTP ${response.status}`, {
+          traceId,
+        });
+        return NextResponse.json(localReply(message, traceId), { status: 200 });
       }
 
       const data = await response.json();
+      if (!data || typeof data.reply !== 'string' || data.reply.trim() === '') {
+        alertServiceFailureInBackground('chat', 'Motor IA devolvió una respuesta sin texto', {
+          traceId,
+        });
+        return NextResponse.json(localReply(message, traceId), { status: 200 });
+      }
       return NextResponse.json(data, { status: 200 });
     } catch (fetchError: unknown) {
-      clearTimeout(timeout);
       logger.error('[Chat-API] Microservicio no disponible:', fetchError);
-
-      // Alerta al equipo DevSecOps/SRE
-      sendTelegramAgentAlert(`Microservicio IA Down (Timeout/Network)`, traceId).catch(() => null);
-
-      return NextResponse.json(
-        {
-          reply:
-            'Bajo la Ley 1843 de 2017 y la Sentencia C-038 de 2020, la Secretaría de Tránsito no puede sancionar al propietario sin identificar al conductor infractor, y debe agotar la notificación física en la dirección registrada en el RUNT.',
-          citations: [
-            {
-              norma: 'Ley 1843 de 2017',
-              articulo: 'Art. 8 - Procedimiento de Notificación',
-              resumen: 'Obligatoriedad de envío por mensajería certificada.',
-            },
-            {
-              norma: 'Sentencia C-038 de 2020',
-              articulo: 'Corte Constitucional',
-              resumen: 'Prohibición de responsabilidad solidaria automática.',
-            },
-          ],
-          suggested_action: {
-            tipo: 'modal_simit',
-            titulo: 'Subir Captura para Estudio Técnico',
-            url: '#subir-captura',
-            descripcion: 'Evaluamos la validez de tu comparendo de forma inmediata.',
-          },
-          follow_up_questions: [
-            '¿Cómo saber si la dirección del RUNT fue respetada?',
-            '¿Qué trámite procede ante un embargo de cuenta?',
-          ],
-          trace_id: traceId,
-        },
-        { status: 200 }
-      );
+      alertServiceFailureInBackground('chat', 'Motor IA sin respuesta (timeout o red)', {
+        traceId,
+      });
+      return NextResponse.json(localReply(message, traceId), { status: 200 });
     }
   } catch (error: unknown) {
     logger.error('[Chat-API] Error interno inesperado:', error);

@@ -6,6 +6,7 @@ import { logger } from '@/lib/logger/security-logger';
 import { extraerComparendos, construirAnalisisCompleto } from '@/lib/legal/comparendo-extractor';
 import { validateWebhookUrl } from '@/lib/security/ssrf-guard';
 import { PROMPT_EXTRACCION_ESTRUCTURADA_ARRAY } from '@/lib/ai/gemini-prompts';
+import { alertServiceFailureInBackground } from '@/lib/monitoring/service-alert';
 
 const redis = Redis.fromEnv();
 
@@ -216,6 +217,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     logger.error('[ocr-worker] Error fatal en worker', { error: msg });
+    alertServiceFailureInBackground('ocr-worker', msg);
     return NextResponse.json({ error: 'Processing failed' }, { status: 500 });
   }
 }

@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import test from 'firebase-functions-test';
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Mocks
@@ -36,16 +35,19 @@ vi.mock('firebase-admin', () => {
       apps: ['mock'],
       initializeApp: vi.fn(),
     },
-    firestore: Object.assign(vi.fn(() => ({ collection })), {
-      FieldValue: { serverTimestamp: vi.fn(), arrayUnion: vi.fn((...a: unknown[]) => a) },
-      Timestamp: { now: vi.fn(() => ({ toDate: () => new Date() })), fromDate: vi.fn() },
-    }),
+    firestore: Object.assign(
+      vi.fn(() => ({ collection })),
+      {
+        FieldValue: { serverTimestamp: vi.fn(), arrayUnion: vi.fn((...a: unknown[]) => a) },
+        Timestamp: { now: vi.fn(() => ({ toDate: () => new Date() })), fromDate: vi.fn() },
+      }
+    ),
     messaging: vi.fn(() => ({ send: mocks.mockMessagingSend })),
   };
 });
 
 vi.mock('firebase-functions', async (importOriginal) => {
-  const actual = await importOriginal<any>();
+  const actual = await importOriginal<typeof import('firebase-functions')>();
   return {
     ...actual,
     logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
@@ -55,6 +57,12 @@ vi.mock('firebase-functions', async (importOriginal) => {
 import { buildCaseReplyMarkup } from '../telegramWebhook';
 import { telegramWebhook } from '../telegramWebhook';
 import { encryptSymmetric } from '../crypto-utils';
+
+// Tipos mínimos para los dobles de prueba (evitan `any`)
+type Btn = { text?: string; callback_data?: string; url?: string };
+type MockReq = { headers: Record<string, string>; body: Record<string, unknown> };
+type MockRes = { status: ReturnType<typeof vi.fn>; send: ReturnType<typeof vi.fn> };
+const invokeWebhook = telegramWebhook as unknown as (req: MockReq, res: MockRes) => Promise<void>;
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Tests de buildCaseReplyMarkup (la función pura exportada)
@@ -71,11 +79,18 @@ describe('buildCaseReplyMarkup — Pipeline completo de 8 estados', () => {
   it('debe incluir todos los 8 estados del Kanban como botones', () => {
     const markup = buildCaseReplyMarkup(DOC_ID, WA_URL);
     const allButtons = markup.inline_keyboard.flat();
-    const callbackDatas = allButtons
-      .map((b: any) => b.callback_data)
-      .filter(Boolean);
+    const callbackDatas = allButtons.map((b: Btn) => b.callback_data).filter(Boolean);
 
-    const expectedStates = ['pendiente', 'contactado', 'estudio', 'descartado', 'apertura', 'radicado', 'tramite', 'finalizado'];
+    const expectedStates = [
+      'pendiente',
+      'contactado',
+      'estudio',
+      'descartado',
+      'apertura',
+      'radicado',
+      'tramite',
+      'finalizado',
+    ];
     for (const estado of expectedStates) {
       expect(callbackDatas).toContain(`estado_${estado}_${DOC_ID}`);
     }
@@ -84,7 +99,7 @@ describe('buildCaseReplyMarkup — Pipeline completo de 8 estados', () => {
   it('el botón de WhatsApp debe ser un link URL (no callback)', () => {
     const markup = buildCaseReplyMarkup(DOC_ID, WA_URL);
     const lastRow = markup.inline_keyboard[markup.inline_keyboard.length - 1];
-    const waBtn = lastRow[0] as any;
+    const waBtn = lastRow[0] as Btn;
     expect(waBtn.url).toBe(WA_URL);
     expect(waBtn.callback_data).toBeUndefined();
   });
@@ -93,10 +108,10 @@ describe('buildCaseReplyMarkup — Pipeline completo de 8 estados', () => {
     const markup = buildCaseReplyMarkup(DOC_ID, WA_URL, 'estudio');
     const allButtons = markup.inline_keyboard.flat();
 
-    const estudiaBtn = allButtons.find((b: any) => b.text?.includes('En Estudio'));
+    const estudiaBtn = allButtons.find((b: Btn) => b.text?.includes('En Estudio'));
     expect(estudiaBtn).toBeDefined();
-    expect((estudiaBtn as any)!.text).toContain('👉');
-    expect((estudiaBtn as any)!.callback_data).toBe('noop');
+    expect((estudiaBtn as Btn).text).toContain('👉');
+    expect((estudiaBtn as Btn).callback_data).toBe('noop');
   });
 
   it('los demás estados NO deben tener 👉 ni ser noop', () => {
@@ -104,8 +119,10 @@ describe('buildCaseReplyMarkup — Pipeline completo de 8 estados', () => {
     const allButtons = markup.inline_keyboard.flat();
 
     // Excluimos el botón de WhatsApp (tiene url, no callback_data)
-    const actionButtons = allButtons.filter((b: any) => b.callback_data && b.callback_data !== 'noop');
-    for (const btn of actionButtons as any[]) {
+    const actionButtons = allButtons.filter(
+      (b: Btn) => b.callback_data && b.callback_data !== 'noop'
+    );
+    for (const btn of actionButtons as Btn[]) {
       expect(btn.text).not.toContain('👉');
     }
   });
@@ -113,7 +130,7 @@ describe('buildCaseReplyMarkup — Pipeline completo de 8 estados', () => {
   it('sin currentState, ningún botón debe ser noop', () => {
     const markup = buildCaseReplyMarkup(DOC_ID, WA_URL);
     const allButtons = markup.inline_keyboard.flat();
-    const noopButtons = allButtons.filter((b: any) => b.callback_data === 'noop');
+    const noopButtons = allButtons.filter((b: Btn) => b.callback_data === 'noop');
     expect(noopButtons).toHaveLength(0);
   });
 });
@@ -122,8 +139,8 @@ describe('buildCaseReplyMarkup — Pipeline completo de 8 estados', () => {
 // Tests del webhook HTTP
 // ──────────────────────────────────────────────────────────────────────────────
 describe('telegramWebhook — Seguridad y comandos', () => {
-  let req: any;
-  let res: any;
+  let req: MockReq;
+  let res: MockRes;
   const AUTHORIZED_CHAT_ID = 12345;
 
   beforeEach(() => {
@@ -138,6 +155,8 @@ describe('telegramWebhook — Seguridad y comandos', () => {
     process.env.TELEGRAM_BOT_TOKEN = 'token_test';
     process.env.TELEGRAM_CHAT_ID = String(AUTHORIZED_CHAT_ID);
     process.env.PII_ENCRYPTION_KEY = 'test_encryption_key_32_bytes_long!!';
+    // crypto-utils exige llave Y salt (sin salt el test de vercedula_ lanzaba excepción)
+    process.env.PII_ENCRYPTION_SALT = 'test_encryption_salt_for_testing_only';
     process.env.PII_HMAC_SECRET = 'test_hmac_secret_value_for_testing';
 
     req = {
@@ -153,14 +172,14 @@ describe('telegramWebhook — Seguridad y comandos', () => {
 
   it('debe rechazar si el secret no coincide (seguridad)', async () => {
     req.headers['x-telegram-bot-api-secret-token'] = 'wrong_token';
-    await (telegramWebhook as any)(req, res);
+    await invokeWebhook(req, res);
     expect(res.status).toHaveBeenCalledWith(200);
     expect(mocks.mockFetch).not.toHaveBeenCalled();
   });
 
   it('debe responder al comando /start con el menú de comandos', async () => {
     req.body = { message: { chat: { id: AUTHORIZED_CHAT_ID }, text: '/start' } };
-    await (telegramWebhook as any)(req, res);
+    await invokeWebhook(req, res);
     expect(mocks.mockFetch).toHaveBeenCalledWith(
       expect.stringContaining('sendMessage'),
       expect.objectContaining({ body: expect.stringContaining('DESMULTA CRM BOT') })
@@ -169,7 +188,7 @@ describe('telegramWebhook — Seguridad y comandos', () => {
 
   it('debe responder al comando /resumen con estadísticas', async () => {
     req.body = { message: { chat: { id: AUTHORIZED_CHAT_ID }, text: '/resumen' } };
-    await (telegramWebhook as any)(req, res);
+    await invokeWebhook(req, res);
     expect(mocks.mockFetch).toHaveBeenCalledWith(
       expect.stringContaining('sendMessage'),
       expect.objectContaining({ body: expect.stringContaining('RESUMEN DESMULTA') })
@@ -203,10 +222,10 @@ describe('telegramWebhook — Seguridad y comandos', () => {
       data: () => ({ contacto: '3001234567', placa: 'ABC', shortId: 'EXP-9' }),
     });
 
-    await (telegramWebhook as any)(req, res);
+    await invokeWebhook(req, res);
 
     // Debe haber llamado a answerCallbackQuery
-    const fetchUrls = mocks.mockFetch.mock.calls.map((callArgs: any[]) => callArgs[0]);
+    const fetchUrls = mocks.mockFetch.mock.calls.map((callArgs) => callArgs[0]);
     expect(fetchUrls.some((u: string) => u.includes('answerCallbackQuery'))).toBe(true);
     expect(res.status).toHaveBeenCalledWith(200);
   });
@@ -224,9 +243,9 @@ describe('telegramWebhook — Seguridad y comandos', () => {
     // processed_callbacks.create() → lanza error por duplicado
     mocks.mockFirestoreCreate.mockRejectedValueOnce(new Error('Document already exists'));
 
-    await (telegramWebhook as any)(req, res);
+    await invokeWebhook(req, res);
 
-    const fetchUrls = mocks.mockFetch.mock.calls.map((callArgs: any[]) => callArgs[0]);
+    const fetchUrls = mocks.mockFetch.mock.calls.map((callArgs) => callArgs[0]);
     // Solo debe llamar a answerCallbackQuery con "Ya procesado"
     expect(fetchUrls.some((u: string) => u.includes('answerCallbackQuery'))).toBe(true);
     // NO debe llamar a editMessageText (no hay cambio real de estado)
@@ -253,10 +272,10 @@ describe('telegramWebhook — Seguridad y comandos', () => {
       data: () => ({ fcmToken: 'fcm_token_xyz' }),
     });
 
-    await (telegramWebhook as any)(req, res);
+    await invokeWebhook(req, res);
 
     // El webhook debe haber respondido al menos una vez (answerCallbackQuery)
-    const fetchUrls = mocks.mockFetch.mock.calls.map((callArgs: any[]) => callArgs[0]);
+    const fetchUrls = mocks.mockFetch.mock.calls.map((callArgs) => callArgs[0]);
     expect(fetchUrls.some((u: string) => u.includes('answerCallbackQuery'))).toBe(true);
     expect(res.status).toHaveBeenCalledWith(200);
   });
@@ -283,10 +302,10 @@ describe('telegramWebhook — Seguridad y comandos', () => {
         data: () => ({ cedula: cedulaCifrada }),
       });
 
-      await (telegramWebhook as any)(req, res);
+      await invokeWebhook(req, res);
 
       // Debe haber llamado a answerCallbackQuery con la cédula desencriptada
-      const answerCall = mocks.mockFetch.mock.calls.find((callArgs: any[]) =>
+      const answerCall = mocks.mockFetch.mock.calls.find((callArgs) =>
         callArgs[0].includes('answerCallbackQuery')
       );
       expect(answerCall).toBeDefined();
@@ -314,9 +333,9 @@ describe('telegramWebhook — Seguridad y comandos', () => {
         data: () => ({ cedula: 'SIMIT-CAPTURA' }),
       });
 
-      await (telegramWebhook as any)(req, res);
+      await invokeWebhook(req, res);
 
-      const answerCall = mocks.mockFetch.mock.calls.find((callArgs: any[]) =>
+      const answerCall = mocks.mockFetch.mock.calls.find((callArgs) =>
         callArgs[0].includes('answerCallbackQuery')
       );
       expect(answerCall).toBeDefined();
@@ -345,9 +364,9 @@ describe('telegramWebhook — Seguridad y comandos', () => {
         data: () => ({ cedula: 'ENC:invalid_parts' }),
       });
 
-      await (telegramWebhook as any)(req, res);
+      await invokeWebhook(req, res);
 
-      const answerCall = mocks.mockFetch.mock.calls.find((callArgs: any[]) =>
+      const answerCall = mocks.mockFetch.mock.calls.find((callArgs) =>
         callArgs[0].includes('answerCallbackQuery')
       );
       expect(answerCall).toBeDefined();
@@ -359,5 +378,4 @@ describe('telegramWebhook — Seguridad y comandos', () => {
       expect(res.status).toHaveBeenCalledWith(200);
     });
   });
-
 });

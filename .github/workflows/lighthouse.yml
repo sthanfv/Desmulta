@@ -1,35 +1,21 @@
-name: Lighthouse CI
+name: Lighthouse (producción)
+
+# [2026-09-22] Antes compilaba el proyecto completo en cada push (sin variables de entorno) y
+# medía un servidor local con emulador: ni representativo ni estable. Ahora mide la web real
+# publicada, una vez por semana o a demanda, y deja el informe enlazado en el resumen.
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  schedule:
+    - cron: '0 11 * * 1' # lunes 6:00 a. m. hora Colombia
+  workflow_dispatch:
 
 jobs:
   lighthouse:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
-          
-      - name: Install dependencies
-        run: npm ci
-        
-      - name: Build project
-        # Desactivamos comprobaciones de tipos y linter para que Lighthouse evalúe solo el rendimiento del build final.
-        # Las validaciones de tipos se hacen en el workflow de CI principal.
-        run: npm run build
-        env:
-          NODE_ENV: production
-          NEXT_PUBLIC_USE_FIREBASE_EMULATOR: true
-          USE_FIREBASE_EMULATOR: true
-          
-      - name: Run Lighthouse CI
-        run: |
-          npm install -g @lhci/cli
-          lhci autorun
+          node-version: '22'
+      - name: Medir desmulta.online
+        run: npx --yes @lhci/cli@0.15.x autorun --config=./lighthouserc.production.js

@@ -1,51 +1,43 @@
-name: CD
+name: CD — Firebase
+
+# [2026-09-22] Vercel ya despliega la web automáticamente con cada push (integración Git).
+# Antes este workflow volvía a compilar y desplegar a Vercel con --prod (dos despliegues de
+# producción compitiendo). Ahora solo despliega lo que Vercel no cubre: reglas, índices y
+# Cloud Functions de Firebase, y únicamente cuando esos archivos cambian.
 on:
   push:
     branches: [main]
+    paths:
+      - 'firestore.rules'
+      - 'firestore.indexes.json'
+      - 'firebase.json'
+      - 'functions/**'
+  workflow_dispatch:
+
+concurrency:
+  group: cd-firebase
+  cancel-in-progress: false
 
 jobs:
-  deploy:
+  firebase:
+    name: Desplegar reglas, índices y Functions
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
     steps:
+      - name: Verificar credenciales
+        if: env.FIREBASE_TOKEN == ''
+        run: |
+          echo "::error::Falta el secreto FIREBASE_TOKEN en Settings > Secrets and variables > Actions."
+          exit 1
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
-      - run: npm ci
-
-      - name: Install Firebase Tools
-        run: npm install -g firebase-tools
-
-      - name: Build Production Frontend
-        run: npm run build
-        env:
-          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
-          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
-          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
-          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
-          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
-          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ secrets.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}
-          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
-          NEXT_PUBLIC_SITE_URL: "https://desmulta.online"
-          NEXT_PUBLIC_BRAND_NAME: "Desmulta"
-          NEXT_PUBLIC_WHATSAPP_NUMBER: ${{ secrets.NEXT_PUBLIC_WHATSAPP_NUMBER }}
-          FIREBASE_CLIENT_EMAIL: ${{ secrets.FIREBASE_CLIENT_EMAIL }}
-          FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
-          COOKIE_SIGNATURE_SECRET: ${{ secrets.COOKIE_SIGNATURE_SECRET }}
-          CRON_SECRET: ${{ secrets.CRON_SECRET }}
-          RSA_PRIVATE_KEY: ${{ secrets.RSA_PRIVATE_KEY }}
-          TURNSTILE_SECRET_KEY: ${{ secrets.TURNSTILE_SECRET_KEY }}
-          VIP_JWT_SECRET: ${{ secrets.VIP_JWT_SECRET }}
-          PII_HMAC_SECRET: ${{ secrets.PII_HMAC_SECRET }}
-
-      - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: '--prod'
-
-      - name: Deploy to Firebase (Rules & Functions)
-        run: firebase deploy --only firestore:rules,firestore:indexes,functions --token "${{ secrets.FIREBASE_TOKEN }}"
+          cache-dependency-path: functions/package-lock.json
+      - name: Dependencias de Functions (el predeploy compila con tsc)
+        run: npm ci --prefix functions
+      - name: Deploy a Firebase
+        run: npx --yes firebase-tools@15 deploy --only firestore:rules,firestore:indexes,functions --non-interactive --token "$FIREBASE_TOKEN"

@@ -15,8 +15,16 @@ import {
   Calculator,
   FileText,
   AlertCircle,
+  MessageCircle,
 } from 'lucide-react';
 import Link from 'next/link';
+import { buildWhatsAppUrl } from '@/lib/chat/whatsapp';
+import { STARTER_QUESTIONS } from '@/lib/chat/small-talk';
+
+// Memoria de la conversación entre páginas / recargas (solo esta pestaña; sin datos en servidor)
+const CHAT_STORAGE_KEY = 'desmulta-chat-v1';
+const MAX_STORED_MESSAGES = 30;
+const HISTORY_SENT_TO_AGENT = 10;
 
 interface Citation {
   norma: string;
@@ -173,16 +181,39 @@ export function ChatAssistantWidget() {
       id: 'welcome-1',
       role: 'assistant',
       content:
-        '¡Hola! Soy tu asesor técnico de Desmulta. Puedo orientarte sobre la validez de fotomultas, calcular tiempos de prescripción o verificar radares autorizados en tu ciudad.',
+        '¡Hola! 👋 Soy el asistente de Desmulta. Cuéntame qué pasó con tu multa o comparendo y lo revisamos juntos.',
       citations: [],
-      followUpQuestions: [
-        '¿Cómo saber si una fotomulta en Bogotá o Medellín es legal?',
-        '¿A los cuántos años prescribe un comparendo?',
-        '¿Qué hacer si me embargaron la cuenta bancaria?',
-      ],
+      followUpQuestions: STARTER_QUESTIONS,
       timestamp: 'Ahora',
     },
   ]);
+  const [restored, setRestored] = useState(false);
+
+  // Restaurar la conversación tras montar (no en el render inicial: evita desajustes de hidratación)
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem(CHAT_STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved) as Message[];
+        if (Array.isArray(parsed) && parsed.length > 0) setMessages(parsed);
+      }
+    } catch {
+      // Almacenamiento no disponible (modo privado / bloqueado): se sigue sin memoria local
+    }
+    setRestored(true);
+  }, []);
+
+  useEffect(() => {
+    if (!restored) return;
+    try {
+      const toStore = messages
+        .slice(-MAX_STORED_MESSAGES)
+        .map((msg) => ({ ...msg, isTyping: false }));
+      sessionStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(toStore));
+    } catch {
+      // Cuota llena o almacenamiento bloqueado: no es crítico
+    }
+  }, [messages, restored]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [thinkingStep, setThinkingStep] = useState(0);
@@ -199,10 +230,10 @@ export function ChatAssistantWidget() {
   }, [isLoading]);
 
   const thinkingMessages = [
-    '🔍 Consultando base de radares ANSV...',
-    '⚖️ Analizando jurisprudencia (Ley 1843)...',
-    '🛡️ Validando viabilidad procesal...',
-    '🧠 Procesando redacción legal...',
+    'Escribiendo...',
+    'Revisando tu pregunta...',
+    'Buscando la mejor forma de explicarte...',
+    'Ya casi...',
   ];
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -241,8 +272,8 @@ export function ChatAssistantWidget() {
     try {
       // Historial para contexto conversacional
       const historyPayload = messages
-        .filter((m) => m.id !== 'welcome-1')
-        .slice(-6)
+        .filter((m) => !m.id.startsWith('welcome-') && !m.isRateLimited)
+        .slice(-HISTORY_SENT_TO_AGENT)
         .map((m) => ({ role: m.role, content: m.content }));
 
       const res = await fetch('/api/chat', {
@@ -271,28 +302,20 @@ export function ChatAssistantWidget() {
       setMessages((prev) => [...prev, assistantMsg]);
     } catch (err) {
       console.error('[ChatWidget] Error enviando mensaje:', err);
+      // Sin conexión con el servidor: mensaje honesto y salida humana (antes: párrafo legal fijo)
       const fallbackMsg: Message = {
         id: 'asst-' + Date.now(),
         role: 'assistant',
         content:
-          'En Colombia, las fotomultas exigen plena identificación del conductor (Sentencia C-038/2020) y notificación formal en la dirección del RUNT (Ley 1843/2017). Si tu comparendo tiene más de 3 años sin mandamiento de pago, aplica prescripción bajo el Art. 159 del CNT.',
-        citations: [
-          {
-            norma: 'Ley 1843 de 2017',
-            articulo: 'Art. 8',
-            resumen: 'Notificación física obligatoria al domicilio registrado en el RUNT.',
-          },
-        ],
+          'Uy, parece que se cayó la conexión y no pude responderte 😕. Revisa tu internet e intenta de nuevo, o escríbenos por WhatsApp y una persona del equipo te ayuda.',
+        citations: [],
         suggestedAction: {
-          tipo: 'modal_simit',
-          titulo: 'Subir Captura para Estudio Técnico',
-          url: '#subir-captura',
-          descripcion: 'Un operador evaluará tu fotomulta de forma inmediata.',
+          tipo: 'whatsapp',
+          titulo: 'Hablar con una persona',
+          url: buildWhatsAppUrl(),
+          descripcion: 'Nuestro equipo te responde por WhatsApp.',
         },
-        followUpQuestions: [
-          '¿Cómo saber si la dirección del RUNT fue respetada?',
-          '¿Qué trámite procede ante un embargo de cuenta?',
-        ],
+        followUpQuestions: [],
         timestamp: getCivilTimeString(),
       };
       setMessages((prev) => [...prev, fallbackMsg]);
@@ -306,14 +329,9 @@ export function ChatAssistantWidget() {
       {
         id: 'welcome-' + Date.now(),
         role: 'assistant',
-        content:
-          'Conversación reiniciada. ¿En qué comparendo, fotomulta o trámite de tránsito te puedo orientar hoy?',
+        content: '¡Listo, empecemos de nuevo! 😊 ¿En qué te puedo ayudar?',
         citations: [],
-        followUpQuestions: [
-          '¿Cómo saber si una fotomulta es legal?',
-          '¿Cuándo prescribe una multa de tránsito?',
-          '¿Qué pasa si me embargaron la cuenta bancaria?',
-        ],
+        followUpQuestions: STARTER_QUESTIONS,
         timestamp: 'Ahora',
       },
     ]);
@@ -331,6 +349,8 @@ export function ChatAssistantWidget() {
         return <Camera className="w-3.5 h-3.5 text-primary" />;
       case 'calculadora':
         return <Calculator className="w-3.5 h-3.5 text-primary" />;
+      case 'whatsapp':
+        return <MessageCircle className="w-3.5 h-3.5 text-primary" />;
       case 'modal_full':
       case 'plantilla':
         return <FileText className="w-3.5 h-3.5 text-primary" />;
@@ -455,6 +475,16 @@ export function ChatAssistantWidget() {
                       </button>
                     </div>
 
+                    <a
+                      href={buildWhatsAppUrl()}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title="Hablar con una persona por WhatsApp"
+                      aria-label="Hablar con una persona por WhatsApp"
+                      className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+                    >
+                      <MessageCircle className="w-3.5 h-3.5" />
+                    </a>
                     <button
                       type="button"
                       onClick={handleResetChat}
@@ -495,24 +525,33 @@ export function ChatAssistantWidget() {
                         }
                       >
                         {/* Mensaje Renderizado con Escala Dinámica de Tipografía */}
-                        <FormattedMessageText text={msg.content} fontScale={fontScale} />
+                        <FormattedMessageText
+                          text={msg.content}
+                          fontScale={fontScale}
+                          isTyping={msg.isTyping}
+                        />
 
                         {/* Tarjeta de Alerta de Rate Limit con Prueba Social */}
                         {msg.isRateLimited && (
                           <div className="mt-2.5 p-2.5 rounded-xl bg-background/80 border border-amber-500/20 text-xs space-y-2">
                             <div className="flex items-center gap-1.5 font-bold text-amber-500 dark:text-amber-400 text-[11px]">
                               <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                              Alta Demanda Ciudadana
+                              Mientras tanto, puedes seguir por aquí
                             </div>
-                            <p className="text-[10px] text-muted-foreground leading-tight">
-                              Para garantizar atención ágil a todos los conductores, puedes radicar
-                              tu caso directamente para estudio con un operador:
-                            </p>
-                            <div className="flex flex-col sm:flex-row gap-1.5 pt-1">
+                            <div className="flex flex-wrap gap-1.5 pt-1">
+                              <a
+                                href={buildWhatsAppUrl()}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[10px] shadow-sm transition-all active:scale-95"
+                              >
+                                <MessageCircle className="w-3 h-3" />
+                                Escribir por WhatsApp
+                              </a>
                               <button
                                 type="button"
                                 onClick={() => handleOpenDesmultaModal('simit')}
-                                className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[10px] shadow-sm transition-all active:scale-95"
+                                className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted hover:bg-muted/80 text-foreground font-bold text-[10px] border border-border transition-all active:scale-95"
                               >
                                 <Camera className="w-3 h-3" />
                                 Subir Foto de Multa
@@ -564,7 +603,17 @@ export function ChatAssistantWidget() {
                             </p>
 
                             {/* Si la acción es abrir un modal interno */}
-                            {msg.suggestedAction.tipo === 'modal_simit' ? (
+                            {msg.suggestedAction.tipo === 'whatsapp' ? (
+                              <a
+                                href={buildWhatsAppUrl()}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[10px] transition-all active:scale-95 shadow-sm"
+                              >
+                                Escribir por WhatsApp
+                                <ArrowRight className="w-2.5 h-2.5" />
+                              </a>
+                            ) : msg.suggestedAction.tipo === 'modal_simit' ? (
                               <button
                                 type="button"
                                 onClick={() => handleOpenDesmultaModal('simit')}

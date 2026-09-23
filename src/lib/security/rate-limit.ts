@@ -29,10 +29,18 @@ export const rateLimiters = {
     limiter: Ratelimit.slidingWindow(3, '7 d'),
     prefix: 'rl:ocr:v2', // Reiniciado a v2 a peticion de QA
   }),
+  // [2026-09-22] Chat en dos niveles. Antes: 10 mensajes por IP cada 24 h — un "hola", un
+  // "gracias" y tres preguntas agotaban medio día de cupo y el ciudadano quedaba bloqueado.
+  // chatAgent frena ráfagas/bots; chatAgentDaily acota el costo de Gemini por IP.
   chatAgent: new Ratelimit({
     redis,
-    limiter: Ratelimit.slidingWindow(10, '24 h'),
-    prefix: 'rl:chat:v1',
+    limiter: Ratelimit.slidingWindow(8, '1 m'),
+    prefix: 'rl:chat:burst:v2',
+  }),
+  chatAgentDaily: new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(60, '24 h'),
+    prefix: 'rl:chat:daily:v2',
   }),
   consultation: new Ratelimit({
     redis,
