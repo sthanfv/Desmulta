@@ -1,13 +1,12 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Verificación de Seguridad - Hallazgos Críticos P0', () => {
-  test('C-1: /api/cron/simit-scheduler debe bloquear accesos sin CRON_SECRET', async ({
+  // [2026-09-22] El scheduler SIMIT se eliminó por cumplimiento: la ruta ya no debe existir
+  test('C-1: /api/cron/simit-scheduler ya no existe (scraper SIMIT eliminado)', async ({
     request,
   }) => {
     const response = await request.post('/api/cron/simit-scheduler');
-    expect(response.status()).toBe(401);
-    const body = await response.json();
-    expect(body.error).toBe('Unauthorized');
+    expect(response.status()).toBe(404);
   });
 
   test('C-3: /api/internal/calculadora debe bloquear accesos sin INTERNAL_API_SECRET', async ({

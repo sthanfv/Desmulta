@@ -3,11 +3,13 @@ import { getAdminApp } from '@/lib/firebase-admin';
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { generateMandateDOCX } from '@/lib/legal/docx-engine';
 import { generateMandatePDF } from '@/lib/legal/pdf-engine';
-import { jwtVerify } from 'jose';
+import { verifyAdminToken } from '@/lib/auth/admin-jwt';
 import { logger } from '@/lib/logger/security-logger';
 import { getTokens } from 'next-firebase-auth-edge/lib/next/tokens';
 
-async function verifyAdminAuth(request: NextRequest): Promise<string | null> {
+async function verifyAdminAuth(
+  request: NextRequest
+): Promise<{ uid: string; email: string } | null> {
   try {
     const tokens = await getTokens(request.cookies, {
       cookieName: '__session',
@@ -26,30 +28,25 @@ async function verifyAdminAuth(request: NextRequest): Promise<string | null> {
     });
 
     if (!tokens) return null;
-    return tokens.decodedToken.email ?? null;
+    return { uid: tokens.decodedToken.uid, email: tokens.decodedToken.email ?? 'admin_sin_correo' };
   } catch {
     return null;
   }
 }
 
-async function verifyGodMode(request: NextRequest) {
-  const token = request.cookies.get('admin-2fa-token');
-  if (!token) return false;
-
-  try {
-    const jwtSecret = process.env.GOD_MODE_JWT_SECRET;
-    if (!jwtSecret) return false;
-    const secret = new TextEncoder().encode(jwtSecret);
-    await jwtVerify(token.value, secret);
-    return true;
-  } catch {
-    return false;
-  }
+// [2026-09-22] FIX: antes leía admin-2fa-token (cualquier operador = "Modo Dios")
+async function verifyGodMode(request: NextRequest, uid: string) {
+  const payload = await verifyAdminToken(
+    request.cookies.get('admin-god-mode-token')?.value,
+    'god-mode'
+  );
+  return !!payload && payload.uid === uid;
 }
 
 export async function GET(request: NextRequest) {
-  const isGodMode = await verifyGodMode(request);
-  if (!isGodMode) {
+  const admin = await verifyAdminAuth(request);
+  const isGodMode = admin ? await verifyGodMode(request, admin.uid) : false;
+  if (!admin || !isGodMode) {
     return new NextResponse('No autorizado. Se requiere Modo Dios.', { status: 401 });
   }
 
@@ -59,7 +56,7 @@ export async function GET(request: NextRequest) {
   try {
     const adminApp = getAdminApp();
     const db = getFirestore(adminApp);
-    const adminEmail = (await verifyAdminAuth(request)) || 'admin_god_mode@desmulta.com';
+    const adminEmail = admin.email;
 
     // Generar un Payload genérico (vacío)
     const genericPayload = {

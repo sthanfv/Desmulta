@@ -110,7 +110,7 @@ export async function updateShowcaseConfig(idToken: string, data: ShowcaseConfig
 
     await docRef.set(data, { merge: true });
 
-    const { logAdminAction } = await import('@/app/admin/audit-actions');
+    const { logAdminAction } = await import('@/lib/audit/log-admin-action');
     await logAdminAction({
       adminEmail: decodedToken.email || decodedToken.uid,
       action: 'UPDATE',
@@ -143,7 +143,7 @@ export async function updateFooterConfig(idToken: string, data: FooterConfig) {
 
     await docRef.set(data, { merge: true });
 
-    const { logAdminAction } = await import('@/app/admin/audit-actions');
+    const { logAdminAction } = await import('@/lib/audit/log-admin-action');
     await logAdminAction({
       adminEmail: decodedToken.email || decodedToken.uid,
       action: 'UPDATE',
@@ -205,7 +205,7 @@ export async function uploadImage(
     // Revalidate the homepage to reflect the new image
     revalidatePath('/');
 
-    const { logAdminAction } = await import('@/app/admin/audit-actions');
+    const { logAdminAction } = await import('@/lib/audit/log-admin-action');
     await logAdminAction({
       adminEmail: decodedToken.email || decodedToken.uid,
       action: 'CREATE',
@@ -227,6 +227,11 @@ export async function deleteExpiredConsultations(idToken: string): Promise<{
 }> {
   try {
     const decodedToken = await requireAdminSession(idToken);
+    // [2026-09-22] FIX: el PIN operacional se verifica en servidor (antes solo en la UI)
+    const { hasFreshOperatorPin } = await import('@/lib/auth/admin-cookie-session');
+    if (!(await hasFreshOperatorPin(decodedToken.uid))) {
+      return { error: 'Confirma el PIN operacional para esta acción.' };
+    }
     getAdminApp();
     const db = getFirestore();
 
@@ -256,7 +261,7 @@ export async function deleteExpiredConsultations(idToken: string): Promise<{
 
     await batch.commit();
 
-    const { logAdminAction } = await import('@/app/admin/audit-actions');
+    const { logAdminAction } = await import('@/lib/audit/log-admin-action');
     await logAdminAction({
       adminEmail: decodedToken.email || decodedToken.uid,
       action: 'DELETE',
@@ -441,7 +446,7 @@ export async function convertToCase(
     if (!customDb && !decodedToken) {
       decodedToken = await requireAdminSession(idToken);
     }
-    const { logAdminAction } = await import('@/app/admin/audit-actions');
+    const { logAdminAction } = await import('@/lib/audit/log-admin-action');
     await logAdminAction({
       adminEmail: decodedToken?.email || decodedToken?.uid || 'SYSTEM',
       action: 'CREATE',
@@ -707,7 +712,7 @@ export async function uploadCaseDocument(
     });
 
     const decodedToken = await requireAdminSession(idToken);
-    const { logAdminAction } = await import('@/app/admin/audit-actions');
+    const { logAdminAction } = await import('@/lib/audit/log-admin-action');
     await logAdminAction({
       adminEmail: decodedToken.email || decodedToken.uid,
       action: 'UPDATE',
@@ -733,6 +738,11 @@ export async function deleteSimitCaptures(idToken: string): Promise<{
 }> {
   try {
     const decodedToken = await requireAdminSession(idToken);
+    // [2026-09-22] FIX: PIN operacional verificado en servidor
+    const { hasFreshOperatorPin } = await import('@/lib/auth/admin-cookie-session');
+    if (!(await hasFreshOperatorPin(decodedToken.uid))) {
+      return { error: 'Confirma el PIN operacional para esta acción.' };
+    }
     const { list, del } = await import('@vercel/blob');
     // Listar blobs con el prefijo específico
     const { blobs } = await list({ prefix: 'simit_cap_' });
@@ -747,7 +757,7 @@ export async function deleteSimitCaptures(idToken: string): Promise<{
     // Eliminar en lote
     await del(urls);
 
-    const { logAdminAction } = await import('@/app/admin/audit-actions');
+    const { logAdminAction } = await import('@/lib/audit/log-admin-action');
     await logAdminAction({
       adminEmail: decodedToken.email || decodedToken.uid,
       action: 'DELETE',
@@ -1289,7 +1299,7 @@ export async function updateReferralStatus(idToken: string, referralId: string, 
       updatedAt: Timestamp.now(),
     });
 
-    const { logAdminAction } = await import('@/app/admin/audit-actions');
+    const { logAdminAction } = await import('@/lib/audit/log-admin-action');
     await logAdminAction({
       adminEmail: decodedToken.email || decodedToken.uid,
       action: 'UPDATE',

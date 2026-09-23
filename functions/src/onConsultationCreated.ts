@@ -3,17 +3,13 @@ import * as admin from 'firebase-admin';
 import { logger } from 'firebase-functions';
 import { Resend } from 'resend';
 import { buildCaseReplyMarkup } from './telegramWebhook';
-import * as QRCode from 'qrcode';
 
 /**
  * Sanitiza texto para uso seguro en mensajes HTML de Telegram.
  * Previene inyección de HTML en el chat del operador.
  */
 function escapeHtml(text: string): string {
-  return String(text)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+  return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 /**
@@ -23,67 +19,76 @@ function escapeHtml(text: string): string {
  * 2. Envía notificación a Telegram para los analistas (con foto si existe).
  * 3. Gestiona la purga del Vercel Blob de evidencia.
  */
-export const onConsultationCreated = onDocumentCreated({
-  document: 'consultations/{id}',
-  region: 'us-central1',
-  timeoutSeconds: 120,
-  secrets: ['RESEND_API_KEY', 'TELEGRAM_BOT_TOKEN', 'TELEGRAM_CHAT_ID', 'INTERNAL_API_SECRET', 'PII_ENCRYPTION_KEY', 'PII_HMAC_SECRET']
-}, async (event) => {
-  const data = event.data?.data();
-  if (!data) return;
+export const onConsultationCreated = onDocumentCreated(
+  {
+    document: 'consultations/{id}',
+    region: 'us-central1',
+    timeoutSeconds: 120,
+    secrets: [
+      'RESEND_API_KEY',
+      'TELEGRAM_BOT_TOKEN',
+      'TELEGRAM_CHAT_ID',
+      'INTERNAL_API_SECRET',
+      'PII_ENCRYPTION_KEY',
+      'PII_HMAC_SECRET',
+    ],
+  },
+  async (event) => {
+    const data = event.data?.data();
+    if (!data) return;
 
-  const docId = event.params.id;
-  const shortId = data.shortId || 'SIN-REF';
-  const emailCiudadano = data.emailContacto || data.email;
-  const trackingUuid = data.trackingUuid;
-  const evidenceUrl = data.evidenceUrl;
-  const ocrData = data.ocrData;
-  const db = admin.firestore();
+    const docId = event.params.id;
+    const shortId = data.shortId || 'SIN-REF';
+    const emailCiudadano = data.emailContacto || data.email;
+    const trackingUuid = data.trackingUuid;
+    const evidenceUrl = data.evidenceUrl;
+    const ocrData = data.ocrData;
+    const db = admin.firestore();
 
-  // 🛡️ IDEMPOTENCIA (v8.9.2)
-  const consultationRef = db.collection('consultations').doc(docId);
+    // 🛡️ IDEMPOTENCIA (v8.9.2)
+    const consultationRef = db.collection('consultations').doc(docId);
 
-  // Verificación atómica: solo procesar si no está ya en proceso o completado
-  let yaFueProcesado = false;
-  await db.runTransaction(async (transaction) => {
-    const snap = await transaction.get(consultationRef);
-    const d = snap.data();
-    if (!d) return;
+    // Verificación atómica: solo procesar si no está ya en proceso o completado
+    let yaFueProcesado = false;
+    await db.runTransaction(async (transaction) => {
+      const snap = await transaction.get(consultationRef);
+      const d = snap.data();
+      if (!d) return;
 
-    const status = d.processingStatus;
-    if (status === 'processing' || status === 'done') {
-      yaFueProcesado = true;
+      const status = d.processingStatus;
+      if (status === 'processing' || status === 'done') {
+        yaFueProcesado = true;
+        return;
+      }
+
+      transaction.update(consultationRef, { processingStatus: 'processing' });
+    });
+
+    if (yaFueProcesado) {
+      logger.info(`[onConsultationCreated] ${docId} ya en proceso o completado — saltando.`);
       return;
     }
 
-    transaction.update(consultationRef, { processingStatus: 'processing' });
-  });
+    // 1. Email de Bienvenida / Confirmación con Dictamen Técnico
+    if (emailCiudadano) {
+      try {
+        const resend = new Resend(process.env.RESEND_API_KEY);
 
-  if (yaFueProcesado) {
-    logger.info(`[onConsultationCreated] ${docId} ya en proceso o completado — saltando.`);
-    return;
-  }
+        const isSimitCapture = data.nombre && data.nombre.startsWith('VÍA CAPTURA');
+        const nombreUsuario = isSimitCapture ? 'conductor' : escapeHtml(data.nombre || 'conductor');
+        const saludoInicial = isSimitCapture
+          ? `¡Hola! 👋 Te damos la bienvenida a Desmulta.`
+          : `¡Hola, ${nombreUsuario}! 👋 Te damos la bienvenida a Desmulta.`;
 
-  // 1. Email de Bienvenida / Confirmación con Dictamen Técnico
-  if (emailCiudadano) {
-    try {
-      const resend = new Resend(process.env.RESEND_API_KEY);
-      
-      const isSimitCapture = data.nombre && data.nombre.startsWith('VÍA CAPTURA');
-      const nombreUsuario = isSimitCapture ? 'conductor' : escapeHtml(data.nombre || 'conductor');
-      const saludoInicial = isSimitCapture 
-        ? `¡Hola! 👋 Te damos la bienvenida a Desmulta.` 
-        : `¡Hola, ${nombreUsuario}! 👋 Te damos la bienvenida a Desmulta.`;
+        const safePlaca = escapeHtml(data.placa || 'en trámite');
+        const safeShortId = escapeHtml(shortId);
 
-      const safePlaca = escapeHtml(data.placa || 'en trámite');
-      const safeShortId = escapeHtml(shortId);
-
-      await resend.emails.send({
-        from: 'Desmulta Gestión <gestion@desmulta.online>',
-        replyTo: 'contactodesmulta@protonmail.com',
-        to: emailCiudadano,
-        subject: `✅ Consulta Recibida: ${safeShortId} (${safePlaca})`,
-        html: `
+        await resend.emails.send({
+          from: 'Desmulta Gestión <gestion@desmulta.online>',
+          replyTo: 'contactodesmulta@protonmail.com',
+          to: emailCiudadano,
+          subject: `✅ Consulta Recibida: ${safeShortId} (${safePlaca})`,
+          html: `
           <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #2c3e50; line-height: 1.6; background-color: #f8f9fa; padding: 20px;">
             <div style="background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
               <div style="text-align: center; padding: 25px; background: #000000; border-bottom: 4px solid #D4AF37;">
@@ -127,9 +132,13 @@ export const onConsultationCreated = onDocumentCreated({
                   <p style="font-size: 13px; color: #64748b; margin-top: 0; text-transform: uppercase; font-weight: bold;">Tu ID de Radicado Único</p>
                   <p style="font-size: 24px; font-family: monospace; color: #000000; margin: 10px 0; letter-spacing: 2px;"><b>${safeShortId}</b></p>
                   
-                  ${trackingUuid ? `<div style="margin-top: 20px;">
+                  ${
+                    trackingUuid
+                      ? `<div style="margin-top: 20px;">
                     <a href="https://desmulta.online/seguir/${trackingUuid}" style="background: #000000; color: #D4AF37; padding: 14px 32px; border-radius: 8px; text-decoration: none; display: inline-block; font-weight: bold; text-transform: uppercase; font-size: 13px; letter-spacing: 0.05em; border: 1px solid #D4AF37;">Ver Estado en Vivo</a>
-                  </div>` : ''}
+                  </div>`
+                      : ''
+                  }
 
                   <div style="margin-top: 25px; border-top: 1px solid #e2e8f0; padding-top: 15px;">
                     <p style="font-size: 12px; color: #64748b; margin: 0; line-height: 1.5;">
@@ -158,201 +167,232 @@ export const onConsultationCreated = onDocumentCreated({
               </div>
             </div>
           </div>
-        `
-      });
-      await db.collection('consultations').doc(docId).update({
-        welcomeEmailSent: true
-      });
-      logger.info(`[onConsultationCreated] Email enviado exitosamente para el radicado ${safeShortId}`);
-    } catch (err) {
-      logger.error(`[onConsultationCreated] Error enviando email:`, err);
+        `,
+        });
+        await db.collection('consultations').doc(docId).update({
+          welcomeEmailSent: true,
+        });
+        logger.info(
+          `[onConsultationCreated] Email enviado exitosamente para el radicado ${safeShortId}`
+        );
+      } catch (err) {
+        logger.error(`[onConsultationCreated] Error enviando email:`, err);
+      }
     }
-  }
 
-  // 2. Notificación Telegram a Analistas
-  const botToken = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
+    // 2. Notificación Telegram a Analistas
+    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
 
-  if (botToken && chatId) {
-    try {
-      let telegramMsgId: number | null = null;
-      const isSimit = data.fuente === 'simit_capture';
-      const headerTitle = isSimit ? `🚨 NUEVA CAPTURA SIMIT (${shortId})` : `💼 NUEVO PROSPECTO (${shortId})`;
-      
-      const numeroLimpio = (data.contacto || '').replace(/\D/g, '');
-      const telefonoWa = numeroLimpio.startsWith('57') ? numeroLimpio : `57${numeroLimpio}`;
-      const urlWhatsApp = `https://wa.me/${telefonoWa}`;
+    if (botToken && chatId) {
+      try {
+        let telegramMsgId: number | null = null;
+        const isSimit = data.fuente === 'simit_capture';
+        const headerTitle = isSimit
+          ? `🚨 NUEVA CAPTURA SIMIT (${shortId})`
+          : `💼 NUEVO PROSPECTO (${shortId})`;
 
-      let message = `<b>${headerTitle}</b>\n━━━━━━━━━━━━━━━━━━━━\n\n`;
-      message += `👤 <b>Cliente:</b> ${escapeHtml(data.nombre)}\n`;
-      if (data.cedula && data.cedula !== 'SIMIT-CAPTURA') {
-        message += `🪪 <b>Cédula:</b> <i>[Cifrada - Usa el botón Ver Cédula]</i>\n`;
-      }
-      message += `🆔 <b>Ref:</b> <code>${shortId}</code>\n`;
-      message += `🚗 <b>Placa:</b> <code>${data.placa || 'N/A'}</code>\n`;
-      message += `📱 <b>WhatsApp:</b> <a href="${urlWhatsApp}">${data.contacto}</a>\n`;
+        const numeroLimpio = (data.contacto || '').replace(/\D/g, '');
+        const telefonoWa = numeroLimpio.startsWith('57') ? numeroLimpio : `57${numeroLimpio}`;
+        const urlWhatsApp = `https://wa.me/${telefonoWa}`;
 
-      if (!isSimit) {
-        message += `\n📋 <b>Datos del Caso:</b>\n`;
-        if (data.emailContacto) message += `📧 <b>Email:</b> ${data.emailContacto}\n`;
-        if (data.ciudad) message += `📍 <b>Ciudad:</b> ${data.ciudad}\n`;
-        if (data.tipoInfraccion) message += `🔸 <b>Tipo:</b> ${data.tipoInfraccion}\n`;
-        if (data.antiguedad) message += `⏳ <b>Antigüedad:</b> ${data.antiguedad}\n`;
-        if (data.estadoCoactivo) message += `⚖️ <b>Coactivo:</b> ${data.estadoCoactivo}\n`;
-        if (data.requiresOperatorFiling) message += `📝 <b>Radicación Operador:</b> SÍ\n`;
-      }
-      
-      // ── 1.5 Buscar Datos Financieros y Dictamen en Leads (Delay para evitar Race Condition)
-      let leadDeuda = 0;
-      let leadMultas: Array<{ comparendo?: string; fecha?: string; valor?: number }> = [];
-      if (data.cedula && data.cedula !== 'SIMIT-CAPTURA') {
+        let message = `<b>${headerTitle}</b>\n━━━━━━━━━━━━━━━━━━━━\n\n`;
+        message += `👤 <b>Cliente:</b> ${escapeHtml(data.nombre)}\n`;
+        if (data.cedula && data.cedula !== 'SIMIT-CAPTURA') {
+          message += `🪪 <b>Cédula:</b> <i>[Cifrada - Usa el botón Ver Cédula]</i>\n`;
+        }
+        message += `🆔 <b>Ref:</b> <code>${shortId}</code>\n`;
+        message += `🚗 <b>Placa:</b> <code>${escapeHtml(data.placa || 'N/A')}</code>\n`;
+        message += `📱 <b>WhatsApp:</b> <a href="${urlWhatsApp}">${escapeHtml(data.contacto || '')}</a>\n`;
+
+        if (!isSimit) {
+          message += `\n📋 <b>Datos del Caso:</b>\n`;
+          if (data.emailContacto) message += `📧 <b>Email:</b> ${escapeHtml(data.emailContacto)}\n`;
+          if (data.ciudad) message += `📍 <b>Ciudad:</b> ${escapeHtml(data.ciudad)}\n`;
+          if (data.tipoInfraccion)
+            message += `🔸 <b>Tipo:</b> ${escapeHtml(data.tipoInfraccion)}\n`;
+          if (data.antiguedad) message += `⏳ <b>Antigüedad:</b> ${escapeHtml(data.antiguedad)}\n`;
+          if (data.estadoCoactivo)
+            message += `⚖️ <b>Coactivo:</b> ${escapeHtml(data.estadoCoactivo)}\n`;
+          if (data.requiresOperatorFiling) message += `📝 <b>Radicación Operador:</b> SÍ\n`;
+        }
+
+        // ── 1.5 Buscar Datos Financieros y Dictamen en Leads (Delay para evitar Race Condition)
+        let leadDeuda = 0;
+        let leadMultas: Array<{ comparendo?: string; fecha?: string; valor?: number }> = [];
+        // [2026-09-22] FIX: data.cedula está cifrada (ENC:iv:...) con IV aleatorio y `leads`
+        // guarda cedulaHash → la consulta anterior por 'cedula' nunca encontraba nada.
+        if (data.cedulaHash) {
+          try {
+            const leadSnap = await db
+              .collection('leads')
+              .where('cedulaHash', '==', data.cedulaHash)
+              .limit(1)
+              .get();
+            if (!leadSnap.empty) {
+              const lData = leadSnap.docs[0].data();
+              leadDeuda = lData.total_deuda_acumulada || 0;
+              leadMultas = lData.multas_registradas || [];
+            }
+          } catch (err) {
+            logger.warn('[onConsultationCreated] Error consultando lead:', err);
+          }
+        }
+
+        if (ocrData || leadMultas.length > 0) {
+          if (ocrData) {
+            message += `\n⚙️ <b>Dictamen Técnico (OCR Actual):</b>\n`;
+            message += `<b>Estado:</b> ${ocrData.isViable ? '🟢' : '🔴'} ${escapeHtml(String(ocrData.status ?? ''))}\n`;
+            if (ocrData.technicalDictum) {
+              message += `<i>"${escapeHtml(ocrData.technicalDictum)}"</i>\n\n`;
+            }
+          }
+
+          if (leadMultas.length > 0) {
+            message += `\n🗄️ <b>Historial SIMIT (Expediente Único):</b>\n`;
+            message += `💰 <b>Total Deuda:</b> $${leadDeuda.toLocaleString('es-CO')}\n`;
+            message += `🚨 <b>Multas (${leadMultas.length}):</b>\n`;
+            leadMultas.slice(0, 5).forEach((m) => {
+              message += `   • ${escapeHtml(m.comparendo || 'Desconocido')} (${escapeHtml(m.fecha || 'Sin fecha')}) - $${Number(m.valor || 0).toLocaleString('es-CO')}\n`;
+            });
+            if (leadMultas.length > 5) message += `   • ...y ${leadMultas.length - 5} más\n`;
+          } else if (ocrData) {
+            // Intentar parseo de emergencia del rawText
+            const rawTotal = ocrData.rawText
+              ?.match(/Total\s*:?\s*\$?\s*([\d\.]+)/i)?.[1]
+              ?.replace(/\./g, '');
+            if (rawTotal && !isNaN(Number(rawTotal))) {
+              message += `💰 <b>Total Detectado OCR:</b> $${Number(rawTotal).toLocaleString('es-CO')}\n`;
+            }
+            if (ocrData.extractedId)
+              message += `🆔 <b>Cédula OCR:</b> <code>${escapeHtml(String(ocrData.extractedId))}</code>\n`;
+          }
+        }
+
+        const replyMarkup = buildCaseReplyMarkup(docId, urlWhatsApp);
+
+        if (evidenceUrl) {
+          const response = await fetch(evidenceUrl);
+          const buffer = await response.arrayBuffer();
+
+          const formData = new FormData();
+          formData.append('chat_id', chatId);
+          formData.append('photo', new Blob([buffer]), 'evidencia.jpg');
+          formData.append('caption', message);
+          formData.append('parse_mode', 'HTML');
+          formData.append('reply_markup', JSON.stringify(replyMarkup));
+
+          const tgResponse = await fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
+            method: 'POST',
+            body: formData,
+          });
+
+          if (!tgResponse.ok) {
+            const errText = await tgResponse.text();
+            logger.error(
+              `[onConsultationCreated] Error de Telegram API (sendPhoto): ${tgResponse.status} - ${errText}`
+            );
+            throw new Error(`Telegram API Error (Photo): ${tgResponse.status}`);
+          }
+          // Guardar message_id del mensaje con foto para poder editarlo después
+          const tgPhotoResult = (await tgResponse.json()) as {
+            ok: boolean;
+            result?: { message_id: number };
+          };
+          telegramMsgId = tgPhotoResult.result?.message_id ?? null;
+        } else {
+          const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chat_id: chatId,
+              text: message,
+              parse_mode: 'HTML',
+              reply_markup: replyMarkup,
+              link_preview_options: { is_disabled: true },
+            }),
+          });
+
+          if (!response.ok) {
+            const errText = await response.text();
+            logger.error(
+              `[onConsultationCreated] Error de Telegram API (sendMessage): ${response.status} - ${errText}`
+            );
+            throw new Error(`Telegram API Error: ${response.status}`);
+          }
+          // Guardar message_id del mensaje de texto para poder editarlo después
+          const tgMsgResult = (await response.json()) as {
+            ok: boolean;
+            result?: { message_id: number };
+          };
+          telegramMsgId = tgMsgResult.result?.message_id ?? null;
+        }
+
+        await db
+          .collection('consultations')
+          .doc(docId)
+          .update({
+            telegramStatus: 'sent',
+            notifiedAt: admin.firestore.FieldValue.serverTimestamp(),
+            telegramMessageId: telegramMsgId ?? null,
+            telegramHasPhoto: !!evidenceUrl,
+          });
+      } catch (err) {
+        logger.error(`[onConsultationCreated] Error Telegram:`, err);
+        // 🛡️ MANDATO-FILTRO: Marcar como 'failed' para que cronRetryNotifications
+        // pueda reintentarlo. Sin esto, el status queda en 'processing' para siempre
+        // y la consulta nunca llega al operador.
         try {
-          const leadSnap = await db.collection('leads')
-            .where('cedula', '==', data.cedula)
-            .orderBy('ultima_actualizacion', 'desc')
-            .limit(1)
-            .get();
-          if (!leadSnap.empty) {
-            const lData = leadSnap.docs[0].data();
-            leadDeuda = lData.total_deuda_acumulada || 0;
-            leadMultas = lData.multas_registradas || [];
+          await db
+            .collection('consultations')
+            .doc(docId)
+            .update({
+              telegramStatus: 'failed',
+              telegramError: err instanceof Error ? err.message : String(err),
+            });
+        } catch (updateErr) {
+          logger.error('[onConsultationCreated] No se pudo marcar como failed:', updateErr);
+        }
+      }
+    }
+
+    // 3. Purga de Vercel Blob (v8.1.0)
+    // 🛡️ REPARACIÓN: Vercel Blob SDK no funciona fuera de Vercel.
+    // Usamos un túnel API interno para purgar la evidencia tras enviarla a Telegram.
+    if (evidenceUrl && data.fuente !== 'simit_capture') {
+      const internalSecret = process.env.INTERNAL_API_SECRET;
+      if (internalSecret) {
+        try {
+          const response = await fetch('https://desmulta.online/api/internal/purge-blob', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-internal-secret': internalSecret,
+            },
+            body: JSON.stringify({ url: evidenceUrl }),
+          });
+
+          if (response.ok) {
+            logger.info(`[onConsultationCreated] Blob purgado vía API: ${evidenceUrl}`);
+          } else {
+            const errorText = await response.text();
+            logger.error(
+              `[onConsultationCreated] Fallo al purgar Blob (${response.status}): ${errorText}`
+            );
           }
         } catch (err) {
-          logger.warn('[onConsultationCreated] Error consultando lead:', err);
+          logger.error(`[onConsultationCreated] Error de red purgando Blob:`, err);
         }
-      }
-
-      if (ocrData || leadMultas.length > 0) {
-        if (ocrData) {
-          message += `\n⚙️ <b>Dictamen Técnico (OCR Actual):</b>\n`;
-          message += `<b>Estado:</b> ${ocrData.isViable ? '🟢' : '🔴'} ${ocrData.status}\n`;
-          if (ocrData.technicalDictum) {
-            message += `<i>"${escapeHtml(ocrData.technicalDictum)}"</i>\n\n`;
-          }
-        }
-        
-        if (leadMultas.length > 0) {
-          message += `\n🗄️ <b>Historial SIMIT (Expediente Único):</b>\n`;
-          message += `💰 <b>Total Deuda:</b> $${leadDeuda.toLocaleString('es-CO')}\n`;
-          message += `🚨 <b>Multas (${leadMultas.length}):</b>\n`;
-          leadMultas.slice(0, 5).forEach((m, i) => {
-            message += `   • ${m.comparendo || 'Desconocido'} (${m.fecha || 'Sin fecha'}) - $${(m.valor || 0).toLocaleString('es-CO')}\n`;
-          });
-          if (leadMultas.length > 5) message += `   • ...y ${leadMultas.length - 5} más\n`;
-        } else if (ocrData) {
-          // Intentar parseo de emergencia del rawText
-          const rawTotal = ocrData.rawText?.match(/Total\s*:?\s*\$?\s*([\d\.]+)/i)?.[1]?.replace(/\./g, '');
-          if (rawTotal && !isNaN(Number(rawTotal))) {
-             message += `💰 <b>Total Detectado OCR:</b> $${Number(rawTotal).toLocaleString('es-CO')}\n`;
-          }
-          if (ocrData.extractedId) message += `🆔 <b>Cédula OCR:</b> <code>${ocrData.extractedId}</code>\n`;
-        }
-      }
-
-      const replyMarkup = buildCaseReplyMarkup(docId, urlWhatsApp);
-
-      if (evidenceUrl) {
-        const response = await fetch(evidenceUrl);
-        const buffer = await response.arrayBuffer();
-        
-        const formData = new FormData();
-        formData.append('chat_id', chatId);
-        formData.append('photo', new Blob([buffer]), 'evidencia.jpg');
-        formData.append('caption', message);
-        formData.append('parse_mode', 'HTML');
-        formData.append('reply_markup', JSON.stringify(replyMarkup));
-
-        const tgResponse = await fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
-          method: 'POST',
-          body: formData
-        });
-
-        if (!tgResponse.ok) {
-          const errText = await tgResponse.text();
-          logger.error(`[onConsultationCreated] Error de Telegram API (sendPhoto): ${tgResponse.status} - ${errText}`);
-          throw new Error(`Telegram API Error (Photo): ${tgResponse.status}`);
-        }
-        // Guardar message_id del mensaje con foto para poder editarlo después
-        const tgPhotoResult = await tgResponse.json() as { ok: boolean; result?: { message_id: number } };
-        telegramMsgId = tgPhotoResult.result?.message_id ?? null;
       } else {
-        const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: chatId,
-            text: message,
-            parse_mode: 'HTML',
-            reply_markup: replyMarkup,
-            link_preview_options: { is_disabled: true }
-          })
-        });
-
-        if (!response.ok) {
-          const errText = await response.text();
-          logger.error(`[onConsultationCreated] Error de Telegram API (sendMessage): ${response.status} - ${errText}`);
-          throw new Error(`Telegram API Error: ${response.status}`);
-        }
-        // Guardar message_id del mensaje de texto para poder editarlo después
-        const tgMsgResult = await response.json() as { ok: boolean; result?: { message_id: number } };
-        telegramMsgId = tgMsgResult.result?.message_id ?? null;
-      }
-      
-      await db.collection('consultations').doc(docId).update({
-        telegramStatus: 'sent',
-        notifiedAt: admin.firestore.FieldValue.serverTimestamp(),
-        telegramMessageId: telegramMsgId ?? null,
-        telegramHasPhoto: !!evidenceUrl,
-      });
-
-    } catch (err) {
-      logger.error(`[onConsultationCreated] Error Telegram:`, err);
-      // 🛡️ MANDATO-FILTRO: Marcar como 'failed' para que cronRetryNotifications
-      // pueda reintentarlo. Sin esto, el status queda en 'processing' para siempre
-      // y la consulta nunca llega al operador.
-      try {
-        await db.collection('consultations').doc(docId).update({
-          telegramStatus: 'failed',
-          telegramError: err instanceof Error ? err.message : String(err),
-        });
-      } catch (updateErr) {
-        logger.error('[onConsultationCreated] No se pudo marcar como failed:', updateErr);
+        logger.warn(
+          '[onConsultationCreated] INTERNAL_API_SECRET no configurado, el blob no se purgará.'
+        );
       }
     }
+
+    // Marcar como completado para futuros retries (no sobreescribir telegramStatus porque ya se manejó)
+    await db.collection('consultations').doc(docId).update({
+      processingStatus: 'done',
+    });
   }
-
-  // 3. Purga de Vercel Blob (v8.1.0)
-  // 🛡️ REPARACIÓN: Vercel Blob SDK no funciona fuera de Vercel. 
-  // Usamos un túnel API interno para purgar la evidencia tras enviarla a Telegram.
-  if (evidenceUrl && data.fuente !== 'simit_capture') {
-    const internalSecret = process.env.INTERNAL_API_SECRET;
-    if (internalSecret) {
-      try {
-        const response = await fetch('https://desmulta.online/api/internal/purge-blob', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-internal-secret': internalSecret,
-          },
-          body: JSON.stringify({ url: evidenceUrl }),
-        });
-
-        if (response.ok) {
-          logger.info(`[onConsultationCreated] Blob purgado vía API: ${evidenceUrl}`);
-        } else {
-          const errorText = await response.text();
-          logger.error(`[onConsultationCreated] Fallo al purgar Blob (${response.status}): ${errorText}`);
-        }
-      } catch (err) {
-        logger.error(`[onConsultationCreated] Error de red purgando Blob:`, err);
-      }
-    } else {
-      logger.warn('[onConsultationCreated] INTERNAL_API_SECRET no configurado, el blob no se purgará.');
-    }
-  }
-
-  // Marcar como completado para futuros retries (no sobreescribir telegramStatus porque ya se manejó)
-  await db.collection('consultations').doc(docId).update({
-    processingStatus: 'done',
-  });
-});
+);

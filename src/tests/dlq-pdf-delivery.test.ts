@@ -97,6 +97,8 @@ describe('DLQ PDF Delivery - Cron Job (QStash)', () => {
     // Verificamos que se construyó bien la query a Firestore
     expect(mockWhere).toHaveBeenCalledWith('status', '==', 'APPROVED');
     expect(mockWhere).toHaveBeenCalledWith('paidAt', '<=', expect.anything());
+    // [2026-09-22] El filtro de entrega pendiente ahora va en la query (no solo en memoria)
+    expect(mockWhere).toHaveBeenCalledWith('pdfDeliveredAt', '==', null);
     expect(mockGenerarYEnviarPDF).not.toHaveBeenCalled();
   });
 

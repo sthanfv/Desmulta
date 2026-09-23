@@ -22,7 +22,9 @@ import { verifyVipSession } from '@/lib/security/vip-jwt';
 
 // 🛡️ AUDITORÍA 2026-08-01: Imports a nivel de módulo para evitar penalización de cold start en Edge.
 import { getTokens } from 'next-firebase-auth-edge/lib/next/tokens';
-import { jwtVerify } from 'jose';
+// [2026-09-22] FIX: verificación con audiencia (antes jwtVerify genérico aceptaba
+// temp_token y god-mode token como si fueran 2FA)
+import { verifyAdminToken } from '@/lib/auth/admin-jwt';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -183,15 +185,11 @@ export async function middleware(request: NextRequest) {
     if (pathname.startsWith('/api/admin')) {
       const isE2E_2FA = process.env.E2E_TEST_MODE === 'true';
       if (!isE2E_2FA) {
-        const token = request.cookies.get('admin-2fa-token')?.value;
-        const jwtSecret = process.env.GOD_MODE_JWT_SECRET;
-        if (!token || !jwtSecret) {
-          return NextResponse.json({ error: '2FA token requerido' }, { status: 401 });
-        }
-        try {
-          const secret = new TextEncoder().encode(jwtSecret);
-          await jwtVerify(token, secret);
-        } catch {
+        const payload = await verifyAdminToken(
+          request.cookies.get('admin-2fa-token')?.value,
+          'admin-2fa'
+        );
+        if (!payload) {
           return NextResponse.json({ error: '2FA token inválido o expirado' }, { status: 401 });
         }
       }
@@ -267,26 +265,13 @@ export async function middleware(request: NextRequest) {
           return NextResponse.redirect(loginUrl);
         }
 
-        // Validar firma del token JWT 2FA
-        try {
-          const token = request.cookies.get('admin-2fa-token')?.value;
-          const jwtSecret = process.env.GOD_MODE_JWT_SECRET;
-          if (!token || !jwtSecret) {
-            // 🛡️ FIX HALLAZGO #8: Mensaje genérico sin metadatos sensibles
-            console.error('[Middleware /admin] Falta token 2FA o configuración de servidor');
-            const loginUrl = new URL('/acceso-panel', request.url);
-            loginUrl.search = request.nextUrl.search;
-            const response = NextResponse.redirect(loginUrl);
-            response.cookies.delete('admin-2fa-token');
-            response.cookies.delete('admin-2fa-flag');
-            return response;
-          }
-          const secret = new TextEncoder().encode(jwtSecret);
-          await jwtVerify(token, secret);
-        } catch (err: unknown) {
-          // Token inválido, expirado o corrupto → limpiar cookies y redirigir a login
-          const errMsg = err instanceof Error ? err.message : String(err);
-          console.error('[Middleware /admin] CRÍTICO: jwtVerify falló.', errMsg);
+        // Validar token 2FA: audiencia 'admin-2fa' + MISMO uid que la sesión Firebase
+        const payload = await verifyAdminToken(
+          request.cookies.get('admin-2fa-token')?.value,
+          'admin-2fa'
+        );
+        if (!payload || payload.uid !== tokens.decodedToken.uid) {
+          console.error('[Middleware /admin] Token 2FA inválido, expirado o de otro usuario');
           const loginUrl = new URL('/acceso-panel', request.url);
           loginUrl.search = request.nextUrl.search;
           const response = NextResponse.redirect(loginUrl);

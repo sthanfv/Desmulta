@@ -19,12 +19,15 @@ export async function GET(request: Request) {
   // 🛡️ F-13 DEVSECOPS: Usar timingSafeEqual en lugar de !== para evitar timing oracle.
   const authHeader = request.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
-  if (cronSecret) {
-    const provided = Buffer.from(authHeader || '');
-    const expected = Buffer.from(`Bearer ${cronSecret}`);
-    if (provided.length !== expected.length || !timingSafeEqual(provided, expected)) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+  // [2026-09-22] FIX: fail-closed. Antes, sin CRON_SECRET el endpoint quedaba abierto.
+  if (!cronSecret) {
+    logger.error('[sync-usage-cron] CRON_SECRET no configurado');
+    return NextResponse.json({ error: 'Configuración incompleta' }, { status: 500 });
+  }
+  const provided = Buffer.from(authHeader || '');
+  const expected = Buffer.from(`Bearer ${cronSecret}`);
+  if (provided.length !== expected.length || !timingSafeEqual(provided, expected)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {

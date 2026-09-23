@@ -1,4 +1,4 @@
-import { isIP } from 'net';
+import { isIP, BlockList } from 'net';
 import { promises as dns } from 'dns';
 
 /**
@@ -16,41 +16,71 @@ import { promises as dns } from 'dns';
  * @throws {Error} Si la URL no cumple con los criterios de seguridad.
  */
 
-const BLOCKED_PATTERNS = [
-  /^127\./, // Loopback IPv4
-  /^10\./, // Clase A privada
-  /^192\.168\./, // Clase C privada
-  /^172\.(1[6-9]|2\d|3[01])\./, // Clase B privada
-  /^169\.254\./, // Link-local / Metadata de Cloud (AWS, GCP, OpenStack)
-  /^100\.64\./, // Vercel / CGNAT redes internas
-  /^0\./, // Red local (no enrutable)
-];
+// [2026-09-22] FIX: rangos por subred con net.BlockList (antes regex/prefijos de texto).
+// Cubre IPv4-mapped en forma hexadecimal (p. ej. [::ffff:a9fe:a9fe] = 169.254.169.254,
+// que es como el parser WHATWG serializa [::ffff:169.254.169.254]), link-local IPv6,
+// multicast, benchmarking, 6to4/NAT64 y el resto de rangos no enrutables.
+const blocklist = new BlockList();
+(
+  [
+    ['0.0.0.0', 8],
+    ['10.0.0.0', 8],
+    ['100.64.0.0', 10], // CGNAT
+    ['127.0.0.0', 8],
+    ['169.254.0.0', 16], // link-local / metadata cloud
+    ['172.16.0.0', 12],
+    ['192.0.0.0', 24],
+    ['192.0.2.0', 24],
+    ['192.168.0.0', 16],
+    ['198.18.0.0', 15],
+    ['198.51.100.0', 24],
+    ['203.0.113.0', 24],
+    ['224.0.0.0', 4], // multicast
+    ['240.0.0.0', 4], // reservado + broadcast
+  ] as const
+).forEach(([net, prefix]) => blocklist.addSubnet(net, prefix, 'ipv4'));
+(
+  [
+    ['::', 128],
+    ['::1', 128],
+    ['64:ff9b::', 96], // NAT64
+    ['2001:db8::', 32],
+    ['2002::', 16], // 6to4 (puede encapsular IPv4 privadas)
+    ['fc00::', 7], // ULA
+    ['fe80::', 10], // link-local
+    ['ff00::', 8], // multicast
+  ] as const
+).forEach(([net, prefix]) => blocklist.addSubnet(net, prefix, 'ipv6'));
 
-const BLOCKED_V6_PREFIXES = [
-  '::1', // Loopback IPv6
-  'fc00:', // Unique Local Address IPv6
-  'fd', // Unique Local Address IPv6
-  '::ffff:169.254.', // Metadata IPv4-mapped
-  '::ffff:127.', // Loopback IPv4-mapped
-  '::ffff:10.', // Clase A IPv4-mapped
-];
-
-const BLOCKED_HOSTS = [
-  'metadata.google.internal',
-  'metadata.google',
-  'instance-data',
-  '169.254.169.254',
-  'localhost',
-  'local',
-  'internal',
-];
-
-function isBlockedIp(ip: string): boolean {
-  const clean = ip.replace(/^\[|\]$/g, '').toLowerCase();
-  if (BLOCKED_PATTERNS.some((p) => p.test(clean))) return true;
-  if (BLOCKED_V6_PREFIXES.some((p) => clean.startsWith(p))) return true;
-  return false;
+function ipv4FromMapped(ip: string): string | null {
+  if (!ip.startsWith('::ffff:')) return null;
+  const rest = ip.slice('::ffff:'.length);
+  if (isIP(rest) === 4) return rest; // ::ffff:127.0.0.1
+  const parts = rest.split(':'); // ::ffff:7f00:1 (forma hexadecimal)
+  if (parts.length === 2 && parts.every((p) => /^[0-9a-f]{1,4}$/i.test(p))) {
+    const hi = parseInt(parts[0], 16);
+    const lo = parseInt(parts[1], 16);
+    return `${hi >> 8}.${hi & 255}.${lo >> 8}.${lo & 255}`;
+  }
+  return null;
 }
+
+export function isBlockedIp(ip: string): boolean {
+  const clean = ip
+    .replace(/^\[|\]$/g, '')
+    .toLowerCase()
+    .split('%')[0];
+  const version = isIP(clean);
+  if (version === 4) return blocklist.check(clean, 'ipv4');
+  if (version === 6) {
+    const mapped = ipv4FromMapped(clean);
+    return mapped ? blocklist.check(mapped, 'ipv4') : blocklist.check(clean, 'ipv6');
+  }
+  return true; // Cualquier cosa que no sea IP válida → bloquear
+}
+
+const BLOCKED_HOST_SUFFIXES = ['.internal', '.local', '.localhost', '.home.arpa'];
+const BLOCKED_HOSTS = ['localhost', 'metadata.google.internal', 'metadata', 'instance-data'];
 
 export async function validateWebhookUrl(rawUrl: string): Promise<void> {
   let url: URL;
@@ -67,8 +97,15 @@ export async function validateWebhookUrl(rawUrl: string): Promise<void> {
 
   const hostname = url.hostname.toLowerCase();
 
-  if (BLOCKED_HOSTS.some((h) => hostname.includes(h))) {
+  // [2026-09-22] Coincidencia exacta/sufijo (antes `includes('local')` bloqueaba p. ej. localiza.com)
+  if (
+    BLOCKED_HOSTS.includes(hostname) ||
+    BLOCKED_HOST_SUFFIXES.some((suffix) => hostname.endsWith(suffix))
+  ) {
     throw new Error('Host no permitido');
+  }
+  if (url.port && url.port !== '443') {
+    throw new Error('webhookUrl solo puede usar el puerto 443');
   }
 
   const cleanHostname = hostname.replace(/^\[|\]$/g, '');

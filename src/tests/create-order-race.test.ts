@@ -108,7 +108,7 @@ describe('Prevención de Race Conditions en Wompi (Hallazgo 1)', () => {
     );
   });
 
-  it('Debe devolver la misma orden (idempotencia) ante un doble clic con el mismo fingerprint', async () => {
+  it('Debe devolver la misma orden (idempotencia) ante un doble clic del MISMO navegador (cookie dt_)', async () => {
     // Simulamos que ya existe una orden previa creada recientemente
     const mockExistingOrder = {
       wompiReference: 'DSM-REF-DUPLICADA-123',
@@ -148,6 +148,11 @@ describe('Prevención de Race Conditions en Wompi (Hallazgo 1)', () => {
       }),
     }) as any;
     req.nextUrl = { origin: 'http://localhost' };
+    // [2026-09-22] La reutilización exige que el navegador presente la cookie dt_ de esa orden
+    req.cookies = {
+      get: (name: string) =>
+        name === 'dt_DSM-REF-DUPLICADA-123' ? { value: 'token-secreto-xyz' } : undefined,
+    };
 
     await POST(req);
 
@@ -160,5 +165,48 @@ describe('Prevención de Race Conditions en Wompi (Hallazgo 1)', () => {
 
     // No debe haber llamado a crear una nueva orden
     expect(mockCreate).not.toHaveBeenCalled();
+  });
+
+  it('NO debe entregar la orden existente (ni su cookie) a otro navegador que solo conoce la cédula', async () => {
+    const mockGetExisting = vi.fn().mockResolvedValue({
+      empty: false,
+      docs: [
+        {
+          data: () => ({
+            wompiReference: 'DSM-REF-VICTIMA-1',
+            downloadToken: 'token-de-la-victima',
+            createdAt: new Date(),
+          }),
+        },
+      ],
+    });
+    const mockWhereIdemp = vi.fn(() => ({
+      where: mockWhereIdemp,
+      limit: vi.fn(() => ({ get: mockGetExisting })),
+      get: mockGetExisting,
+    }));
+    mockCollection.mockReturnValueOnce({ where: mockWhereIdemp });
+    mockDoc.mockReturnValue({ id: 'nueva', create: mockCreate });
+    process.env.WOMPI_INTEGRITY_SECRET = 'test-secret';
+
+    const req = new Request('http://localhost/api/payments/create-order', {
+      method: 'POST',
+      body: JSON.stringify({
+        productType: 'peticion_general',
+        customerEmail: 'test@example.com',
+        cedula: '987654321',
+        celular: '3001234567',
+        caseData: { infractorName: 'Maria Gomez', infractorId: '987654321', shortId: 'X1' },
+      }),
+    }) as any;
+    req.nextUrl = { origin: 'http://localhost' };
+    req.cookies = { get: () => undefined };
+
+    await POST(req);
+
+    expect(mockJson).not.toHaveBeenCalledWith(
+      expect.objectContaining({ wompiReference: 'DSM-REF-VICTIMA-1' })
+    );
+    expect(mockCreate).toHaveBeenCalled();
   });
 });

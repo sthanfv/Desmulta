@@ -16,6 +16,14 @@ const mockCreate = vi.fn();
 vi.mock('firebase-admin/firestore', () => {
   return {
     getFirestore: vi.fn(() => ({
+      // [2026-09-22] El webhook usa una transacción (idempotencia + actualización atómica)
+      runTransaction: vi.fn(async (fn: (tx: unknown) => unknown) =>
+        fn({
+          get: (ref: { get: () => unknown }) => ref.get(),
+          update: (ref: { update: (d: unknown) => unknown }, d: unknown) => ref.update(d),
+          create: (ref: { create: (d: unknown) => unknown }, d: unknown) => ref.create(d),
+        })
+      ),
       collection: vi.fn((collName) => ({
         doc: vi.fn((docId) => ({
           get: () => mockGet(collName, docId),
@@ -105,6 +113,7 @@ describe('Wompi Webhook API', () => {
           reference: 'ref_123',
           status: 'APPROVED',
           amount_in_cents: 10000,
+          currency: 'COP',
         },
       },
       timestamp,

@@ -1,7 +1,14 @@
-import { SignJWT, jwtVerify } from 'jose';
-import { Redis } from '@upstash/redis';
+// Se importa desde el middleware (Edge Runtime): subrutas de jose y el build fetch-only de
+// Upstash ('/cloudflare'), que no usa APIs de Node → build sin advertencias de Edge.
+import { SignJWT } from 'jose/jwt/sign';
+import { jwtVerify } from 'jose/jwt/verify';
+import { Redis } from '@upstash/redis/cloudflare';
 
-const redis = Redis.fromEnv();
+const redis = Redis.fromEnv({
+  UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL || '',
+  UPSTASH_REDIS_REST_TOKEN:
+    process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN || '',
+});
 
 export function getVipSecret(): Uint8Array {
   if (!process.env.VIP_JWT_SECRET) {

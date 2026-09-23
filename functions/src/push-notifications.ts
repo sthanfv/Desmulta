@@ -33,7 +33,11 @@ const STATUS_TEMPLATES: Record<string, (caseId: string, note?: string) => PushMe
   }),
   estudio: (id, note) => ({
     title: '🔍 Estudio de Viabilidad',
-    body: formatBody(id, 'Estamos analizando las pruebas y fundamentos para darte una respuesta definitiva.', note),
+    body: formatBody(
+      id,
+      'Estamos analizando las pruebas y fundamentos para darte una respuesta definitiva.',
+      note
+    ),
   }),
   en_proceso: (id, note) => ({
     title: '⚙️ Expediente en Proceso',
@@ -45,19 +49,35 @@ const STATUS_TEMPLATES: Record<string, (caseId: string, note?: string) => PushMe
   }),
   apertura: (id, note) => ({
     title: '🟢 Expediente Iniciado',
-    body: formatBody(id, 'Tu caso ha sido aprobado y ya está formalmente abierto en el sistema.', note),
+    body: formatBody(
+      id,
+      'Tu caso ha sido aprobado y ya está formalmente abierto en el sistema.',
+      note
+    ),
   }),
   radicado: (id, note) => ({
     title: '✉️ Petición Radicada',
-    body: formatBody(id, 'Hemos radicado formalmente los documentos ante el organismo de tránsito.', note),
+    body: formatBody(
+      id,
+      'Hemos radicado formalmente los documentos ante el organismo de tránsito.',
+      note
+    ),
   }),
   tramite: (id, note) => ({
     title: '⚖️ Trámite Legal Activo',
-    body: formatBody(id, 'Tu caso se encuentra actualmente en gestión ante las autoridades viales.', note),
+    body: formatBody(
+      id,
+      'Tu caso se encuentra actualmente en gestión ante las autoridades viales.',
+      note
+    ),
   }),
   resolucion: (id, note) => ({
     title: '🏛️ En Resolución',
-    body: formatBody(id, 'Esperando el fallo o pronunciamiento oficial de la autoridad de tránsito.', note),
+    body: formatBody(
+      id,
+      'Esperando el fallo o pronunciamiento oficial de la autoridad de tránsito.',
+      note
+    ),
   }),
   en_espera: (id, note) => ({
     title: '⏳ Gestión en Espera',
@@ -65,11 +85,19 @@ const STATUS_TEMPLATES: Record<string, (caseId: string, note?: string) => PushMe
   }),
   descartado: (id, note) => ({
     title: '❌ Expediente Descartado',
-    body: formatBody(id, 'Tu solicitud ha sido descartada tras completar el análisis técnico.', note),
+    body: formatBody(
+      id,
+      'Tu solicitud ha sido descartada tras completar el análisis técnico.',
+      note
+    ),
   }),
   finalizado: (id, note) => ({
     title: '✅ Expediente Finalizado',
-    body: formatBody(id, 'El proceso de tu expediente ha concluido. Revisa el portal para ver el resultado.', note),
+    body: formatBody(
+      id,
+      'El proceso de tu expediente ha concluido. Revisa el portal para ver el resultado.',
+      note
+    ),
   }),
   terminado: (id, note) => ({
     title: '✅ Expediente Finalizado',
@@ -134,19 +162,20 @@ export async function sendCaseUpdateNotification(
   } catch (err: unknown) {
     const error = err as { code?: string };
     if (
-      consultationId && (
-        error?.code === 'messaging/registration-token-not-registered' ||
-        error?.code === 'messaging/invalid-registration-token'
-      )
+      consultationId &&
+      (error?.code === 'messaging/registration-token-not-registered' ||
+        error?.code === 'messaging/invalid-registration-token')
     ) {
       try {
         const db = getFirestore();
         await db
-          .collection('consultations').doc(consultationId)
-          .collection('private').doc('push')
+          .collection('consultations')
+          .doc(consultationId)
+          .collection('private')
+          .doc('push')
           .delete();
         logger.info(`[Push] Token expirado eliminado para ${consultationId}`);
-      } catch (e) {}
+      } catch (_e) {}
     }
     logger.error('[PushNotifications] Error al enviar notificación:', {
       error: err instanceof Error ? err.message : 'Error desconocido',

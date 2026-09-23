@@ -6,10 +6,18 @@ import { getAuth } from 'firebase-admin/auth';
 import { syncOperatorRoster } from '@/lib/sync-operator-roster';
 import { logger } from '@/lib/logger/security-logger';
 import { headers, cookies } from 'next/headers';
-import { SignJWT, jwtVerify } from 'jose';
 import { timingSafeEqual } from 'crypto';
 import { rateLimit } from '@/lib/security/rate-limit';
-import { getTokens } from 'next-firebase-auth-edge/lib/next/tokens';
+// [2026-09-22] FIX: tokens con audiencia + identidad admin desde cookies + logger fuera de 'use server'
+import { signAdminToken, verifyAdminToken } from '@/lib/auth/admin-jwt';
+import { getAdminFromCookies } from '@/lib/auth/admin-cookie-session';
+import { logAdminAction } from '@/lib/audit/log-admin-action';
+
+const escapeHtml = (v: unknown) =>
+  String(v ?? '').replace(
+    /[&<>"']/g,
+    (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] as string
+  );
 
 export interface AdminUser {
   uid: string;
@@ -37,65 +45,26 @@ export interface AuditLog {
   timestamp: Date | Timestamp;
 }
 
-export async function logAdminAction(payload: {
-  adminEmail: string;
-  action: AuditLog['action'];
-  resource: string;
-  details: Record<string, unknown>;
-}) {
-  try {
-    let ip = 'unknown';
-    try {
-      const headersList = await headers();
-      const { getSecureIp } = await import('@/lib/security/ip-utils');
-      ip = getSecureIp(headersList);
-    } catch {
-      ip = 'background-task/test';
-    }
-
-    getAdminApp();
-    const db = getFirestore();
-
-    const now = new Date();
-    const retentionDays = 30;
-    const expireDate = new Date(now.getTime() + retentionDays * 24 * 60 * 60 * 1000);
-
-    const logEntry = {
-      adminEmail: payload.adminEmail,
-      action: payload.action,
-      resource: payload.resource,
-      details: payload.details,
-      ipAddress: ip,
-      timestamp: Timestamp.fromDate(now),
-      expireAt: Timestamp.fromDate(expireDate), // Campo clave para el TTL gratuito de Firebase
-    };
-
-    await db.collection('audit_logs').add(logEntry);
-
-    logger.security(
-      `[AuditLog] ${payload.action} on ${payload.resource} by ${payload.adminEmail}`,
-      { ip }
-    );
-
-    return { success: true };
-  } catch (error) {
-    logger.error('Error al registrar auditoria general', { error: String(error) });
-    return { success: false };
-  }
-}
+// logAdminAction vive ahora en '@/lib/audit/log-admin-action' (NO es Server Action).
 
 export async function logExportAction(payload: {
   user: string;
   type: 'excel' | 'pdf';
   count: number;
 }) {
+  // [2026-09-22] FIX: antes era invocable sin sesión (Server Action pública) y metía
+  // `payload.user` sin escapar en un mensaje HTML de Telegram.
+  const admin = await getAdminFromCookies();
+  if (!admin) return { success: false };
+  const count = Number.isFinite(payload.count) ? Math.max(0, Math.floor(payload.count)) : 0;
+
   // Enviar alerta a Telegram
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_SECURITY_CHAT_ID;
   if (token && chatId) {
     try {
       const typeStr = payload.type === 'excel' ? 'Excel' : 'PDF';
-      const msg = `🚨 <b>ALERTA DE SEGURIDAD</b> 🚨\n\n<b>Operador:</b> ${payload.user}\n<b>Acción:</b> Exportación masiva de Base de Datos\n<b>Formato:</b> ${typeStr}\n<b>Registros:</b> ${payload.count}\n\n<i>Esto fue generado desde el panel de administrador.</i>`;
+      const msg = `🚨 <b>ALERTA DE SEGURIDAD</b> 🚨\n\n<b>Operador:</b> ${escapeHtml(admin.email)}\n<b>Acción:</b> Exportación masiva de Base de Datos\n<b>Formato:</b> ${typeStr}\n<b>Registros:</b> ${count}\n\n<i>Esto fue generado desde el panel de administrador.</i>`;
 
       await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method: 'POST',
@@ -108,10 +77,10 @@ export async function logExportAction(payload: {
   }
 
   return logAdminAction({
-    adminEmail: payload.user,
+    adminEmail: admin.email,
     action: 'EXPORT',
     resource: payload.type === 'excel' ? 'ExportExcel' : 'ExportPDF',
-    details: { count: payload.count },
+    details: { count },
   });
 }
 
@@ -120,6 +89,10 @@ export async function logExportAction(payload: {
 // ============================================================================
 
 export async function verifyGodMode(password: string) {
+  // [2026-09-22] FIX: God Mode exige además una sesión admin 2FA válida.
+  const admin = await getAdminFromCookies();
+  if (!admin) return { success: false, error: 'Acceso denegado' };
+
   const headersList = await headers();
   const { getSecureIp } = await import('@/lib/security/ip-utils');
   const ip = getSecureIp(headersList);
@@ -146,21 +119,12 @@ export async function verifyGodMode(password: string) {
   const bufPassword = Buffer.from(password);
   const bufExpected = Buffer.from(expectedPassword);
   if (bufPassword.length !== bufExpected.length || !timingSafeEqual(bufPassword, bufExpected)) {
-    logger.security('Intento fallido de acceso a God Mode', { password_length: password.length });
+    logger.security('Intento fallido de acceso a God Mode', { uid: admin.uid });
     return { success: false, error: 'Acceso denegado' };
   }
 
-  // Generamos un token temporal de 30 minutos
-  const jwtSecret = process.env.GOD_MODE_JWT_SECRET;
-  if (!jwtSecret) {
-    logger.error('CRITICAL: GOD_MODE_JWT_SECRET no configurada.');
-    return { success: false, error: 'Configuración de seguridad ausente' };
-  }
-  const secret = new TextEncoder().encode(jwtSecret);
-  const token = await new SignJWT({ role: 'superadmin', auth: true })
-    .setProtectedHeader({ alg: 'HS256' })
-    .setExpirationTime('30m')
-    .sign(secret);
+  // Token temporal de 30 minutos con audiencia 'god-mode' ligado al uid del admin
+  const token = await signAdminToken('god-mode', { uid: admin.uid, role: 'superadmin' }, '30m');
 
   // Guardamos en cookie HttpOnly
   const cookieStore = await cookies();
@@ -177,22 +141,16 @@ export async function verifyGodMode(password: string) {
 }
 
 export async function checkGodModeSession() {
+  // [2026-09-22] FIX: antes aceptaba CUALQUIER JWT del mismo secreto (p. ej. el
+  // admin-2fa-token de cualquier operador) → escalada a superadmin.
   const cookieStore = await cookies();
-  const token = cookieStore.get('admin-god-mode-token');
-  if (!token) return false;
-
-  try {
-    const jwtSecret = process.env.GOD_MODE_JWT_SECRET;
-    if (!jwtSecret) {
-      logger.error('CRITICAL: GOD_MODE_JWT_SECRET no configurada');
-      return false;
-    }
-    const secret = new TextEncoder().encode(jwtSecret);
-    await jwtVerify(token.value, secret);
-    return true;
-  } catch {
-    return false;
-  }
+  const payload = await verifyAdminToken(
+    cookieStore.get('admin-god-mode-token')?.value,
+    'god-mode'
+  );
+  if (!payload) return false;
+  const admin = await getAdminFromCookies();
+  return !!admin && payload.uid === admin.uid;
 }
 
 export async function exitGodMode() {
@@ -459,6 +417,11 @@ export async function revokeAdminAccess(uid: string, targetEmail: string) {
 // ----------------------------------------------------------------------
 
 export async function verifyOperatorPin(pin: string) {
+  // [2026-09-22] FIX: exige sesión admin y emite una prueba server-side (5 min) que
+  // las acciones destructivas verifican. Antes el PIN solo bloqueaba la UI.
+  const admin = await getAdminFromCookies();
+  if (!admin) return { success: false, error: 'Acceso denegado' };
+
   const expectedPin = process.env.OPERATOR_PIN;
   if (!expectedPin) {
     logger.error('CRITICAL: OPERATOR_PIN no configurada.');
@@ -483,32 +446,24 @@ export async function verifyOperatorPin(pin: string) {
     return { success: false, error: 'PIN incorrecto' };
   }
 
-  return { success: true };
-}
-
-async function getAdminEmailFromSession(): Promise<string> {
+  const pinToken = await signAdminToken('operator-pin', { uid: admin.uid }, '5m');
   const cookieStore = await cookies();
-  const tokens = await getTokens(cookieStore, {
-    cookieName: '__session',
-    cookieSignatureKeys: [
-      process.env.AUTH_COOKIE_SIGNATURE_KEY_CURRENT || '',
-      process.env.AUTH_COOKIE_SIGNATURE_KEY_PREVIOUS || '',
-    ],
-    serviceAccount: {
-      projectId:
-        process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || '',
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL || '',
-      privateKey: (process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
-    },
-    apiKey: process.env.NEXT_PUBLIC_BASE_API_KEY || process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '',
+  cookieStore.set('operator-pin-token', pinToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    path: '/',
+    maxAge: 5 * 60,
   });
 
-  return tokens?.decodedToken?.email || 'admin_desconocido@desmulta.com';
+  return { success: true };
 }
 
 export async function logRevealAuditAction(expedienteId: string) {
   try {
-    const adminEmail = await getAdminEmailFromSession();
+    const admin = await getAdminFromCookies();
+    if (!admin) return { success: false, error: 'Acceso denegado' };
+    const adminEmail = admin.email;
 
     await logAdminAction({
       adminEmail,
@@ -528,7 +483,9 @@ export async function logRevealAuditAction(expedienteId: string) {
 
 export async function logExportPdfAction(filtrosStr: string) {
   try {
-    const adminEmail = await getAdminEmailFromSession();
+    const admin = await getAdminFromCookies();
+    if (!admin) return { success: false, error: 'Acceso denegado' };
+    const adminEmail = admin.email;
 
     await logAdminAction({
       adminEmail,

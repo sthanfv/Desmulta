@@ -78,10 +78,28 @@ export async function POST(req: NextRequest) {
       : `Sé pedagógico, claro y empático. Explica el concepto legal de forma sencilla sin ser insistente con ventas.`;
 
     // 4. Preparación de la petición B2B al microservicio Python
-    const agentUrl = process.env.AGENT_AI_URL || 'http://127.0.0.1:8080';
-    const hmacSecret =
-      process.env.AGENT_HMAC_SECRET ||
-      '294b5b30f188fa0f5143b882744439c65680d5936a3be43889f83c7db63bd6db';
+    // [2026-09-22] FIX CRÍTICO: se eliminó el secreto HMAC hardcodeado como fallback
+    // (quedó en el historial de Git → ROTARLO en Vercel y en desmulta-ai-agent).
+    const agentUrl = process.env.AGENT_AI_URL;
+    const hmacSecret = process.env.AGENT_HMAC_SECRET;
+    if (!agentUrl || !hmacSecret || hmacSecret.length < 32) {
+      logger.error('[Chat-API] AGENT_AI_URL / AGENT_HMAC_SECRET no configurados');
+      return NextResponse.json(
+        {
+          reply:
+            'Nuestro asistente está en mantenimiento. Puedes radicar tu caso y un especialista lo revisará.',
+          citations: [],
+          suggested_action: {
+            tipo: 'modal_full',
+            titulo: 'Radicar Caso para Estudio Gratuito',
+            url: '#consultar',
+            descripcion: 'Un especialista evaluará tu comparendo.',
+          },
+          follow_up_questions: [],
+        },
+        { status: 200 }
+      );
+    }
 
     const timestamp = Date.now().toString();
     // FIX CRÍTICO (Prompt Injection): Nunca concatenar. Aislar plano de control en "system_directive"

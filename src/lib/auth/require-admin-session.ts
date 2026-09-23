@@ -18,19 +18,48 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { getAdminApp } from '@/lib/firebase-admin';
 import { headers, cookies } from 'next/headers';
 import { logger } from '@/lib/logger/security-logger';
-import { jwtVerify } from 'jose';
+import { verifyAdminToken } from '@/lib/auth/admin-jwt';
 
 /** Token expira en menos de N segundos → rechazar para evitar race conditions */
 const TOKEN_EXPIRY_BUFFER_SECS = 60;
 
 /**
- * Valida que la sesión de admin es legítima y tiene permisos suficientes.
+ * Valida idToken + rol admin + 2FA (admin-2fa-token con aud correcta y MISMO uid).
  * Llamar desde Server Actions y Route Handlers que requieran acceso admin.
+ *
+ * [2026-09-22] FIX: antes el 2FA se validaba con jwtVerify genérico (aceptaba
+ * temp_token o god-mode token) y ANTES de conocer el uid (no había binding).
  *
  * @throws Error con mensaje GENÉRICO al cliente (no filtra información interna)
  * @returns DecodedIdToken si la sesión es válida
  */
 export async function requireAdminSession(idToken: string) {
+  const decodedToken = await verifyAdminIdToken(idToken);
+
+  // Bypass E2E solo fuera de Vercel (el middleware ya aborta si E2E está activo en Vercel)
+  if (process.env.E2E_TEST_MODE === 'true' && !process.env.VERCEL_ENV) {
+    return decodedToken;
+  }
+
+  const cookieStore = await cookies();
+  const payload = await verifyAdminToken(cookieStore.get('admin-2fa-token')?.value, 'admin-2fa');
+  if (!payload || payload.uid !== decodedToken.uid) {
+    logger.security('[requireAdminSession] Bloqueado: 2FA ausente, inválido o de otro usuario', {
+      uid: decodedToken.uid,
+    });
+    throw new Error('Acceso denegado.');
+  }
+
+  return decodedToken;
+}
+
+/**
+ * Valida SOLO idToken + rol admin (SIN segundo factor).
+ * ⚠️ Usar ÚNICAMENTE en el flujo previo al OTP (pre-login / envío de OTP).
+ * Antes pre-login llamaba requireAdminSession, que exigía un 2FA previo:
+ * desde un navegador limpio el login fallaba siempre con 401.
+ */
+export async function verifyAdminIdToken(idToken: string) {
   // ── Validación de presencia ──────────────────────────────────────────────
   if (!idToken || typeof idToken !== 'string' || idToken.trim().length === 0) {
     throw new Error('Acceso denegado.');
@@ -64,32 +93,7 @@ export async function requireAdminSession(idToken: string) {
     throw new Error('Acceso denegado.');
   }
 
-  // 🛡️ FIX CRÍTICO: Validar el segundo factor (2FA JWT) nativamente en las Server Actions.
-  // Sin esto, un atacante con un idToken de Firebase robado podría hacer Action Hijacking
-  // llamando a Server Actions administrativas desde rutas públicas (ej. /) evadiendo el middleware.
-  const isE2E_2FA = process.env.E2E_TEST_MODE === 'true';
-  if (!isE2E_2FA) {
-    const cookieStore = await cookies();
-    const token2fa = cookieStore.get('admin-2fa-token')?.value;
-    const jwtSecret = process.env.GOD_MODE_JWT_SECRET;
-
-    if (!token2fa || !jwtSecret) {
-      logger.security(
-        '[requireAdminSession] Bloqueado: Falta token 2FA en Server Action Hijacking'
-      );
-      throw new Error('Acceso denegado.');
-    }
-
-    try {
-      const secret = new TextEncoder().encode(jwtSecret);
-      await jwtVerify(token2fa, secret);
-    } catch {
-      logger.security(
-        '[requireAdminSession] Bloqueado: Token 2FA inválido en Server Action Hijacking'
-      );
-      throw new Error('Acceso denegado.');
-    }
-  }
+  // (El segundo factor se valida en requireAdminSession, ya con el uid conocido.)
 
   // 🛡️ Verificación del token con Firebase Admin 🛡️────────────────────────────
   getAdminApp();

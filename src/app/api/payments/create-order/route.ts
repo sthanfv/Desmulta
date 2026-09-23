@@ -28,7 +28,7 @@ import { getAdminApp } from '@/lib/firebase-admin';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 import { checkRateLimit } from '@/lib/security/rate-limit';
 import { hashPII } from '@/lib/security/server-crypto';
-import { createHash } from 'crypto';
+import { createHash, timingSafeEqual } from 'crypto';
 import { PRODUCT_PRICES } from '@/lib/payments/product-prices';
 import { logger } from '@/lib/logger/security-logger';
 
@@ -61,7 +61,7 @@ const schema = z.object({
       .refine((val) => /^[a-záéíóúüñA-ZÁÉÍÓÚÜÑ\s\-\.]+$/.test(val), {
         message: 'El nombre solo puede contener letras, espacios, guiones y puntos.',
       }),
-    infractorId: z.string().min(1),
+    infractorId: z.string().min(1).max(20),
     licensePlate: z.string().optional().default('N/A'),
     ticketNumber: z.string().optional(),
     antiguedad: z.string().optional(),
@@ -70,7 +70,7 @@ const schema = z.object({
     ciudadEmision: z.string().optional(),
     autoridadTransito: z.string().optional(),
     direccionNotificacion: z.string().optional(),
-    shortId: z.string().min(1),
+    shortId: z.string().regex(/^[A-Za-z0-9_-]{1,40}$/), // termina en Content-Disposition
   }),
 });
 
@@ -118,11 +118,15 @@ export async function POST(req: NextRequest) {
 
   const db = getFirestore(getAdminApp());
 
-  // 3. Generar llave de idempotencia y verificar existencia de orden previa
-  // FIX: Se remueve caseData.shortId del fingerprint porque al depender de Date.now()
-  // en el frontend, invalidaba la protección contra doble-clics.
-  const requestFingerprint = `${cedula}-${productType}`;
-  const idempotencyKey = createHash('sha256').update(requestFingerprint).digest('hex');
+  // 3. Llave de idempotencia (anti doble-clic).
+  // [2026-09-22] FIX: antes se CONSULTABA sha256(cedula-producto) pero se GUARDABA
+  // idempotencyKey = wompiReference → la reutilización nunca ocurría. Además, si hubiera
+  // funcionado, entregaba la cookie dt_ de la orden a CUALQUIERA que conociera la cédula
+  // (secuestro del documento pagado). Ahora: llave con HMAC y reutilización SOLO si el
+  // navegador ya presenta la cookie dt_ de esa orden.
+  const idempotencyKey = createHash('sha256')
+    .update(`${hashPII(cedula)}:${productType}:${customerEmail.trim().toLowerCase()}`)
+    .digest('hex');
 
   const integritySecret = process.env.WOMPI_INTEGRITY_SECRET;
   if (!integritySecret) {
@@ -143,9 +147,18 @@ export async function POST(req: NextRequest) {
       .limit(1)
       .get();
 
-    if (!recentOrders.empty) {
-      // Reutilizar la orden existente para evitar peticiones duplicadas
-      const existingOrder = recentOrders.docs[0].data();
+    const existingOrder = recentOrders.empty ? null : recentOrders.docs[0].data();
+    const presented = existingOrder
+      ? req.cookies.get(`dt_${existingOrder.wompiReference}`)?.value || ''
+      : '';
+    const sameBrowser =
+      !!existingOrder &&
+      presented.length > 0 &&
+      presented.length === String(existingOrder.downloadToken || '').length &&
+      timingSafeEqual(Buffer.from(presented), Buffer.from(String(existingOrder.downloadToken)));
+
+    if (existingOrder && sameBrowser) {
+      // Reutilizar la orden existente (mismo navegador → doble clic / reintento)
       const existingRef = existingOrder.wompiReference;
       const existingDownloadToken = existingOrder.downloadToken;
 
@@ -204,9 +217,12 @@ export async function POST(req: NextRequest) {
         customerEmail,
         caseData: { ...caseData, citizenEmail: customerEmail },
         createdAt: FieldValue.serverTimestamp(),
-        idempotencyKey: wompiReference,
+        idempotencyKey,
         ipAddress: ip,
         downloadToken,
+        // [2026-09-22] FIX: campos explícitos para que la DLQ pueda filtrar con == null
+        pdfDeliveredAt: null,
+        deliveryRetries: 0,
         // 🛡️ FIX: expiración del enlace y control de descargas (Hallazgo 5)
         downloadTokenExpiresAt: new Date(Date.now() + 72 * 60 * 60 * 1000), // 72h de validez
         downloadCount: 0,

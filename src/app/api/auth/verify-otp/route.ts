@@ -16,7 +16,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { jwtVerify, SignJWT } from 'jose';
+import { signAdminToken, verifyAdminToken } from '@/lib/auth/admin-jwt';
 import { setAuthCookies } from 'next-firebase-auth-edge/lib/next/cookies';
 import { verifyOtpCode } from '@/lib/auth/otp-service';
 import { logger } from '@/lib/logger/security-logger';
@@ -94,41 +94,16 @@ export async function POST(request: NextRequest) {
     }
     const { temp_token, code } = parsed.data;
 
-    // 1. Verificar la firma y expiración del tempToken
-    const jwtSecret = process.env.GOD_MODE_JWT_SECRET;
-    if (!jwtSecret) {
-      logger.error('[verify-otp] CRITICAL: GOD_MODE_JWT_SECRET no configurada.');
-      return NextResponse.json(
-        { error: 'Configuración de seguridad ausente en el servidor.' },
-        { status: 500 }
-      );
-    }
-
-    const secret = new TextEncoder().encode(jwtSecret);
-    let payload: { uid: string; email: string; idToken: string; purpose: string };
-
-    try {
-      const { payload: decoded } = await jwtVerify(temp_token, secret);
-      payload = decoded as typeof payload;
-    } catch {
-      // Token inválido, expirado o corrupto
+    // 1-2. Verificar firma, expiración y PROPÓSITO del tempToken (aud = 'otp-pending').
+    // [2026-09-22] FIX: antes se aceptaba cualquier JWT firmado con el mismo secreto.
+    const decoded = await verifyAdminToken(temp_token, 'otp-pending');
+    if (!decoded || typeof decoded.uid !== 'string' || typeof decoded.idToken !== 'string') {
       return NextResponse.json(
         { error: 'Token temporal inválido o expirado. Inicia sesión nuevamente.' },
         { status: 401 }
       );
     }
-
-    // 2. Verificar que el token sea exclusivo para verificación de OTP
-    if (payload.purpose !== 'otp-verification') {
-      logger.security('[verify-otp] Intento de uso de token con propósito no autorizado.', {
-        uid: payload.uid,
-        purpose: payload.purpose,
-      });
-      return NextResponse.json(
-        { error: 'Token no autorizado para esta operación.' },
-        { status: 403 }
-      );
-    }
+    const payload = decoded as unknown as { uid: string; email: string; idToken: string };
 
     // 3. Verificar el código OTP en Firestore
     const otpResult = await verifyOtpCode(payload.uid, code);
@@ -220,16 +195,14 @@ export async function POST(request: NextRequest) {
     }
 
     // 6. Firmar y añadir el token JWT de 2FA (8 horas)
-    const token2fa = await new SignJWT({ uid: payload.uid, role: 'admin', auth2fa: true })
-      .setProtectedHeader({ alg: 'HS256' })
-      .setExpirationTime('8h')
-      .sign(secret);
+    const token2fa = await signAdminToken('admin-2fa', { uid: payload.uid, role: 'admin' }, '8h');
 
     finalResponse.cookies.set('admin-2fa-token', token2fa, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       path: '/',
+      maxAge: 8 * 60 * 60, // alineado con la expiración del JWT
     });
 
     // Cookie de bandera pública (no HttpOnly) para que el cliente detecte el estado
@@ -241,7 +214,7 @@ export async function POST(request: NextRequest) {
     });
 
     // 7. Registrar evento en la auditoría forense
-    const { logAdminAction } = await import('@/app/admin/audit-actions');
+    const { logAdminAction } = await import('@/lib/audit/log-admin-action');
     await logAdminAction({
       adminEmail: payload.email,
       action: 'ACCESS',

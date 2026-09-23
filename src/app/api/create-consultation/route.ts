@@ -191,6 +191,34 @@ export async function POST(request: NextRequest) {
     const validatedData = validation.data;
     const authorUid = validatedData.authorUid;
 
+    // [2026-09-22] FIX: ciudad y emailContacto venían del payload descifrado SIN pasar por
+    // Zod y terminaban en mensajes HTML de Telegram (inyección de enlaces al operador o
+    // mensaje rechazado → lead sin notificar). Se validan aquí.
+    const ciudadParsed = z
+      .string()
+      .trim()
+      .max(80)
+      .regex(/^[\p{L}\p{N} .,'()-]*$/u)
+      .safeParse(bodyAsRecord?.ciudad ?? (validatedData as { ciudad?: string }).ciudad ?? '');
+    const safeCiudad = ciudadParsed.success ? ciudadParsed.data : '';
+    const emailParsed = z
+      .string()
+      .trim()
+      .toLowerCase()
+      .max(254)
+      .email()
+      .safeParse(
+        bodyAsRecord?.emailContacto ??
+          bodyAsRecord?.email ??
+          (validatedData as { email?: string }).email ??
+          ''
+      );
+    const safeEmail = emailParsed.success ? emailParsed.data : '';
+    // Nombre de campo dinámico en system_metrics: acotar formato/longitud (evita inflar el
+    // doc de métricas hasta 1 MB con valores arbitrarios). Ideal: z.enum con las opciones reales.
+    const metricKey = (v: unknown) =>
+      typeof v === 'string' && /^[\p{L}\p{N} ()_\/-]{1,60}$/u.test(v) ? v : 'otro';
+
     // 🛡️ Honeypot: Detección silenciosa de bots
     if (validatedData.websiteHoneypot && validatedData.websiteHoneypot.length > 0) {
       logger.security('[create-consultation] Honeypot activado — bot detectado', {
@@ -254,8 +282,7 @@ export async function POST(request: NextRequest) {
           // FIX: también guardamos contactoHash en capturas SIMIT para consistencia
           contactoHash,
           evidenceUrl: (validatedData as SimitCaptureData).evidenceUrl || '',
-          emailContacto:
-            (bodyAsRecord?.emailContacto as string) || (bodyAsRecord?.email as string) || '',
+          emailContacto: safeEmail,
           aceptoTerminos: validatedData.aceptoTerminos,
           antiguedad: 'N/A',
           tipoInfraccion: 'N/A',
@@ -280,14 +307,8 @@ export async function POST(request: NextRequest) {
           placa: (validatedData as ConsultationData).placa || '',
           nombre: (validatedData as ConsultationData).nombre,
           contacto: validatedData.contacto,
-          emailContacto:
-            (bodyAsRecord?.emailContacto as string) ||
-            (validatedData as ConsultationData).email ||
-            '',
-          ciudad:
-            (bodyAsRecord?.ciudad as string) ||
-            (validatedData as ConsultationData & { ciudad?: string }).ciudad ||
-            '',
+          emailContacto: safeEmail,
+          ciudad: safeCiudad,
           evidenceUrl: (validatedData as ConsultationData).evidenceUrl || '',
           aceptoTerminos: validatedData.aceptoTerminos,
           antiguedad: (validatedData as ConsultationData).antiguedad,
@@ -359,7 +380,7 @@ export async function POST(request: NextRequest) {
           type: 'global',
           totalConsultations: FieldValue.increment(1),
           [`status_pendiente`]: FieldValue.increment(1),
-          [`infraction_${dataToSave.tipoInfraccion || 'N/A'}`]: FieldValue.increment(1),
+          [`infraction_${metricKey(dataToSave.tipoInfraccion || 'N/A')}`]: FieldValue.increment(1),
         },
         { merge: true }
       );

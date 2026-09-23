@@ -3,7 +3,7 @@ import { sendAdminOtp, verifyAdminOtp } from '@/app/admin/otp-actions';
 import { sendOtpToAdmin, verifyOtpCode } from '@/lib/auth/otp-service';
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { resend } from '@/lib/resend';
-import { requireAdminSession } from '@/lib/auth/require-admin-session';
+import { requireAdminSession, verifyAdminIdToken } from '@/lib/auth/require-admin-session';
 import { cookies } from 'next/headers';
 import { createHash } from 'crypto';
 
@@ -42,6 +42,7 @@ vi.mock('@/lib/firebase-admin', () => ({
 
 vi.mock('@/lib/auth/require-admin-session', () => ({
   requireAdminSession: vi.fn(),
+  verifyAdminIdToken: vi.fn(),
 }));
 
 vi.mock('@/lib/resend', () => ({
@@ -59,10 +60,13 @@ vi.mock('next/headers', () => {
   };
 });
 
-vi.mock('jose', () => ({
+vi.mock('jose/jwt/sign', () => ({
   SignJWT: vi.fn().mockImplementation(function (this: object) {
     return {
       setProtectedHeader: vi.fn().mockReturnThis(),
+      setIssuer: vi.fn().mockReturnThis(),
+      setAudience: vi.fn().mockReturnThis(),
+      setIssuedAt: vi.fn().mockReturnThis(),
       setExpirationTime: vi.fn().mockReturnThis(),
       sign: vi.fn().mockResolvedValue('mocked-jwt-token'),
     };
@@ -70,6 +74,10 @@ vi.mock('jose', () => ({
 }));
 
 vi.mock('@/app/admin/audit-actions', () => ({
+  logAdminAction: vi.fn().mockResolvedValue({}),
+}));
+
+vi.mock('@/lib/audit/log-admin-action', () => ({
   logAdminAction: vi.fn().mockResolvedValue({}),
 }));
 
@@ -222,11 +230,14 @@ describe('2FA OTP — Server Actions (Flujo Clásico)', () => {
     vi.clearAllMocks();
     process.env.GOD_MODE_JWT_SECRET = 'super-secret-key-of-32-chars-long';
 
-    vi.mocked(requireAdminSession).mockResolvedValue({
+    const decoded = {
       uid: mockUid,
       email: mockEmail,
       exp: Math.floor(Date.now() / 1000) + 3600,
-    } as ReturnType<typeof requireAdminSession> extends Promise<infer T> ? T : never);
+    } as ReturnType<typeof requireAdminSession> extends Promise<infer T> ? T : never;
+    vi.mocked(requireAdminSession).mockResolvedValue(decoded);
+    // [2026-09-22] sendAdminOtp/verifyAdminOtp usan verifyAdminIdToken (sin 2FA previo)
+    vi.mocked(verifyAdminIdToken).mockResolvedValue(decoded);
   });
 
   it('✅ sendAdminOtp: debe generar OTP, guardarlo en Firestore y enviarlo por email', async () => {

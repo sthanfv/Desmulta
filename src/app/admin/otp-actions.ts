@@ -15,10 +15,10 @@
  * - POST /api/auth/verify-otp (Fase 2 — emite cookies atómicamente)
  */
 
-import { requireAdminSession } from '@/lib/auth/require-admin-session';
+import { verifyAdminIdToken } from '@/lib/auth/require-admin-session';
 import { sendOtpToAdmin, verifyOtpCode } from '@/lib/auth/otp-service';
 import { cookies } from 'next/headers';
-import { SignJWT } from 'jose';
+import { signAdminToken } from '@/lib/auth/admin-jwt';
 import { logger } from '@/lib/logger/security-logger';
 
 /**
@@ -29,7 +29,7 @@ import { logger } from '@/lib/logger/security-logger';
  */
 export async function sendAdminOtp(idToken: string): Promise<{ success: boolean; error?: string }> {
   try {
-    const decodedToken = await requireAdminSession(idToken);
+    const decodedToken = await verifyAdminIdToken(idToken); // [2026-09-22] sin 2FA previo (este ES el 2FA)
     const email = decodedToken.email;
     if (!email) throw new Error('El administrador no tiene un correo registrado.');
 
@@ -37,7 +37,7 @@ export async function sendAdminOtp(idToken: string): Promise<{ success: boolean;
     await sendOtpToAdmin(decodedToken.uid, email);
 
     // Registrar en logs de auditoría
-    const { logAdminAction } = await import('@/app/admin/audit-actions');
+    const { logAdminAction } = await import('@/lib/audit/log-admin-action');
     await logAdminAction({
       adminEmail: email,
       action: 'ACCESS',
@@ -66,13 +66,13 @@ export async function verifyAdminOtp(
   code: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const decodedToken = await requireAdminSession(idToken);
+    const decodedToken = await verifyAdminIdToken(idToken); // [2026-09-22] sin 2FA previo (este ES el 2FA)
     const email = decodedToken.email || 'admin_desconocido@desmulta.com';
 
     // Delegar la verificación al servicio centralizado
     const result = await verifyOtpCode(decodedToken.uid, code);
     if (!result.success) {
-      const { logAdminAction } = await import('@/app/admin/audit-actions');
+      const { logAdminAction } = await import('@/lib/audit/log-admin-action');
       await logAdminAction({
         adminEmail: email,
         action: 'ACCESS',
@@ -82,18 +82,8 @@ export async function verifyAdminOtp(
       return result;
     }
 
-    // Firmar el JWT de 2FA temporal (2 horas de seguridad máxima)
-    const jwtSecret = process.env.GOD_MODE_JWT_SECRET;
-    if (!jwtSecret) {
-      logger.error('CRITICAL: GOD_MODE_JWT_SECRET no configurada para firmas de 2FA.');
-      return { success: false, error: 'Configuración de seguridad ausente en el servidor.' };
-    }
-
-    const secret = new TextEncoder().encode(jwtSecret);
-    const token = await new SignJWT({ uid: decodedToken.uid, role: 'admin', auth2fa: true })
-      .setProtectedHeader({ alg: 'HS256' })
-      .setExpirationTime('2h') // FIX: Reducido de 8h a 2h para máxima seguridad
-      .sign(secret);
+    // Firmar el JWT de 2FA (2 horas) con audiencia 'admin-2fa'
+    const token = await signAdminToken('admin-2fa', { uid: decodedToken.uid, role: 'admin' }, '2h');
 
     // Inyectar Cookie HttpOnly segura como "Session Cookie" (sin maxAge, se borra al cerrar el navegador)
     const cookieStore = await cookies();
@@ -112,7 +102,7 @@ export async function verifyAdminOtp(
       path: '/',
     });
 
-    const { logAdminAction } = await import('@/app/admin/audit-actions');
+    const { logAdminAction } = await import('@/lib/audit/log-admin-action');
     await logAdminAction({
       adminEmail: email,
       action: 'ACCESS',

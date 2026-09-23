@@ -26,6 +26,9 @@ global.fetch = mockFetch;
 describe('Chat API Guardrail Injection (Sales vs Pedagogy)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // [2026-09-22] La ruta ya no tiene secreto HMAC por defecto: el test debe proveerlo
+    process.env.AGENT_AI_URL = 'http://agent.test';
+    process.env.AGENT_HMAC_SECRET = 'test-hmac-secret-0123456789abcdef0123456789';
     mockFetch.mockResolvedValue({
       ok: true,
       json: async () => ({ reply: 'Mock AI Response', trace_id: '123' }),

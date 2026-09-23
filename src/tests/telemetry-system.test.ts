@@ -1,6 +1,8 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { logAdminAction, logRevealAuditAction } from '@/app/admin/audit-actions';
+import { logRevealAuditAction } from '@/app/admin/audit-actions';
+// [2026-09-22] logAdminAction ya no es Server Action pública: vive en lib/audit
+import { logAdminAction } from '@/lib/audit/log-admin-action';
 import { POST as webhookWompi } from '@/app/api/payments/webhook-wompi/route';
 import { NextRequest } from 'next/server';
 import crypto from 'crypto';
@@ -16,6 +18,14 @@ const mockGetPurchase = vi.fn();
 vi.mock('firebase-admin/firestore', () => {
   return {
     getFirestore: vi.fn(() => ({
+      // [2026-09-22] El webhook de Wompi ahora usa una transacción (idempotencia atómica)
+      runTransaction: vi.fn(async (fn: (tx: unknown) => unknown) =>
+        fn({
+          get: (ref: { get: () => unknown }) => ref.get(),
+          update: (ref: { update: (d: unknown) => unknown }, d: unknown) => ref.update(d),
+          create: (ref: { create: (d: unknown) => unknown }, d: unknown) => ref.create(d),
+        })
+      ),
       collection: vi.fn((collName) => ({
         add: (logEntry: any) => mockAddLog(collName, logEntry),
         doc: vi.fn((docId) => ({
@@ -67,6 +77,14 @@ vi.mock('next/headers', () => ({
     get: vi.fn(() => ({ value: 'mock-session-token' })),
     set: vi.fn(),
     delete: vi.fn(),
+  })),
+}));
+
+// [2026-09-22] Las acciones de auditoría exigen sesión admin (cookies) — se simula aquí
+vi.mock('@/lib/auth/admin-cookie-session', () => ({
+  getAdminFromCookies: vi.fn(async () => ({
+    uid: 'admin_uid_123',
+    email: 'admin_test@desmulta.online',
   })),
 }));
 
@@ -185,6 +203,7 @@ describe('📊 Sistema Integrado de Telemetría, Modo Dios y Ventas', () => {
             reference: reference,
             status: 'APPROVED',
             amount_in_cents: 19500_00,
+            currency: 'COP',
           },
         },
         timestamp,
@@ -207,7 +226,7 @@ describe('📊 Sistema Integrado de Telemetría, Modo Dios y Ventas', () => {
       // 2. Debe haber registrado la idempotencia del callback
       expect(mockCreateCallback).toHaveBeenCalledWith(
         'processed_callbacks',
-        transactionId,
+        `${transactionId}_APPROVED`, // la llave incluye el status (VOIDED posterior no se descarta)
         expect.objectContaining({
           wompiTransactionId: transactionId,
           result: 'APPROVED',
@@ -259,6 +278,7 @@ describe('📊 Sistema Integrado de Telemetría, Modo Dios y Ventas', () => {
             reference: reference,
             status: 'APPROVED',
             amount_in_cents: 50_00, // Solo pagó 50 COP
+            currency: 'COP',
           },
         },
         timestamp,

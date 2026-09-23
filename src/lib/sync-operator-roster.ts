@@ -1,5 +1,4 @@
-'use server';
-
+// [2026-09-22] FIX: se quitó 'use server' — esto NO debe ser una Server Action pública.
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { getAdminApp } from '@/lib/firebase-admin';
 import { logger } from '@/lib/logger/security-logger';

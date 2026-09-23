@@ -49,14 +49,14 @@ import { sendMessage, editMessageText, answerCallbackQuery } from './telegram-ut
 
 // ─── Mapa de estados ──────────────────────────────────────────────────────────
 const ESTADOS: Record<string, { label: string; emoji: string; desc: string }> = {
-  contactado:  { emoji: '✅', label: 'Contactado',    desc: 'Asignado a especialista' },
-  estudio:     { emoji: '🔍', label: 'En Estudio',    desc: 'Análisis jurídico en curso' },
-  apertura:    { emoji: '📂', label: 'Apertura',      desc: 'Expediente formal abierto' },
-  en_proceso:  { emoji: '⚙️', label: 'En Proceso',    desc: 'Análisis técnico avanzado' },
-  radicado:    { emoji: '📋', label: 'Radicado',      desc: 'Requerimiento radicado oficialmente' },
-  tramite:     { emoji: '🏛️', label: 'En Trámite',    desc: 'Gestión ante entidad de tránsito' },
-  finalizado:  { emoji: '🏁', label: 'Finalizado',    desc: 'Proceso concluido exitosamente' },
-  descartado:  { emoji: '❌', label: 'Descartado',    desc: 'Caso no viable' },
+  contactado: { emoji: '✅', label: 'Contactado', desc: 'Asignado a especialista' },
+  estudio: { emoji: '🔍', label: 'En Estudio', desc: 'Análisis jurídico en curso' },
+  apertura: { emoji: '📂', label: 'Apertura', desc: 'Expediente formal abierto' },
+  en_proceso: { emoji: '⚙️', label: 'En Proceso', desc: 'Análisis técnico avanzado' },
+  radicado: { emoji: '📋', label: 'Radicado', desc: 'Requerimiento radicado oficialmente' },
+  tramite: { emoji: '🏛️', label: 'En Trámite', desc: 'Gestión ante entidad de tránsito' },
+  finalizado: { emoji: '🏁', label: 'Finalizado', desc: 'Proceso concluido exitosamente' },
+  descartado: { emoji: '❌', label: 'Descartado', desc: 'Caso no viable' },
 };
 
 // ─── Lógica de cambio de estado ───────────────────────────────────────────────
@@ -77,7 +77,7 @@ async function cambiarEstado(
   consultationId: string,
   nuevoEstado: string,
   operador: string,
-  messageId?: number
+  _messageId?: number
 ): Promise<boolean> {
   try {
     const consultationRef = db.collection('consultations').doc(consultationId);
@@ -98,7 +98,7 @@ async function cambiarEstado(
     await consultationRef.update({
       status: nuevoEstado,
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      lastOperator: operador
+      lastOperator: operador,
     });
 
     // ── 2. Actualizar public_tracking con el evento ───────────────────────────
@@ -141,7 +141,18 @@ async function cambiarEstado(
         }),
       });
       logger.info(`[CRM] Case sincronizado → ${nuevoEstado}`, { consultationId });
-    } else if (['apertura', 'en_proceso', 'radicado', 'tramite', 'resolucion', 'en_espera', 'finalizado', 'terminado'].includes(nuevoEstado)) {
+    } else if (
+      [
+        'apertura',
+        'en_proceso',
+        'radicado',
+        'tramite',
+        'resolucion',
+        'en_espera',
+        'finalizado',
+        'terminado',
+      ].includes(nuevoEstado)
+    ) {
       // ── 4. AVANCE A FASE LEGAL → Crear case unificado ───────────────────
       //
       // Buscar el lead correspondiente por cédula (si existe).
@@ -211,11 +222,13 @@ async function cambiarEstado(
             description: `Caso creado y aceptado por ${operador} desde Telegram CRM.`,
           },
           ...(leadData
-            ? [{
-                type: 'system',
-                date: admin.firestore.Timestamp.now(),
-                description: `Expediente vinculado: ${leadData.multas_registradas?.length || 0} multas · Deuda total: $${(leadData.total_deuda_acumulada || 0).toLocaleString('es-CO')}`,
-              }]
+            ? [
+                {
+                  type: 'system',
+                  date: admin.firestore.Timestamp.now(),
+                  description: `Expediente vinculado: ${leadData.multas_registradas?.length || 0} multas · Deuda total: $${(leadData.total_deuda_acumulada || 0).toLocaleString('es-CO')}`,
+                },
+              ]
             : []),
         ],
       };
@@ -248,14 +261,22 @@ async function cambiarEstado(
   }
 }
 
-
 // ─── Cloud Function ───────────────────────────────────────────────────────────
 
 export const telegramWebhook = onRequest(
   {
     region: 'us-central1',
     minInstances: 0,
-    secrets: ['TELEGRAM_BOT_TOKEN', 'TELEGRAM_WEBHOOK_SECRET', 'PII_ENCRYPTION_KEY', 'PII_HMAC_SECRET', 'PII_ENCRYPTION_SALT', 'TELEGRAM_CHAT_ID', 'TELEGRAM_DEV_CHAT_ID', 'TELEGRAM_SECURITY_CHAT_ID'],
+    secrets: [
+      'TELEGRAM_BOT_TOKEN',
+      'TELEGRAM_WEBHOOK_SECRET',
+      'PII_ENCRYPTION_KEY',
+      'PII_HMAC_SECRET',
+      'PII_ENCRYPTION_SALT',
+      'TELEGRAM_CHAT_ID',
+      'TELEGRAM_DEV_CHAT_ID',
+      'TELEGRAM_SECURITY_CHAT_ID',
+    ],
   },
   async (req, res) => {
     const webhookSecret = process.env.TELEGRAM_WEBHOOK_SECRET?.trim();
@@ -271,9 +292,9 @@ export const telegramWebhook = onRequest(
     }
 
     if (!isTokenValid) {
-      logger.warn('[telegramWebhook] Secret no coincide o no configurado — ignorando.', { 
-        received: typeof receivedToken === 'string' ? '[REDACTED]' : 'null', 
-        expectedLength: webhookSecret?.length || 0 
+      logger.warn('[telegramWebhook] Secret no coincide o no configurado — ignorando.', {
+        received: typeof receivedToken === 'string' ? '[REDACTED]' : 'null',
+        expectedLength: webhookSecret?.length || 0,
       });
       res.status(200).send({ ok: true });
       return;
@@ -307,7 +328,10 @@ export const telegramWebhook = onRequest(
     // enviar comandos sin este control. Soportamos múltiples IDs separados por comas.
     const parseAllowedIds = (envVal: string | undefined): number[] => {
       if (!envVal) return [];
-      return envVal.split(',').map((val) => Number(val.trim())).filter((val) => !isNaN(val));
+      return envVal
+        .split(',')
+        .map((val) => Number(val.trim()))
+        .filter((val) => !isNaN(val));
     };
 
     const allowedIds = [
@@ -316,8 +340,7 @@ export const telegramWebhook = onRequest(
       ...parseAllowedIds(process.env.TELEGRAM_SECURITY_CHAT_ID),
     ];
 
-    const incomingChatId =
-      update.message?.chat.id ?? update.callback_query?.message?.chat.id;
+    const incomingChatId = update.message?.chat.id ?? update.callback_query?.message?.chat.id;
 
     if (allowedIds.length === 0 || !incomingChatId || !allowedIds.includes(incomingChatId)) {
       logger.warn('[telegramWebhook] Comando recibido de chat no autorizado — ignorando.', {
@@ -327,7 +350,9 @@ export const telegramWebhook = onRequest(
       return;
     }
 
-    logger.info(`[telegramWebhook] Recibido ${req.method}`, { isString: typeof req.body === 'string' });
+    logger.info(`[telegramWebhook] Recibido ${req.method}`, {
+      isString: typeof req.body === 'string',
+    });
 
     try {
       // ── CALLBACK QUERIES (botones inline) ─────────────────────────────────
@@ -349,7 +374,7 @@ export const telegramWebhook = onRequest(
           const cbRef = db.collection('processed_callbacks').doc(callbackId);
           try {
             await cbRef.create({ ts: new Date().toISOString(), data: dataStr });
-          } catch (e) {
+          } catch (_e) {
             await answerCallbackQuery(token, callbackId, '✅ Ya procesado');
             res.status(200).send({ ok: true });
             return;
@@ -376,7 +401,11 @@ export const telegramWebhook = onRequest(
             // Para evitar un mensaje infinito, limitamos cómo se agrega la línea,
             // pero para mantenerlo simple, solo la adjuntamos.
             const msgActual = cb.message?.caption || cb.message?.text || '';
-            const cleanMsg = msgActual.split('\n\n🔍 <b>Estado actualizado:</b>')[0].split('\n\n✅ <b>Estado actualizado:</b>')[0].split('\n\n📋 <b>Estado actualizado:</b>')[0].split('\n\n❌ <b>Estado actualizado:</b>')[0];
+            const cleanMsg = msgActual
+              .split('\n\n🔍 <b>Estado actualizado:</b>')[0]
+              .split('\n\n✅ <b>Estado actualizado:</b>')[0]
+              .split('\n\n📋 <b>Estado actualizado:</b>')[0]
+              .split('\n\n❌ <b>Estado actualizado:</b>')[0];
             const nuevaLinea = `\n\n${estadoInfo?.emoji || '🔄'} <b>Estado actualizado:</b> ${estadoInfo?.label || nuevoEstado} — por ${operador}`;
 
             await editMessageText(
@@ -386,7 +415,11 @@ export const telegramWebhook = onRequest(
               cleanMsg + nuevaLinea,
               buildCaseReplyMarkup(consultationId, whatsappUrl, nuevoEstado)
             );
-            await answerCallbackQuery(token, callbackId, `${estadoInfo?.emoji} Listo — Estado: ${estadoInfo?.label}`);
+            await answerCallbackQuery(
+              token,
+              callbackId,
+              `${estadoInfo?.emoji} Listo — Estado: ${estadoInfo?.label}`
+            );
           } else {
             await answerCallbackQuery(token, callbackId, '❌ Error al actualizar', true);
           }
@@ -400,14 +433,14 @@ export const telegramWebhook = onRequest(
           const cbRef = db.collection('processed_callbacks').doc(callbackId);
           try {
             await cbRef.create({ ts: new Date().toISOString(), data: dataStr });
-          } catch (e) {
+          } catch (_e) {
             await answerCallbackQuery(token, callbackId, '✅ Ya procesado');
             res.status(200).send({ ok: true });
             return;
           }
 
           const consultationId = dataStr.replace('vercedula_', '');
-          
+
           try {
             const docSnap = await db.collection('consultations').doc(consultationId).get();
             if (!docSnap.exists) {
@@ -423,41 +456,52 @@ export const telegramWebhook = onRequest(
               await answerCallbackQuery(token, callbackId, '⚠️ Sin cédula registrada', true);
             } else {
               const decrypted = decryptSymmetric(encryptedCedula);
-              
+
               const msgActual = cb.message?.caption || cb.message?.text || '';
-              let nuevoMensaje = msgActual.replace('[Cifrada - Usa el botón Ver Cédula]', decrypted);
-              
+              let nuevoMensaje = msgActual.replace(
+                '[Cifrada - Usa el botón Ver Cédula]',
+                decrypted
+              );
+
               if (nuevoMensaje === msgActual) {
-                 nuevoMensaje = msgActual + `\n\n🪪 <b>Cédula revelada:</b> <code>${decrypted}</code>`;
+                nuevoMensaje =
+                  msgActual + `\n\n🪪 <b>Cédula revelada:</b> <code>${decrypted}</code>`;
               }
-              
+
               if (nuevoMensaje !== msgActual) {
                 // Generar nuevo markup sin el botón de 'Ver Cédula'
-                const currentMarkup = (cb.message as any)?.reply_markup as { inline_keyboard: any[][] } | undefined;
+                const currentMarkup = (
+                  cb.message as
+                    | {
+                        reply_markup?: {
+                          inline_keyboard: Array<Array<{ callback_data?: string }>>;
+                        };
+                      }
+                    | undefined
+                )?.reply_markup;
                 let nuevoMarkup = currentMarkup;
-                
+
                 if (currentMarkup?.inline_keyboard) {
                   nuevoMarkup = {
-                    inline_keyboard: currentMarkup.inline_keyboard.map(row => 
-                      row.filter(btn => !btn.callback_data?.startsWith('vercedula_'))
-                    )
+                    inline_keyboard: currentMarkup.inline_keyboard.map((row) =>
+                      row.filter((btn) => !btn.callback_data?.startsWith('vercedula_'))
+                    ),
                   };
                 }
 
-                await editMessageText(
-                  token,
-                  chatId,
-                  messageId,
-                  nuevoMensaje,
-                  nuevoMarkup
-                );
+                await editMessageText(token, chatId, messageId, nuevoMensaje, nuevoMarkup);
               }
 
               await answerCallbackQuery(token, callbackId, '✅ Cédula revelada en el mensaje');
             }
           } catch (err) {
             logger.error('[CRM] Error desencriptando cédula en Telegram callback:', err);
-            await answerCallbackQuery(token, callbackId, '❌ Error de seguridad al descifrar cédula', true);
+            await answerCallbackQuery(
+              token,
+              callbackId,
+              '❌ Error de seguridad al descifrar cédula',
+              true
+            );
           }
 
           res.status(200).send({ ok: true });
@@ -469,7 +513,7 @@ export const telegramWebhook = onRequest(
           const cbRef = db.collection('processed_callbacks').doc(callbackId);
           try {
             await cbRef.create({ ts: new Date().toISOString(), data: dataStr });
-          } catch (e) {
+          } catch (_e) {
             await answerCallbackQuery(token, callbackId, '✅ Ya procesado');
             res.status(200).send({ ok: true });
             return;
@@ -484,7 +528,12 @@ export const telegramWebhook = onRequest(
           if (docSnap.exists) {
             let fcmToken = docSnap.data()?.fcmToken;
             if (!fcmToken) {
-              const pushSnap = await db.collection('consultations').doc(docId).collection('private').doc('push').get();
+              const pushSnap = await db
+                .collection('consultations')
+                .doc(docId)
+                .collection('private')
+                .doc('push')
+                .get();
               if (pushSnap.exists) {
                 fcmToken = pushSnap.data()?.fcmToken;
               }
@@ -520,7 +569,12 @@ export const telegramWebhook = onRequest(
 
         // noop
         if (dataStr === 'noop') {
-          await answerCallbackQuery(token, callbackId, '⚠️ El caso ya se encuentra en este estado.', true);
+          await answerCallbackQuery(
+            token,
+            callbackId,
+            '⚠️ El caso ya se encuentra en este estado.',
+            true
+          );
           res.status(200).send({ ok: true });
           return;
         }
@@ -569,13 +623,15 @@ export const telegramWebhook = onRequest(
         const [totalSnap, pendientesSnap, hoySnap, contactadosSnap] = await Promise.all([
           col.count().get(),
           col.where('status', '==', 'pendiente').count().get(),
-          col
-            .where('createdAt', '>=', admin.firestore.Timestamp.fromDate(inicioHoy))
-            .count()
-            .get(),
+          col.where('createdAt', '>=', admin.firestore.Timestamp.fromDate(inicioHoy)).count().get(),
           col
             .where('status', 'in', [
-              'contactado', 'estudio', 'apertura', 'en_proceso', 'radicado', 'tramite',
+              'contactado',
+              'estudio',
+              'apertura',
+              'en_proceso',
+              'radicado',
+              'tramite',
             ])
             .count()
             .get(),
@@ -629,8 +685,7 @@ export const telegramWebhook = onRequest(
 
       // /caso SHORTID o /caso_SHORTID
       const casoMatch =
-        rawText.match(/^\/caso[_ ]([A-Z0-9-]+)$/i) ||
-        rawText.match(/^\/caso[_ @]([A-Z0-9-]+)/i);
+        rawText.match(/^\/caso[_ ]([A-Z0-9-]+)$/i) || rawText.match(/^\/caso[_ @]([A-Z0-9-]+)/i);
 
       if (casoMatch) {
         const shortId = casoMatch[1].toUpperCase();
@@ -692,7 +747,11 @@ export const telegramWebhook = onRequest(
  *
  * El estado actual se marca con 👉 y su botón no genera acción.
  */
-export function buildCaseReplyMarkup(consultationDocId: string, whatsappUrl: string, currentState?: string) {
+export function buildCaseReplyMarkup(
+  consultationDocId: string,
+  whatsappUrl: string,
+  currentState?: string
+) {
   const getBtn = (estado: string, label: string) => {
     if (currentState === estado) {
       return { text: `👉 ${label}`, callback_data: 'noop' };
@@ -703,23 +762,11 @@ export function buildCaseReplyMarkup(consultationDocId: string, whatsappUrl: str
   return {
     inline_keyboard: [
       // ── Fase 1: Pipeline de Leads ──────────────────────────────────────────
-      [
-        getBtn('pendiente', '🆕 Nuevo'),
-        getBtn('contactado', '✅ Contactado'),
-      ],
-      [
-        getBtn('estudio', '🔍 En Estudio'),
-        getBtn('descartado', '❌ Descartar'),
-      ],
+      [getBtn('pendiente', '🆕 Nuevo'), getBtn('contactado', '✅ Contactado')],
+      [getBtn('estudio', '🔍 En Estudio'), getBtn('descartado', '❌ Descartar')],
       // ── Fase 2: Pipeline de Casos ──────────────────────────────────────────
-      [
-        getBtn('apertura', '🚀 Apertura'),
-        getBtn('radicado', '📋 Radicado'),
-      ],
-      [
-        getBtn('tramite', '⚙️ En Trámite'),
-        getBtn('finalizado', '🏁 Finalizado'),
-      ],
+      [getBtn('apertura', '🚀 Apertura'), getBtn('radicado', '📋 Radicado')],
+      [getBtn('tramite', '⚙️ En Trámite'), getBtn('finalizado', '🏁 Finalizado')],
       // ── Acciones de Contacto e Identidad ───────────────────────────────────
       [
         { text: '📱 WhatsApp', url: whatsappUrl },

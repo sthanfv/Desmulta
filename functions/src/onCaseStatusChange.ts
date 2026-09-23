@@ -3,16 +3,15 @@ import * as admin from 'firebase-admin';
 import { logger } from 'firebase-functions';
 import { Resend } from 'resend';
 import { buildCaseReplyMarkup } from './telegramWebhook';
-import * as QRCode from 'qrcode';
 import { sendCaseUpdateNotification } from './push-notifications';
 
 function escapeHtml(unsafe: string): string {
   return unsafe
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 /**
  * Trigger: onCaseStatusChange & onCaseCreated
@@ -42,7 +41,12 @@ interface CaseAfterData {
   fcmToken?: string;
 }
 
-async function processCaseEmail(caseId: string, after: CaseAfterData, isNew: boolean, isLead: boolean = false) {
+async function processCaseEmail(
+  caseId: string,
+  after: CaseAfterData,
+  isNew: boolean,
+  isLead: boolean = false
+) {
   const consultationId = isLead ? caseId : after.consultationId;
   const status = after.status;
   if (!consultationId || consultationId === 'N/A' || !status) {
@@ -52,7 +56,7 @@ async function processCaseEmail(caseId: string, after: CaseAfterData, isNew: boo
   try {
     const db = admin.firestore();
     const leadSnap = await db.collection('consultations').doc(consultationId).get();
-    
+
     if (!leadSnap.exists) {
       logger.warn(`[processCaseEmail] No se encontró la consulta vinculada: ${consultationId}`);
       return;
@@ -66,71 +70,87 @@ async function processCaseEmail(caseId: string, after: CaseAfterData, isNew: boo
     let operatorNote: string | undefined;
     const historyArray = after.history || after.timeline_updates || [];
     if (Array.isArray(historyArray)) {
-      const lastNoteEvent = historyArray.slice().reverse().find((e: { operatorNote?: string }) => e.operatorNote);
+      const lastNoteEvent = historyArray
+        .slice()
+        .reverse()
+        .find((e: { operatorNote?: string }) => e.operatorNote);
       if (lastNoteEvent) operatorNote = lastNoteEvent.operatorNote;
     }
 
     const resend = new Resend(process.env.RESEND_API_KEY);
 
-    const descripciones: Record<string, { asunto: string; titulo: string; explicacion: string; color: string }> = {
+    const descripciones: Record<
+      string,
+      { asunto: string; titulo: string; explicacion: string; color: string }
+    > = {
       contactado: {
         asunto: '📞 Un especialista se pondrá en contacto contigo - Desmulta',
         titulo: '¡Tu caso ha sido asignado!',
-        explicacion: '¡Hola! Te confirmamos que tu caso ha sido asignado a uno de nuestros especialistas. Muy pronto te escribiremos por WhatsApp para darte el veredicto final y el plan de acción.',
+        explicacion:
+          '¡Hola! Te confirmamos que tu caso ha sido asignado a uno de nuestros especialistas. Muy pronto te escribiremos por WhatsApp para darte el veredicto final y el plan de acción.',
         color: '#D4AF37',
       },
       apertura: {
         asunto: '🚀 Tu expediente ha sido abierto - Desmulta',
         titulo: 'Hemos iniciado tu gestión formal',
-        explicacion: '¡Hola! Te confirmamos que ya registramos oficialmente tu caso en nuestro sistema. A partir de ahora, un especialista técnico liderará tu proceso para buscar el mejor resultado posible ante las autoridades.',
+        explicacion:
+          '¡Hola! Te confirmamos que ya registramos oficialmente tu caso en nuestro sistema. A partir de ahora, un especialista técnico liderará tu proceso para buscar el mejor resultado posible ante las autoridades.',
         color: '#D4AF37',
       },
       documentacion: {
         asunto: '📂 Validando tu documentación - Desmulta',
         titulo: 'Organizando tus evidencias',
-        explicacion: 'Estamos en la fase de armado de expediente. Revisamos cada foto y dato que nos enviaste para que la reclamación sea sólida. Si nos hace falta algo, te avisaremos de inmediato.',
+        explicacion:
+          'Estamos en la fase de armado de expediente. Revisamos cada foto y dato que nos enviaste para que la reclamación sea sólida. Si nos hace falta algo, te avisaremos de inmediato.',
         color: '#D4AF37',
       },
       estudio: {
         asunto: '🔍 Caso en análisis jurídico - Desmulta',
         titulo: 'Buscando los mejores argumentos',
-        explicacion: 'Nuestros especialistas técnicos y legales están analizando a profundidad la normativa vigente para aplicarla a tu favor. No solo tramitamos, estudiamos cada oportunidad legal para ganar tu caso.',
+        explicacion:
+          'Nuestros especialistas técnicos y legales están analizando a profundidad la normativa vigente para aplicarla a tu favor. No solo tramitamos, estudiamos cada oportunidad legal para ganar tu caso.',
         color: '#D4AF37',
       },
       tramite: {
         asunto: '⚙️ Tu solicitud está en camino - Desmulta',
         titulo: 'Gestión ante el organismo de tránsito',
-        explicacion: 'Ya estamos moviendo los hilos necesarios. Tu solicitud está navegando por los canales administrativos correspondientes para lograr una resolución.',
+        explicacion:
+          'Ya estamos moviendo los hilos necesarios. Tu solicitud está navegando por los canales administrativos correspondientes para lograr una resolución.',
         color: '#D4AF37',
       },
       radicado: {
         asunto: '📋 Radicación oficial completada - Desmulta',
         titulo: '¡Tu reclamación ya es oficial!',
-        explicacion: 'Hoy hemos radicado formalmente tu documento de defensa ante las autoridades de tránsito. Ya tenemos el sello de recibido y ahora la pelota está en su cancha.',
+        explicacion:
+          'Hoy hemos radicado formalmente tu documento de defensa ante las autoridades de tránsito. Ya tenemos el sello de recibido y ahora la pelota está en su cancha.',
         color: '#D4AF37',
       },
       en_espera: {
         asunto: '⏳ Aguardando respuesta oficial - Desmulta',
         titulo: 'Paciencia, estamos en espera',
-        explicacion: 'Hemos cumplido con todos los pasos y ahora dependemos de los tiempos de ley de la autoridad de tránsito. Estamos monitoreando diariamente para avisarte apenas respondan.',
+        explicacion:
+          'Hemos cumplido con todos los pasos y ahora dependemos de los tiempos de ley de la autoridad de tránsito. Estamos monitoreando diariamente para avisarte apenas respondan.',
         color: '#D4AF37',
       },
       resolucion: {
         asunto: '⚖️ Tu caso entró en fase de resolución - Desmulta',
         titulo: 'La autoridad está decidiendo',
-        explicacion: 'La entidad de tránsito ya tiene una postura sobre tu reclamación. Nuestro equipo está revisando minuciosamente su respuesta para asegurarnos de que se cumplan tus derechos.',
+        explicacion:
+          'La entidad de tránsito ya tiene una postura sobre tu reclamación. Nuestro equipo está revisando minuciosamente su respuesta para asegurarnos de que se cumplan tus derechos.',
         color: '#D4AF37',
       },
       finalizado: {
         asunto: '✅ Gestión concluida exitosamente - Desmulta',
         titulo: 'Hemos llegado al final del proceso',
-        explicacion: 'El ciclo de tu expediente ha terminado. Esperamos que el resultado sea el que buscábamos. Recuerda verificar tu estado en el RUNT/SIMIT en los próximos días para ver el cambio reflejado.',
+        explicacion:
+          'El ciclo de tu expediente ha terminado. Esperamos que el resultado sea el que buscábamos. Recuerda verificar tu estado en el RUNT/SIMIT en los próximos días para ver el cambio reflejado.',
         color: '#D4AF37',
       },
       archivo: {
         asunto: '📁 Expediente archivado - Desmulta',
         titulo: 'Caso guardado en archivo general',
-        explicacion: 'Hemos movido tu expediente a nuestro archivo histórico. Tu información seguirá protegida y disponible si decides consultarla en el futuro.',
+        explicacion:
+          'Hemos movido tu expediente a nuestro archivo histórico. Tu información seguirá protegida y disponible si decides consultarla en el futuro.',
         color: '#D4AF37',
       },
     };
@@ -138,22 +158,40 @@ async function processCaseEmail(caseId: string, after: CaseAfterData, isNew: boo
     const info = descripciones[status.toLowerCase()] || {
       asunto: '📬 Novedades en tu expediente - Desmulta',
       titulo: 'Actualización en tu proceso legal',
-      explicacion: 'Hola, te informamos que hemos actualizado el estado de tu expediente administrativo. Seguimos trabajando con el compromiso de siempre para defender tus intereses.',
+      explicacion:
+        'Hola, te informamos que hemos actualizado el estado de tu expediente administrativo. Seguimos trabajando con el compromiso de siempre para defender tus intereses.',
       color: '#D4AF37',
     };
 
     // ─── Push notification automático al cliente ──────────────────────────
     // Restaurado en Cloud Functions para atrapar cambios desde Telegram y Web.
-    const pushSnap = await db.collection('consultations').doc(consultationId).collection('private').doc('push').get();
+    const pushSnap = await db
+      .collection('consultations')
+      .doc(consultationId)
+      .collection('private')
+      .doc('push')
+      .get();
     const fcmToken = pushSnap.data()?.fcmToken || leadData?.fcmToken;
 
     if (fcmToken) {
-      const trackingUrl = trackingUuid ? `https://desmulta.online/seguir/${trackingUuid}` : undefined;
-      await sendCaseUpdateNotification(fcmToken, status, caseId, trackingUrl, consultationId, operatorNote, shortId);
+      const trackingUrl = trackingUuid
+        ? `https://desmulta.online/seguir/${trackingUuid}`
+        : undefined;
+      await sendCaseUpdateNotification(
+        fcmToken,
+        status,
+        caseId,
+        trackingUrl,
+        consultationId,
+        operatorNote,
+        shortId
+      );
     }
 
     if (!emailCiudadano) {
-      logger.info(`[processCaseEmail] El caso ${caseId} no tiene email de contacto. Solo Push fue enviado.`);
+      logger.info(
+        `[processCaseEmail] El caso ${caseId} no tiene email de contacto. Solo Push fue enviado.`
+      );
       return;
     }
 
@@ -178,18 +216,24 @@ async function processCaseEmail(caseId: string, after: CaseAfterData, isNew: boo
               <h2 style="color: #000000; font-size: 20px; margin-top: 0;">${info.titulo}</h2>
               <p style="font-size: 16px; color: #4a5568;">${info.explicacion}</p>
               
-              ${operatorNote ? `
+              ${
+                operatorNote
+                  ? `
               <div style="margin: 25px 0; padding: 20px; background: #f0fdf4; border-left: 4px solid #22c55e; border-radius: 4px;">
                 <p style="margin: 0; font-size: 14px; color: #166534; font-weight: bold; margin-bottom: 8px;">🧑‍💼 Mensaje de tu asesor:</p>
                 <p style="margin: 0; font-size: 14px; color: #15803d; font-style: italic;">"${escapeHtml(operatorNote)}"</p>
               </div>
-              ` : ''}
+              `
+                  : ''
+              }
 
               <div style="margin: 30px 0; padding: 20px; background: #fffbeb; border-left: 4px solid ${info.color}; border-radius: 4px;">
                 <p style="margin: 0; font-size: 14px; color: #2d3748; font-weight: bold;">Nuevo estado legal: <span style="color: ${info.color}; text-transform: uppercase;">${escapeHtml(status).replace('_', ' ')}</span></p>
               </div>
 
-              ${trackingUuid ? `
+              ${
+                trackingUuid
+                  ? `
               <div style="text-align: center; margin-top: 35px;">
                 <p style="font-size: 14px; color: #4a5568; margin-bottom: 15px;">Guarde este código QR para hacer seguimiento rápido desde cualquier dispositivo:</p>
                 <img src="${qrImageUrl}" alt="QR de Seguimiento" style="width: 150px; height: 150px; border-radius: 8px; border: 2px solid #e2e8f0; padding: 5px; background: white; margin-bottom: 20px;" />
@@ -203,7 +247,9 @@ async function processCaseEmail(caseId: string, after: CaseAfterData, isNew: boo
                   e identificándose con su número de documento y celular de contacto.
                 </p>
               </div>
-              ` : ''}
+              `
+                  : ''
+              }
               
               <div style="margin-top: 30px; padding: 15px; background: #fffbeb; border: 1px solid #fef3c7; border-radius: 8px;">
                 <p style="margin: 0; font-size: 12px; color: #92400e; line-height: 1.6;">
@@ -223,9 +269,10 @@ async function processCaseEmail(caseId: string, after: CaseAfterData, isNew: boo
     if (error) {
       logger.error(`[processCaseEmail] Error enviando email via Resend:`, error);
     } else {
-      logger.info(`[processCaseEmail] Email enviado exitosamente a ${emailCiudadano}. ID: ${data?.id}`);
+      logger.info(
+        `[processCaseEmail] Email enviado exitosamente a ${emailCiudadano}. ID: ${data?.id}`
+      );
     }
-
   } catch (err) {
     logger.error(`[processCaseEmail] Error crítico:`, err);
   }
@@ -247,16 +294,16 @@ async function notifyTelegramStatusChange(
   if (!botToken || !chatId) return;
 
   const ESTADOS: Record<string, { emoji: string; label: string }> = {
-    pendiente:   { emoji: '⏳', label: 'Pendiente' },
-    nuevo:       { emoji: '🆕', label: 'Nuevo' },
-    contactado:  { emoji: '✅', label: 'Contactado' },
-    estudio:     { emoji: '🔍', label: 'En Estudio' },
-    apertura:    { emoji: '🚀', label: 'Apertura' },
-    radicado:    { emoji: '📋', label: 'Radicado' },
-    tramite:     { emoji: '⚙️', label: 'En Trámite' },
-    en_proceso:  { emoji: '⚙️', label: 'En Proceso' },
-    finalizado:  { emoji: '🏁', label: 'Finalizado' },
-    descartado:  { emoji: '❌', label: 'Descartado' },
+    pendiente: { emoji: '⏳', label: 'Pendiente' },
+    nuevo: { emoji: '🆕', label: 'Nuevo' },
+    contactado: { emoji: '✅', label: 'Contactado' },
+    estudio: { emoji: '🔍', label: 'En Estudio' },
+    apertura: { emoji: '🚀', label: 'Apertura' },
+    radicado: { emoji: '📋', label: 'Radicado' },
+    tramite: { emoji: '⚙️', label: 'En Trámite' },
+    en_proceso: { emoji: '⚙️', label: 'En Proceso' },
+    finalizado: { emoji: '🏁', label: 'Finalizado' },
+    descartado: { emoji: '❌', label: 'Descartado' },
   };
 
   const estadoInfo = ESTADOS[after.status] || { emoji: '🔄', label: after.status };
@@ -276,7 +323,10 @@ async function notifyTelegramStatusChange(
     let operatorNote: string | undefined;
     const historyArray = after.history || after.timeline_updates || [];
     if (Array.isArray(historyArray)) {
-      const lastNoteEvent = historyArray.slice().reverse().find((e: { operatorNote?: string }) => e.operatorNote);
+      const lastNoteEvent = historyArray
+        .slice()
+        .reverse()
+        .find((e: { operatorNote?: string }) => e.operatorNote);
       if (lastNoteEvent) operatorNote = lastNoteEvent.operatorNote;
     }
 
@@ -311,14 +361,16 @@ async function notifyTelegramStatusChange(
         bodyPayload.link_preview_options = { is_disabled: true };
       }
 
-      let editRes = await fetch(`https://api.telegram.org/bot${botToken}/${endpoint}`, {
+      const editRes = await fetch(`https://api.telegram.org/bot${botToken}/${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(bodyPayload),
       });
 
       if (!editRes.ok) {
-        const errorData = (await editRes.json().catch(() => ({ description: '' }))) as { description?: string };
+        const errorData = (await editRes.json().catch(() => ({ description: '' }))) as {
+          description?: string;
+        };
         const desc = errorData.description || '';
 
         if (desc.includes('message is not modified')) {
@@ -358,7 +410,10 @@ async function notifyTelegramStatusChange(
             }),
           });
           if (newRes.ok) {
-            const newResult = await newRes.json() as { ok: boolean; result?: { message_id: number } };
+            const newResult = (await newRes.json()) as {
+              ok: boolean;
+              result?: { message_id: number };
+            };
             if (newResult.result?.message_id) {
               await admin.firestore().collection('consultations').doc(consultationId).update({
                 telegramMessageId: newResult.result.message_id,
@@ -383,7 +438,10 @@ async function notifyTelegramStatusChange(
         }),
       });
       if (sendRes.ok) {
-        const sendResult = await sendRes.json() as { ok: boolean; result?: { message_id: number } };
+        const sendResult = (await sendRes.json()) as {
+          ok: boolean;
+          result?: { message_id: number };
+        };
         if (sendResult.result?.message_id) {
           await admin.firestore().collection('consultations').doc(consultationId).update({
             telegramMessageId: sendResult.result.message_id,
@@ -392,82 +450,97 @@ async function notifyTelegramStatusChange(
       }
     }
 
-    logger.info(`[notifyTelegramStatusChange] Mensaje Telegram actualizado para ${shortId} → ${after.status}`);
+    logger.info(
+      `[notifyTelegramStatusChange] Mensaje Telegram actualizado para ${shortId} → ${after.status}`
+    );
   } catch (err) {
     // No es crítico — el email ya fue enviado. Solo logueamos.
     logger.warn(`[notifyTelegramStatusChange] Error (no crítico):`, err);
   }
 }
 
-export const onCaseStatusChange = onDocumentUpdated({
-  document: 'cases/{caseId}',
-  region: 'us-central1',
-  secrets: ['RESEND_API_KEY', 'TELEGRAM_BOT_TOKEN', 'TELEGRAM_CHAT_ID']
-}, async (event) => {
-  const before = event.data?.before.data();
-  const after = event.data?.after.data();
+export const onCaseStatusChange = onDocumentUpdated(
+  {
+    document: 'cases/{caseId}',
+    region: 'us-central1',
+    secrets: ['RESEND_API_KEY', 'TELEGRAM_BOT_TOKEN', 'TELEGRAM_CHAT_ID'],
+  },
+  async (event) => {
+    const before = event.data?.before.data();
+    const after = event.data?.after.data();
 
-  // Validar si hubo cambio de estado real
-  if (!before || !after || before.status === after.status) {
-    return;
+    // Validar si hubo cambio de estado real
+    if (!before || !after || before.status === after.status) {
+      return;
+    }
+
+    const consultationId = after.consultationId;
+
+    // Ejecutar en paralelo: email al cliente + ping a Telegram para el operador
+    await Promise.allSettled([
+      processCaseEmail(event.params.caseId, after, false),
+      consultationId && consultationId !== 'N/A'
+        ? notifyTelegramStatusChange(consultationId, after, 'kanban')
+        : Promise.resolve(),
+    ]);
   }
+);
 
-  const consultationId = after.consultationId;
+export const onCaseCreated = onDocumentCreated(
+  {
+    document: 'cases/{caseId}',
+    region: 'us-central1',
+    secrets: ['RESEND_API_KEY'],
+  },
+  async (event) => {
+    const after = event.data?.data();
+    if (!after) return;
 
-  // Ejecutar en paralelo: email al cliente + ping a Telegram para el operador
-  await Promise.allSettled([
-    processCaseEmail(event.params.caseId, after, false),
-    consultationId && consultationId !== 'N/A'
-      ? notifyTelegramStatusChange(consultationId, after, 'kanban')
-      : Promise.resolve(),
-  ]);
-});
-
-export const onCaseCreated = onDocumentCreated({
-  document: 'cases/{caseId}',
-  region: 'us-central1',
-  secrets: ['RESEND_API_KEY']
-}, async (event) => {
-  const after = event.data?.data();
-  if (!after) return;
-
-  await processCaseEmail(event.params.caseId, after, true);
-});
-
-export const onConsultationStatusChange = onDocumentUpdated({
-  document: 'consultations/{consultationId}',
-  region: 'us-central1',
-  secrets: ['RESEND_API_KEY', 'TELEGRAM_BOT_TOKEN', 'TELEGRAM_CHAT_ID']
-}, async (event) => {
-  const before = event.data?.before.data();
-  const after = event.data?.after.data();
-
-  if (!before || !after || before.status === after.status) return;
-
-  const consultationId = event.params.consultationId;
-
-  // Evitar notificaciones duplicadas:
-  // Si el lead ya fue convertido a caso (tiene caseId), ignoramos este trigger porque onCaseStatusChange se encargará.
-  if (after.caseId) {
-    logger.info(`[onConsultationStatusChange] Ignorando status '${after.status}' porque el lead ya es un Caso Legal (${after.caseId}).`);
-    return;
+    await processCaseEmail(event.params.caseId, after, true);
   }
+);
 
-  // Solo disparamos en etapas tempranas exclusivas del Lead.
-  const leadOnlyStatuses = ['pendiente', 'nuevo', 'contactado', 'estudio', 'descartado'];
-  if (!leadOnlyStatuses.includes(after.status.toLowerCase())) {
-    logger.info(`[onConsultationStatusChange] Ignorando status '${after.status}' para evitar duplicados. Se maneja en onCaseStatusChange.`);
-    return;
+export const onConsultationStatusChange = onDocumentUpdated(
+  {
+    document: 'consultations/{consultationId}',
+    region: 'us-central1',
+    secrets: ['RESEND_API_KEY', 'TELEGRAM_BOT_TOKEN', 'TELEGRAM_CHAT_ID'],
+  },
+  async (event) => {
+    const before = event.data?.before.data();
+    const after = event.data?.after.data();
+
+    if (!before || !after || before.status === after.status) return;
+
+    const consultationId = event.params.consultationId;
+
+    // Evitar notificaciones duplicadas:
+    // Si el lead ya fue convertido a caso (tiene caseId), ignoramos este trigger porque onCaseStatusChange se encargará.
+    if (after.caseId) {
+      logger.info(
+        `[onConsultationStatusChange] Ignorando status '${after.status}' porque el lead ya es un Caso Legal (${after.caseId}).`
+      );
+      return;
+    }
+
+    // Solo disparamos en etapas tempranas exclusivas del Lead.
+    const leadOnlyStatuses = ['pendiente', 'nuevo', 'contactado', 'estudio', 'descartado'];
+    if (!leadOnlyStatuses.includes(after.status.toLowerCase())) {
+      logger.info(
+        `[onConsultationStatusChange] Ignorando status '${after.status}' para evitar duplicados. Se maneja en onCaseStatusChange.`
+      );
+      return;
+    }
+
+    const fakeAfterForLead = {
+      ...after,
+      consultationId,
+    };
+
+    // Enviar email al cliente y notificar al operador en Telegram para los cambios de estado iniciales.
+    await Promise.allSettled([
+      processCaseEmail(consultationId, fakeAfterForLead, false, true),
+      notifyTelegramStatusChange(consultationId, after, 'kanban'),
+    ]);
   }
-
-  const fakeAfterForLead = {
-    ...after,
-    consultationId,
-  };
-
-  // Enviar email al cliente y notificar al operador en Telegram para los cambios de estado iniciales.
-  await Promise.allSettled([
-    processCaseEmail(consultationId, fakeAfterForLead, false, true),
-    notifyTelegramStatusChange(consultationId, after, 'kanban'),
-  ]);
-});
+);

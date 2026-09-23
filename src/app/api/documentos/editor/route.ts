@@ -6,6 +6,8 @@ import { timingSafeEqual } from 'crypto';
 import { z } from 'zod';
 
 // Esquema estricto para validar formData enviado por el usuario
+const REF_REGEX = /^DSM-[0-9a-f-]{36}$/i;
+
 const DocumentFormDataSchema = z.object({
   ciudad: z.string().min(1, 'Ciudad es requerida').max(100),
   fecha: z.string().min(1, 'Fecha es requerida').max(50),
@@ -24,11 +26,14 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const ref = searchParams.get('ref');
-    const token = searchParams.get('token') || req.headers.get('x-download-token');
 
-    if (!ref) {
+    if (!ref || !REF_REGEX.test(ref)) {
       return NextResponse.json({ error: 'Referencia requerida' }, { status: 400 });
     }
+    // [2026-09-22] FIX: el token viaja en la cookie HttpOnly dt_<ref> emitida por
+    // create-order (antes se esperaba en la URL/sessionStorage, que ya no se llenan →
+    // el editor redirigía siempre al inicio, y un token en URL queda en logs/historial).
+    const token = req.cookies.get(`dt_${ref}`)?.value || req.headers.get('x-download-token');
 
     if (!token || token.trim() === '') {
       logger.security('[api/documentos/editor] Intento de acceso sin token', { ref });
@@ -95,10 +100,12 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { ref, formData, token: bodyToken } = body;
-    const token = bodyToken || req.headers.get('x-download-token');
+    const { ref, formData } = body;
+    const token =
+      (typeof ref === 'string' && req.cookies.get(`dt_${ref}`)?.value) ||
+      req.headers.get('x-download-token');
 
-    if (!ref || !formData) {
+    if (!ref || typeof ref !== 'string' || !REF_REGEX.test(ref) || !formData) {
       return NextResponse.json({ error: 'Parámetros incompletos' }, { status: 400 });
     }
 

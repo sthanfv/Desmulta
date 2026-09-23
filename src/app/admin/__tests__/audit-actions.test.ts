@@ -85,11 +85,25 @@ vi.mock('@/lib/firebase-admin', () => ({
   getAdminApp: vi.fn(),
 }));
 
+// [2026-09-22] God Mode y PIN operacional exigen una sesión admin 2FA válida
+const mockGetAdminFromCookies = vi.fn();
+vi.mock('@/lib/auth/admin-cookie-session', () => ({
+  getAdminFromCookies: (...args: unknown[]) => mockGetAdminFromCookies(...args),
+}));
+
 describe('God Mode Security System', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     process.env.SUPERADMIN_AUDIT_PASSWORD = '9316';
-    process.env.GOD_MODE_JWT_SECRET = 'test_secret_key';
+    process.env.GOD_MODE_JWT_SECRET = 'test_secret_key_with_at_least_32_chars!';
+    mockGetAdminFromCookies.mockResolvedValue({ uid: 'admin-1', email: 'admin@desmulta.online' });
+  });
+
+  it('Debe rechazar God Mode sin sesión admin 2FA aunque la contraseña sea correcta', async () => {
+    mockGetAdminFromCookies.mockResolvedValueOnce(null);
+    const result = await verifyGodMode('9316');
+    expect(result.success).toBe(false);
+    expect(mockSetCookie).not.toHaveBeenCalled();
   });
 
   it('Debe rechazar el acceso con una contraseña incorrecta', async () => {
@@ -120,6 +134,8 @@ describe('Operator Security PIN & Actions', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     process.env.OPERATOR_PIN = '123456';
+    process.env.GOD_MODE_JWT_SECRET = 'test_secret_key_with_at_least_32_chars!';
+    mockGetAdminFromCookies.mockResolvedValue({ uid: 'admin-1', email: 'admin@desmulta.online' });
   });
 
   it('verifyOperatorPin - Debe rechazar un PIN incorrecto en tiempo constante', async () => {

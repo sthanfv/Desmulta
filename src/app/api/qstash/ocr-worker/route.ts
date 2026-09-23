@@ -189,11 +189,19 @@ export async function POST(request: NextRequest) {
       try {
         await validateWebhookUrl(webhookUrl);
 
-        await fetch(webhookUrl, {
+        // [2026-09-22] FIX SSRF: fetch seguía redirecciones por defecto. Un webhook
+        // https válido podía responder 302 → http://127.0.0.1:9001 o 169.254.169.254 y
+        // saltarse validateWebhookUrl. 'error' rechaza cualquier redirección.
+        // Riesgo residual: DNS rebinding entre la validación y el fetch (fijar IP con un
+        // Agent de undici si el endpoint B2B crece).
+        const webhookRes = await fetch(webhookUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(finalPayload),
+          redirect: 'error',
+          signal: AbortSignal.timeout(10_000),
         });
+        if (!webhookRes.ok) throw new Error(`Webhook respondió HTTP ${webhookRes.status}`);
         logger.info('[ocr-worker] Resultado enviado al webhook exitosamente', { webhookUrl });
       } catch (webhookErr) {
         const msg = webhookErr instanceof Error ? webhookErr.message : String(webhookErr);

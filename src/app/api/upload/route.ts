@@ -57,8 +57,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       }
     }
 
-    // Usar UID verificado o IP como fallback (nunca el header no verificado)
-    const authorUid = verifiedUid || clienteIp;
+    // [2026-09-22] FIX: el cupo semanal se cuenta SIEMPRE por IP. Antes, con un idToken
+    // válido se contaba por UID, y cada cuenta anónima nueva de Firebase daba 5 subidas
+    // más (bypass trivial del límite). El UID verificado queda solo para trazabilidad.
+    const authorUid = clienteIp;
+    if (verifiedUid) logger.info('[upload] UID verificado', { verifiedUid });
 
     // Obtener el lunes de la semana actual para conteo semanal
     const ahora = new Date();

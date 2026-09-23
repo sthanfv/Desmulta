@@ -23,7 +23,6 @@ export default function DocumentEditor({ params }: { params: Promise<{ id: strin
 
   const [loading, setLoading] = useState(true);
   const [purchase, setPurchase] = useState<PurchaseData | null>(null);
-  const [downloadToken, setDownloadToken] = useState('');
 
   // Formulario del Editor
   const [formData, setFormData] = useState({
@@ -45,18 +44,8 @@ export default function DocumentEditor({ params }: { params: Promise<{ id: strin
   useEffect(() => {
     async function loadPurchase() {
       try {
-        const searchParams = new URLSearchParams(
-          typeof window !== 'undefined' ? window.location.search : ''
-        );
-        const token =
-          searchParams.get('token') ||
-          (typeof window !== 'undefined'
-            ? sessionStorage.getItem(`download_token_${refId}`) || ''
-            : '') ||
-          '';
-        setDownloadToken(token);
-
-        const res = await fetch(`/api/documentos/editor?ref=${refId}&token=${token}`);
+        // [2026-09-22] FIX: el token viaja en la cookie HttpOnly dt_<ref> (same-origin)
+        const res = await fetch(`/api/documentos/editor?ref=${encodeURIComponent(refId)}`);
         if (!res.ok) {
           router.push('/');
           return;
@@ -87,13 +76,13 @@ export default function DocumentEditor({ params }: { params: Promise<{ id: strin
       const res = await fetch('/api/documentos/editor', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ref: refId, formData, token: downloadToken }),
+        body: JSON.stringify({ ref: refId, formData }),
       });
       if (!res.ok) {
         throw new Error('Fallo al guardar el documento en el servidor');
       }
       // Redirigir al endpoint de descarga pasando el token de descarga para evitar el bloqueo IDOR
-      window.location.href = `/api/documentos/download?ref=${refId}&downloadToken=${downloadToken}`;
+      window.location.href = `/api/documentos/download?ref=${encodeURIComponent(refId)}`;
     } catch (err) {
       console.error('Error guardando documento:', err);
       alert('Error al guardar el documento. Por favor, intenta de nuevo.');

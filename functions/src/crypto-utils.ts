@@ -61,7 +61,7 @@ export function decryptSymmetric(encryptedString: string): string {
     decrypted += decipher.final('utf8');
 
     return decrypted;
-  } catch (err) {
+  } catch (_err) {
     return '[Error de Descifrado - PII Protegida]';
   }
 }

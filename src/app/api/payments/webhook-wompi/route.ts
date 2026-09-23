@@ -122,91 +122,112 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, ignored: true });
   }
 
-  const transaction = data.transaction;
-  const transactionId = transaction.id;
-  const reference = transaction.reference; // = wompiReference generado en create-order
-  const status = transaction.status; // APPROVED | DECLINED | VOIDED
+  const transaction = data?.transaction;
+  if (!transaction?.id || !transaction?.reference || !transaction?.status) {
+    logger.warn('[webhook-wompi] Evento sin transacción válida');
+    return NextResponse.json({ ok: true, ignored: true });
+  }
+  const transactionId: string = String(transaction.id);
+  const reference: string = String(transaction.reference); // = wompiReference de create-order
+  const status: string = String(transaction.status); // APPROVED | DECLINED | VOIDED | ERROR
+  const amountConfirmadoPorWompi = Number(transaction.amount_in_cents);
 
   const db = getFirestore(getAdminApp());
 
-  // ── Pasos 5 y 6: Idempotencia ATÓMICA — evitar dobles entregas ─────────────
-  // 🛡️ FIX: Se reemplaza la secuencia get()+set() por un único create() atómico.
-  // Si Wompi envía el mismo evento en paralelo, dos instancias serverless pueden
-  // pasar el get() simultáneamente antes de que ninguna escriba el set().
-  // Con create(), Firestore garantiza que solo UNA instancia triunfa (escritura
-  // exclusiva); la segunda recibe el código de error 6 (ALREADY_EXISTS) y retorna
-  // 200 de inmediato, cerrando la ventana de race condition.
-  const callbackRef = db.collection('processed_callbacks').doc(transactionId);
+  // ── Pasos 5-8: Idempotencia + validación + actualización en UNA transacción ──
+  // [2026-09-22] FIX: antes processed_callbacks se creaba ANTES de procesar. Si el
+  // update de la compra fallaba (timeout, cuota), el reintento de Wompi se trataba
+  // como duplicado y el pago quedaba PENDING para siempre (cliente sin documento).
+  // Ahora: si algo falla, no se escribe nada y se responde 500 → Wompi reintenta.
+  // La llave incluye el status para no descartar un VOIDED posterior a un APPROVED.
+  const callbackRef = db.collection('processed_callbacks').doc(`${transactionId}_${status}`);
+  const purchaseRef = db.collection('purchases').doc(reference);
+
+  type Outcome = 'duplicate' | 'not_found' | 'flagged' | 'ignored' | 'updated';
+  let outcome: Outcome;
+  let purchase: PurchaseDocument | undefined;
+
   try {
-    await callbackRef.create({
-      wompiTransactionId: transactionId,
-      processedAt: FieldValue.serverTimestamp(),
-      result: status,
-    });
-  } catch (err: unknown) {
-    const code = (err as { code?: number })?.code;
-    if (code === 6 /* ALREADY_EXISTS — webhook duplicado */) {
-      logger.info('[webhook-wompi] Webhook duplicado ignorado (idempotencia atómica)', {
-        transactionId,
+    ({ outcome, purchase } = await db.runTransaction(async (tx) => {
+      const [cbSnap, pSnap] = await Promise.all([tx.get(callbackRef), tx.get(purchaseRef)]);
+      if (cbSnap.exists) return { outcome: 'duplicate' as Outcome, purchase: undefined };
+
+      const current = pSnap.data() as PurchaseDocument | undefined;
+      const marker = {
+        wompiTransactionId: transactionId,
+        reference,
+        result: status,
+        processedAt: FieldValue.serverTimestamp(),
+      };
+
+      if (!current) {
+        tx.create(callbackRef, { ...marker, note: 'reference_not_found' });
+        return { outcome: 'not_found' as Outcome, purchase: undefined };
+      }
+
+      // 🚨 El monto (y la moneda) cobrados deben coincidir con la pre-orden server-side
+      if (
+        status === 'APPROVED' &&
+        (amountConfirmadoPorWompi !== current.amountCop || transaction.currency !== 'COP')
+      ) {
+        tx.update(purchaseRef, {
+          status: 'FLAGGED_AMOUNT_MISMATCH',
+          wompiTransactionId: transactionId,
+          flaggedDetails: {
+            paidCents: amountConfirmadoPorWompi,
+            expectedCents: current.amountCop,
+            currency: String(transaction.currency ?? ''),
+            flaggedAt: new Date(),
+          },
+        });
+        tx.create(callbackRef, { ...marker, note: 'amount_mismatch' });
+        return { outcome: 'flagged' as Outcome, purchase: current };
+      }
+
+      // No degradar una compra ya aprobada con un DECLINED/ERROR tardío (solo VOIDED revierte)
+      if (current.status === 'APPROVED' && status !== 'VOIDED') {
+        tx.create(callbackRef, { ...marker, note: 'already_approved' });
+        return { outcome: 'ignored' as Outcome, purchase: current };
+      }
+
+      tx.update(purchaseRef, {
+        status,
+        wompiTransactionId: transactionId,
+        ...(status === 'APPROVED' && { paidAt: FieldValue.serverTimestamp() }),
       });
-      return NextResponse.json({ ok: true, duplicate: true });
-    }
-    throw err;
+      tx.create(callbackRef, marker);
+      return { outcome: 'updated' as Outcome, purchase: current };
+    }));
+  } catch (err) {
+    logger.error('[webhook-wompi] Fallo transaccional — se pide reintento a Wompi', {
+      reference,
+      transactionId,
+      err: String(err),
+    });
+    return NextResponse.json({ error: 'retry' }, { status: 500 });
   }
 
-  // ── Paso 7: Obtener y validar el monto esperado de la compra ──────────────
-  const purchaseRef = db.collection('purchases').doc(reference);
-  const purchaseSnap = await purchaseRef.get();
-  const purchase = purchaseSnap.data() as PurchaseDocument | undefined;
-
-  if (!purchase) {
+  if (outcome === 'duplicate') {
+    logger.info('[webhook-wompi] Webhook duplicado ignorado', { transactionId, status });
+    return NextResponse.json({ ok: true, duplicate: true });
+  }
+  if (outcome === 'not_found') {
     logger.security('[webhook-wompi] Referencia inexistente en purchases', { reference });
     return NextResponse.json({ ok: true, ignored: true });
   }
-
-  // 🚨 FIX CRÍTICO: Validar que el monto que Wompi REALMENTE cobró coincide con
-  // el precio server-side establecido al crear la pre-orden en Firestore.
-  // purchase.amountCop está en centavos (ej. 1950000 para $19.500)
-  const amountConfirmadoPorWompi = Number(transaction.amount_in_cents);
-  if (status === 'APPROVED' && amountConfirmadoPorWompi !== purchase.amountCop) {
+  if (outcome === 'flagged') {
     logger.security('[webhook-wompi] 🚨 DISCREPANCIA DE MONTO — posible intento de fraude', {
       reference,
       transactionId,
       amountConfirmadoPorWompi,
-      amountEsperado: purchase.amountCop,
+      amountEsperado: purchase?.amountCop,
     });
-    await purchaseRef.update({
-      status: 'FLAGGED_AMOUNT_MISMATCH',
-      wompiTransactionId: transactionId,
-      flaggedDetails: {
-        paidCents: amountConfirmadoPorWompi,
-        expectedCents: purchase.amountCop,
-        flaggedAt: new Date(),
-      },
-    });
-
-    // FIX SEGURIDAD: Banear la IP original del estafador de forma permanente
-    if (purchase.ipAddress) {
-      await db.collection('banned_ips').doc(purchase.ipAddress.replace(/:/g, '_')).set({
-        ip: purchase.ipAddress,
-        reason: 'FRAUD_AMOUNT_MISMATCH',
-        bannedAt: FieldValue.serverTimestamp(),
-        reference,
-      });
-      logger.security('[webhook-wompi] IP BANEADA POR INTENTO DE FRAUDE', {
-        ip: purchase.ipAddress,
-      });
-    }
-
+    // Nota: se eliminó la escritura a banned_ips — ningún endpoint la consultaba.
     return NextResponse.json({ ok: true, flagged: true });
   }
-
-  // ── Paso 8: Actualizar el estado de la compra en Firestore ─────────────────
-  await purchaseRef.update({
-    status,
-    wompiTransactionId: transactionId,
-    ...(status === 'APPROVED' && { paidAt: FieldValue.serverTimestamp() }),
-  });
+  if (outcome === 'ignored' || !purchase) {
+    return NextResponse.json({ ok: true, ignored: true });
+  }
 
   // ── Paso 9: Si fue APPROVED → entregar el PDF de forma segura ─────────────
   if (status === 'APPROVED') {

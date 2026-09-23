@@ -12,9 +12,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAdminSession } from '@/lib/auth/require-admin-session';
+import { verifyAdminIdToken } from '@/lib/auth/require-admin-session';
 import { sendOtpToAdmin } from '@/lib/auth/otp-service';
-import { SignJWT } from 'jose';
+import { signAdminToken } from '@/lib/auth/admin-jwt';
 import { logger } from '@/lib/logger/security-logger';
 import { getSecureIp } from '@/lib/security/ip-utils';
 import { Ratelimit } from '@upstash/ratelimit';
@@ -64,8 +64,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 1. Validar que el token pertenece a un administrador
-    const decodedToken = await requireAdminSession(idToken);
+    // 1. Validar que el token pertenece a un administrador.
+    // [2026-09-22] FIX: verifyAdminIdToken (sin 2FA). requireAdminSession exige un 2FA
+    // previo, por lo que desde un navegador limpio el login siempre fallaba.
+    const decodedToken = await verifyAdminIdToken(idToken);
     const email = decodedToken.email;
 
     if (!email) {
@@ -80,25 +82,12 @@ export async function POST(request: NextRequest) {
 
     // 3. Generar el tempToken de vida corta (5 minutos)
     //    Incluye el idToken original para poder crear la sesión en verify-otp
-    const jwtSecret = process.env.GOD_MODE_JWT_SECRET;
-    if (!jwtSecret) {
-      logger.error('[pre-login] CRITICAL: GOD_MODE_JWT_SECRET no configurada.');
-      return NextResponse.json(
-        { error: 'Configuración de seguridad ausente en el servidor.' },
-        { status: 500 }
-      );
-    }
-
-    const secret = new TextEncoder().encode(jwtSecret);
-    const tempToken = await new SignJWT({
-      uid: decodedToken.uid,
-      email,
-      idToken, // Necesario para emitir la sesión en el paso de verificación
-      purpose: 'otp-verification', // Restringe el uso de este token
-    })
-      .setProtectedHeader({ alg: 'HS256' })
-      .setExpirationTime('5m')
-      .sign(secret);
+    // [2026-09-22] FIX: audiencia 'otp-pending' — este token ya NO sirve como admin-2fa-token.
+    const tempToken = await signAdminToken(
+      'otp-pending',
+      { uid: decodedToken.uid, email, idToken }, // idToken necesario para emitir la sesión
+      '5m'
+    );
 
     logger.info('[pre-login] Pre-autenticación exitosa. OTP enviado.', { email });
 

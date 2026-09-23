@@ -50,20 +50,19 @@ async function handler(_req: NextRequest) {
     cutoffDate.setMinutes(cutoffDate.getMinutes() - GRACE_PERIOD_MINUTES);
     const cutoffTimestamp = Timestamp.fromDate(cutoffDate);
 
-    // Consultar compras atascadas
-    // Requisitos: Aprobadas, no entregadas (sin pdfDeliveredAt) y que ya superaron
-    // su ventana de gracia (paidAt < 15 mins ago).
+    // [2026-09-22] FIX CRÍTICO: antes se pedían las 30 compras APROBADAS MÁS ANTIGUAS
+    // (orderBy paidAt asc) y se filtraba en memoria. Con más de 30 ventas entregadas,
+    // la consulta devolvía siempre las mismas 30 → ninguna falla nueva se reintentaba.
+    // Ahora se filtra en Firestore por pdfDeliveredAt == null (create-order lo inicializa
+    // en null; correr scripts/backfill-pdf-delivered.ts una vez para compras antiguas).
+    // Requiere el índice compuesto purchases(status, pdfDeliveredAt, paidAt).
     const snapshot = await db
       .collection('purchases')
       .where('status', '==', 'APPROVED')
-      // Importante: Firestore index limit. 'pdfDeliveredAt' no existe si no se entregó.
-      // Firestore soporta filtrar por inexistencia si usamos un query manual o si
-      // hacemos la verificación posterior. Como Firestore es NoSQL, una forma eficiente
-      // es pedir los APPROVED menores a cutoff, y luego filtrar en memoria los que
-      // no tienen pdfDeliveredAt. Si la base crece, se requeriría índice compuesto.
+      .where('pdfDeliveredAt', '==', null)
       .where('paidAt', '<=', cutoffTimestamp)
       .orderBy('paidAt', 'asc')
-      .limit(MAX_RETRIES_PER_RUN * 3) // Pedimos más por el filtrado en memoria
+      .limit(MAX_RETRIES_PER_RUN * 2)
       .get();
 
     if (snapshot.empty) {
@@ -73,14 +72,15 @@ async function handler(_req: NextRequest) {
 
     const failedPurchases: PurchaseDocument[] = [];
 
-    // Filtrar en memoria las que NO tienen el campo pdfDeliveredAt y no han superado el límite de reintentos
     snapshot.forEach((docSnap) => {
-      const data = docSnap.data() as PurchaseDocument;
-      if (!data.pdfDeliveredAt && (data.deliveryRetries || 0) < MAX_DELIVERY_ATTEMPTS) {
+      const raw = docSnap.data() as PurchaseDocument;
+      const data: PurchaseDocument = { ...raw, id: raw.id || docSnap.id };
+      if (data.pdfDeliveredAt) return; // defensa extra ante datos inconsistentes
+      if ((data.deliveryRetries || 0) < MAX_DELIVERY_ATTEMPTS) {
         failedPurchases.push(data);
-      } else if (!data.pdfDeliveredAt && (data.deliveryRetries || 0) >= MAX_DELIVERY_ATTEMPTS) {
+      } else {
         logger.warn(
-          `[dlq-pdf-delivery] Compra ${data.id} superó el límite de reintentos (${MAX_DELIVERY_ATTEMPTS}). Abandonando envío para evitar starvation.`
+          `[dlq-pdf-delivery] Compra ${data.id} superó ${MAX_DELIVERY_ATTEMPTS} reintentos — requiere intervención manual.`
         );
       }
     });

@@ -119,8 +119,10 @@ export async function GET(req: NextRequest) {
         infractorName: caseData?.infractorName ?? '',
         infractorId: caseData?.infractorId ?? '',
         documentType: tokenData.productType as DocumentType,
-        operatorName: 'SISTEMA AUTOMATIZADO DESMULTA',
-        operatorId: 'NIT 900.000.000-1',
+        // [2026-09-22] FIX: antes se imprimía un NIT ficticio ('NIT 900.000.000-1') en
+        // documentos legales vendidos. Mismo origen que pdf-delivery.ts (correo).
+        operatorName: process.env.OPERATOR_LEGAL_NAME || 'SISTEMA AUTOMATIZADO DESMULTA',
+        operatorId: process.env.OPERATOR_LEGAL_ID || '[NIT_NO_CONFIGURADO]',
         acceptedAt: purchase?.paidAt
           ? purchase.paidAt.toDate().toISOString()
           : new Date().toISOString(),
@@ -217,8 +219,10 @@ export async function GET(req: NextRequest) {
         infractorName: purchase.caseData?.infractorName ?? '',
         infractorId: purchase.caseData?.infractorId ?? '',
         documentType: purchase.productType as DocumentType,
-        operatorName: 'SISTEMA AUTOMATIZADO DESMULTA',
-        operatorId: 'NIT 900.000.000-1',
+        // [2026-09-22] FIX: antes se imprimía un NIT ficticio ('NIT 900.000.000-1') en
+        // documentos legales vendidos. Mismo origen que pdf-delivery.ts (correo).
+        operatorName: process.env.OPERATOR_LEGAL_NAME || 'SISTEMA AUTOMATIZADO DESMULTA',
+        operatorId: process.env.OPERATOR_LEGAL_ID || '[NIT_NO_CONFIGURADO]',
         acceptedAt: purchase.paidAt
           ? purchase.paidAt.toDate().toISOString()
           : new Date().toISOString(),
