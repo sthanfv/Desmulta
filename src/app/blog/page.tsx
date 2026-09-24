@@ -41,7 +41,7 @@ export default async function BlogIndex() {
       />
 
       {/* Header Glassmorphic */}
-      <header className="fixed top-0 w-full z-50 p-6">
+      <header data-desktop-header className="fixed top-0 w-full z-50 p-6">
         <div className="max-w-4xl mx-auto glass rounded-3xl px-8 h-16 flex items-center justify-between shadow-2xl border-white/10">
           <Link
             href="/"
@@ -59,7 +59,7 @@ export default async function BlogIndex() {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-6 pt-36 pb-24">
+      <main className="max-w-6xl mx-auto px-6 pt-6 md:pt-36 pb-24">
         {/* Hero Blog */}
         <div className="mb-20 animate-in fade-in slide-in-from-bottom-4 duration-700 text-center">
           <div className="inline-flex items-center justify-center p-3 bg-primary/10 rounded-2xl text-primary mb-6 shadow-pill">

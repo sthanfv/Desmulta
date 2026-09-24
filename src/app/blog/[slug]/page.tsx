@@ -90,7 +90,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_90%_90%,rgba(255,191,0,0.03)_0%,transparent_40%)] pointer-events-none" />
 
       {/* Header Glassmorphic */}
-      <header className="fixed top-0 w-full z-50 p-6">
+      <header data-desktop-header className="fixed top-0 w-full z-50 p-6">
         <div className="max-w-4xl mx-auto glass rounded-3xl px-8 h-16 flex items-center justify-between shadow-2xl border-white/10">
           <Link
             href="/blog"
@@ -108,7 +108,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-6 pt-36 pb-24">
+      <main className="max-w-4xl mx-auto px-6 pt-6 md:pt-36 pb-24">
         {/* Cabecera del Artículo */}
         <div className="mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
           <div className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest border border-primary/20 mb-8">

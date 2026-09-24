@@ -129,7 +129,7 @@ export default async function MultasCiudadPage(props: Props) {
       />
       <div className="min-h-screen bg-background text-foreground selection:bg-brand-500/30 selection:text-primary-foreground relative">
         {/* Header flotante para navegación fácil */}
-        <header className="fixed top-0 w-full z-50 p-4 sm:p-6">
+        <header data-desktop-header className="fixed top-0 w-full z-50 p-4 sm:p-6">
           <div className="max-w-4xl mx-auto glass rounded-3xl px-6 sm:px-8 h-16 flex items-center justify-between shadow-2xl border-slate-200 dark:border-white/10 bg-white/40 dark:bg-black/40 backdrop-blur-md">
             <Link
               href="/#contacto"
@@ -148,7 +148,7 @@ export default async function MultasCiudadPage(props: Props) {
         </header>
 
         {/* Hero Section */}
-        <section className="relative pt-36 sm:pt-44 pb-16 sm:pb-20 px-4 sm:px-6 md:px-12 overflow-hidden">
+        <section className="relative pt-6 md:pt-44 pb-16 sm:pb-20 px-4 sm:px-6 md:px-12 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-brand-900/10 dark:from-brand-900/20 to-background pointer-events-none" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] sm:w-[800px] h-[600px] sm:h-[800px] bg-brand-500/10 blur-[120px] rounded-full pointer-events-none" />
 

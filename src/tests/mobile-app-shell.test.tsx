@@ -5,6 +5,7 @@ import {
   isAppShellRoute,
   openAssistant,
   openConsultation,
+  titleFor,
   OPEN_ASSISTANT_EVENT,
   OPEN_CONSULTATION_EVENT,
 } from '@/components/mobile/app-shell';
@@ -161,5 +162,39 @@ describe('MobileQuickActions — accesos rápidos del Inicio', () => {
     expect(target.scrollIntoView).toHaveBeenCalled();
     window.removeEventListener(OPEN_ASSISTANT_EVENT, listener);
     target.remove();
+  });
+});
+
+describe('Fase 3 — barra superior de páginas internas', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it.each([
+    ['/estado', 'Mi caso'],
+    ['/calculadora', 'Calculadora'],
+    ['/plantillas', 'Plantillas legales'],
+    ['/blog', 'Guía legal'],
+    ['/blog/como-tumbar-una-fotomulta', 'Artículo'],
+    ['/faq', 'Preguntas frecuentes'],
+    ['/multas/bogota', 'Multas por ciudad'],
+    ['/ruta-nueva', 'Desmulta'],
+  ])('título de %s → %s', (path, title) => {
+    expect(titleFor(path)).toBe(title);
+  });
+
+  it('en una página interna muestra flecha atrás y el título, sin un h1 extra', () => {
+    mockPathname.mockReturnValue('/faq');
+    const { container } = render(<MobileAppShell />);
+
+    expect(container.querySelector('[data-app-topbar="inner"]')).not.toBeNull();
+    expect(screen.getByText('Preguntas frecuentes')).toBeInTheDocument();
+    expect(container.querySelector('h1')).toBeNull();
+  });
+
+  it('sin historial previo, la flecha atrás lleva a Inicio', () => {
+    mockPathname.mockReturnValue('/calculadora');
+    render(<MobileAppShell />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Volver' }));
+    expect(mockPush).toHaveBeenCalledWith('/');
   });
 });

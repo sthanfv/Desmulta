@@ -17,7 +17,7 @@ export default function DirectorioCiudadesPage() {
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-brand-500/30 relative overflow-hidden pb-20">
       {/* Header flotante */}
-      <header className="fixed top-0 w-full z-50 p-6">
+      <header data-desktop-header className="fixed top-0 w-full z-50 p-6">
         <div className="max-w-7xl mx-auto glass rounded-3xl px-8 h-16 flex items-center justify-between shadow-sm border border-slate-200 dark:border-white/10 bg-white/80 dark:bg-black/40 backdrop-blur-md">
           <Link
             href="/#contacto"
@@ -39,7 +39,7 @@ export default function DirectorioCiudadesPage() {
       <div className="absolute top-0 left-0 w-full h-[500px] bg-[radial-gradient(circle_at_50%_-20%,rgba(245,158,11,0.1)_0%,transparent_50%)] dark:bg-[radial-gradient(circle_at_50%_-20%,rgba(245,158,11,0.06)_0%,transparent_50%)] pointer-events-none" />
 
       {/* Hero Section */}
-      <section className="relative z-10 pt-36 pb-12 px-6 md:px-12 text-center">
+      <section className="relative z-10 pt-6 md:pt-36 pb-12 px-6 md:px-12 text-center">
         <div className="max-w-4xl mx-auto">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-[1.5rem] bg-brand-500/10 mb-8 border border-brand-500/20 shadow-inner">
             <MapPin size={30} className="text-brand-500" />

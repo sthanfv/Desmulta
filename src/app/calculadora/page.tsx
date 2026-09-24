@@ -57,7 +57,10 @@ export default function CalculadoraPage() {
       />
 
       {/* Header Sutil */}
-      <header className="w-full p-6 border-b border-zinc-800/80 bg-[#0a0a0a]/80 backdrop-blur-md sticky top-0 z-50">
+      <header
+        data-desktop-header
+        className="w-full p-6 border-b border-zinc-800/80 bg-[#0a0a0a]/80 backdrop-blur-md sticky top-0 z-50"
+      >
         <div className="max-w-4xl mx-auto flex justify-between items-center">
           <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <ShieldAlert className="w-6 h-6 text-yellow-400" />

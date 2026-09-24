@@ -133,7 +133,7 @@ export default function PlantillasPage() {
 
   return (
     <div
-      className="min-h-screen bg-gradient-to-br from-white via-white to-amber-50/50 dark:bg-none dark:bg-background selection:bg-primary/30 selection:text-primary-foreground py-16 px-4 md:px-8 pt-24 relative overflow-hidden group/layout"
+      className="min-h-screen bg-gradient-to-br from-white via-white to-amber-50/50 dark:bg-none dark:bg-background selection:bg-primary/30 selection:text-primary-foreground py-16 px-4 md:px-8 pt-4 md:pt-24 relative overflow-hidden group/layout"
       onMouseMove={handleMouseMove}
     >
       {/* Patrón de puntos amigable (amarillo tenue) en lugar de negro para evitar que se vea 'sucio' u 'oscuro' */}
@@ -176,8 +176,8 @@ export default function PlantillasPage() {
       />
 
       <div className="max-w-6xl mx-auto relative z-10">
-        {/* Botón de Regreso */}
-        <div className="mb-12">
+        {/* Botón de Regreso (escritorio; en teléfono está la flecha de la barra de la app) */}
+        <div className="mb-12 hidden md:block">
           <Link
             href="/"
             className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 dark:text-zinc-400 bg-white dark:bg-zinc-900/50 backdrop-blur-sm border border-slate-200 dark:border-zinc-800 rounded-full hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors shadow-sm hover:text-slate-900 dark:hover:text-zinc-200"

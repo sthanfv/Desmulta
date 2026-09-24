@@ -789,4 +789,21 @@ body[data-scroll-locked] .chat-widget-container {
   body:has([data-app-shell]) [data-desktop-header] {
     display: none;
   }
+  /* Páginas internas: espacio para la barra superior con flecha atrás */
+  body:has([data-app-topbar='inner']) #main-content {
+    padding-top: calc(3.5rem + env(safe-area-inset-top));
+  }
+  /* Transición de pantalla (solo opacidad; ver MobileAppShell) */
+  #main-content.app-screen-enter {
+    animation: app-screen-enter 220ms ease-out;
+  }
+}
+
+@keyframes app-screen-enter {
+  from {
+    opacity: 0.35;
+  }
+  to {
+    opacity: 1;
+  }
 }

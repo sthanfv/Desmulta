@@ -13,7 +13,7 @@ export default function PrivacidadPage() {
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_10%_10%,rgba(255,191,0,0.05)_0%,transparent_40%)] pointer-events-none" />
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_90%_90%,rgba(255,191,0,0.03)_0%,transparent_40%)] pointer-events-none" />
 
-      <header className="fixed top-0 w-full z-50 p-6">
+      <header data-desktop-header className="fixed top-0 w-full z-50 p-6">
         <div className="max-w-4xl mx-auto glass rounded-3xl px-8 h-16 flex items-center justify-between shadow-2xl border-white/10">
           <Link
             href="/"
@@ -31,7 +31,7 @@ export default function PrivacidadPage() {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-6 pt-36 pb-24">
+      <main className="max-w-4xl mx-auto px-6 pt-6 md:pt-36 pb-24">
         <div className="mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
           <h1 className="text-5xl md:text-7xl font-black mb-6 text-foreground tracking-tight leading-[0.95]">
             Políticas de <br />

@@ -36,6 +36,27 @@ export function activeTabFor(pathname: string | null | undefined): AppTab | null
   return null;
 }
 
+/** Título de la barra superior en páginas internas (Inicio muestra la marca). */
+const TITLES: Array<[RegExp, string]> = [
+  [/^\/estado(\/|$)/, 'Mi caso'],
+  [/^\/seguir(\/|$)/, 'Seguimiento'],
+  [/^\/calculadora(\/|$)/, 'Calculadora'],
+  [/^\/plantillas(\/|$)/, 'Plantillas legales'],
+  [/^\/blog\/.+/, 'Artículo'],
+  [/^\/blog\/?$/, 'Guía legal'],
+  [/^\/faq(\/|$)/, 'Preguntas frecuentes'],
+  [/^\/servicios(\/|$)/, 'Servicios'],
+  [/^\/metodologia(\/|$)/, 'Metodología'],
+  [/^\/referidos(\/|$)/, 'Referidos'],
+  [/^\/privacidad(\/|$)/, 'Privacidad'],
+  [/^\/terminos(\/|$)/, 'Términos'],
+  [/^\/multas(\/|$)/, 'Multas por ciudad'],
+];
+
+export function titleFor(pathname: string): string {
+  return TITLES.find(([pattern]) => pattern.test(pathname))?.[1] ?? 'Desmulta';
+}
+
 // Eventos que escuchan HomeClient (modal de consulta) y ChatAssistantWidget (chat)
 export const OPEN_CONSULTATION_EVENT = 'open-consultation-modal';
 export const OPEN_ASSISTANT_EVENT = 'open-chat-assistant';

@@ -10,11 +10,12 @@
 // cabecera de escritorio solo en las rutas donde la carcasa está presente.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import {
+  ArrowLeft,
   BookOpen,
   Calculator,
   Camera,
@@ -47,6 +48,7 @@ import {
   isAppShellRoute,
   openAssistant,
   openConsultation,
+  titleFor,
   type ConsultationMode,
 } from './app-shell';
 
@@ -54,6 +56,25 @@ export function MobileAppShell() {
   const pathname = usePathname() ?? '/';
   const router = useRouter();
   const [sheet, setSheet] = useState<'consultar' | 'mas' | null>(null);
+
+  // Transición de pantalla al cambiar de ruta: solo opacidad (un transform sobre #main-content
+  // rompería los elementos position:fixed de su interior mientras dura la animación)
+  useEffect(() => {
+    const main = document.getElementById('main-content');
+    if (
+      !main ||
+      !window.matchMedia?.('(max-width: 767px)').matches ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+      return;
+    }
+    main.classList.remove('app-screen-enter');
+    void main.offsetWidth; // reinicia la animación si se navega rápido
+    main.classList.add('app-screen-enter');
+    const done = () => main.classList.remove('app-screen-enter');
+    main.addEventListener('animationend', done, { once: true });
+    return () => main.removeEventListener('animationend', done);
+  }, [pathname]);
 
   if (!isAppShellRoute(pathname)) return null;
 
@@ -68,7 +89,18 @@ export function MobileAppShell() {
 
   return (
     <div data-app-shell className="md:hidden">
-      {pathname === '/' && <MobileTopBar />}
+      {pathname === '/' ? (
+        <MobileTopBar />
+      ) : (
+        <InnerTopBar
+          title={titleFor(pathname)}
+          onBack={() => {
+            haptic();
+            if (window.history.length > 1) router.back();
+            else router.push('/');
+          }}
+        />
+      )}
 
       <nav
         aria-label="Navegación principal"
@@ -152,6 +184,28 @@ export function MobileAppShell() {
         </DrawerContent>
       </Drawer>
     </div>
+  );
+}
+
+/** Barra de páginas internas: flecha atrás + título, como las pantallas de una app. */
+function InnerTopBar({ title, onBack }: { title: string; onBack: () => void }) {
+  return (
+    <header
+      data-app-topbar="inner"
+      className="fixed inset-x-0 top-0 z-[45] border-b border-border/50 bg-background/90 backdrop-blur-xl pt-[env(safe-area-inset-top)]"
+    >
+      <div className="flex h-14 items-center gap-1 px-2">
+        <button
+          type="button"
+          onClick={onBack}
+          aria-label="Volver"
+          className="flex h-10 w-10 items-center justify-center rounded-full text-foreground transition-transform active:scale-90 active:bg-muted"
+        >
+          <ArrowLeft className="h-[22px] w-[22px]" />
+        </button>
+        <p className="truncate text-[17px] font-bold text-foreground">{title}</p>
+      </div>
+    </header>
   );
 }
 
