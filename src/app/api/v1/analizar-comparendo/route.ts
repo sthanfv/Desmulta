@@ -13,6 +13,7 @@ import { extraerComparendos, construirAnalisisCompleto } from '@/lib/legal/compa
 import { validateApiKey, API_KEY_HEADER, handleApiKeyError } from '@/lib/security/api-key-guard';
 import { validateWebhookUrl } from '@/lib/security/ssrf-guard';
 import { PROMPT_EXTRACCION_ESTRUCTURADA_SINGLE } from '@/lib/ai/gemini-prompts';
+import { GEMINI_OCR_MODEL } from '@/lib/ai/gemini-model';
 
 /**
  * API Route: POST /api/v1/analizar-comparendo
@@ -92,7 +93,7 @@ function getGeminiModel() {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error('[analizar-comparendo] GEMINI_API_KEY no configurada.');
   const genAI = new GoogleGenerativeAI(apiKey);
-  return genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+  return genAI.getGenerativeModel({ model: GEMINI_OCR_MODEL });
 }
 
 const PROMPT_EXTRACCION_ESTRUCTURADA = PROMPT_EXTRACCION_ESTRUCTURADA_SINGLE;

@@ -8,6 +8,7 @@ import { apiError } from '@/lib/types/api-response';
 import { OcrCircuitBreakerFs } from '@/lib/security/circuit-breaker-firestore';
 import { Redis } from '@upstash/redis';
 import { PROMPT_EXTRACCION_ESTRUCTURADA_STRICT } from '@/lib/ai/gemini-prompts';
+import { GEMINI_OCR_MODEL } from '@/lib/ai/gemini-model';
 import { getAdminApp } from '@/lib/firebase-admin';
 import { getFirestore } from 'firebase-admin/firestore';
 import * as admin from 'firebase-admin';
@@ -47,8 +48,8 @@ function getGeminiModel() {
   }
 
   const genAI = new GoogleGenerativeAI(apiKey);
-  // Usar flash-1.5 por ser el más estable y óptimo para OCR multimodal
-  return genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+  // Modelo configurable (GEMINI_OCR_MODEL); ver src/lib/ai/gemini-model.ts
+  return genAI.getGenerativeModel({ model: GEMINI_OCR_MODEL });
 }
 
 export async function GET() {

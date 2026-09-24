@@ -6,6 +6,7 @@ import { logger } from '@/lib/logger/security-logger';
 import { extraerComparendos, construirAnalisisCompleto } from '@/lib/legal/comparendo-extractor';
 import { validateWebhookUrl } from '@/lib/security/ssrf-guard';
 import { PROMPT_EXTRACCION_ESTRUCTURADA_ARRAY } from '@/lib/ai/gemini-prompts';
+import { GEMINI_OCR_MODEL } from '@/lib/ai/gemini-model';
 import { alertServiceFailureInBackground } from '@/lib/monitoring/service-alert';
 
 const redis = Redis.fromEnv();
@@ -24,7 +25,7 @@ function getGeminiModel() {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error('[ocr-worker] GEMINI_API_KEY no configurada.');
   const genAI = new GoogleGenerativeAI(apiKey);
-  return genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+  return genAI.getGenerativeModel({ model: GEMINI_OCR_MODEL });
 }
 
 export async function POST(request: NextRequest) {
