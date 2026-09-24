@@ -33,6 +33,13 @@
 
 ## 📜 Historial Reciente (Últimos Cambios Clave)
 
+### [2026-09-24] - Recolección de noticias manual (`npm run blog:sync`)
+
+- 7 artículos nuevos reescritos con Gemini (`gemini-flash-lite-latest`), 250-320 palabras, validados con el compilador MDX (7/7). Notificación de Telegram enviada.
+- La poda automática (máx. 30 importados) eliminó 3 antiguos, entre ellos "Tatequieto": sus dos slugs redirigen ahora a `/blog`.
+- Secreto `GEMINI_API_KEY` creado en GitHub por el propietario; falta resolver por qué GitHub Actions se corta a los 2 s para que la recolección vuelva a ser automática (diaria, 06:00 UTC).
+- Mejora posible: los `excerpt` arrastran texto basura de Google Alerts ("Descargue la App…").
+
 ### [2026-09-24] - Privacidad y Términos: correcciones de exactitud
 
 - **Privacidad (`src/app/privacidad/page.tsx`):** decía que el OCR se procesaba "100% en su dispositivo" y que las imágenes no se enviaban a IA externa — **falso** (`/api/ocr` usa Gemini y Lector-OCR). También afirmaba consultas automatizadas (bots/scraping) al SIMIT/RUNT, desactivadas por cumplimiento. Se corrigió y se agregaron: Microsoft Clarity y Cloudflare Turnstile en rastreadores, asistente virtual (mensajes a Gemini, conversación solo en el navegador, analítica sin texto), derechos del titular (Art. 8 Ley 1581) con canal y plazos (Arts. 14-15), conservación y seguridad, y fecha de actualización.

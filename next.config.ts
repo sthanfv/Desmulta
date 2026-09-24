@@ -83,9 +83,16 @@ const nextConfig: NextConfig = {
   // Se renombraron a slugs limpios; la redirección 301 conserva los enlaces ya indexados.
   async redirects() {
     return [
+      // El artículo "Tatequieto" salió en la poda automática (máx. 30 importados): ambos slugs
+      // llevan a la Guía legal para no dejar enlaces rotos.
       {
         source: '/blog/39tatequieto39-a-las-nuevas-fotomultas-en-la-via-al-mar---elheraldoco',
-        destination: '/blog/tatequieto-a-las-nuevas-fotomultas-en-la-via-al-mar---elheraldoco',
+        destination: '/blog',
+        permanent: true,
+      },
+      {
+        source: '/blog/tatequieto-a-las-nuevas-fotomultas-en-la-via-al-mar---elheraldoco',
+        destination: '/blog',
         permanent: true,
       },
       {
