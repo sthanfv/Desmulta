@@ -3,7 +3,16 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import Image from 'next/image';
-import { X, ImageOff, Maximize2, GripVertical, ZoomIn, ZoomOut } from 'lucide-react';
+import {
+  X,
+  ImageOff,
+  Maximize2,
+  GripVertical,
+  ZoomIn,
+  ZoomOut,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
 import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion';
 import type { ShowcaseConfig } from '@/lib/config-constants';
 import { Haptics } from '@/lib/utils/haptics';
@@ -21,6 +30,12 @@ interface SuccessCase {
 interface SuccessCasesProps {
   showcaseData: ShowcaseConfig;
 }
+
+/** Ancho real del visor en línea: el contenedor es max-w-4xl (896 px) en escritorio. */
+const IMAGE_SIZES_INLINE = '(min-width: 768px) 896px, 100vw';
+
+/** Distancia (px) de arrastre horizontal para pasar de caso. */
+const SWIPE_THRESHOLD = 60;
 
 /**
  * SkeletonSlider — Placeholder animado mientras carga /api/gallery
@@ -66,6 +81,11 @@ function ImageSlider({
   const containerRef = useRef<HTMLDivElement>(null);
   const [errorBefore, setErrorBefore] = useState(false);
   const [errorAfter, setErrorAfter] = useState(false);
+  const [loadedCount, setLoadedCount] = useState(0);
+  // [2026-09-24] Antes `unoptimized`: se descargaba la foto original completa en cada teléfono.
+  // Con `sizes`, Next.js sirve la variante adecuada a la pantalla (AVIF/WebP).
+  const sizes = isExpanded ? '100vw' : IMAGE_SIZES_INLINE;
+  const imagesReady = loadedCount >= 2;
 
   // Calcula exactamente en dónde cae la manija usando el cliente X
   const handleMove = useCallback((clientX: number) => {
@@ -147,11 +167,12 @@ function ImageSlider({
         src={afterSrc}
         alt="Simit Paz y Salvo"
         fill
-        className={`pointer-events-none transform-gpu ${isExpanded ? 'object-contain object-center' : 'object-cover object-left-top'}`}
+        className={`pointer-events-none transform-gpu transition-opacity duration-500 ${imagesReady ? 'opacity-100' : 'opacity-0'} ${isExpanded ? 'object-contain object-center' : 'object-cover object-left-top'}`}
         style={{ transform: 'translateZ(0)' }}
+        sizes={sizes}
         loading="lazy"
         decoding="async"
-        unoptimized
+        onLoad={() => setLoadedCount((n) => n + 1)}
         onError={() => setErrorAfter(true)}
       />
 
@@ -173,11 +194,12 @@ function ImageSlider({
           src={beforeSrc}
           alt="Simit Multas"
           fill
-          className={`transform-gpu ${isExpanded ? 'object-contain object-center' : 'object-cover object-left-top'}`}
+          className={`transform-gpu transition-opacity duration-500 ${imagesReady ? 'opacity-100' : 'opacity-0'} ${isExpanded ? 'object-contain object-center' : 'object-cover object-left-top'}`}
           style={{ transform: 'translateZ(0)' }}
+          sizes={sizes}
           loading="lazy"
           decoding="async"
-          unoptimized
+          onLoad={() => setLoadedCount((n) => n + 1)}
           onError={() => setErrorBefore(true)}
         />
         <div className="absolute top-4 left-4 z-10 px-3 py-1 bg-rose-500/80 backdrop-blur-md rounded-full shadow-lg pointer-events-none">
@@ -190,6 +212,7 @@ function ImageSlider({
       {/* Línea divisoria central con manija */}
       <div
         // Área táctil extra ancha (w-12) para que los dedos gordos en celulares la agarren fácil. touch-none evita scroll al agarrarla.
+        data-slider-handle
         className="absolute top-0 bottom-0 z-20 flex items-center justify-center w-12 cursor-ew-resize touch-none"
         style={{ left: `${sliderPos}%`, transform: 'translateX(-50%)' }}
         onPointerDown={handlePointerDown}
@@ -476,15 +499,26 @@ export const SuccessCases = ({ showcaseData }: SuccessCasesProps) => {
   const [escalaZoom, setEscalaZoom] = useState(1);
   const [dynamicCases, setDynamicCases] = useState<SuccessCase[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
+  // Dirección de la última navegación (1 = siguiente, -1 = anterior): orienta la animación
+  const [direction, setDirection] = useState<1 | -1>(1);
+  // Desplazamiento horizontal mientras el dedo arrastra la tarjeta (la sigue en tiempo real)
+  const [dragX, setDragX] = useState(0);
 
   // ── Navegación entre casos ─────────────────────────────────────────────
   const irAlAnterior = useCallback(() => {
+    setDirection(-1);
     setActiveIndex((prev) => (prev === 0 ? dynamicCases.length - 1 : prev - 1));
   }, [dynamicCases.length]);
 
   const irAlSiguiente = useCallback(() => {
+    setDirection(1);
     setActiveIndex((prev) => (prev === dynamicCases.length - 1 ? 0 : prev + 1));
   }, [dynamicCases.length]);
+
+  const irAlCaso = (idx: number) => {
+    setDirection(idx >= activeIndex ? 1 : -1);
+    setActiveIndex(idx);
+  };
 
   // Teclado: flechas izquierda/derecha
   useEffect(() => {
@@ -497,24 +531,80 @@ export const SuccessCases = ({ showcaseData }: SuccessCasesProps) => {
     return () => window.removeEventListener('keydown', handler);
   }, [dynamicCases.length, irAlAnterior, irAlSiguiente]);
 
-  // Swipe táctil entre casos
-  const swipeStartX = useRef<number | null>(null);
+  // ── Swipe táctil entre casos: la tarjeta sigue al dedo ─────────────────
+  // [2026-09-24] Antes: salto al soltar si el desplazamiento superaba 50 px, y arrastrar la manija
+  // antes/después también contaba como swipe (saltaba de caso al comparar). Ahora se ignora el gesto
+  // que empieza en la manija, se bloquea el eje (vertical = scroll de la página) y la tarjeta se
+  // mueve con el dedo; al soltar pasa de caso o vuelve a su sitio.
+  const swipe = useRef<{ x: number; y: number; axis: 'x' | 'y' | null } | null>(null);
   const handleSwipeStart = (e: React.TouchEvent) => {
-    swipeStartX.current = e.touches[0].clientX;
+    if ((e.target as HTMLElement).closest('[data-slider-handle]') || dynamicCases.length < 2) {
+      swipe.current = null;
+      return;
+    }
+    swipe.current = { x: e.touches[0].clientX, y: e.touches[0].clientY, axis: null };
   };
-  const handleSwipeEnd = (e: React.TouchEvent) => {
-    if (swipeStartX.current === null) return;
-    const delta = swipeStartX.current - e.changedTouches[0].clientX;
-    if (Math.abs(delta) > 50) {
-      if (delta > 0) {
-        irAlSiguiente();
-      } else {
-        irAlAnterior();
-      }
+  const handleSwipeMove = (e: React.TouchEvent) => {
+    const s = swipe.current;
+    if (!s) return;
+    const dx = e.touches[0].clientX - s.x;
+    const dy = e.touches[0].clientY - s.y;
+    if (!s.axis && Math.max(Math.abs(dx), Math.abs(dy)) > 8) {
+      s.axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+    }
+    if (s.axis === 'x') setDragX(dx);
+  };
+  const handleSwipeEnd = () => {
+    const s = swipe.current;
+    swipe.current = null;
+    if (!s || s.axis !== 'x') return;
+    if (Math.abs(dragX) > SWIPE_THRESHOLD) {
+      if (dragX < 0) irAlSiguiente();
+      else irAlAnterior();
       Haptics.impact();
     }
-    swipeStartX.current = null;
+    setDragX(0);
   };
+
+  // ── Precarga de los casos vecinos (sin parpadeo al deslizar) ───────────
+  const vecinos =
+    dynamicCases.length > 1
+      ? [
+          dynamicCases[(activeIndex + 1) % dynamicCases.length],
+          dynamicCases[(activeIndex - 1 + dynamicCases.length) % dynamicCases.length],
+        ]
+      : [];
+
+  // ── Visor a pantalla completa: "atrás" del teléfono, Escape y scroll bloqueado ──
+  const abrirVisor = () => {
+    setEscalaZoom(1);
+    setVisorAbierto(true);
+    // Entrada propia en el historial: el gesto/botón "atrás" de Android cierra el visor
+    // en vez de sacar al ciudadano de la página.
+    window.history.pushState({ ...window.history.state, visorCasos: true }, '');
+  };
+  const cerrarVisor = useCallback(() => {
+    if (window.history.state?.visorCasos)
+      window.history.back(); // popstate lo cierra
+    else setVisorAbierto(false);
+  }, []);
+
+  useEffect(() => {
+    if (!visorAbierto) return;
+    const onPopState = () => setVisorAbierto(false);
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') cerrarVisor();
+    };
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('popstate', onPopState);
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('popstate', onPopState);
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [visorAbierto, cerrarVisor]);
   /** isLoading: true mientras el fetch no ha completado (éxito o error) */
   const [isLoading, setIsLoading] = useState(true);
 
@@ -638,7 +728,9 @@ export const SuccessCases = ({ showcaseData }: SuccessCasesProps) => {
               <div
                 className="relative p-2 md:p-3 rounded-[2.5rem] bg-gradient-to-br from-primary/10 via-background to-background shadow-inner border border-primary/10"
                 onTouchStart={handleSwipeStart}
+                onTouchMove={handleSwipeMove}
                 onTouchEnd={handleSwipeEnd}
+                onTouchCancel={handleSwipeEnd}
               >
                 {/* Flecha izquierda */}
                 {dynamicCases.length > 1 && (
@@ -675,25 +767,37 @@ export const SuccessCases = ({ showcaseData }: SuccessCasesProps) => {
                       </span>
                     </div>
                   )}
-                  <AnimatePresence mode="wait">
-                    <m.div
-                      key={dynamicCases[activeIndex]?.id || activeIndex}
-                      initial={{ opacity: 0, scale: 0.98, filter: 'blur(4px)' }}
-                      animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-                      exit={{ opacity: 0, scale: 1.02, filter: 'blur(4px)' }}
-                      transition={{ duration: 0.25, ease: 'easeInOut' }}
-                      className="w-full h-full z-10 relative"
-                    >
-                      <ImageSlider
-                        beforeSrc={currentBefore}
-                        afterSrc={currentAfter}
-                        onExpand={() => {
-                          setEscalaZoom(1);
-                          setVisorAbierto(true);
+                  {/* La tarjeta sigue al dedo mientras se arrastra; al soltar vuelve con transición */}
+                  <div
+                    className="w-full h-full z-10 relative"
+                    style={{
+                      transform: `translateX(${dragX}px)`,
+                      transition: dragX === 0 ? 'transform 0.25s ease-out' : 'none',
+                    }}
+                  >
+                    <AnimatePresence mode="wait" custom={direction}>
+                      <m.div
+                        key={dynamicCases[activeIndex]?.id || activeIndex}
+                        custom={direction}
+                        variants={{
+                          enter: (dir: number) => ({ opacity: 0, x: dir * 48 }),
+                          center: { opacity: 1, x: 0 },
+                          exit: (dir: number) => ({ opacity: 0, x: dir * -48 }),
                         }}
-                      />
-                    </m.div>
-                  </AnimatePresence>
+                        initial="enter"
+                        animate="center"
+                        exit="exit"
+                        transition={{ duration: 0.22, ease: 'easeOut' }}
+                        className="w-full h-full relative"
+                      >
+                        <ImageSlider
+                          beforeSrc={currentBefore}
+                          afterSrc={currentAfter}
+                          onExpand={abrirVisor}
+                        />
+                      </m.div>
+                    </AnimatePresence>
+                  </div>
                 </div>
 
                 {/* Flecha derecha */}
@@ -723,7 +827,7 @@ export const SuccessCases = ({ showcaseData }: SuccessCasesProps) => {
                     <button
                       key={idx}
                       onClick={() => {
-                        setActiveIndex(idx);
+                        irAlCaso(idx);
                         Haptics.impact();
                       }}
                       className={`rounded-full transition-all duration-300 ${
@@ -732,8 +836,27 @@ export const SuccessCases = ({ showcaseData }: SuccessCasesProps) => {
                           : 'w-2 h-2 bg-muted-foreground/30 hover:bg-muted-foreground/60'
                       }`}
                       aria-label={`Ir al caso ${idx + 1}`}
+                      aria-current={idx === activeIndex ? 'true' : undefined}
                     />
                   ))}
+                </div>
+              )}
+
+              {/* Precarga invisible de los casos vecinos: mismas `sizes` que el visor, así el
+                  navegador descarga la misma variante y al deslizar la foto ya está en caché. */}
+              {vecinos.length > 0 && (
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute h-px w-px overflow-hidden opacity-0"
+                >
+                  {vecinos.flatMap((caso) => [
+                    <div key={`${caso.id}-a`} className="relative h-px w-px">
+                      <Image src={caso.afterImageUrl} alt="" fill sizes={IMAGE_SIZES_INLINE} />
+                    </div>,
+                    <div key={`${caso.id}-b`} className="relative h-px w-px">
+                      <Image src={caso.beforeImageUrl} alt="" fill sizes={IMAGE_SIZES_INLINE} />
+                    </div>,
+                  ])}
                 </div>
               )}
 
@@ -771,20 +894,29 @@ export const SuccessCases = ({ showcaseData }: SuccessCasesProps) => {
                   animate={{ opacity: 1, backdropFilter: 'blur(24px)' }}
                   exit={{ opacity: 0, backdropFilter: 'blur(0px)' }}
                   transition={{ duration: 0.3 }}
-                  className="fixed inset-0 z-[999999] bg-black/80 flex flex-col"
+                  className="fixed inset-0 z-[999999] bg-black/80 flex flex-col pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
                   role="dialog"
                   aria-modal="true"
+                  aria-label="Visor de casos de éxito"
                 >
                   {/* Toolbar Superior Glass */}
-                  <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-black/40 shrink-0 z-50">
-                    <span className="text-[10px] md:text-xs font-black tracking-[0.2em] uppercase text-white/70">
-                      Evidencia de Condonación
-                    </span>
+                  <div className="flex items-center justify-between px-4 md:px-6 py-3 md:py-4 border-b border-white/10 bg-black/40 shrink-0 z-50">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] md:text-xs font-black tracking-[0.2em] uppercase text-white/70">
+                        Evidencia de Condonación
+                      </span>
+                      {dynamicCases.length > 1 && (
+                        <span className="text-[11px] font-semibold text-white/50 tabular-nums">
+                          Caso {activeIndex + 1} de {dynamicCases.length}
+                        </span>
+                      )}
+                    </div>
 
                     <div className="flex gap-2 items-center">
                       <button
                         onClick={() => ajustarZoom(-0.5)}
                         disabled={escalaZoom <= 1}
+                        aria-label="Alejar"
                         className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 disabled:opacity-30 transition-all flex items-center justify-center text-white"
                       >
                         <ZoomOut className="w-5 h-5" />
@@ -795,13 +927,15 @@ export const SuccessCases = ({ showcaseData }: SuccessCasesProps) => {
                       <button
                         onClick={() => ajustarZoom(0.5)}
                         disabled={escalaZoom >= 4}
+                        aria-label="Acercar"
                         className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 disabled:opacity-30 transition-all flex items-center justify-center text-white mr-2"
                       >
                         <ZoomIn className="w-5 h-5" />
                       </button>
 
                       <button
-                        onClick={() => setVisorAbierto(false)}
+                        onClick={cerrarVisor}
+                        aria-label="Cerrar visor"
                         className="w-10 h-10 rounded-full bg-red-500/20 hover:bg-red-500/50 transition-all flex items-center justify-center text-white ml-2"
                       >
                         <X className="w-5 h-5" />
@@ -833,8 +967,34 @@ export const SuccessCases = ({ showcaseData }: SuccessCasesProps) => {
                     </m.div>
                   </div>
 
+                  {/* Pasar de caso dentro del visor (ocultas con zoom para no chocar con el arrastre) */}
+                  {dynamicCases.length > 1 && escalaZoom === 1 && (
+                    <>
+                      <button
+                        onClick={() => {
+                          irAlAnterior();
+                          Haptics.impact();
+                        }}
+                        aria-label="Caso anterior"
+                        className="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 z-50 w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 backdrop-blur-md flex items-center justify-center text-white transition-all active:scale-90"
+                      >
+                        <ChevronLeft className="w-6 h-6" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          irAlSiguiente();
+                          Haptics.impact();
+                        }}
+                        aria-label="Caso siguiente"
+                        className="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 z-50 w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 backdrop-blur-md flex items-center justify-center text-white transition-all active:scale-90"
+                      >
+                        <ChevronRight className="w-6 h-6" />
+                      </button>
+                    </>
+                  )}
+
                   {/* Helper footer */}
-                  <div className="absolute bottom-6 left-1/2 -translate-x-1/2 px-6 py-2 bg-black/60 backdrop-blur-xl border border-white/20 rounded-full pointer-events-none">
+                  <div className="absolute bottom-[calc(1.5rem+env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 px-6 py-2 bg-black/60 backdrop-blur-xl border border-white/20 rounded-full pointer-events-none">
                     <span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-emerald-400">
                       Desliza la barra central
                     </span>

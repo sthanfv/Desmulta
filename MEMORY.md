@@ -33,6 +33,14 @@
 
 ## 📜 Historial Reciente (Últimos Cambios Clave)
 
+### [2026-09-24] - Visor de casos de éxito (`src/components/sections/SuccessCases.tsx`)
+
+- Fotos optimizadas por Next.js (antes `unoptimized`: se descargaba el original completo en cada teléfono) con `sizes` y aparición suave al cargar.
+- Deslizar entre casos: la tarjeta sigue al dedo, se bloquea el eje (vertical = scroll) y la animación se orienta según la dirección. **Bug corregido:** arrastrar la manija antes/después más de 50 px saltaba al caso siguiente.
+- Precarga invisible de los casos vecinos (misma `sizes`) para que no parpadee al deslizar.
+- Visor a pantalla completa: el gesto/botón "atrás" lo cierra (entrada propia en el historial), Escape lo cierra, bloquea el scroll del fondo, contador "Caso X de N", flechas para pasar de caso (ocultas con zoom) y botones con nombre accesible.
+- Tests nuevos: `src/tests/success-cases-viewer.test.tsx`.
+
 ### [2026-09-24] - Blog: títulos rotos y sincronización detenida; Referidos solo para clientes
 
 - **Títulos con "39":** el importador (`scripts/sync-blog-rss.ts`) solo decodificaba 5 entidades HTML; `&#39;` (apóstrofo) quedaba crudo en el título y como "39" en el slug. Nuevo `src/lib/text/html-entities.ts` (entidades numéricas y nombradas, doble escapado). Los 2 artículos afectados se renombraron a slugs limpios con redirección 301 en `next.config.ts`.
@@ -120,5 +128,4 @@
 - **GitHub Actions:** los jobs se cortan a los 2 s por un tema de la cuenta (revisar Settings → Billing); el repo es público, así que los runners estándar no deberían consumir cuota. CD necesita el secreto `FIREBASE_TOKEN`.
 - **Blog automático:** crear el secreto `GEMINI_API_KEY` en GitHub (Settings → Secrets and variables → Actions); sin eso el blog se importa sin reescribir.
 - **Firebase:** desplegar índices nuevos (`firebase deploy --only firestore:indexes`) y correr una vez `npm run backfill:pdf`.
-- **Visor de casos de éxito:** fotos optimizadas, cerrar con el gesto "atrás", deslizamiento que sigue el dedo (embla), precarga del siguiente caso, accesibilidad.
 - Evaluar posible expansión del embudo hacia suscripciones automáticas (notificaciones).
