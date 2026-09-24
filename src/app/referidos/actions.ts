@@ -84,8 +84,14 @@ export async function registerReferral(
   }
 
   // ── 3. Validación Zod estricta ───────────────────────────────────────────
-  const rawTu = tuNumero.replace(/\D/g, '');
-  const rawSu = suNumero.replace(/\D/g, '');
+  // [2026-09-24] Las consultas guardan el celular en 10 dígitos (3XXXXXXXXX). Si el cliente escribe
+  // el indicativo (+57 300…), quedaban 12 dígitos y un cliente real era rechazado como "no registrado".
+  const toLocalMobile = (value: string) => {
+    const digits = value.replace(/\D/g, '');
+    return digits.length === 12 && digits.startsWith('57') ? digits.slice(2) : digits;
+  };
+  const rawTu = toLocalMobile(tuNumero);
+  const rawSu = toLocalMobile(suNumero);
 
   const validation = ReferralSchema.safeParse({ tuNumero: rawTu, suNumero: rawSu });
   if (!validation.success) {

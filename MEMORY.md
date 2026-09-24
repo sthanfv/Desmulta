@@ -33,6 +33,12 @@
 
 ## 📜 Historial Reciente (Últimos Cambios Clave)
 
+### [2026-09-24] - Blog: títulos rotos y sincronización detenida; Referidos solo para clientes
+
+- **Títulos con "39":** el importador (`scripts/sync-blog-rss.ts`) solo decodificaba 5 entidades HTML; `&#39;` (apóstrofo) quedaba crudo en el título y como "39" en el slug. Nuevo `src/lib/text/html-entities.ts` (entidades numéricas y nombradas, doble escapado). Los 2 artículos afectados se renombraron a slugs limpios con redirección 301 en `next.config.ts`.
+- **Blog detenido desde el 22/08:** (1) el workflow `blog-sync.yml` no llegaba a correr (GitHub Actions cortado a los 2 s); (2) no pasaba `GEMINI_API_KEY` al script, así que nunca reescribía con IA; (3) abría un Pull Request que nadie aprobaba; (4) el script usaba el modelo retirado `gemini-2.5-flash`. Ahora: modelo `GEMINI_BLOG_MODEL` (por defecto `gemini-flash-lite-latest`), clave por header y publicación directa en `main`. **Requiere el secreto `GEMINI_API_KEY` en GitHub.**
+- **Referidos:** la regla "solo clientes" seguía en el servidor (`src/app/referidos/actions.ts`: el referidor debe tener una consulta ya revisada), pero el enlace se había puesto por error en el menú "Más" del modo app, visible para todos. Se quitó: se entra solo desde el banner del seguimiento de caso (`/seguir/[id]`). Además, un cliente que escribía su número con +57 era rechazado (12 dígitos vs. 10 guardados); se normaliza.
+
 ### [2026-09-22 a 2026-09-24] - Auditoría de seguridad, chat con IA real y modo app en teléfono
 
 - **Auditoría de seguridad (commit `6c28bd6`):** tokens de admin con audiencia (antes cualquier JWT del mismo secreto abría God Mode o saltaba el OTP), 2FA ligado al uid, `POST /api/auth/session` desactivado, webhook de Wompi transaccional (ya no quedan pagos "pendientes para siempre"), DLQ de PDF filtrando `pdfDeliveredAt == null` (+ índice y `npm run backfill:pdf`), SSRF guard con `net.BlockList`, escape HTML en Telegram, eliminación de secretos hardcodeados (HMAC del agente y API key del scraper SIMIT). Informe: `docs/auditoria-2026-09-22/`.
@@ -112,6 +118,7 @@
 - **Seguridad:** generar una clave nueva de Gemini en AI Studio (las actuales quedaron expuestas en una conversación) y revocar la API key del scraper SIMIT, que sigue en el historial de Git.
 - **Vercel:** confirmar `GEMINI_API_KEY` nueva (OCR) y, opcional, `GEMINI_OCR_MODEL`.
 - **GitHub Actions:** los jobs se cortan a los 2 s por un tema de la cuenta (revisar Settings → Billing); el repo es público, así que los runners estándar no deberían consumir cuota. CD necesita el secreto `FIREBASE_TOKEN`.
+- **Blog automático:** crear el secreto `GEMINI_API_KEY` en GitHub (Settings → Secrets and variables → Actions); sin eso el blog se importa sin reescribir.
 - **Firebase:** desplegar índices nuevos (`firebase deploy --only firestore:indexes`) y correr una vez `npm run backfill:pdf`.
 - **Visor de casos de éxito:** fotos optimizadas, cerrar con el gesto "atrás", deslizamiento que sigue el dedo (embla), precarga del siguiente caso, accesibilidad.
 - Evaluar posible expansión del embudo hacia suscripciones automáticas (notificaciones).

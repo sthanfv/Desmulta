@@ -1,5 +1,10 @@
+/* eslint-disable security/detect-non-literal-fs-filename --
+ * Igual que src/lib/mdx.ts: todas las rutas se construyen dentro de BLOG_DIR (src/content/blog) y
+ * los nombres de archivo salen de generateSlug(), que solo deja [a-z0-9-]. */
 import fs from 'fs';
 import path from 'path';
+import Parser from 'rss-parser';
+import { decodeHtmlEntities } from '../src/lib/text/html-entities';
 
 // Helper para cargar variables de entorno del archivo .env local de forma manual (sin dependencias)
 function loadEnv() {
@@ -14,7 +19,10 @@ function loadEnv() {
         const key = match[1];
         let value = match[2].trim();
         // Quitar comillas simples o dobles si existen
-        if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+        if (
+          (value.startsWith('"') && value.endsWith('"')) ||
+          (value.startsWith("'") && value.endsWith("'"))
+        ) {
           value = value.slice(1, -1);
         }
         process.env[key] = value;
@@ -54,47 +62,40 @@ function parseDate(rawDate: string): string {
 // Limpia tags HTML básicos para convertirlos a Markdown y escapa llaves de MDX
 function htmlToMarkdown(html: string): string {
   if (!html) return '';
-  return html
-    .replace(/<p>/gi, '')
-    .replace(/<\/p>/gi, '\n\n')
-    .replace(/<br\s*\/?>/gi, '\n')
-    .replace(/<strong>(.*?)<\/strong>/gi, '**$1**')
-    .replace(/<b>(.*?)<\/b>/gi, '**$1**')
-    .replace(/<a\s+(?:[^>]*?\s+)?href="([^"]*)"[^>]*>(.*?)<\/a>/gi, '[$2]($1)')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/<!\[CDATA\[(.*?)\]\]>/g, '$1') // CDATA wrapper
-    .replace(/<[^>]*>/g, '') // Elimina cualquier otro tag residual
-    .replace(/\{/g, '\\{') // Escapa {
-    .replace(/\}/g, '\\}') // Escapa }
-    .trim();
+  return (
+    html
+      .replace(/<p>/gi, '')
+      .replace(/<\/p>/gi, '\n\n')
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/<strong>(.*?)<\/strong>/gi, '**$1**')
+      .replace(/<b>(.*?)<\/b>/gi, '**$1**')
+      .replace(/<a\b[^>]*\bhref="([^"]*)"[^>]*>(.*?)<\/a>/gi, '[$2]($1)')
+      // [2026-09-24] Todas las entidades, incluidas las numéricas (&#39;); antes solo 5 nombradas
+      .replace(/&[#a-z0-9]+;/gi, (entity) => decodeHtmlEntities(entity))
+      .replace(/<!\[CDATA\[(.*?)\]\]>/g, '$1') // CDATA wrapper
+      .replace(/<[^>]*>/g, '') // Elimina cualquier otro tag residual
+      .replace(/\{/g, '\\{') // Escapa {
+      .replace(/\}/g, '\\}') // Escapa }
+      .trim()
+  );
 }
 
-// Extrae el valor de una etiqueta XML mediante Regex
-function extractTagContent(itemXml: string, tagName: string): string {
-  const regex = new RegExp(`<${tagName}(?:\\s+[^>]*)?>([\\s\\S]*?)</${tagName}>`, 'i');
-  const match = itemXml.match(regex);
-  if (match && match[1]) {
-    // Si contiene CDATA, extraerlo
-    const cdataMatch = match[1].match(/<!\[CDATA\[([\s\S]*?)\]\]>/i);
-    return cdataMatch ? cdataMatch[1].trim() : match[1].trim();
-  }
-  return '';
-}
+const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
 // Función nativa para llamar a Gemini API vía fetch y evitar instalar @google/generative-ai
 async function reescribirConGemini(titulo: string, contenidoCrudo: string): Promise<string> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey || apiKey.trim() === '') {
-    console.warn('[GEMINI-WARN] No se encontró GEMINI_API_KEY. Se usará el contenido crudo (riesgo de contenido duplicado).');
+    console.warn(
+      '[GEMINI-WARN] No se encontró GEMINI_API_KEY. Se usará el contenido crudo (riesgo de contenido duplicado).'
+    );
     return contenidoCrudo;
   }
 
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-  
+  // [2026-09-24] gemini-2.5-flash fue retirado (HTTP 404): modelo configurable y clave por header
+  const model = process.env.GEMINI_BLOG_MODEL || 'gemini-flash-lite-latest';
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+
   const prompt = `
 You are an expert Colombian traffic and transportation analyst writing informational articles for the blog of "Desmulta", a legal tech platform dedicated to contesting speed camera tickets (fotomultas) and achieving legal clearance of traffic fines.
 You will be provided with an excerpt from a news article or bulletin regarding transportation regulations, fines, or traffic rules.
@@ -115,11 +116,11 @@ Content: ${contenidoCrudo}
   try {
     const response = await fetch(endpoint, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.6 }
-      })
+        generationConfig: { temperature: 0.6 },
+      }),
     });
 
     if (!response.ok) {
@@ -128,16 +129,18 @@ Content: ${contenidoCrudo}
       return contenidoCrudo; // Fallback
     }
 
-    const data = (await response.json()) as any;
+    const data = (await response.json()) as {
+      candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+    };
     const textoGenerado = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    
+
     if (!textoGenerado) {
       return contenidoCrudo; // Fallback
     }
-    
+
     return textoGenerado.trim();
-  } catch (error: any) {
-    console.error(`[GEMINI-ERROR] Excepción al contactar la API: ${error.message}`);
+  } catch (error) {
+    console.error(`[GEMINI-ERROR] Excepción al contactar la API: ${errorMessage(error)}`);
     return contenidoCrudo; // Fallback
   }
 }
@@ -158,10 +161,10 @@ async function notifyTelegram(newPosts: { title: string; slug: string }[]) {
 
   const isAutoPublish = process.env.AUTO_PUBLISH_BLOG === 'true';
 
-  let message = isAutoPublish 
+  let message = isAutoPublish
     ? `📢 *Nuevos artículos publicados en el blog*\n\n`
     : `📢 *Nuevos borradores de blog importados*\n\n`;
-    
+
   message += isAutoPublish
     ? `Se han importado y publicado automáticamente *${newPosts.length}* noticias desde el feed oficial:\n\n`
     : `Se han importado automáticamente *${newPosts.length}* borradores de noticias desde el feed oficial:\n\n`;
@@ -195,15 +198,17 @@ async function notifyTelegram(newPosts: { title: string; slug: string }[]) {
       console.log('[TELEGRAM] Notificación enviada con éxito al administrador.');
     } else {
       const errText = await response.text();
-      console.error(`[TELEGRAM-ERROR] Error al enviar mensaje: HTTP ${response.status} - ${errText}`);
+      console.error(
+        `[TELEGRAM-ERROR] Error al enviar mensaje: HTTP ${response.status} - ${errText}`
+      );
     }
-  } catch (error: any) {
-    console.error(`[TELEGRAM-ERROR] Error de conexión: ${error.message}`);
+  } catch (error) {
+    console.error(`[TELEGRAM-ERROR] Error de conexión: ${errorMessage(error)}`);
   }
 }
 
 async function syncBlogFromRss() {
-  const rssUrls = RSS_URL.split(',').map(url => url.trim());
+  const rssUrls = RSS_URL.split(',').map((url) => url.trim());
   console.log(`[RSS-SYNC] Iniciando sincronización de ${rssUrls.length} feeds...`);
 
   let creados = 0;
@@ -213,7 +218,7 @@ async function syncBlogFromRss() {
   for (const url of rssUrls) {
     if (!url) continue;
     console.log(`[RSS-SYNC] Consultando novedades viales en: ${url}`);
-    
+
     try {
       const urlObj = new URL(url);
       const allowedDomains = [
@@ -221,34 +226,39 @@ async function syncBlogFromRss() {
         'mintransporte.gov.co',
         'simit.org.co',
         'www.movilidadbogota.gov.co',
-        'www.google.com'
+        'www.google.com',
       ];
       if (!allowedDomains.includes(urlObj.hostname)) {
-        console.error(`[RSS-SYNC-ERROR] URL denegada por política de seguridad: el dominio ${urlObj.hostname} no está en la allowlist.`);
+        console.error(
+          `[RSS-SYNC-ERROR] URL denegada por política de seguridad: el dominio ${urlObj.hostname} no está en la allowlist.`
+        );
         continue;
       }
 
       const response = await fetch(url);
       if (!response.ok) {
-        console.error(`[RSS-SYNC-WARN] HTTP ${response.status} - No se pudo descargar el feed: ${url}`);
+        console.error(
+          `[RSS-SYNC-WARN] HTTP ${response.status} - No se pudo descargar el feed: ${url}`
+        );
         continue;
       }
 
       const xmlText = await response.text();
-      
+
       // Inicializar el parser en cada iteración
-      const Parser = require('rss-parser');
       const parser = new Parser({
         customFields: {
-          item: ['description', 'summary', 'content', 'content:encoded', 'published', 'updated']
-        }
+          item: ['description', 'summary', 'content', 'content:encoded', 'published', 'updated'],
+        },
       });
-      
+
       const feed = await parser.parseString(xmlText);
       const items = feed.items || [];
 
       if (items.length === 0) {
-        console.log('[RSS-SYNC] No se encontraron noticias o formato XML no reconocido para este feed.');
+        console.log(
+          '[RSS-SYNC] No se encontraron noticias o formato XML no reconocido para este feed.'
+        );
         continue;
       }
 
@@ -256,9 +266,10 @@ async function syncBlogFromRss() {
 
       for (const item of items) {
         let title = item.title;
-        let pubDate = item.pubDate || item.published || item.updated;
-        let description = item.description || item.summary || item.content || item['content:encoded'] || '';
-        let link = item.link || '';
+        const pubDate = item.pubDate || item.published || item.updated;
+        const description =
+          item.description || item.summary || item.content || item['content:encoded'] || '';
+        const link = item.link || '';
 
         if (!title || !pubDate) {
           continue;
@@ -270,23 +281,66 @@ async function syncBlogFromRss() {
           .replace(/&lt;\/b&gt;/gi, '')
           .replace(/<b>/gi, '')
           .replace(/<\/b>/gi, '')
-          .replace(/&quot;/gi, '"')
-          .replace(/&amp;/gi, '&')
+          .replace(/<[^>]*>/g, '');
+        // [2026-09-24] Antes solo &quot; y &amp;: &#39; quedaba crudo en el título y como "39" en el slug
+        title = decodeHtmlEntities(title)
           .replace(/<[^>]*>/g, '')
+          .replace(/\s+/g, ' ')
           .trim();
 
         // Filtro de relevancia: Lista Negra (accidentes/tragedias/sucesos) y Lista Blanca (estrictamente legal/multas)
         const titleLower = title.toLowerCase();
-        
+
         // Ampliamos la lista negra para descartar crónica roja, deportes, farándula, clima, etc.
-        const blacklist = ['fallece', 'fallecido', 'muerto', 'asesinado', 'herido', 'choque', 'colision', 'accidente', 'tragedia', 'volcamiento', 'lesionado', 'shakira', 'mundial', 'fútbol', 'futbol', 'balacera', 'homicidio', 'clima', 'aerolínea', 'vuelo'];
-        const contieneBasura = blacklist.some(palabra => titleLower.includes(palabra));
-        
+        const blacklist = [
+          'fallece',
+          'fallecido',
+          'muerto',
+          'asesinado',
+          'herido',
+          'choque',
+          'colision',
+          'accidente',
+          'tragedia',
+          'volcamiento',
+          'lesionado',
+          'shakira',
+          'mundial',
+          'fútbol',
+          'futbol',
+          'balacera',
+          'homicidio',
+          'clima',
+          'aerolínea',
+          'vuelo',
+        ];
+        const contieneBasura = blacklist.some((palabra) => titleLower.includes(palabra));
+
         // Reducimos la lista blanca a palabras clave altamente específicas de defensa legal y tránsito sancionatorio
-        const whitelist = ['fotomulta', 'fotocomparendo', 'multa', 'comparendo', 'infracción', 'infractor', 'simit', 'runt', 'secretaría de movilidad', 'ministerio de transporte', 'soat', 'tecnomecánica', 'pico y placa', 'impugnación', 'tránsito', 'transito', 'caducidad', 'prescripción', 'embargo'];
-        
+        const whitelist = [
+          'fotomulta',
+          'fotocomparendo',
+          'multa',
+          'comparendo',
+          'infracción',
+          'infractor',
+          'simit',
+          'runt',
+          'secretaría de movilidad',
+          'ministerio de transporte',
+          'soat',
+          'tecnomecánica',
+          'pico y placa',
+          'impugnación',
+          'tránsito',
+          'transito',
+          'caducidad',
+          'prescripción',
+          'embargo',
+        ];
+
         // Filtro estricto: la palabra clave DEBE estar en el título.
-        const esRelevante = whitelist.some(palabra => titleLower.includes(palabra));
+        const esRelevante = whitelist.some((palabra) => titleLower.includes(palabra));
 
         if (contieneBasura || !esRelevante) {
           console.log(`[-] Omitido por filtro de relevancia estricto: "${title}"`);
@@ -304,9 +358,9 @@ async function syncBlogFromRss() {
 
         const dateStr = parseDate(pubDate);
         const htmlToMd = htmlToMarkdown(description);
-        
+
         const cleanDescription = htmlToMd.slice(0, 160).replace(/\n/g, ' ') + '...';
-        
+
         console.log(`[GEMINI] Procesando y reescribiendo artículo de forma única: ${title}...`);
         const rewrittenContent = await reescribirConGemini(title, htmlToMd);
 
@@ -333,17 +387,19 @@ ${rewrittenContent}
         console.log(`[+] Borrador creado: src/content/blog/${slug}.mdx`);
         creadosList.push({ title, slug });
         creados++;
-        
+
         // FinOps: Delay de 15 segundos entre peticiones para no exceder el límite gratuito de Google (5 RPM por ráfaga)
         if (creados % 5 !== 0) {
-           await new Promise(resolve => setTimeout(resolve, 15000));
+          await new Promise((resolve) => setTimeout(resolve, 15000));
         } else {
-           // Pausa más larga cada 5 artículos
-           await new Promise(resolve => setTimeout(resolve, 60000));
+          // Pausa más larga cada 5 artículos
+          await new Promise((resolve) => setTimeout(resolve, 60000));
         }
       }
-    } catch (err: any) {
-      console.error(`[ERROR-RSS] Falló la sincronización de la URL: ${url}. Motivo: ${err.message}`);
+    } catch (err) {
+      console.error(
+        `[ERROR-RSS] Falló la sincronización de la URL: ${url}. Motivo: ${errorMessage(err)}`
+      );
     }
   }
 
@@ -385,18 +441,22 @@ function pruneOldPosts(maxPosts: number) {
 
     if (posts.length > maxPosts) {
       const toDelete = posts.slice(maxPosts);
-      console.log(`[RSS-SYNC] Detectados ${posts.length} posts auto-importados. Límite máximo: ${maxPosts}. Iniciando poda de ${toDelete.length} posts antiguos...`);
+      console.log(
+        `[RSS-SYNC] Detectados ${posts.length} posts auto-importados. Límite máximo: ${maxPosts}. Iniciando poda de ${toDelete.length} posts antiguos...`
+      );
       toDelete.forEach((post) => {
         try {
           fs.unlinkSync(post.filePath);
           console.log(`[-] Eliminado post antiguo por limpieza: ${path.basename(post.filePath)}`);
-        } catch (err: any) {
-          console.error(`[RSS-SYNC-ERROR] No se pudo borrar ${post.filePath}: ${err.message}`);
+        } catch (err) {
+          console.error(
+            `[RSS-SYNC-ERROR] No se pudo borrar ${post.filePath}: ${errorMessage(err)}`
+          );
         }
       });
     }
-  } catch (err: any) {
-    console.error(`[RSS-SYNC-ERROR] Error durante el proceso de poda: ${err.message}`);
+  } catch (err) {
+    console.error(`[RSS-SYNC-ERROR] Error durante el proceso de poda: ${errorMessage(err)}`);
   }
 }
 

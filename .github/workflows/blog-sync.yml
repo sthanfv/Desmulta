@@ -10,9 +10,14 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: blog-sync
+  cancel-in-progress: false
+
 jobs:
   sync-blog:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Checkout del Repositorio
@@ -21,30 +26,32 @@ jobs:
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: Instalar Dependencias
         run: npm ci
 
+      # [2026-09-24] Antes no se pasaba GEMINI_API_KEY: los artículos nunca se reescribían con IA
       - name: Ejecutar Sincronización de Feed
         run: npm run blog:sync
         env:
           BLOG_RSS_URL: ${{ secrets.BLOG_RSS_URL }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          NEXT_PUBLIC_SITE_URL: "https://desmulta.online"
+          NEXT_PUBLIC_SITE_URL: 'https://desmulta.online'
 
-      - name: Crear Pull Request con nuevos borradores
-        uses: peter-evans/create-pull-request@v6
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "automatización: importar nuevos borradores de blog"
-          branch: blog-sync/update-feed
-          title: "🤖 Nuevos borradores de blog — requiere revisión"
-          body: |
-            Se han importado nuevos borradores de blog automáticamente desde el feed RSS.
-            Por favor, revisa el contenido de las noticias antes de aprobar este Pull Request para evitar problemas tipográficos o expresiones MDX inválidas.
-          labels: |
-            blog
-            automatización
+      # [2026-09-24] Publicación directa en main (el proyecto no usa ramas ni PRs). Antes se abría
+      # un Pull Request a blog-sync/update-feed que nadie aprobaba y las noticias no llegaban a la web.
+      - name: Publicar nuevos artículos en main
+        run: |
+          if [ -z "$(git status --porcelain src/content/blog)" ]; then
+            echo "Sin artículos nuevos."
+            exit 0
+          fi
+          git config user.name "desmulta-bot"
+          git config user.email "desmulta-bot@users.noreply.github.com"
+          git add src/content/blog
+          git commit -m "automatización: importar nuevos artículos del blog"
+          git push origin HEAD:main

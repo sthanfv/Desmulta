@@ -31,7 +31,6 @@ import {
   ShieldCheck,
   Sparkles,
   Sun,
-  Users,
 } from 'lucide-react';
 import {
   Drawer,
@@ -365,7 +364,7 @@ const MORE_LINKS: Array<{ href: string; label: string; icon: IconType }> = [
   { href: '/blog', label: 'Guía legal', icon: BookOpen },
   { href: '/faq', label: 'Preguntas frecuentes', icon: HelpCircle },
   { href: '/servicios', label: 'Servicios', icon: Sparkles },
-  { href: '/referidos', label: 'Referidos', icon: Users },
+  // Referidos NO va aquí: el programa es solo para clientes y se entra desde /seguir/[id]
 ];
 
 function MoreMenu({ onNavigate }: { onNavigate: () => void }) {

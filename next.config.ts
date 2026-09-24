@@ -79,6 +79,24 @@ const nextConfig: NextConfig = {
   },
   // Compresión gzip/brotli de respuestas (reduce JS/CSS en ~30%)
   compress: true,
+  // [2026-09-24] Artículos importados con entidades HTML sin decodificar (&#39; → "39" en el slug).
+  // Se renombraron a slugs limpios; la redirección 301 conserva los enlaces ya indexados.
+  async redirects() {
+    return [
+      {
+        source: '/blog/39tatequieto39-a-las-nuevas-fotomultas-en-la-via-al-mar---elheraldoco',
+        destination: '/blog/tatequieto-a-las-nuevas-fotomultas-en-la-via-al-mar---elheraldoco',
+        permanent: true,
+      },
+      {
+        source:
+          '/blog/frenan-instalacion-de-fotomultas-en-via-al-mar-tras-39jalon-de-orejas39-de-mintransporte',
+        destination:
+          '/blog/frenan-instalacion-de-fotomultas-en-via-al-mar-tras-jalon-de-orejas-de-mintransporte',
+        permanent: true,
+      },
+    ];
+  },
   // Headers de caché para assets estáticos
   async headers() {
     return [

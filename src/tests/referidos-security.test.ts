@@ -66,6 +66,13 @@ describe('🛡️ Seguridad de Referidos VIP — Accesos y Validaciones', () => 
     expect(result.error).toContain('No puedes referirte a ti mismo');
   });
 
+  it('✅ Normaliza el indicativo +57: busca al cliente por los 10 dígitos guardados', async () => {
+    mockGet.mockResolvedValueOnce(mockDocsEmpty);
+
+    await registerReferral('+57 300 123 4567', '3117654321', '');
+    expect(mockWhere).toHaveBeenCalledWith('contacto', '==', '3001234567');
+  });
+
   it('❌ Debe bloquear el acceso VIP si el referidor no tiene consultas registradas', async () => {
     // 1ª llamada: consultas del referidor → vacío
     mockGet.mockResolvedValueOnce(mockDocsEmpty);
