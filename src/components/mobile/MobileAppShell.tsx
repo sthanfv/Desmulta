@@ -210,13 +210,28 @@ function InnerTopBar({ title, onBack }: { title: string; onBack: () => void }) {
 }
 
 function MobileTopBar() {
+  // Igual que la cabecera de escritorio: al bajar, la marca se recoge y queda solo el escudo
+  const [collapsed, setCollapsed] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setCollapsed(window.scrollY > 20);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   return (
     <header className="fixed inset-x-0 top-0 z-[45] border-b border-border/50 bg-background/90 backdrop-blur-xl pt-[env(safe-area-inset-top)]">
-      <div className="flex h-14 items-center gap-2.5 px-4">
-        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary shadow-md shadow-primary/20">
+      <div className="flex h-14 items-center px-4">
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary shadow-md shadow-primary/20">
           <ShieldCheck className="h-[18px] w-[18px] text-primary-foreground" />
         </span>
-        <div className="leading-none">
+        <div
+          data-collapsed={collapsed || undefined}
+          className={cn(
+            'overflow-hidden whitespace-nowrap leading-none transition-all duration-500',
+            collapsed ? 'ml-0 max-w-0 opacity-0' : 'ml-2.5 max-w-[240px] opacity-100'
+          )}
+        >
           <p className="text-base font-black tracking-tight text-foreground">
             DES<span className="text-primary italic">MULTA</span>
           </p>

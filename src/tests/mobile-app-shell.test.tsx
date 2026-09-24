@@ -198,3 +198,19 @@ describe('Fase 3 — barra superior de páginas internas', () => {
     expect(mockPush).toHaveBeenCalledWith('/');
   });
 });
+
+describe('Barra superior de Inicio al bajar', () => {
+  it('recoge la marca y deja solo el escudo, como en escritorio', () => {
+    mockPathname.mockReturnValue('/');
+    const { container } = render(<MobileAppShell />);
+    expect(container.querySelector('[data-collapsed]')).toBeNull();
+
+    Object.defineProperty(window, 'scrollY', { value: 120, configurable: true });
+    fireEvent.scroll(window);
+    expect(container.querySelector('[data-collapsed]')).not.toBeNull();
+
+    Object.defineProperty(window, 'scrollY', { value: 0, configurable: true });
+    fireEvent.scroll(window);
+    expect(container.querySelector('[data-collapsed]')).toBeNull();
+  });
+});
