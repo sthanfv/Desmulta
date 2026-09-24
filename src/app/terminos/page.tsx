@@ -4,12 +4,14 @@ import React from 'react';
 import Link from 'next/link';
 import { ArrowLeft, ShieldCheck, FileText, Lock, Scale } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { FOOTER_DEFAULTS } from '@/lib/config-constants';
 
 /** Fecha de la última revisión del contenido (actualizar al cambiar el texto). */
 const ULTIMA_ACTUALIZACION = '24 de septiembre de 2026';
 
 export default function TerminosPage() {
   const brandName = process.env.NEXT_PUBLIC_BRAND_NAME || 'Desmulta';
+  const contactEmail = FOOTER_DEFAULTS.email;
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden text-foreground/80 font-sans selection:bg-primary/30">
@@ -132,14 +134,22 @@ export default function TerminosPage() {
 
               <div className="space-y-3">
                 <h4 className="font-black text-foreground uppercase tracking-widest text-xs opacity-60">
-                  1.4. Políticas de Desistimiento
+                  1.4. Derecho de Retracto y Desistimiento
                 </h4>
                 <p>
-                  Si el usuario desiste durante la Fase 1, se reintegrará su dinero descontando un
-                  30% por concepto de apertura de expediente, uso de plataforma y análisis jurídico.
-                  Al iniciar la Fase 2 (radicación formal ante autoridades), los valores abonados
-                  adquieren el carácter de no reembolsables debido al consumo de recursos técnicos y
-                  humanos.
+                  <strong>Retracto (Art. 47, Ley 1480 de 2011):</strong> por tratarse de una compra
+                  en línea, usted puede retractarse dentro de los 5 días hábiles siguientes al pago
+                  y recibir la devolución total del dinero en un plazo máximo de 30 días calendario.
+                  Este derecho no aplica, según el mismo artículo, cuando con su autorización ya
+                  comenzó la prestación del servicio o cuando se entregaron documentos elaborados de
+                  forma personalizada con los datos de su caso.
+                </p>
+                <p>
+                  <strong>Desistimiento posterior:</strong> si desiste durante la Fase 1, fuera del
+                  retracto, se reintegrará su dinero descontando un 30% por apertura de expediente,
+                  uso de plataforma y análisis jurídico ya realizados. Al iniciar la Fase 2
+                  (radicación formal ante autoridades), los valores abonados no son reembolsables
+                  porque corresponden a trabajo ya ejecutado.
                 </p>
               </div>
 
@@ -279,38 +289,48 @@ export default function TerminosPage() {
             </div>
           </section>
 
-          {/* SECCIÓN 5: Jurisdicción y Arbitraje */}
+          {/* SECCIÓN 5: Ley aplicable y solución de controversias.
+              [2026-09-24] Se reemplazaron la "renuncia a demandas colectivas" y el arbitraje
+              obligatorio: ambas son cláusulas abusivas e ineficaces según el Art. 43 de la
+              Ley 1480 de 2011 (num. 12: obligar al consumidor a acudir a la justicia arbitral). */}
           <section className="floating-card bg-card/40 backdrop-blur-sm border border-white/10 p-10 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-700">
             <div className="flex items-center gap-4 mb-10">
               <div className="p-3 bg-primary/10 rounded-2xl border border-primary/20 shadow-inner">
                 <Scale className="text-primary" size={28} />
               </div>
               <h2 className="text-3xl font-black text-foreground tracking-tight">
-                Jurisdicción y Arbitraje
+                Ley Aplicable y Reclamaciones
               </h2>
             </div>
             <div className="grid gap-8 text-muted-foreground leading-relaxed text-lg">
               <div className="space-y-3">
                 <h4 className="font-black text-foreground uppercase tracking-widest text-xs opacity-60">
-                  5.1. Renuncia a Demandas Colectivas
+                  5.1. Ley Colombiana y Derechos del Consumidor
                 </h4>
                 <p>
-                  Al aceptar estos términos, usted acepta que cualquier reclamo o disputa legal
-                  relacionada con el uso de nuestros servicios deberá resolverse de manera
-                  individual, renunciando expresamente a participar en cualquier tipo de acción,
-                  litigio o demanda colectiva.
+                  Estos términos se rigen por la ley colombiana y se interpretan de la forma más
+                  favorable al consumidor (Art. 34, Ley 1480 de 2011). Nada de lo aquí previsto
+                  limita los derechos que le otorgan el Estatuto del Consumidor, la Ley 1581 de 2012
+                  ni las acciones populares y de grupo de la Ley 472 de 1998, incluida la reversión
+                  del pago cuando proceda (Art. 51, Ley 1480 de 2011).
                 </p>
               </div>
               <div className="space-y-3">
                 <h4 className="font-black text-foreground uppercase tracking-widest text-xs opacity-60">
-                  5.2. Cláusula de Arbitraje (Colombia)
+                  5.2. Cómo presentar una reclamación
                 </h4>
                 <p>
-                  Toda controversia o diferencia relativa a la prestación de los servicios será
-                  resuelta por un Tribunal de Arbitramento designado por el Centro de Arbitraje y
-                  Conciliación de la Cámara de Comercio correspondiente a la sede principal de{' '}
-                  {brandName} en la República de Colombia, sujeto a las leyes colombianas y fallando
-                  en derecho.
+                  Escríbanos a{' '}
+                  <a
+                    href={`mailto:${contactEmail}`}
+                    className="text-primary underline underline-offset-4"
+                  >
+                    {contactEmail}
+                  </a>{' '}
+                  o por WhatsApp. Respondemos en un máximo de 15 días hábiles. Si no quedamos de
+                  acuerdo, usted puede acudir a la Superintendencia de Industria y Comercio o a los
+                  jueces competentes. El arbitraje solo procede si ambas partes lo acuerdan
+                  voluntariamente después de surgida la controversia.
                 </p>
               </div>
             </div>

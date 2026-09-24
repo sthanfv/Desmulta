@@ -33,6 +33,16 @@
 
 ## 📜 Historial Reciente (Últimos Cambios Clave)
 
+### [2026-09-24] - Firebase al día, causa del bloqueo de GitHub Actions y revisión legal (Ley 1480 / 1581)
+
+- **GitHub Actions:** la API pública de runs muestra la causa real: _"The job was not started because your account is locked due to a billing issue."_ La cuenta de GitHub está bloqueada por facturación; ningún workflow (CI, blog, Lighthouse) puede correr hasta resolverlo en github.com/settings/billing.
+- **Firestore:** se desplegaron los índices de `purchases` (DLQ de PDF e idempotencia). `firestore.indexes.json` se reemplazó por la exportación de producción (15 índices, 6 field overrides, 5 TTL: `audit_logs.expireAt`, `consultationCooldowns.lastAttemptAt`, `otp_rate_limits.windowStart`, `processed_callbacks.processedAt`, `validar_consulta_rl.windowStart`); antes el archivo no reflejaba producción y un deploy con `--force` habría borrado los TTL.
+- **Backfill** `npm run backfill:pdf`: 2 compras actualizadas, 0 aprobadas sin entrega; segunda corrida 0 cambios (idempotente).
+- **Términos:** se reemplazaron cláusulas abusivas según la Ley 1480 de 2011: arbitraje obligatorio (Art. 43 num. 12) y renuncia a acciones colectivas (Ley 472 de 1998); el desistimiento ahora reconoce el derecho de retracto de 5 días hábiles (Art. 47) y conserva el 30% solo fuera del retracto; nueva sección de ley aplicable, interpretación favorable (Art. 34), reversión del pago (Art. 51) y canal de reclamación (15 días hábiles, SIC).
+- **Privacidad:** nueva sección 8 (Decreto 1377 de 2013): responsable del tratamiento, encargados y transmisión internacional de datos (Google, Vercel, Upstash, Resend, Telegram, analítica; Arts. 25-26 Ley 1581) y vigencia.
+- **CLAUDE.md** reescrito con el protocolo MANDATO-FILTRO del propietario (arranque, prefijos de commit, validación, reporte en 6 secciones).
+- **Pendiente:** razón social, NIT y dirección del responsable (Art. 50 Ley 1480 / Decreto 1377) — solo el propietario los tiene; revisión gratuita sugerida en un consultorio jurídico universitario.
+
 ### [2026-09-24] - Recolección de noticias manual (`npm run blog:sync`)
 
 - 7 artículos nuevos reescritos con Gemini (`gemini-flash-lite-latest`), 250-320 palabras, validados con el compilador MDX (7/7). Notificación de Telegram enviada.
@@ -138,7 +148,6 @@
 
 - **Seguridad:** generar una clave nueva de Gemini en AI Studio (las actuales quedaron expuestas en una conversación) y revocar la API key del scraper SIMIT, que sigue en el historial de Git.
 - **Vercel:** confirmar `GEMINI_API_KEY` nueva (OCR) y, opcional, `GEMINI_OCR_MODEL`.
-- **GitHub Actions:** los jobs se cortan a los 2 s por un tema de la cuenta (revisar Settings → Billing); el repo es público, así que los runners estándar no deberían consumir cuota. CD necesita el secreto `FIREBASE_TOKEN`.
-- **Blog automático:** crear el secreto `GEMINI_API_KEY` en GitHub (Settings → Secrets and variables → Actions); sin eso el blog se importa sin reescribir.
-- **Firebase:** desplegar índices nuevos (`firebase deploy --only firestore:indexes`) y correr una vez `npm run backfill:pdf`.
+- **GitHub Actions:** la cuenta de GitHub está **bloqueada por facturación** ("account is locked due to a billing issue"); resolver en github.com/settings/billing. Secreto `GEMINI_API_KEY` ya creado. CD necesita además `FIREBASE_TOKEN`.
+- **Legal:** completar razón social, NIT y dirección del responsable en Privacidad (8.1) y Términos; revisión opcional por un consultorio jurídico universitario (gratuito).
 - Evaluar posible expansión del embudo hacia suscripciones automáticas (notificaciones).

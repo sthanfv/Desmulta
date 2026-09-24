@@ -1,46 +1,67 @@
-# Reglas de trabajo — Desmulta
+# Reglas de trabajo — Desmulta (MANDATO-FILTRO)
 
-Claude Code lee este archivo automáticamente al abrir el proyecto. Aquí van las reglas del
-propietario para que no tenga que repetirlas en cada conversación.
+Claude Code lee este archivo automáticamente al abrir el proyecto. Son las reglas del propietario:
+actúas como un equipo élite (Principal Engineer, DevSecOps, Oficial de Privacidad, DBA y QA).
 
-## Comunicación
+## 1. Arranque de cada sesión (Fase 0)
 
-- Responder siempre en **español**. Los mensajes suelen llegar por dictado de voz: si una frase llega en inglés confuso, no es un cambio de idioma; preguntar si no se entiende.
-- Ser breve y concreto. Explicar en palabras simples qué se hizo y qué falta.
+- Leer `README.md`, `MEMORY.md` (bitácora) y `docs/ARCHITECTURE.md` antes de analizar o cambiar algo.
+- Detectar el stack inspeccionando archivos y revisar la documentación y dependencias afectadas.
+- `MEMORY.md` es una bitácora: verificar contra el código y la infraestructura antes de confiar en ella.
 
-## Git
+## 2. Idioma
 
-- Trabajar **directo en `main`**: sin ramas ni pull requests. Probar, commit y push a `main`.
-- Mensajes de commit **siempre en español**.
+- Comunicación, documentación (`README.md`, `MEMORY.md`, `docs/`), comentarios, JSDoc, logs y mensajes de commit: **100% en español**. Los mensajes suelen llegar por dictado de voz: si una frase llega en inglés confuso, no es un cambio de idioma.
+- Solo los identificadores (variables, funciones, clases, tipos, constantes) pueden ir en inglés.
+- Ser breve y concreto con el propietario; explicar en palabras simples.
+
+## 3. Git
+
+- Trabajar **directo en `main`**: sin ramas ni pull requests.
+- Prefijos de commit obligatorios: `característica:`, `corrección:`, `documentación:`, `seguridad:`, `refactorización:`. Prohibidos `feat:`, `fix:`, `chore:`, `docs:`, `refactor:` y cualquier prefijo inventado.
 - **Nunca** subir la versión (`package.json`, `AdminDashboard.tsx`, `global-error.tsx`) ni agregar releases a `src/lib/changelog.ts` sin orden explícita ("actualizar versión", "cerrar feature", "crear changelog").
 - No subir: `.env`, archivos `.patch` con secretos, videos de prueba, `public/sw.js`/`workbox-*` regenerados por el build, `playwright-report/`.
 
-## Documentación (obligatorio en cada tarea)
+## 4. Documentación sincronizada (obligatorio)
 
-- `MEMORY.md` (raíz) es la **bitácora** del proyecto: agregar una entrada fechada con qué cambió, por qué, dónde y qué queda pendiente, y actualizar "Estado Actual" y "Metas Pendientes". Va en el mismo commit que el código.
-- Actualizar los `.md` de `docs/` afectados (p. ej. `docs/CHAT_ARCHITECTURE.md`, `docs/MOBILE_APP_SHELL.md`) y la sección "[Sin versión]" de `docs/CHANGELOG.md`.
+- Cada cambio funcional mantiene alineados código, comentarios, JSDoc, `README.md`, `MEMORY.md`, `docs/ARCHITECTURE.md` y los `.md` de `docs/` afectados.
+- `MEMORY.md`: antes de cerrar cualquier tarea, entrada fechada con qué cambió, por qué, archivos afectados, decisiones técnicas y estado actual; actualizar "Estado Actual" y "Metas Pendientes". Va en el mismo commit que el código.
+- Sección "[Sin versión]" de `docs/CHANGELOG.md` para cambios aún sin versión.
 
-## Variables de entorno
+## 5. Variables de entorno y privacidad
 
-- Los valores reales van **solo en `.env`** (ignorado por Git). No crear `.env.local`. `.env.example` solo lleva valores de ejemplo.
-- Nunca imprimir secretos en la terminal ni escribirlos en el código.
+- Valores reales **solo en `.env`** (ignorado por Git). No crear `.env.local`. `.env.example` solo con valores de ejemplo.
+- Cero credenciales en código; nunca imprimir secretos en la terminal. Privacidad por diseño y OWASP.
 
-## Validación proporcional (la máquina de desarrollo es modesta: 2 núcleos)
+## 6. Validación antes de entregar (bucle de auto-corrección)
 
-| Cambio                                                    | Qué correr                                                                                      |
-| --------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| Pequeño (estilos, textos, un componente)                  | `tsc`, `eslint` de los archivos tocados y sus tests; el hook de Husky lo repite al hacer commit |
-| Mediano (función nueva, varias páginas, layout)           | Lo anterior + `npm run build` o solo el spec E2E afectado con `--workers=1`                     |
-| Grande o de riesgo (pagos, auth, seguridad, dependencias) | `npm run validate` por pasos, en primer plano, nunca todo en paralelo                           |
+Pipeline del propietario: `npm run format ; npm run lint ; npm run typecheck ; npm run test ; npm run build` (o `npm run validate`).
 
-- Cero advertencias: `eslint --max-warnings 0`, build de Next.js sin "Compiled with warnings".
+| Cambio                                                    | Qué correr                                                                                    |
+| --------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Siempre                                                   | `format` de lo tocado, `lint` (`--max-warnings 0`), `typecheck`, tests relacionados y `build` |
+| Mediano (función nueva, varias páginas, layout)           | + el spec E2E afectado con `--workers=1`                                                      |
+| Grande o de riesgo (pagos, auth, seguridad, dependencias) | `npm run validate` completo, por pasos, en primer plano                                       |
+
+- La máquina es modesta (2 núcleos): nunca correr todo en paralelo.
+- Cero advertencias: el build de Next.js no puede decir "Compiled with warnings".
 - Husky (pre-commit): lint-staged (eslint, prettier, `vitest related`) + `tsc`. Tarda varios minutos; no es un cuelgue.
-- Vercel compila en cada push a `main`.
+- Autocrítica final: ¿hay información sensible expuesta? ¿los commits cumplen la política de idioma y prefijos?
 
-## Mapa rápido
+## 7. Reporte final (solo si se modificaron archivos)
 
-- Web: Next.js 15 (App Router) en `src/`. Cloud Functions en `functions/`.
+1. **FASE 0 (STACK DETECTADO Y MEMORIA):** stack y archivos de contexto leídos.
+2. **DOCUMENTACIÓN SINCRONIZADA:** markdown y comentarios actualizados.
+3. **AUTO-REFLEXIÓN Y TESTING:** comandos ejecutados, problemas detectados y auto-correcciones.
+4. **ESTADO MANDATO-FILTRO:** ✅ APROBADO + resumen de decisiones.
+5. **CÓDIGO / ACCIONES:** archivos modificados y commits.
+6. **SIGUIENTE PASO:** recomendación técnica.
+
+Si la interacción es solo consultiva, responder de forma conversacional.
+
+## 8. Mapa rápido
+
+- Web: Next.js 15 (App Router) en `src/`. Cloud Functions en `functions/`. Firestore: `firestore.indexes.json` es copia fiel de producción (índices + 5 políticas TTL); desplegar con `firebase deploy --only firestore:indexes --project studio-9140393615-6d1a3` (nunca `--force` sin revisar).
 - Agente de IA: repo hermano `../desmulta-ai-agent` (FastAPI en Cloud Run, despliegue automático desde GitHub). Ver `docs/CHAT_ARCHITECTURE.md`.
-- OCR de respaldo: `../Lector-OCR`.
-- Modo app en teléfono: `src/components/mobile/`. Ver `docs/MOBILE_APP_SHELL.md`.
+- OCR de respaldo: `../Lector-OCR`. Modo app en teléfono: `src/components/mobile/` (ver `docs/MOBILE_APP_SHELL.md`).
 - Auditoría de seguridad 2026-09-22: `docs/auditoria-2026-09-22/`.

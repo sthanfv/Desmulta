@@ -11,6 +11,7 @@ import {
   MessageCircle,
   UserCheck,
   Clock,
+  Globe,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FOOTER_DEFAULTS } from '@/lib/config-constants';
@@ -332,6 +333,60 @@ export default function PrivacidadPage() {
                 <p>
                   Los datos sensibles, como el número de documento, se almacenan cifrados. El acceso
                   al panel interno exige doble verificación y cada acceso queda registrado.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* SECCIÓN 8: Responsable, encargados y transferencias (Decreto 1377 de 2013) */}
+          <section className="floating-card bg-card/40 backdrop-blur-sm border border-white/10 p-10 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-500">
+            <div className="flex items-center gap-4 mb-10">
+              <div className="p-3 bg-primary/10 rounded-2xl border border-primary/20 shadow-inner">
+                <Globe className="text-primary" size={28} />
+              </div>
+              <h2 className="text-3xl font-black text-foreground tracking-tight">
+                Responsable y Proveedores
+              </h2>
+            </div>
+            <div className="grid gap-8 text-muted-foreground leading-relaxed text-lg">
+              <div className="space-y-3">
+                <h4 className="font-black text-foreground uppercase tracking-widest text-xs opacity-60">
+                  8.1. Responsable del tratamiento
+                </h4>
+                <p>
+                  {brandName}, con atención en todo el territorio colombiano. Contacto para asuntos
+                  de datos personales:{' '}
+                  <a
+                    href={`mailto:${contactEmail}`}
+                    className="text-primary underline underline-offset-4"
+                  >
+                    {contactEmail}
+                  </a>
+                  .
+                </p>
+              </div>
+              <div className="space-y-3">
+                <h4 className="font-black text-foreground uppercase tracking-widest text-xs opacity-60">
+                  8.2. Encargados y transmisión internacional
+                </h4>
+                <p>
+                  Para operar la plataforma usamos proveedores de tecnología que tratan datos por
+                  cuenta nuestra y cuyos servidores pueden estar fuera de Colombia (principalmente
+                  en Estados Unidos): Google (Firebase, Cloud Run y Gemini) para almacenamiento y
+                  procesamiento, Vercel para el alojamiento de la web y de las imágenes, Upstash
+                  para el control de abuso, Resend para el envío de correos, Telegram para avisar a
+                  nuestro equipo de las nuevas consultas y los proveedores de analítica indicados en
+                  la sección 2. Al aceptar esta política usted autoriza esa transmisión, que se
+                  limita a lo necesario para prestar el servicio (Arts. 25 y 26, Ley 1581 de 2012).
+                </p>
+              </div>
+              <div className="space-y-3">
+                <h4 className="font-black text-foreground uppercase tracking-widest text-xs opacity-60">
+                  8.3. Vigencia
+                </h4>
+                <p>
+                  Esta política rige desde su publicación ({ULTIMA_ACTUALIZACION}). Cualquier cambio
+                  importante se informará en esta misma página.
                 </p>
               </div>
             </div>
