@@ -33,6 +33,12 @@
 
 ## 📜 Historial Reciente (Últimos Cambios Clave)
 
+### [2026-09-24] - Privacidad y Términos: correcciones de exactitud
+
+- **Privacidad (`src/app/privacidad/page.tsx`):** decía que el OCR se procesaba "100% en su dispositivo" y que las imágenes no se enviaban a IA externa — **falso** (`/api/ocr` usa Gemini y Lector-OCR). También afirmaba consultas automatizadas (bots/scraping) al SIMIT/RUNT, desactivadas por cumplimiento. Se corrigió y se agregaron: Microsoft Clarity y Cloudflare Turnstile en rastreadores, asistente virtual (mensajes a Gemini, conversación solo en el navegador, analítica sin texto), derechos del titular (Art. 8 Ley 1581) con canal y plazos (Arts. 14-15), conservación y seguridad, y fecha de actualización.
+- **Términos (`src/app/terminos/page.tsx`):** nueva cláusula 1.6 (herramientas automáticas y asistente: orientativos, no son asesoría jurídica) y fecha de actualización.
+- **Pendiente legal (decisión del propietario):** que un abogado revise ambos textos; en particular la cláusula 5.1 "Renuncia a demandas colectivas" (Ley 472 de 1998 / Ley 1480 de 2011) y el derecho de retracto en ventas en línea (Art. 47 Ley 1480).
+
 ### [2026-09-24] - Visor de casos de éxito (`src/components/sections/SuccessCases.tsx`)
 
 - Fotos optimizadas por Next.js (antes `unoptimized`: se descargaba el original completo en cada teléfono) con `sizes` y aparición suave al cargar.

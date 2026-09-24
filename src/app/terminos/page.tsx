@@ -5,6 +5,9 @@ import Link from 'next/link';
 import { ArrowLeft, ShieldCheck, FileText, Lock, Scale } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
+/** Fecha de la última revisión del contenido (actualizar al cambiar el texto). */
+const ULTIMA_ACTUALIZACION = '24 de septiembre de 2026';
+
 export default function TerminosPage() {
   const brandName = process.env.NEXT_PUBLIC_BRAND_NAME || 'Desmulta';
 
@@ -42,6 +45,9 @@ export default function TerminosPage() {
           <p className="text-xl text-muted-foreground font-medium max-w-2xl">
             Transparencia técnica y jurídica en el manejo de sus datos y la gestión de sus procesos
             administrativos.
+          </p>
+          <p className="mt-4 text-sm text-muted-foreground/70">
+            Última actualización: {ULTIMA_ACTUALIZACION}
           </p>
         </div>
 
@@ -148,6 +154,18 @@ export default function TerminosPage() {
                   embargo, no se garantiza infalibilidad en el resultado final, el cual recae
                   exclusivamente en la autonomía y discrecionalidad de las autoridades
                   administrativas o jueces de la República.
+                </p>
+              </div>
+              <div className="space-y-3">
+                <h4 className="font-black text-foreground uppercase tracking-widest text-xs opacity-60">
+                  1.6. Herramientas Automáticas y Asistente Virtual
+                </h4>
+                <p>
+                  El asistente virtual, la calculadora de prescripción y la lectura automática de
+                  comparendos usan inteligencia artificial y reglas automatizadas. Sus respuestas
+                  son <strong>orientativas</strong>: no constituyen asesoría jurídica, no crean una
+                  relación de representación y pueden contener errores. El estudio de viabilidad de
+                  su caso lo realiza nuestro equipo con los documentos que usted aporte.
                 </p>
               </div>
             </div>
