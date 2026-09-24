@@ -4,88 +4,114 @@
 >
 > 1. **Fechas Obligatorias:** Cada vez que leas, actualices o modifiques este archivo, DEBES fechar la entrada (Ej. `[2026-08-17] Auditoría...`). El archivo debe reflejar la cronología real para evitar la degradación de la documentación.
 > 2. **Escepticismo Activo (No confíes ciegamente):** Este archivo es una bitácora, pero la realidad reside en el código y en la infraestructura. Antes de dar por hecho el "Estado Actual", DEBES verificar si las variables de entorno, contenedores o servicios siguen existiendo realmente. Mantenlo conciso, eliminando historial irrelevante.
-> 3. **Política de Git Hooks (Husky):** Desmulta posee una suite pesada de Vitest pre-commit/push. **USA `git commit --no-verify` o `git push --no-verify`** para saltar las comprobaciones cuando actualices documentación, MDs, o realices ajustes triviales. La suite completa SOLO debe dejarse correr (sin `--no-verify`) cuando se realicen refactorizaciones reales de código, APIs o servicios.
+> 3. **Validación proporcional y Husky:** El hook pre-commit ya corre eslint, prettier, `vitest related` y `tsc` sobre lo que cambió. Cambios pequeños → basta con el hook (o `--no-verify` si es solo documentación). Cambios medianos → además `npm run build` o el spec E2E afectado. Cambios grandes o de riesgo (pagos, auth, seguridad, dependencias) → `npm run validate` completo, por pasos. La máquina de desarrollo es modesta: nunca correr todo en paralelo.
+> 4. **Reglas de trabajo:** ver `CLAUDE.md` en la raíz (lo leen automáticamente los agentes de IA). Esta bitácora se actualiza en el mismo commit que el código.
 
-## 🏗️ Estado Actual de Implementación (Actualizado: 2026-08-17)
+## 🏗️ Estado Actual de Implementación (Actualizado: 2026-09-24)
 
 ### Módulos Principales
 
-1. **Frontend (Next.js 15 / React 19)**:
+1. **Frontend (Next.js 15.5 / React 19)**:
+   - **Modo app en teléfono (< 768 px):** barra de pestañas (Inicio · Mi caso · Consultar · Asistente · Más), barra superior con flecha atrás, paneles nativos (vaul) y chat en pantalla completa. Escritorio sin cambios. Ver `docs/MOBILE_APP_SHELL.md`.
    - **Tablero Kanban (`vial-clear`)**: Modo compacto activado. Progressive Disclosure para reducir estrés cognitivo.
    - **Dashboard Analytics**: Round-Robin de asignación de operadores integrado.
    - **Calculadora Pública**: Protegida por Cloudflare Turnstile, Honeypots y cifrado E2E.
-   - **Seguridad UI**: Sticky CTA para CRO, Light Mode automático (OS-Level), Open Graph dinámico para expedientes.
+   - **Seguridad UI**: Light Mode automático (OS-Level), Open Graph dinámico para expedientes.
 2. **Backend & Seguridad**:
    - **Zero-PII Storage**: AES-256-GCM y HMAC-SHA256 para aislamiento total de datos de clientes.
-   - **Rate Limiting**: Upstash Redis activo (Calculadora limitada a 10 consultas/día por IP).
+   - **Tokens de admin con audiencia** (`src/lib/auth/admin-jwt.ts`): `otp-pending`, `admin-2fa`, `god-mode`, `operator-pin`; el 2FA queda ligado al uid de la sesión.
+   - **Rate Limiting**: Upstash Redis. Chat: 8 msg/min + 60 msg/día por IP (fail-closed). OCR: 3 cada 7 días.
    - **Middlewares**: Geobloqueo estricto (Solo tráfico desde Colombia - `x-vercel-ip-country`). Defensa Zero-Trust con JWTs de Firebase y OTPs.
-3. **Integraciones B2B y Microservicios**:
+   - **Alertas de caída** (`src/lib/monitoring/service-alert.ts`): chat y OCR → Telegram en HTML, 1 alerta por servicio cada 10 min.
+3. **Integraciones B2B y Microservicios** (repos en `C:\Workspace\Ecosistema_Desmulta\`):
+   - **Agente IA (`desmulta-ai-agent`, FastAPI en Cloud Run):** Gemini `gemini-flash-lite-latest` con respaldo `gemini-flash-latest`; despliegue automático desde GitHub (Cloud Build). Ver `docs/CHAT_ARCHITECTURE.md`.
    - **Motor Financiero (Go)**: Integrado vía HMAC-SHA256 (`desmulta-calculadora-go`). Serverless.
-   - **Lector OCR (Python)**: Desplegado en Cloud Run. Usa QStash para mensajería asíncrona.
-   - **Pasarela de Pagos (Wompi)**: Credenciales de producción activas. Idempotencia y Circuit Breaker implementados.
+   - **Lector OCR (Python)**: Respaldo del OCR de Gemini. Usa QStash para mensajería asíncrona.
+   - **Pasarela de Pagos (Wompi)**: Credenciales de producción activas. Webhook transaccional e idempotente.
 
 ---
 
 ## 📜 Historial Reciente (Últimos Cambios Clave)
 
-### [2026-08-16 a 2026-08-17] - Auditorías y Hotfixes
+### [2026-09-22 a 2026-09-24] - Auditoría de seguridad, chat con IA real y modo app en teléfono
 
-- **Criptografía Zero-PII y Auditoría:** 19 vulnerabilidades parchadas exitosamente (incluyendo SSRF, Path Traversal, HTML Injection).
-- **Seguridad (OTP):** Se incrementó el tiempo de expiración del código OTP (2FA Administrativo) de 2 a 5 minutos en `src/lib/auth/otp-service.ts` para mitigar delays de Resend.
-- **Trazabilidad (Pilar 1 SRE):** Inyección de `X-Trace-Id` en los 3 repositorios para observabilidad distribuida. Alertas de colapso enlazadas directamente a Telegram y Sentry.
-- **Cancelación SIMIT Scraper:** El motor de scraping estocástico hacia SIMIT fue inhabilitado permanentemente (HTTP 410 Gone) por cumplimiento de normativa Anti-Scraping (Riesgo Ley 1273 de 2009).
+- **Auditoría de seguridad (commit `6c28bd6`):** tokens de admin con audiencia (antes cualquier JWT del mismo secreto abría God Mode o saltaba el OTP), 2FA ligado al uid, `POST /api/auth/session` desactivado, webhook de Wompi transaccional (ya no quedan pagos "pendientes para siempre"), DLQ de PDF filtrando `pdfDeliveredAt == null` (+ índice y `npm run backfill:pdf`), SSRF guard con `net.BlockList`, escape HTML en Telegram, eliminación de secretos hardcodeados (HMAC del agente y API key del scraper SIMIT). Informe: `docs/auditoria-2026-09-22/`.
+- **Chat (commits `1d95f2c`, agente `e4507c9`→`a2abdd0`):** diagnóstico: el chat NUNCA usó IA en producción (clave de Gemini inválida + modelo `gemini-2.5-flash` retirado + créditos agotados) y respondía 4 párrafos fijos por palabra clave, sin dejar rastro en logs. Ahora: charla corta humana (hola/gracias/chao sin leyes), prompt con personalidad y honestidad (no inventa servicios ni promete resultados), botón sugerido según la pregunta, memoria de 10 mensajes con presupuesto de bytes (antes el agente rechazaba > 4 KB), respaldo con WhatsApp si el agente falla, fallos de Gemini registrados. Secreto HMAC rotado en Vercel y Cloud Run (el filtrado responde 401).
+- **OCR (commit `c14a7e9`):** el modelo estaba escrito a mano y retirado; ahora `GEMINI_OCR_MODEL` (por defecto `gemini-flash-lite-latest`), verificado con una imagen real.
+- **Dependencias:** `next` 15.5.26 (vulnerabilidad crítica), `sharp` 0.35.4, `postcss`/`serialize-javascript` parcheados vía `overrides`.
+- **GitHub Actions:** CI ahora corre en `main` (antes ignoraba `main`); CD solo despliega Firebase (Vercel ya despliega la web); Lighthouse semanal contra producción.
+- **Modo app en teléfono (commits `1f621e7`, `d7a0fc1`, `433d172`, `c2f895e`):** fase 1 carcasa + pestañas + paneles + chat a pantalla completa; fase 2 Inicio con accesos rápidos y pilares en carrusel; fase 3 barra con flecha atrás en páginas internas y transición de pantalla; la marca de la barra se recoge al bajar como en escritorio. Sin ocultar contenido (SEO mobile-first intacto).
+- **Tests:** E2E reparados (smoke buscaba un botón que cambió de texto; God Mode sin bypass E2E tras la auditoría; Escudo SIMIT omitido porque la página está desactivada). Integración 590/590.
 
-### [2026-08-14] - Implementación de Caché (Pilar 2)
+### [2026-08-22] - Auditoría Estricta DevSecOps y Hotfixes Financieros
 
-- Patron Cache-Aside con Upstash Redis para proteger los motores pesados de Go (Calculadora) y OCR, mitigando facturación redundante en Serverless.
+> Nota [2026-09-24]: esta entrada llegó con las comillas invertidas perdidas; se reparó. Los valores de precios que se perdieron no se reconstruyeron: la fuente de verdad es `PRODUCT_PRICES` en `src/lib/payments/product-prices.ts`.
 
-### [2026-08-18] - Fase 4: SEO Programático (ANSV) y Generación de Leads
-
-- [x] **Generador de JSON de ANSV:** Modificación del script `fetch-ansv.js` para limpiar formatos, lidiar con direcciones faltantes e inyectar coordenadas GPS exactas.
-- [x] **Inyección SEO en Sitemap:** Se inyectó la ruta dinámica `/multas/[ciudad]/camaras` directamente en `sitemap.ts` para indexación de Google.
-- [x] **UI de Radar Nivel Premium:** Se rediseñó desde cero un radar usando `conic-gradient`, blips dinámicos en CSS, y soporte para Tree Shaking mediante `<m.div>` (LazyMotion de Framer).
-- [x] **Gestor de Estados de Cámaras (Cards):** Rediseño profundo estilo "Dark Premium" (`#0a0a0a`), uso avanzado de colorimetría para severidad de infracción (Ámbar para C, Rojo para D), y formato inteligente satelital cuando falta la dirección legal.
-- [x] **Barra Fija de Estadísticas (Sticky Bar):** Contador flotante en tiempo real del número de cámaras activadas, conectado al embudo de ventas (`#escaner`).
-- [x] **Conversión en Ciudades Vacías:** Las ciudades con 0 cámaras ahora muestran un "Empty State" optimizado psicológicamente, indicando que todas las multas allí son ilegales para impulsar la auditoría. Project Manager, se ejecutó una revisión de seguridad pasiva sobre la implementación (100% Client-Side Filtering, JSON estático, protección XSS nativa de React, sin SQL/DB queries, enlaces de Maps codificados). Pendiente cualquier auditoría adicional.
-- [x] **Auditoría UI/UX Dual-Theme (Light/Dark):** Se ajustó el contraste visual extremo del componente militar de escaneo de radar para funcionar en modo claro (Light Mode) forzando interior oscuro, y se liberó la ruta `multas/ciudades` que tenía un fondo negro (Dark Mode) hardcodeado. Las tarjetas se elevaron con degradados sutiles (Gradients + Shadows) aumentando su visibilidad diurna.
-- [x] **Unificación de Tokens (Tailwind):** Se inyectó el token oficial `brand` en `tailwind.config.ts` (basado en la paleta Amber) reemplazando colores harcodeados (`green-500`) y resolviendo el contraste en tarjetas oscuras (ej. Buenaventura).
-- [x] **Tolerancia a Fallos (Fuzzy Search):** Se implementó normalización estricta (remoción de tildes y del sufijo "D.C.") en el cruce de datos y buscador, resolviendo un bug crítico donde Bogotá aparecía con 0 cámaras.
-- Evaluar posible expansión del embudo hacia suscripciones automáticas (notificaciones).
-
-### [2026-08-19] - Consolidación de Servicios (Documentación de Funcionalidades)
-
-- **Calculadora de Tiempo y SIMIT OCR:** Operativos. El sistema permite escanear comparendos y calcular fechas usando IA y lógica determinista (Go).
-- **Directorio de Códigos de Infracción y Ciudades:** Base de datos estática navegable (SEO programático) que mapea todas las ciudades de Colombia y sus respectivos códigos de infracción de tránsito.
-- **Directorio Nacional de Radares (ANSV):** Directorio interactivo con coordenadas GPS exactas conectado a Google Maps, con animaciones de entrada en SSR/Client.
-- **Portal VIP de Seguimiento (Seguridad):** Módulo de trazabilidad y estado para usuarios registrados, bajo estrictas reglas de Zero-PII.
-- **Limpieza DevSecOps:** Erradicación de advertencias (warnings) de compilación en Vercel (Edge Runtime mitigado en OG images, Sentry disableLogger removido, y Scripts de NPM autorizados).
-
-## 🎯 Metas Pendientes / Tareas a Seguir
-
-- **Agente Comercial IA (desmulta-ai-agent):** [2026-08-20] Microservicio inicializado y blindado en C:\Workspace\desmulta-ai-agent con FastAPI, 27 tests unitarios (94% cobertura), autenticación B2B con HMAC-SHA256, Zero-PII y RAG legal colombiano.
-
-- **Revisión de Seguridad del Código Nuevo:** Como solicitado por el Project Manager, se ejecutó una revisión de seguridad pasiva sobre la implementación (100% Client-Side Filtering, JSON estático, protección XSS nativa de React, sin SQL/DB queries, enlaces de Maps codificados). Pendiente cualquier auditoría adicional.
-- Evaluar posible expansión del embudo hacia suscripciones automáticas (notificaciones).
-
-### [2026-08-21] - Fase 3: Telemetría Zero-Cost y Observabilidad
-
-- [x] **Analítica de Demanda Ciudadana (Google Trends de Multas)**: Implementación de rastreador asíncrono en RAM usando Upstash Redis. Costo $0 (cero escrituras/lecturas de Firestore). Clasifica temas como mbargos, prescripcion y ciudades.
-- [x] **Dashboard Administrativo**: Se creó DemandTrendsWidget.tsx incrustado en AnalyticsView.tsx de Desmulta.
-- [x] **Seguridad Admin**: La telemetría solo se extrae validando el \_\_session token JWT de administrador en el Route Handler con
-      ext-firebase-auth-edge.
-- [x] **Tolerancia a Fallos y SRE**: Agregadas alertas a Telegram (sendTelegramAgentAlert) que se disparan únicamente cuando hay un fallo en el motor del agente de IA, evitando spam y aprovechando la infraestructura existente de elegram.ts.
+- **Vulnerabilidad DoS en Middleware**: Se corrigió el `path` de la cookie OTP (`admin-2fa-token`) en el generador de auth para prevenir que el Middleware bloqueara a los administradores en `/api/admin/`.
+- **Privilege Escalation en Server Actions**: Se inyectó validación nativa 2FA (con `jwtVerify`) dentro de `requireAdminSession.ts` para evitar invocaciones maliciosas de Server Actions desde rutas públicas. (Reforzado el 2026-09-22 con tokens con audiencia.)
+- **SSRF / LFI en Motor PDF**: Se mitigó la inyección de código con los filtros `escapeHtml` y `escapeCssString` dentro de `src/lib/pdf/template.ts`.
+- **Logic Flaw Crítico en Pasarela Wompi**: Se arregló un bug financiero donde Wompi comparaba montos de validación con división de `/ 100`, lo que denegaba erróneamente todas las compras válidas como `FLAGGED_AMOUNT_MISMATCH`.
+- **Revisión General de Precios (50% de Descuento)**:
+  - Catálogo nativo (`PRODUCT_PRICES`) rebajado un 50% en centavos.
+  - Vistas UI (Hero, Calculadora, Formulario IA, Generador) ajustadas a los nuevos precios.
+  - Componente `AdminDashboard` y suite de pruebas unitarias re-escritos con aserciones alineadas al descuento.
+- **Tolerancia a Fallos de Pagos Validada**:
+  - Webhook configurado con `waitUntil()` nativo para retención de contenedor.
+  - Reintentos vía Upstash QStash DLQ cada 15 min implementados para PDF no entregados.
 
 ### [2026-08-22] - Corrección de Coherencia IA (RAG Proxy)
 
-- Inyección de Guardarraíl Comercial Algorítmico en src/app/api/chat/route.ts para alinear ventas sin afectar pedagogía.
-- Tests de inyección creados: chat-guardrail.test.ts.
+- Inyección de Guardarraíl Comercial Algorítmico en `src/app/api/chat/route.ts` para alinear ventas sin afectar pedagogía. Tests: `chat-guardrail.test.ts`.
+- Configurado Isolation Testing en package.json (`vitest related`) para velocidad DevSecOps.
+- Añadido `ChatConsumptionWidget` al dashboard usando Upstash Redis para trackear consumo de API del Chat a costo 0 de BBDD.
+- Pilar 4: UX de Streaming Simulado en el `ChatAssistantWidget` (Thinking Steps + Typewriter). (El typewriter no se activaba; corregido el 2026-09-22.)
+- SEO CTR y Distribución:
+  - Script `blog:sync` con Google Alerts y Gemini IA para reescritura de artículos y generación de MDX libres de plagio.
+  - Logotipo oficial en `layout.tsx` para su visualización en Google Search.
+  - Schema.org JSON-LD (`FAQPage` y `AggregateRating`) en `page.tsx` para Rich Snippets.
+  - Cabeceras CSP y HSTS verificadas en `middleware.ts`.
 
-- Configurado Isolation Testing en package.json ( vitest related ) para velocidad DevSecOps.
+### [2026-08-21] - Fase 3: Telemetría Zero-Cost y Observabilidad
 
-- [2026-08-22] - Añadido `ChatConsumptionWidget` al dashboard usando Upstash Redis para trackear consumo de API del Chat a costo 0 de BBDD.
-- [2026-08-22] - Pilar 4 completado: Añadido UX de Streaming Simulado en el ChatAssistantWidget (Thinking Steps + Typewriter) preservando la integridad del Python RAG Engine.
-- [2026-08-22] - SEO CTR y Distribución:
-  - Se configuró el script `blog:sync` con Google Alerts y Gemini IA para reescritura de artículos y generación de MDX libres de plagio.
-  - Se inyectó el Logotipo oficial en `layout.tsx` para forzar su visualización en Google Search.
-  - Se inyectó Schema.org JSON-LD avanzado (`FAQPage` y `AggregateRating`) en el `<head>` de `page.tsx` para habilitar Rich Snippets (estrellas y preguntas) en los resultados de Google, aumentando drásticamente el CTR (Click-Through Rate).
-  - Se verificó que las cabeceras CSP (Content Security Policy) y HSTS en `middleware.ts` están 100% blindadas y funcionales, previniendo inyecciones.
+- [x] **Analítica de Demanda Ciudadana (Google Trends de Multas)**: rastreador asíncrono en RAM usando Upstash Redis. Costo $0 (cero lecturas/escrituras de Firestore). Clasifica temas como embargos, prescripción y ciudades.
+- [x] **Dashboard Administrativo**: `DemandTrendsWidget.tsx` incrustado en `AnalyticsView.tsx`.
+- [x] **Seguridad Admin**: la telemetría solo se extrae validando el token `__session` de administrador en el Route Handler con `next-firebase-auth-edge`.
+- [x] **Tolerancia a Fallos y SRE**: alertas a Telegram (`sendTelegramAgentAlert`) cuando falla el motor del agente de IA. (Desde 2026-09-22 el chat usa `service-alert.ts` con anti-spam.)
+
+### [2026-08-19] - Consolidación de Servicios (Documentación de Funcionalidades)
+
+- **Calculadora de Tiempo y SIMIT OCR:** Operativos. Escaneo de comparendos y cálculo de fechas con IA y lógica determinista (Go).
+- **Directorio de Códigos de Infracción y Ciudades:** Base de datos estática navegable (SEO programático).
+- **Directorio Nacional de Radares (ANSV):** Directorio interactivo con coordenadas GPS conectado a Google Maps.
+- **Portal VIP de Seguimiento (Seguridad):** Trazabilidad y estado para usuarios registrados, bajo reglas Zero-PII.
+- **Limpieza DevSecOps:** Erradicación de advertencias de compilación en Vercel.
+
+### [2026-08-18] - Fase 4: SEO Programático (ANSV) y Generación de Leads
+
+- [x] Generador de JSON de ANSV (`fetch-ansv.js`) con coordenadas GPS exactas.
+- [x] Ruta dinámica `/multas/[ciudad]/camaras` en `sitemap.ts`.
+- [x] UI de radar premium (`conic-gradient`, LazyMotion) y tarjetas de cámaras con colorimetría por severidad.
+- [x] Empty State optimizado para ciudades sin cámaras; auditoría dual-theme (claro/oscuro); token `brand` en `tailwind.config.ts`.
+- [x] Fuzzy Search: normalización de tildes y sufijo "D.C." (Bogotá aparecía con 0 cámaras).
+
+### [2026-08-16 a 2026-08-17] - Auditorías y Hotfixes
+
+- **Criptografía Zero-PII y Auditoría:** 19 vulnerabilidades parchadas (incluyendo SSRF, Path Traversal, HTML Injection).
+- **Seguridad (OTP):** expiración del OTP administrativo de 2 a 5 minutos en `src/lib/auth/otp-service.ts`.
+- **Trazabilidad (Pilar 1 SRE):** `X-Trace-Id` en los 3 repositorios; alertas enlazadas a Telegram y Sentry.
+- **Cancelación SIMIT Scraper:** el scraping hacia SIMIT fue inhabilitado permanentemente por cumplimiento (Riesgo Ley 1273 de 2009). El 2026-09-22 se eliminaron el scheduler y la API key del `.env.example`.
+
+### [2026-08-14] - Implementación de Caché (Pilar 2)
+
+- Patrón Cache-Aside con Upstash Redis para proteger los motores pesados de Go (Calculadora) y OCR.
+
+---
+
+## 🎯 Metas Pendientes / Tareas a Seguir (Actualizado: 2026-09-24)
+
+- **Seguridad:** generar una clave nueva de Gemini en AI Studio (las actuales quedaron expuestas en una conversación) y revocar la API key del scraper SIMIT, que sigue en el historial de Git.
+- **Vercel:** confirmar `GEMINI_API_KEY` nueva (OCR) y, opcional, `GEMINI_OCR_MODEL`.
+- **GitHub Actions:** los jobs se cortan a los 2 s por un tema de la cuenta (revisar Settings → Billing); el repo es público, así que los runners estándar no deberían consumir cuota. CD necesita el secreto `FIREBASE_TOKEN`.
+- **Firebase:** desplegar índices nuevos (`firebase deploy --only firestore:indexes`) y correr una vez `npm run backfill:pdf`.
+- **Visor de casos de éxito:** fotos optimizadas, cerrar con el gesto "atrás", deslizamiento que sigue el dedo (embla), precarga del siguiente caso, accesibilidad.
+- Evaluar posible expansión del embudo hacia suscripciones automáticas (notificaciones).

@@ -14,13 +14,18 @@
 - ⚖️ [**Marco Legal y Privacidad**](docs/LEGAL.md)
 - 🛡️ [**Idempotencia y Seguridad**](docs/IDEMPOTENCIA_SEGURIDAD.md)
 - 🧠 [**Memoria de Sesiones (MEMORY.md)**](docs/MEMORY.md)
+- 📓 [**Bitácora del proyecto (MEMORY.md raíz)**](MEMORY.md) — estado actual y cambios recientes
+- 🤖 [**Reglas para agentes de IA (CLAUDE.md)**](CLAUDE.md)
+- 💬 [**Asistente IA / Chat**](docs/CHAT_ARCHITECTURE.md)
+- 📱 [**Modo app en teléfono**](docs/MOBILE_APP_SHELL.md)
 
 ---
 
 ## 🚀 Inicio Rápido
+
 ```bash
 npm ci
 npm run dev
 ```
 
-*Desmulta v1.0.0*
+_Desmulta v1.0.0_
