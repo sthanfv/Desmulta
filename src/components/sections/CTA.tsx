@@ -15,7 +15,7 @@ interface CTAProps {
  */
 export const CTA = ({ onConsultar, onOpenSimitTutorial }: CTAProps) => {
   return (
-    <section className="py-16 md:py-24 px-4 mb-8 sm:mb-12">
+    <section className="py-10 md:py-24 px-4 mb-4 sm:mb-12">
       <div className="max-w-5xl mx-auto relative">
         <div className="relative bg-primary text-primary-foreground p-8 sm:p-14 md:p-20 rounded-3xl overflow-hidden text-center space-y-8 shadow-xl shadow-primary/10">
           {/* Luz ambiental sutil — opacity muy baja */}

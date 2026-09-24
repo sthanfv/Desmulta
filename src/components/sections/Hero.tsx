@@ -24,6 +24,7 @@ import { useExpedienteStore } from '@/store/useExpedienteStore';
 import { ReturningUserBanner } from '@/components/vial-clear/ReturningUserBanner';
 import { useHydration } from '@/hooks/useHydration';
 import type { ShowcaseConfig } from '@/lib/site-config';
+import { MobileQuickActions } from '@/components/mobile/MobileQuickActions';
 
 interface HeroProps {
   cityContext?: string;
@@ -43,7 +44,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
 
   return (
     <LazyMotion features={domAnimation} strict>
-      <section className="min-h-[100svh] flex items-center pt-24 sm:pt-36 md:pt-40 pb-16 sm:pb-24 md:pb-32 px-4 relative overflow-hidden">
+      <section className="md:min-h-[100svh] flex items-center pt-[calc(4.75rem+env(safe-area-inset-top))] md:pt-40 pb-10 md:pb-32 px-4 relative overflow-hidden">
         {/* Atmósfera institucional */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none bg-gradient-to-br from-slate-50 via-white to-amber-50/40 dark:from-background dark:via-background dark:to-background">
           <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/15 dark:from-primary/5 to-transparent opacity-70 rounded-full translate-x-1/3 -translate-y-1/4" />
@@ -63,21 +64,21 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
         {/* Grid principal: 1 columna en móvil, 2 columnas en desktop */}
         <div className="max-w-6xl mx-auto w-full relative z-20 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
           {/* ─── COLUMNA IZQUIERDA: Título + CTA + Calculadora ─── */}
-          <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-5 md:gap-8">
             {/* Badge */}
             <m.div
               style={{ willChange: 'transform, opacity' }}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-semibold border border-primary/20 backdrop-blur-sm w-fit shadow-sm"
+              className="hidden md:inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-semibold border border-primary/20 backdrop-blur-sm w-fit shadow-sm"
             >
               <Shield size={15} className="text-primary" />
               <span className="tracking-wide">Soluciones para multas de tránsito</span>
             </m.div>
 
             {/* Titular */}
-            <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[7rem] font-black text-foreground tracking-tighter leading-[1.05] sm:leading-[0.9] text-balance">
+            <h1 className="text-[2.6rem] sm:text-6xl md:text-8xl lg:text-[7rem] font-black text-foreground tracking-tighter leading-[1.02] md:leading-[0.9] text-balance">
               {cityContext ? (
                 <>
                   <span className="block text-foreground/90 whitespace-nowrap">MULTAS EN</span>
@@ -98,8 +99,8 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
                 : '¿Tiene multas en el SIMIT? Analizamos su caso sin costo y le decimos si podemos borrarlas por tiempo cumplido o errores en el proceso.'}
             </p>
 
-            {/* CTAs */}
-            <div className="flex flex-col sm:flex-row gap-4">
+            {/* CTAs (escritorio) */}
+            <div className="hidden md:flex md:flex-row gap-4">
               <Button
                 onClick={onConsultar}
                 size="lg"
@@ -111,6 +112,9 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
                 </span>
               </Button>
             </div>
+
+            {/* Accesos rápidos (teléfono): la pantalla de inicio de la app */}
+            <MobileQuickActions />
 
             {isHydrated && (
               <>

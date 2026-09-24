@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import {
   activeTabFor,
   isAppShellRoute,
@@ -21,6 +21,7 @@ vi.mock('next-themes', () => ({
 }));
 
 import { MobileAppShell } from '@/components/mobile/MobileAppShell';
+import { MobileQuickActions } from '@/components/mobile/MobileQuickActions';
 
 describe('Modo app — rutas y pestañas', () => {
   it.each([
@@ -120,5 +121,45 @@ describe('MobileAppShell — renderizado', () => {
     mockPathname.mockReturnValue('/admin');
     const { container } = render(<MobileAppShell />);
     expect(container.innerHTML).toBe('');
+  });
+});
+
+describe('MobileQuickActions — accesos rápidos del Inicio', () => {
+  it('muestra las 4 acciones', () => {
+    render(<MobileQuickActions />);
+    for (const label of ['Consultar gratis', 'Subir foto', 'Calculadora', 'Asistente IA']) {
+      expect(screen.getByText(label)).toBeInTheDocument();
+    }
+  });
+
+  it('Consultar gratis y Subir foto abren el formulario en su modo', () => {
+    const listener = vi.fn();
+    window.addEventListener(OPEN_CONSULTATION_EVENT, listener);
+    render(<MobileQuickActions />);
+
+    fireEvent.click(screen.getByText('Consultar gratis'));
+    fireEvent.click(screen.getByText('Subir foto'));
+
+    const modes = listener.mock.calls.map((c) => (c[0] as CustomEvent).detail.mode);
+    expect(modes).toEqual(['full', 'simit']);
+    window.removeEventListener(OPEN_CONSULTATION_EVENT, listener);
+  });
+
+  it('Asistente IA abre el chat y Calculadora baja hasta la calculadora', () => {
+    const listener = vi.fn();
+    window.addEventListener(OPEN_ASSISTANT_EVENT, listener);
+    const target = document.createElement('div');
+    target.id = 'calculadora-hero';
+    target.scrollIntoView = vi.fn();
+    document.body.appendChild(target);
+    render(<MobileQuickActions />);
+
+    fireEvent.click(screen.getByText('Asistente IA'));
+    fireEvent.click(screen.getByText('Calculadora'));
+
+    expect(listener).toHaveBeenCalledTimes(1);
+    expect(target.scrollIntoView).toHaveBeenCalled();
+    window.removeEventListener(OPEN_ASSISTANT_EVENT, listener);
+    target.remove();
   });
 });

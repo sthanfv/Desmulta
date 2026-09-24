@@ -18,7 +18,7 @@ interface FAQProps {
  */
 export const FAQ = ({ mounted }: FAQProps) => {
   return (
-    <section id="faq" className="py-16 md:py-24 px-4 bg-muted/10">
+    <section id="faq" className="py-10 md:py-24 px-4 bg-muted/10">
       <div className="max-w-4xl mx-auto space-y-12">
         <div className="text-center space-y-4 mb-20 reveal">
           <h2 className="text-4xl md:text-6xl lg:text-7xl font-black text-foreground tracking-tighter text-balance">

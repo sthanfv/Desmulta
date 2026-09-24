@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
  */
 export const Methodology = () => {
   return (
-    <section id="metodologia" className="py-16 md:py-24 px-4">
+    <section id="metodologia" className="py-10 md:py-24 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="glass p-6 sm:p-12 md:p-20 rounded-[2rem] md:rounded-[3rem] relative overflow-hidden border-white/10 shadow-3xl bg-white/5 dark:bg-white/[0.02]">
           <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
