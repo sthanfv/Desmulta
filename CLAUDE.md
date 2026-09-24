@@ -64,4 +64,5 @@ Si la interacción es solo consultiva, responder de forma conversacional.
 - Web: Next.js 15 (App Router) en `src/`. Cloud Functions en `functions/`. Firestore: `firestore.indexes.json` es copia fiel de producción (índices + 5 políticas TTL); desplegar con `firebase deploy --only firestore:indexes --project studio-9140393615-6d1a3` (nunca `--force` sin revisar).
 - Agente de IA: repo hermano `../desmulta-ai-agent` (FastAPI en Cloud Run, despliegue automático desde GitHub). Ver `docs/CHAT_ARCHITECTURE.md`.
 - OCR de respaldo: `../Lector-OCR`. Modo app en teléfono: `src/components/mobile/` (ver `docs/MOBILE_APP_SHELL.md`).
+- Noticias del blog: tarea semanal de Windows "Desmulta - Noticias del blog" → `scripts/blog-sync-publish.ps1` (GitHub Actions está bloqueado por facturación). Manual: `npm run blog:publish`.
 - Auditoría de seguridad 2026-09-22: `docs/auditoria-2026-09-22/`.

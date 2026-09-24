@@ -33,6 +33,12 @@
 
 ## 📜 Historial Reciente (Últimos Cambios Clave)
 
+### [2026-09-24] - Blog: publicación semanal desde el PC (sin GitHub Actions)
+
+- Con la cuenta de GitHub bloqueada por facturación, la importación de noticias corre en el PC del propietario con el **Programador de tareas de Windows** (tarea "Desmulta - Noticias del blog", lunes 19:30; si el PC está apagado, corre al encenderlo).
+- `scripts/blog-sync-publish.ps1` (`npm run blog:publish`): actualiza `main`, corre `blog:sync`, valida con `scripts/validate-blog-mdx.mjs` (`npm run blog:validate`) y, si todo compila, hace commit y push (Vercel despliega). Si un artículo no compila, descarta los cambios. Registro en `logs/blog-sync.log` (ignorado por Git).
+- Recolección manual de hoy: 2 artículos nuevos (44/44 válidos).
+
 ### [2026-09-24] - Firebase al día, causa del bloqueo de GitHub Actions y revisión legal (Ley 1480 / 1581)
 
 - **GitHub Actions:** la API pública de runs muestra la causa real: _"The job was not started because your account is locked due to a billing issue."_ La cuenta de GitHub está bloqueada por facturación; ningún workflow (CI, blog, Lighthouse) puede correr hasta resolverlo en github.com/settings/billing.

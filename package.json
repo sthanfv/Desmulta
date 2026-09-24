@@ -28,6 +28,8 @@
     "test:smoke": "firebase emulators:exec \"cross-env USE_FIREBASE_EMULATOR=true NEXT_PUBLIC_USE_FIREBASE_EMULATOR=true playwright test tests/e2e/smoke.test.ts\" --only firestore --config firebase.test.json",
     "blog:sync": "ts-node --skip-project -O \"{\\\"module\\\":\\\"commonjs\\\"}\" scripts/sync-blog-rss.ts",
     "repair:admins": "ts-node --skip-project -O \"{\\\"module\\\":\\\"commonjs\\\"}\" scripts/repair-admin-docs.ts",
+    "blog:publish": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/blog-sync-publish.ps1",
+    "blog:validate": "node scripts/validate-blog-mdx.mjs",
     "backfill:pdf": "ts-node --skip-project -O \"{\\\"module\\\":\\\"commonjs\\\"}\" scripts/backfill-pdf-delivered.ts",
     "docs:lint": "markdownlint README.md CONTRIBUTING.md CHANGELOG.md docs/*.md",
     "prepare": "husky"

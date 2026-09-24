@@ -8,6 +8,8 @@ Todas las versiones y cambios significativos del proyecto.
 
 ### ✨ Features & UX
 
+- **Blog semanal sin GitHub Actions:** tarea del Programador de tareas de Windows (lunes 19:30) que ejecuta `scripts/blog-sync-publish.ps1` (`npm run blog:publish`): importa noticias, valida el MDX (`npm run blog:validate`) y publica en `main`.
+
 - **Modo app en teléfono:** barra de pestañas, paneles nativos, chat a pantalla completa, Inicio con accesos rápidos, barra con flecha atrás en páginas internas y transición de pantalla. Ver `docs/MOBILE_APP_SHELL.md`.
 - **Chat con IA real y conversación natural:** charla corta humana, prompt con personalidad, botón según la pregunta, memoria de la conversación, respaldo con WhatsApp. Ver `docs/CHAT_ARCHITECTURE.md`.
 
