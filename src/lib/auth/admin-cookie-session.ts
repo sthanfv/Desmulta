@@ -19,6 +19,11 @@ export interface CookieAdmin {
 }
 
 export async function getAdminFromCookies(): Promise<CookieAdmin | null> {
+  // Pruebas E2E: mismo bypass y misma condición que requireAdminSession (solo fuera de Vercel;
+  // el middleware aborta si E2E_TEST_MODE llega a estar activo en Vercel).
+  if (process.env.E2E_TEST_MODE === 'true' && !process.env.VERCEL_ENV) {
+    return { uid: 'e2e-admin', email: 'e2e-admin@desmulta.test' };
+  }
   try {
     const cookieStore = await cookies();
     const tokens = await getTokens(cookieStore, {

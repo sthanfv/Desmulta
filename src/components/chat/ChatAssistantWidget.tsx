@@ -20,6 +20,7 @@ import {
 import Link from 'next/link';
 import { buildWhatsAppUrl } from '@/lib/chat/whatsapp';
 import { STARTER_QUESTIONS } from '@/lib/chat/small-talk';
+import { OPEN_ASSISTANT_EVENT } from '@/components/mobile/app-shell';
 
 // Memoria de la conversación entre páginas / recargas (solo esta pestaña; sin datos en servidor)
 const CHAT_STORAGE_KEY = 'desmulta-chat-v1';
@@ -214,6 +215,18 @@ export function ChatAssistantWidget() {
       // Cuota llena o almacenamiento bloqueado: no es crítico
     }
   }, [messages, restored]);
+
+  // Pestaña "Asistente" del modo app: evento en Inicio o ?action=asistente desde otra página
+  useEffect(() => {
+    const open = () => setIsOpen(true);
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('action') === 'asistente') {
+      open();
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+    window.addEventListener(OPEN_ASSISTANT_EVENT, open);
+    return () => window.removeEventListener(OPEN_ASSISTANT_EVENT, open);
+  }, []);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [thinkingStep, setThinkingStep] = useState(0);
@@ -394,7 +407,7 @@ export function ChatAssistantWidget() {
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0, opacity: 0 }}
                 transition={{ duration: 0.2 }}
-                className="relative group flex items-center gap-2.5 p-2 sm:px-4 sm:py-2.5 rounded-full bg-card/95 dark:bg-zinc-900/95 text-foreground shadow-2xl border border-primary/40 hover:border-primary backdrop-blur-xl transition-all duration-300"
+                className="relative group hidden md:flex items-center gap-2.5 p-2 sm:px-4 sm:py-2.5 rounded-full bg-card/95 dark:bg-zinc-900/95 text-foreground shadow-2xl border border-primary/40 hover:border-primary backdrop-blur-xl transition-all duration-300"
                 aria-label="Abrir asistente de tránsito Desmulta"
               >
                 {/* Ícono de Diálogo Conversacional */}
@@ -418,11 +431,8 @@ export function ChatAssistantWidget() {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 25, scale: 0.96 }}
                 transition={{ type: 'spring', damping: 25, stiffness: 320 }}
-                className="fixed inset-x-0 bottom-0 sm:static w-full sm:w-[400px] h-[66vh] max-h-[520px] sm:h-[510px] flex flex-col rounded-t-[2.2rem] sm:rounded-[2rem] bg-card/98 dark:bg-zinc-950/98 backdrop-blur-3xl border-t sm:border border-border/80 dark:border-primary/25 shadow-2xl shadow-black/60 overflow-hidden text-foreground"
+                className="fixed inset-0 md:static w-full md:w-[400px] h-[100dvh] md:h-[510px] md:max-h-[520px] flex flex-col rounded-none md:rounded-[2rem] pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] md:pt-0 md:pb-0 bg-card/98 dark:bg-zinc-950/98 backdrop-blur-3xl md:border border-border/80 dark:border-primary/25 shadow-2xl shadow-black/60 overflow-hidden text-foreground"
               >
-                {/* Tirador visual de Bottom Sheet en Móvil */}
-                <div className="w-12 h-1 bg-muted-foreground/30 rounded-full mx-auto mt-2 sm:hidden shrink-0" />
-
                 {/* Encabezado del Asistente con Accesibilidad de Tamaño de Letra */}
                 <div className="flex items-center justify-between px-4 py-2.5 bg-muted/40 dark:bg-zinc-900/60 border-b border-border/60 shrink-0">
                   <div className="flex items-center gap-2.5">
@@ -443,7 +453,7 @@ export function ChatAssistantWidget() {
                   {/* Controles de Cabecera: Selector de Letra (A- / A+) + Reset + Cerrar */}
                   <div className="flex items-center gap-1.5">
                     {/* Selector de Accesibilidad Visual (A- / A+) */}
-                    <div className="flex items-center bg-background/80 dark:bg-zinc-900/90 rounded-lg p-0.5 border border-border/60 shadow-xs">
+                    <div className="hidden md:flex items-center bg-background/80 dark:bg-zinc-900/90 rounded-lg p-0.5 border border-border/60 shadow-xs">
                       <button
                         type="button"
                         onClick={() =>
@@ -505,7 +515,7 @@ export function ChatAssistantWidget() {
                 </div>
 
                 {/* Cuerpo de la Conversación */}
-                <div className="flex-1 p-3.5 overflow-y-auto space-y-3.5 scroll-smooth">
+                <div className="flex-1 p-3.5 overflow-y-auto overscroll-contain space-y-3.5 scroll-smooth">
                   {messages.map((msg) => (
                     <div
                       key={msg.id}

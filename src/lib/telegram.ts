@@ -433,10 +433,7 @@ export async function sendTelegramCronError(errorMsg: string): Promise<boolean> 
  * sendTelegramAgentAlert — Notifica al equipo de ingeniería si el motor
  * conversacional de IA o la API de Google tienen una falla crítica.
  */
-export async function sendTelegramAgentAlert(
-  errorMsg: string,
-  traceId: string
-): Promise<boolean> {
+export async function sendTelegramAgentAlert(errorMsg: string, traceId: string): Promise<boolean> {
   const { TELEGRAM_BOT_TOKEN, TELEGRAM_DEV_CHAT_ID, TELEGRAM_CHAT_ID } = process.env;
   const targetChatId = TELEGRAM_DEV_CHAT_ID || TELEGRAM_CHAT_ID;
   if (!TELEGRAM_BOT_TOKEN || !targetChatId) return false;
@@ -466,4 +463,3 @@ export async function sendTelegramAgentAlert(
     return false;
   }
 }
-

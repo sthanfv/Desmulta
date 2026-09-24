@@ -19,11 +19,13 @@ export async function GET(request: NextRequest) {
         process.env.AUTH_COOKIE_SIGNATURE_KEY_PREVIOUS || '',
       ],
       serviceAccount: {
-        projectId: process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || '',
+        projectId:
+          process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || '',
         clientEmail: process.env.FIREBASE_CLIENT_EMAIL || '',
         privateKey: (process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
       },
-      apiKey: process.env.NEXT_PUBLIC_BASE_API_KEY || process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '',
+      apiKey:
+        process.env.NEXT_PUBLIC_BASE_API_KEY || process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '',
     });
 
     if (!tokens) {
@@ -48,39 +50,51 @@ export async function GET(request: NextRequest) {
     pipeline.get(`analytics:demand:total:${monthKey}`);
     pipeline.hgetall(`analytics:demand:topics:${monthKey}`);
     pipeline.hgetall(`analytics:demand:cities:${monthKey}`);
-    
-    const [totalStr, topicsHash, citiesHash] = await pipeline.exec() as [string | null, Record<string, string> | null, Record<string, string> | null];
-    
+
+    const [totalStr, topicsHash, citiesHash] = (await pipeline.exec()) as [
+      string | null,
+      Record<string, string> | null,
+      Record<string, string> | null,
+    ];
+
     const totalQueries = totalStr ? parseInt(totalStr, 10) : 0;
 
     // 4. Transformar los Hashes a Arrays y calcular porcentajes
-    const topics = topicsHash ? Object.entries(topicsHash).map(([id, count]) => {
-      const cnt = parseInt(count, 10);
-      return {
-        id,
-        label: getDemandTopicLabel(id),
-        count: cnt,
-        percentage: totalQueries > 0 ? Number(((cnt / totalQueries) * 100).toFixed(1)) : 0
-      };
-    }).sort((a, b) => b.count - a.count) : [];
+    const topics = topicsHash
+      ? Object.entries(topicsHash)
+          .map(([id, count]) => {
+            const cnt = parseInt(count, 10);
+            return {
+              id,
+              label: getDemandTopicLabel(id),
+              count: cnt,
+              percentage: totalQueries > 0 ? Number(((cnt / totalQueries) * 100).toFixed(1)) : 0,
+            };
+          })
+          .sort((a, b) => b.count - a.count)
+      : [];
 
-    const cities = citiesHash ? Object.entries(citiesHash).map(([city, count]) => {
-      const cnt = parseInt(count, 10);
-      return {
-        city: city.charAt(0).toUpperCase() + city.slice(1),
-        count: cnt,
-        percentage: totalQueries > 0 ? Number(((cnt / totalQueries) * 100).toFixed(1)) : 0
-      };
-    }).sort((a, b) => b.count - a.count).slice(0, 5) : []; // Top 5 ciudades
+    const cities = citiesHash
+      ? Object.entries(citiesHash)
+          .map(([city, count]) => {
+            const cnt = parseInt(count, 10);
+            return {
+              city: city.charAt(0).toUpperCase() + city.slice(1),
+              count: cnt,
+              percentage: totalQueries > 0 ? Number(((cnt / totalQueries) * 100).toFixed(1)) : 0,
+            };
+          })
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 5)
+      : []; // Top 5 ciudades
 
     // 5. Retornar el informe JSON consolidado
     return NextResponse.json({
       month: monthKey,
       totalQueries,
       topics,
-      cities
+      cities,
     });
-
   } catch (error) {
     logger.error('[API Admin] Error cargando analítica de demanda:', error);
     return NextResponse.json({ error: 'Error interno obteniendo analítica' }, { status: 500 });

@@ -69,10 +69,7 @@ export function ClientInfraccionesGrid({ infraccionesData, ciudad }: Props) {
               </p>
               <div className="mt-6 flex items-center gap-2 text-brand-500 text-sm font-semibold">
                 Ver estrategia{' '}
-                <ArrowRight
-                  size={16}
-                  className="group-hover:translate-x-1 transition-transform"
-                />
+                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
               </div>
             </Link>
           </m.div>
@@ -96,10 +93,7 @@ export function ClientInfraccionesGrid({ infraccionesData, ciudad }: Props) {
             </p>
             <div className="mt-6 flex items-center gap-2 text-brand-500 text-sm font-bold">
               Explorar mapa{' '}
-              <ArrowRight
-                size={16}
-                className="group-hover:translate-x-1 transition-transform"
-              />
+              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
             </div>
           </Link>
         </m.div>

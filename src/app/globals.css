@@ -775,3 +775,18 @@ body[data-scroll-locked] .chat-widget-container {
   transform: translateY(15px) scale(0.95) !important;
 }
 
+/* ─── Modo app en teléfono (src/components/mobile/MobileAppShell.tsx) ───────────
+   Solo aplica cuando la carcasa está en la página ([data-app-shell]) y la pantalla
+   es de teléfono: deja espacio para la barra de pestañas y oculta la cabecera de
+   escritorio, que en móvil se reemplaza por la barra superior tipo app. */
+@media (max-width: 767px) {
+  body:has([data-app-shell]) {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body:has([data-app-shell]) #main-content {
+    padding-bottom: calc(4rem + env(safe-area-inset-bottom));
+  }
+  body:has([data-app-shell]) [data-desktop-header] {
+    display: none;
+  }
+}

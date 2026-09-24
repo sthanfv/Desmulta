@@ -20,6 +20,7 @@ import { SystemHealthProvider } from '@/components/providers/SystemHealthProvide
 import { PWAAutoUpdater } from '@/components/providers/PWAAutoUpdater';
 import { PageProgressBar } from '@/components/ui/PageProgressBar';
 import { ChatAssistantWidget } from '@/components/chat/ChatAssistantWidget';
+import { MobileAppShell } from '@/components/mobile/MobileAppShell';
 
 // Directiva Mobile-First y Adaptive del Sistema Operativo
 export const viewport: Viewport = {
@@ -30,6 +31,8 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
+  // Sin 'cover', env(safe-area-inset-*) vale 0 en iPhone y las barras quedan bajo el notch
+  viewportFit: 'cover',
 };
 
 export const metadata: Metadata = {
@@ -153,6 +156,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
               <ShadcnToaster />
               <ChatAssistantWidget />
+              <MobileAppShell />
             </ThemeProvider>
           </FirebaseClientProvider>
         </ErrorBoundary>

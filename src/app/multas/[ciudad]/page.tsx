@@ -180,12 +180,12 @@ export default async function MultasCiudadPage(props: Props) {
             </div>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link
-                  href="/#escaner"
-                  className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-brand-500 hover:bg-brand-400 text-black font-bold text-lg transition-all active:scale-95 flex items-center justify-center gap-2 shadow-[0_0_30px_rgba(245,158,11,0.3)]"
-                >
-                  Auditar Multa Gratis <ArrowRight size={20} />
-                </Link>
+              <Link
+                href="/#escaner"
+                className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-brand-500 hover:bg-brand-400 text-black font-bold text-lg transition-all active:scale-95 flex items-center justify-center gap-2 shadow-[0_0_30px_rgba(245,158,11,0.3)]"
+              >
+                Auditar Multa Gratis <ArrowRight size={20} />
+              </Link>
             </div>
           </div>
         </section>
@@ -203,7 +203,10 @@ export default async function MultasCiudadPage(props: Props) {
               </p>
             </div>
 
-            <ClientInfraccionesGrid infraccionesData={infraccionesData} ciudad={{ slug: ciudad.slug, nombre: ciudad.nombre }} />
+            <ClientInfraccionesGrid
+              infraccionesData={infraccionesData}
+              ciudad={{ slug: ciudad.slug, nombre: ciudad.nombre }}
+            />
           </div>
         </section>
 

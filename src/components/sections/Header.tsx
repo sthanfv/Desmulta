@@ -92,7 +92,10 @@ export const Header = ({ onOpenModal }: HeaderProps) => {
 
   return (
     <LazyMotion features={domAnimation} strict>
-      <header className="fixed top-0 left-0 right-0 z-50 px-2 sm:px-4 py-4 sm:py-8 pointer-events-none">
+      <header
+        data-desktop-header
+        className="fixed top-0 left-0 right-0 z-50 px-2 sm:px-4 py-4 sm:py-8 pointer-events-none"
+      >
         {/* Contenedor Principal (Píldora Glassmorphism iOS-17) */}
         <div
           className={`max-w-6xl mx-auto glass overflow-visible rounded-[2rem] px-4 sm:px-6 flex justify-between items-center shadow-2xl border-white/5 pointer-events-auto relative z-50 transition-all duration-500 ${

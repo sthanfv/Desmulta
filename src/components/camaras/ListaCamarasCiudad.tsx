@@ -37,8 +37,7 @@ export default function ListaCamarasCiudad({ ciudadNombre, ciudadSlug }: Props) 
   // Filtrar cámaras de la ciudad una sola vez
   const camarasCiudad = React.useMemo(() => {
     return camarasData.filter(
-      (camara) =>
-        normalizeCityName(camara.municipio) === normalizeCityName(ciudadNombre)
+      (camara) => normalizeCityName(camara.municipio) === normalizeCityName(ciudadNombre)
     );
   }, [ciudadNombre]);
 
@@ -267,10 +266,15 @@ export default function ListaCamarasCiudad({ ciudadNombre, ciudadSlug }: Props) 
                     <m.div
                       layout
                       initial="hidden"
-                      animate={isScanning ? "hidden" : "visible"}
+                      animate={isScanning ? 'hidden' : 'visible'}
                       variants={{
                         hidden: { opacity: 0, scale: 0.95, y: 20 },
-                        visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.3, delay: index * 0.05 } }
+                        visible: {
+                          opacity: 1,
+                          scale: 1,
+                          y: 0,
+                          transition: { duration: 0.3, delay: index * 0.05 },
+                        },
                       }}
                       exit={{ opacity: 0, scale: 0.95 }}
                       key={`${camara.id}-${index}`}
