@@ -38,7 +38,8 @@
 
 - `/referidos`: se quitaron los avatares de relleno y "Más de 500+ usuarios referidos este mes" (el propietario confirmó que hay 1 referido; la cifra era para generar urgencia). Ahora dice "Programa exclusivo para clientes de Desmulta".
 - Contador de casos: el valor real es 205. El "+" vive en Firestore (`site_config/showcase.counterValue = "205+"`), escrito desde el panel de administración; el propietario debe cambiarlo a `205` desde el panel (la escritura directa en producción desde el asistente quedó bloqueada por permisos).
-- Limpieza de la base: el propietario pidió borrar los leads experimentales. Inventario (2026-09-24): consultations 24 (+ subcolección `private`), consultas_index 14, public_tracking 24, cases 7, leads 2, simit_leads 1, simit_subscriptions 1, pdf_tokens 3, purchases 2, `metadata/counters/shards`. Pendiente de su confirmación o de permiso para ejecutarla.
+- Limpieza de la base: el propietario pidió borrar los leads experimentales. Inventario (2026-09-24): consultations 24 (+ subcolección `private`), consultas_index 14, public_tracking 24, cases 7, leads 2, simit_leads 1, simit_subscriptions 1, pdf_tokens 3, purchases 2, `metadata/counters/shards`. **Hecho el 2026-09-24:** el propietario ejecutó `firebase firestore:delete --recursive` sobre esas colecciones y `system_metrics` (métricas del panel). Verificado: 0 documentos en ellas y en las subcolecciones `private` y `shards`; la numeración de casos vuelve a empezar en 1 (el código crea el contador si no existe). Se conservan `admins`, `config`, `site_config`, `success_cases`, `audit_logs` y las colecciones de límites temporales (se vacían solas por TTL).
+- **Monitor externo activo:** UptimeRobot revisa `https://desmulta.online/api/health` cada 5 minutos desde Norteamérica (estado Up; ~2,3 s por arranque en frío) y avisa por correo.
 
 ### [2026-09-24] - Operación (salud, copias, runbook) y revisión visual completa de la portada
 
@@ -179,8 +180,7 @@
 - **Seguridad:** generar una clave nueva de Gemini en AI Studio (las actuales quedaron expuestas en una conversación) y revocar la API key del scraper SIMIT, que sigue en el historial de Git.
 - **Vercel:** confirmar `GEMINI_API_KEY` nueva (OCR) y, opcional, `GEMINI_OCR_MODEL`.
 - **GitHub Actions:** la cuenta de GitHub está **bloqueada por facturación** ("account is locked due to a billing issue"); resolver en github.com/settings/billing. Secreto `GEMINI_API_KEY` ya creado. CD necesita además `FIREBASE_TOKEN`.
-- **Monitor externo:** crear la cuenta gratis de UptimeRobot y el monitor a `https://desmulta.online/api/health` (pasos en `docs/GUIA_INCIDENTES.md`).
 - **Contador de casos:** cambiar `205+` por `205` en el panel de administración (vitrina de casos).
-- **Limpieza de leads experimentales** en Firestore (ver entrada "Cifras públicas honestas").
+- **Prueba final en producción (recomendada):** una consulta real desde el celular para confirmar que llega a Telegram como caso 1. Opcional: borrar en Vercel Blob las fotos de los leads de prueba (sin tocar las imágenes de la vitrina).
 - **Legal:** el proyecto no tiene empresa registrada: identificar al responsable por marca, correo y, si el propietario acepta, nombre y ciudad; revisión opcional por un consultorio jurídico universitario (gratuito).
 - Evaluar posible expansión del embudo hacia suscripciones automáticas (notificaciones).
