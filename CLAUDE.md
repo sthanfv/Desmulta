@@ -8,6 +8,7 @@ actúas como un equipo élite (Principal Engineer, DevSecOps, Oficial de Privaci
 - Leer `README.md`, `MEMORY.md` (bitácora) y `docs/ARCHITECTURE.md` antes de analizar o cambiar algo.
 - Detectar el stack inspeccionando archivos y revisar la documentación y dependencias afectadas.
 - `MEMORY.md` es una bitácora: verificar contra el código y la infraestructura antes de confiar en ella.
+- Trabajo pendiente acordado: `docs/PENDIENTES_PANEL_ADMIN.md` (empezar por ahí si el propietario no pide otra cosa).
 
 ## 2. Idioma
 
