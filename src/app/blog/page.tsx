@@ -85,7 +85,7 @@ export default async function BlogIndex() {
               style={{ animationDelay: `${i * 100}ms` }}
             >
               <div className="space-y-4">
-                <span className="text-[10px] font-black text-primary/60 uppercase tracking-widest bg-primary/5 px-3 py-1 rounded-full border border-primary/10">
+                <span className="text-xs font-bold text-amber-800 dark:text-primary tracking-wide bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
                   {post.date}
                 </span>
                 <h2 className="text-2xl font-black text-foreground line-clamp-2 leading-tight min-h-[3.5rem]">
@@ -96,7 +96,7 @@ export default async function BlogIndex() {
                 </p>
                 <Link
                   href={`/blog/${post.slug}`}
-                  className="inline-flex items-center text-xs font-black text-primary pt-4 hover:translate-x-1 transition-transform group"
+                  className="inline-flex items-center text-xs font-black text-amber-700 dark:text-primary pt-4 hover:translate-x-1 transition-transform group"
                 >
                   LEER ARTÍCULO COMPLETO
                   <ArrowUpRight

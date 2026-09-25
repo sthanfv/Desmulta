@@ -392,8 +392,11 @@ export function ChatAssistantWidget() {
         )}
       </AnimatePresence>
 
-      {/* ─── Posición: en móvil a la derecha (right-4) para pulgar, en desktop a la izquierda (left-6) ─── */}
-      <div className="chat-widget-container fixed bottom-24 right-4 sm:bottom-6 sm:left-6 z-[60] flex flex-col items-end sm:items-start font-sans transition-all duration-300">
+      {/* ─── Posición: abajo a la derecha en todos los tamaños (estándar de los lanzadores de chat).
+           [2026-09-24] En escritorio es el ÚNICO botón flotante de ayuda: el WhatsApp va dentro
+           del asistente (cabecera) y ya no hay un botón verde aparte. En móvil el lanzador se
+           oculta y se abre desde la pestaña "Asistente". ─── */}
+      <div className="chat-widget-container fixed bottom-24 right-4 md:bottom-6 md:right-6 z-[60] flex flex-col items-end font-sans transition-all duration-300">
         <LazyMotion features={domAnimation}>
           <AnimatePresence mode="wait">
             {!isOpen ? (
@@ -408,7 +411,7 @@ export function ChatAssistantWidget() {
                 exit={{ scale: 0, opacity: 0 }}
                 transition={{ duration: 0.2 }}
                 className="relative group hidden md:flex items-center gap-2.5 p-2 sm:px-4 sm:py-2.5 rounded-full bg-card/95 dark:bg-zinc-900/95 text-foreground shadow-2xl border border-primary/40 hover:border-primary backdrop-blur-xl transition-all duration-300"
-                aria-label="Abrir asistente de tránsito Desmulta"
+                aria-label="Abrir ayuda: asistente de tránsito y WhatsApp"
               >
                 {/* Ícono de Diálogo Conversacional */}
                 <div className="relative flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground shadow-md shadow-primary/20 shrink-0">
@@ -416,11 +419,11 @@ export function ChatAssistantWidget() {
                 </div>
 
                 <div className="flex flex-col items-start pr-1 text-left hidden sm:flex">
-                  <span className="text-xs font-black tracking-tight text-foreground leading-tight">
-                    Asistente Desmulta
+                  <span className="text-sm font-bold text-foreground leading-tight">
+                    ¿Necesita ayuda?
                   </span>
-                  <span className="text-[10px] text-muted-foreground font-medium">
-                    Especialista en Tránsito
+                  <span className="text-xs text-muted-foreground font-medium">
+                    Asistente y WhatsApp
                   </span>
                 </div>
               </m.button>
@@ -491,9 +494,10 @@ export function ChatAssistantWidget() {
                       rel="noopener noreferrer"
                       title="Hablar con una persona por WhatsApp"
                       aria-label="Hablar con una persona por WhatsApp"
-                      className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+                      className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold text-white bg-[#075E54] hover:bg-[#064d45] transition-colors"
                     >
                       <MessageCircle className="w-3.5 h-3.5" />
+                      <span className="hidden md:inline">WhatsApp</span>
                     </a>
                     <button
                       type="button"

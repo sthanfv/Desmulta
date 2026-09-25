@@ -65,4 +65,5 @@ Si la interacción es solo consultiva, responder de forma conversacional.
 - Agente de IA: repo hermano `../desmulta-ai-agent` (FastAPI en Cloud Run, despliegue automático desde GitHub). Ver `docs/CHAT_ARCHITECTURE.md`.
 - OCR de respaldo: `../Lector-OCR`. Modo app en teléfono: `src/components/mobile/` (ver `docs/MOBILE_APP_SHELL.md`).
 - Noticias del blog: tarea semanal de Windows "Desmulta - Noticias del blog" → `scripts/blog-sync-publish.ps1` (GitHub Actions está bloqueado por facturación). Manual: `npm run blog:publish`.
+- Incidentes, salud (`/api/health`) y copias de seguridad de Firestore: `docs/GUIA_INCIDENTES.md`.
 - Auditoría de seguridad 2026-09-22: `docs/auditoria-2026-09-22/`.

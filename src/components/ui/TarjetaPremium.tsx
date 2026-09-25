@@ -18,6 +18,10 @@ interface TarjetaPremiumProps extends React.HTMLAttributes<HTMLDivElement> {
  * procesado por la GPU, garantizando 120 FPS sin re-renders de React.
  *
  * MANDATO-FILTRO v5.40.0: Rendimiento extremo y estética de alta tecnología.
+ *
+ * [2026-09-24] En modo claro la tarjeta era blanca translúcida sobre fondo blanco y la sombra
+ * interior (utilidad) anulaba la sombra de `.card-elevated`: las tarjetas no se veían. Ahora el
+ * fondo y el borde son visibles en claro y la sombra interior solo aplica en oscuro.
  */
 export function TarjetaPremium({
   children,
@@ -49,7 +53,7 @@ export function TarjetaPremium({
       onMouseMove={handleMouseMove}
       onClick={onClick}
       style={style}
-      className={`card-elevated relative overflow-hidden bg-white/5 dark:bg-white/[0.02] backdrop-blur-2xl border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] rounded-3xl group transition-colors duration-300 ${className}`}
+      className={`card-elevated relative overflow-hidden bg-card/90 dark:bg-white/[0.02] backdrop-blur-2xl border border-border/60 dark:border-white/10 dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] rounded-3xl group transition-colors duration-300 ${className}`}
       {...props}
     >
       {/* Efecto Linterna (Solo en PC con puntero real para optimizar móvil) */}

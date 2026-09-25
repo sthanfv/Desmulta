@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import TextType from '@/components/ui/TextType';
 
 interface CTAProps {
   onConsultar: () => void;
@@ -12,6 +11,7 @@ interface CTAProps {
 /**
  * CTA - Sección de Llamada a la Acción.
  * Tono corporativo-legal: formal, directo y sin efectos visuales excesivos.
+ * Jerarquía: un solo botón principal (Consulta gratuita); SIMIT es secundario (contorno).
  */
 export const CTA = ({ onConsultar, onOpenSimitTutorial }: CTAProps) => {
   return (
@@ -21,13 +21,16 @@ export const CTA = ({ onConsultar, onOpenSimitTutorial }: CTAProps) => {
           {/* Luz ambiental sutil — opacity muy baja */}
           <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-white/8 rounded-full blur-[80px] pointer-events-none" />
 
-          <h2 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tighter leading-[1.05] relative z-10 text-balance">
-            Su diagnóstico es gratuito.
-            <br />
-            <span className="text-xl md:text-3xl opacity-90 mt-2 block font-semibold">
+          {/* [2026-09-24] El subtítulo estaba dentro del h2 y heredaba tracking-tighter (-0.05em):
+              a 20-30px las palabras se pegaban. Ahora es un párrafo con espaciado normal. */}
+          <div className="relative z-10 space-y-4">
+            <h2 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tighter leading-[1.05] text-balance">
+              Su diagnóstico es gratuito.
+            </h2>
+            <p className="text-xl md:text-2xl font-semibold opacity-90 max-w-2xl mx-auto text-balance leading-snug">
               En menos de 24 horas sabrá si su caso tiene fundamento legal para actuar.
-            </span>
-          </h2>
+            </p>
+          </div>
 
           <p className="text-base md:text-lg opacity-85 max-w-xl mx-auto font-medium relative z-10 leading-relaxed">
             Nuestro equipo analiza su caso y le comunica la viabilidad legal sin compromiso.
@@ -45,25 +48,12 @@ export const CTA = ({ onConsultar, onOpenSimitTutorial }: CTAProps) => {
             <Button
               onClick={onOpenSimitTutorial}
               size="lg"
-              className="w-full sm:w-auto h-auto md:h-16 min-h-[3.5rem] px-4 md:px-12 bg-foreground text-background hover:bg-foreground/90 font-semibold rounded-2xl active:scale-95 transition-all text-base md:text-lg shadow-lg border-none relative overflow-hidden group flex flex-col items-center justify-center py-3"
+              className="w-full sm:w-auto h-auto min-h-[3.5rem] md:min-h-16 px-4 md:px-10 bg-transparent text-primary-foreground hover:bg-black/5 border-2 border-primary-foreground/80 font-semibold rounded-2xl active:scale-95 transition-all text-base md:text-lg shadow-none relative overflow-hidden group flex flex-col items-center justify-center gap-0.5 py-2.5"
             >
-              <span className="relative z-10 block mb-1">SIMIT</span>
-              <span className="relative z-10 text-[10px] md:text-xs font-medium opacity-80 block leading-tight text-center">
-                Consulte en el portal oficial:
-                <br className="md:hidden" />
-                <span className="inline-block font-mono px-2 py-0.5 rounded ml-0 md:ml-1 mt-1 md:mt-0 tracking-wider">
-                  <TextType
-                    text={['simit.org.co', 'www.simit.org.co']}
-                    typingSpeed={110}
-                    pauseDuration={4000}
-                    deletingSpeed={70}
-                    showCursor={true}
-                    cursorCharacter="_"
-                    cursorClassName="opacity-70"
-                  />
-                </span>
+              <span className="relative z-10 block">Consultar en SIMIT</span>
+              <span className="relative z-10 text-xs font-medium opacity-80 block leading-tight">
+                Portal oficial: <span className="font-mono">simit.org.co</span>
               </span>
-              <div className="absolute inset-0 bg-black/5 dark:bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
             </Button>
           </div>
         </div>

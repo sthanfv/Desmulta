@@ -104,7 +104,7 @@ export const Methodology = () => {
                   {
                     titulo: 'Privacidad y Habeas Data',
                     descripcion:
-                      'Ley 1581 de 2012. Tus datos están encriptados y jamás serán compartidos con terceros.',
+                      'Ley 1581 de 2012. Tus datos viajan cifrados, tu cédula se guarda cifrada y nunca vendemos tu información.',
                     icon: <Lock className="w-6 h-6" />,
                   },
                   {

@@ -97,6 +97,8 @@ export async function middleware(request: NextRequest) {
   const esRutaWebhookWompi = pathname.startsWith('/api/payments/webhook-wompi');
   const esRutaWebhookSentry = pathname.startsWith('/api/webhooks/sentry');
   const esRutaAssets = pathname.startsWith('/_next');
+  // Monitor externo de disponibilidad: revisa desde servidores fuera de Colombia
+  const esRutaHealth = pathname === '/api/health';
   const esPaginaBloqueo = pathname.startsWith('/geo-bloqueado');
   const esArchivoSEO =
     pathname.endsWith('.xml') || pathname.endsWith('.txt') || pathname.endsWith('.html');
@@ -119,6 +121,7 @@ export async function middleware(request: NextRequest) {
     !esRutaWebhookWompi &&
     !esRutaWebhookSentry &&
     !esRutaAssets &&
+    !esRutaHealth &&
     !esPaginaBloqueo &&
     !esArchivoSEO &&
     !isBot

@@ -151,13 +151,13 @@ export const Footer = ({ footerData, onOpenWhatsAppWarning }: FooterProps) => {
                   <div className="p-3 bg-background rounded-2xl border border-primary/20">
                     <Mail size={20} className="text-primary" />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs font-black text-muted-foreground uppercase tracking-widest leading-none mb-1.5">
-                      Email Corporativo
+                      Correo de contacto
                     </p>
                     <button
                       onClick={handleCopyEmail}
-                      className="text-lg sm:text-xl font-bold text-foreground truncate max-w-[280px] sm:max-w-full hover:text-primary transition-colors flex items-center gap-2 group/email tracking-tight"
+                      className="text-base lg:text-lg font-bold text-foreground break-all text-left hover:text-primary transition-colors flex items-center gap-2 group/email"
                       title="Haz clic para copiar"
                     >
                       {footerData.email || 'contacto@desmulta.online'}
@@ -169,11 +169,13 @@ export const Footer = ({ footerData, onOpenWhatsAppWarning }: FooterProps) => {
                   <div className="p-3 bg-background rounded-2xl border border-primary/20">
                     <MapPin size={20} className="text-primary" />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs font-black text-muted-foreground uppercase tracking-widest leading-none mb-1.5">
                       Base de Operaciones
                     </p>
-                    <p className="text-xl font-bold text-foreground">Cobertura Nacional Digital</p>
+                    <p className="text-base lg:text-lg font-bold text-foreground">
+                      Cobertura nacional digital
+                    </p>
                   </div>
                 </div>
               </div>

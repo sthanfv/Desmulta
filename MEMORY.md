@@ -23,6 +23,7 @@
    - **Rate Limiting**: Upstash Redis. Chat: 8 msg/min + 60 msg/día por IP (fail-closed). OCR: 3 cada 7 días.
    - **Middlewares**: Geobloqueo estricto (Solo tráfico desde Colombia - `x-vercel-ip-country`). Defensa Zero-Trust con JWTs de Firebase y OTPs.
    - **Alertas de caída** (`src/lib/monitoring/service-alert.ts`): chat y OCR → Telegram en HTML, 1 alerta por servicio cada 10 min.
+   - **Salud y recuperación:** `GET /api/health` (monitor externo, exenta del geobloqueo), copia diaria de Firestore con 7 días de retención y runbook en `docs/GUIA_INCIDENTES.md`.
 3. **Integraciones B2B y Microservicios** (repos en `C:\Workspace\Ecosistema_Desmulta\`):
    - **Agente IA (`desmulta-ai-agent`, FastAPI en Cloud Run):** Gemini `gemini-flash-lite-latest` con respaldo `gemini-flash-latest`; despliegue automático desde GitHub (Cloud Build). Ver `docs/CHAT_ARCHITECTURE.md`.
    - **Motor Financiero (Go)**: Integrado vía HMAC-SHA256 (`desmulta-calculadora-go`). Serverless.
@@ -32,6 +33,23 @@
 ---
 
 ## 📜 Historial Reciente (Últimos Cambios Clave)
+
+### [2026-09-24] - Operación (salud, copias, runbook) y revisión visual completa de la portada
+
+**Por qué:** el propietario preguntó si al sistema le falta algo según el estándar de la industria y encontró texto apretado en la sección final de la portada. Se pidió aplicar todo, probarlo y documentarlo.
+
+- **Copias de seguridad:** no existía ninguna. Se activó la copia diaria de Firestore `(default)` con retención de 7 días (`gcloud firestore backups schedules create`). Cuesta centavos al mes. Restauración en `docs/GUIA_INCIDENTES.md`.
+- **Salud:** nueva ruta pública `GET /api/health` (`src/app/api/health/route.ts` + `src/lib/monitoring/health.ts`): 200/503 según Firestore, sin detalles internos, resultado guardado 30 s, espera hasta 8 s (el primer acceso en frío tardó >3 s en local y daba 503 falso). Exenta del geobloqueo en `src/middleware.ts` porque los monitores revisan desde fuera de Colombia.
+- **Runbook:** `docs/GUIA_INCIDENTES.md` (qué vigila el sistema, cómo configurar UptimeRobot gratis, síntomas → qué hacer, restauración de copias). Enlazado en README, ARCHITECTURE y CLAUDE.md.
+- **Auditoría visual** (Playwright en PC 1366×768 y móvil 390×844 sobre 14 páginas + revisión de capturas):
+  - Sección final (`CTA.tsx`): el subtítulo estaba dentro del h2 y heredaba `tracking-tighter` → palabras pegadas. Ahora es un párrafo. El botón SIMIT pasa a secundario (contorno) y sin animación de escritura (`TextType` eliminado, ya no se usaba).
+  - **Ventana de bienvenida eliminada** (`WelcomeModal.tsx`): tapaba la página a cada visitante nuevo, en pantallas de 768 px de alto se cortaba sin mostrar el botón, y su botón "Iniciar mi diagnóstico" solo la cerraba. Google penaliza en móvil las ventanas que tapan el contenido al llegar.
+  - **Tarjetas invisibles en modo claro** (`TarjetaPremium.tsx`): fondo blanco translúcido sobre blanco y una sombra interior que anulaba la de `.card-elevated`. Ahora tienen fondo y borde visibles en claro; en móvil el carrusel de "Por qué elegirnos" ya no parece texto cortado.
+  - **Botones flotantes:** había tres (asistente abajo a la izquierda, WhatsApp verde de 80 px con animación permanente y "volver arriba"). Queda un solo lanzador abajo a la derecha, "¿Necesita ayuda? — Asistente y WhatsApp", con WhatsApp destacado en la cabecera del chat; "volver arriba" es pequeño y aparece tras 1 000 px.
+  - **Textos falsos corregidos:** "su información nunca viaja a servidores externos" (`Pillars.tsx`) y "tus datos están encriptados y jamás serán compartidos" (`Methodology.tsx`). La portada decía "205+ casos exitosos este mes" y más abajo la misma cifra como total: ahora dice "en toda Colombia".
+  - Pie de página: el correo se cortaba en 1366 px; ahora se parte en dos líneas. "Email corporativo" pasa a "Correo de contacto".
+  - **Blog:** los resúmenes traían el resaltado de Google Noticias (`**multas**`, "..."). Nuevo `src/lib/text/excerpt.ts` (`buildExcerpt`): el importador genera el resumen desde el texto del artículo, y se corrigieron 37 artículos. Fecha y enlace de las tarjetas con más contraste en modo claro.
+- **Pruebas nuevas:** `health-check.test.ts`, `excerpt.test.ts` (incluye que ningún artículo tenga Markdown en el resumen) y un caso de geobloqueo para `/api/health`.
 
 ### [2026-09-24] - Blog: publicación semanal desde el PC (sin GitHub Actions)
 
@@ -155,5 +173,7 @@
 - **Seguridad:** generar una clave nueva de Gemini en AI Studio (las actuales quedaron expuestas en una conversación) y revocar la API key del scraper SIMIT, que sigue en el historial de Git.
 - **Vercel:** confirmar `GEMINI_API_KEY` nueva (OCR) y, opcional, `GEMINI_OCR_MODEL`.
 - **GitHub Actions:** la cuenta de GitHub está **bloqueada por facturación** ("account is locked due to a billing issue"); resolver en github.com/settings/billing. Secreto `GEMINI_API_KEY` ya creado. CD necesita además `FIREBASE_TOKEN`.
-- **Legal:** completar razón social, NIT y dirección del responsable en Privacidad (8.1) y Términos; revisión opcional por un consultorio jurídico universitario (gratuito).
+- **Monitor externo:** crear la cuenta gratis de UptimeRobot y el monitor a `https://desmulta.online/api/health` (pasos en `docs/GUIA_INCIDENTES.md`).
+- **Cifras públicas por confirmar con el propietario:** "205+ casos exitosos" (portada) y "Más de 500+ usuarios referidos este mes" (`/referidos`); si no son reales, son publicidad engañosa (Ley 1480, art. 30).
+- **Legal:** el proyecto no tiene empresa registrada: identificar al responsable por marca, correo y, si el propietario acepta, nombre y ciudad; revisión opcional por un consultorio jurídico universitario (gratuito).
 - Evaluar posible expansión del embudo hacia suscripciones automáticas (notificaciones).

@@ -5,6 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import Parser from 'rss-parser';
 import { decodeHtmlEntities } from '../src/lib/text/html-entities';
+import { buildExcerpt } from '../src/lib/text/excerpt';
 
 // Helper para cargar variables de entorno del archivo .env local de forma manual (sin dependencias)
 function loadEnv() {
@@ -359,10 +360,10 @@ async function syncBlogFromRss() {
         const dateStr = parseDate(pubDate);
         const htmlToMd = htmlToMarkdown(description);
 
-        const cleanDescription = htmlToMd.slice(0, 160).replace(/\n/g, ' ') + '...';
-
         console.log(`[GEMINI] Procesando y reescribiendo artículo de forma única: ${title}...`);
         const rewrittenContent = await reescribirConGemini(title, htmlToMd);
+        // Resumen en texto plano sacado del artículo final (no del fragmento de Google Noticias)
+        const cleanDescription = buildExcerpt(rewrittenContent || htmlToMd);
 
         const isAutoPublish = process.env.AUTO_PUBLISH_BLOG === 'true';
 

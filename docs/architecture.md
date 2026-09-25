@@ -196,6 +196,12 @@ firebase deploy --only firestore:rules
 firebase deploy --only firestore:indexes
 ```
 
+### Operación y recuperación (2026-09-24)
+
+- **Salud:** `GET /api/health` (pública, exenta del geobloqueo) → 200 si el sitio y Firestore responden, 503 si Firestore falla. La vigila un monitor externo gratis (UptimeRobot).
+- **Copias de seguridad:** copia diaria de Firestore `(default)` con retención de 7 días (`gcloud firestore backups schedules list --database="(default)"`).
+- **Runbook:** [GUIA_INCIDENTES.md](GUIA_INCIDENTES.md) — síntomas, diagnóstico y restauración.
+
 ---
 
 ## 8. Post-Mortem (Módulo "Escudo SIMIT")

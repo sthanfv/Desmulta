@@ -35,4 +35,11 @@ describe('🌍 Edge Middleware - Geobloqueo y Hiper Localismo', () => {
     // Pasa directo sin redirección
     expect(res.status).toBe(200);
   });
+
+  it('Debe permitir el chequeo de salud desde fuera de Colombia (monitor externo)', async () => {
+    const req = new NextRequest('http://localhost:9005/api/health');
+    req.headers.set('x-vercel-ip-country', 'US');
+    const res = await middleware(req);
+    expect(res.status).toBe(200);
+  });
 });

@@ -40,7 +40,8 @@ Widget (ChatAssistantWidget.tsx)
 
 - Efecto máquina de escribir (5 caracteres / 20 ms) y mensajes de espera neutros.
 - En teléfono: pantalla completa, sin selector de tamaño de letra, abierto desde la pestaña "Asistente" (ver `docs/MOBILE_APP_SHELL.md`).
-- Botón de WhatsApp en la cabecera del chat y en los respaldos.
+- Botón de WhatsApp (verde, con texto en escritorio) en la cabecera del chat y en los respaldos.
+- **Un solo lanzador de ayuda** (2026-09-24): en escritorio, abajo a la derecha, "¿Necesita ayuda? — Asistente y WhatsApp". Se retiró el botón verde de WhatsApp de la portada (80 px con animación permanente) porque competía con el asistente y tapaba contenido; el WhatsApp queda dentro del asistente y en el pie de página. "Volver arriba" es un botón pequeño encima del lanzador que aparece tras 1 000 px de scroll.
 
 ## 4. Seguridad B2B
 

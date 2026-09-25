@@ -18,6 +18,7 @@
 - 🤖 [**Reglas para agentes de IA (CLAUDE.md)**](CLAUDE.md)
 - 💬 [**Asistente IA / Chat**](docs/CHAT_ARCHITECTURE.md)
 - 📱 [**Modo app en teléfono**](docs/MOBILE_APP_SHELL.md)
+- 🚨 [**Guía de incidentes (qué hacer si…)**](docs/GUIA_INCIDENTES.md)
 
 ---
 

@@ -196,7 +196,7 @@ export const Hero = ({ cityContext, showcaseData, onConsultar }: HeroProps) => {
                     <div className="font-bold text-sm text-white">
                       {showcaseData.counterLabel || 'Casos Exitosos'}
                     </div>
-                    <p className="text-xs text-white/70 font-medium">Este mes en toda Colombia</p>
+                    <p className="text-xs text-white/70 font-medium">En toda Colombia</p>
                   </div>
                 </div>
               </div>

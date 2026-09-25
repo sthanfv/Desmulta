@@ -8,6 +8,11 @@ Todas las versiones y cambios significativos del proyecto.
 
 ### ✨ Features & UX
 
+- **Operación:** ruta pública `/api/health` para monitor externo, copia diaria de Firestore (7 días) y `docs/GUIA_INCIDENTES.md`.
+- **Portada:** un solo botón flotante de ayuda (asistente + WhatsApp), sin ventana de bienvenida, tarjetas visibles en modo claro y sección final sin letras pegadas.
+- **Blog:** resúmenes en texto plano generados desde el artículo (sin `**` de Google Noticias) y mejor contraste.
+- **Exactitud:** se corrigieron textos de privacidad que no eran ciertos en la portada.
+
 - **Blog semanal sin GitHub Actions:** tarea del Programador de tareas de Windows (lunes 19:30) que ejecuta `scripts/blog-sync-publish.ps1` (`npm run blog:publish`): importa noticias, valida el MDX (`npm run blog:validate`) y publica en `main`.
 
 - **Modo app en teléfono:** barra de pestañas, paneles nativos, chat a pantalla completa, Inicio con accesos rápidos, barra con flecha atrás en páginas internas y transición de pantalla. Ver `docs/MOBILE_APP_SHELL.md`.
