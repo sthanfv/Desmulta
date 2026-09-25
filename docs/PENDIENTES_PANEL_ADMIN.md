@@ -51,6 +51,18 @@
 
 **Pruebas:** un artículo oculto no aparece en el listado ni en el sitemap y su página responde 404; al mostrarlo vuelve a aparecer.
 
+## 4. Segundo factor del panel con app autenticadora (TOTP)
+
+**Por qué:** hoy el segundo factor del admin de Desmulta es un código por correo (`src/app/admin/otp-actions.ts`, como Wompi). Sirve, pero según NIST 800-63B el correo no es un autenticador fuerte: quien entre al correo tiene ambos factores. La app autenticadora (TOTP, RFC 6238) es el estándar de GitHub, Vercel y los bancos; es gratis y no depende de que llegue un correo.
+
+**Qué construir** (ya está hecho y probado en Origgo, reutilizar):
+
+- TOTP sin dependencias: `../hunter-portal-showcase/lib/admin/totp.js` (vectores oficiales del RFC 6238 en `tests/admin_2fa.test.js`).
+- Enrolamiento local con QR y 8 códigos de respaldo de un solo uso: `scripts/admin-2fa-enrolar.js`.
+- Un solo uso por código (creación atómica en Firestore), máx. 5 intentos cada 15 min, auditoría de ingresos y rechazos.
+- Mantener el código por correo como **respaldo** opcional, o reemplazarlo; decidirlo con el propietario.
+- Encaja con el flujo actual de audiencias JWT (`otp-pending` → `admin-2fa` en `src/lib/auth/admin-jwt.ts`).
+
 ## Cómo trabajar estas tareas (reglas del propietario)
 
 - Revisar la RAM y la CPU libres antes de pruebas pesadas. Correr E2E con `--workers=1` y de a un archivo.
