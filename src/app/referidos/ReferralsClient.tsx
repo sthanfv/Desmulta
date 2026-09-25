@@ -104,22 +104,12 @@ export function ReferralsClient() {
               con éxito.
             </p>
 
-            <div className="flex gap-4 items-center">
-              <div className="flex -space-x-4">
-                {[1, 2, 3].map((i) => (
-                  <div
-                    key={i}
-                    className={`w-12 h-12 rounded-full border-2 border-black flex items-center justify-center bg-zinc-800 text-xs font-bold`}
-                  >
-                    U{i}
-                  </div>
-                ))}
-              </div>
-              <p className="text-sm font-medium text-white/40">
-                Más de <span className="text-amber-500 font-bold">500+</span> usuarios referidos
-                este mes.
-              </p>
-            </div>
+            {/* [2026-09-24] Antes mostraba avatares de relleno y "Más de 500+ usuarios referidos este
+                mes", una cifra inventada (publicidad engañosa, Ley 1480 art. 30). Solo afirmaciones
+                verificables. */}
+            <p className="text-sm font-medium text-white/50">
+              Programa exclusivo para clientes de Desmulta.
+            </p>
           </div>
 
           {/* Formulario VIP */}

@@ -11,7 +11,7 @@ Todas las versiones y cambios significativos del proyecto.
 - **Operación:** ruta pública `/api/health` para monitor externo, copia diaria de Firestore (7 días) y `docs/GUIA_INCIDENTES.md`.
 - **Portada:** un solo botón flotante de ayuda (asistente + WhatsApp), sin ventana de bienvenida, tarjetas visibles en modo claro y sección final sin letras pegadas.
 - **Blog:** resúmenes en texto plano generados desde el artículo (sin `**` de Google Noticias) y mejor contraste.
-- **Exactitud:** se corrigieron textos de privacidad que no eran ciertos en la portada.
+- **Exactitud:** se corrigieron textos de privacidad que no eran ciertos en la portada y se retiró la cifra inventada de referidos.
 
 - **Blog semanal sin GitHub Actions:** tarea del Programador de tareas de Windows (lunes 19:30) que ejecuta `scripts/blog-sync-publish.ps1` (`npm run blog:publish`): importa noticias, valida el MDX (`npm run blog:validate`) y publica en `main`.
 
