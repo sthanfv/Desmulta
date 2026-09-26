@@ -63,6 +63,12 @@
 - Mantener el código por correo como **respaldo** opcional, o reemplazarlo; decidirlo con el propietario.
 - Encaja con el flujo actual de audiencias JWT (`otp-pending` → `admin-2fa` en `src/lib/auth/admin-jwt.ts`).
 
+## 5. Animación de la verificación del código (OTP)
+
+**Por qué:** el propietario compartió una referencia visual (video en `C:\Users\Sthan\Escritorio\para antigravity`, componente "OTP Verification"): casillas con brillo en la activa, dígitos que entran animados y, al completar, los dígitos se juntan en el centro con un destello, la tarjeta cambia de color y aparece un check dentro de un anillo luminoso con botón "Continuar". Se hará primero en Origgo y luego aquí, con los colores de Desmulta.
+
+**Cómo:** solo CSS y JavaScript (sin librerías, sin costo), respetando `prefers-reduced-motion`; incluir sacudida en código incorrecto. Reutilizar el componente de Origgo (`../hunter-portal-showcase/src/admin/`).
+
 ## Cómo trabajar estas tareas (reglas del propietario)
 
 - Revisar la RAM y la CPU libres antes de pruebas pesadas. Correr E2E con `--workers=1` y de a un archivo.
