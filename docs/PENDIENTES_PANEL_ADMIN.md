@@ -65,7 +65,11 @@
 
 ## 5. Animación de la verificación del código (OTP) — ✅ HECHA (2026-09-25)
 
-**Hecho:** `src/components/admin/CasillasOtp.tsx` (+ `.module.css`), usado en `src/app/acceso-panel/page.tsx`. Ver la entrada del 2026-09-25 en `MEMORY.md`. Si se cambia a TOTP (tarea 4), el mismo componente sirve sin cambios.
+**Hecho:** `src/components/admin/CasillasOtp.tsx` y `VerificacionExitosa.tsx` (+ sus `.module.css`), usados en `src/app/acceso-panel/page.tsx`; rehecha el 2026-09-26 para que sea fiel a la referencia (la tarjeta completa se transforma). Ver `MEMORY.md`. Si se cambia a TOTP (tarea 4), los mismos componentes sirven sin cambios.
+
+## 6. Cierre de sesión por inactividad — ✅ HECHO (2026-09-26)
+
+15 min sin actividad y 8 h absolutas, exigidos por el middleware (`src/lib/auth/admin-sesion.ts`); aviso con cuenta regresiva y pestañas sincronizadas (`CierrePorInactividad.tsx`).
 
 **Por qué:** el propietario compartió una referencia visual (video en `C:\Users\Sthan\Escritorio\para antigravity`, componente "OTP Verification"): casillas con brillo en la activa, dígitos que entran animados y, al completar, los dígitos se juntan en el centro con un destello, la tarjeta cambia de color y aparece un check dentro de un anillo luminoso con botón "Continuar". Se hará primero en Origgo y luego aquí, con los colores de Desmulta.
 

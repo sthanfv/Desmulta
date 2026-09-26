@@ -34,6 +34,14 @@
 
 ## 📜 Historial Reciente (Últimos Cambios Clave)
 
+### [2026-09-26] - Animación del código fiel a la referencia y cierre de sesión por inactividad (estándar OWASP/NIST)
+
+- **Por qué:** el propietario revisó los paneles en producción y la animación anterior no se notaba ni se parecía a la referencia (video "OTP Verification" en `C:/Users/Sthan/Escritorio/para antigravity`). También pidió cerrar la sesión por inactividad "como lo hacen los profesionales".
+- **Animación (comparada cuadro por cuadro con la referencia):** `CasillasOtp` con casilla activa de borde grueso y resplandor ámbar interno, dígitos con rebote, onda de luz y desenfoque al completar, rojo y sacudida si falla. Al acertar, la TARJETA del modal se transforma (`src/components/admin/VerificacionExitosa.tsx` + `.module.css`): el contenido se desenfoca, resplandor verde-azulado desde abajo, sello que crece con el check y halo, y botón **Continuar** (se habilita cuando el servidor ya reconoce la sesión). Vista previa solo en desarrollo: `/acceso-panel?vista=codigo` (123456 = correcto); no existe en el build de producción (verificado).
+- **Sesión (el servidor manda):** `src/lib/auth/admin-sesion.ts` — el `admin-2fa-token` lleva `ini` y `act`; el middleware cierra tras 15 min sin actividad (`?motivo=inactividad`) y a las 8 h absolutas (`?motivo=vencida`), y renueva `act` como máximo una vez por minuto. Tokens anteriores sin marcas piden entrar de nuevo (`?motivo=antigua`). Cookie de sesión (sin maxAge) en `verify-otp` y `otp-actions`. Nueva ruta `GET /api/admin/sesion` (latido).
+- **Navegador:** `src/components/admin/CierrePorInactividad.tsx` (montado en `src/app/admin/layout.tsx`, reemplaza el temporizador de 30 min solo del cliente): actividad compartida entre pestañas, latido cada 4 min, aviso "¿Sigues ahí?" 2 min antes con cuenta regresiva, cierre en todas las pestañas (BroadcastChannel, también desde `/logout`). `/acceso-panel` explica el motivo del cierre.
+- **Verificado (validación proporcional):** `tsc`, eslint y `npm run build` OK; `vitest` de a un archivo: `admin-sesion` 4/4 (nueva), `CasillasOtp` 4/4, `middleware-auth` 2/2, `logout-security` 3/3; capturas con Playwright de cada fase.
+
 ### [2026-09-25] - Animación del código de verificación del panel (tarea 5 de los pendientes)
 
 - **Qué:** en `/acceso-panel`, el código que llega por correo ahora se escribe en casillas animadas: la activa brilla, cada dígito entra con un rebote y, al completar los 6, se envía solo; los dígitos se juntan en el centro con un destello que late mientras verifica; si es correcto, la tarjeta se ilumina en ámbar y se dibuja un check dentro de un anillo luminoso (~1 s) antes de entrar al panel; si es incorrecto, las casillas se sacuden en rojo, se vacían y el foco vuelve a la primera.

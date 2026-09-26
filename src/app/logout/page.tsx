@@ -6,6 +6,7 @@ import { ShieldCheck, Database, HardDrive, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '@/firebase';
 import { secureLogout } from '@/lib/security/client-logout';
 import { useSearchParams } from 'next/navigation';
+import { CANAL_SESION_ADMIN } from '@/components/admin/CierrePorInactividad';
 
 function SweeperContent() {
   const auth = useAuth();
@@ -16,6 +17,17 @@ function SweeperContent() {
 
   useEffect(() => {
     let isMounted = true;
+
+    // Cerrar sesión aquí la cierra en todas las pestañas del panel (ver CierrePorInactividad).
+    if (reason !== 'otra-pestana') {
+      try {
+        const canal = new BroadcastChannel(CANAL_SESION_ADMIN);
+        canal.postMessage('salir');
+        canal.close();
+      } catch {
+        // Navegador sin BroadcastChannel: solo se cierra esta pestaña.
+      }
+    }
 
     const runSweep = async () => {
       // Step 0: "Activando protocolo Zero-Trust..."
@@ -44,7 +56,7 @@ function SweeperContent() {
       await new Promise((r) => setTimeout(r, 800));
 
       // Redirección dura final (purga memoria de Next.js)
-      window.location.href = `/acceso-panel?reason=clean`;
+      window.location.href = `/acceso-panel?reason=${reason === 'inactividad' ? 'inactividad' : 'clean'}`;
     };
 
     runSweep();

@@ -3,14 +3,14 @@
 /**
  * Casillas animadas para el código de verificación (OTP) del panel de administración.
  *
- * Animación (referencia visual del propietario, la misma del panel de Origgo):
- * - La casilla activa brilla y cada dígito entra con un pequeño rebote.
- * - Al verificar, los dígitos viajan al centro y se funden en un destello que late.
- * - Si el código es correcto se dibuja un check dentro de un anillo luminoso.
- * - Si es incorrecto, las casillas vuelven en rojo y se sacuden.
+ * Animación (fiel a la referencia "OTP Verification" del propietario, la misma de Origgo):
+ * - La casilla activa tiene borde grueso y un resplandor que la llena por dentro.
+ * - Cada dígito entra con un rebote.
+ * - Al verificar, una onda de luz y desenfoque recorre las casillas.
+ * - Si es incorrecto, las casillas se ponen en rojo y se sacuden.
+ * El estado "verificado" (la tarjeta completa se transforma) está en VerificacionExitosa.tsx.
  *
- * Solo CSS (transform/opacity), sin librerías; respeta prefers-reduced-motion
- * (la regla global de globals.css reduce las duraciones a casi cero).
+ * Solo CSS, sin librerías; respeta prefers-reduced-motion (regla global de globals.css).
  */
 
 import {
@@ -123,13 +123,6 @@ export function CasillasOtp({
             aria-label={`Dígito ${i + 1} del código de verificación`}
           />
         ))}
-      </div>
-      <div className={estilos.centro} aria-hidden="true">
-        <span className={estilos.destello} />
-        <svg className={estilos.check} viewBox="0 0 56 56">
-          <circle cx="28" cy="28" r="25" />
-          <path d="M17 29l7.5 7.5L40 21" />
-        </svg>
       </div>
       <span className="sr-only" role="status">
         {TEXTO_ESTADO[estado]}

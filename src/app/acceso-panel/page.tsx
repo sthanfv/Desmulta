@@ -34,6 +34,7 @@ import {
   prefiereMenosMovimiento,
   type EstadoOtp,
 } from '@/components/admin/CasillasOtp';
+import { VerificacionExitosa, estilosTarjeta } from '@/components/admin/VerificacionExitosa';
 
 // ── Máquina de estados del flujo de autenticación ────────────────────────────
 type AuthPhase =
@@ -75,6 +76,9 @@ function formatTime(seconds: number): string {
   return `${m}:${s}`;
 }
 
+/** Token ficticio de la vista previa de desarrollo (nunca llega al servidor). */
+const VISTA_PREVIA = 'vista-previa-desarrollo';
+
 export default function AccesoPanel() {
   const router = useRouter();
   const auth = useAuth();
@@ -101,6 +105,10 @@ export default function AccesoPanel() {
   const [otpCode, setOtpCode] = useState('');
   // Estado visual de la animación de las casillas (ver CasillasOtp)
   const [estadoOtp, setEstadoOtp] = useState<EstadoOtp>('normal');
+  // El servidor ya reconoce la sesión: el botón "Continuar" de la tarjeta verificada se habilita.
+  const [sesionLista, setSesionLista] = useState(false);
+  // Motivo de un cierre automático de sesión (llega en la URL desde el middleware o /logout).
+  const [avisoSesion, setAvisoSesion] = useState<string | null>(null);
   const [expiresAt, setExpiresAt] = useState<number>(0);
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [otpCooldown, setOtpCooldown] = useState<number>(0);
@@ -139,6 +147,7 @@ export default function AccesoPanel() {
     setTempToken(null);
     setOtpCode('');
     setEstadoOtp('normal');
+    setSesionLista(false);
     setExpiresAt(0);
     setTimeLeft(0);
     setOtpCooldown(0);
@@ -282,23 +291,37 @@ export default function AccesoPanel() {
 
     try {
       // Fase 2: Verificación final — AQUÍ se emiten __session + admin-2fa-token
-      const res = await fetch('/api/auth/verify-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ temp_token: tempToken, code }),
-      });
+      const esVistaPrevia = process.env.NODE_ENV !== 'production' && tempToken === VISTA_PREVIA;
+      // La onda de las casillas se deja ver completa al menos una vez.
+      const [res] = await Promise.all([
+        esVistaPrevia
+          ? new Promise<Response>((ok) =>
+              setTimeout(
+                () =>
+                  ok(
+                    new Response(JSON.stringify({ error: 'Código incorrecto.' }), {
+                      status: code === '123456' ? 200 : 401,
+                    })
+                  ),
+                700
+              )
+            )
+          : fetch('/api/auth/verify-otp', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ temp_token: tempToken, code }),
+            }),
+        new Promise((r) => setTimeout(r, prefiereMenosMovimiento() ? 0 : 900)),
+      ]);
 
       if (!res.ok) {
         const data = await res.json();
         throw new Error(data.error || 'Código incorrecto o expirado.');
       }
 
+      // La tarjeta se transforma en "Código verificado" (VerificacionExitosa).
       setPhase('success');
       setEstadoOtp('exito');
-      toast({
-        title: '✅ Acceso autorizado',
-        description: 'Verificación de doble factor completada.',
-      });
 
       // INYECCIÓN TAB-LOCK Removida (Soporte multi-pestaña)
 
@@ -306,14 +329,11 @@ export default function AccesoPanel() {
       // En lugar de un delay fijo e impredecible, se usa un mecanismo de reintento con
       // backoff exponencial que verifica activamente si el servidor ya reconoce la sesión
       // antes de navegar. Esto es robusto ante redes lentas o navegadores con carga alta.
-      const animacionMinima = new Promise((r) =>
-        setTimeout(r, prefiereMenosMovimiento() ? 300 : 1100)
-      );
       const MAX_RETRIES = 5;
       const BASE_DELAY_MS = 200;
       let adminAccessible = false;
 
-      for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      for (let attempt = 0; attempt < (esVistaPrevia ? 0 : MAX_RETRIES); attempt++) {
         await new Promise((resolve) => setTimeout(resolve, BASE_DELAY_MS * (attempt + 1)));
         try {
           // HEAD request silenciosa: si el servidor devuelve 200, las cookies están activas.
@@ -328,12 +348,9 @@ export default function AccesoPanel() {
         }
       }
 
-      // Se deja ver el check (anillo luminoso) antes de navegar.
-      await animacionMinima;
-
-      // Recarga completa (no client-side navigation) para que el middleware
-      // de Next.js lea el nuevo estado de cookies desde el servidor.
-      window.location.href = '/admin' + window.location.search;
+      // Con la sesión reconocida se habilita "Continuar" (si los reintentos se agotan, igual se
+      // habilita: el middleware decidirá al entrar).
+      setSesionLista(true);
     } catch (error: unknown) {
       // Las casillas vuelven en rojo y se sacuden; luego se vacían para reintentar
       // (al vaciarse, CasillasOtp devuelve el foco a la primera).
@@ -350,6 +367,38 @@ export default function AccesoPanel() {
       });
     }
   };
+
+  /** "Continuar": recarga completa para que el middleware lea las cookies nuevas. */
+  const continuarAlPanel = () => {
+    const params = new URLSearchParams(window.location.search);
+    params.delete('motivo');
+    params.delete('reason');
+    const q = params.toString();
+    window.location.href = '/admin' + (q ? `?${q}` : '');
+  };
+
+  // Explica por qué se cerró la sesión (middleware: ?motivo=… ; /logout: ?reason=inactividad).
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    // Vista previa SOLO en desarrollo (npm run dev): /acceso-panel?vista=codigo abre el modal del
+    // código sin iniciar sesión; 123456 simula un código correcto. En producción no existe.
+    if (process.env.NODE_ENV !== 'production' && params.get('vista') === 'codigo') {
+      setEmail('admin@ejemplo.com');
+      setTempToken(VISTA_PREVIA);
+      setExpiresAt(Date.now() + 2 * 60 * 1000);
+      setPhase('awaiting_otp');
+    }
+    const motivo =
+      params.get('motivo') || (params.get('reason') === 'inactividad' ? 'inactividad' : null);
+    if (motivo === 'inactividad')
+      setAvisoSesion(
+        'Cerramos tu sesión tras 15 minutos sin actividad. Vuelve a entrar para continuar.'
+      );
+    else if (motivo === 'vencida')
+      setAvisoSesion('Tu sesión llegó al máximo de 8 horas. Vuelve a entrar para continuar.');
+    else if (motivo === 'antigua')
+      setAvisoSesion('Actualizamos la seguridad del panel. Vuelve a entrar para continuar.');
+  }, []);
 
   // ── Handler: Reenviar OTP ─────────────────────────────────────────────────
   const handleResendOtp = async () => {
@@ -470,6 +519,14 @@ export default function AccesoPanel() {
             <p className="text-muted-foreground text-center mb-6">Inicie sesión para continuar</p>
 
             <form onSubmit={handleEmailSignIn} className="space-y-4">
+              {avisoSesion && !loginError && (
+                <div
+                  role="status"
+                  className="rounded-lg bg-primary/10 border border-primary/30 px-4 py-3 text-sm text-foreground"
+                >
+                  {avisoSesion}
+                </div>
+              )}
               {loginError && (
                 <div
                   role="alert"
@@ -569,95 +626,100 @@ export default function AccesoPanel() {
           <div
             className={cn(
               'w-full max-w-sm rounded-2xl border border-border bg-card p-8 shadow-2xl relative overflow-hidden animate-in zoom-in-95 duration-200',
-              'transition-[border-color,box-shadow] duration-500',
-              // Al acertar, la tarjeta se ilumina con el color de marca (como en la referencia)
-              phase === 'success' &&
-                'border-primary/60 shadow-[0_0_48px_-10px_hsl(var(--primary)/0.55)]'
+              // Al acertar, la tarjeta completa se transforma (VerificacionExitosa)
+              estilosTarjeta.tarjeta
             )}
+            data-estado={estadoOtp}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Glow decorativo de fondo */}
-            <div className="absolute -top-12 -right-12 w-24 h-24 bg-primary/10 rounded-full blur-2xl pointer-events-none" />
+            <div className={estilosTarjeta.vistaCodigo} aria-hidden={estadoOtp === 'exito'}>
+              {/* Glow decorativo de fondo */}
+              <div className="absolute -top-12 -right-12 w-24 h-24 bg-primary/10 rounded-full blur-2xl pointer-events-none" />
 
-            {/* Encabezado del modal */}
-            <div className="flex flex-col items-center mb-4">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary mb-3">
-                <KeyRound className="w-6 h-6" />
+              {/* Encabezado del modal */}
+              <div className="flex flex-col items-center mb-4">
+                <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary mb-3">
+                  <KeyRound className="w-6 h-6" />
+                </div>
+                <h2 className="text-xl font-bold text-center">Verificación de Doble Factor</h2>
+                <p className="text-muted-foreground text-center text-xs mt-1.5 max-w-[280px]">
+                  Código enviado a <strong className="text-foreground">{maskEmail(email)}</strong>
+                </p>
+                <p className="text-[10px] text-muted-foreground/60 text-center mt-1.5 max-w-[280px]">
+                  💡 Si no lo encuentras, revisa tu carpeta de <strong>Correo no deseado</strong>.
+                </p>
               </div>
-              <h2 className="text-xl font-bold text-center">Verificación de Doble Factor</h2>
-              <p className="text-muted-foreground text-center text-xs mt-1.5 max-w-[280px]">
-                Código enviado a <strong className="text-foreground">{maskEmail(email)}</strong>
-              </p>
-              <p className="text-[10px] text-muted-foreground/60 text-center mt-1.5 max-w-[280px]">
-                💡 Si no lo encuentras, revisa tu carpeta de <strong>Correo no deseado</strong>.
-              </p>
-            </div>
 
-            {/* Countdown visual de expiración */}
-            <div
-              className={cn(
-                'flex items-center justify-center gap-1.5 text-sm font-mono font-semibold mb-5 transition-colors duration-500',
-                countdownColorClass
-              )}
-            >
-              <Clock className="w-4 h-4" />
-              <span>{formatTime(timeLeft)}</span>
-            </div>
-
-            <form onSubmit={handleVerifyOtp} className="space-y-4">
-              {/* 6 casillas animadas: se envían solas al completarse */}
-              <CasillasOtp
-                valor={otpCode}
-                onCambio={setOtpCode}
-                onCompleto={verificarCodigo}
-                estado={estadoOtp}
-                deshabilitado={phase !== 'awaiting_otp'}
-              />
-
-              {/* Botones de acción */}
-              <div className="flex flex-col gap-2 pt-1">
-                <Button
-                  type="submit"
-                  className="w-full rounded-xl py-5"
-                  disabled={phase !== 'awaiting_otp' || otpCode.length !== 6}
-                >
-                  {phase === 'success' ? (
-                    'Código correcto'
-                  ) : phase === 'verifying' ? (
-                    <>
-                      <Loader2 className="animate-spin mr-2 h-4 w-4" />
-                      Verificando código...
-                    </>
-                  ) : (
-                    'Confirmar Código'
-                  )}
-                </Button>
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleResendOtp}
-                  disabled={otpCooldown > 0 || phase !== 'awaiting_otp'}
-                  className="w-full rounded-xl py-5 border-border/60 hover:bg-muted text-xs gap-2"
-                >
-                  <RefreshCw className="h-3.5 w-3.5" />
-                  {otpCooldown > 0 ? `Reenviar en ${otpCooldown}s` : 'Reenviar Código'}
-                </Button>
-              </div>
-            </form>
-
-            {/* Footer del modal */}
-            <div className="flex items-center justify-between mt-6 pt-4 border-t border-border/40">
-              <button
-                type="button"
-                onClick={handleCancelOtp}
-                disabled={phase !== 'awaiting_otp'}
-                className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              {/* Countdown visual de expiración */}
+              <div
+                className={cn(
+                  'flex items-center justify-center gap-1.5 text-sm font-mono font-semibold mb-5 transition-colors duration-500',
+                  countdownColorClass
+                )}
               >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Cancelar</span>
-              </button>
+                <Clock className="w-4 h-4" />
+                <span>{formatTime(timeLeft)}</span>
+              </div>
+
+              <form onSubmit={handleVerifyOtp} className="space-y-4">
+                {/* 6 casillas animadas: se envían solas al completarse */}
+                <CasillasOtp
+                  valor={otpCode}
+                  onCambio={setOtpCode}
+                  onCompleto={verificarCodigo}
+                  estado={estadoOtp}
+                  deshabilitado={phase !== 'awaiting_otp'}
+                />
+
+                {/* Botones de acción */}
+                <div className="flex flex-col gap-2 pt-1">
+                  <Button
+                    type="submit"
+                    className="w-full rounded-xl py-5"
+                    disabled={phase !== 'awaiting_otp' || otpCode.length !== 6}
+                  >
+                    {phase === 'success' ? (
+                      'Código correcto'
+                    ) : phase === 'verifying' ? (
+                      <>
+                        <Loader2 className="animate-spin mr-2 h-4 w-4" />
+                        Verificando código...
+                      </>
+                    ) : (
+                      'Confirmar Código'
+                    )}
+                  </Button>
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleResendOtp}
+                    disabled={otpCooldown > 0 || phase !== 'awaiting_otp'}
+                    className="w-full rounded-xl py-5 border-border/60 hover:bg-muted text-xs gap-2"
+                  >
+                    <RefreshCw className="h-3.5 w-3.5" />
+                    {otpCooldown > 0 ? `Reenviar en ${otpCooldown}s` : 'Reenviar Código'}
+                  </Button>
+                </div>
+              </form>
+
+              {/* Footer del modal */}
+              <div className="flex items-center justify-between mt-6 pt-4 border-t border-border/40">
+                <button
+                  type="button"
+                  onClick={handleCancelOtp}
+                  disabled={phase !== 'awaiting_otp'}
+                  className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <span>Cancelar</span>
+                </button>
+              </div>
             </div>
+
+            {estadoOtp === 'exito' && (
+              <VerificacionExitosa listo={sesionLista} onContinuar={continuarAlPanel} />
+            )}
           </div>
         </div>
       )}

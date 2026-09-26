@@ -3,14 +3,14 @@ import { logger } from '@/lib/logger/security-logger';
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useUser, useAuth } from '@/firebase';
+import { useUser } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import { Loader2, RefreshCw } from 'lucide-react';
 import { OfflineBanner } from '@/components/ui/offline-banner';
+import { CierrePorInactividad } from '@/components/admin/CierrePorInactividad';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const auth = useAuth();
   const { user, isUserLoading } = useUser();
 
   // 🛡️ TESTING BYPASS: Permitir el bypass de autenticación del cliente en los tests de Playwright (solo en dev)
@@ -63,33 +63,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     };
   }, [user, isUserLoading, isMockAdmin]);
 
-  // 🛡️ MANDATO-FILTRO: Vigía de Inactividad (Cierra sesión a los 30 min)
-  useEffect(() => {
-    if (!user || !isAdmin) return;
-
-    let timeoutId: NodeJS.Timeout;
-    const INACTIVITY_TIME = 30 * 60 * 1000; // 30 minutos
-
-    const logout = () => {
-      router.push('/logout?reason=inactividad');
-    };
-
-    const resetTimer = () => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(logout, INACTIVITY_TIME);
-    };
-
-    // Eventos que reinician el contador
-    const events = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart'];
-
-    events.forEach((event) => document.addEventListener(event, resetTimer, { passive: true }));
-    resetTimer(); // Iniciar cronómetro por primera vez
-
-    return () => {
-      clearTimeout(timeoutId);
-      events.forEach((event) => document.removeEventListener(event, resetTimer));
-    };
-  }, [user, isAdmin, auth, router]);
+  // Cierre por inactividad: lo exige el middleware (15 min, src/lib/auth/admin-sesion.ts) y
+  // <CierrePorInactividad /> muestra el aviso y sincroniza las pestañas (ver más abajo).
 
   const handleRefreshPermissions = async () => {
     if (!user) return;
@@ -168,6 +143,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <>
       <OfflineBanner />
+      {!isMockAdmin && <CierrePorInactividad />}
       {children}
     </>
   );

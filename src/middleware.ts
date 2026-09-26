@@ -25,6 +25,12 @@ import { getTokens } from 'next-firebase-auth-edge/lib/next/tokens';
 // [2026-09-22] FIX: verificación con audiencia (antes jwtVerify genérico aceptaba
 // temp_token y god-mode token como si fueran 2FA)
 import { verifyAdminToken } from '@/lib/auth/admin-jwt';
+import {
+  COOKIE_2FA,
+  OPCIONES_COOKIE_2FA,
+  evaluarSesion2fa,
+  firmarSesion2fa,
+} from '@/lib/auth/admin-sesion';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -195,6 +201,24 @@ export async function middleware(request: NextRequest) {
         if (!payload) {
           return NextResponse.json({ error: '2FA token inválido o expirado' }, { status: 401 });
         }
+        // Cierre por inactividad (15 min) y límite absoluto (8 h), exigidos por el servidor.
+        const sesion = evaluarSesion2fa(payload);
+        if (!sesion.valida) {
+          const cierre = NextResponse.json(
+            { error: 'La sesión se cerró por inactividad.', codigo: 'SESION_INACTIVA' },
+            { status: 401 }
+          );
+          cierre.cookies.delete(COOKIE_2FA);
+          cierre.cookies.delete('admin-2fa-flag');
+          return cierre;
+        }
+        if (sesion.renovar) {
+          response.cookies.set(
+            COOKIE_2FA,
+            await firmarSesion2fa(String(payload.uid), { ini: sesion.ini }),
+            OPCIONES_COOKIE_2FA
+          );
+        }
       }
     }
 
@@ -202,6 +226,8 @@ export async function middleware(request: NextRequest) {
   }
 
   // ── 5. Rutas /admin — Guard JWT criptográfico ────────────────────────────
+  // Token 2FA renovado por actividad (se aplica a la respuesta final, sección 6).
+  let token2faRenovado: string | null = null;
   if (pathname.startsWith('/admin')) {
     // 🛡️ E2E TESTING BYPASS: Permitir el bypass de autenticación en tests de Playwright usando el emulador
     const isE2E = process.env.E2E_TEST_MODE === 'true';
@@ -282,6 +308,21 @@ export async function middleware(request: NextRequest) {
           response.cookies.delete('admin-2fa-flag');
           return response;
         }
+
+        // Cierre por inactividad (15 min) y límite absoluto (8 h), exigidos por el servidor.
+        const sesion = evaluarSesion2fa(payload);
+        if (!sesion.valida) {
+          const loginUrl = new URL('/acceso-panel', request.url);
+          loginUrl.searchParams.set('motivo', sesion.motivo);
+          const cierre = NextResponse.redirect(loginUrl);
+          cierre.cookies.delete(COOKIE_2FA);
+          cierre.cookies.delete('admin-2fa-flag');
+          cierre.cookies.delete('__session');
+          return cierre;
+        }
+        if (sesion.renovar) {
+          token2faRenovado = await firmarSesion2fa(String(payload.uid), { ini: sesion.ini });
+        }
       }
     } catch (err: unknown) {
       // Token expirado, corrupto o error de red → redirect a login
@@ -308,6 +349,7 @@ export async function middleware(request: NextRequest) {
   const response = NextResponse.next({
     request: { headers: requestHeaders },
   });
+  if (token2faRenovado) response.cookies.set(COOKIE_2FA, token2faRenovado, OPCIONES_COOKIE_2FA);
 
   response.headers.set('x-ciudad-usuario', ciudadUsuario);
 

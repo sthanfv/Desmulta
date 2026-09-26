@@ -16,7 +16,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { signAdminToken, verifyAdminToken } from '@/lib/auth/admin-jwt';
+import { verifyAdminToken } from '@/lib/auth/admin-jwt';
+import { COOKIE_2FA, OPCIONES_COOKIE_2FA, firmarSesion2fa } from '@/lib/auth/admin-sesion';
 import { setAuthCookies } from 'next-firebase-auth-edge/lib/next/cookies';
 import { verifyOtpCode } from '@/lib/auth/otp-service';
 import { logger } from '@/lib/logger/security-logger';
@@ -194,16 +195,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 6. Firmar y añadir el token JWT de 2FA (8 horas)
-    const token2fa = await signAdminToken('admin-2fa', { uid: payload.uid, role: 'admin' }, '8h');
-
-    finalResponse.cookies.set('admin-2fa-token', token2fa, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      path: '/',
-      maxAge: 8 * 60 * 60, // alineado con la expiración del JWT
-    });
+    // 6. Token 2FA con inicio y última actividad: 15 min de inactividad o 8 h en total cierran
+    // la sesión (src/lib/auth/admin-sesion.ts). Cookie de sesión: se borra al cerrar el navegador.
+    const token2fa = await firmarSesion2fa(String(payload.uid));
+    finalResponse.cookies.set(COOKIE_2FA, token2fa, OPCIONES_COOKIE_2FA);
 
     // Cookie de bandera pública (no HttpOnly) para que el cliente detecte el estado
     finalResponse.cookies.set('admin-2fa-flag', 'true', {

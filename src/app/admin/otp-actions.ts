@@ -18,7 +18,7 @@
 import { verifyAdminIdToken } from '@/lib/auth/require-admin-session';
 import { sendOtpToAdmin, verifyOtpCode } from '@/lib/auth/otp-service';
 import { cookies } from 'next/headers';
-import { signAdminToken } from '@/lib/auth/admin-jwt';
+import { COOKIE_2FA, OPCIONES_COOKIE_2FA, firmarSesion2fa } from '@/lib/auth/admin-sesion';
 import { logger } from '@/lib/logger/security-logger';
 
 /**
@@ -82,17 +82,12 @@ export async function verifyAdminOtp(
       return result;
     }
 
-    // Firmar el JWT de 2FA (2 horas) con audiencia 'admin-2fa'
-    const token = await signAdminToken('admin-2fa', { uid: decodedToken.uid, role: 'admin' }, '2h');
+    // Token 2FA con inicio y última actividad (15 min sin uso o 8 h en total cierran la sesión).
+    const token = await firmarSesion2fa(decodedToken.uid);
 
-    // Inyectar Cookie HttpOnly segura como "Session Cookie" (sin maxAge, se borra al cerrar el navegador)
+    // Cookie HttpOnly de sesión (sin maxAge, se borra al cerrar el navegador)
     const cookieStore = await cookies();
-    cookieStore.set('admin-2fa-token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      path: '/',
-    });
+    cookieStore.set(COOKIE_2FA, token, OPCIONES_COOKIE_2FA);
 
     // Cookie de bandera pública para el cliente (no HttpOnly)
     cookieStore.set('admin-2fa-flag', 'true', {

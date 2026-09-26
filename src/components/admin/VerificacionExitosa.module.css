@@ -1,0 +1,182 @@
+/*
+ * La tarjeta del código se transforma al verificar (referencia "OTP Verification"):
+ * el contenido se desenfoca y desaparece, la tarjeta se llena de un resplandor verde-azulado
+ * desde abajo, un sello pequeño crece, se dibuja el check con su halo y aparece "Continuar".
+ * Ver VerificacionExitosa.tsx. Solo transform/opacity/filter.
+ */
+
+.tarjeta {
+  isolation: isolate;
+  transition:
+    border-color 0.6s ease,
+    box-shadow 0.6s ease;
+}
+
+.tarjeta::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(
+      90% 70% at 50% 100%,
+      hsl(168 80% 45% / 0.55),
+      hsl(168 75% 32% / 0.2) 50%,
+      transparent 78%
+    ),
+    radial-gradient(40% 30% at 50% 62%, hsl(168 85% 55% / 0.28), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.8s ease 0.2s;
+  pointer-events: none;
+}
+
+.tarjeta[data-estado='exito'] {
+  border-color: hsl(168 70% 55% / 0.45);
+  box-shadow: 0 0 60px -12px hsl(168 80% 45% / 0.55);
+}
+
+.tarjeta[data-estado='exito']::after {
+  opacity: 1;
+}
+
+.vistaCodigo {
+  position: relative;
+  z-index: 1;
+  transition:
+    filter 0.5s ease,
+    opacity 0.5s ease,
+    transform 0.5s ease;
+}
+
+.tarjeta[data-estado='exito'] .vistaCodigo {
+  filter: blur(12px);
+  opacity: 0;
+  transform: scale(0.97);
+  pointer-events: none;
+}
+
+.vistaExito {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 2rem;
+  text-align: center;
+}
+
+.aparece {
+  margin: 0;
+  animation: aparece 0.55s ease 0.4s both;
+}
+
+.aparece + .aparece {
+  animation-delay: 0.5s;
+}
+
+@keyframes aparece {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+    filter: blur(6px);
+  }
+}
+
+.sello {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  margin: 14px 0 10px;
+  border-radius: 24px;
+  border: 2px solid hsl(168 80% 58% / 0.95);
+  background: linear-gradient(160deg, hsl(168 60% 22% / 0.9), hsl(168 70% 12% / 0.95));
+  box-shadow:
+    0 0 0 1px hsl(168 80% 60% / 0.2) inset,
+    0 0 44px 6px hsl(168 80% 48% / 0.5);
+  animation: selloCrece 0.7s cubic-bezier(0.3, 1.35, 0.5, 1) 0.55s both;
+}
+
+.sello::after {
+  content: '';
+  position: absolute;
+  inset: -12px;
+  border-radius: 32px;
+  border: 1.5px solid hsl(168 80% 60% / 0.35);
+  box-shadow: 0 0 22px hsl(168 80% 50% / 0.25);
+  animation: halo 0.7s ease-out 1.05s both;
+}
+
+.sello svg {
+  width: 44px;
+  height: 44px;
+  fill: none;
+  stroke: #ecfdf5;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 24;
+  animation: trazoCheck 0.45s ease-out 1s both;
+}
+
+@keyframes selloCrece {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+    box-shadow: none;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+
+@keyframes halo {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+}
+
+@keyframes trazoCheck {
+  from {
+    stroke-dashoffset: 24;
+  }
+}
+
+.continuar {
+  min-width: 170px;
+  padding: 12px 28px;
+  border: 1.5px solid hsl(168 90% 75% / 0.9);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #5eead4, #14b8a6);
+  color: #042f2e;
+  font-weight: 800;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: 0 0 28px -2px hsl(172 80% 50% / 0.6);
+  animation: aparece 0.5s ease 1.3s both;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    opacity 0.2s ease;
+}
+
+.continuar:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 0 38px 0 hsl(172 80% 55% / 0.75);
+}
+
+.continuar:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+.continuar:focus-visible {
+  outline: 3px solid hsl(168 90% 75% / 0.6);
+  outline-offset: 3px;
+}
