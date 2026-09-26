@@ -63,7 +63,9 @@
 - Mantener el código por correo como **respaldo** opcional, o reemplazarlo; decidirlo con el propietario.
 - Encaja con el flujo actual de audiencias JWT (`otp-pending` → `admin-2fa` en `src/lib/auth/admin-jwt.ts`).
 
-## 5. Animación de la verificación del código (OTP)
+## 5. Animación de la verificación del código (OTP) — ✅ HECHA (2026-09-25)
+
+**Hecho:** `src/components/admin/CasillasOtp.tsx` (+ `.module.css`), usado en `src/app/acceso-panel/page.tsx`. Ver la entrada del 2026-09-25 en `MEMORY.md`. Si se cambia a TOTP (tarea 4), el mismo componente sirve sin cambios.
 
 **Por qué:** el propietario compartió una referencia visual (video en `C:\Users\Sthan\Escritorio\para antigravity`, componente "OTP Verification"): casillas con brillo en la activa, dígitos que entran animados y, al completar, los dígitos se juntan en el centro con un destello, la tarjeta cambia de color y aparece un check dentro de un anillo luminoso con botón "Continuar". Se hará primero en Origgo y luego aquí, con los colores de Desmulta.
 

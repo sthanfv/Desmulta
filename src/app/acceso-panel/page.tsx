@@ -29,6 +29,11 @@ import { Loader2, LogIn, Eye, EyeOff, ArrowLeft, KeyRound, RefreshCw, Clock } fr
 import { useToast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger/security-logger';
 import { cn } from '@/lib/utils';
+import {
+  CasillasOtp,
+  prefiereMenosMovimiento,
+  type EstadoOtp,
+} from '@/components/admin/CasillasOtp';
 
 // ── Máquina de estados del flujo de autenticación ────────────────────────────
 type AuthPhase =
@@ -93,13 +98,13 @@ export default function AccesoPanel() {
   // ── Estado del modal OTP ──────────────────────────────────────────────────
   // tempToken: almacenado SOLO en estado de React (nunca en localStorage/sessionStorage)
   const [tempToken, setTempToken] = useState<string | null>(null);
-  const [digits, setDigits] = useState<string[]>(['', '', '', '', '', '']);
+  const [otpCode, setOtpCode] = useState('');
+  // Estado visual de la animación de las casillas (ver CasillasOtp)
+  const [estadoOtp, setEstadoOtp] = useState<EstadoOtp>('normal');
   const [expiresAt, setExpiresAt] = useState<number>(0);
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [otpCooldown, setOtpCooldown] = useState<number>(0);
 
-  // Refs para los 6 inputs del OTP (autofocus secuencial entre dígitos)
-  const inputRefs = useRef<Array<HTMLInputElement | null>>(Array(6).fill(null));
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // ── Sincronizar usuarios ya autenticados (solo en fase idle) ──────────────
@@ -132,7 +137,8 @@ export default function AccesoPanel() {
     if (timerRef.current) clearInterval(timerRef.current);
     setPhase('idle');
     setTempToken(null);
-    setDigits(['', '', '', '', '', '']);
+    setOtpCode('');
+    setEstadoOtp('normal');
     setExpiresAt(0);
     setTimeLeft(0);
     setOtpCooldown(0);
@@ -199,11 +205,11 @@ export default function AccesoPanel() {
     setExpiresAt(expiry);
     setTimeLeft(120);
     setOtpCooldown(60);
-    setDigits(['', '', '', '', '', '']);
+    setOtpCode('');
+    setEstadoOtp('normal');
     setPhase('awaiting_otp');
 
     // Auto-focus al primer dígito del OTP
-    setTimeout(() => inputRefs.current[0]?.focus(), 100);
   }, []);
 
   // ── Handler: Login con email y contraseña ─────────────────────────────────
@@ -254,11 +260,14 @@ export default function AccesoPanel() {
   };
 
   // ── Handler: Verificar OTP — llama a /api/auth/verify-otp ────────────────
-  const handleVerifyOtp = async (e: React.FormEvent) => {
+  const handleVerifyOtp = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!tempToken) return;
+    verificarCodigo(otpCode);
+  };
 
-    const code = digits.join('');
+  const verificarCodigo = async (code: string) => {
+    if (!tempToken || phase === 'verifying' || phase === 'success') return;
+
     if (code.length !== 6) {
       toast({
         variant: 'destructive',
@@ -269,6 +278,7 @@ export default function AccesoPanel() {
     }
 
     setPhase('verifying');
+    setEstadoOtp('verificando');
 
     try {
       // Fase 2: Verificación final — AQUÍ se emiten __session + admin-2fa-token
@@ -284,6 +294,7 @@ export default function AccesoPanel() {
       }
 
       setPhase('success');
+      setEstadoOtp('exito');
       toast({
         title: '✅ Acceso autorizado',
         description: 'Verificación de doble factor completada.',
@@ -295,6 +306,9 @@ export default function AccesoPanel() {
       // En lugar de un delay fijo e impredecible, se usa un mecanismo de reintento con
       // backoff exponencial que verifica activamente si el servidor ya reconoce la sesión
       // antes de navegar. Esto es robusto ante redes lentas o navegadores con carga alta.
+      const animacionMinima = new Promise((r) =>
+        setTimeout(r, prefiereMenosMovimiento() ? 300 : 1100)
+      );
       const MAX_RETRIES = 5;
       const BASE_DELAY_MS = 200;
       let adminAccessible = false;
@@ -314,14 +328,20 @@ export default function AccesoPanel() {
         }
       }
 
+      // Se deja ver el check (anillo luminoso) antes de navegar.
+      await animacionMinima;
+
       // Recarga completa (no client-side navigation) para que el middleware
       // de Next.js lea el nuevo estado de cookies desde el servidor.
       window.location.href = '/admin' + window.location.search;
     } catch (error: unknown) {
-      // Regresar a la fase de espera y limpiar los dígitos para reintento
+      // Las casillas vuelven en rojo y se sacuden; luego se vacían para reintentar
+      // (al vaciarse, CasillasOtp devuelve el foco a la primera).
       setPhase('awaiting_otp');
-      setDigits(['', '', '', '', '', '']);
-      setTimeout(() => inputRefs.current[0]?.focus(), 100);
+      setEstadoOtp('error');
+      await new Promise((r) => setTimeout(r, prefiereMenosMovimiento() ? 0 : 650));
+      setOtpCode('');
+      setEstadoOtp('normal');
 
       toast({
         variant: 'destructive',
@@ -354,51 +374,9 @@ export default function AccesoPanel() {
 
   // ── Handler: Cancelar flujo de OTP ───────────────────────────────────────
   const handleCancelOtp = async () => {
-    if (phase === 'verifying') return; // No cancelar mientras verifica
+    if (phase === 'verifying' || phase === 'success') return; // No cancelar mientras verifica
     if (auth) await auth.signOut().catch(() => {});
     resetToIdle();
-  };
-
-  // ── Handlers de los 6 inputs del OTP ─────────────────────────────────────
-
-  const handleDigitChange = (index: number, value: string) => {
-    const digit = value.replace(/\D/g, '').slice(-1);
-    const newDigits = [...digits];
-    newDigits[index] = digit;
-    setDigits(newDigits);
-    // Avanzar foco automáticamente al siguiente dígito
-    if (digit && index < 5) {
-      inputRefs.current[index + 1]?.focus();
-    }
-  };
-
-  const handleDigitKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Backspace') {
-      if (digits[index]) {
-        const newDigits = [...digits];
-        newDigits[index] = '';
-        setDigits(newDigits);
-      } else if (index > 0) {
-        inputRefs.current[index - 1]?.focus();
-      }
-    } else if (e.key === 'ArrowLeft' && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    } else if (e.key === 'ArrowRight' && index < 5) {
-      inputRefs.current[index + 1]?.focus();
-    }
-  };
-
-  const handleDigitPaste = (e: React.ClipboardEvent) => {
-    e.preventDefault();
-    const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
-    const newDigits = ['', '', '', '', '', ''];
-    pasted.split('').forEach((char, i) => {
-      newDigits[i] = char;
-    });
-    setDigits(newDigits);
-    // Foco al último dígito pegado o al primero vacío
-    const focusIndex = Math.min(pasted.length, 5);
-    inputRefs.current[focusIndex]?.focus();
   };
 
   // ── Handler: Restablecimiento de contraseña ───────────────────────────────
@@ -432,10 +410,9 @@ export default function AccesoPanel() {
   }
 
   // ── Variables de renderizado ──────────────────────────────────────────────
-  const isOtpPhase = phase === 'awaiting_otp' || phase === 'verifying';
+  // 'success' mantiene el modal abierto para mostrar el check antes de navegar al panel.
+  const isOtpPhase = phase === 'awaiting_otp' || phase === 'verifying' || phase === 'success';
   const isFormBusy = phase === 'authenticating' || phase === 'pre_login' || phase === 'success';
-
-  const otpCode = digits.join('');
 
   // Color del countdown según urgencia temporal
   const countdownColorClass =
@@ -590,7 +567,13 @@ export default function AccesoPanel() {
           // Solo el botón "Cancelar" puede cerrar el flujo explícitamente
         >
           <div
-            className="w-full max-w-sm rounded-2xl border border-border bg-card p-8 shadow-2xl relative overflow-hidden animate-in zoom-in-95 duration-200"
+            className={cn(
+              'w-full max-w-sm rounded-2xl border border-border bg-card p-8 shadow-2xl relative overflow-hidden animate-in zoom-in-95 duration-200',
+              'transition-[border-color,box-shadow] duration-500',
+              // Al acertar, la tarjeta se ilumina con el color de marca (como en la referencia)
+              phase === 'success' &&
+                'border-primary/60 shadow-[0_0_48px_-10px_hsl(var(--primary)/0.55)]'
+            )}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Glow decorativo de fondo */}
@@ -622,44 +605,25 @@ export default function AccesoPanel() {
             </div>
 
             <form onSubmit={handleVerifyOtp} className="space-y-4">
-              {/* 6 inputs separados con autofocus secuencial */}
-              <div className="flex justify-center gap-2" onPaste={handleDigitPaste}>
-                {digits.map((digit, index) => (
-                  <input
-                    key={index}
-                    ref={(el) => {
-                      inputRefs.current[index] = el;
-                    }}
-                    type="text"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    maxLength={1}
-                    value={digit}
-                    onChange={(e) => handleDigitChange(index, e.target.value)}
-                    onKeyDown={(e) => handleDigitKeyDown(index, e)}
-                    disabled={phase === 'verifying'}
-                    className={cn(
-                      'w-10 h-12 rounded-xl border-2 bg-background text-center text-lg font-bold',
-                      'transition-all duration-150 outline-none select-none',
-                      'focus:border-primary focus:shadow-[0_0_10px_rgba(255,191,0,0.15)]',
-                      digit
-                        ? 'border-zinc-500 text-foreground dark:border-zinc-400'
-                        : 'border-border text-transparent',
-                      phase === 'verifying' && 'opacity-50 cursor-not-allowed'
-                    )}
-                    aria-label={`Dígito ${index + 1} del código de verificación`}
-                  />
-                ))}
-              </div>
+              {/* 6 casillas animadas: se envían solas al completarse */}
+              <CasillasOtp
+                valor={otpCode}
+                onCambio={setOtpCode}
+                onCompleto={verificarCodigo}
+                estado={estadoOtp}
+                deshabilitado={phase !== 'awaiting_otp'}
+              />
 
               {/* Botones de acción */}
               <div className="flex flex-col gap-2 pt-1">
                 <Button
                   type="submit"
                   className="w-full rounded-xl py-5"
-                  disabled={phase === 'verifying' || otpCode.length !== 6}
+                  disabled={phase !== 'awaiting_otp' || otpCode.length !== 6}
                 >
-                  {phase === 'verifying' ? (
+                  {phase === 'success' ? (
+                    'Código correcto'
+                  ) : phase === 'verifying' ? (
                     <>
                       <Loader2 className="animate-spin mr-2 h-4 w-4" />
                       Verificando código...
@@ -673,7 +637,7 @@ export default function AccesoPanel() {
                   type="button"
                   variant="outline"
                   onClick={handleResendOtp}
-                  disabled={otpCooldown > 0 || phase === 'verifying'}
+                  disabled={otpCooldown > 0 || phase !== 'awaiting_otp'}
                   className="w-full rounded-xl py-5 border-border/60 hover:bg-muted text-xs gap-2"
                 >
                   <RefreshCw className="h-3.5 w-3.5" />
@@ -687,7 +651,7 @@ export default function AccesoPanel() {
               <button
                 type="button"
                 onClick={handleCancelOtp}
-                disabled={phase === 'verifying'}
+                disabled={phase !== 'awaiting_otp'}
                 className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />

@@ -1,0 +1,188 @@
+/*
+ * Animación del código de verificación (ver CasillasOtp.tsx).
+ * Colores de Desmulta: ámbar de marca (--primary) y rojo para el error.
+ * Solo transform/opacity para que el navegador la haga en la GPU.
+ */
+
+.otp {
+  position: relative;
+  --otp-rojo: 0 84% 60%;
+}
+
+.casillas {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.casilla {
+  width: 2.75rem;
+  height: 3.25rem;
+  border-radius: 0.75rem;
+  border: 2px solid hsl(var(--border));
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 700;
+  caret-color: hsl(var(--primary));
+  outline: none;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.42s cubic-bezier(0.65, 0, 0.35, 1),
+    opacity 0.42s ease;
+}
+
+.casilla:focus {
+  border-color: hsl(var(--primary));
+  box-shadow: 0 0 0 4px hsl(var(--primary) / 0.18);
+}
+
+.casilla:focus:not(.llena) {
+  animation: brillo 1.6s ease-in-out infinite;
+}
+
+.llena {
+  border-color: hsl(var(--primary) / 0.55);
+  animation: entraDigito 0.24s cubic-bezier(0.3, 1.5, 0.6, 1);
+}
+
+@keyframes brillo {
+  50% {
+    box-shadow:
+      0 0 0 4px hsl(var(--primary) / 0.22),
+      0 0 22px 2px hsl(var(--primary) / 0.4);
+  }
+}
+
+@keyframes entraDigito {
+  from {
+    transform: translateY(6px) scale(0.86);
+  }
+}
+
+/* Verificando: cada casilla viaja al centro (la distancia depende de su posición --i). */
+.otp[data-estado='verificando'] .casilla,
+.otp[data-estado='exito'] .casilla {
+  transform: translateX(calc((2.5 - var(--i)) * (100% + 8px))) scale(0.5);
+  opacity: 0;
+}
+
+.centro {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.centro > * {
+  grid-area: 1 / 1;
+}
+
+.destello {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff 0%, hsl(var(--primary)) 45%, transparent 72%);
+  box-shadow: 0 0 26px 8px hsl(var(--primary) / 0.5);
+  opacity: 0;
+  transform: scale(0);
+  transition:
+    opacity 0.2s ease,
+    transform 0.3s ease;
+}
+
+.otp[data-estado='verificando'] .destello {
+  opacity: 1;
+  transform: scale(1);
+  transition-delay: 0.3s;
+  animation: latido 1s ease-in-out 0.55s infinite;
+}
+
+@keyframes latido {
+  50% {
+    transform: scale(1.4);
+    box-shadow: 0 0 40px 14px hsl(var(--primary) / 0.32);
+  }
+}
+
+/* Correcto: el anillo y el check se dibujan (stroke-dashoffset). */
+.check {
+  width: 60px;
+  height: 60px;
+  overflow: visible;
+  opacity: 0;
+  transform: scale(0.6);
+}
+
+.check circle {
+  fill: hsl(var(--primary) / 0.14);
+  stroke: hsl(var(--primary));
+  stroke-width: 2.5;
+  stroke-dasharray: 158;
+}
+
+.check path {
+  fill: none;
+  stroke: hsl(var(--primary));
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 34;
+}
+
+.otp[data-estado='exito'] .check {
+  opacity: 1;
+  transform: scale(1);
+  filter: drop-shadow(0 0 12px hsl(var(--primary) / 0.65));
+  transition:
+    opacity 0.2s ease,
+    transform 0.5s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+.otp[data-estado='exito'] .check circle {
+  animation: trazoAnillo 0.5s ease-out both;
+}
+
+.otp[data-estado='exito'] .check path {
+  animation: trazoCheck 0.35s ease-out 0.35s both;
+}
+
+@keyframes trazoAnillo {
+  from {
+    stroke-dashoffset: 158;
+  }
+}
+
+@keyframes trazoCheck {
+  from {
+    stroke-dashoffset: 34;
+  }
+}
+
+/* Incorrecto: las casillas vuelven a su sitio en rojo y se sacuden. */
+.otp[data-estado='error'] .casillas {
+  animation: sacudida 0.45s ease;
+}
+
+.otp[data-estado='error'] .casilla {
+  border-color: hsl(var(--otp-rojo));
+  box-shadow: 0 0 0 4px hsl(var(--otp-rojo) / 0.16);
+}
+
+@keyframes sacudida {
+  20% {
+    transform: translateX(-9px);
+  }
+  40% {
+    transform: translateX(8px);
+  }
+  60% {
+    transform: translateX(-5px);
+  }
+  80% {
+    transform: translateX(3px);
+  }
+}

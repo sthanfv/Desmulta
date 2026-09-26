@@ -34,6 +34,13 @@
 
 ## 📜 Historial Reciente (Últimos Cambios Clave)
 
+### [2026-09-25] - Animación del código de verificación del panel (tarea 5 de los pendientes)
+
+- **Qué:** en `/acceso-panel`, el código que llega por correo ahora se escribe en casillas animadas: la activa brilla, cada dígito entra con un rebote y, al completar los 6, se envía solo; los dígitos se juntan en el centro con un destello que late mientras verifica; si es correcto, la tarjeta se ilumina en ámbar y se dibuja un check dentro de un anillo luminoso (~1 s) antes de entrar al panel; si es incorrecto, las casillas se sacuden en rojo, se vacían y el foco vuelve a la primera.
+- **Cómo (estándar):** componente reutilizable `src/components/admin/CasillasOtp.tsx` + `CasillasOtp.module.css`, solo CSS con `transform`/`opacity` (sin librerías), estados por `data-estado` (`normal`, `verificando`, `exito`, `error`), aviso para lectores de pantalla (`role="status"`) y respeto de `prefers-reduced-motion`. Es el mismo sistema del panel de Origgo con los colores de Desmulta. La navegación al panel espera en paralelo la comprobación de la sesión y el check, así que no suma demora.
+- **Archivos:** `src/app/acceso-panel/page.tsx` (usa el componente; se quitaron los manejadores propios de las casillas; la fase `success` mantiene el modal para mostrar el check), `src/components/admin/CasillasOtp.tsx`, `src/components/admin/CasillasOtp.module.css`, `src/tests/CasillasOtp.test.tsx` (4 pruebas), `docs/PENDIENTES_PANEL_ADMIN.md`.
+- **Verificado (validación proporcional):** `tsc` y eslint limpios, `vitest run src/tests/CasillasOtp.test.tsx` 4/4, `npm run build` OK.
+
 ### [2026-09-24] - Cifras públicas honestas
 
 - `/referidos`: se quitaron los avatares de relleno y "Más de 500+ usuarios referidos este mes" (el propietario confirmó que hay 1 referido; la cifra era para generar urgencia). Ahora dice "Programa exclusivo para clientes de Desmulta".
@@ -177,7 +184,7 @@
 
 ## 🎯 Metas Pendientes / Tareas a Seguir (Actualizado: 2026-09-24)
 
-- **▶ PRÓXIMA SESIÓN — empezar aquí:** [docs/PENDIENTES_PANEL_ADMIN.md](docs/PENDIENTES_PANEL_ADMIN.md). Tres funciones del panel acordadas con el propietario, en orden: (1) borrar los datos de una persona a pedido (Ley 1581, obligatorio), (2) cambiar precios desde el panel, (3) ocultar o aprobar artículos del blog desde el panel, (4) segundo factor del admin con app autenticadora TOTP en vez de código por correo (reutilizar lo hecho en Origgo).
+- **▶ PRÓXIMA SESIÓN — empezar aquí:** [docs/PENDIENTES_PANEL_ADMIN.md](docs/PENDIENTES_PANEL_ADMIN.md). Tres funciones del panel acordadas con el propietario, en orden: (1) borrar los datos de una persona a pedido (Ley 1581, obligatorio), (2) cambiar precios desde el panel, (3) ocultar o aprobar artículos del blog desde el panel, (4) segundo factor del admin con app autenticadora TOTP en vez de código por correo (reutilizar lo hecho en Origgo). La (5), animación del código, quedó hecha el 2026-09-25.
 - **Seguridad:** generar una clave nueva de Gemini en AI Studio (las actuales quedaron expuestas en una conversación) y revocar la API key del scraper SIMIT, que sigue en el historial de Git.
 - **Vercel:** confirmar `GEMINI_API_KEY` nueva (OCR) y, opcional, `GEMINI_OCR_MODEL`.
 - **GitHub Actions:** la cuenta de GitHub está **bloqueada por facturación** ("account is locked due to a billing issue"); resolver en github.com/settings/billing. Secreto `GEMINI_API_KEY` ya creado. CD necesita además `FIREBASE_TOKEN`.
