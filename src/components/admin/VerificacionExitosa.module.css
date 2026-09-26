@@ -1,7 +1,7 @@
 /*
  * La tarjeta del código se transforma al verificar (referencia "OTP Verification"):
- * el contenido se desenfoca y desaparece, la tarjeta se llena de un resplandor verde-azulado
- * desde abajo, un sello pequeño crece, se dibuja el check con su halo y aparece "Continuar".
+ * el contenido se desenfoca y desaparece, la tarjeta se llena de un resplandor ÁMBAR (color de
+ * marca de Desmulta, --primary; nunca los colores de Origgo) desde abajo, un sello pequeño crece, se dibuja el check con su halo y aparece "Continuar".
  * Ver VerificacionExitosa.tsx. Solo transform/opacity/filter.
  */
 
@@ -21,19 +21,19 @@
   background:
     radial-gradient(
       90% 70% at 50% 100%,
-      hsl(168 80% 45% / 0.55),
-      hsl(168 75% 32% / 0.2) 50%,
+      hsl(var(--primary) / 0.55),
+      hsl(var(--primary) / 0.2) 50%,
       transparent 78%
     ),
-    radial-gradient(40% 30% at 50% 62%, hsl(168 85% 55% / 0.28), transparent 70%);
+    radial-gradient(40% 30% at 50% 62%, hsl(var(--primary) / 0.28), transparent 70%);
   opacity: 0;
   transition: opacity 0.8s ease 0.2s;
   pointer-events: none;
 }
 
 .tarjeta[data-estado='exito'] {
-  border-color: hsl(168 70% 55% / 0.45);
-  box-shadow: 0 0 60px -12px hsl(168 80% 45% / 0.55);
+  border-color: hsl(var(--primary) / 0.45);
+  box-shadow: 0 0 60px -12px hsl(var(--primary) / 0.55);
 }
 
 .tarjeta[data-estado='exito']::after {
@@ -94,11 +94,11 @@
   height: 84px;
   margin: 14px 0 10px;
   border-radius: 24px;
-  border: 2px solid hsl(168 80% 58% / 0.95);
-  background: linear-gradient(160deg, hsl(168 60% 22% / 0.9), hsl(168 70% 12% / 0.95));
+  border: 2px solid hsl(var(--primary) / 0.95);
+  background: linear-gradient(160deg, hsl(var(--primary) / 0.22), hsl(var(--card)) 70%);
   box-shadow:
-    0 0 0 1px hsl(168 80% 60% / 0.2) inset,
-    0 0 44px 6px hsl(168 80% 48% / 0.5);
+    0 0 0 1px hsl(var(--primary) / 0.2) inset,
+    0 0 44px 6px hsl(var(--primary) / 0.5);
   animation: selloCrece 0.7s cubic-bezier(0.3, 1.35, 0.5, 1) 0.55s both;
 }
 
@@ -107,8 +107,8 @@
   position: absolute;
   inset: -12px;
   border-radius: 32px;
-  border: 1.5px solid hsl(168 80% 60% / 0.35);
-  box-shadow: 0 0 22px hsl(168 80% 50% / 0.25);
+  border: 1.5px solid hsl(var(--primary) / 0.35);
+  box-shadow: 0 0 22px hsl(var(--primary) / 0.25);
   animation: halo 0.7s ease-out 1.05s both;
 }
 
@@ -116,7 +116,7 @@
   width: 44px;
   height: 44px;
   fill: none;
-  stroke: #ecfdf5;
+  stroke: hsl(var(--primary));
   stroke-width: 2.6;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -151,14 +151,14 @@
 .continuar {
   min-width: 170px;
   padding: 12px 28px;
-  border: 1.5px solid hsl(168 90% 75% / 0.9);
+  border: 1.5px solid hsl(var(--primary) / 0.9);
   border-radius: 999px;
-  background: linear-gradient(180deg, #5eead4, #14b8a6);
-  color: #042f2e;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
   font-weight: 800;
   font-size: 0.95rem;
   cursor: pointer;
-  box-shadow: 0 0 28px -2px hsl(172 80% 50% / 0.6);
+  box-shadow: 0 0 28px -2px hsl(var(--primary) / 0.6);
   animation: aparece 0.5s ease 1.3s both;
   transition:
     transform 0.15s ease,
@@ -168,7 +168,7 @@
 
 .continuar:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 0 38px 0 hsl(172 80% 55% / 0.75);
+  box-shadow: 0 0 38px 0 hsl(var(--primary) / 0.75);
 }
 
 .continuar:disabled {
@@ -177,6 +177,38 @@
 }
 
 .continuar:focus-visible {
-  outline: 3px solid hsl(168 90% 75% / 0.6);
+  outline: 3px solid hsl(var(--primary) / 0.6);
   outline-offset: 3px;
+}
+
+/* Movimiento reducido (Windows con "Efectos de animación" apagados): se REDUCE, no se elimina
+   (WCAG 2.3.3). Se quitan escalas y desenfoques; se mantienen los fundidos y el resplandor. */
+@media (prefers-reduced-motion: reduce) {
+  .tarjeta::after {
+    transition: opacity 0.6s ease !important;
+  }
+  .vistaCodigo {
+    transition: opacity 0.4s ease !important;
+  }
+  .tarjeta[data-estado='exito'] .vistaCodigo {
+    filter: none;
+    transform: none;
+  }
+  .aparece,
+  .sello,
+  .continuar {
+    animation: soloAparece 0.5s ease 0.3s both !important;
+  }
+  .sello::after {
+    animation: soloAparece 0.5s ease 0.6s both !important;
+  }
+  .sello svg {
+    animation: trazoCheck 0.4s ease-out 0.5s both !important;
+  }
+}
+
+@keyframes soloAparece {
+  from {
+    opacity: 0;
+  }
 }

@@ -118,3 +118,29 @@
     transform: translateX(3px);
   }
 }
+
+/* Movimiento reducido: sin desplazamientos ni sacudidas; se mantienen el brillo de la casilla
+   activa y una onda solo de luz (sin desenfoque) mientras se verifica. */
+@media (prefers-reduced-motion: reduce) {
+  .casilla:focus:not(.llena) {
+    animation: brillo 2s ease-in-out infinite !important;
+  }
+  .llena {
+    animation: none !important;
+  }
+  .otp[data-estado='verificando'] .casilla,
+  .otp[data-estado='exito'] .casilla {
+    animation: ondaSuave 1.2s ease-in-out infinite !important;
+    animation-delay: calc(var(--i) * 150ms) !important;
+  }
+  .otp[data-estado='error'] .casillas {
+    animation: none !important;
+  }
+}
+
+@keyframes ondaSuave {
+  35% {
+    border-color: hsl(var(--primary));
+    box-shadow: 0 0 22px 3px hsl(var(--primary) / 0.45);
+  }
+}

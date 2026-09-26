@@ -34,6 +34,13 @@
 
 ## 📜 Historial Reciente (Últimos Cambios Clave)
 
+### [2026-09-26] - Colores de Desmulta en la verificación y movimiento reducido "reducir, no eliminar"
+
+- **Hallazgo (confirmado en el PC del propietario):** Windows tiene los "Efectos de animación" apagados (`SPI_GETCLIENTAREAANIMATION = False`), así que Chrome envía `prefers-reduced-motion: reduce` y la regla global de `globals.css` apagaba TODAS las animaciones, incluido el spinner (`animate-spin`). Por eso el propietario no veía ninguna animación.
+- **Arreglo (WCAG 2.3.3: reducir, no eliminar):** con movimiento reducido el spinner sigue girando (más lento) y el código de verificación mantiene fundidos, brillo de la casilla activa, onda solo de luz, sello, check y botón; se quitan escalas, sacudidas y desenfoques.
+- **Colores:** el estado "Código verificado" usaba el verde azulado de Origgo; ahora usa el ámbar de Desmulta (`--primary`). Regla: cada marca con su paleta.
+- **Archivos:** `src/components/admin/VerificacionExitosa.module.css`, `src/components/admin/CasillasOtp.module.css`, `src/app/globals.css`. Verificado con capturas emulando movimiento reducido; build OK.
+
 ### [2026-09-26] - Animación del código fiel a la referencia y cierre de sesión por inactividad (estándar OWASP/NIST)
 
 - **Por qué:** el propietario revisó los paneles en producción y la animación anterior no se notaba ni se parecía a la referencia (video "OTP Verification" en `C:/Users/Sthan/Escritorio/para antigravity`). También pidió cerrar la sesión por inactividad "como lo hacen los profesionales".

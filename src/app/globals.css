@@ -506,6 +506,13 @@
   [role='button'] {
     transition-duration: 150ms !important;
   }
+
+  /* Los indicadores de carga son información, no decoración (WCAG 2.3.3): siguen girando,
+     más despacio. Antes se detenían y parecía que la página no respondía. */
+  .animate-spin {
+    animation-duration: 1.6s !important;
+    animation-iteration-count: infinite !important;
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {
